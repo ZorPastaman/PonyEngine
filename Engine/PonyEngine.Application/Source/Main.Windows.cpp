@@ -38,24 +38,40 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 			std::unique_ptr<PonyEngine::Main::App> app = CreateApp();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creating application done.");
 
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop start.");
-			bool shouldExit = false;
-			while (!shouldExit)
+			try
 			{
-				PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Ticking application.");
-				shouldExit = app->Tick(exitCode);
-
-				if (!shouldExit) [[likely]]
+				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop start.");
+				bool shouldExit = false;
+				while (!shouldExit)
 				{
-					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Checking for quit message.");
-					shouldExit = PonyEngine::Main::Windows::CheckForQuit(exitCode);
-				}
-			}
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop finish. Exit code: '{}'.", exitCode);
+					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Ticking application.");
+					shouldExit = app->Tick(exitCode);
 
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroying application...");
+					if (!shouldExit) [[likely]]
+					{
+						PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Checking for quit message.");
+						shouldExit = PonyEngine::Main::Windows::CheckForQuit(exitCode);
+					}
+				}
+				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop finish. Exit code: '{}'.", exitCode);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_CONSOLE_E(e, "On application tick.");
+				MessageBoxA(nullptr, PonyEngine::Utility::SafeFormat("Exception on application tick: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
+
+				exitCode = PonyEngine::Main::ExitCodes::TickException;
+			}
+			catch (...)
+			{
+				PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception on application tick.");
+				MessageBoxA(nullptr, "Exception on application tick.", "PonyEngine exception", MB_OK | MB_ICONERROR);
+
+				exitCode = PonyEngine::Main::ExitCodes::TickException;
+			}
+
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Releasing application.");
 			app.reset();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroying application done.");
 		}
 		catch (const std::exception& e)
 		{
@@ -66,7 +82,7 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 		}
 		catch (...)
 		{
-			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception - on application.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception on application.");
 			MessageBoxA(nullptr, "Exception on application.", "PonyEngine exception", MB_OK | MB_ICONERROR);
 
 			exitCode = PonyEngine::Main::ExitCodes::ApplicationException;
@@ -85,7 +101,7 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 	}
 	catch (...)
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception - on main.");
+		PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception on main.");
 		MessageBoxA(nullptr, "Unknown exception on main.", "PonyEngine exception", MB_OK | MB_ICONERROR);
 
 		exitCode = PonyEngine::Main::ExitCodes::MainException;

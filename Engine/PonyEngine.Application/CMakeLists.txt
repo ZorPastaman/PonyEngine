@@ -65,8 +65,10 @@ endif()
 target_compile_definitions(PonyEngine.Application PRIVATE PONY_COMPANY_NAME=${PONY_COMPANY_NAME} PONY_PROJECT_NAME=${PONY_PROJECT_NAME})
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Application PROPERTIES CXX_STANDARD 23)
-set_target_properties(PonyEngine.Application PROPERTIES OUTPUT_NAME "${PONY_PROJECT_NAME}")
+set_target_properties(PonyEngine.Application PROPERTIES 
+	CXX_STANDARD 23
+	OUTPUT_NAME "${PONY_PROJECT_NAME}"
+)
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Application PRIVATE

@@ -27,7 +27,7 @@ export namespace PonyEngine::Log
 		/// @brief Begins logging.
 		virtual void Begin() = 0;
 		/// @brief Ends logging.
-		virtual void End() noexcept = 0;
+		virtual void End() = 0;
 
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.

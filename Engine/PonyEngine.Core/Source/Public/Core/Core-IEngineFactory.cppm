@@ -26,9 +26,8 @@ export namespace PonyEngine::Core
 		INTERFACE_BODY(IEngineFactory)
 
 		/// @brief Creates an engine.
-		/// @param context Module context.
 		/// @return Created engine.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<IEngine> Create(const IModuleContext& context) = 0;
+		virtual std::shared_ptr<IEngine> Create() = 0;
 	};
 }

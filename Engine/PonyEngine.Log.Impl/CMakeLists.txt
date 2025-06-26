@@ -149,8 +149,10 @@ if(NOT PONY_FORCE_STATIC)
 endif()
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Log.Impl PROPERTIES CXX_STANDARD 23)
-set_target_properties(PonyEngine.Log.Impl PROPERTIES OUTPUT_NAME "PonyEngine.Log")
+set_target_properties(PonyEngine.Log.Impl PROPERTIES 
+	CXX_STANDARD 23
+	OUTPUT_NAME "PonyEngine.Log"
+)
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Impl PRIVATE

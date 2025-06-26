@@ -132,6 +132,12 @@ export namespace PonyEngine::Main
 			bool allowAdds;
 		};
 
+		/// @brief Initializes the application.
+		void Initialize();
+		/// @brief Finalizes the application.
+		/// @param lastModule Last module pointer.
+		void Finalize(std::uintptr_t lastModule) noexcept;
+
 		/// @brief Start up modules.
 		/// @param start Start pointer.
 		/// @param end End pointer.
@@ -141,10 +147,6 @@ export namespace PonyEngine::Main
 		/// @param start Start pointer.
 		/// @param end End pointer.
 		void ShutdownModules(std::uintptr_t start, std::uintptr_t end) const noexcept;
-
-		/// @brief Finalizes the application.
-		/// @param lastModule Last module pointer.
-		void Finalize(std::uintptr_t lastModule) noexcept;
 
 		/// @brief Checks if logger modules are correct.
 		/// @param loggerPhase Is this a logger phase now?
@@ -158,6 +160,9 @@ export namespace PonyEngine::Main
 		/// @brief Creates an engine.
 		void CreateEngine();
 
+		AppContext appContext; ///< Application context.
+		ModuleContext moduleContext; ///< Module context.
+
 		Application::ApplicationPaths paths; ///< Application paths.
 
 		std::shared_ptr<DefaultLogger> defaultLogger; ///< Default logger.
@@ -166,9 +171,6 @@ export namespace PonyEngine::Main
 
 		std::shared_ptr<Core::IEngine> engine; ///< Engine.
 		Engine::IEngine* publicEngine; ///< Public engine from the engine.
-
-		AppContext appContext; ///< Application context.
-		ModuleContext moduleContext; ///< Module context.
 	};
 }
 
@@ -181,6 +183,8 @@ namespace PonyEngine::Main
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::IModule** LastModule = nullptr;
 
 	App::App(const PlatformPaths& platformPaths) :
+		appContext(*this),
+		moduleContext(appContext),
 		paths
 		{
 			.gameData = platformPaths.gameData,
@@ -191,70 +195,13 @@ namespace PonyEngine::Main
 		defaultLogger(std::make_shared<DefaultLogger>()),
 		logger(defaultLogger),
 		publicLogger{&logger->PublicLogger()},
-		publicEngine{nullptr},
-		appContext(*this),
-		moduleContext(appContext)
+		publicEngine{nullptr}
 	{
 		PONY_LOG(*publicLogger, Log::LogType::Info, "Creating data directories.");
 		std::filesystem::create_directories(paths.localData);
 		std::filesystem::create_directories(paths.userData);
 
-		std::uintptr_t lastStartedModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
-
-		try
-		{
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up modules...");
-
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up log modules.");
-			moduleContext.AllowAdds(true);
-			StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LogCheckpoint), lastStartedModule);
-			moduleContext.AllowAdds(false);
-			CheckForLoggerModule(true);
-			CheckForEngineModule(false);
-			TryCreateLogger();
-			moduleContext.ClearData();
-
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up early engine modules.");
-			moduleContext.AllowAdds(true);
-			StartupModules(reinterpret_cast<std::uintptr_t>(&LogCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint), lastStartedModule);
-			moduleContext.AllowAdds(false);
-			CheckForLoggerModule(false);
-			CheckForEngineModule(false);
-			moduleContext.ClearData();
-
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up engine modules.");
-			moduleContext.AllowAdds(true);
-			StartupModules(reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineCheckpoint), lastStartedModule);
-			moduleContext.AllowAdds(false);
-			CheckForLoggerModule(false);
-			CheckForEngineModule(true);
-			CreateEngine();
-			moduleContext.ClearData();
-
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up late engine modules.");
-			moduleContext.AllowAdds(true);
-			StartupModules(reinterpret_cast<std::uintptr_t>(&EngineCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LastModule), lastStartedModule);
-			moduleContext.AllowAdds(false);
-			CheckForLoggerModule(false);
-			CheckForEngineModule(false);
-			moduleContext.ClearData();
-
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up modules done.");
-		}
-		catch (const std::exception& e)
-		{
-			PONY_LOG_E(*publicLogger, e, "On starting up modules.");
-			Finalize(lastStartedModule);
-
-			throw;
-		}
-		catch (...)
-		{
-			PONY_LOG(*publicLogger, Log::LogType::Exception, "Unknown exception on starting up modules.");
-			Finalize(lastStartedModule);
-
-			throw;
-		}
+		Initialize();
 	}
 
 	App::~App() noexcept
@@ -362,6 +309,10 @@ namespace PonyEngine::Main
 		{
 			throw std::logic_error("Adding data is not allowed at this moment.");
 		}
+		if (!data) [[unlikely]]
+		{
+			throw std::invalid_argument("Data is nullptr.");
+		}
 
 		dataMap[type].push_back(data);
 	}
@@ -379,6 +330,122 @@ namespace PonyEngine::Main
 	void App::ModuleContext::ClearData() noexcept
 	{
 		dataMap.clear();
+	}
+
+	void App::Initialize()
+	{
+		std::uintptr_t lastStartedModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
+		try
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up modules...");
+
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up log modules.");
+			moduleContext.AllowAdds(true);
+			StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LogCheckpoint), lastStartedModule);
+			moduleContext.AllowAdds(false);
+			CheckForLoggerModule(true);
+			CheckForEngineModule(false);
+			TryCreateLogger();
+			moduleContext.ClearData();
+
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up early engine modules.");
+			moduleContext.AllowAdds(true);
+			StartupModules(reinterpret_cast<std::uintptr_t>(&LogCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint), lastStartedModule);
+			moduleContext.AllowAdds(false);
+			CheckForLoggerModule(false);
+			CheckForEngineModule(false);
+			moduleContext.ClearData();
+
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up engine modules.");
+			moduleContext.AllowAdds(true);
+			StartupModules(reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineCheckpoint), lastStartedModule);
+			moduleContext.AllowAdds(false);
+			CheckForLoggerModule(false);
+			CheckForEngineModule(true);
+			CreateEngine();
+			moduleContext.ClearData();
+
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up late engine modules.");
+			moduleContext.AllowAdds(true);
+			StartupModules(reinterpret_cast<std::uintptr_t>(&EngineCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LastModule), lastStartedModule);
+			moduleContext.AllowAdds(false);
+			CheckForLoggerModule(false);
+			CheckForEngineModule(false);
+			moduleContext.ClearData();
+
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Starting up modules done.");
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(*publicLogger, e, "On starting up modules.");
+			Finalize(lastStartedModule);
+
+			throw;
+		}
+		catch (...)
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Exception, "Unknown exception on starting up modules.");
+			Finalize(lastStartedModule);
+
+			throw;
+		}
+	}
+
+	void App::Finalize(std::uintptr_t lastModule) noexcept
+	{
+		PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down modules...");
+
+		if (lastModule > reinterpret_cast<std::uintptr_t>(&EngineCheckpoint))
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down late engine modules.");
+			ShutdownModules(reinterpret_cast<std::uintptr_t>(&EngineCheckpoint), lastModule);
+			lastModule = reinterpret_cast<std::uintptr_t>(&EngineCheckpoint) - sizeof(Core::IModule**);
+		}
+
+		if (engine)
+		{
+			if (engine->IsRunning())
+			{
+				PONY_LOG(*publicLogger, Log::LogType::Info, "Stopping engine...", engine->IsRunning());
+				engine->Stop();
+				PONY_LOG(*publicLogger, Log::LogType::Info, "Stopping engine done. Exit code", engine->ExitCode());
+			}
+
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Releasing engine.");
+			engine.reset();
+		}
+
+		if (lastModule > reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint))
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down engine modules.");
+			ShutdownModules(reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint), lastModule);
+			lastModule = reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint) - sizeof(Core::IModule**);
+		}
+
+		if (lastModule > reinterpret_cast<std::uintptr_t>(&LogCheckpoint))
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down early engine modules.");
+			ShutdownModules(reinterpret_cast<std::uintptr_t>(&LogCheckpoint), lastModule);
+			lastModule = reinterpret_cast<std::uintptr_t>(&LogCheckpoint) - sizeof(Core::IModule**);
+		}
+
+		if (logger != defaultLogger)
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Releasing logger.");
+			std::shared_ptr<Core::ILogger> loggerTemp = logger;
+			logger = defaultLogger;
+			publicLogger = &logger->PublicLogger();
+			loggerTemp.reset();
+		}
+
+		if (lastModule > reinterpret_cast<std::uintptr_t>(&FirstModule))
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down log modules.");
+			ShutdownModules(reinterpret_cast<std::uintptr_t>(&FirstModule), lastModule);
+			lastModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
+		}
+
+		PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down modules done.");
 	}
 
 	void App::StartupModules(const std::uintptr_t start, const std::uintptr_t end, std::uintptr_t& lastStartedModule)
@@ -434,72 +501,17 @@ namespace PonyEngine::Main
 		}
 	}
 
-	void App::Finalize(std::uintptr_t lastModule) noexcept
-	{
-		PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down modules...");
-		if (lastModule > reinterpret_cast<std::uintptr_t>(&EngineCheckpoint))
-		{
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down late engine modules...");
-			ShutdownModules(reinterpret_cast<std::uintptr_t>(&EngineCheckpoint), lastModule);
-			lastModule = reinterpret_cast<std::uintptr_t>(&EngineCheckpoint) - sizeof(Core::IModule**);
-		}
-
-		if (engine)
-		{
-			if (engine->IsRunning())
-			{
-				PONY_LOG(*publicLogger, Log::LogType::Info, "Stopping engine...", engine->IsRunning());
-				engine->Stop();
-				PONY_LOG(*publicLogger, Log::LogType::Info, "Stopping engine done. Exit code", engine->ExitCode());
-			}
-
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Destructing engine...");
-			engine.reset();
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Destructing engine done.");
-		}
-
-		if (lastModule > reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint))
-		{
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down engine modules...");
-			ShutdownModules(reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint), lastModule);
-			lastModule = reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint) - sizeof(Core::IModule**);
-		}
-
-		if (lastModule > reinterpret_cast<std::uintptr_t>(&LogCheckpoint))
-		{
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down early engine modules...");
-			ShutdownModules(reinterpret_cast<std::uintptr_t>(&LogCheckpoint), lastModule);
-			lastModule = reinterpret_cast<std::uintptr_t>(&LogCheckpoint) - sizeof(Core::IModule**);
-		}
-
-		if (logger != defaultLogger)
-		{
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Destructing logger...");
-			logger = defaultLogger;
-			publicLogger = &logger->PublicLogger();
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Destructing logger done.");
-		}
-
-		if (lastModule > reinterpret_cast<std::uintptr_t>(&FirstModule))
-		{
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down log modules...");
-			ShutdownModules(reinterpret_cast<std::uintptr_t>(&FirstModule), lastModule);
-			lastModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
-		}
-		PONY_LOG(*publicLogger, Log::LogType::Info, "Shutting down modules done.");
-	}
-
 	void App::CheckForLoggerModule(const bool loggerPhase) const
 	{
 		if (moduleContext.DataCount(typeid(Core::ILoggerFactory)) > static_cast<std::size_t>(loggerPhase)) [[unlikely]]
 		{
 			if (loggerPhase)
 			{
-				throw std::logic_error("More than 1 logger modules added.");
+				throw std::logic_error("More than 1 logger modules found.");
 			}
 			else
 			{
-				throw std::logic_error("No logger modules allowed out of log module phase.");
+				throw std::logic_error("No logger module allowed out of log module phase.");
 			}
 		}
 	}
@@ -518,13 +530,13 @@ namespace PonyEngine::Main
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(*publicLogger, e, "On creating application logger with '{}' factory.", typeid(*loggerFactory).name());
+				PONY_LOG_E(*publicLogger, e, "On creating application logger. Factory: '{}'.", typeid(*loggerFactory).name());
 
 				throw;
 			}
 			catch (...)
 			{
-				PONY_LOG(*publicLogger, Log::LogType::Exception, "Unknown exception on creating application logger with '{}' factory.", typeid(*loggerFactory).name());
+				PONY_LOG(*publicLogger, Log::LogType::Exception, "Unknown exception on creating application logger. Factory: '{}'.", typeid(*loggerFactory).name());
 
 				throw;
 			}
@@ -536,50 +548,49 @@ namespace PonyEngine::Main
 
 	void App::CheckForEngineModule(const bool enginePhase) const
 	{
-		if (moduleContext.DataCount(typeid(Core::IEngineFactory)) > static_cast<std::size_t>(enginePhase)) [[unlikely]]
+		const std::size_t engineModuleCount = moduleContext.DataCount(typeid(Core::IEngineFactory));
+
+		if (enginePhase)
 		{
-			if (enginePhase)
+			if (engineModuleCount > 1Z) [[unlikely]]
 			{
 				throw std::logic_error("More than 1 engine modules added.");
 			}
-			else
+			if (engineModuleCount < 1Z) [[unlikely]]
 			{
-				throw std::logic_error("No engine modules allowed out of engine module phase.");
+				throw std::logic_error("No engine module found.");
 			}
+		}
+		else if (engineModuleCount > 0Z) [[unlikely]]
+		{
+			throw std::logic_error("No engine module allowed out of engine module phase.");
 		}
 	}
 
 	void App::CreateEngine()
 	{
-		if (moduleContext.DataCount(typeid(Core::IEngineFactory)) > 0Z)
+		const std::shared_ptr<void>& engineFactoryData = moduleContext.GetData(typeid(Core::IEngineFactory), 0Z);
+		const std::shared_ptr<Core::IEngineFactory> engineFactory = std::static_pointer_cast<Core::IEngineFactory>(engineFactoryData);
+
+		PONY_LOG(*publicLogger, Log::LogType::Info, "Creating application engine... Factory: '{}'", typeid(*engineFactory).name());
+		try
 		{
-			const std::shared_ptr<void>& engineFactoryData = moduleContext.GetData(typeid(Core::IEngineFactory), 0Z);
-			const std::shared_ptr<Core::IEngineFactory> engineFactory = std::static_pointer_cast<Core::IEngineFactory>(engineFactoryData);
-
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Creating application engine... Factory: '{}'", typeid(*engineFactory).name());
-			try
-			{
-				engine = engineFactory->Create(moduleContext);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(*publicLogger, e, "On creating application engine with '{}' factory.", typeid(*engineFactory).name());
-
-				throw;
-			}
-			catch (...)
-			{
-				PONY_LOG(*publicLogger, Log::LogType::Exception, "Unknown exception on creating application engine with '{}' factory.", typeid(*engineFactory).name());
-
-				throw;
-			}
-			assert(engine && "The created engine is nullptr!");
-			publicEngine = &engine->PublicEngine();
-			PONY_LOG(*publicLogger, Log::LogType::Info, "Creating application engine done. Engine: '{}'.", typeid(*engine).name());
+			engine = engineFactory->Create();
 		}
-		else
+		catch (const std::exception& e)
 		{
-			throw std::logic_error("No engine factory found.");
+			PONY_LOG_E(*publicLogger, e, "On creating application engine. Factory: '{}'.", typeid(*engineFactory).name());
+
+			throw;
 		}
+		catch (...)
+		{
+			PONY_LOG(*publicLogger, Log::LogType::Exception, "Unknown exception on creating application engine. Factory: '{}'.", typeid(*engineFactory).name());
+
+			throw;
+		}
+		assert(engine && "The created engine is nullptr!");
+		publicEngine = &engine->PublicEngine();
+		PONY_LOG(*publicLogger, Log::LogType::Info, "Creating application engine done. Engine: '{}'.", typeid(*engine).name());
 	}
 }

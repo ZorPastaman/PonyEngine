@@ -27,6 +27,3 @@ endif()
 
 # Set PonyEngine dependencies.
 target_link_libraries(GameSample PRIVATE PonyEngine.Core)
-
-# Add Game module to PonyEngine.
-target_link_libraries(PonyEngine.Application PRIVATE GameSample)

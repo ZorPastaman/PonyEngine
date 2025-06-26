@@ -33,7 +33,7 @@ export namespace PonyEngine::Log
 		~FileSubLogger() noexcept;
 
 		virtual void Begin() override;
-		virtual void End() noexcept override;
+		virtual void End() override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -75,7 +75,7 @@ namespace PonyEngine::Log
 	{
 	}
 
-	void FileSubLogger::End() noexcept
+	void FileSubLogger::End()
 	{
 	}
 
