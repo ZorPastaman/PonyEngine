@@ -123,7 +123,7 @@ endif()
 
 if(NOT PONY_IS_SUBPROJECT AND PONY_ENGINE_ADD_GAME)
 	message(VERBOSE "Adding game")
-	add_subdirectory("Game/MinimalSample/GameSample")
+	add_subdirectory("Game/${PONY_ENGINE_GAME_NAME}/GameSample")
 	pony_set_log_defines(GameSample ${PONY_GAME_LOG_LEVEL} ${PONY_GAME_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 	pony_set_build_options(GameSample ${PONY_GAME_OPTIMIZATION})
 
