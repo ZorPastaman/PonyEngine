@@ -23,6 +23,7 @@
 				"PONY_ENGINE_ENGINE_IMPL": "TRUE",
 				"PONY_ENGINE_APPLICATION": "TRUE",
 				"PONY_ENGINE_ADD_GAME": "TRUE",
+				"PONY_ENGINE_GAME_NAME": "ApplicationModuleSample",
 				"PONY_ENGINE_TESTING": "TRUE"
 			}
 		},
