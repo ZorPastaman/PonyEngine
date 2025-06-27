@@ -13,8 +13,6 @@
 
 import PonyEngine.Core;
 
-#define PONY_ENGINE_CONSOLE_SUBLOGGER_MODULE_NAME PonyEngineConsoleSubLogger
-
 namespace PonyEngine::Log
 {
 	/// @brief Gets the console sub-logger module.

@@ -20,14 +20,19 @@ target_include_directories(PonyEngine.Engine.Impl PUBLIC
 )
 
 message(VERBOSE "Configuring sources")
-#target_sources(PonyEngine.Engine.Impl PUBLIC
-#	"Source/Main.Engine.cpp"
-#)
-#target_sources(PonyEngine.Engine.Impl PRIVATE
-#	"Source/Main.Logger.Impl.cpp"
-#)
+target_sources(PonyEngine.Engine.Impl PUBLIC
+	"Source/Main.Engine.cpp"
+)
+target_sources(PonyEngine.Engine.Impl PRIVATE
+	"Source/Main.Engine.Impl.cpp"
+)
 target_sources(PonyEngine.Engine.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Engine.Core/Engine.Core.cppm"
+	"Source/Private/Engine.Core/Engine.Core-Engine.cppm"
+	"Source/Private/Engine.Core/Engine.Core-EngineFactory.cppm"
+	"Source/Private/Engine.Core/Engine.Core-EngineLogger.cppm"
+	"Source/Private/Engine.Core/Engine.Core-EngineModule.cppm"
+	"Source/Private/Engine.Core/Engine.Core-ExitCodes.cppm"
 	"Source/Private/Engine.Core/Engine.Core-SystemManager.cppm"
 )
 

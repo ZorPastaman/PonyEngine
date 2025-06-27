@@ -10,6 +10,8 @@ include(FetchContent)
 # Set game project.
 project(${PONY_PROJECT_NAME} VERSION ${PONY_PROJECT_VERSION} LANGUAGES CXX)
 
+set(PONY_ENGINE_APPLICATION TRUE)
+
 # Add PonyEngine project.
 FetchContent_Declare(
   PonyEngine

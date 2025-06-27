@@ -10,8 +10,6 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Log/ConsoleModule.h"
-#include "PonyEngine/Utility/Macro.h"
 
 export module PonyEngine.Log.Console:ConsoleSubLoggerModule;
 
@@ -60,6 +58,6 @@ namespace PonyEngine::Log
 
 	std::string_view ConsoleSubLoggerModule::Name() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_ENGINE_CONSOLE_SUBLOGGER_MODULE_NAME);
+		return "PonyEngineConsoleSubLogger";
 	}
 }

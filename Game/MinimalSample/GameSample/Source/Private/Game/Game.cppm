@@ -33,7 +33,7 @@ namespace Game
 	void GameModule::ShutDown(const PonyEngine::Core::IModuleContext& context)
 	{
 		// Add shutdown logic here. The log can be safely removed.
-		PONY_LOG(context.Logger(), PonyEngine::Log::LogType::Info, "Game module shut up.");
+		PONY_LOG(context.Logger(), PonyEngine::Log::LogType::Info, "Game module shut down.");
 	}
 
 	std::string_view GameModule::Name() const noexcept

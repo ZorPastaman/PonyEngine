@@ -7,7 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Core/Module.h"
-#include "PonyEngine/Log/WinCore/PlatformConsoleModule.h"
+#pragma once
 
-PONY_MODULE_LOG(PonyEngine::Log::WinCore::GetPlatformConsoleModule, PonyEngineWinCorePlatformConsoleSubLogger);
+#include "PonyEngine/Utility/Compiler.h"
+
+import PonyEngine.Core;
+
+namespace PonyEngine::Engine
+{
+	/// @brief Gets the engine module.
+	/// @return Engine module.
+	PONY_DLL_EXPORT Core::IModule* GetEngineModule();
+}

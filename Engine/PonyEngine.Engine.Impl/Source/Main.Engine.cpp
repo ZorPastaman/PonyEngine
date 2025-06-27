@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Core/Module.h"
-#include "PonyEngine/Log/WinCore/PlatformConsoleModule.h"
+#include "PonyEngine/Engine/EngineModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::WinCore::GetPlatformConsoleModule, PonyEngineWinCorePlatformConsoleSubLogger);
+PONY_MODULE_ENGINE(PonyEngine::Engine::GetEngineModule, PonyEngineEngine);
