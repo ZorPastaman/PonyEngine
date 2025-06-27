@@ -10,8 +10,6 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Log/FileModule.h"
-#include "PonyEngine/Utility/Macro.h"
 
 export module PonyEngine.Log.File:FileSubLoggerModule;
 
@@ -50,6 +48,6 @@ namespace PonyEngine::Log
 
 	std::string_view FileSubLoggerModule::Name() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_ENGINE_FILE_SUBLOGGER_MODULE_NAME);
+		return "PonyEngineFileSubLogger";
 	}
 }

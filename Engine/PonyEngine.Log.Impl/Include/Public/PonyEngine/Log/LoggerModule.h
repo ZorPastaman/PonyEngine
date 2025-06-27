@@ -13,11 +13,9 @@
 
 import PonyEngine.Core;
 
-#define PONY_ENGINE_LOGGER_MODULE_NAME PonyEngineLogger
-
 namespace PonyEngine::Log
 {
 	/// @brief Gets the logger module.
 	/// @return Logger module.
-	PONY_DLL_EXPORT PonyEngine::Core::IModule* GetLoggerModule();
+	PONY_DLL_EXPORT Core::IModule* GetLoggerModule();
 }

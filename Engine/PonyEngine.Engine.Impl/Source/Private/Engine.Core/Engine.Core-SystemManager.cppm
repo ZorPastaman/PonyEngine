@@ -28,7 +28,7 @@ export namespace PonyEngine::Engine
 	public:
 		/// @brief Creates a system manager.
 		/// @param engine Engine context.
-		/// @param systemFactories Engine system factories.
+		/// @param systemFactories Engine system factories. The order of the factories may be changed.
 		[[nodiscard("Pure constructor")]]
 		SystemManager(IEngineContext& engine, std::span<ISystemFactory*> systemFactories);
 		SystemManager(const SystemManager&) = delete;
@@ -131,7 +131,7 @@ namespace PonyEngine::Engine
 
 	void SystemManager::Tick()
 	{
-		PONY_LOG(engine->Logger(), Log::LogType::Verbose, "Ticking engine systems...");
+		PONY_LOG(engine->Logger(), Log::LogType::Verbose, "Ticking engine systems.");
 		for (ITickableSystem* const tickableSystem : tickableSystems)
 		{
 			try
@@ -152,7 +152,6 @@ namespace PonyEngine::Engine
 				throw;
 			}
 		}
-		PONY_LOG(engine->Logger(), Log::LogType::Info, "Ticking engine systems done.");
 	}
 
 	void SystemManager::Initialize(const std::span<ISystemFactory*> systemFactories)

@@ -10,7 +10,6 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Log/WinCore/PlatformConsoleModule.h"
 
 export module PonyEngine.Log.PlatformConsole.WinCore:PlatformConsoleSubLoggerModule;
 
@@ -59,6 +58,6 @@ namespace PonyEngine::Log::WinCore
 
 	std::string_view PlatformConsoleSubLoggerModule::Name() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_ENGINE_WINCORE_PLATFORM_CONSOLE_SUBLOGGER_MODULE_NAME);
+		return "PonyEngineWinCorePlatformConsoleSubLogger";
 	}
 }

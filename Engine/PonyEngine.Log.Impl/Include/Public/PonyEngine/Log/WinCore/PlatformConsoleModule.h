@@ -13,8 +13,6 @@
 
 import PonyEngine.Core;
 
-#define PONY_ENGINE_WINCORE_PLATFORM_CONSOLE_SUBLOGGER_MODULE_NAME PonyEngineWinCorePlatformConsoleSubLogger
-
 namespace PonyEngine::Log::WinCore
 {
 	/// @brief Gets the WinCore platform console sub-logger module.

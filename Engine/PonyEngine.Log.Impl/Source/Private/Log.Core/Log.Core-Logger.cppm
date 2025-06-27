@@ -29,7 +29,7 @@ export namespace PonyEngine::Log
 	public:
 		/// @brief Creates a logger.
 		/// @param application Application context.
-		/// @param subLoggerFactories Sub-logger factories.
+		/// @param subLoggerFactories Sub-logger factories. The order of the factories may be changed.
 		[[nodiscard("Pure constuctor")]]
 		Logger(Application::IApplicationContext& application, std::span<ISubLoggerFactory*> subLoggerFactories);
 		Logger(const Logger&) = delete;
@@ -179,10 +179,8 @@ namespace PonyEngine::Log
 
 	void Logger::Initialize(const std::span<ISubLoggerFactory*> subLoggerFactories)
 	{
-		PONY_LOG(this->application->Logger(), LogType::Debug, "Reserving.");
-		subLoggers.reserve(subLoggerFactories.size());
-
 		PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-loggers...");
+		subLoggers.reserve(subLoggerFactories.size());
 		for (ISubLoggerFactory* const factory : subLoggerFactories)
 		{
 			try

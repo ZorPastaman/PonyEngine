@@ -89,7 +89,7 @@ export namespace PonyEngine::Main
 			/// @brief Creates a module context.
 			/// @param appContext Application context.
 			[[nodiscard("Pure constructor")]]
-			explicit ModuleContext(Application::IApplicationContext& appContext) noexcept;
+			explicit ModuleContext(App& application) noexcept;
 			ModuleContext(const ModuleContext&) = delete;
 			ModuleContext(ModuleContext&&) = delete;
 
@@ -126,7 +126,7 @@ export namespace PonyEngine::Main
 			ModuleContext& operator =(ModuleContext&&) = delete;
 
 		private:
-			Application::IApplicationContext* appContext; ///< Application context.
+			App* application; ///< Application.
 
 			std::unordered_map<std::type_index, std::vector<std::shared_ptr<void>>> dataMap; ///< Data map.
 			bool allowAdds;
@@ -160,10 +160,10 @@ export namespace PonyEngine::Main
 		/// @brief Creates an engine.
 		void CreateEngine();
 
+		Application::ApplicationPaths paths; ///< Application paths.
+
 		AppContext appContext; ///< Application context.
 		ModuleContext moduleContext; ///< Module context.
-
-		Application::ApplicationPaths paths; ///< Application paths.
 
 		std::shared_ptr<DefaultLogger> defaultLogger; ///< Default logger.
 		std::shared_ptr<Core::ILogger> logger; ///< Current logger.
@@ -183,8 +183,6 @@ namespace PonyEngine::Main
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::IModule** LastModule = nullptr;
 
 	App::App(const PlatformPaths& platformPaths) :
-		appContext(*this),
-		moduleContext(appContext),
 		paths
 		{
 			.gameData = platformPaths.gameData,
@@ -192,6 +190,8 @@ namespace PonyEngine::Main
 			.localData = platformPaths.localData,
 			.userData = platformPaths.userData
 		},
+		appContext(*this),
+		moduleContext(*this),
 		defaultLogger(std::make_shared<DefaultLogger>()),
 		logger(defaultLogger),
 		publicLogger{&logger->PublicLogger()},
@@ -254,30 +254,30 @@ namespace PonyEngine::Main
 		return application->paths;
 	}
 
-	App::ModuleContext::ModuleContext(Application::IApplicationContext& appContext) noexcept :
-		appContext{&appContext},
+	App::ModuleContext::ModuleContext(App& application) noexcept :
+		application{&application},
 		allowAdds{false}
 	{
 	}
 
 	Application::IApplicationContext& App::ModuleContext::Application() noexcept
 	{
-		return *appContext;
+		return application->appContext;
 	}
 
 	const Application::IApplicationContext& App::ModuleContext::Application() const noexcept
 	{
-		return *appContext;
+		return application->appContext;
 	}
 
 	Log::ILogger& App::ModuleContext::Logger() noexcept
 	{
-		return appContext->Logger();
+		return *application->publicLogger;
 	}
 
 	const Log::ILogger& App::ModuleContext::Logger() const noexcept
 	{
-		return appContext->Logger();
+		return *application->publicLogger;
 	}
 
 	std::size_t App::ModuleContext::DataCount(const std::type_info& type) const noexcept

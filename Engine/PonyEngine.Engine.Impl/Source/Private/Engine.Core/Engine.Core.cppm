@@ -10,3 +10,5 @@
 export module PonyEngine.Engine.Core;
 
 export import PonyEngine.Engine.Ext;
+
+export import :EngineModule;

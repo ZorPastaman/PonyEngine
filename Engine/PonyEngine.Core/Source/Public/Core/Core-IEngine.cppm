@@ -26,7 +26,12 @@ export namespace PonyEngine::Core
 		/// @return Public engine.
 		/// @remark The function must return the same reference each time it is called.
 		[[nodiscard("Pure function")]]
-		virtual Engine::IEngine& PublicEngine() const noexcept = 0;
+		virtual Engine::IEngine& PublicEngine() noexcept = 0;
+		/// @brief Gets a public engine.
+		/// @return Public engine.
+		/// @remark The function must return the same reference each time it is called.
+		[[nodiscard("Pure function")]]
+		virtual const Engine::IEngine& PublicEngine() const noexcept = 0;
 
 		/// @brief Did the engine receive an exit code?
 		/// @remark Exit code can be gotten via @p ExitCode().
