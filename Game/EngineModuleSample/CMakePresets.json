@@ -7,24 +7,17 @@
 			"binaryDir": "${sourceDir}/Output/Build/${presetName}",
 			"installDir": "${sourceDir}/Output/Install/${presetName}",
 			"cacheVariables": {
-				"PONY_COMPANY_NAME": "PonyEngine",
-				"PONY_PROJECT_NAME": "PonyEngineGame",
-				"PONY_PROJECT_VERSION": "0.0.0.0",
+				"PONY_COMPANY_NAME": "PonyGameCompany",
+				"PONY_PROJECT_NAME": "PonyEngineGameSample",
+				"PONY_PROJECT_VERSION": "1.0.0.0",
 				"PONY_CONSOLE_LOG": "TRUE",
-				"PONY_ENGINE_LOG_EXT": "TRUE",
 				"PONY_ENGINE_LOG_IMPL": "TRUE",
 				"PONY_ENGINE_LOG_CORE": "TRUE",
 				"PONY_ENGINE_LOG_CONSOLE": "TRUE",
 				"PONY_ENGINE_LOG_FILE": "TRUE",
 				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
 				"PONY_ENGINE_LOG_CONSOLE_ORDER": "10",
-				"PONY_ENGINE_LOG_FILE_ORDER": "50",
-				"PONY_ENGINE_ENGINE_EXT": "TRUE",
-				"PONY_ENGINE_ENGINE_IMPL": "TRUE",
-				"PONY_ENGINE_APPLICATION": "TRUE",
-				"PONY_ENGINE_ADD_GAME": "TRUE",
-				"PONY_ENGINE_GAME_NAME": "EngineModuleSample",
-				"PONY_ENGINE_TESTING": "TRUE"
+				"PONY_ENGINE_LOG_FILE_ORDER": "50"
 			}
 		},
 		{
@@ -117,7 +110,7 @@
 			"name": "Windows-Debug",
 			"inherits": [ "Debug", "Windows" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE" : "TRUE"
+				"PONY_ENGINE_CREATE_CONSOLE": "TRUE"
 			}
 		},
 		{
