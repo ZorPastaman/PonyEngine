@@ -30,10 +30,12 @@ export namespace PonyEngine::Engine
 		virtual SystemData Create(IEngineContext& engine) = 0;
 
 		/// @brief Gets the system initialize order.
+		/// @note The order must remain the same for the whole engine lifetime.
 		/// @return System initialize order.
 		[[nodiscard("Pure function")]]
 		virtual std::int32_t InitOrder() const noexcept = 0;
 		/// @brief Gets the system tick order.
+		/// @note The order must remain the same for the whole engine lifetime.
 		/// @return System tick order.
 		[[nodiscard("Pure function")]]
 		virtual std::int32_t TickOrder() const noexcept = 0;

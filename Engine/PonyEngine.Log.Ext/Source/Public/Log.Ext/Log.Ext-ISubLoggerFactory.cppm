@@ -33,6 +33,7 @@ export namespace PonyEngine::Log
 		virtual std::shared_ptr<ISubLogger> CreateSubLogger(ILoggerContext& logger) = 0;
 
 		/// @brief Gets the sub-logger order.
+		/// @note The order must remain the same for the whole engine lifetime.
 		/// @return Sub-logger order.
 		[[nodiscard("Pure function")]]
 		virtual std::int32_t Order() const noexcept = 0;
