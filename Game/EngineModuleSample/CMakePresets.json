@@ -17,7 +17,9 @@
 				"PONY_ENGINE_LOG_FILE": "TRUE",
 				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
 				"PONY_ENGINE_LOG_CONSOLE_ORDER": "10",
-				"PONY_ENGINE_LOG_FILE_ORDER": "50"
+				"PONY_ENGINE_LOG_FILE_ORDER": "50",
+				"PONY_ENGINE_ENGINE_EXT": "TRUE",
+				"PONY_ENGINE_ENGINE_IMPL": "TRUE"
 			}
 		},
 		{
@@ -127,6 +129,24 @@
 		{
 			"name": "Windows-Shipping",
 			"inherits": [ "Shipping", "Windows" ]
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "Windows-Debug",
+			"configurePreset": "Windows-Debug"
+		},
+		{
+			"name": "Windows-Development",
+			"configurePreset": "Windows-Development"
+		},
+		{
+			"name": "Windows-Release",
+			"configurePreset": "Windows-Release"
+		},
+		{
+			"name": "Windows-Shipping",
+			"configurePreset": "Windows-Shipping"
 		}
 	]
 }

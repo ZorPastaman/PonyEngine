@@ -9,6 +9,7 @@ include(FetchContent)
 
 # Set game project.
 project(${PONY_PROJECT_NAME} VERSION ${PONY_PROJECT_VERSION} LANGUAGES CXX)
+pony_clean_build_options()
 
 set(PONY_ENGINE_APPLICATION TRUE)
 
@@ -28,6 +29,12 @@ endif()
 if(TARGET PonyEngine.Log.Impl)
 	pony_set_log_defines(PonyEngine.Log.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 endif()
+if(TARGET PonyEngine.Engine.Ext)
+	pony_set_log_defines(PonyEngine.Engine.Ext ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+endif()
+if(TARGET PonyEngine.Engine.Impl)
+	pony_set_log_defines(PonyEngine.Engine.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+endif()
 pony_set_log_defines(PonyEngine.Application ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 
 # Set PonyEngine build options.
@@ -37,6 +44,12 @@ if(TARGET PonyEngine.Log.Ext)
 endif()
 if(TARGET PonyEngine.Log.Impl)
 	pony_set_build_options(PonyEngine.Log.Impl ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.Engine.Ext)
+	pony_set_build_options(PonyEngine.Engine.Ext ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.Engine.Impl)
+	pony_set_build_options(PonyEngine.Engine.Impl ${PONY_ENGINE_OPTIMIZATION})
 endif()
 pony_set_build_options(PonyEngine.Application ${PONY_ENGINE_OPTIMIZATION})
 
@@ -56,6 +69,9 @@ if(NOT PONY_ENGINE_FORCE_STATIC)
 	list(APPEND INSTALL_TARGETS GameSample)
 	if(TARGET PonyEngine.Log.Impl)
 		list(APPEND INSTALL_TARGETS PonyEngine.Log.Impl)	
+	endif()
+	if(TARGET PonyEngine.Engine.Impl)
+		list(APPEND INSTALL_TARGETS PonyEngine.Engine.Impl)
 	endif()
 endif()
 install(TARGETS ${INSTALL_TARGETS}

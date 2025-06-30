@@ -117,7 +117,7 @@
 			"name": "Windows-Debug",
 			"inherits": [ "Debug", "Windows" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE" : "TRUE"
+				"PONY_ENGINE_CREATE_CONSOLE": "TRUE"
 			}
 		},
 		{
@@ -134,6 +134,42 @@
 		{
 			"name": "Windows-Shipping",
 			"inherits": [ "Shipping", "Windows" ]
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "Windows-Debug",
+			"configurePreset": "Windows-Debug"
+		},
+		{
+			"name": "Windows-Development",
+			"configurePreset": "Windows-Development"
+		},
+		{
+			"name": "Windows-Release",
+			"configurePreset": "Windows-Release"
+		},
+		{
+			"name": "Windows-Shipping",
+			"configurePreset": "Windows-Shipping"
+		}
+	],
+	"testPresets": [
+		{
+			"name": "Windows-Debug",
+			"configurePreset": "Windows-Debug"
+		},
+		{
+			"name": "Windows-Development",
+			"configurePreset": "Windows-Development"
+		},
+		{
+			"name": "Windows-Release",
+			"configurePreset": "Windows-Release"
+		},
+		{
+			"name": "Windows-Shipping",
+			"configurePreset": "Windows-Shipping"
 		}
 	]
 }

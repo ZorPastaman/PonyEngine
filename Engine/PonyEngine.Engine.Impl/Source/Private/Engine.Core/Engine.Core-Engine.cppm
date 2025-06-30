@@ -117,7 +117,7 @@ export namespace PonyEngine::Engine
 namespace PonyEngine::Engine
 {
 	Engine::Engine(Application::IApplicationContext& application, const std::span<ISystemFactory*> systemFactories) :
-		frameCount{0ULL},
+		frameCount{0ull},
 		exitCode{ExitCodes::InitialExitCode},
 		isRunning{true},
 		isTicking{false},

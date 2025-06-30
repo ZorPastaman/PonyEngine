@@ -63,6 +63,10 @@ export namespace PonyEngine::Utility
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> Span() const noexcept;
 
+		/// @brief Gets the capacity.
+		/// @return Capacity.
+		[[nodiscard("Pure function")]]
+		std::size_t Capacity() const noexcept;
 		/// @brief Reserves a space for the @p count of elements.
 		/// @param count Count of elements to reserve for.
 		void Reserve(std::size_t count);
@@ -116,6 +120,11 @@ namespace PonyEngine::Utility
 	std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> ObjectInterfaces::Span() const noexcept
 	{
 		return interfaces;
+	}
+
+	std::size_t ObjectInterfaces::Capacity() const noexcept
+	{
+		return interfaces.capacity();
 	}
 
 	void ObjectInterfaces::Reserve(const std::size_t count)

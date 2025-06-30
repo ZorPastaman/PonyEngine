@@ -7,6 +7,7 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Log/LogHelper.cpp"
 	"Log/LogMacro.cpp"
 	"Utility/Enum.cpp"
+	"Utility/ObjectInterfaces.cpp"
 	"Utility/SafeFormat.cpp"
 )
 

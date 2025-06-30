@@ -518,9 +518,9 @@ namespace PonyEngine::Main
 
 	void App::TryCreateLogger()
 	{
-		if (moduleContext.DataCount(typeid(Core::ILoggerFactory)) > 0Z)
+		if (moduleContext.DataCount(typeid(Core::ILoggerFactory)) > 0z)
 		{
-			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::ILoggerFactory), 0Z);
+			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::ILoggerFactory), 0z);
 			const std::shared_ptr<Core::ILoggerFactory> loggerFactory = std::static_pointer_cast<Core::ILoggerFactory>(loggerFactoryData);
 
 			PONY_LOG(*publicLogger, Log::LogType::Info, "Creating application logger... Factory: '{}'", typeid(*loggerFactory).name());
@@ -552,16 +552,16 @@ namespace PonyEngine::Main
 
 		if (enginePhase)
 		{
-			if (engineModuleCount > 1Z) [[unlikely]]
+			if (engineModuleCount > 1z) [[unlikely]]
 			{
 				throw std::logic_error("More than 1 engine modules added.");
 			}
-			if (engineModuleCount < 1Z) [[unlikely]]
+			if (engineModuleCount < 1z) [[unlikely]]
 			{
 				throw std::logic_error("No engine module found.");
 			}
 		}
-		else if (engineModuleCount > 0Z) [[unlikely]]
+		else if (engineModuleCount > 0z) [[unlikely]]
 		{
 			throw std::logic_error("No engine module allowed out of engine module phase.");
 		}
@@ -569,7 +569,7 @@ namespace PonyEngine::Main
 
 	void App::CreateEngine()
 	{
-		const std::shared_ptr<void>& engineFactoryData = moduleContext.GetData(typeid(Core::IEngineFactory), 0Z);
+		const std::shared_ptr<void>& engineFactoryData = moduleContext.GetData(typeid(Core::IEngineFactory), 0z);
 		const std::shared_ptr<Core::IEngineFactory> engineFactory = std::static_pointer_cast<Core::IEngineFactory>(engineFactoryData);
 
 		PONY_LOG(*publicLogger, Log::LogType::Info, "Creating application engine... Factory: '{}'", typeid(*engineFactory).name());
