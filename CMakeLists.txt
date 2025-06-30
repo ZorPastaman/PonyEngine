@@ -146,5 +146,6 @@ endif()
 
 if(NOT PONY_IS_SUBPROJECT AND PONY_ENGINE_TESTING)
 	message(STATUS "Configuring test project")
+	enable_testing()
 	add_subdirectory("Tests")
 endif()

@@ -61,7 +61,7 @@ namespace PonyEngine::Engine
 		const std::size_t systemFactoryCount = context->DataCount<ISystemFactory>();
 		std::vector<ISystemFactory*> systemFactories;
 		systemFactories.reserve(systemFactoryCount);
-		for (std::size_t i = 0Z; i < systemFactoryCount; ++i)
+		for (std::size_t i = 0z; i < systemFactoryCount; ++i)
 		{
 			systemFactories.push_back(context->GetData<ISystemFactory>(i).get());
 		}
