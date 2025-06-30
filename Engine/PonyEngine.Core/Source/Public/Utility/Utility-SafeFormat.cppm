@@ -58,13 +58,13 @@ namespace PonyEngine::Utility
 	};
 
 	template<typename... Args>
-	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept
+	std::string SafeFormat(const std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		return SafeFormat<EmptyExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
 	template<ExceptionHandler ExceptionHandler, typename... Args>
-	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>)
+	std::string SafeFormat(const std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>)
 	{
 		auto handler = ExceptionHandler();
 
@@ -72,7 +72,7 @@ namespace PonyEngine::Utility
 	}
 
 	template<ExceptionHandler ExceptionHandler, typename... Args>
-	std::string SafeFormat(ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept
+	std::string SafeFormat(ExceptionHandler& exceptionHandler, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		try
 		{

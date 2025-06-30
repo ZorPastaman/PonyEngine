@@ -17,7 +17,7 @@
 	[[nodiscard("Pure function")]] \
 	constexpr std::string_view ToString(const Value value) noexcept \
 	{ \
-		return ValueNames[std::min(static_cast<std::size_t>(value), ValueNames.size() - 1Z)]; \
+		return ValueNames[std::min(static_cast<std::size_t>(value), ValueNames.size() - 1z)]; \
 	} \
 	std::ostream& operator <<(std::ostream& stream, const Value value) \
 	{ \
@@ -82,20 +82,20 @@
 		return answer; \
 	} \
 	[[nodiscard("Pure function")]] \
-	constexpr std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> Mask##GenerateToStrings() \
+	constexpr std::array<std::string, static_cast<std::size_t>(Mask::All) + 2z> Mask##GenerateToStrings() \
 	{ \
-		std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> answer; \
-		for (std::size_t i = 0Z; i < answer.size(); ++i) \
+		std::array<std::string, static_cast<std::size_t>(Mask::All) + 2z> answer; \
+		for (std::size_t i = 0z; i < answer.size(); ++i) \
 		{ \
 			answer[i] = Mask##GenerateToString(static_cast<Mask>(i)); \
 		} \
 		return answer; \
 	} \
-	const std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> Mask##GeneratedNames = Mask##GenerateToStrings(); \
+	const std::array<std::string, static_cast<std::size_t>(Mask::All) + 2z> Mask##GeneratedNames = Mask##GenerateToStrings(); \
 	[[nodiscard("Pure function")]] \
 	std::string_view ToString(const Mask mask) noexcept \
 	{ \
-		return Mask##GeneratedNames[std::min(static_cast<std::size_t>(mask), Mask##GeneratedNames.size() - 1Z)]; \
+		return Mask##GeneratedNames[std::min(static_cast<std::size_t>(mask), Mask##GeneratedNames.size() - 1z)]; \
 	} \
 	std::ostream& operator <<(std::ostream& stream, const Mask mask) \
 	{ \

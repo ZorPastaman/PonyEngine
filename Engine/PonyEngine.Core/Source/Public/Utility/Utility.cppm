@@ -9,4 +9,5 @@
 
 export module PonyEngine.Utility;
 
+export import :ObjectInterfaces;
 export import :SafeFormat;

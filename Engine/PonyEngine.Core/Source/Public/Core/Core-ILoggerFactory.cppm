@@ -15,9 +15,7 @@ export module PonyEngine.Core:ILoggerFactory;
 
 import std;
 
-import PonyEngine.Log;
-
-import :IModuleContext;
+import :ILogger;
 
 export namespace PonyEngine::Core
 {
@@ -27,9 +25,8 @@ export namespace PonyEngine::Core
 		INTERFACE_BODY(ILoggerFactory)
 
 		/// @brief Creates a logger.
-		/// @param context Module context.
 		/// @return Created logger.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Log::ILogger> Create(const IModuleContext& context) = 0;
+		virtual std::shared_ptr<ILogger> Create() = 0;
 	};
 }
