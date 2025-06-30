@@ -9,6 +9,11 @@
 
 #pragma once
 
+#include <winsdkver.h>
+#define _WIN32_WINNT 0x0A00
+#define WINVER _WIN32_WINNT
+#define NTDDI_VERSION 0x0A000010
+#include <sdkddkver.h>
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 #include <windowsx.h>

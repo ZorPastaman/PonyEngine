@@ -1,16 +1,12 @@
 message(STATUS "Fetching Catch2")
-include(FetchContent)
 FetchContent_Declare(
   Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG v3.8.1
 )
 FetchContent_MakeAvailable(Catch2)
-
-message(STATUS "Setting build options")
-pony_set_build_options(Catch2 TRUE)
-pony_set_build_options(Catch2WithMain TRUE)
+pony_set_build_options(Catch2WithMain ${PONY_ENGINE_OPTIMIZATION})
 
 message(STATUS "Configuring tests")
 add_subdirectory("PonyEngine.Core.Tests")
-add_subdirectory("PonyEngine.Log.Extension.Tests")
+add_subdirectory("PonyEngine.Log.Ext.Tests")

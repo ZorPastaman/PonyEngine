@@ -33,8 +33,16 @@
 #define PONY_MODULE_ORDER_LOG d
 /// @brief Used by the application to find an end point of log modules. Don't use in modules.
 #define PONY_MODULE_ORDER_LOG_CHECKPOINT e
+/// @brief Order for modules that are started up before an engine.
+#define PONY_MODULE_ORDER_ENGINE_EARLY i
+/// @brief Used by the application to find an end point of engine early modules. Don't use in modules.
+#define PONY_MODULE_ORDER_ENGINE_EARLY_CHECKPOINT j
 /// @brief Order for engine modules.
 #define PONY_MODULE_ORDER_ENGINE m
+/// @brief Used by the application to find an end point of engine modules. Don't use in modules.
+#define PONY_MODULE_ORDER_ENGINE_CHECKPOINT n
+/// @brief Order for modules that are started up after an engine.
+#define PONY_MODULE_ORDER_ENGINE_LATE r
 /// @brief Used by the application to find an end point. Don't use in modules.
 #define PONY_MODULE_ORDER_END z
 
@@ -42,7 +50,11 @@
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LOG))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LOG_CHECKPOINT))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE_EARLY))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE_EARLY_CHECKPOINT))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE_CHECKPOINT))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE_LATE))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 
 /// @brief Adds the module.
@@ -62,7 +74,15 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 /// @param function Module getter function of type PonyEngine::Core::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
 /// @param moduleName Module name. Must be unique across the whole application.
 #define PONY_MODULE_LOG(function, moduleName) PONY_MODULE(function, moduleName, PONY_MODULE_ORDER_LOG)
+/// @brief Adds the engine early module.
+/// @param function Module getter function of type PonyEngine::Core::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param moduleName Module name. Must be unique across the whole application.
+#define PONY_MODULE_ENGINE_EARLY(function, moduleName) PONY_MODULE(function, moduleName, PONY_MODULE_ORDER_ENGINE_EARLY)
 /// @brief Adds the engine module.
 /// @param function Module getter function of type PonyEngine::Core::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
 /// @param moduleName Module name. Must be unique across the whole application.
 #define PONY_MODULE_ENGINE(function, moduleName) PONY_MODULE(function, moduleName, PONY_MODULE_ORDER_ENGINE)
+/// @brief Adds the engine late module.
+/// @param function Module getter function of type PonyEngine::Core::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param moduleName Module name. Must be unique across the whole application.
+#define PONY_MODULE_ENGINE_LATE(function, moduleName) PONY_MODULE(function, moduleName, PONY_MODULE_ORDER_ENGINE_LATE)
