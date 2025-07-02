@@ -52,8 +52,8 @@ if(PONY_ENGINE_LOG_FILE)
 	endforeach()
 endif()
 
-if(NOT TARGET PonyEngine.Log.Ext)
-	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
+if(NOT TARGET PonyEngine.Log.Extension)
+	message(FATAL_ERROR "PonyEngine.Log.Extension wasn't configured")
 endif()
 
 if(PONY_ENGINE_FORCE_STATIC)
@@ -157,5 +157,5 @@ set_target_properties(PonyEngine.Log.Impl PROPERTIES
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Impl PRIVATE
 	PonyEngine.Core
-	PonyEngine.Log.Ext
+	PonyEngine.Log.Extension
 )

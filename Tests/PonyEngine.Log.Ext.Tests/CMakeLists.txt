@@ -19,7 +19,7 @@ message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Ext.Tests PRIVATE 
 	Catch2::Catch2WithMain
 	PonyEngine.Core
-	PonyEngine.Log.Ext
+	PonyEngine.Log.Extension
 )
 
 message(STATUS "Discovering tests")
