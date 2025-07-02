@@ -11,9 +11,9 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Main.Windows:QuitChecker;
+export module PonyEngine.Application.Main.Windows:QuitChecker;
 
-export namespace PonyEngine::Main::Windows
+export namespace PonyEngine::Application::Windows
 {
 	/// @brief Checks if the application must exit.
 	/// @remark The function peeks and removes all the messages to the application. So, it must be called last.
@@ -23,7 +23,7 @@ export namespace PonyEngine::Main::Windows
 	bool CheckForQuit(int& exitCode);
 }
 
-namespace PonyEngine::Main::Windows
+namespace PonyEngine::Application::Windows
 {
 	bool CheckForQuit(int& exitCode)
 	{

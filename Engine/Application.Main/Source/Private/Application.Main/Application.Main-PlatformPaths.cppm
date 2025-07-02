@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Main:PlatformPaths;
+export module PonyEngine.Application.Main:PlatformPaths;
 
 import std;
 
-export namespace PonyEngine::Main
+export namespace PonyEngine::Application
 {
 	/// @brief Platform specific paths.
 	struct PlatformPaths final

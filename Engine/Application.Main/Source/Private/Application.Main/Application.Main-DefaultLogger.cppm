@@ -11,14 +11,14 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 
-export module PonyEngine.Main:DefaultLogger;
+export module PonyEngine.Application.Main:DefaultLogger;
 
 import std;
 
 import PonyEngine.Core;
 import PonyEngine.Log;
 
-export namespace PonyEngine::Main
+export namespace PonyEngine::Application
 {
 	/// @brief Console logger.
 	class DefaultLogger final : public Core::ILogger, private Log::ILogger
@@ -44,7 +44,7 @@ export namespace PonyEngine::Main
 	};
 }
 
-namespace PonyEngine::Main
+namespace PonyEngine::Application
 {
 	void DefaultLogger::Log(const Log::LogType logType, const Log::LogInput& logInput) const noexcept
 	{

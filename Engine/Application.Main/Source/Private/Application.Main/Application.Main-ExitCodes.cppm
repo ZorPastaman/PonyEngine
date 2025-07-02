@@ -11,9 +11,9 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Main:ExitCodes;
+export module PonyEngine.Application.Main:ExitCodes;
 
-export namespace PonyEngine::Main
+export namespace PonyEngine::Application
 {
 	/// @brief Exit codes that must be used by main. The application uses negative codes.
 	struct ExitCodes final
