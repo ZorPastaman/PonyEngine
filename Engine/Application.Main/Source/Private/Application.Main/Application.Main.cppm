@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Main;
+export module PonyEngine.Application.Main;
 
 export import :App;
 export import :ExitCodes;

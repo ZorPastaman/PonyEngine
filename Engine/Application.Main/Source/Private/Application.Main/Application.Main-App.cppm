@@ -14,7 +14,7 @@ module;
 #include "PonyEngine/Core/Module.h"
 #include "PonyEngine/Log/Log.h"
 
-export module PonyEngine.Main:App;
+export module PonyEngine.Application.Main:App;
 
 import std;
 
@@ -25,7 +25,7 @@ import PonyEngine.Log;
 import :DefaultLogger;
 import :PlatformPaths;
 
-export namespace PonyEngine::Main
+export namespace PonyEngine::Application
 {
 	/// @brief Application.
 	class App
@@ -50,7 +50,7 @@ export namespace PonyEngine::Main
 
 	private:
 		/// @brief Application context.
-		class AppContext final : public Application::IApplicationContext
+		class AppContext final : public IApplicationContext
 		{
 		public:
 			/// @brief Creates an application context.
@@ -73,7 +73,7 @@ export namespace PonyEngine::Main
 			virtual const Engine::IEngine* Engine() const noexcept override;
 
 			[[nodiscard("Pure function")]]
-			virtual const Application::ApplicationPaths& Paths() const noexcept override;
+			virtual const ApplicationPaths& Paths() const noexcept override;
 
 			AppContext& operator =(const AppContext&) = delete;
 			AppContext& operator =(AppContext&&) = delete;
@@ -87,7 +87,7 @@ export namespace PonyEngine::Main
 		{
 		public:
 			/// @brief Creates a module context.
-			/// @param appContext Application context.
+			/// @param application Application context.
 			[[nodiscard("Pure constructor")]]
 			explicit ModuleContext(App& application) noexcept;
 			ModuleContext(const ModuleContext&) = delete;
@@ -96,9 +96,9 @@ export namespace PonyEngine::Main
 			~ModuleContext() noexcept = default;
 
 			[[nodiscard("Pure function")]]
-			virtual Application::IApplicationContext& Application() noexcept override;
+			virtual IApplicationContext& Application() noexcept override;
 			[[nodiscard("Pure function")]]
-			virtual const Application::IApplicationContext& Application() const noexcept override;
+			virtual const IApplicationContext& Application() const noexcept override;
 
 			[[nodiscard("Pure function")]]
 			virtual Log::ILogger& Logger() noexcept override;
@@ -160,7 +160,7 @@ export namespace PonyEngine::Main
 		/// @brief Creates an engine.
 		void CreateEngine();
 
-		Application::ApplicationPaths paths; ///< Application paths.
+		ApplicationPaths paths; ///< Application paths.
 
 		AppContext appContext; ///< Application context.
 		ModuleContext moduleContext; ///< Module context.
@@ -174,7 +174,7 @@ export namespace PonyEngine::Main
 	};
 }
 
-namespace PonyEngine::Main
+namespace PonyEngine::Application
 {
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) Core::IModule** FirstModule = nullptr;
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_LOG_CHECKPOINT) Core::IModule** LogCheckpoint = nullptr;
@@ -249,7 +249,7 @@ namespace PonyEngine::Main
 		return application->publicEngine;
 	}
 
-	const Application::ApplicationPaths& App::AppContext::Paths() const noexcept
+	const ApplicationPaths& App::AppContext::Paths() const noexcept
 	{
 		return application->paths;
 	}
@@ -260,12 +260,12 @@ namespace PonyEngine::Main
 	{
 	}
 
-	Application::IApplicationContext& App::ModuleContext::Application() noexcept
+	IApplicationContext& App::ModuleContext::Application() noexcept
 	{
 		return application->appContext;
 	}
 
-	const Application::IApplicationContext& App::ModuleContext::Application() const noexcept
+	const IApplicationContext& App::ModuleContext::Application() const noexcept
 	{
 		return application->appContext;
 	}

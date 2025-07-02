@@ -11,7 +11,7 @@ include(FetchContent)
 project(${PONY_PROJECT_NAME} VERSION ${PONY_PROJECT_VERSION} LANGUAGES CXX)
 pony_clean_build_options()
 
-set(PONY_ENGINE_APPLICATION TRUE)
+set(PONY_ENGINE_APPLICATION_MAIN TRUE)
 
 # Add PonyEngine project.
 FetchContent_Declare(
@@ -35,7 +35,7 @@ endif()
 if(TARGET PonyEngine.Engine.Impl)
 	pony_set_log_defines(PonyEngine.Engine.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 endif()
-pony_set_log_defines(PonyEngine.Application ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_log_defines(PonyEngine.Application.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 
 # Set PonyEngine build options.
 pony_set_build_options(PonyEngine.Core ${PONY_ENGINE_OPTIMIZATION})
@@ -51,7 +51,7 @@ endif()
 if(TARGET PonyEngine.Engine.Impl)
 	pony_set_build_options(PonyEngine.Engine.Impl ${PONY_ENGINE_OPTIMIZATION})
 endif()
-pony_set_build_options(PonyEngine.Application ${PONY_ENGINE_OPTIMIZATION})
+pony_set_build_options(PonyEngine.Application.Main ${PONY_ENGINE_OPTIMIZATION})
 
 # Add game modules.
 add_subdirectory("GameSample")
@@ -60,11 +60,11 @@ pony_set_log_defines(GameSample ${PONY_GAME_LOG_LEVEL} ${PONY_GAME_LOG_STACKTRAC
 # Set Game build options.
 pony_set_build_options(GameSample ${PONY_GAME_OPTIMIZATION})
 # Add Game module to PonyEngine.
-target_link_libraries(PonyEngine.Application PRIVATE GameSample)
+target_link_libraries(PonyEngine.Application.Main PRIVATE GameSample)
 
 # Install targets.
 set(INSTALL_TARGETS "")
-list(APPEND INSTALL_TARGETS PonyEngine.Application)
+list(APPEND INSTALL_TARGETS PonyEngine.Application.Main)
 if(NOT PONY_ENGINE_FORCE_STATIC)
 	list(APPEND INSTALL_TARGETS GameSample)
 	if(TARGET PonyEngine.Log.Impl)

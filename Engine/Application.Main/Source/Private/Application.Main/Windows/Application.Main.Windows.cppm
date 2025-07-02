@@ -7,6 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Main.WinCore;
+export module PonyEngine.Application.Main.Windows;
 
-export import PonyEngine.Main;
+export import PonyEngine.Application.Main.WinCore;
+
+export import :Console;
+export import :Paths;
+export import :Process;
+export import :QuitChecker;
