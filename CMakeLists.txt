@@ -51,7 +51,7 @@ endif()
 
 message(VERBOSE "Configuring modules")
 set(PONY_INSTALL_TARGETS "")
-add_subdirectory("Engine/PonyEngine.Core")
+add_subdirectory("Engine/Core")
 if(NOT PONY_IS_SUBPROJECT)
 	message(VERBOSE "Post-configuring")
 	pony_set_log_defines(PonyEngine.Core ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
