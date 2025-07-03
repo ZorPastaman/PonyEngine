@@ -31,5 +31,5 @@ endif()
 # Set PonyEngine dependencies.
 target_link_libraries(GameSample PRIVATE 
 	PonyEngine.Core
-	PonyEngine.Engine.Ext
+	PonyEngine.Engine.Extension
 )

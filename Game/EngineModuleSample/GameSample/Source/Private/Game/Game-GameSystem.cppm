@@ -6,7 +6,7 @@ export module Game:GameSystem;
 
 import std;
 
-import PonyEngine.Engine.Ext;
+import PonyEngine.Engine.Extension;
 import PonyEngine.Log;
 
 export namespace Game
