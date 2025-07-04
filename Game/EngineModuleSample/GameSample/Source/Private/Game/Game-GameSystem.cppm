@@ -6,7 +6,7 @@ export module Game:GameSystem;
 
 import std;
 
-import PonyEngine.Engine.Ext;
+import PonyEngine.Engine.Extension;
 import PonyEngine.Log;
 
 export namespace Game
@@ -67,6 +67,6 @@ namespace Game
 		// The system tick logic goes here.
 		// This is the place to update the system state, process events, etc.
 		// The log can be safely removed.
-		PONY_LOG(engine->Logger(), PonyEngine::Log::LogType::Info, "Game system ticked.");
+		PONY_LOG(engine->Logger(), PonyEngine::Log::LogType::Verbose, "Game system ticked.");
 	}
 }

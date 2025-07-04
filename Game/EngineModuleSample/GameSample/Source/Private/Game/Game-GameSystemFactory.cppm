@@ -7,7 +7,7 @@ export module Game:GameSystemFactory;
 import std;
 
 import PonyEngine.Core;
-import PonyEngine.Engine.Ext;
+import PonyEngine.Engine.Extension;
 import PonyEngine.Log;
 
 import :GameSystem;
