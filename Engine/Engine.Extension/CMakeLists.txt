@@ -17,9 +17,10 @@ target_sources(PonyEngine.Engine.Extension PUBLIC FILE_SET CXX_MODULES FILES
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Engine.Extension PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Engine.Extension PRIVATE
+target_link_libraries(PonyEngine.Engine.Extension PUBLIC
 	PonyEngine.Core
 )

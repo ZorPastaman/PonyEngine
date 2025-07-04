@@ -1,7 +1,6 @@
 message(STATUS "Configuring PonyEngine.Log.Console")
 
 message(VERBOSE "Validating settings")
-
 if(NOT PONY_ENGINE_LOG_CONSOLE_ORDER)
 	message(FATAL_ERROR "PONY_ENGINE_LOG_CONSOLE is set but PONY_ENGINE_LOG_CONSOLE_ORDER isn't")
 endif()
@@ -41,10 +40,11 @@ target_compile_definitions(PonyEngine.Log.Console PRIVATE PONY_ENGINE_LOG_CONSOL
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Console PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.Console PRIVATE
+target_link_libraries(PonyEngine.Log.Console PUBLIC
 	PonyEngine.Core
 	PonyEngine.Log.Extension
 )

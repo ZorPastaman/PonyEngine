@@ -15,9 +15,10 @@ target_sources(PonyEngine.Log.Extension PUBLIC FILE_SET CXX_MODULES FILES
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Extension PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.Extension PRIVATE
+target_link_libraries(PonyEngine.Log.Extension PUBLIC
 	PonyEngine.Core
 )

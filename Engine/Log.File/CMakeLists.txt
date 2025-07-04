@@ -57,10 +57,11 @@ target_compile_definitions(PonyEngine.Log.File PRIVATE PONY_ENGINE_LOG_FILE_PATH
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.File PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.File PRIVATE
+target_link_libraries(PonyEngine.Log.File PUBLIC
 	PonyEngine.Core
 	PonyEngine.Log.Extension
 )

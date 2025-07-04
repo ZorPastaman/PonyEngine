@@ -21,7 +21,7 @@
 				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
 				"PONY_ENGINE_LOG_CONSOLE_ORDER": "10",
 				"PONY_ENGINE_LOG_FILE_ORDER": "50",
-				"PONY_ENGINE_ADD_GAME": "FALSE",
+				"PONY_ENGINE_ADD_GAME": "TRUE",
 				"PONY_ENGINE_GAME_NAME": "EngineModuleSample",
 				"PONY_ENGINE_TESTING": "TRUE"
 			}
@@ -37,7 +37,8 @@
 				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Debug",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Error"
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Error",
+				"PONY_MAKE_GROUPS": "TRUE"
 			}
 		},
 		{
@@ -51,7 +52,8 @@
 				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Info",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception"
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_MAKE_GROUPS": "TRUE"
 			}
 		},
 		{
@@ -65,8 +67,7 @@
 				"PONY_GAME_LOG_LEVEL": "Info",
 				"PONY_ENGINE_LOG_LEVEL": "Warning",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_ENGINE_FORCE_STATIC": "TRUE"
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception"
 			}
 		},
 		{
@@ -80,8 +81,7 @@
 				"PONY_GAME_LOG_LEVEL": "Error",
 				"PONY_ENGINE_LOG_LEVEL": "Error",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_ENGINE_FORCE_STATIC": "TRUE"
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception"
 			}
 		},
 		{

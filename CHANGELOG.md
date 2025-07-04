@@ -10,8 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Core module.
-- Log module.
-- Application module.
-- Minimal game sample.
+- Application main module.
+- Log main module.
+- Log console module.
+- Log platform console module.
+- Log file module.
+- Engine main module.
 
 [Unreleased]: https://github.com/ZorPastaman/PonyEngine
