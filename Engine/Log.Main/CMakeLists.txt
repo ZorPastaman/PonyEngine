@@ -32,10 +32,11 @@ endif()
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Main PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.Main PRIVATE
+target_link_libraries(PonyEngine.Log.Main PUBLIC
 	PonyEngine.Core
 	PonyEngine.Log.Extension
 )

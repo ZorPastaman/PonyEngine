@@ -1,7 +1,6 @@
 message(STATUS "Configuring PonyEngine.Engine.Main")
 
 message(VERBOSE "Validating settings")
-
 if(NOT TARGET PonyEngine.Engine.Extension)
 	message(FATAL_ERROR "PonyEngine.Engine.Extension wasn't configured")
 endif()
@@ -34,10 +33,11 @@ target_sources(PonyEngine.Engine.Main PRIVATE FILE_SET CXX_MODULES FILES
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Engine.Main PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Engine.Main PRIVATE
+target_link_libraries(PonyEngine.Engine.Main PUBLIC
 	PonyEngine.Core
 	PonyEngine.Engine.Extension
 )

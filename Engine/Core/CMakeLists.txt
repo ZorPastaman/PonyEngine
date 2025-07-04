@@ -77,4 +77,5 @@ endif()
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )

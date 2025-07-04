@@ -1,7 +1,7 @@
 message(STATUS "Configuring PonyEngine.Core.Tests")
 add_executable(PonyEngine.Core.Tests)
 
-message(STATUS "Configuring sources")
+message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
 	"Log/LogFormat.cpp"
 	"Log/LogHelper.cpp"
@@ -12,7 +12,7 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 )
 
 if(PONY_WINCORE)
-	message(STATUS "Configuring sources for WinCore")
+	message(VERBOSE "Configuring sources for WinCore")
 	target_sources(PonyEngine.Core.Tests PRIVATE
 		"Platform/WinCore/GUID.cpp"
 		"Platform/WinCore/Utility.cpp"
@@ -20,29 +20,30 @@ if(PONY_WINCORE)
 endif()
 
 if(PONY_WINDOWS)
-	message(STATUS "Configuring sources for Windows")
+	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Core.Tests PRIVATE
 		"Platform/Windows/Cursor.cpp"
 		"Platform/Windows/Module.cpp"
 	)
 endif()
 
-message(STATUS "Configuring defines")
+message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 
-message(STATUS "Setting properties")
-set_target_properties(PonyEngine.Core.Tests PROPERTIES CXX_STANDARD 23)
+message(VERBOSE "Setting properties")
+set_target_properties(PonyEngine.Core.Tests PROPERTIES 
+	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
+)
 
-message(STATUS "Setting build options")
+message(VERBOSE "Setting build options")
 pony_set_build_options(PonyEngine.Core.Tests ${PONY_ENGINE_OPTIMIZATION})
 
-message(STATUS "Configuring dependencies")
+message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Core.Tests PRIVATE 
 	Catch2::Catch2WithMain
 	PonyEngine.Core
 )
 
-message(STATUS "Discovering tests")
-include(CTest)
-include(Catch)
+message(VERBOSE "Discovering tests")
 catch_discover_tests(PonyEngine.Core.Tests)

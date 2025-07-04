@@ -48,10 +48,11 @@ target_compile_definitions(PonyEngine.Log.PlatformConsole PRIVATE PONY_ENGINE_LO
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.PlatformConsole PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.PlatformConsole PRIVATE
+target_link_libraries(PonyEngine.Log.PlatformConsole PUBLIC
 	PonyEngine.Core
 	PonyEngine.Log.Extension
 )

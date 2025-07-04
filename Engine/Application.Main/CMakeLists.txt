@@ -67,6 +67,7 @@ target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_COMPANY_NAME
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Application.Main PROPERTIES 
 	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
 	OUTPUT_NAME "${PONY_PROJECT_NAME}"
 )
 
