@@ -1,4 +1,4 @@
-﻿message(STATUS "Configuring PonyEngine.Application")
+﻿message(STATUS "Configuring PonyEngine.Application.Main")
 
 message(VERBOSE "Validating settings")
 if(PONY_ENGINE_CREATE_CONSOLE)
