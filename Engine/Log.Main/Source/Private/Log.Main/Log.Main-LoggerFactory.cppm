@@ -60,7 +60,7 @@ namespace PonyEngine::Log
 		const std::size_t subLoggerFactoryCount = context->DataCount<ISubLoggerFactory>();
 		std::vector<ISubLoggerFactory*> subLoggerFactories;
 		subLoggerFactories.reserve(subLoggerFactoryCount);
-		for (std::size_t i = 0z; i < subLoggerFactoryCount; ++i)
+		for (std::size_t i = 0uz; i < subLoggerFactoryCount; ++i)
 		{
 			subLoggerFactories.push_back(context->GetData<ISubLoggerFactory>(i).get());
 		}

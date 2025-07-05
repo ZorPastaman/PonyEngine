@@ -170,7 +170,7 @@ TEST_CASE("PONY_LOG_E_IF", "[Log][LogMacro]")
 	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
 
-/*
+
 TEST_CASE("PONY_CONSOLE compilation", "[Log][LogMacro]")
 {
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Format: {}", "Arg!");
@@ -181,4 +181,3 @@ TEST_CASE("PONY_CONSOLE compilation", "[Log][LogMacro]")
 	PONY_CONSOLE_E(std::runtime_error("Test!"), "Format: {}", "Arg!");
 	PONY_CONSOLE_E_IF(true, std::runtime_error("Test!"), "Format: {}", "Arg!");
 }
-*/
