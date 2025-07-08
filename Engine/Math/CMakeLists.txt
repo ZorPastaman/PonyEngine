@@ -7,10 +7,16 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Math PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math.cppm"
 	"Source/Public/Math/Math-Common.cppm"
+	"Source/Public/Math/Math-Vector.cppm"
 )
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Math PROPERTIES 
 	CXX_STANDARD 23
 	POSITION_INDEPENDENT_CODE TRUE
+)
+
+message(VERBOSE "Configuring dependencies")
+target_link_libraries(PonyEngine.Math PUBLIC
+	PonyEngine.Core
 )

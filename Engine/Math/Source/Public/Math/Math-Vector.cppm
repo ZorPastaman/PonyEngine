@@ -9,32 +9,26 @@
 
 module;
 
-#include "PonyBase/Utility/ObjectBody.h"
+#include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyMath.Core:Vector2;
+export module PonyEngine.Math:Vector;
 
-import <algorithm>;
-import <array>;
-import <cmath>;
-import <cstddef>;
-import <format>;
-import <ostream>;
-import <string>;
-import <span>;
-import <type_traits>;
+import std;
+
+import PonyEngine.Type;
 
 import :Common;
 
-export namespace PonyMath::Core
+export namespace PonyEngine::Math
 {
 	/// @brief 2D vector implementation.
 	/// @tparam T Component type.
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	class Vector2 final
 	{
 	public:
 		using ValueType = T; ///< Component type.
-		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
+		using ComputationalType = Type::ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
 
 		static constexpr std::size_t ComponentCount = 2; ///< Component count. For any vector, it's always 2.
 
@@ -83,6 +77,36 @@ export namespace PonyMath::Core
 		/// @return Span.
 		[[nodiscard("Pure function")]]
 		constexpr std::span<const T, 2> Span() const noexcept;
+
+		/// @brief Gets a swizzled vector - xx.
+		/// @return Swizzled vector - xx.
+		[[nodiscard("Pure function")]]
+		constexpr Vector2 XX() const noexcept;
+		/// @brief Gets a swizzled vector - xy.
+		/// @return Swizzled vector - xy.
+		[[nodiscard("Pure function")]]
+		constexpr Vector2 XY() const noexcept;
+		/// @brief Gets a swizzled vector - yx.
+		/// @return Swizzled vector - yx.
+		[[nodiscard("Pure function")]]
+		constexpr Vector2 YX() const noexcept;
+		/// @brief Gets a swizzled vector - yy.
+		/// @return Swizzled vector - yy.
+		[[nodiscard("Pure function")]]
+		constexpr Vector2 YY() const noexcept;
+
+		/// @brief Computes a vector rotated by 90 degrees clockwise.
+		/// @return Vector rotated by 90 degrees clockwise.
+		[[nodiscard("Pure function")]]
+		constexpr Vector2 Rotated90CW() const noexcept;
+		/// @brief Rotates the vector by 90 degrees clockwise.
+		constexpr void Rotate90CW() noexcept;
+		/// @brief Computes a vector rotated by 90 degrees counter-clockwise.
+		/// @return Vector rotated by 90 degrees counter-clockwise.
+		[[nodiscard("Pure function")]]
+		constexpr Vector2 Rotated90CCW() const noexcept;
+		/// @brief Rotates the vector by 90 degrees counter-clockwise.
+		constexpr void Rotate90CCW() noexcept;
 
 		/// @brief Computes a magnitude of the vector.
 		/// @return Computed magnitude.
@@ -139,13 +163,10 @@ export namespace PonyMath::Core
 		/// @return Sum.
 		[[nodiscard("Pure function")]]
 		constexpr T Sum() const noexcept;
-
-		/// @brief Swaps the components and returns a vector in order y, x.
-		/// @return Swapped vector.
+		/// @brief Multiplies all the components and returns the result.
+		/// @return Product.
 		[[nodiscard("Pure function")]]
-		constexpr Vector2 Swapped() const noexcept;
-		/// @brief Swaps the components in the vector. The order is y, x.
-		constexpr void Swap() noexcept;
+		constexpr T Product() const noexcept;
 
 		/// @brief Checks if all the components are zero.
 		/// @return @a True if this vector components are zero; @a false otherwise.
@@ -164,7 +185,7 @@ export namespace PonyMath::Core
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsAlmostUnit(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
+		constexpr bool IsAlmostUnit(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this vector is uniform.
 		/// @return @a True if this vector is uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -173,12 +194,12 @@ export namespace PonyMath::Core
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsAlmostUniform(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
+		constexpr bool IsAlmostUniform(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
+		constexpr bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
@@ -194,7 +215,7 @@ export namespace PonyMath::Core
 
 		/// @brief Casts all the components to the @p U and returns a new vector with those components.
 		/// @tparam U Target component type.
-		template<Arithmetic U> [[nodiscard("Pure operator")]]
+		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Vector2<U>() const noexcept;
 
 		/// @brief Gets a component by the @p index.
@@ -207,6 +228,13 @@ export namespace PonyMath::Core
 		/// @return Component. 0 -> x, 1 -> y.
 		[[nodiscard("Pure operator")]]
 		constexpr const T& operator [](std::size_t index) const noexcept;
+
+		/// @brief Gets a swizzled vector by indices.
+		/// @param xIndex X index. Must be in range [0, 1].
+		/// @param yIndex Y index. Must be in range [0, 1].
+		/// @return Swizzled vector.
+		[[nodiscard("Pure operator")]]
+		constexpr Vector2 operator [](std::size_t xIndex, std::size_t yIndex) const noexcept;
 
 		constexpr Vector2& operator =(const Vector2& other) noexcept = default;
 		constexpr Vector2& operator =(Vector2&& other) noexcept = default;
@@ -247,21 +275,21 @@ export namespace PonyMath::Core
 	/// @param left Left vector.
 	/// @param right Right vector.
 	/// @return Dot product.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a cross vector and returns its z component.
 	/// @tparam T Component type.
 	/// @param left Left vector.
 	/// @param right Right vector.
 	/// @return Cross product z component.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T CrossZ(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a distance between two points.
 	/// @tparam T Component type.
 	/// @param left Left vector.
 	/// @param right Right vector.
 	/// @return Distance.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	typename Vector2<T>::ComputationalType Distance(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a squared distance between two points.
 	/// @remark This function is much faster than @p Distance 'cause it doesn't compute a square root.
@@ -269,7 +297,7 @@ export namespace PonyMath::Core
 	/// @param left Left vector.
 	/// @param right Right vector.
 	/// @return Distance
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T DistanceSquared(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Computes an angle between the two vectors.
@@ -301,7 +329,6 @@ export namespace PonyMath::Core
 	/// @return Projected vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> ProjectOnPlane(const Vector2<T>& vector, const Vector2<T>& normal) noexcept;
-
 	/// @brief Reflects the @p vector off a plane defined by the @p normal vector.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
@@ -315,36 +342,36 @@ export namespace PonyMath::Core
 	/// @param left Multiplicand.
 	/// @param right Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Multiply(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Divides the @p left vector by the @p right vector component-wise.
 	/// @tparam T Component type.
 	/// @param left Dividend.
 	/// @param right Divisor.
 	/// @return Quotient.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Divide(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Computes absolute values of the @p vector components.
 	/// @tparam T Component type.
 	/// @param vector Source.
 	/// @return Absolute vector.
-	template<Signed T> [[nodiscard("Pure function")]]
-	Vector2<T> Abs(const Vector2<T>& vector) noexcept;
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector2<T> Abs(const Vector2<T>& vector) noexcept;
 
 	/// @brief Creates a vector consisting of minimal elements of the two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector.
 	/// @param right Right vector.
 	/// @return Vector of minimal elements.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Min(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Creates a vector consisting of maximal elements of the two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector.
 	/// @param right Right vector.
 	/// @return Vector of maximal elements.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Max(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Clamps the @p value between the @p min and @p max component-wise.
 	/// @tparam T Component type.
@@ -352,7 +379,7 @@ export namespace PonyMath::Core
 	/// @param min Minimum.
 	/// @param max Maximum.
 	/// @return Clamped vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Clamp(const Vector2<T>& value, const Vector2<T>& min, const Vector2<T>& max) noexcept;
 	/// @brief Clamps the @p vector magnitude.
 	/// @tparam T Component type.
@@ -368,7 +395,7 @@ export namespace PonyMath::Core
 	/// @param to Interpolation/Extrapolation target point.
 	/// @param time Interpolation/Extrapolation time. It can be negative.
 	/// @return Interpolated/Extrapolated vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Lerp(const Vector2<T>& from, const Vector2<T>& to, typename Vector2<T>::ComputationalType time) noexcept;
 
 	/// @brief Checks if the two vectors are almost equal with the tolerance value.
@@ -385,14 +412,14 @@ export namespace PonyMath::Core
 	/// @param left Augend.
 	/// @param right Addend.
 	/// @return Sum.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator +(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Negates the @p vector.
 	/// @tparam T Component type.
 	/// @param vector Vector to negate.
 	/// @return Negated vector.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator -(const Vector2<T>& vector) noexcept;
 
 	/// @brief Subtracts the @p right vector from the @p left vector.
@@ -400,7 +427,7 @@ export namespace PonyMath::Core
 	/// @param left Minuend.
 	/// @param right Subtrahend.
 	/// @return Difference.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator -(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Multiplies the @p vector components by the @p multiplier.
@@ -408,7 +435,7 @@ export namespace PonyMath::Core
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator *(const Vector2<T>& vector, T multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
@@ -422,7 +449,7 @@ export namespace PonyMath::Core
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator *(T multiplier, const Vector2<T>& vector) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
@@ -437,7 +464,7 @@ export namespace PonyMath::Core
 	/// @param vector Dividend.
 	/// @param divisor Divisor.
 	/// @return Quotient.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<Type::Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator /(const Vector2<T>& vector, T divisor) noexcept;
 	/// @brief Divides the @p vector components by the @p divisor.
 	/// @tparam T Component type.
@@ -452,10 +479,10 @@ export namespace PonyMath::Core
 	/// @param stream Target stream.
 	/// @param vector Input source.
 	/// @return @p stream.
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Vector2<T>& vector);
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	struct Vector2<T>::Predefined final
 	{
 		NON_CONSTRUCTIBLE_BODY(Predefined)
@@ -470,189 +497,252 @@ export namespace PonyMath::Core
 	};
 }
 
-namespace PonyMath::Core
+/// @brief Vector2 formatter.
+/// @tparam T Component type.
+export template<PonyEngine::Type::Arithmetic T>
+struct std::formatter<PonyEngine::Math::Vector2<T>, char>
 {
-	template<Arithmetic T>
+	static constexpr auto parse(std::format_parse_context& context)
+	{
+		if (*context.begin() != '}') [[unlikely]]
+		{
+			throw std::format_error("Unexpected format specifier.");
+		}
+
+		return context.begin();
+	}
+
+	static auto format(const PonyEngine::Math::Vector2<T>& vector, std::format_context& context)
+	{
+		return std::ranges::copy(vector.ToString(), context.out()).out;
+	}
+};
+
+namespace PonyEngine::Math
+{
+	template<Type::Arithmetic T>
 	constexpr Vector2<T>::Vector2(const T x, const T y) noexcept :
 		components{x, y}
 	{
 	}
 
-	template<Arithmetic T>
-	constexpr Vector2<T>::Vector2(const std::span<const T, ComponentCount> span) noexcept
+	template<Type::Arithmetic T>
+	constexpr Vector2<T>::Vector2(const std::span<const T, ComponentCount> span) noexcept :
+		components{span[0], span[1]}
 	{
-		std::ranges::copy(span, components.data());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T& Vector2<T>::X() noexcept
 	{
 		return components[0];
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr const T& Vector2<T>::X() const noexcept
 	{
 		return components[0];
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T& Vector2<T>::Y() noexcept
 	{
 		return components[1];
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr const T& Vector2<T>::Y() const noexcept
 	{
 		return components[1];
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr std::span<T, 2> Vector2<T>::Span() noexcept
 	{
 		return components;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr std::span<const T, 2> Vector2<T>::Span() const noexcept
 	{
 		return components;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Vector2<T>::XX() const noexcept
+	{
+		return Vector2(X(), X());
+	}
+
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Vector2<T>::XY() const noexcept
+	{
+		return Vector2(X(), Y());
+	}
+
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Vector2<T>::YX() const noexcept
+	{
+		return Vector2(Y(), X());
+	}
+
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Vector2<T>::YY() const noexcept
+	{
+		return Vector2(Y(), Y());
+	}
+
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Vector2<T>::Rotated90CW() const noexcept
+	{
+		return Vector2(Y(), -X());
+	}
+
+	template<Type::Arithmetic T>
+	constexpr void Vector2<T>::Rotate90CW() noexcept
+	{
+		*this = Rotated90CW();
+	}
+
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Vector2<T>::Rotated90CCW() const noexcept
+	{
+		return Vector2(-Y(), X());
+	}
+
+	template<Type::Arithmetic T>
+	constexpr void Vector2<T>::Rotate90CCW() noexcept
+	{
+		*this = Rotated90CCW();
+	}
+
+	template<Type::Arithmetic T>
 	typename Vector2<T>::ComputationalType Vector2<T>::Magnitude() const noexcept
 	{
 		return std::sqrt(static_cast<ComputationalType>(MagnitudeSquared()));
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T Vector2<T>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	Vector2<T> Vector2<T>::Normalized() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return *this * (T{1} / Magnitude());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	void Vector2<T>::Normalize() noexcept requires (std::is_floating_point_v<T>)
 	{
 		*this = Normalized();
 	}
 
-	template <Arithmetic T>
+	template<Type::Arithmetic T>
 	Vector2<T> Vector2<T>::Normalized(const Vector2& fallback) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return IsAlmostZero() ? fallback : Normalized();
 	}
 
-	template <Arithmetic T>
+	template<Type::Arithmetic T>
 	void Vector2<T>::Normalize(const Vector2& fallback) noexcept requires (std::is_floating_point_v<T>)
 	{
 		*this = Normalized(fallback);
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T& Vector2<T>::Min() noexcept
 	{
 		return const_cast<T&>(std::min(X(), Y()));
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr const T& Vector2<T>::Min() const noexcept
 	{
 		return std::min(X(), Y());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T& Vector2<T>::Max() noexcept
 	{
 		return const_cast<T&>(std::max(X(), Y()));
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr const T& Vector2<T>::Max() const noexcept
 	{
 		return std::max(X(), Y());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr std::pair<T&, T&> Vector2<T>::MinMax() noexcept
 	{
 		return X() < Y() ? std::pair<T&, T&>(X(), Y()) : std::pair<T&, T&>(Y(), X());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr std::pair<const T&, const T&> Vector2<T>::MinMax() const noexcept
 	{
 		return X() < Y() ? std::pair<const T&, const T&>(X(), Y()) : std::pair<const T&, const T&>(Y(), X());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T Vector2<T>::Sum() const noexcept
 	{
 		return X() + Y();
 	}
 
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2<T>::Swapped() const noexcept
+	template<Type::Arithmetic T>
+	constexpr T Vector2<T>::Product() const noexcept
 	{
-		return Vector2(Y(), X());
+		return X() * Y();
 	}
 
-	template<Arithmetic T>
-	constexpr void Vector2<T>::Swap() noexcept
-	{
-		std::swap(X(), Y());
-	}
-
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr bool Vector2<T>::IsZero() const noexcept
 	{
 		return *this == Predefined::Zero;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr bool Vector2<T>::IsAlmostZero(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Predefined::Zero, tolerance);
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr bool Vector2<T>::IsUnit() const noexcept
 	{
 		return MagnitudeSquared() == T{1};
 	}
 
-	template<Arithmetic T>
-	bool Vector2<T>::IsAlmostUnit(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
+	template<Type::Arithmetic T>
+	constexpr bool Vector2<T>::IsAlmostUnit(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(MagnitudeSquared(), T{1}, tolerance);
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr bool Vector2<T>::IsUniform() const noexcept
 	{
 		return X() == Y();
 	}
 
-	template<Arithmetic T>
-	bool Vector2<T>::IsAlmostUniform(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
+	template<Type::Arithmetic T>
+	constexpr bool Vector2<T>::IsAlmostUniform(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(X(), Y(), tolerance);
 	}
 
-	template<Arithmetic T>
-	bool Vector2<T>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
+	template<Type::Arithmetic T>
+	constexpr bool Vector2<T>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
-		return std::isfinite(X()) && std::isfinite(Y());
+		return Math::IsFinite(X()) && Math::IsFinite(Y());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr void Vector2<T>::Multiply(const Vector2& multiplier) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -661,7 +751,7 @@ namespace PonyMath::Core
 		}
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr void Vector2<T>::Divide(const Vector2& divisor) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -670,31 +760,31 @@ namespace PonyMath::Core
 		}
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	std::string Vector2<T>::ToString() const
 	{
 		return std::format("({}, {})", X(), Y());
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		return left.X() * right.X() + left.Y() * right.Y();
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T CrossZ(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		return left.X() * right.Y() - left.Y() * right.X();
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	typename Vector2<T>::ComputationalType Distance(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		return std::sqrt(static_cast<typename Vector2<T>::ComputationalType>(DistanceSquared(left, right)));
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T DistanceSquared(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		return (left - right).MagnitudeSquared();
@@ -737,7 +827,7 @@ namespace PonyMath::Core
 		return vector + normal * multiplier;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> Multiply(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		Vector2<T> product;
@@ -749,7 +839,7 @@ namespace PonyMath::Core
 		return product;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> Divide(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		Vector2<T> quotient;
@@ -761,19 +851,19 @@ namespace PonyMath::Core
 		return quotient;
 	}
 
-	template<Signed T>
-	Vector2<T> Abs(const Vector2<T>& vector) noexcept
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Abs(const Vector2<T>& vector) noexcept
 	{
 		Vector2<T> answer;
 		for (std::size_t i = 0; i < Vector2<T>::ComponentCount; ++i)
 		{
-			answer[i] = std::abs(vector[i]);
+			answer[i] = Abs(vector[i]);
 		}
 
 		return answer;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> Min(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		Vector2<T> min;
@@ -785,7 +875,7 @@ namespace PonyMath::Core
 		return min;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> Max(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		Vector2<T> max;
@@ -797,7 +887,7 @@ namespace PonyMath::Core
 		return max;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> Clamp(const Vector2<T>& value, const Vector2<T>& min, const Vector2<T>& max) noexcept
 	{
 		Vector2<T> clamped;
@@ -819,7 +909,7 @@ namespace PonyMath::Core
 			: vector;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> Lerp(const Vector2<T>& from, const Vector2<T>& to, const typename Vector2<T>::ComputationalType time) noexcept
 	{
 		return from + (to - from) * time;
@@ -828,11 +918,11 @@ namespace PonyMath::Core
 	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, const T tolerance) noexcept
 	{
-		return (left - right).MagnitudeSquared() <= tolerance * tolerance;
+		return DistanceSquared(left, right) <= tolerance * tolerance;
 	}
 
-	template<Arithmetic T>
-	template<Arithmetic U>
+	template<Type::Arithmetic T>
+	template<Type::Arithmetic U>
 	constexpr Vector2<T>::operator Vector2<U>() const noexcept
 	{
 		Vector2<U> cast;
@@ -844,19 +934,25 @@ namespace PonyMath::Core
 		return cast;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr T& Vector2<T>::operator [](const std::size_t index) noexcept
 	{
 		return components[index];
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr const T& Vector2<T>::operator [](const std::size_t index) const noexcept
 	{
 		return components[index];
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
+	constexpr Vector2<T> Vector2<T>::operator [](const std::size_t xIndex, const std::size_t yIndex) const noexcept
+	{
+		return Vector2(components[xIndex], components[yIndex]);
+	}
+
+	template<Type::Arithmetic T>
 	constexpr Vector2<T>& Vector2<T>::operator +=(const Vector2& other) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -867,7 +963,7 @@ namespace PonyMath::Core
 		return *this;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T>& Vector2<T>::operator -=(const Vector2& other) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -878,7 +974,7 @@ namespace PonyMath::Core
 		return *this;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T>& Vector2<T>::operator *=(const T multiplier) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -889,7 +985,7 @@ namespace PonyMath::Core
 		return *this;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T>& Vector2<T>::operator *=(const ComputationalType multiplier) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -900,7 +996,7 @@ namespace PonyMath::Core
 		return *this;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T>& Vector2<T>::operator /=(const T divisor) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -911,7 +1007,7 @@ namespace PonyMath::Core
 		return *this;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
@@ -922,7 +1018,7 @@ namespace PonyMath::Core
 		return *this;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> operator +(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		Vector2<T> sum;
@@ -934,7 +1030,7 @@ namespace PonyMath::Core
 		return sum;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> operator -(const Vector2<T>& vector) noexcept
 	{
 		Vector2<T> negated;
@@ -946,7 +1042,7 @@ namespace PonyMath::Core
 		return negated;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> operator -(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		Vector2<T> difference;
@@ -958,7 +1054,7 @@ namespace PonyMath::Core
 		return difference;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> operator *(const Vector2<T>& vector, const T multiplier) noexcept
 	{
 		Vector2<T> product;
@@ -982,7 +1078,7 @@ namespace PonyMath::Core
 		return product;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> operator *(const T multiplier, const Vector2<T>& vector) noexcept
 	{
 		return vector * multiplier;
@@ -994,7 +1090,7 @@ namespace PonyMath::Core
 		return vector * multiplier;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	constexpr Vector2<T> operator /(const Vector2<T>& vector, const T divisor) noexcept
 	{
 		Vector2<T> quotient;
@@ -1018,7 +1114,7 @@ namespace PonyMath::Core
 		return quotient;
 	}
 
-	template<Arithmetic T>
+	template<Type::Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Vector2<T>& vector)
 	{
 		return stream << vector.ToString();
