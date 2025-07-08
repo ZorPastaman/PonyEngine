@@ -7,7 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math;
+export module PonyEngine.Type;
 
 export import :Common;
-export import :Vector;

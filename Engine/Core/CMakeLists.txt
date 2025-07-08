@@ -33,6 +33,8 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Log/Log-LogInput.cppm"
 	"Source/Public/Log/Log-LogType.cppm"
 	"Source/Public/Platform/Platform.cppm"
+	"Source/Public/Type/Type.cppm"
+	"Source/Public/Type/Type-Common.cppm"
 	"Source/Public/Utility/Utility.cppm"
 	"Source/Public/Utility/Utility-ObjectInterfaces.cppm"
 	"Source/Public/Utility/Utility-SafeFormat.cppm"

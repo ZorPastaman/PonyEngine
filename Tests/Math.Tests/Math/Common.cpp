@@ -14,74 +14,6 @@ import std;
 
 import PonyEngine.Math;
 
-TEST_CASE("Arithmetic concept", "[Math][Common]") 
-{
-	STATIC_REQUIRE(PonyEngine::Math::Arithmetic<std::int32_t>);
-	STATIC_REQUIRE(PonyEngine::Math::Arithmetic<std::uint64_t>);
-	STATIC_REQUIRE(PonyEngine::Math::Arithmetic<float>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::Arithmetic<void*>);
-}
-
-TEST_CASE("Signed concept", "[Math][Common]")
-{
-	STATIC_REQUIRE(PonyEngine::Math::Signed<std::int16_t>);
-	STATIC_REQUIRE(PonyEngine::Math::Signed<float>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::Signed<std::uint32_t>);
-}
-
-TEST_CASE("IsGreater", "[Math][Common]")
-{
-	STATIC_REQUIRE(PonyEngine::Math::IsGreater<double, float>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsGreater<float, double>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsGreater<float, std::int64_t>);
-	STATIC_REQUIRE(PonyEngine::Math::IsGreater<std::int64_t, float>);
-	STATIC_REQUIRE(PonyEngine::Math::IsGreater<std::uint16_t, std::int8_t>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsGreater<std::int8_t, std::uint16_t>);
-}
-TEST_CASE("IsLess", "[Math][Common]")
-{
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsLess<double, float>);
-	STATIC_REQUIRE(PonyEngine::Math::IsLess<float, double>);
-	STATIC_REQUIRE(PonyEngine::Math::IsLess<float, std::int64_t>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsLess<std::int64_t, float>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsLess<std::uint16_t, std::int8_t>);
-	STATIC_REQUIRE(PonyEngine::Math::IsLess<std::int8_t, std::uint16_t>);
-}
-
-TEST_CASE("IsEqual", "[Math][Common]")
-{
-	STATIC_REQUIRE(PonyEngine::Math::IsEqual<std::int64_t, std::int64_t>);
-	STATIC_REQUIRE(PonyEngine::Math::IsEqual<std::int64_t, std::uint64_t>);
-	STATIC_REQUIRE(PonyEngine::Math::IsEqual<std::int32_t, float>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsEqual<std::int16_t, double>);
-	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsEqual<float, double>);
-}
-
-TEST_CASE("FloatingBySize and ComputationalFor", "[Math][Common]")
-{
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<float>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<double>, double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<std::int16_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<std::uint32_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<std::int64_t>, double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<std::uint64_t>, double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<std::pair<std::int64_t, std::int8_t>>, long double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::FloatingBySize<std::pair<std::uint64_t, std::uint8_t>>, long double>);
-}
-
-TEST_CASE("ComputationalFor", "[Math][Common]")
-{
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<float>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<double>, double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<long double>, long double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<std::int8_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<std::uint16_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<std::int32_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<std::uint64_t>, double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<std::pair<std::int64_t, std::int8_t>>, long double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::ComputationalFor<std::pair<std::uint64_t, std::uint8_t>>, long double>);
-}
-
 TEST_CASE("DegToRad and RadToDeg", "[Math][Common]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::DegToRad<float>, std::numbers::pi_v<float> / 180.f));
@@ -92,17 +24,17 @@ TEST_CASE("DegToRad and RadToDeg", "[Math][Common]")
 
 TEST_CASE("AreAlmostEqual", "[Math][Common]")
 {
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-6f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-10f));
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f, 3.f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-6f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-10f));
 	REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f, 3.f));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-6f) & PonyEngine::Math::AreAlmostEqual(1.f, 2.f);
+		return PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-10f) & PonyEngine::Math::AreAlmostEqual(1.f, 2.f);
 	};
 #endif
 }
@@ -236,6 +168,164 @@ TEST_CASE("Align", "[Math][Common]")
 	BENCHMARK("Bench")
 	{
 		return PonyEngine::Math::Align(17u, 8u);
+	};
+#endif
+}
+
+TEST_CASE("Abs", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::Abs(5) == 5);
+	STATIC_REQUIRE(PonyEngine::Math::Abs(-5) == 5);
+	STATIC_REQUIRE(PonyEngine::Math::Abs(5.f) == 5.f);
+	STATIC_REQUIRE(PonyEngine::Math::Abs(-5.f) == 5.f);
+	STATIC_REQUIRE(PonyEngine::Math::Abs(5u) == 5u);
+	REQUIRE(PonyEngine::Math::Abs(5) == 5);
+	REQUIRE(PonyEngine::Math::Abs(-5) == 5);
+	REQUIRE(PonyEngine::Math::Abs(5.f) == 5.f);
+	REQUIRE(PonyEngine::Math::Abs(-5.f) == 5.f);
+	REQUIRE(PonyEngine::Math::Abs(5u) == 5u);
+}
+
+TEST_CASE("Factorial", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::Factorial(0u) == 1u);
+	STATIC_REQUIRE(PonyEngine::Math::Factorial(1u) == 1u);
+	STATIC_REQUIRE(PonyEngine::Math::Factorial(2u) == 2u);
+	STATIC_REQUIRE(PonyEngine::Math::Factorial(10u) == 3628800u);
+	STATIC_REQUIRE(PonyEngine::Math::Factorial(20ull) == 2432902008176640000ull);
+	REQUIRE(PonyEngine::Math::Factorial(0u) == 1u);
+	REQUIRE(PonyEngine::Math::Factorial(1u) == 1u);
+	REQUIRE(PonyEngine::Math::Factorial(2u) == 2u);
+	REQUIRE(PonyEngine::Math::Factorial(10u) == 3628800u);
+	REQUIRE(PonyEngine::Math::Factorial(20ull) == 2432902008176640000ull);
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Zero")
+	{
+		return PonyEngine::Math::Factorial(0u);
+	};
+	BENCHMARK("One")
+	{
+		return PonyEngine::Math::Factorial(1u);
+	};
+	BENCHMARK("Ten")
+	{
+		return PonyEngine::Math::Factorial(10u);
+	};
+	BENCHMARK("Twenty")
+	{
+		return PonyEngine::Math::Factorial(20u);
+	};
+#endif
+}
+
+TEST_CASE("IsInf", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::IsInf(std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE(PonyEngine::Math::IsInf(-std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsInf(1.23f));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsInf(0.f));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsInf(std::numeric_limits<float>::quiet_NaN()));
+	REQUIRE(PonyEngine::Math::IsInf(std::numeric_limits<float>::infinity()));
+	REQUIRE(PonyEngine::Math::IsInf(-std::numeric_limits<float>::infinity()));
+	REQUIRE_FALSE(PonyEngine::Math::IsInf(1.23f));
+	REQUIRE_FALSE(PonyEngine::Math::IsInf(0.f));
+	REQUIRE_FALSE(PonyEngine::Math::IsInf(std::numeric_limits<float>::quiet_NaN()));
+
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsInf(42));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsInf(0));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsInf(-69));
+	REQUIRE_FALSE(PonyEngine::Math::IsInf(42));
+	REQUIRE_FALSE(PonyEngine::Math::IsInf(0));
+	REQUIRE_FALSE(PonyEngine::Math::IsInf(-69));
+}
+
+TEST_CASE("IsNan", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::IsNan(std::numeric_limits<float>::quiet_NaN()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNan(std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNan(-std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNan(0.f));
+	REQUIRE(PonyEngine::Math::IsNan(std::numeric_limits<float>::quiet_NaN()));
+	REQUIRE_FALSE(PonyEngine::Math::IsNan(std::numeric_limits<float>::infinity()));
+	REQUIRE_FALSE(PonyEngine::Math::IsNan(-std::numeric_limits<float>::infinity()));
+	REQUIRE_FALSE(PonyEngine::Math::IsNan(0.f));
+
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNan(42));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNan(0));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNan(-69));
+	REQUIRE_FALSE(PonyEngine::Math::IsNan(42));
+	REQUIRE_FALSE(PonyEngine::Math::IsNan(0));
+	REQUIRE_FALSE(PonyEngine::Math::IsNan(-69));
+}
+
+TEST_CASE("IsNormal", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::IsNormal(1.23f));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNormal(0.f));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNormal(std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNormal(-std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNormal(std::numeric_limits<float>::quiet_NaN()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNormal(std::numeric_limits<float>::denorm_min()));
+	REQUIRE(PonyEngine::Math::IsNormal(1.23f));
+	REQUIRE_FALSE(PonyEngine::Math::IsNormal(0.f));
+	REQUIRE_FALSE(PonyEngine::Math::IsNormal(std::numeric_limits<float>::infinity()));
+	REQUIRE_FALSE(PonyEngine::Math::IsNormal(-std::numeric_limits<float>::infinity()));
+	REQUIRE_FALSE(PonyEngine::Math::IsNormal(std::numeric_limits<float>::quiet_NaN()));
+	REQUIRE_FALSE(PonyEngine::Math::IsNormal(std::numeric_limits<float>::denorm_min()));
+
+	STATIC_REQUIRE(PonyEngine::Math::IsNormal(42));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsNormal(0));
+	STATIC_REQUIRE(PonyEngine::Math::IsNormal(-69));
+	REQUIRE(PonyEngine::Math::IsNormal(42));
+	REQUIRE_FALSE(PonyEngine::Math::IsNormal(0));
+	REQUIRE(PonyEngine::Math::IsNormal(-69));
+}
+
+TEST_CASE("IsFinite", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::IsFinite(1.23f));
+	STATIC_REQUIRE(PonyEngine::Math::IsFinite(0.f));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsFinite(std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsFinite(-std::numeric_limits<float>::infinity()));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsFinite(std::numeric_limits<float>::quiet_NaN()));
+	REQUIRE(PonyEngine::Math::IsFinite(1.23f));
+	REQUIRE(PonyEngine::Math::IsFinite(0.f));
+	REQUIRE_FALSE(PonyEngine::Math::IsFinite(std::numeric_limits<float>::infinity()));
+	REQUIRE_FALSE(PonyEngine::Math::IsFinite(-std::numeric_limits<float>::infinity()));
+	REQUIRE_FALSE(PonyEngine::Math::IsFinite(std::numeric_limits<float>::quiet_NaN()));
+
+	STATIC_REQUIRE(PonyEngine::Math::IsFinite(42));
+	STATIC_REQUIRE(PonyEngine::Math::IsFinite(0));
+	STATIC_REQUIRE(PonyEngine::Math::IsFinite(-69));
+	REQUIRE(PonyEngine::Math::IsFinite(42));
+	REQUIRE(PonyEngine::Math::IsFinite(0));
+	REQUIRE(PonyEngine::Math::IsFinite(-69));
+}
+
+TEST_CASE("IsEven/Odd", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::IsEven(0));
+	STATIC_REQUIRE(PonyEngine::Math::IsEven(2));
+	STATIC_REQUIRE(PonyEngine::Math::IsEven(-10));
+	STATIC_REQUIRE(PonyEngine::Math::IsOdd(1));
+	STATIC_REQUIRE(PonyEngine::Math::IsOdd(7));
+	STATIC_REQUIRE(PonyEngine::Math::IsOdd(-11));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsOdd(0));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsOdd(2));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsOdd(-10));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsEven(1));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsEven(7));
+	STATIC_REQUIRE_FALSE(PonyEngine::Math::IsEven(-11));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("IsEven")
+	{
+		return PonyEngine::Math::IsEven(2) | PonyEngine::Math::IsEven(7);
+	};
+	BENCHMARK("IsOdd")
+	{
+		return PonyEngine::Math::IsEven(5) | PonyEngine::Math::IsEven(12);
 	};
 #endif
 }

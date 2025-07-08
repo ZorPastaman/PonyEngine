@@ -4,6 +4,7 @@ add_executable(PonyEngine.Math.Tests)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/Common.cpp"
+	"Math/Vector.cpp"
 )
 
 message(VERBOSE "Configuring defines")
