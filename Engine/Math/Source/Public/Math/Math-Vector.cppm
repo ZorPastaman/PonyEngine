@@ -406,7 +406,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Reflect(const Vector<T, Size>& vector, const Vector<T, Size>& normal) noexcept requires (Size >= 1uz);
 
-	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
+	/// @brief Multiplies the @p lhs vector by the @p rhs vector component-wise.
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
 	/// @param lhs Multiplicand.
@@ -414,7 +414,7 @@ export namespace PonyEngine::Math
 	/// @return Product.
 	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Multiply(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
-	/// @brief Divides the @p left vector by the @p right vector component-wise.
+	/// @brief Divides the @p lhs vector by the @p rhs vector component-wise.
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
 	/// @param lhs Dividend.
@@ -485,7 +485,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs, T tolerance = T{0.00001}) noexcept requires (Size >= 1uz);
 
-	/// @brief Sums the @p left vector and the @p right vector.
+	/// @brief Sums the @p lhs and the @p rhs vectors.
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
 	/// @param lhs Augend.
@@ -502,7 +502,7 @@ export namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator -(const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
 
-	/// @brief Subtracts the @p right vector from the @p left vector.
+	/// @brief Subtracts the @p rhs vector from the @p lhs one.
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
 	/// @param lhs Minuend.

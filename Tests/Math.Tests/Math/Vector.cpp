@@ -235,7 +235,8 @@ TEST_CASE("Vector move constructor", "[Math][Vector]")
 	auto moveTest = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Vector<T, Size>& vector) constexpr
 	{
 		auto copy = vector;
-		return std::move(copy);
+		auto moved = std::move(copy);
+		return moved;
 	};
 
 	constexpr std::int32_t x = -5;

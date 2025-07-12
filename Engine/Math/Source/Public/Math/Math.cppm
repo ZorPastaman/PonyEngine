@@ -10,4 +10,5 @@
 export module PonyEngine.Math;
 
 export import :Common;
+export import :Quaternion;
 export import :Vector;
