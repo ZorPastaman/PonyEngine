@@ -13,6 +13,7 @@
 import std;
 
 import PonyEngine.Math;
+import PonyEngine.Type;
 
 TEST_CASE("Quaternion static", "[Math][Quaternion]")
 {

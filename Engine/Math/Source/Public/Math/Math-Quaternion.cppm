@@ -339,7 +339,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Quaternion<T>::Quaternion(std::span<const T, ComponentCount> span) noexcept :
+	constexpr Quaternion<T>::Quaternion(const std::span<const T, ComponentCount> span) noexcept :
 		components(span)
 	{
 	}
