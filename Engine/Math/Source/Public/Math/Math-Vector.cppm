@@ -21,7 +21,7 @@ export namespace PonyEngine::Math
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	class Vector final
+	class Vector final // TODO: Add SIMD alignas
 	{
 	public:
 		using ValueType = T; ///< Component type.
@@ -862,8 +862,8 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T Vector<T, Size>::Sum() const noexcept
 	{
-		T answer = (*this)[0];
-		for (std::size_t i = 1uz; i < Size; ++i)
+		T answer = T{0};
+		for (std::size_t i = 0uz; i < Size; ++i)
 		{
 			answer += (*this)[i];
 		}
@@ -874,8 +874,8 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T Vector<T, Size>::Product() const noexcept
 	{
-		T answer = (*this)[0];
-		for (std::size_t i = 1uz; i < Size; ++i)
+		T answer = T{1};
+		for (std::size_t i = 0uz; i < Size; ++i)
 		{
 			answer *= (*this)[i];
 		}
@@ -981,8 +981,8 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size>
 	constexpr T Dot(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
-		T answer = lhs[0] * rhs[0];
-		for (std::size_t i = 1uz; i < Size; ++i)
+		T answer = T{0};
+		for (std::size_t i = 0uz; i < Size; ++i)
 		{
 			answer += lhs[i] * rhs[i];
 		}
