@@ -15,6 +15,12 @@ import std;
 import PonyEngine.Math;
 import PonyEngine.Type;
 
+TEST_CASE("Quaternion size", "[Math][Quaternion]")
+{
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Quaternion<float>) == sizeof(float) * 4);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Quaternion<double>) == sizeof(double) * 4);
+}
+
 TEST_CASE("Quaternion static", "[Math][Quaternion]")
 {
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Quaternion<float>::ValueType, float>);

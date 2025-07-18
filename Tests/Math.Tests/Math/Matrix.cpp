@@ -15,6 +15,33 @@ import std;
 import PonyEngine.Math;
 import PonyEngine.Type;
 
+TEST_CASE("Matrix size", "[Math][Matrix]")
+{
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix1x1<std::int8_t>) == sizeof(std::int8_t));
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix1x2<std::int8_t>) == sizeof(std::int8_t) * 2);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix2x2<std::int8_t>) == sizeof(std::int8_t) * 4);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix2x3<std::int8_t>) == sizeof(std::int8_t) * 6);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix3x3<std::int8_t>) == sizeof(std::int8_t) * 9);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix3x4<std::int8_t>) == sizeof(std::int8_t) * 12);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix4x4<std::int8_t>) == sizeof(std::int8_t) * 16);
+
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix1x1<std::int16_t>) == sizeof(std::int16_t));
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix1x2<std::int16_t>) == sizeof(std::int16_t) * 2);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix2x2<std::int16_t>) == sizeof(std::int16_t) * 4);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix2x3<std::int16_t>) == sizeof(std::int16_t) * 6);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix3x3<std::int16_t>) == sizeof(std::int16_t) * 9);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix3x4<std::int16_t>) == sizeof(std::int16_t) * 12);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix4x4<std::int16_t>) == sizeof(std::int16_t) * 16);
+
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix1x1<std::int32_t>) == sizeof(std::int32_t));
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix1x2<std::int32_t>) == sizeof(std::int32_t) * 2);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix2x2<std::int32_t>) == sizeof(std::int32_t) * 4);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix2x3<std::int32_t>) == sizeof(std::int32_t) * 6);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix3x3<std::int32_t>) == sizeof(std::int32_t) * 9);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix3x4<std::int32_t>) == sizeof(std::int32_t) * 12);
+	STATIC_REQUIRE(sizeof(PonyEngine::Math::Matrix4x4<std::int32_t>) == sizeof(std::int32_t) * 16);
+}
+
 TEST_CASE("Matrix static", "[Math][Matrix]")
 {
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Matrix2x2<std::int32_t>::ValueType, std::int32_t>);
