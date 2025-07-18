@@ -579,6 +579,10 @@ struct std::formatter<PonyEngine::Math::Vector<T, Size>, char>
 {
 	static constexpr auto parse(std::format_parse_context& context)
 	{
+		if (context.begin() == context.end()) [[unlikely]]
+		{
+			throw std::format_error("Unexpected context end.");
+		}
 		if (*context.begin() != '}') [[unlikely]]
 		{
 			throw std::format_error("Unexpected format specifier.");
