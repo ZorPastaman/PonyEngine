@@ -19,12 +19,12 @@ export namespace PonyEngine::Math
 	/// @brief Quaternion.
 	/// @tparam T Component type.
 	template<std::floating_point T>
-	class Quaternion final
+	class alignas(AlignSIMD(sizeof(T), 4uz)) Quaternion final
 	{
 	public:
 		using ValueType = T; ///< Component type.
 
-		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any quaternion, it's always 4.
+		static constexpr std::size_t ComponentCount = 4uz; ///< Component count. For any quaternion, it's always 4.
 
 		/// @brief Creates a quaternion and sets its components to zero.
 		[[nodiscard("Pure constructor")]]

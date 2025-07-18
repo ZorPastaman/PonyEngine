@@ -172,6 +172,20 @@ TEST_CASE("Align", "[Math][Common]")
 #endif
 }
 
+TEST_CASE("Align SIMD", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(0, 0) == 0uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(0, 1) == 0uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(1, 1) == 1uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(2, 1) == 2uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(2, 2) == 4uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(4, 3) == 4uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(4, 4) == 16uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(4, 10) == 8uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(4, 16) == 64uz);
+	STATIC_REQUIRE(PonyEngine::Math::AlignSIMD(4, 9) == 4uz);
+}
+
 TEST_CASE("Abs", "[Math][Common]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::Abs(5) == 5);
