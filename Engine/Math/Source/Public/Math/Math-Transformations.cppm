@@ -670,7 +670,6 @@ namespace PonyEngine::Math
 	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept
 	{
 		Quaternion<T> quaternion;
-
 		if (const T trace = rotationMatrix.Trace(); trace > T{0})
 		{
 			const T s = std::sqrt(T{1} + trace) * T {2};
@@ -1255,7 +1254,25 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	T ExtractAngleCompact(const Matrix2x3<T>& trsMatrix) noexcept
 	{
-		return ExtractAngle(ExtractRsMatrix(trsMatrix));
+		return ExtractAngle(ExtractRsMatrixCompact(trsMatrix));
+	}
+
+	template<std::floating_point T>
+	Quaternion<T> ExtractRotationQuaternion(const Matrix3x3<T>& rsMatrix) noexcept
+	{
+		return RotationQuaternion(ExtractRotationMatrix(rsMatrix));
+	}
+
+	template<std::floating_point T>
+	Quaternion<T> ExtractRotationQuaternion(const Matrix4x4<T>& trsMatrix) noexcept
+	{
+		return RotationQuaternion(ExtractRotationMatrix(trsMatrix));
+	}
+
+	template<std::floating_point T>
+	Quaternion<T> ExtractRotationQuaternionCompact(const Matrix3x4<T>& trsMatrix) noexcept
+	{
+		return RotationQuaternion(ExtractRotationMatrixCompact(trsMatrix));
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -1283,6 +1300,42 @@ namespace PonyEngine::Math
 	Matrix<T, Size, Size> ExtractRotationMatrixCompact(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
 	{
 		return ExtractRotationMatrix(ExtractRsMatrixCompact(trsMatrix));
+	}
+
+	template<std::floating_point T>
+	Vector3<T> ExtractEuler(const Matrix3x3<T>& rsMatrix) noexcept
+	{
+		return Euler(ExtractRotationMatrix(rsMatrix));
+	}
+
+	template<std::floating_point T>
+	Vector3<T> ExtractEuler(const Matrix4x4<T>& trsMatrix) noexcept
+	{
+		return Euler(ExtractRotationMatrix(trsMatrix));
+	}
+
+	template<std::floating_point T>
+	Vector3<T> ExtractEulerCompact(const Matrix3x4<T>& trsMatrix) noexcept
+	{
+		return Euler(ExtractRotationMatrixCompact(trsMatrix));
+	}
+
+	template<std::floating_point T>
+	std::pair<Vector3<T>, T> ExtractAxisAngle(const Matrix3x3<T>& rsMatrix) noexcept
+	{
+		return AxisAngle(ExtractRotationMatrix(rsMatrix));
+	}
+
+	template<std::floating_point T>
+	std::pair<Vector3<T>, T> ExtractAxisAngle(const Matrix4x4<T>& trsMatrix) noexcept
+	{
+		return AxisAngle(ExtractRotationMatrix(trsMatrix));
+	}
+
+	template<std::floating_point T>
+	std::pair<Vector3<T>, T> ExtractAxisAngleCompact(const Matrix3x4<T>& trsMatrix) noexcept
+	{
+		return AxisAngle(ExtractRotationMatrixCompact(trsMatrix));
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -1335,9 +1388,65 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	T ExtractFov(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	{
+		const T fovTan = T{1} / perspectiveMatrix[1, 1];
+
+		return std::atan(fovTan) * T {2};
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractWidth(const Matrix4x4<T>& orthographicMatrix) noexcept
+	{
+		return T{2} / orthographicMatrix[0, 0];
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractHeight(const Matrix4x4<T>& orthographicMatrix) noexcept
+	{
+		return T{2} / orthographicMatrix[1, 1];
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractAspect(const Matrix4x4<T>& projectionMatrix) noexcept
+	{
+		return projectionMatrix[1, 1] / projectionMatrix[0, 0];
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractNearPlane(const Matrix4x4<T>& projectionMatrix) noexcept
+	{
+		return -projectionMatrix[2, 3] / projectionMatrix[2, 2];
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractFarPlanePerspective(const Matrix4x4<T>& orthographicMatrix) noexcept
+	{
+		return -orthographicMatrix[2, 3] / (orthographicMatrix[2, 3] - T{1});
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractFarPlaneOrthographic(const Matrix4x4<T>& orthographicMatrix) noexcept
+	{
+		return (T{1} - orthographicMatrix[2, 3]) / orthographicMatrix[2, 2];
+	}
+
+	template<std::floating_point T>
 	Vector2<T> Rotate(const Vector2<T>& vector, const T angle) noexcept
 	{
 		return RotationMatrix(angle) * vector;
+	}
+
+	template<std::floating_point T>
+	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& axis, const T angle) noexcept
+	{
+		const Vector3<T> cross = Cross(axis, vector);
+		const T dot = Dot(axis, vector);
+		const T sin = std::sin(angle);
+		const T cos = std::cos(angle);
+		const T mCos = T{1} - cos;
+
+		return vector * cos + cross * sin + axis * (dot * mCos);
 	}
 
 	template<bool PerspectiveDivision, std::floating_point T, std::size_t Size>
@@ -1394,5 +1503,14 @@ namespace PonyEngine::Math
 		homogeneous[Size] = homogeneousComponent;
 
 		return homogeneous;
+	}
+
+	template<std::floating_point T>
+	Matrix3x3<T> LookIn(const Vector3<T>& forward, const Vector3<T>& up) noexcept
+	{
+		const Vector3<T> right = Cross(up, forward).Normalized();
+		const Vector3<T> trueUp = Cross(forward, right);
+
+		return Matrix3x3<T>(right, trueUp, forward);
 	}
 }
