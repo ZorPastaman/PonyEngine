@@ -9,6 +9,7 @@ target_sources(PonyEngine.Math PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Common.cppm"
 	"Source/Public/Math/Math-Matrix.cppm"
 	"Source/Public/Math/Math-Quaternion.cppm"
+	"Source/Public/Math/Math-Transformations.cppm"
 	"Source/Public/Math/Math-Vector.cppm"
 )
 
