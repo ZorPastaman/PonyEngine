@@ -6,6 +6,7 @@ target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/Common.cpp"
 	"Math/Matrix.cpp"
 	"Math/Quaternion.cpp"
+	"Math/Transformations.cpp"
 	"Math/Vector.cpp"
 )
 

@@ -19,7 +19,7 @@ export namespace PonyEngine::Math
 {
 	/// @brief Converts the 2D rotation matrix to a rotation angle.
 	/// @tparam T Value type.
-	/// @param rotationMatrix Rotation matrix. 
+	/// @param rotationMatrix Rotation matrix.
 	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T RotationAngle(const Matrix2x2<T>& rotationMatrix) noexcept;
@@ -672,7 +672,7 @@ namespace PonyEngine::Math
 		Quaternion<T> quaternion;
 		if (const T trace = rotationMatrix.Trace(); trace > T{0})
 		{
-			const T s = std::sqrt(T{1} + trace) * T {2};
+			const T s = std::sqrt(T{1} + trace) * T{2};
 			const T inverseS = T{1} / s;
 
 			quaternion.X() = (rotationMatrix[2, 1] - rotationMatrix[1, 2]) * inverseS;
@@ -682,7 +682,7 @@ namespace PonyEngine::Math
 		}
 		else if (rotationMatrix[0, 0] > rotationMatrix[1, 1] && rotationMatrix[0, 0] > rotationMatrix[2, 2])
 		{
-			const T s = std::sqrt(T{1} + rotationMatrix[0, 0] - rotationMatrix[1, 1] - rotationMatrix[2, 2]) * T {2};
+			const T s = std::sqrt(T{1} + rotationMatrix[0, 0] - rotationMatrix[1, 1] - rotationMatrix[2, 2]) * T{2};
 			const T inverseS = T{1} / s;
 
 			quaternion.X() = s * T{0.25};
@@ -692,7 +692,7 @@ namespace PonyEngine::Math
 		}
 		else if (rotationMatrix[1, 1] > rotationMatrix[2, 2])
 		{
-			const T s = std::sqrt(T{1} + rotationMatrix[1, 1] - rotationMatrix[0, 0] - rotationMatrix[2, 2]) * T {2};
+			const T s = std::sqrt(T{1} + rotationMatrix[1, 1] - rotationMatrix[0, 0] - rotationMatrix[2, 2]) * T{2};
 			const T inverseS = T{1} / s;
 
 			quaternion.X() = (rotationMatrix[0, 1] + rotationMatrix[1, 0]) * inverseS;
@@ -702,7 +702,7 @@ namespace PonyEngine::Math
 		}
 		else
 		{
-			const T s = std::sqrt(T{1} + rotationMatrix[2, 2] - rotationMatrix[0, 0] - rotationMatrix[1, 1]) * T {2};
+			const T s = std::sqrt(T{1} + rotationMatrix[2, 2] - rotationMatrix[0, 0] - rotationMatrix[1, 1]) * T{2};
 			const T inverseS = T{1} / s;
 
 			quaternion.X() = (rotationMatrix[0, 2] + rotationMatrix[2, 0]) * inverseS;
@@ -717,17 +717,14 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Quaternion<T> RotationQuaternion(const Vector3<T>& euler) noexcept
 	{
-		const T xHalf = euler.X() * T {0.5};
-		const T yHalf = euler.Y() * T {0.5};
-		const T zHalf = euler.Z() * T {0.5};
+		const Vector3<T> eulerHalf = euler * T{0.5};
 
-		const T xSin = std::sin(xHalf);
-		const T ySin = std::sin(yHalf);
-		const T zSin = std::sin(zHalf);
-
-		const T xCos = std::cos(xHalf);
-		const T yCos = std::cos(yHalf);
-		const T zCos = std::cos(zHalf);
+		const T xSin = std::sin(eulerHalf.X());
+		const T xCos = std::cos(eulerHalf.X());
+		const T ySin = std::sin(eulerHalf.Y());
+		const T yCos = std::cos(eulerHalf.Y());
+		const T zSin = std::sin(eulerHalf.Z());
+		const T zCos = std::cos(eulerHalf.Z());
 
 		const T xSyS = xSin * ySin;
 		const T xSyC = xSin * yCos;
@@ -1242,7 +1239,9 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	T ExtractAngle(const Matrix2x2<T>& rsMatrix) noexcept
 	{
-		return RotationAngle(rsMatrix);
+		return rsMatrix.Column(0).IsAlmostZero()
+			? std::atan2(-rsMatrix[0, 1], rsMatrix[1, 1])
+			: std::atan2(rsMatrix[1, 0], rsMatrix[0, 0]);
 	}
 
 	template<std::floating_point T>
