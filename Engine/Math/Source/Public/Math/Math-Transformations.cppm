@@ -801,15 +801,15 @@ namespace PonyEngine::Math
 		const T zw = quaternion.Z() * quaternion.W();
 
 		Matrix3x3<T> rotationMatrix;
-		rotationMatrix[0, 0] = T{1} - T{2} * (yy + zz);
+		rotationMatrix[0, 0] = T{1} - (yy + zz) * T{2};
 		rotationMatrix[1, 0] = T{2} * (xy + zw);
 		rotationMatrix[2, 0] = T{2} * (xz - yw);
 		rotationMatrix[0, 1] = T{2} * (xy - zw);
-		rotationMatrix[1, 1] = T{1} - T{2} * (xx + zz);
+		rotationMatrix[1, 1] = T{1} - (xx + zz) * T{2};
 		rotationMatrix[2, 1] = T{2} * (yz + xw);
 		rotationMatrix[0, 2] = T{2} * (xz + yw);
 		rotationMatrix[1, 2] = T{2} * (yz - xw);
-		rotationMatrix[2, 2] = T{1} - T{2} *(xx + yy);
+		rotationMatrix[2, 2] = T{1} - (xx + yy) * T{2};
 
 		return rotationMatrix;
 	}
@@ -818,20 +818,22 @@ namespace PonyEngine::Math
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& euler) noexcept
 	{
 		const T xSin = std::sin(euler.X());
-		const T ySin = std::sin(euler.Y());
-		const T zSin = std::sin(euler.Z());
-
 		const T xCos = std::cos(euler.X());
+		const T ySin = std::sin(euler.Y());
 		const T yCos = std::cos(euler.Y());
+		const T zSin = std::sin(euler.Z());
 		const T zCos = std::cos(euler.Z());
 
+		const T xSyS = xSin * ySin;
+		const T xSyC = xSin * yCos;
+
 		Matrix3x3<T> rotationMatrix;
-		rotationMatrix[0, 0] = xSin * ySin * zSin + yCos * zCos;
+		rotationMatrix[0, 0] = xSyS * zSin + yCos * zCos;
 		rotationMatrix[1, 0] = xCos * zSin;
-		rotationMatrix[2, 0] = xSin * yCos * zSin - ySin * zCos;
-		rotationMatrix[0, 1] = xSin * ySin * zCos - yCos * zSin;
+		rotationMatrix[2, 0] = xSyC * zSin - ySin * zCos;
+		rotationMatrix[0, 1] = xSyS * zCos - yCos * zSin;
 		rotationMatrix[1, 1] = xCos * zCos;
-		rotationMatrix[2, 1] = xSin * yCos * zCos + ySin * zSin;
+		rotationMatrix[2, 1] = xSyC * zCos + ySin * zSin;
 		rotationMatrix[0, 2] = xCos * ySin;
 		rotationMatrix[1, 2] = -xSin;
 		rotationMatrix[2, 2] = xCos * yCos;
@@ -998,7 +1000,6 @@ namespace PonyEngine::Math
 		const T dot = Dot(fromDirection, toDirection);
 
 		std::pair<Vector3<T>, T> axisAngle;
-
 		if (dot > T{0.9999}) [[unlikely]]
 		{
 			axisAngle.first = Vector3<T>::Forward();
