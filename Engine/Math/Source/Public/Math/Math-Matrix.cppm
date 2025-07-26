@@ -1233,10 +1233,10 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>
 	constexpr Vector<T, RowCount> operator *(const Matrix<T, RowCount, ColumnCount>& matrix, const Vector<T, ColumnCount>& vector) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
 	{
-		Vector<T, RowCount> answer;
-		for (std::size_t i = 0uz; i < RowCount; ++i)
+		auto answer = Vector<T, RowCount>::Zero();
+		for (std::size_t i = 0uz; i < ColumnCount; ++i)
 		{
-			answer[i] = Dot(matrix.Row(i), vector);
+			answer += matrix.Column(i) * vector[i];
 		}
 
 		return answer;
