@@ -95,12 +95,6 @@ export namespace PonyEngine::Math
 	/// @return Aligned value.
 	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
 	constexpr T Align(T value, T alignment) noexcept;
-	/// @brief Computes an optimal array alignment for SIMD.
-	/// @param elementSize Element size.
-	/// @param elementCount Element count.
-	/// @return Array alignment.
-	[[nodiscard("Pure function")]]
-	constexpr std::size_t AlignSIMD(std::size_t elementSize, std::size_t elementCount) noexcept;
 
 	/// @brief Computes an absolute value.
 	/// @remark In non-constexpr context it just calls std::abs.
@@ -225,18 +219,6 @@ namespace PonyEngine::Math
 		const T alignmentValue = alignment - T{1};
 
 		return value + alignmentValue & ~alignmentValue;
-	}
-
-	constexpr std::size_t AlignSIMD(const std::size_t elementSize, const std::size_t elementCount) noexcept
-	{
-		const std::size_t arraySize = elementSize * elementCount;
-		std::size_t alignment = std::bit_floor(arraySize);
-		while (alignment > elementSize && arraySize % alignment)
-		{
-			alignment >>= 1uz;
-		}
-
-		return alignment;
 	}
 
 	template<Type::Arithmetic T>

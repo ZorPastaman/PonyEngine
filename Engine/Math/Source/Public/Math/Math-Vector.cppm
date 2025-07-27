@@ -21,7 +21,7 @@ export namespace PonyEngine::Math
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	class alignas(AlignSIMD(sizeof(T), Size)) Vector final
+	class Vector final
 	{
 	public:
 		using ValueType = T; ///< Component type.

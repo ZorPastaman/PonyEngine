@@ -19,7 +19,7 @@ export namespace PonyEngine::Math
 	/// @brief Quaternion.
 	/// @tparam T Component type.
 	template<std::floating_point T>
-	class alignas(AlignSIMD(sizeof(T), 4uz)) Quaternion final
+	class Quaternion final
 	{
 	public:
 		using ValueType = T; ///< Component type.
