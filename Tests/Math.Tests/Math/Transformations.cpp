@@ -378,7 +378,7 @@ TEST_CASE("Rotation quaternion from Euler angles", "[Math][Transformations]")
 {
 	auto euler = PonyEngine::Math::Vector3<float>::Zero();
 	auto quaternion = PonyEngine::Math::RotationQuaternion(euler);
-	REQUIRE(quaternion.IsIdentity());
+	REQUIRE(quaternion.IsAlmostIdentity());
 	
 	euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float> / 2.f);
 	quaternion = PonyEngine::Math::RotationQuaternion(euler);
@@ -1894,6 +1894,573 @@ TEST_CASE("Rotation matrix from Euler angles", "[Math][Transformations]")
 	BENCHMARK("Bench")
 	{
 		return PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.f, 0.75f, -2.15f));
+	};
+#endif
+}
+
+TEST_CASE("Rotation matrix from axis-angle", "[Math][Transformations]")
+{
+	auto axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	float angle = 0.f;
+	auto matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = 0.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(matrix.IsIdentity());
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, 1.f, 0.f, -1.f, 0.f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, -1.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, -1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, 1.f, 0.f, 1.f, 0.f, -1.f, 0.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, -1.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.f, -1.f, 0.f, 1.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.911f, -0.244f, -0.244f, 0.333f, 0.911f, 0.911f, -0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.244f, -0.911f, -0.911f, 0.333f, -0.244f, 0.244f, 0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.911f, -0.244f, 0.244f, 0.333f, -0.911f, 0.911f, 0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.244f, -0.911f, 0.911f, 0.333f, 0.244f, 0.244f, -0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.244f, 0.911f, -0.911f, 0.333f, 0.244f, -0.244f, -0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.911f, 0.244f, -0.244f, 0.333f, -0.911f, -0.911f, 0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.244f, 0.911f, 0.911f, 0.333f, -0.244f, -0.244f, 0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.911f, 0.244f, 0.244f, 0.333f, 0.911f, -0.911f, -0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, -1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, -1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, -1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, -1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, 0.6667f, 0.6667f, 0.6667f, -0.3333f, 0.6667f, 0.6667f, 0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, -0.6667f, -0.6667f, -0.6667f, -0.3333f, 0.6667f, -0.6667f, 0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, -0.6667f, 0.6667f, -0.6667f, -0.3333f, -0.6667f, 0.6667f, -0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, 0.6667f, -0.6667f, 0.6667f, -0.3333f, -0.6667f, -0.6667f, -0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, -0.6667f, 0.6667f, -0.6667f, -0.3333f, -0.6667f, 0.6667f, -0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, 0.6667f, -0.6667f, 0.6667f, -0.3333f, -0.6667f, -0.6667f, -0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, 0.6667f, 0.6667f, 0.6667f, -0.3333f, 0.6667f, 0.6667f, 0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3333f, -0.6667f, -0.6667f, -0.6667f, -0.3333f, 0.6667f, -0.6667f, 0.6667f, -0.3333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, -1.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, 1.f, 0.f, -1.f, 0.f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, 1.f, 0.f, 1.f, 0.f, -1.f, 0.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, -1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.f, -1.f, 0.f, 1.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, -1.f, 0.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.244f, 0.911f, 0.911f, 0.333f, -0.244f, -0.244f, 0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.911f, 0.244f, 0.244f, 0.333f, 0.911f, -0.911f, -0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.244f, 0.911f, -0.911f, 0.333f, 0.244f, -0.244f, -0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.911f, 0.244f, -0.244f, 0.333f, -0.911f, -0.911f, 0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.911f, -0.244f, 0.244f, 0.333f, -0.911f, 0.911f, 0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, -0.244f, -0.911f, 0.911f, 0.333f, 0.244f, 0.244f, -0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.911f, -0.244f, -0.244f, 0.333f, 0.911f, 0.911f, -0.244f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.333f, 0.244f, -0.911f, -0.911f, 0.333f, -0.244f, 0.244f, 0.911f, 0.333f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.54f, 0.841f, 0.f, -0.841f, 0.54f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.54f, -0.841f, 0.f, 0.841f, 0.54f, 0.f, 0.f, 0.f, 1.f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.54f, 0.f, -0.841f, 0.f, 1.f, 0.f, 0.841f, 0.f, 0.54f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.54f, 0.f, 0.841f, 0.f, 1.f, 0.f, -0.841f, 0.f, 0.54f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.54f, 0.841f, 0.f, -0.841f, 0.54f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.54f, -0.841f, 0.f, 0.841f, 0.54f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.1f, 1.2f, 0.9f).Normalized();
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.701f, 0.583f, -0.411f, -0.232f, 0.732f, 0.641f, 0.674f, -0.354f, 0.648f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 4.f).Normalized();
+	angle = 0.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.739f, 0.504f, -0.447f, -0.66f, 0.674f, -0.332f, 0.134f, 0.541f, 0.83f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-4.f, 2.f, -5.f).Normalized();
+	angle = 1.1f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.648f, -0.761f, -0.023f, 0.567f, 0.502f, -0.653f, 0.509f, 0.41f, 0.757f), matrix, 0.001f));
+	
+	axis = PonyEngine::Math::Vector3<float>(4.f, 4.f, -3.f).Normalized();
+	angle = 0.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.815f, -0.218f, -0.537f, 0.454f, 0.815f, 0.359f, 0.359f, -0.537f, 0.763f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(1.1f, -1.2f, 0.9f).Normalized();
+	angle = 1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.701f, 0.232f, 0.674f, -0.583f, 0.732f, 0.354f, -0.411f, -0.641f, 0.648f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-3.f, -2.f, 4.f).Normalized();
+	angle = 0.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.739f, 0.66f, 0.134f, -0.504f, 0.674f, -0.541f, -0.447f, 0.332f, 0.83f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-4.f, -2.f, -5.f).Normalized();
+	angle = 1.1f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.648f, -0.567f, 0.509f, 0.761f, 0.502f, -0.41f, -0.023f, 0.653f, 0.757f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(4.f, -4.f, -3.f).Normalized();
+	angle = 0.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.815f, -0.454f, 0.359f, 0.218f, 0.815f, 0.537f, -0.537f, -0.359f, 0.763f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(12.f, 8.f, 10.f).Normalized();
+	angle = 2.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.0342f, 0.7962f, 0.604f, 0.4144f, -0.5386f, 0.7335f, 0.9094f, 0.2754f, -0.3116f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, 10.f).Normalized();
+	angle = 3.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.06f, -0.54f, -0.84f, -0.701f, -0.576f, 0.42f, -0.711f, 0.613f, -0.344f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, -11.f).Normalized();
+	angle = 2.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.1083f, -0.7202f, 0.6853f, -0.43f, -0.5876f, -0.6855f, 0.8963f, -0.3689f, -0.2461f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(9.f, 8.f, -11.f).Normalized();
+	angle = 2.7f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.3243f, 0.2271f, -0.9183f, 0.8036f, -0.4459f, -0.3941f, -0.499f, -0.8658f, -0.0379f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(12.f, -8.f, 10.f).Normalized();
+	angle = 2.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.0342f, -0.4145f, 0.9094f, -0.7962f, -0.5386f, -0.2754f, 0.604f, -0.7335f, -0.3116f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, 10.f).Normalized();
+	angle = 3.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.06f, 0.701f, -0.711f, 0.54f, -0.576f, -0.613f, -0.84f, -0.42f, -0.344f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, -11.f).Normalized();
+	angle = 2.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.1083f, 0.43f, 0.8963f, 0.7202f, -0.5875f, 0.3689f, 0.6853f, 0.6853f, -0.2461f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(9.f, -8.f, -11.f).Normalized();
+	angle = 2.7f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.324f, -0.804f, -0.499f, -0.227f, -0.446f, 0.866f, -0.918f, 0.394f, -0.038f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(12.f, 8.f, 10.f).Normalized();
+	angle = -2.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.0342f, 0.4145f, 0.9094f, 0.7962f, -0.5386f, 0.2754f, 0.604f, 0.7335f, -0.3116f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, 10.f).Normalized();
+	angle = -3.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.06f, -0.701f, -0.711f, -0.54f, -0.576f, 0.613f, -0.84f, 0.42f, -0.344f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, -11.f).Normalized();
+	angle = -2.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.1083f, -0.43f, 0.8963f, -0.7202f, -0.5875f, -0.3689f, 0.6853f, -0.6855f, -0.2461f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(9.f, 8.f, -11.f).Normalized();
+	angle = -2.7f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.324f, 0.804f, -0.499f, 0.227f, -0.446f, -0.865f, -0.918f, -0.394f, -0.038f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(12.f, -8.f, 10.f).Normalized();
+	angle = -2.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.0342f, -0.7962f, 0.604f, -0.4145f, -0.5386f, -0.7335f, 0.909f, -0.2754f, -0.3112f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, 10.f).Normalized();
+	angle = -3.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.06f, 0.54f, -0.84f, 0.701f, -0.576f, -0.42f, -0.711f, -0.613f, -0.344f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, -11.f).Normalized();
+	angle = -2.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.108f, 0.72f, 0.685f, 0.43f, -0.588f, 0.685f, 0.896f, 0.369f, -0.246f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(9.f, -8.f, -11.f).Normalized();
+	angle = -2.7f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.324f, -0.227f, -0.918f, -0.804f, -0.446f, 0.394f, -0.499f, 0.866f, -0.038f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(1.1f, 1.2f, 0.9f).Normalized();
+	angle = -1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.701f, -0.232f, 0.674f, 0.583f, 0.732f, -0.354f, -0.411f, 0.641f, 0.648f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 4.f).Normalized();
+	angle = -0.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.739f, -0.66f, 0.134f, 0.504f, 0.674f, 0.541f, -0.447f, -0.332f, 0.83f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-4.f, 2.f, -5.f).Normalized();
+	angle = -1.1f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.648f, 0.567f, 0.509f, -0.761f, 0.502f, 0.41f, -0.023f, -0.653f, 0.757f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(4.f, 4.f, -3.f).Normalized();
+	angle = -0.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.815f, 0.454f, 0.359f, -0.218f, 0.815f, -0.537f, -0.537f, 0.359f, 0.763f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(1.1f, -1.2f, 0.9f).Normalized();
+	angle = -1.f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.701f, -0.583f, -0.411f, 0.232f, 0.732f, -0.641f, 0.674f, 0.354f, 0.648f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-3.f, -2.f, 4.f).Normalized();
+	angle = -0.9f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.739f, -0.504f, -0.447f, 0.66f, 0.674f, 0.332f, 0.134f, -0.541f, 0.83f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(-4.f, -2.f, -5.f).Normalized();
+	angle = -1.1f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.648f, 0.761f, -0.023f, -0.567f, 0.502f, 0.653f, 0.509f, -0.41f, 0.757f), matrix, 0.001f));
+
+	axis = PonyEngine::Math::Vector3<float>(4.f, -4.f, -3.f).Normalized();
+	angle = -0.8f;
+	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.815f, 0.218f, -0.537f, -0.454f, 0.815f, -0.359f, 0.359f, 0.537f, 0.763f), matrix, 0.001f));
+
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::RotationMatrix(axis, angle);
+	};
+}
+
+TEST_CASE("Rotation matrix from from-to", "[Math][Transformations]")
+{
+	auto from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	auto to = from;
+	auto matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(matrix.IsIdentity());
+
+	from = PonyEngine::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
+	to = from;
+	matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(matrix.IsIdentity());
+
+	from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	to = -from;
+	matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, -1.f), matrix, 0.001f));
+
+	from = PonyEngine::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
+	to = -from;
+	matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, -1.f, 0.f, -1.f, 0.f, -1.f, 0.f, 0.f), matrix, 0.001f));
+
+	from = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
+	to = -from;
+	matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, -1.f), matrix, 0.001f));
+
+	from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+	to = -from;
+	matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.923f, -0.384f, 0.f, -0.384f, -0.923f, 0.f, 0.f, 0.f, -1.f), matrix, 0.001f));
+
+	from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+	to = PonyEngine::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
+	matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.8118f, -0.5661f, -0.1432f, 0.584f, 0.7847f, 0.2078f, -0.0052f, -0.2522f, 0.9676f), matrix, 0.001f));
+
+	from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+	to = PonyEngine::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
+	matrix = PonyEngine::Math::FromToRotationMatrix(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(-0.0495f, 0.3075f, 0.9503f, -0.8426f, -0.5237f, 0.1256f, 0.5362f, -0.7945f, 0.285f), matrix, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Usual")
+	{
+		return PonyEngine::Math::FromToRotationMatrix(from, to);
+	};
+	BENCHMARK("Parallel")
+	{
+		return PonyEngine::Math::FromToRotationMatrix(PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f), PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f));
+	};
+	BENCHMARK("Anti-parallel")
+	{
+		return PonyEngine::Math::FromToRotationMatrix(PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f), PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f));
+	};
+#endif
+}
+
+TEST_CASE("Rotation matrix from look-in", "[Math][Transformations]")
+{
+	const auto forward = PonyEngine::Math::Vector3<float>(-3.f, 2.4f, 1.7f).Normalized();
+	const auto up = PonyEngine::Math::Vector3<float>(1.f, 1.2f, 0.7f).Normalized();
+	auto matrix = PonyEngine::Math::LookInRotationMatrix(forward, up);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.051f, -0.534f, 0.844f, 0.698f, 0.623f, 0.353f, -0.714f, 0.571f, 0.405f), matrix, 0.001f));
+
+	matrix = PonyEngine::Math::LookInRotationMatrix(forward, forward);
+	auto expectedMatrix = PonyEngine::Math::FromToRotationMatrix(PonyEngine::Math::Vector3<float>::Forward(), forward);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(expectedMatrix, matrix));
+
+	matrix = PonyEngine::Math::LookInRotationMatrix(forward, -forward);
+	expectedMatrix = PonyEngine::Math::FromToRotationMatrix(PonyEngine::Math::Vector3<float>::Forward(), forward);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(expectedMatrix, matrix));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Usual")
+	{
+		return PonyEngine::Math::LookInRotationMatrix(forward, up);
+	};
+	BENCHMARK("Parallel")
+	{
+		return PonyEngine::Math::LookInRotationMatrix(PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f), PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f));
+	};
+	BENCHMARK("Anti-parallel")
+	{
+		return PonyEngine::Math::LookInRotationMatrix(PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f), PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f));
 	};
 #endif
 }

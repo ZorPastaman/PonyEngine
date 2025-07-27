@@ -846,33 +846,27 @@ namespace PonyEngine::Math
 	{
 		const T sin = std::sin(angle);
 		const T cos = std::cos(angle);
-		const T mCos = T{1} - cos;
 
-		const T mx = mCos * axis.X();
-		const T my = mCos * axis.Y();
-		const T mz = mCos * axis.Z();
+		const Vector3<T> axisSin = axis * sin;
+		const Vector3<T> axisCos = axis * (T{1} - cos);
 
-		const T mxx = mx * axis.X();
-		const T mxy = mx * axis.Y();
-		const T mxz = mx * axis.Z();
-		const T myy = my * axis.Y();
-		const T myz = my * axis.Z();
-		const T mzz = mz * axis.Z();
-
-		const T sx = sin * axis.X();
-		const T sy = sin * axis.Y();
-		const T sz = sin * axis.Z();
+		const T xx = axisCos.X() * axis.X();
+		const T xy = axisCos.X() * axis.Y();
+		const T xz = axisCos.X() * axis.Z();
+		const T yy = axisCos.Y() * axis.Y();
+		const T yz = axisCos.Y() * axis.Z();
+		const T zz = axisCos.Z() * axis.Z();
 
 		Matrix3x3<T> rotationMatrix;
-		rotationMatrix[0, 0] = mxx + cos;
-		rotationMatrix[1, 0] = mxy + sz;
-		rotationMatrix[2, 0] = mxz - sy;
-		rotationMatrix[0, 1] = mxy - sz;
-		rotationMatrix[1, 1] = myy + cos;
-		rotationMatrix[2, 1] = myz + sx;
-		rotationMatrix[0, 2] = mxz + sy;
-		rotationMatrix[1, 2] = myz - sx;
-		rotationMatrix[2, 2] = mzz + cos;
+		rotationMatrix[0, 0] = xx + cos;
+		rotationMatrix[1, 0] = xy + axisSin.Z();
+		rotationMatrix[2, 0] = xz - axisSin.Y();
+		rotationMatrix[0, 1] = xy - axisSin.Z();
+		rotationMatrix[1, 1] = yy + cos;
+		rotationMatrix[2, 1] = yz + axisSin.X();
+		rotationMatrix[0, 2] = xz + axisSin.Y();
+		rotationMatrix[1, 2] = yz - axisSin.X();
+		rotationMatrix[2, 2] = zz + cos;
 
 		return rotationMatrix;
 	}
