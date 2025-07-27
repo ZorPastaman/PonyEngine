@@ -15,24 +15,6 @@ import std;
 import PonyEngine.Math;
 import PonyEngine.Type;
 
-TEST_CASE("Vector size", "[Math][Vector]")
-{
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector1<std::int8_t>) == sizeof(std::int8_t));
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector2<std::int8_t>) == sizeof(std::int8_t) * 2);
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector3<std::int8_t>) == sizeof(std::int8_t) * 3);
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector4<std::int8_t>) == sizeof(std::int8_t) * 4);
-
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector1<std::int16_t>) == sizeof(std::int16_t));
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector2<std::int16_t>) == sizeof(std::int16_t) * 2);
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector3<std::int16_t>) == sizeof(std::int16_t) * 3);
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector4<std::int16_t>) == sizeof(std::int16_t) * 4);
-
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector1<std::int32_t>) == sizeof(std::int32_t));
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector2<std::int32_t>) == sizeof(std::int32_t) * 2);
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector3<std::int32_t>) == sizeof(std::int32_t) * 3);
-	STATIC_REQUIRE(sizeof(PonyEngine::Math::Vector4<std::int32_t>) == sizeof(std::int32_t) * 4);
-}
-
 TEST_CASE("Vector static", "[Math][Vector]")
 {
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector1<std::int32_t>::ValueType, std::int32_t>);

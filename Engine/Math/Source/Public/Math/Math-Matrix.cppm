@@ -24,7 +24,7 @@ export namespace PonyEngine::Math
 	/// @tparam RowCount Row count.
 	/// @tparam ColumnCount Column count.
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
-	class alignas(AlignSIMD(sizeof(T), RowCount * ColumnCount)) Matrix final
+	class Matrix final
 	{
 	public:
 		using ValueType = T; ///< Component type.
