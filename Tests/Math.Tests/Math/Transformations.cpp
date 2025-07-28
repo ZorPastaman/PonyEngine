@@ -562,6 +562,7 @@ TEST_CASE("Rotation quaternion from Euler angles", "[Math][Transformations]")
 	
 	euler = PonyEngine::Math::Vector3<float>(-2.1f, 2.75f, 0.4f);
 	quaternion = PonyEngine::Math::RotationQuaternion(euler);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>(-0.068f, 0.512f, 0.853f, -0.074f).Normalized(), quaternion, 0.001f));
 
 	euler = PonyEngine::Math::Vector3<float>(-2.1f, 2.75f, 2.4f);
 	quaternion = PonyEngine::Math::RotationQuaternion(euler);
@@ -2370,10 +2371,12 @@ TEST_CASE("Rotation matrix from axis-angle", "[Math][Transformations]")
 	matrix = PonyEngine::Math::RotationMatrix(axis, angle);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0.815f, 0.218f, -0.537f, -0.454f, 0.815f, -0.359f, 0.359f, 0.537f, 0.763f), matrix, 0.001f));
 
+#if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
 		return PonyEngine::Math::RotationMatrix(axis, angle);
 	};
+#endif
 }
 
 TEST_CASE("Rotation matrix from from-to", "[Math][Transformations]")
@@ -2461,6 +2464,352 @@ TEST_CASE("Rotation matrix from look-in", "[Math][Transformations]")
 	BENCHMARK("Anti-parallel")
 	{
 		return PonyEngine::Math::LookInRotationMatrix(PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f), PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f));
+	};
+#endif
+}
+
+TEST_CASE("Euler from quaternion", "[Math][Transformations]")
+{
+	auto quaternion = PonyEngine::Math::Quaternion<float>::Identity();
+	auto euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(euler.IsZero());
+
+	quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 0.707f, 0.707f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float> / 2.f), euler, 0.001f));
+
+	quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f, 0.f);
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float>), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, -0.707f, 0.707f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, -std::numbers::pi_v<float> / 2.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.707f, 0.f, 0.707f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f);
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.f, -0.707f, 0.f, 0.707f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.707f, 0.f, 0.f, 0.707f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 0.f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.6408564f, 0.2988362f, -0.2988362f, 0.6408564f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 0.873f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.6408564f, -0.2988362f, 0.2988362f, 0.6408564f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, -0.873f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.5f, 0.5f, -0.5f, 0.5f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.4545195f, 0.5416752f, -0.5416752f, 0.4545195f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 1.745f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.4545195f, -0.5416752f, 0.5416752f, 0.4545195f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, -1.745f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.1830127f, -0.6830127f, 0.6830127f, 0.1830127f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, -2.618f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.5f, -0.5f, 0.5f, 0.5f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, -std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.6123724f, -0.3535534f, 0.3535534f, 0.6123724f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, -1.047f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.6123724f, 0.3535534f, -0.3535534f, 0.6123724f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 1.047f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f);
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, std::numbers::pi_v<float>), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.7071068f, 0.f, 0.f, 0.7071068f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-std::numbers::pi_v<float> / 2.f, -std::numbers::pi_v<float> * 2.f, 0.f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.549f, 0.027f, 0.297f, 0.781f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.9995f, 0.7491f, 1.15f), euler, 0.001f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.495f, -0.239f, 0.635f, 0.543f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 0.7503f, 2.15f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.071f, 0.545f, -0.802f, 0.234f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 0.7503f, -2.15f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.2f, 0.512f, -0.591f, 0.59f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 0.748f, -1.148f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.611f, 0.614f, -0.26f, 0.427f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 2.75f, 1.35f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.83f, 0.246f, -0.024f, 0.5f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 2.75f, 2.35f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.758f, 0.418f, -0.339f, -0.368f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 2.75f, -2.35f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.465f, 0.73f, -0.474f, -0.161f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 2.75f, -1.35f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.29f, -0.816f, 0.498f, -0.051f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, -2.75f, 0.9f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.843f, -0.196f, 0.226f, -0.446f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, -2.75f, 2.9f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.866f, -0.011f, -0.113f, 0.487f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, -2.75f, -2.9f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.458f, -0.735f, 0.349f, 0.358f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, -2.75f, -0.9f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.362f, -0.459f, 0.427f, 0.69f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.1f, -0.798f, 0.603f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.191f, -0.553f, 0.811f, 0.014f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.1f, -0.798f, 2.603f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.449f, 0.375f, -0.702f, 0.406f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.1f, -0.802f, -2.601f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.558f, -0.175f, -0.038f, 0.81f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.098f, -0.8f, -0.601f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.806f, -0.187f, -0.085f, 0.555f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -2.391f, -2.241f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.278f, -0.779f, 0.421f, 0.371f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -2.392f, -0.242f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.084f, 0.823f, -0.498f, -0.26f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -2.392f, 0.242f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.648f, 0.515f, -0.487f, 0.279f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -2.392f, 2.242f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.364f, 0.366f, -0.724f, 0.457f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -0.391f, -2.242f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.505f, -0.109f, -0.006f, 0.856f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -0.391f, -0.241f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.464f, 0.226f, -0.199f, -0.833f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -0.391f, 0.241f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.06f, 0.513f, -0.808f, -0.283f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, -0.391f, 2.241f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.161f, -0.491f, 0.736f, -0.438f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.042f, 0.393f, -1.841f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.377f, -0.353f, 0.436f, -0.737f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.042f, 0.393f, -0.841f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.514f, -0.045f, 0.259f, 0.816f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.042f, 0.393f, 0.841f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.43f, -0.286f, 0.619f, 0.592f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, 0.393f, 1.843f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.771f, -0.301f, 0.383f, 0.41f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, 2.393f, -2.843f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.163f, -0.811f, 0.552f, -0.101f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, 2.393f, -0.843f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.496f, 0.662f, -0.293f, 0.479f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, 2.393f, 0.843f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.825f, -0.06f, 0.245f, 0.505f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.041f, 2.393f, 2.843f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.5f, 0.659f, 0.541f, 0.149f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, -2.391f, -1.742f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.123f, 0.818f, 0.547f, -0.128f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, -2.391f, -0.743f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.462f, -0.686f, -0.316f, 0.464f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, -2.391f, 0.743f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.735f, -0.381f, -0.055f, 0.559f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, -2.391f, 1.742f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.068f, 0.512f, 0.853f, -0.074f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.042f, -0.39f, -2.743f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.394f, 0.334f, 0.399f, -0.758f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.042f, -0.39f, -0.744f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.516f, 0.02f, 0.218f, 0.828f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.042f, -0.39f, 0.744f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.262f, 0.445f, 0.815f, 0.264f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.042f, -0.39f, 2.741f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.305f, -0.416f, -0.784f, 0.344f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.04f, 0.389f, -2.54f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.515f, 0.032f, -0.134f, 0.846f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, 0.39f, -0.54f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.425f, -0.293f, -0.321f, -0.794f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.04f, 0.389f, 0.542f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.017f, -0.516f, -0.841f, -0.159f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.04f, 0.389f, 2.542f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.822f, 0.097f, -0.145f, 0.542f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, 2.394f, -2.464f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.362f, 0.744f, 0.378f, 0.415f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, 2.394f, -0.464f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.007f, -0.827f, -0.523f, -0.203f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, 2.394f, 0.464f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.7f, -0.441f, -0.454f, 0.331f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.041f, 2.394f, 2.464f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.163f, 0.542f, 0.321f, 0.76f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 1.201f, 0.731f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.544f, 0.156f, 0.813f, 0.141f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 1.201f, 2.729f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.56f, 0.075f, -0.801f, 0.196f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 1.201f, -2.73f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.24f, 0.512f, -0.268f, 0.78f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 1.201f, -0.73f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.363f, 0.813f, 0.235f, 0.39f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, 0.89f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.88f, 0.134f, 0.455f, 0.013f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, 2.89f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.886f, 0.089f, -0.444f, 0.101f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, -2.89f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.404f, 0.794f, -0.155f, 0.428f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, -0.89f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.591f, -0.666f, 0.258f, 0.375f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, 1.4f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.838f, -0.301f, 0.406f, 0.206f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, 2.4f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.821f, -0.344f, -0.438f, 0.123f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, -2.4f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.556f, -0.696f, -0.326f, 0.318f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, -1.4f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.097f, -0.054f, 0.557f, 0.823f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, 1.2f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(-0.111f, -0.001f, 0.883f, 0.455f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, 2.2f), euler, 0.01f));
+	
+	quaternion = PonyEngine::Math::Quaternion<float>(0.066f, -0.09f, -0.888f, 0.446f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, -2.2f), euler, 0.01f));
+
+	quaternion = PonyEngine::Math::Quaternion<float>(0.015f, -0.11f, -0.565f, 0.817f).Normalized();
+	euler = PonyEngine::Math::Euler(quaternion);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, -1.2f), euler, 0.01f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Usual")
+	{
+		return PonyEngine::Math::Euler(quaternion);
+	};
+	BENCHMARK("Singularity")
+	{
+		return PonyEngine::Math::Euler(PonyEngine::Math::Quaternion<float>(0.707106829f, 0.f, 0.f, 0.707106829f));
 	};
 #endif
 }
