@@ -337,7 +337,7 @@ export namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure function")]]
 	constexpr Matrix<T, RowCount, ColumnCount> Multiply(const Matrix<T, RowCount, ColumnCount>& lhs, const Matrix<T, RowCount, ColumnCount>& rhs) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 	/// @brief Divides the @p lhs matrix by the @p rhs matrix component-wise.
-	/// @tparam T ComponentType.
+	/// @tparam T Component type.
 	/// @tparam RowCount Row count.
 	/// @tparam ColumnCount Column count.
 	/// @param lhs Dividend.
@@ -345,6 +345,15 @@ export namespace PonyEngine::Math
 	/// @return Quotient.
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure function")]]
 	constexpr Matrix<T, RowCount, ColumnCount> Divide(const Matrix<T, RowCount, ColumnCount>& lhs, const Matrix<T, RowCount, ColumnCount>& rhs) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
+
+	/// @brief Normalizes the columns of the @p matrix.
+	/// @tparam T Component type.
+	/// @tparam RowCount Row count.
+	/// @tparam ColumnCount Column count.
+	/// @param matrix Matrix to normalize.
+	/// @return Normalized matrix.
+	template<std::floating_point T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure function")]]
+	Matrix<T, RowCount, ColumnCount> NormalizeColumns(const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 
 	/// @brief Checks if the two matrices are almost equal with the tolerance value.
 	/// @tparam T Component type.
@@ -1108,6 +1117,18 @@ namespace PonyEngine::Math
 			{
 				answer[i, j] = lhs[i, j] / rhs[i, j];
 			}
+		}
+
+		return answer;
+	}
+
+	template<std::floating_point T, std::size_t RowCount, std::size_t ColumnCount>
+	Matrix<T, RowCount, ColumnCount> NormalizeColumns(const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	{
+		Matrix<T, RowCount, ColumnCount> answer;
+		for (std::size_t i = 0uz; i < ColumnCount; ++i)
+		{
+			answer.Column(i, matrix.Column(i).Normalized());
 		}
 
 		return answer;

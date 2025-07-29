@@ -904,9 +904,10 @@ namespace PonyEngine::Math
 		}
 		else [[likely]]
 		{
+			const T xx = quaternion.X() * quaternion.X();
 			euler.X() = std::asin(T{2} * halfSin);
-			euler.Y() = std::atan2(T{2} * (quaternion.X() * quaternion.Z() + quaternion.Y() * quaternion.W()), T{1} - T{2} * (quaternion.X() * quaternion.X() + quaternion.Y() * quaternion.Y()));
-			euler.Z() = std::atan2(T{2} * (quaternion.X() * quaternion.Y() + quaternion.Z() * quaternion.W()), T{1} - T{2} * (quaternion.X() * quaternion.X() + quaternion.Z() * quaternion.Z()));
+			euler.Y() = std::atan2(T{2} * (quaternion.X() * quaternion.Z() + quaternion.Y() * quaternion.W()), T{1} - T{2} * (xx + quaternion.Y() * quaternion.Y()));
+			euler.Z() = std::atan2(T{2} * (quaternion.X() * quaternion.Y() + quaternion.Z() * quaternion.W()), T{1} - T{2} * (xx + quaternion.Z() * quaternion.Z()));
 		}
 
 		return euler;
