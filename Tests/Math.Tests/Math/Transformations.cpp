@@ -14,6 +14,33 @@ import std;
 
 import PonyEngine.Math;
 
+template<std::floating_point T>
+constexpr T FixRotation(const T angle)
+{
+	if (PonyEngine::Math::AreAlmostEqual(angle, -std::numbers::pi_v<T>))
+	{
+		return std::numbers::pi_v<T>;
+	}
+	if (PonyEngine::Math::AreAlmostEqual(angle, std::numbers::pi_v<T> * 2.f) || PonyEngine::Math::AreAlmostEqual(angle, -std::numbers::pi_v<T> * 2.f))
+	{
+		return T{0};
+	}
+
+	return angle;
+}
+
+template<std::floating_point T>
+constexpr PonyEngine::Math::Vector3<T> FixRotation(const PonyEngine::Math::Vector3<T>& vector)
+{
+	auto copy = vector;
+	for (std::size_t i = 0; i < PonyEngine::Math::Vector3<T>::ComponentCount; ++i)
+	{
+		copy[i] = FixRotation(copy[i]);
+	}
+
+	return copy;
+}
+
 TEST_CASE("Rotation angle from rotation matrix", "[Math][Transformations]")
 {
 	auto matrix = PonyEngine::Math::Matrix2x2<float>::Identity();
@@ -3224,6 +3251,592 @@ TEST_CASE("Euler from rotation matrix", "[Math][Transformations]")
 	BENCHMARK("Singularity")
 	{
 		return PonyEngine::Math::Euler(PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, -1.f, 0.f));
+	};
+#endif
+}
+
+TEST_CASE("Euler from axis-angle", "[Math][Transformations]")
+{
+	auto axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	float angle = 0.f;
+	auto euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = 0.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(euler.IsAlmostZero());
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float> / 2.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, -std::numbers::pi_v<float> / 2.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 0.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-std::numbers::pi_v<float> / 2.f, -std::numbers::pi_v<float> * 2.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.247f, 1.22f, 1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.145f, 0.632f, 0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.247f, 1.22f, -1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.145f, 0.632f, -0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.145f, -0.632f, 0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.247f, -1.22f, 1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.145f, -0.632f, -0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.247f, -1.22f, -1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, -std::numbers::pi_v<float>), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float>), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float>, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, std::numbers::pi_v<float>), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float>, -std::numbers::pi_v<float>), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.73f, 2.034f, 2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.73f, -2.034f, -2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.73f, 2.034f, -2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.73f, -2.034f, 2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.73f, 2.034f, -2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.73f, -2.034f, 2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.73f, 2.034f, 2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = std::numbers::pi_v<float>;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.73f, -2.034f, -2.034f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, -std::numbers::pi_v<float> / 2.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float> / 2.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float> / 2.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-std::numbers::pi_v<float> / 2.f, std::numbers::pi_v<float> * 2.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 0.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.145f, -0.632f, -0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.247f, -1.22f, -1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.145f, -0.632f, 0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.247f, -1.22f, 1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.247f, 1.22f, -1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.145f, 0.632f, -0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.247f, 1.22f, 1.22f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+	angle = -std::numbers::pi_v<float> / 2.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.145f, 0.632f, 0.632f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.1f, 1.2f, 0.9f).Normalized();
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.362f, 0.805f, 0.672f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 4.f).Normalized();
+	angle = 0.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.571f, 0.16f, 0.642f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-4.f, 2.f, -5.f).Normalized();
+	angle = 1.1f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.422f, 0.591f, -0.988f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(4.f, 4.f, -3.f).Normalized();
+	angle = 0.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.567f, 0.44f, -0.261f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.1f, -1.2f, 0.9f).Normalized();
+	angle = 1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.696f, -0.566f, 0.307f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-3.f, -2.f, 4.f).Normalized();
+	angle = 0.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.338f, -0.494f, 0.775f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-4.f, -2.f, -5.f).Normalized();
+	angle = 1.1f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.711f, -0.03f, -0.846f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(4.f, -4.f, -3.f).Normalized();
+	angle = 0.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.368f, -0.613f, -0.509f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(12.f, 8.f, 10.f).Normalized();
+	angle = 2.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.279f, 1.9f, 2.166f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, 10.f).Normalized();
+	angle = 3.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.66f, -2.021f, -2.389f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, -11.f).Normalized();
+	angle = 2.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.378f, 1.839f, -2.255f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(9.f, 8.f, -11.f).Normalized();
+	angle = 2.7f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.047f, -1.647f, 2.671f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(12.f, -8.f, 10.f).Normalized();
+	angle = 2.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.823f, 2.047f, -2.486f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, 10.f).Normalized();
+	angle = 3.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.434f, -1.96f, 2.259f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, -11.f).Normalized();
+	angle = 2.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.755f, 1.916f, 2.51f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(9.f, -8.f, -11.f).Normalized();
+	angle = 2.7f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.405f, -1.612f, -2.077f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(12.f, 8.f, 10.f).Normalized();
+	angle = -2.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.823f, 2.047f, 2.486f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, 10.f).Normalized();
+	angle = -3.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.434f, -1.96f, -2.259f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, -11.f).Normalized();
+	angle = -2.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.755f, 1.916f, -2.51f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(9.f, 8.f, -11.f).Normalized();
+	angle = -2.7f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.405f, -1.612f, 2.077f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(12.f, -8.f, 10.f).Normalized();
+	angle = -2.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.279f, 1.901f, -2.166f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, 10.f).Normalized();
+	angle = -3.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.66f, -2.021f, 2.389f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, -11.f).Normalized();
+	angle = -2.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.378f, 1.839f, 2.255f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(9.f, -8.f, -11.f).Normalized();
+	angle = -2.7f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-1.047f, -1.647f, -2.671f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.1f, 1.2f, 0.9f).Normalized();
+	angle = -1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.696f, -0.566f, -0.307f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 4.f).Normalized();
+	angle = -0.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.338f, -0.494f, -0.775f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-4.f, 2.f, -5.f).Normalized();
+	angle = -1.1f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.711f, -0.03f, 0.846f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(4.f, 4.f, -3.f).Normalized();
+	angle = -0.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.368f, -0.613f, 0.509f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(1.1f, -1.2f, 0.9f).Normalized();
+	angle = -1.f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.362f, 0.805f, -0.672f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-3.f, -2.f, 4.f).Normalized();
+	angle = -0.9f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.571f, 0.16f, -0.642f), euler, 0.01f));
+	
+	axis = PonyEngine::Math::Vector3<float>(-4.f, -2.f, -5.f).Normalized();
+	angle = -1.1f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.422f, 0.591f, 0.988f), euler, 0.01f));
+
+	axis = PonyEngine::Math::Vector3<float>(4.f, -4.f, -3.f).Normalized();
+	angle = -0.8f;
+	euler = PonyEngine::Math::Euler(axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.567f, 0.44f, 0.261f), euler, 0.01f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Usual")
+	{
+		return PonyEngine::Math::Euler(axis, angle);
+	};
+	BENCHMARK("Singularity")
+	{
+		return PonyEngine::Math::Euler(PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f), std::numbers::pi_v<float> / 2.f);
+	};
+#endif
+}
+
+TEST_CASE("Euler from from-to", "[Math][Transformations]")
+{
+	auto from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	auto to = from;
+	auto euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(euler.IsAlmostZero());
+	
+	from = PonyEngine::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
+	to = from;
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(euler.IsAlmostZero());
+	
+	from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	to = -from;
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float>, -std::numbers::pi_v<float>), euler, 0.01f));
+
+	from = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+	to = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 0.f, 0.f), euler, 0.01f));
+	
+	from = PonyEngine::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
+	to = -from;
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float> / 2.f, -std::numbers::pi_v<float>), euler, 0.01f));
+	
+	from = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
+	to = -from;
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, std::numbers::pi_v<float>), FixRotation(euler), 0.01f));
+	
+	from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+	to = -from;
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, -2.747f), euler, 0.01f));
+	
+	from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+	to = PonyEngine::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.255f, -0.005f, -0.625f), euler, 0.01f));
+
+	from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+	to = PonyEngine::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
+	euler = PonyEngine::Math::FromToEuler(from, to);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.918f, 1.082f, 2.611f), euler, 0.01f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Usual")
+	{
+		return PonyEngine::Math::FromToEuler(from, to);
+	};
+	BENCHMARK("Singularity")
+	{
+		return PonyEngine::Math::FromToEuler(PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f), PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f));
+	};
+	BENCHMARK("Parallel")
+	{
+		return PonyEngine::Math::FromToEuler(from, from);
+	};
+	BENCHMARK("Anti-parallel")
+	{
+		return PonyEngine::Math::FromToEuler(from, -from);
+	};
+#endif
+}
+
+TEST_CASE("Euler from look-in", "[Math][Transformations]")
+{
+	const auto forward = PonyEngine::Math::Vector3<float>(-3.f, 2.4f, 1.7f).Normalized();
+	const auto up = PonyEngine::Math::Vector3<float>(1.f, 1.2f, 0.7f).Normalized();
+	auto euler = PonyEngine::Math::LookInEuler(forward, up);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.608f, -1.055f, -0.708f), euler, 0.01f));
+
+	euler = PonyEngine::Math::LookInEuler(forward, forward);
+	auto expectedEuler = PonyEngine::Math::FromToEuler(PonyEngine::Math::Vector3<float>::Forward(), forward);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(expectedEuler, euler));
+
+	euler = PonyEngine::Math::LookInEuler(forward, -forward);
+	expectedEuler = PonyEngine::Math::FromToEuler(PonyEngine::Math::Vector3<float>::Forward(), forward);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(expectedEuler, euler));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::LookInEuler(forward, up);
+	};
+	BENCHMARK("Singularity")
+	{
+		return PonyEngine::Math::LookInEuler(PonyEngine::Math::Vector3<float>::Down(), PonyEngine::Math::Vector3<float>::Forward());
+	};
+	BENCHMARK("Parallel")
+	{
+		return PonyEngine::Math::LookInEuler(PonyEngine::Math::Vector3<float>::Forward(), PonyEngine::Math::Vector3<float>::Forward());
+	};
+	BENCHMARK("Anti-parallel")
+	{
+		return PonyEngine::Math::LookInEuler(PonyEngine::Math::Vector3<float>::Forward(), -PonyEngine::Math::Vector3<float>::Forward());
 	};
 #endif
 }
