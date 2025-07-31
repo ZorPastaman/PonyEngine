@@ -814,15 +814,34 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, std::max(RowCount - 1uz, 1uz), std::max(ColumnCount - 1uz, 1uz)> Matrix<T, RowCount, ColumnCount>::Submatrix(const std::size_t rowIndex, const std::size_t columnIndex) const noexcept requires (RowCount > 1uz && ColumnCount > 1uz)
 	{
 		Matrix<T, RowCount - 1uz, ColumnCount - 1uz> answer;
-		for (std::size_t i = 0uz; i < columnIndex; ++i)
+		if consteval
 		{
-			std::ranges::copy(Span(i).begin(), Span(i).begin() + rowIndex, answer.Span(i).begin());
-			std::ranges::copy(Span(i).begin() + rowIndex + 1uz, Span(i).begin() + RowCount, answer.Span(i).begin() + rowIndex);
+			for (std::size_t i = 0uz; i < columnIndex; ++i)
+			{
+				std::ranges::copy(Span(i).begin(), Span(i).begin() + rowIndex, answer.Span(i).begin());
+				std::ranges::copy(Span(i).begin() + rowIndex + 1uz, Span(i).begin() + RowCount, answer.Span(i).begin() + rowIndex);
+			}
+			for (std::size_t i = columnIndex + 1uz; i < ColumnCount; ++i)
+			{
+				std::ranges::copy(Span(i).begin(), Span(i).begin() + rowIndex, answer.Span(i - 1uz).begin());
+				std::ranges::copy(Span(i).begin() + rowIndex + 1uz, Span(i).begin() + RowCount, answer.Span(i - 1uz).begin() + rowIndex);
+			}
 		}
-		for (std::size_t i = columnIndex + 1uz; i < ColumnCount; ++i)
+		else
 		{
-			std::ranges::copy(Span(i).begin(), Span(i).begin() + rowIndex, answer.Span(i - 1uz).begin());
-			std::ranges::copy(Span(i).begin() + rowIndex + 1uz, Span(i).begin() + RowCount, answer.Span(i - 1uz).begin() + rowIndex);
+			const T* source = reinterpret_cast<const T*>(this);
+			T* destination = reinterpret_cast<T*>(&answer);
+			for (std::size_t i = 0uz; i < columnIndex; ++i, source += RowCount, destination += RowCount - 1uz)
+			{
+				std::memcpy(destination, source, rowIndex * sizeof(T));
+				std::memcpy(destination + rowIndex, source + rowIndex + 1uz, (RowCount - 1uz - rowIndex) * sizeof(T));
+			}
+			source += RowCount;
+			for (std::size_t i = columnIndex + 1uz; i < ColumnCount; ++i, source += RowCount, destination += RowCount - 1uz)
+			{
+				std::memcpy(destination, source, rowIndex * sizeof(T));
+				std::memcpy(destination + rowIndex, source + rowIndex + 1uz, (RowCount - 1uz - rowIndex) * sizeof(T));
+			}
 		}
 
 		return answer;
