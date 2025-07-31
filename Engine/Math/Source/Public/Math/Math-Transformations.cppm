@@ -1124,13 +1124,20 @@ namespace PonyEngine::Math
 		return TrsMatrixCompact(translation, RsMatrix(axis, angle, scaling));
 	}
 
-	template<std::floating_point T, std::size_t Size>
+	template<std::floating_point T, std::size_t Size> 
 	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
 		Matrix<T, Size + 1, Size + 1> trsMatrix = Matrix<T, Size + 1, Size + 1>::Identity();
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			std::ranges::copy(rsMatrix.Column(i).Span(), trsMatrix.Column(i).Span().begin());
+			if consteval
+			{
+				std::ranges::copy(rsMatrix.Column(i).Span(), trsMatrix.Column(i).Span().begin());
+			}
+			else
+			{
+				std::memcpy(&trsMatrix.Column(i), &rsMatrix.Column(i), sizeof(T) * Size);
+			}
 		}
 
 		return trsMatrix;
@@ -1139,10 +1146,17 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
-		Matrix<T, Size, Size + 1> trsMatrix;
-		for (std::size_t i = 0uz; i < Size; ++i)
+		Matrix<T, Size, Size + 1> trsMatrix = Matrix<T, Size, Size + 1>::Zero();
+		if consteval
 		{
-			trsMatrix.Column(i, rsMatrix.Column(i));
+			for (std::size_t i = 0uz; i < Size; ++i)
+			{
+				trsMatrix.Column(i, rsMatrix.Column(i));
+			}
+		}
+		else
+		{
+			std::memcpy(&trsMatrix, &rsMatrix, sizeof(T) * Size * Size);
 		}
 
 		return trsMatrix;
@@ -1152,7 +1166,14 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
 		Matrix<T, Size + 1, Size + 1> trsMatrix = TrsMatrix(rsMatrix);
-		std::ranges::copy(translation.Span(), trsMatrix.Column(Size).Span().begin());
+		if consteval
+		{
+			std::ranges::copy(translation.Span(), trsMatrix.Column(Size).Span().begin());
+		}
+		else
+		{
+			std::memcpy(&trsMatrix.Column(Size), &translation, sizeof(T) * Size);
+		}
 
 		return trsMatrix;
 	}
@@ -1160,7 +1181,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
-		Matrix<T, Size + 1, Size + 1> trsMatrix = TrsMatrix(rsMatrix);
+		Matrix<T, Size, Size + 1> trsMatrix = TrsMatrixCompact(rsMatrix);
 		trsMatrix.Column(Size, translation);
 
 		return trsMatrix;
@@ -1170,9 +1191,16 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Matrix<T, Size, Size + 1>& trsMatrixCompact) noexcept
 	{
 		auto trsMatrix = Matrix<T, Size + 1, Size + 1>::Identity();
-		for (std::size_t i = 0uz; i < Size; ++i)
+		for (std::size_t i = 0uz; i < Size + 1; ++i)
 		{
-			std::ranges::copy(trsMatrixCompact.Column(i).Span(), trsMatrix.Column(i).Span().begin());
+			if consteval
+			{
+				std::ranges::copy(trsMatrixCompact.Column(i).Span(), trsMatrix.Column(i).Span().begin());
+			}
+			else
+			{
+				std::memcpy(&trsMatrix.Column(i), &trsMatrixCompact.Column(i), sizeof(T) * Size);
+			}
 		}
 
 		return trsMatrix;
@@ -1182,9 +1210,16 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Matrix<T, Size + 1, Size + 1>& trsMatrix) noexcept
 	{
 		Matrix<T, Size, Size + 1> trsMatrixCompact;
-		for (std::size_t i = 0uz; i < Size; ++i)
+		for (std::size_t i = 0uz; i < Size + 1; ++i)
 		{
-			trsMatrixCompact.Column(i, Vector<T, Size>(trsMatrix.Column(i).Span().subspan<0, Size>()));
+			if consteval
+			{
+				std::ranges::copy(trsMatrix.Column(i).Span().begin(), trsMatrix.Column(i).Span().begin() + Size, trsMatrixCompact.Column(i).Span().begin());
+			}
+			else
+			{
+				std::memcpy(&trsMatrixCompact.Column(i), &trsMatrix.Column(i), sizeof(T) * Size);
+			}
 		}
 
 		return trsMatrixCompact;
@@ -1387,7 +1422,7 @@ namespace PonyEngine::Math
 	{
 		const T fovTan = T{1} / perspectiveMatrix[1, 1];
 
-		return std::atan(fovTan) * T {2};
+		return std::atan(fovTan) * T{2};
 	}
 
 	template<std::floating_point T>

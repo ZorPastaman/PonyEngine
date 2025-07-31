@@ -791,10 +791,12 @@ TEST_CASE("Matrix submatrix", "[Math][Matrix]")
 	constexpr auto matrix2x3 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
 	constexpr auto expectedSubMatrix2x3 = PonyEngine::Math::Matrix<std::int32_t, 1, 2>(components[0], components[2]);
 	STATIC_REQUIRE(matrix2x3.Submatrix(1uz, 2uz) == expectedSubMatrix2x3);
+	REQUIRE(matrix2x3.Submatrix(1uz, 2uz) == expectedSubMatrix2x3);
 
 	constexpr auto matrix4x4 = PonyEngine::Math::Matrix4x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
 	constexpr auto expectedSubMatrix4x4 = PonyEngine::Math::Matrix<float, 3, 3>(components[0], components[2], components[3], components[4], components[6], components[7], components[12], components[14], components[15]);
 	STATIC_REQUIRE(matrix4x4.Submatrix(1uz, 2uz) == expectedSubMatrix4x4);
+	REQUIRE(matrix4x4.Submatrix(1uz, 2uz) == expectedSubMatrix4x4);
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
