@@ -578,6 +578,13 @@ export namespace PonyEngine::Math
 	/// @return Rotated vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> Rotate(const Vector2<T>& vector, T angle) noexcept;
+	/// @brief Rotates the @p vector with the @p euler.
+	/// @tparam T Value type.
+	/// @param vector Vector to rotate.
+	/// @param euler Euler angles in radians.
+	/// @return Rotated vector.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& euler) noexcept;
 	/// @brief Rotates the @p vector with the @p axis and @p angle.
 	/// @tparam T Value type.
 	/// @param vector Vector to rotate.
@@ -1453,7 +1460,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr T ExtractFarPlanePerspective(const Matrix4x4<T>& perspectiveMatrix) noexcept
 	{
-		return -perspectiveMatrix[2, 3] / (perspectiveMatrix[2, 3] - T{1});
+		return -perspectiveMatrix[2, 3] / (perspectiveMatrix[2, 2] - T{1});
 	}
 
 	template<std::floating_point T>
@@ -1466,6 +1473,12 @@ namespace PonyEngine::Math
 	Vector2<T> Rotate(const Vector2<T>& vector, const T angle) noexcept
 	{
 		return RotationMatrix(angle) * vector;
+	}
+
+	template<std::floating_point T>
+	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& euler) noexcept
+	{
+		return RotationQuaternion(euler) * vector;
 	}
 
 	template<std::floating_point T>
@@ -1483,8 +1496,8 @@ namespace PonyEngine::Math
 	template<bool PerspectiveDivision, std::floating_point T, std::size_t Size>
 	constexpr Vector<T, Size> TransformPoint(const Matrix<T, Size + 1, Size + 1>& transformationMatrix, const Vector<T, Size>& vector) noexcept
 	{
-		const Vector<T, Size + 1> homogeneous = transformationMatrix * CreateHomogeneous(vector, T{1});
-		auto transformed =  Vector<T, Size>(homogeneous.Span().subspan<0, Size>());
+		const Vector<T, Size + 1> homogeneous = TransformHomogeneous(transformationMatrix, vector, T{1});
+		auto transformed = Vector<T, Size>(homogeneous.Span().subspan<0, Size>());
 		if constexpr (PerspectiveDivision)
 		{
 			transformed *= T{1} / homogeneous[Size];
@@ -1496,13 +1509,13 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr Vector<T, Size> TransformPoint(const Matrix<T, Size, Size + 1>& transformationMatrix, const Vector<T, Size>& vector) noexcept
 	{
-		return transformationMatrix * CreateHomogeneous(vector, T{1});
+		return TransformHomogeneous(transformationMatrix, vector, T{1});
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	constexpr Vector<T, Size> TransformDirection(const Matrix<T, Size + 1, Size + 1>& transformationMatrix, const Vector<T, Size>& vector) noexcept
 	{
-		const Vector<T, Size + 1> homogeneous = transformationMatrix * CreateHomogeneous(vector, T{0});
+		const Vector<T, Size + 1> homogeneous = TransformHomogeneous(transformationMatrix, vector, T{0});
 
 		return Vector<T, Size>(homogeneous.Span().subspan<0, Size>());
 	}
@@ -1510,7 +1523,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr Vector<T, Size> TransformDirection(const Matrix<T, Size, Size + 1>& transformationMatrix, const Vector<T, Size>& vector) noexcept
 	{
-		return transformationMatrix * CreateHomogeneous(vector, T{0});
+		return TransformHomogeneous(transformationMatrix, vector, T{0});
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -1529,7 +1542,14 @@ namespace PonyEngine::Math
 	constexpr Vector<T, Size + 1> CreateHomogeneous(const Vector<T, Size>& vector, const T homogeneousComponent) noexcept
 	{
 		Vector<T, Size + 1> homogeneous;
-		std::ranges::copy(vector.Span(), homogeneous.Span().begin());
+		if consteval
+		{
+			std::ranges::copy(vector.Span(), homogeneous.Span().begin());
+		}
+		else
+		{
+			std::memcpy(&homogeneous, &vector, sizeof(T) * Size);
+		}
 		homogeneous[Size] = homogeneousComponent;
 
 		return homogeneous;

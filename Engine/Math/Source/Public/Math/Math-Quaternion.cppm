@@ -132,6 +132,10 @@ export namespace PonyEngine::Math
 		/// @brief Gets the quaternion as a vector.
 		/// @return Vector.
 		[[nodiscard("Pure function")]]
+		constexpr Vector4<T>& Vector() noexcept;
+		/// @brief Gets the quaternion as a vector.
+		/// @return Vector.
+		[[nodiscard("Pure function")]]
 		constexpr const Vector4<T>& Vector() const noexcept;
 
 		/// @brief Checks if this quaternion is equal to the identity quaternion.
@@ -456,6 +460,12 @@ namespace PonyEngine::Math
 	void Quaternion<T>::Normalize() noexcept
 	{
 		*this = Normalized();
+	}
+
+	template<std::floating_point T>
+	constexpr Vector4<T>& Quaternion<T>::Vector() noexcept
+	{
+		return components;
 	}
 
 	template<std::floating_point T>

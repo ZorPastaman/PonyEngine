@@ -265,12 +265,23 @@ TEST_CASE("Quaternion normalize", "[Math][Quaternion]")
 
 TEST_CASE("Quaternion vector", "[Math][Quaternion]")
 {
+	auto test = []<std::floating_point T>(const PonyEngine::Math::Quaternion<T>& quaternion) constexpr
+	{
+		auto copy = quaternion;
+		copy.Vector().X() -= 2.f;
+		copy.Vector().Y() += 4.f;
+		copy.Vector().Z() += 1.f;
+		copy.Vector().W() -= 3.f;
+		return copy;
+	};
+
 	constexpr float x = 2.f;
 	constexpr float y = -3.f;
 	constexpr float z = 4.f;
 	constexpr float w = 1.f;
 	constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
 	STATIC_REQUIRE(quaternion.Vector() == PonyEngine::Math::Vector4<float>(x, y, z, w));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(PonyEngine::Math::Quaternion<float>(x - 2.f, y + 4.f, z + 1.f, w - 3.f), test(quaternion), 0.001f));
 }
 
 TEST_CASE("Quaternion isIdentity, isUnit", "[Math][Quaternion]")

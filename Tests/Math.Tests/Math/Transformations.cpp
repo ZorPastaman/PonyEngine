@@ -5654,10 +5654,275 @@ TEST_CASE("Tts matrix compact from trs matrix", "[Math][Transformations]")
 	const auto trsMatrixCompact = PonyEngine::Math::ExtractTrsMatrixFromTrs(trsMatrix);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x4<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f, 2.f, -3.f, 5.f), trsMatrixCompact, 0.001f));
 
-//#if PONY_ENGINE_TESTING_BENCHMARK
+#if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
 		return PonyEngine::Math::ExtractTrsMatrixFromTrs(trsMatrix);
 	};
-//#endif
+#endif
+}
+
+TEST_CASE("Fov from projection matrix", "[Math][Transformations]")
+{
+	constexpr auto perspectiveMatrix = PonyEngine::Math::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
+	const float fov = PonyEngine::Math::ExtractFov(perspectiveMatrix);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(80.f * PonyEngine::Math::DegToRad<float>, fov, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::ExtractFov(perspectiveMatrix);
+	};
+#endif
+}
+
+TEST_CASE("Width from projection matrix", "[Math][Transformations]")
+{
+	constexpr auto orthographicMatrix = PonyEngine::Math::Matrix4x4<float>(0.058f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.f, 0.f, 0.f, 0.f, 0.001f, 0.f, 0.f, 0.f, -0.0002f, 1.f);
+	constexpr float width = PonyEngine::Math::ExtractWidth(orthographicMatrix);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(34.483f, width, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::ExtractWidth(orthographicMatrix);
+	};
+#endif
+}
+
+TEST_CASE("Height from projection matrix", "[Math][Transformations]")
+{
+	constexpr auto orthographicMatrix = PonyEngine::Math::Matrix4x4<float>(0.058f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.f, 0.f, 0.f, 0.f, 0.001f, 0.f, 0.f, 0.f, -0.0002f, 1.f);
+	const float height = PonyEngine::Math::ExtractHeight(orthographicMatrix);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(20.f, height, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::ExtractHeight(orthographicMatrix);
+	};
+#endif
+}
+
+TEST_CASE("Aspect from projection matrix", "[Math][Transformations]")
+{
+	constexpr auto perspectiveMatrix = PonyEngine::Math::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
+	constexpr float aspect = PonyEngine::Math::ExtractAspect(perspectiveMatrix);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.7f, aspect, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::ExtractAspect(perspectiveMatrix);
+	};
+#endif
+}
+
+TEST_CASE("Near plane from projection matrix", "[Math][Transformations]")
+{
+	constexpr auto perspectiveMatrix = PonyEngine::Math::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
+	constexpr float nearPlane = PonyEngine::Math::ExtractNearPlane(perspectiveMatrix);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(0.2f, nearPlane, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::ExtractNearPlane(perspectiveMatrix);
+	};
+#endif
+}
+
+TEST_CASE("Far plane from perspective matrix", "[Math][Transformations]")
+{
+	constexpr auto perspectiveMatrix = PonyEngine::Math::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.00020003f, 1.f, 0.f, 0.f, -0.200040013f, 0.f);
+	constexpr float farPlane = PonyEngine::Math::ExtractFarPlanePerspective(perspectiveMatrix);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1000.f, farPlane, 0.1f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::ExtractFarPlanePerspective(perspectiveMatrix);
+	};
+#endif
+}
+
+TEST_CASE("Far plane from orthographic matrix", "[Math][Transformations]")
+{
+	constexpr auto orthographicMatrix = PonyEngine::Math::OrthographicMatrix(20.f, 1.7f, 0.2f, 1000.f);
+	constexpr float farPlane = PonyEngine::Math::ExtractFarPlaneOrthographic(orthographicMatrix);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1000.f, farPlane, 0.1f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::ExtractFarPlaneOrthographic(orthographicMatrix);
+	};
+#endif
+}
+
+TEST_CASE("Rotate with angle", "[Math][Transformations]")
+{
+	constexpr PonyEngine::Math::Vector2<float> vector(-2.f, 3.f);
+	constexpr float angle = 1.01f;
+	const PonyEngine::Math::Vector2<float> rotated = PonyEngine::Math::Rotate(vector, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector2<float>(-3.604f, -0.098f), rotated, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::Rotate(PonyEngine::Math::Vector2<float>(4.6f, 8.1f), 1.2f);
+	};
+#endif
+}
+
+TEST_CASE("Rotate with Euler angles", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto euler = PonyEngine::Math::Vector3<float>(1.2f, -2.9f, -0.2f);
+	const auto rotated = PonyEngine::Math::Rotate(vector, euler);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-7.168f, 6.18f, -3.521f), rotated, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::Rotate(PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f), PonyEngine::Math::Vector3<float>(1.2f, -2.9f, -0.2f));
+	};
+#endif
+}
+
+TEST_CASE("Rotate with Euler axis-angle", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto axis = PonyEngine::Math::Vector3<float>(0.1513236f, -0.8183146f, 0.5544928f);
+	constexpr float angle = 2.8305042f;
+	const auto rotated = PonyEngine::Math::Rotate(vector, axis, angle);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-7.168f, 6.18f, -3.521f), rotated, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::Rotate(PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f), PonyEngine::Math::Vector3<float>(0.1513236f, -0.8183146f, 0.5544928f), 2.8305042f);
+	};
+#endif
+}
+
+TEST_CASE("Transform point with transformation matrix", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.556f, -2.78489148f, 2.1459669f, 2.297652f, 0.326f, 1.56952848f, 0.0955356f, 1.81313376f, -0.005f, 2.f, -3.f, 5.f, 1.23f);
+	constexpr auto transformed = PonyEngine::Math::TransformPoint(trsMatrix, vector);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-21.15f, 27.045f, 11.067f), transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformPoint(trsMatrix, vector);
+	};
+#endif
+}
+
+TEST_CASE("Transform point with transformation matrix with perspective division", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.556f, -2.78489148f, 2.1459669f, 2.297652f, 0.326f, 1.56952848f, 0.0955356f, 1.81313376f, -0.005f, 2.f, -3.f, 5.f, 1.23f);
+	constexpr auto transformed = PonyEngine::Math::TransformPoint<true>(trsMatrix, vector);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-21.15f, 27.045f, 11.067f) / 6.4477f, transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformPoint<true>(trsMatrix, vector);
+	};
+#endif
+}
+
+TEST_CASE("Transform point with transformation matrix compact", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto trsMatrix = PonyEngine::Math::Matrix3x4<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f, 2.f, -3.f, 5.f);
+	constexpr auto transformed = PonyEngine::Math::TransformPoint(trsMatrix, vector);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-21.15f, 27.045f, 11.067f), transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformPoint(trsMatrix, vector);
+	};
+#endif
+}
+
+TEST_CASE("Transform direction with transformation matrix", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.556f, -2.78489148f, 2.1459669f, 2.297652f, 0.326f, 1.56952848f, 0.0955356f, 1.81313376f, -0.005f, 2.f, -3.f, 5.f, 1.23f);
+	constexpr auto transformed = PonyEngine::Math::TransformDirection(trsMatrix, vector);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-23.15f, 30.045f, 6.067f), transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformDirection(trsMatrix, vector);
+	};
+#endif
+}
+
+TEST_CASE("Transform direction with transformation matrix compact", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto trsMatrix = PonyEngine::Math::Matrix3x4<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f, 2.f, -3.f, 5.f);
+	constexpr auto transformed = PonyEngine::Math::TransformDirection(trsMatrix, vector);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-23.15f, 30.045f, 6.067f), transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformDirection(trsMatrix, vector);
+	};
+#endif
+}
+
+TEST_CASE("Transform homogeneous with transformation matrix", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.556f, -2.78489148f, 2.1459669f, 2.297652f, 0.326f, 1.56952848f, 0.0955356f, 1.81313376f, -0.005f, 2.f, -3.f, 5.f, 1.23f);
+	constexpr auto transformed = PonyEngine::Math::TransformHomogeneous(trsMatrix, vector, 0.5f);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector4<float>(-22.15f, 28.545f, 8.567f, 5.833f), transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformHomogeneous(trsMatrix, vector, 0.5f);
+	};
+#endif
+}
+
+TEST_CASE("Transform homogeneous with transformation matrix compact", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto trsMatrix = PonyEngine::Math::Matrix3x4<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f, 2.f, -3.f, 5.f);
+	constexpr auto transformed = PonyEngine::Math::TransformHomogeneous(trsMatrix, vector, 0.5f);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-22.15f, 28.545f, 8.567f), transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformHomogeneous(trsMatrix, vector, 0.5f);
+	};
+#endif
+}
+
+TEST_CASE("Create homogeneous with transformation matrix", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	constexpr auto homogeneousC = PonyEngine::Math::CreateHomogeneous(vector, 2.5f);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector4<float>(4.6f, 8.1f, -3.9f, 2.5f), homogeneousC, 0.001f));
+	const auto homogeneous = PonyEngine::Math::CreateHomogeneous(vector, 2.5f);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector4<float>(4.6f, 8.1f, -3.9f, 2.5f), homogeneous, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::CreateHomogeneous(PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f), 2.5f);
+	};
+#endif
 }
