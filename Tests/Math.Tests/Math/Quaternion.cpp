@@ -384,6 +384,27 @@ TEST_CASE("Quaternion cast", "[Math][Quaternion]")
 #endif
 }
 
+TEST_CASE("Quaternion cast to vector", "[Math][Quaternion]")
+{
+	constexpr float x = 2.f;
+	constexpr float y = -3.f;
+	constexpr float z = 4.f;
+	constexpr float w = 1.f;
+	constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+	constexpr auto vector = static_cast<PonyEngine::Math::Vector4<float>>(quaternion);
+	STATIC_REQUIRE(vector.X() == x);
+	STATIC_REQUIRE(vector.Y() == y);
+	STATIC_REQUIRE(vector.Z() == z);
+	STATIC_REQUIRE(vector.W() == w);
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return static_cast<PonyEngine::Math::Quaternion<double>>(PonyEngine::Math::Quaternion<float>(3.f, 4.f, -1.f, 2.f));
+	};
+#endif
+}
+
 TEST_CASE("Quaternion access by index", "[Math][Quaternion]")
 {
 	auto access = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Quaternion<T>& quaternion) constexpr
