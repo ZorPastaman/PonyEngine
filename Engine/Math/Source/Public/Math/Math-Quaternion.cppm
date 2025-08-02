@@ -173,6 +173,10 @@ export namespace PonyEngine::Math
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Quaternion<U>() const noexcept;
 
+		/// @brief Converts to a vector.
+		[[nodiscard("Pure operator")]]
+		explicit constexpr operator Vector4<T>() const noexcept;
+
 		/// @brief Gets a component by the @p index.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
@@ -516,6 +520,12 @@ namespace PonyEngine::Math
 	constexpr Quaternion<T>::operator Quaternion<U>() const noexcept
 	{
 		return Quaternion<U>(static_cast<Vector4<U>>(components));
+	}
+
+	template<std::floating_point T>
+	constexpr Quaternion<T>::operator Vector4<T>() const noexcept
+	{
+		return components;
 	}
 
 	template<std::floating_point T>
