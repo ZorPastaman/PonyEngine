@@ -76,16 +76,3 @@ TEST_CASE("FloatingBySize and ComputationalFor", "[Type][Common]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::FloatingBySize<std::pair<std::int64_t, std::int8_t>>, long double>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::FloatingBySize<std::pair<std::uint64_t, std::uint8_t>>, long double>);
 }
-
-TEST_CASE("ComputationalFor", "[Type][Common]")
-{
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<float>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<double>, double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<long double>, long double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<std::int8_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<std::uint16_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<std::int32_t>, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<std::uint64_t>, double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<std::pair<std::int64_t, std::int8_t>>, long double>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Type::ComputationalFor<std::pair<std::uint64_t, std::uint8_t>>, long double>);
-}

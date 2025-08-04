@@ -14,6 +14,7 @@ import std;
 import PonyEngine.Type;
 
 import :Common;
+import :InternalUtility;
 import :Vector;
 
 export namespace PonyEngine::Math
@@ -28,7 +29,6 @@ export namespace PonyEngine::Math
 	{
 	public:
 		using ValueType = T; ///< Component type.
-		using ComputationalType = Type::ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
 
 		static constexpr std::size_t Rows = RowCount; ///< Row count.
 		static constexpr std::size_t Columns = ColumnCount; ///< Column count.
@@ -43,10 +43,12 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix(T value) noexcept requires(RowCount == ColumnCount);
 		/// @brief Creates a matrix and assigns its components from the arguments.
+		/// @tparam Ts Component types.
 		/// @param components Matrix components
-		template<typename... Ts> [[nodiscard("Pure constructor")]]
-		explicit constexpr Matrix(Ts&&... components) noexcept requires (sizeof...(Ts) == RowCount * ColumnCount && (std::is_convertible_v<Ts, T> && ...));
+		template<Type::Arithmetic... Ts> [[nodiscard("Pure constructor")]]
+		explicit constexpr Matrix(Ts... components) noexcept requires (sizeof...(Ts) == RowCount * ColumnCount);
 		/// @brief Creates a matrix and assigns its columns from the arguments.
+		/// @tparam Ts Column types.
 		/// @param columns Matrix columns.
 		template<typename... Ts> [[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix(Ts&&... columns) noexcept requires (sizeof...(Ts) == ColumnCount && (std::is_convertible_v<Ts, Vector<T, RowCount>> && ...));
@@ -275,9 +277,11 @@ export namespace PonyEngine::Math
 		/// @return @a This.
 		constexpr Matrix& operator *=(T multiplier) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
+		/// @tparam U Multiplier type.
 		/// @param multiplier Multiplier.
 		/// @return @a This.
-		constexpr Matrix& operator *=(ComputationalType multiplier) noexcept requires (std::is_integral_v<T>);
+		template<std::floating_point U = double>
+		constexpr Matrix& operator *=(U multiplier) noexcept requires (std::is_integral_v<T>);
 		/// @brief Multiplies @a this by the @p other.
 		/// @param other Matrix to multiply.
 		/// @return @a This.
@@ -287,9 +291,11 @@ export namespace PonyEngine::Math
 		/// @return @a This.
 		constexpr Matrix& operator /=(T divisor) noexcept;
 		/// @brief Divides @a this by the @p divisor.
+		/// @tparam U Divisor type.
 		/// @param divisor Divisor.
 		/// @return @a This.
-		constexpr Matrix& operator /=(ComputationalType divisor) noexcept requires (std::is_integral_v<T>);
+		template<std::floating_point U = double>
+		constexpr Matrix& operator /=(U divisor) noexcept requires (std::is_integral_v<T>);
 
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Matrix& other) const noexcept = default;
@@ -405,13 +411,14 @@ export namespace PonyEngine::Math
 	constexpr Matrix<T, RowCount, ColumnCount> operator *(const Matrix<T, RowCount, ColumnCount>& matrix, T multiplier) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
+	/// @tparam U Multiplier type.
 	/// @tparam RowCount Row count.
 	/// @tparam ColumnCount Column count.
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<std::integral T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure operator")]]
-	constexpr Matrix<T, RowCount, ColumnCount> operator *(const Matrix<T, RowCount, ColumnCount>& matrix, typename Matrix<T, RowCount, ColumnCount>::ComputationalType multiplier) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
+	template<std::floating_point U = double, std::integral T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure operator")]]
+	constexpr Matrix<T, RowCount, ColumnCount> operator *(const Matrix<T, RowCount, ColumnCount>& matrix, U multiplier) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @tparam RowCount Row count.
@@ -423,13 +430,14 @@ export namespace PonyEngine::Math
 	constexpr Matrix<T, RowCount, ColumnCount> operator *(T multiplier, const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
+	/// @tparam U Multiplier type.
 	/// @tparam RowCount Row count.
 	/// @tparam ColumnCount Column count.
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<std::integral T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure operator")]]
-	constexpr Matrix<T, RowCount, ColumnCount> operator *(typename Matrix<T, RowCount, ColumnCount>::ComputationalType multiplier, const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
+	template<std::floating_point U = double, std::integral T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure operator")]]
+	constexpr Matrix<T, RowCount, ColumnCount> operator *(U multiplier, const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 
 	/// @brief Multiplies the @p lhs matrix by the @p rhs matrix.
 	/// @tparam T Component type.
@@ -462,13 +470,14 @@ export namespace PonyEngine::Math
 	constexpr Matrix<T, RowCount, ColumnCount> operator /(const Matrix<T, RowCount, ColumnCount>& matrix, T divisor) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 	/// @brief Divides the @p matrix by the @p divisor.
 	/// @tparam T Component type.
+	/// @tparam U Divisor type.
 	/// @tparam RowCount Row count.
 	/// @tparam ColumnCount Column count.
 	/// @param matrix Dividend.
 	/// @param divisor Divisor.
 	/// @return Quotient.
-	template<std::integral T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure operator")]]
-	constexpr Matrix<T, RowCount, ColumnCount> operator /(const Matrix<T, RowCount, ColumnCount>& matrix, typename Matrix<T, RowCount, ColumnCount>::ComputationalType divisor) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
+	template<std::floating_point U = double, std::integral T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure operator")]]
+	constexpr Matrix<T, RowCount, ColumnCount> operator /(const Matrix<T, RowCount, ColumnCount>& matrix, U divisor) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
 
 	/// @brief Outputs a string representation of the @p matrix.
 	/// @tparam T Component type.
@@ -533,9 +542,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
-	template<typename... Ts>
-	constexpr Matrix<T, RowCount, ColumnCount>::Matrix(Ts&&... components) noexcept requires (sizeof...(Ts) == RowCount * ColumnCount && (std::is_convertible_v<Ts, T> && ...)) :
-		Matrix(std::array<T, RowCount * ColumnCount>{static_cast<T>(std::forward<Ts>(components))...})
+	template<Type::Arithmetic... Ts>
+	constexpr Matrix<T, RowCount, ColumnCount>::Matrix(Ts... components) noexcept requires (sizeof...(Ts) == RowCount * ColumnCount) :
+		Matrix(std::array<T, RowCount * ColumnCount>{ConvertTo<T>(components)...})
 	{
 	}
 
@@ -1064,7 +1073,8 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
-	constexpr Matrix<T, RowCount, ColumnCount>& Matrix<T, RowCount, ColumnCount>::operator *=(const ComputationalType multiplier) noexcept requires (std::is_integral_v<T>)
+	template<std::floating_point U>
+	constexpr Matrix<T, RowCount, ColumnCount>& Matrix<T, RowCount, ColumnCount>::operator *=(const U multiplier) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1098,7 +1108,8 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
-	constexpr Matrix<T, RowCount, ColumnCount>& Matrix<T, RowCount, ColumnCount>::operator /=(const ComputationalType divisor) noexcept requires (std::is_integral_v<T>)
+	template<std::floating_point U>
+	constexpr Matrix<T, RowCount, ColumnCount>& Matrix<T, RowCount, ColumnCount>::operator /=(const U divisor) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1226,8 +1237,8 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<std::integral T, std::size_t RowCount, std::size_t ColumnCount>
-	constexpr Matrix<T, RowCount, ColumnCount> operator *(const Matrix<T, RowCount, ColumnCount>& matrix, const typename Matrix<T, RowCount, ColumnCount>::ComputationalType multiplier) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	template<std::floating_point U, std::integral T, std::size_t RowCount, std::size_t ColumnCount>
+	constexpr Matrix<T, RowCount, ColumnCount> operator *(const Matrix<T, RowCount, ColumnCount>& matrix, const U multiplier) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
 	{
 		Matrix<T, RowCount, ColumnCount> answer;
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
@@ -1247,8 +1258,8 @@ namespace PonyEngine::Math
 		return matrix * multiplier;
 	}
 
-	template<std::integral T, std::size_t RowCount, std::size_t ColumnCount>
-	constexpr Matrix<T, RowCount, ColumnCount> operator *(const typename Matrix<T, RowCount, ColumnCount>::ComputationalType multiplier, const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	template<std::floating_point U, std::integral T, std::size_t RowCount, std::size_t ColumnCount>
+	constexpr Matrix<T, RowCount, ColumnCount> operator *(const U multiplier, const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
 	{
 		return matrix * multiplier;
 	}
@@ -1297,8 +1308,8 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<std::integral T, std::size_t RowCount, std::size_t ColumnCount>
-	constexpr Matrix<T, RowCount, ColumnCount> operator /(const Matrix<T, RowCount, ColumnCount>& matrix, const typename Matrix<T, RowCount, ColumnCount>::ComputationalType divisor) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	template<std::floating_point U, std::integral T, std::size_t RowCount, std::size_t ColumnCount>
+	constexpr Matrix<T, RowCount, ColumnCount> operator /(const Matrix<T, RowCount, ColumnCount>& matrix, const U divisor) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
 	{
 		Matrix<T, RowCount, ColumnCount> answer;
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)

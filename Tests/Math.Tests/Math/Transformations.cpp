@@ -5020,7 +5020,7 @@ TEST_CASE("Trs matrix from translation-angle-scaling", "[Math][Transformations]"
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::Math::TrsMatrix(PonyEngine::Math::Vector2<float>(2, -4), -1.2f, PonyEngine::Math::Vector2<float>(-3, 2));
+		return PonyEngine::Math::TrsMatrix(PonyEngine::Math::Vector2<float>(2.f, -4.f), -1.2f, PonyEngine::Math::Vector2<float>(-3.f, 2.f));
 	};
 #endif
 }
@@ -5036,7 +5036,7 @@ TEST_CASE("Trs matrix compact from translation-angle-scaling", "[Math][Transform
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::Math::TrsMatrixCompact(PonyEngine::Math::Vector2<float>(2, -4), -1.2f, PonyEngine::Math::Vector2<float>(-3, 2));
+		return PonyEngine::Math::TrsMatrixCompact(PonyEngine::Math::Vector2<float>(2.f, -4.f), -1.2f, PonyEngine::Math::Vector2<float>(-3.f, 2.f));
 	};
 #endif
 }
@@ -5354,11 +5354,11 @@ TEST_CASE("Angle from trs matrix", "[Math][Transformations]")
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Usual")
 	{
-		return PonyEngine::Math::ExtractAngleFromRs(PonyEngine::Math::Matrix3x3<float>(-0.97f, -1.75f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f));
+		return PonyEngine::Math::ExtractAngleFromTrs(PonyEngine::Math::Matrix3x3<float>(-0.97f, -1.75f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f));
 	};
 	BENCHMARK("Zero first column")
 	{
-		return PonyEngine::Math::ExtractAngleFromRs(PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f));
+		return PonyEngine::Math::ExtractAngleFromTrs(PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f));
 	};
 #endif
 }
@@ -5376,11 +5376,11 @@ TEST_CASE("Angle from trs matrix compact", "[Math][Transformations]")
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Usual")
 	{
-		return PonyEngine::Math::ExtractAngleFromRs(PonyEngine::Math::Matrix2x3<float>(-0.97f, -1.75f, -2.625f, 1.455f, -3.f, 7.f));
+		return PonyEngine::Math::ExtractAngleFromTrs(PonyEngine::Math::Matrix2x3<float>(-0.97f, -1.75f, -2.625f, 1.455f, -3.f, 7.f));
 	};
 	BENCHMARK("Zero first column")
 	{
-		return PonyEngine::Math::ExtractAngleFromRs(PonyEngine::Math::Matrix2x3<float>(0.f, 0.f, -2.625f, 1.455f, -3.f, 7.f));
+		return PonyEngine::Math::ExtractAngleFromTrs(PonyEngine::Math::Matrix2x3<float>(0.f, 0.f, -2.625f, 1.455f, -3.f, 7.f));
 	};
 #endif
 }
