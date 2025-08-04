@@ -103,6 +103,15 @@ TEST_CASE("Quaternion move constructor", "[Math][Quaternion]")
 TEST_CASE("Quaternion predefined", "[Math][Quaternion]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>::Identity() == PonyEngine::Math::Quaternion<float>(0.f, 0.f, 0.f, 1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationX90(), PonyEngine::Math::Quaternion<float>(1.f / std::numbers::sqrt2_v<float>, 0.f, 0.f, 1.f / std::numbers::sqrt2_v<float>)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationX180(), PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationX270(), PonyEngine::Math::Quaternion<float>(-1.f / std::numbers::sqrt2_v<float>, 0.f, 0.f, 1.f / std::numbers::sqrt2_v<float>)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationY90(), PonyEngine::Math::Quaternion<float>(0.f, 1.f / std::numbers::sqrt2_v<float>, 0.f, 1.f / std::numbers::sqrt2_v<float>)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationY180(), PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationY270(), PonyEngine::Math::Quaternion<float>(0.f, -1.f / std::numbers::sqrt2_v<float>, 0.f, 1.f / std::numbers::sqrt2_v<float>)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationZ90(), PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f / std::numbers::sqrt2_v<float>, 1.f / std::numbers::sqrt2_v<float>)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationZ180(), PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f, 0.f)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Quaternion<float>::RotationZ270(), PonyEngine::Math::Quaternion<float>(0.f, 0.f, -1.f / std::numbers::sqrt2_v<float>, 1.f / std::numbers::sqrt2_v<float>)));
 }
 
 TEST_CASE("Quaternion access", "[Math][Quaternion]")

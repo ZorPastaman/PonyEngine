@@ -21,10 +21,6 @@ TEST_CASE("Vector static", "[Math][Vector]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector1<std::uint32_t>::ValueType, std::uint32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector1<float>::ValueType, float>);
 
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector1<std::int32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector1<std::uint32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector1<float>::ComputationalType, float>);
-
 	STATIC_REQUIRE(PonyEngine::Math::Vector1<std::int32_t>::ComponentCount == 1uz);
 	STATIC_REQUIRE(PonyEngine::Math::Vector1<std::uint32_t>::ComponentCount == 1uz);
 	STATIC_REQUIRE(PonyEngine::Math::Vector1<float>::ComponentCount == 1uz);
@@ -32,10 +28,6 @@ TEST_CASE("Vector static", "[Math][Vector]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector2<std::int32_t>::ValueType, std::int32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector2<std::uint32_t>::ValueType, std::uint32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector2<float>::ValueType, float>);
-
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector2<std::int32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector2<std::uint32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector2<float>::ComputationalType, float>);
 
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<std::int32_t>::ComponentCount == 2uz);
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<std::uint32_t>::ComponentCount == 2uz);
@@ -45,10 +37,6 @@ TEST_CASE("Vector static", "[Math][Vector]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector3<std::uint32_t>::ValueType, std::uint32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector3<float>::ValueType, float>);
 
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector3<std::int32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector3<std::uint32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector3<float>::ComputationalType, float>);
-
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<std::int32_t>::ComponentCount == 3uz);
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<std::uint32_t>::ComponentCount == 3uz);
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::ComponentCount == 3uz);
@@ -56,10 +44,6 @@ TEST_CASE("Vector static", "[Math][Vector]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector4<std::int32_t>::ValueType, std::int32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector4<std::uint32_t>::ValueType, std::uint32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector4<float>::ValueType, float>);
-
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector4<std::int32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector4<std::uint32_t>::ComputationalType, float>);
-	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Vector4<float>::ComputationalType, float>);
 
 	STATIC_REQUIRE(PonyEngine::Math::Vector4<std::int32_t>::ComponentCount == 4uz);
 	STATIC_REQUIRE(PonyEngine::Math::Vector4<std::uint32_t>::ComponentCount == 4uz);
@@ -83,7 +67,7 @@ TEST_CASE("Vector default constructor", "[Math][Vector]")
 
 TEST_CASE("Vector fill constructor", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
+	constexpr std::int16_t x = -5;
 
 	constexpr auto vector1 = PonyEngine::Math::Vector1<float>(x);
 	STATIC_REQUIRE(vector1.X() == x);
@@ -121,10 +105,10 @@ TEST_CASE("Vector fill constructor", "[Math][Vector]")
 
 TEST_CASE("Vector main constructor", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 7;
-	constexpr std::int32_t w = -2;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 7;
+	constexpr std::int16_t w = -2;
 
 	constexpr auto vector1 = PonyEngine::Math::Vector1<float>(x);
 	STATIC_REQUIRE(vector1.X() == x);
@@ -198,10 +182,10 @@ TEST_CASE("Vector span constructor", "[Math][Vector]")
 
 TEST_CASE("Vector copy constructor", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 7;
-	constexpr std::int32_t w = -2;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 7;
+	constexpr std::int16_t w = -2;
 
 	constexpr auto vector1 = PonyEngine::Math::Vector1<float>(x);
 	constexpr PonyEngine::Math::Vector1<float> vector1Copy = vector1;
@@ -240,10 +224,10 @@ TEST_CASE("Vector move constructor", "[Math][Vector]")
 		return moved;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 7;
-	constexpr std::int32_t w = -2;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 7;
+	constexpr std::int16_t w = -2;
 
 	constexpr auto vector1 = PonyEngine::Math::Vector1<float>(x);
 	constexpr PonyEngine::Math::Vector1<float> vector1Copy = moveTest(vector1);
@@ -312,24 +296,24 @@ TEST_CASE("Vector predefined", "[Math][Vector]")
 	STATIC_REQUIRE(PonyEngine::Math::Vector1<std::int32_t>::Right() == PonyEngine::Math::Vector1<std::int32_t>(1));
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<float>::Right() == PonyEngine::Math::Vector2<float>(1.f, 0.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<std::int32_t>::Right() == PonyEngine::Math::Vector2<std::int32_t>(1, 0));
-	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Right() == PonyEngine::Math::Vector3<float>(1.f, 0, 0));
+	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Right() == PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<std::int32_t>::Right() == PonyEngine::Math::Vector3<std::int32_t>(1, 0, 0));
 
 	STATIC_REQUIRE(PonyEngine::Math::Vector1<float>::Left() == PonyEngine::Math::Vector1<float>(-1.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector1<std::int32_t>::Left() == PonyEngine::Math::Vector1<std::int32_t>(-1));
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<float>::Left() == PonyEngine::Math::Vector2<float>(-1.f, 0.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<std::int32_t>::Left() == PonyEngine::Math::Vector2<std::int32_t>(-1, 0));
-	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Left() == PonyEngine::Math::Vector3<float>(-1.f, 0, 0));
+	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Left() == PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<std::int32_t>::Left() == PonyEngine::Math::Vector3<std::int32_t>(-1, 0, 0));
 
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<float>::Up() == PonyEngine::Math::Vector2<float>(0.f, 1.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<std::int32_t>::Up() == PonyEngine::Math::Vector2<std::int32_t>(0, 1));
-	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Up() == PonyEngine::Math::Vector3<float>(0.f, 1, 0));
+	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Up() == PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<std::int32_t>::Up() == PonyEngine::Math::Vector3<std::int32_t>(0, 1, 0));
 
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<float>::Down() == PonyEngine::Math::Vector2<float>(0.f, -1.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<std::int32_t>::Down() == PonyEngine::Math::Vector2<std::int32_t>(0, -1));
-	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Down() == PonyEngine::Math::Vector3<float>(0.f, -1, 0));
+	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Down() == PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f));
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<std::int32_t>::Down() == PonyEngine::Math::Vector3<std::int32_t>(0, -1, 0));
 
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<float>::Forward() == PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f));
@@ -352,10 +336,10 @@ TEST_CASE("Vector access", "[Math][Vector]")
 		return copy;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 7;
-	constexpr std::int32_t w = -2;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 7;
+	constexpr std::int16_t w = -2;
 
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	STATIC_REQUIRE(intVector.X() == x);
@@ -393,10 +377,10 @@ TEST_CASE("Vector span", "[Math][Vector]")
 		return copy;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 7;
-	constexpr std::int32_t w = -2;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 7;
+	constexpr std::int16_t w = -2;
 
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	STATIC_REQUIRE(intVector.Span()[0] == x);
@@ -423,14 +407,14 @@ TEST_CASE("Vector span", "[Math][Vector]")
 
 TEST_CASE("Vector magnitude", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 7;
-	constexpr std::int32_t w = -2;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 7;
+	constexpr std::int16_t w = -2;
 
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	STATIC_REQUIRE(intVector.MagnitudeSquared() == 87);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(intVector.Magnitude(), 9.327f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(intVector.Magnitude<float>(), 9.327f, 0.001f));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector4<float>(x, y, z, w);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector.MagnitudeSquared(), 87.f));
@@ -617,7 +601,7 @@ TEST_CASE("Vector sum this", "[Math][Vector]")
 	};
 	BENCHMARK("Float")
 	{
-		return PonyEngine::Math::Vector4<float>(7.f, -3.f, 4, -1).Sum();
+		return PonyEngine::Math::Vector4<float>(7.f, -3.f, 4.f, -1.f).Sum();
 	};
 #endif
 }
@@ -727,14 +711,14 @@ TEST_CASE("Vector multiply this", "[Math][Vector]")
 		return copy;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = -15;
-	constexpr std::int32_t w = 13;
-	constexpr std::int32_t x1 = 15;
-	constexpr std::int32_t y1 = -13;
-	constexpr std::int32_t z1 = 5;
-	constexpr std::int32_t w1 = 3;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = -15;
+	constexpr std::int16_t w = 13;
+	constexpr std::int16_t x1 = 15;
+	constexpr std::int16_t y1 = -13;
+	constexpr std::int16_t z1 = 5;
+	constexpr std::int16_t w1 = 3;
 
 	STATIC_REQUIRE(multiply(PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w), PonyEngine::Math::Vector4<std::int32_t>(x1, y1, z1, w1)) == PonyEngine::Math::Vector4<std::int32_t>(x * x1, y * y1, z * z1, w * w1));
 	STATIC_REQUIRE(multiply(PonyEngine::Math::Vector4<float>(x, y, z, w), PonyEngine::Math::Vector4<float>(x1, y1, z1, w1)) == PonyEngine::Math::Vector4<float>(static_cast<float>(x) * x1, static_cast<float>(y) * y1, static_cast<float>(z) * z1, static_cast<float>(w) * w1));
@@ -764,14 +748,14 @@ TEST_CASE("Vector divide this", "[Math][Vector]")
 		return copy;
 	};
 
-	constexpr std::int32_t x = -50;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t z = -150;
-	constexpr std::int32_t w = 130;
-	constexpr std::int32_t x1 = 15;
-	constexpr std::int32_t y1 = -13;
-	constexpr std::int32_t z1 = 5;
-	constexpr std::int32_t w1 = 3;
+	constexpr std::int16_t x = -50;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t z = -150;
+	constexpr std::int16_t w = 130;
+	constexpr std::int16_t x1 = 15;
+	constexpr std::int16_t y1 = -13;
+	constexpr std::int16_t z1 = 5;
+	constexpr std::int16_t w1 = 3;
 
 	STATIC_REQUIRE(divide(PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w), PonyEngine::Math::Vector4<std::int32_t>(x1, y1, z1, w1)) == PonyEngine::Math::Vector4<std::int32_t>(x / x1, y / y1, z / z1, w / w1));
 	STATIC_REQUIRE(divide(PonyEngine::Math::Vector4<float>(x, y, z, w), PonyEngine::Math::Vector4<float>(x1, y1, z1, w1)) == PonyEngine::Math::Vector4<float>(static_cast<float>(x) / x1, static_cast<float>(y) / y1, static_cast<float>(z) / z1, static_cast<float>(w) / w1));
@@ -794,10 +778,10 @@ TEST_CASE("Vector divide this", "[Math][Vector]")
 
 TEST_CASE("Vector ToString", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = -15;
-	constexpr std::int32_t w = 13;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = -15;
+	constexpr std::int16_t w = 13;
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	const std::string intExpected = std::format("({}, {}, {}, {})", x, y, z, w);
 
@@ -830,10 +814,10 @@ TEST_CASE("Vector ToString", "[Math][Vector]")
 
 TEST_CASE("Vector cast", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = -15;
-	constexpr std::int32_t w = 13;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = -15;
+	constexpr std::int16_t w = 13;
 	constexpr auto vector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	constexpr auto cast = static_cast<PonyEngine::Math::Vector4<float>>(vector);
 	STATIC_REQUIRE(cast.X() == static_cast<float>(x));
@@ -871,10 +855,10 @@ TEST_CASE("Vector access by index", "[Math][Vector]")
 		return copy;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = -15;
-	constexpr std::int32_t w = 13;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = -15;
+	constexpr std::int16_t w = 13;
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	STATIC_REQUIRE(intVector[0] == x);
 	STATIC_REQUIRE(intVector[1] == y);
@@ -906,10 +890,10 @@ TEST_CASE("Vector copy assignment", "[Math][Vector]")
 		return copy = vector;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = -15;
-	constexpr std::int32_t w = 13;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = -15;
+	constexpr std::int16_t w = 13;
 
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	STATIC_REQUIRE(assignment(intVector) == intVector);
@@ -927,8 +911,8 @@ TEST_CASE("Vector move assignment", "[Math][Vector]")
 		return moved = std::move(copy);
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	STATIC_REQUIRE(assignment(intVector) == intVector);
@@ -945,14 +929,14 @@ TEST_CASE("Vector sum assignment", "[Math][Vector]")
 		return copy += other;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = -15;
-	constexpr std::int32_t w = 13;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
-	constexpr std::int32_t z1 = -1;
-	constexpr std::int32_t w1 = 4;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = -15;
+	constexpr std::int16_t w = 13;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
+	constexpr std::int16_t z1 = -1;
+	constexpr std::int16_t w1 = 4;
 
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	constexpr auto intVector1 = PonyEngine::Math::Vector4<std::int32_t>(x1, y1, z1, w1);
@@ -986,10 +970,10 @@ TEST_CASE("Vector subtraction assignment", "[Math][Vector]")
 		return copy -= other;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1023,12 +1007,12 @@ TEST_CASE("Vector product assignment", "[Math][Vector]")
 		return copy *= multiplier;
 	};
 
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t multiplier = 3;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t multiplier = 3;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
-	STATIC_REQUIRE(assignment(intVector, multiplier) == intVector * multiplier);
+	STATIC_REQUIRE(assignment(intVector, multiplier) == intVector * static_cast<std::int32_t>(multiplier));
 	STATIC_REQUIRE(assignment(intVector, static_cast<float>(multiplier)) == intVector * static_cast<float>(multiplier));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
@@ -1055,18 +1039,18 @@ TEST_CASE("Vector product assignment", "[Math][Vector]")
 
 TEST_CASE("Vector division assignment", "[Math][Vector]")
 {
-	auto assignment = []<PonyEngine::Type::Arithmetic T, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Vector2<T>&vector, U multiplier) constexpr
+	auto assignment = []<PonyEngine::Type::Arithmetic T, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Vector2<T>& vector, const U multiplier) constexpr
 	{
 		PonyEngine::Math::Vector2<T> copy = vector;
 		return copy /= multiplier;
 	};
 
-	constexpr std::int32_t x = -50;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t multiplier = 3;
+	constexpr std::int16_t x = -50;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t multiplier = 3;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
-	STATIC_REQUIRE(assignment(intVector, multiplier) == intVector / multiplier);
+	STATIC_REQUIRE(assignment(intVector, multiplier) == intVector / static_cast<std::int32_t>(multiplier));
 	STATIC_REQUIRE(assignment(intVector, static_cast<float>(multiplier)) == intVector / static_cast<float>(multiplier));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
@@ -1093,10 +1077,10 @@ TEST_CASE("Vector division assignment", "[Math][Vector]")
 
 TEST_CASE("Vector equals", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1118,10 +1102,10 @@ TEST_CASE("Vector equals", "[Math][Vector]")
 
 TEST_CASE("Vector dot", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1145,10 +1129,10 @@ TEST_CASE("Vector dot", "[Math][Vector]")
 
 TEST_CASE("Vector2 crossZ", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1172,12 +1156,12 @@ TEST_CASE("Vector2 crossZ", "[Math][Vector]")
 
 TEST_CASE("Vector3 cross", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 4;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
-	constexpr std::int32_t z1 = -2;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 4;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
+	constexpr std::int16_t z1 = -2;
 
 	constexpr auto intVector = PonyEngine::Math::Vector3<std::int32_t>(x, y, z);
 	constexpr auto intVector1 = PonyEngine::Math::Vector3<std::int32_t>(x1, y1, z1);
@@ -1201,15 +1185,15 @@ TEST_CASE("Vector3 cross", "[Math][Vector]")
 
 TEST_CASE("Vector distance", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
 	STATIC_REQUIRE(PonyEngine::Math::DistanceSquared(intVector, intVector1) == 130);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Distance(intVector, intVector1), std::sqrt(130.f)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Distance<float>(intVector, intVector1), std::sqrt(130.f)));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto floatVector1 = PonyEngine::Math::Vector2<float>(x1, y1);
@@ -1238,10 +1222,10 @@ TEST_CASE("Vector distance", "[Math][Vector]")
 
 TEST_CASE("Vector2 angle", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	auto vector = PonyEngine::Math::Vector2<float>(x, y).Normalized();
 	auto vector1 = PonyEngine::Math::Vector2<float>(x1, y1).Normalized();
@@ -1269,16 +1253,16 @@ TEST_CASE("Vector2 angle", "[Math][Vector]")
 
 TEST_CASE("Vector3 angle", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t z = 4;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
-	constexpr std::int32_t z1 = -4;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t z = 4;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
+	constexpr std::int16_t z1 = -4;
 
 	auto vector = PonyEngine::Math::Vector3<float>(x, y, z).Normalized();
 	auto vector1 = PonyEngine::Math::Vector3<float>(x1, y1, z1).Normalized();
-	auto vector2 = PonyEngine::Math::Vector3<float>(0, 4, -3);
+	auto vector2 = PonyEngine::Math::Vector3<float>(0.f, 4.f, -3.f);
 	auto vector3 = -vector;
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector), 0.f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector1), 2.553f, 0.001f));
@@ -1303,24 +1287,24 @@ TEST_CASE("Vector3 angle", "[Math][Vector]")
 
 TEST_CASE("Vector2 rotate90", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	STATIC_REQUIRE(PonyEngine::Math::Rotate90CW(intVector) == PonyEngine::Math::Vector2<std::int32_t>(3, 5));
 	STATIC_REQUIRE(PonyEngine::Math::Rotate90CCW(intVector) == PonyEngine::Math::Vector2<std::int32_t>(-3, -5));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
-	STATIC_REQUIRE(PonyEngine::Math::Rotate90CW(floatVector) == PonyEngine::Math::Vector2<float>(3, 5));
-	STATIC_REQUIRE(PonyEngine::Math::Rotate90CCW(floatVector) == PonyEngine::Math::Vector2<float>(-3, -5));
+	STATIC_REQUIRE(PonyEngine::Math::Rotate90CW(floatVector) == PonyEngine::Math::Vector2<float>(3.f, 5.f));
+	STATIC_REQUIRE(PonyEngine::Math::Rotate90CCW(floatVector) == PonyEngine::Math::Vector2<float>(-3.f, -5.f));
 }
 
 TEST_CASE("Vector project", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto vector1 = PonyEngine::Math::Vector2<float>(x1, y1);
@@ -1344,10 +1328,10 @@ TEST_CASE("Vector project", "[Math][Vector]")
 
 TEST_CASE("Vector project on plane", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto vector1 = PonyEngine::Math::Vector2<float>(x1, y1);
@@ -1371,10 +1355,10 @@ TEST_CASE("Vector project on plane", "[Math][Vector]")
 
 TEST_CASE("Vector reflect", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto vector1 = PonyEngine::Math::Vector2<float>(x1, y1);
@@ -1398,17 +1382,17 @@ TEST_CASE("Vector reflect", "[Math][Vector]")
 
 TEST_CASE("Vector multiply", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
 	STATIC_REQUIRE(PonyEngine::Math::Multiply(intVector, intVector1) == PonyEngine::Math::Vector2<std::int32_t>(x * x1, y * y1));
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto floatVector1 = PonyEngine::Math::Vector2<float>(x1, y1);
-	STATIC_REQUIRE(PonyEngine::Math::Multiply(floatVector, floatVector1) == PonyEngine::Math::Vector2<float>(x * x1, y * y1));
+	STATIC_REQUIRE(PonyEngine::Math::Multiply(floatVector, floatVector1) == PonyEngine::Math::Vector2<float>(static_cast<float>(x * x1), static_cast<float>(y * y1)));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
@@ -1424,17 +1408,17 @@ TEST_CASE("Vector multiply", "[Math][Vector]")
 
 TEST_CASE("Vector divide", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -50;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -50;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
 	STATIC_REQUIRE(PonyEngine::Math::Divide(intVector, intVector1) == PonyEngine::Math::Vector2<std::int32_t>(x / x1, y / y1));
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto floatVector1 = PonyEngine::Math::Vector2<float>(x1, y1);
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Divide(floatVector, floatVector1), PonyEngine::Math::Vector2<float>(x / x1, y / y1)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Divide(floatVector, floatVector1), PonyEngine::Math::Vector2<float>(static_cast<float>(x / x1), static_cast<float>(y / y1))));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
@@ -1450,8 +1434,8 @@ TEST_CASE("Vector divide", "[Math][Vector]")
 
 TEST_CASE("Vector abs", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = 3;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = 3;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVectorX = PonyEngine::Math::Vector2<std::int32_t>(-x, y);
@@ -1463,9 +1447,9 @@ TEST_CASE("Vector abs", "[Math][Vector]")
 	STATIC_REQUIRE(PonyEngine::Math::Abs(intVectorXY) == intVector);
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
-	constexpr auto floatVectorX = PonyEngine::Math::Vector2<float>(-x, y);
-	constexpr auto floatVectorY = PonyEngine::Math::Vector2<float>(x, -y);
-	constexpr auto floatVectorXY = PonyEngine::Math::Vector2<float>(-x, -y);
+	constexpr auto floatVectorX = PonyEngine::Math::Vector2<float>(static_cast<float>(-x), y);
+	constexpr auto floatVectorY = PonyEngine::Math::Vector2<float>(x, static_cast<float>(-y));
+	constexpr auto floatVectorXY = PonyEngine::Math::Vector2<float>(static_cast<float>(-x), static_cast<float>(-y));
 	STATIC_REQUIRE(PonyEngine::Math::Abs(floatVector) == floatVector);
 	STATIC_REQUIRE(PonyEngine::Math::Abs(floatVectorX) == floatVector);
 	STATIC_REQUIRE(PonyEngine::Math::Abs(floatVectorY) == floatVector);
@@ -1485,10 +1469,10 @@ TEST_CASE("Vector abs", "[Math][Vector]")
 
 TEST_CASE("Vector min", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -50;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -50;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1512,10 +1496,10 @@ TEST_CASE("Vector min", "[Math][Vector]")
 
 TEST_CASE("Vector max", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -50;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -50;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1539,22 +1523,22 @@ TEST_CASE("Vector max", "[Math][Vector]")
 
 TEST_CASE("Vector clamp", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
-	constexpr std::int32_t x2 = 20;
-	constexpr std::int32_t y2 = 10;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
+	constexpr std::int16_t x2 = 20;
+	constexpr std::int16_t y2 = 10;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
 	constexpr auto intVector2 = PonyEngine::Math::Vector2<std::int32_t>(x2, y2);
 	STATIC_REQUIRE(PonyEngine::Math::Clamp(intVector, intVector1, intVector2) == PonyEngine::Math::Vector2<std::int32_t>(x, y2));
 
-	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x1 - 1, y2 - 1);
+	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(static_cast<float>(x1 - 1), static_cast<float>(y2 - 1));
 	constexpr auto floatVector1 = PonyEngine::Math::Vector2<float>(x1, y1);
 	constexpr auto floatVector2 = PonyEngine::Math::Vector2<float>(x2, y2);
-	STATIC_REQUIRE(PonyEngine::Math::Clamp(floatVector, floatVector1, floatVector2) == PonyEngine::Math::Vector2<float>(x1, y2 - 1));
+	STATIC_REQUIRE(PonyEngine::Math::Clamp(floatVector, floatVector1, floatVector2) == PonyEngine::Math::Vector2<float>(x1, static_cast<float>(y2 - 1)));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
@@ -1570,8 +1554,8 @@ TEST_CASE("Vector clamp", "[Math][Vector]")
 
 TEST_CASE("Vector clamp magnitude", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = 3;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = 3;
 	constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
 	REQUIRE(PonyEngine::Math::ClampMagnitude(vector, 100.f) == vector);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ClampMagnitude(vector, 2.3f), vector.Normalized() * 2.3f));
@@ -1590,10 +1574,10 @@ TEST_CASE("Vector clamp magnitude", "[Math][Vector]")
 
 TEST_CASE("Vector lerp", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1625,10 +1609,10 @@ TEST_CASE("Vector lerp", "[Math][Vector]")
 
 TEST_CASE("Vector are almost equal", "[Math][Vector]")
 {
-	constexpr std::int32_t x = -5;
-	constexpr std::int32_t y = 3;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = -5;
+	constexpr std::int16_t y = 3;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto vector1 = PonyEngine::Math::Vector2<float>(x1, y1);
@@ -1647,10 +1631,10 @@ TEST_CASE("Vector are almost equal", "[Math][Vector]")
 
 TEST_CASE("Vector sum", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1658,7 +1642,7 @@ TEST_CASE("Vector sum", "[Math][Vector]")
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto floatVector1 = PonyEngine::Math::Vector2<float>(x1, y1);
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector + floatVector1, PonyEngine::Math::Vector2<float>(x + x1, y + y1)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector + floatVector1, PonyEngine::Math::Vector2<float>(static_cast<float>(x + x1), static_cast<float>(y + y1))));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
@@ -1674,14 +1658,14 @@ TEST_CASE("Vector sum", "[Math][Vector]")
 
 TEST_CASE("Vector negation", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = -30;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = -30;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	STATIC_REQUIRE(-intVector == PonyEngine::Math::Vector2<std::int32_t>(-x, -y));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(-floatVector, PonyEngine::Math::Vector2<float>(-x, -y)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(-floatVector, PonyEngine::Math::Vector2<float>(static_cast<float>(-x), static_cast<float>(-y))));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
@@ -1697,10 +1681,10 @@ TEST_CASE("Vector negation", "[Math][Vector]")
 
 TEST_CASE("Vector subtraction", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t x1 = 2;
-	constexpr std::int32_t y1 = -6;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t x1 = 2;
+	constexpr std::int16_t y1 = -6;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
@@ -1708,7 +1692,7 @@ TEST_CASE("Vector subtraction", "[Math][Vector]")
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	constexpr auto floatVector1 = PonyEngine::Math::Vector2<float>(x1, y1);
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector - floatVector1, PonyEngine::Math::Vector2<float>(x - x1, y - y1)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector - floatVector1, PonyEngine::Math::Vector2<float>(static_cast<float>(x - x1), static_cast<float>(y - y1))));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
@@ -1724,15 +1708,15 @@ TEST_CASE("Vector subtraction", "[Math][Vector]")
 
 TEST_CASE("Vector product", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 5;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t multiplier = 4;
+	constexpr std::int16_t x = 5;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t multiplier = 4;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
-	STATIC_REQUIRE(intVector * multiplier == PonyEngine::Math::Vector2<std::int32_t>(x * multiplier, y * multiplier));
-	STATIC_REQUIRE(multiplier * intVector == PonyEngine::Math::Vector2<std::int32_t>(x * multiplier, y * multiplier));
-	STATIC_REQUIRE(intVector * static_cast<float>(multiplier) == PonyEngine::Math::Vector2<std::int32_t>(x * static_cast<float>(multiplier), y * static_cast<float>(multiplier)));
-	STATIC_REQUIRE(static_cast<float>(multiplier) * intVector == PonyEngine::Math::Vector2<std::int32_t>(x * static_cast<float>(multiplier), y * static_cast<float>(multiplier)));
+	STATIC_REQUIRE(intVector * static_cast<std::int32_t>(multiplier) == PonyEngine::Math::Vector2<std::int32_t>(x * multiplier, y * multiplier));
+	STATIC_REQUIRE(static_cast<std::int32_t>(multiplier) * intVector == PonyEngine::Math::Vector2<std::int32_t>(x * multiplier, y * multiplier));
+	STATIC_REQUIRE(intVector * static_cast<float>(multiplier) == PonyEngine::Math::Vector2<std::int32_t>(static_cast<std::int32_t>(x * static_cast<float>(multiplier)), static_cast<std::int32_t>(y * static_cast<float>(multiplier))));
+	STATIC_REQUIRE(static_cast<float>(multiplier) * intVector == PonyEngine::Math::Vector2<std::int32_t>(static_cast<std::int32_t>(x * static_cast<float>(multiplier)), static_cast<std::int32_t>(y * static_cast<float>(multiplier))));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	STATIC_REQUIRE(floatVector * static_cast<float>(multiplier) == PonyEngine::Math::Vector2<float>(x * static_cast<float>(multiplier), y * static_cast<float>(multiplier)));
@@ -1756,13 +1740,13 @@ TEST_CASE("Vector product", "[Math][Vector]")
 
 TEST_CASE("Vector division", "[Math][Vector]")
 {
-	constexpr std::int32_t x = 50;
-	constexpr std::int32_t y = 30;
-	constexpr std::int32_t divisor = 4;
+	constexpr std::int16_t x = 50;
+	constexpr std::int16_t y = 30;
+	constexpr std::int16_t divisor = 4;
 
 	constexpr auto intVector = PonyEngine::Math::Vector2<std::int32_t>(x, y);
-	STATIC_REQUIRE(intVector / divisor == PonyEngine::Math::Vector2<std::int32_t>(x / divisor, y / divisor));
-	STATIC_REQUIRE(intVector / static_cast<float>(divisor) == PonyEngine::Math::Vector2<std::int32_t>(x / static_cast<float>(divisor), y / static_cast<float>(divisor)));
+	STATIC_REQUIRE(intVector / static_cast<std::int32_t>(divisor) == PonyEngine::Math::Vector2<std::int32_t>(x / divisor, y / divisor));
+	STATIC_REQUIRE(intVector / static_cast<float>(divisor) == PonyEngine::Math::Vector2<std::int32_t>(static_cast<std::int32_t>(x / static_cast<float>(divisor)), static_cast<std::int32_t>(y / static_cast<float>(divisor))));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	STATIC_REQUIRE(floatVector / static_cast<float>(divisor) == PonyEngine::Math::Vector2<float>(x / static_cast<float>(divisor), y / static_cast<float>(divisor)));

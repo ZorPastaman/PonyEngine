@@ -55,6 +55,42 @@ export namespace PonyEngine::Math
 		/// @return Identity quaternion.
 		[[nodiscard("Pure function")]]
 		static constexpr const Quaternion& Identity() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 90 degrees around the x-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationX90() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 180 degrees around the x-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationX180() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 270 degrees around the x-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationX270() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 90 degrees around the y-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationY90() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 180 degrees around the y-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationY180() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 270 degrees around the y-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationY270() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 90 degrees around the z-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationZ90() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 180 degrees around the z-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationZ180() noexcept;
+		/// @brief Gets a quaternion that represents a rotation of 270 degrees around the z-axis.
+		/// @return Rotation quaternion.
+		[[nodiscard("Pure function")]]
+		static constexpr const Quaternion& RotationZ270() noexcept;
 
 		/// @brief Gets the x-component.
 		/// @return X-component.
@@ -368,6 +404,78 @@ namespace PonyEngine::Math
 		static constexpr auto IdentityQuaternion = Quaternion(T{0}, T{0}, T{0}, T{1});
 
 		return IdentityQuaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationX90() noexcept
+	{
+		static constexpr auto RotationX90Quaternion = Quaternion(T{1} / std::numbers::sqrt2_v<T>, T{0}, T{0}, T{1} / std::numbers::sqrt2_v<T>);
+
+		return RotationX90Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationX180() noexcept
+	{
+		static constexpr auto RotationX180Quaternion = Quaternion(T{1}, T{0}, T{0}, T{0});
+
+		return RotationX180Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationX270() noexcept
+	{
+		static constexpr auto RotationX270Quaternion = Quaternion(T{-1} / std::numbers::sqrt2_v<T>, T{0}, T{0}, T{1} / std::numbers::sqrt2_v<T>);
+
+		return RotationX270Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationY90() noexcept
+	{
+		static constexpr auto RotationY90Quaternion = Quaternion(T{0}, T{1} / std::numbers::sqrt2_v<T>, T{0}, T{1} / std::numbers::sqrt2_v<T>);
+
+		return RotationY90Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationY180() noexcept
+	{
+		static constexpr auto RotationY180Quaternion = Quaternion(T{0}, T{1}, T{0}, T{0});
+
+		return RotationY180Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationY270() noexcept
+	{
+		static constexpr auto RotationY270Quaternion = Quaternion(T{0}, T{-1} / std::numbers::sqrt2_v<T>, T{0}, T{1} / std::numbers::sqrt2_v<T>);
+
+		return RotationY270Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationZ90() noexcept
+	{
+		static constexpr auto RotationZ90Quaternion = Quaternion(T{0}, T{0}, T{1} / std::numbers::sqrt2_v<T>, T{1} / std::numbers::sqrt2_v<T>);
+
+		return RotationZ90Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationZ180() noexcept
+	{
+		static constexpr auto RotationZ180Quaternion = Quaternion(T{0}, T{0}, T{1}, T{0});
+
+		return RotationZ180Quaternion;
+	}
+
+	template<std::floating_point T>
+	constexpr const Quaternion<T>& Quaternion<T>::RotationZ270() noexcept
+	{
+		static constexpr auto RotationZ270Quaternion = Quaternion(T{0}, T{0}, T{-1} / std::numbers::sqrt2_v<T>, T{1} / std::numbers::sqrt2_v<T>);
+
+		return RotationZ270Quaternion;
 	}
 
 	template<std::floating_point T>

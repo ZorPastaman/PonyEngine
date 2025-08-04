@@ -43,8 +43,4 @@ export namespace PonyEngine::Type
 	/// @tparam T Input type.
 	template<typename T>
 	using FloatingBySize = std::conditional_t<IsGreater<T, double>, long double, std::conditional_t<IsGreater<T, float>, double, float>>;
-	/// @brief It's @p T if @p T is a floating point type; otherwise the type is chosen by the @p FloatingBySize.
-	/// @tparam T Input type.
-	template<typename T>
-	using ComputationalFor = std::conditional_t<std::is_floating_point_v<T>, T, FloatingBySize<T>>;
 }
