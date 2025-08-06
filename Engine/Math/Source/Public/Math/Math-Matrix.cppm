@@ -29,6 +29,7 @@ export namespace PonyEngine::Math
 	{
 	public:
 		using ValueType = T; ///< Component type.
+		using ColumnType = Vector<T, RowCount>; ///< Column type.
 
 		static constexpr std::size_t Rows = RowCount; ///< Row count.
 		static constexpr std::size_t Columns = ColumnCount; ///< Column count.
