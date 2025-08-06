@@ -164,6 +164,14 @@ export namespace PonyEngine::Math
 		/// @brief Normalizes the quaternion.
 		/// @note If the magnitude of the quaternion is 0, the result is undefined.
 		void Normalize() noexcept;
+		/// @brief Computes a quaternion normalized from this one.
+		/// @param fallback Fallback quaternion. This vector is returned if the magnitude of the vector is 0.
+		/// @return Normalized quaternion; the @p fallback if the magnitude of the quaternion is 0.
+		[[nodiscard("Pure function")]]
+		Quaternion Normalized(const Quaternion& fallback) const noexcept;
+		/// @brief Normalizes the quaternion.
+		/// @param fallback Fallback quaternion. This quaternion is set if the magnitude of the quaternion is 0.
+		void Normalize(const Quaternion& fallback) noexcept;
 
 		/// @brief Gets the quaternion as a vector.
 		/// @return Vector.
@@ -572,6 +580,18 @@ namespace PonyEngine::Math
 	void Quaternion<T>::Normalize() noexcept
 	{
 		*this = Normalized();
+	}
+
+	template<std::floating_point T>
+	Quaternion<T> Quaternion<T>::Normalized(const Quaternion& fallback) const noexcept
+	{
+		return Quaternion(components.Normalized(fallback.components));
+	}
+
+	template<std::floating_point T>
+	void Quaternion<T>::Normalize(const Quaternion& fallback) noexcept
+	{
+		*this = Normalized(fallback);
 	}
 
 	template<std::floating_point T>

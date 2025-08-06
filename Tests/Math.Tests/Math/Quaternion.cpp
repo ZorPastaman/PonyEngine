@@ -272,6 +272,44 @@ TEST_CASE("Quaternion normalize", "[Math][Quaternion]")
 #endif
 }
 
+TEST_CASE("Quaternion normalize with fallback", "[Math][Quaternion]")
+{
+	constexpr float x = 2.f;
+	constexpr float y = -3.f;
+	constexpr float z = 4.f;
+	constexpr float w = 1.f;
+	auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+	constexpr auto norm = PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f);
+	auto normalized = quaternion.Normalized(norm);
+	const auto magnitude = quaternion.Magnitude();
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(normalized.X(), x / magnitude));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(normalized.Y(), y / magnitude));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(normalized.Z(), z / magnitude));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(normalized.W(), w / magnitude));
+	auto normalizedFallback = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 0.f, 0.f).Normalized(norm);
+	REQUIRE(normalizedFallback == norm);
+
+	quaternion.Normalize(norm);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternion, normalized));
+
+	quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 0.f, 0.f);
+	quaternion.Normalize(norm);
+	REQUIRE(quaternion == norm);
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Normalized")
+	{
+		return PonyEngine::Math::Quaternion<float>(2.f, -3.f, 4.f, 1.f).Normalized(PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f));
+	};
+	BENCHMARK("Normalize")
+	{
+		auto quaternion = PonyEngine::Math::Quaternion<float>(2.f, -3.f, 4.f, 1.f);
+		quaternion.Normalize(PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f));
+		return quaternion;
+	};
+#endif
+}
+
 TEST_CASE("Quaternion vector", "[Math][Quaternion]")
 {
 	auto test = []<std::floating_point T>(const PonyEngine::Math::Quaternion<T>& quaternion) constexpr
