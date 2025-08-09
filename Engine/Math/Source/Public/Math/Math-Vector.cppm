@@ -1072,7 +1072,13 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size>
 	constexpr T DistanceSquared(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
-		return (lhs - rhs).MagnitudeSquared();
+		Vector<T, Size> diff;
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			diff[i] = std::max(lhs[i], rhs[i]) - std::min(lhs[i], rhs[i]);
+		}
+
+		return diff.MagnitudeSquared();
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -1223,7 +1229,13 @@ namespace PonyEngine::Math
 	template<std::floating_point U, std::integral T, std::size_t Size>
 	constexpr Vector<T, Size> Lerp(const Vector<T, Size>& from, const Vector<T, Size>& to, const U time) noexcept requires (Size >= 1uz)
 	{
-		return from + (to - from) * time;
+		Vector<T, Size> answer;
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			answer[i] = static_cast<T>(from[i] + (to[i] >= from[i] ? (to[i] - from[i]) * time : (from[i] - to[i]) * -time));
+		}
+
+		return answer;
 	}
 
 	template<std::floating_point T, std::size_t Size>

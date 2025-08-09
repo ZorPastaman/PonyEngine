@@ -9,6 +9,7 @@
 
 export module PonyEngine.Math;
 
+export import :Color;
 export import :Common;
 export import :Matrix;
 export import :Quaternion;
