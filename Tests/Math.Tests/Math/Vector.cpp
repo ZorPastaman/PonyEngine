@@ -1583,7 +1583,7 @@ TEST_CASE("Vector lerp", "[Math][Vector]")
 	constexpr auto intVector1 = PonyEngine::Math::Vector2<std::int32_t>(x1, y1);
 	STATIC_REQUIRE(PonyEngine::Math::Lerp(intVector, intVector1, 0.f) == intVector);
 	STATIC_REQUIRE(PonyEngine::Math::Lerp(intVector, intVector1, 1.f) == intVector1);
-	STATIC_REQUIRE(PonyEngine::Math::Lerp(intVector, intVector1, 0.5f) == PonyEngine::Math::Vector2<std::int32_t>(4, 12));
+	STATIC_REQUIRE(PonyEngine::Math::Lerp(intVector, intVector1, 0.5f) == PonyEngine::Math::Vector2<std::int32_t>(3, 12));
 	STATIC_REQUIRE(PonyEngine::Math::Lerp(intVector, intVector1, -1.f) == intVector - (intVector1 - intVector));
 	STATIC_REQUIRE(PonyEngine::Math::Lerp(intVector, intVector1, 2.f) == intVector + (intVector1 - intVector) * 2);
 

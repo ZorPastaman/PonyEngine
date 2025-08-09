@@ -6,6 +6,7 @@ add_library(PonyEngine.Math STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Math PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math.cppm"
+	"Source/Public/Math/Math-Color.cppm"
 	"Source/Public/Math/Math-Common.cppm"
 	"Source/Public/Math/Math-InternalUtility.cppm"
 	"Source/Public/Math/Math-Matrix.cppm"
