@@ -288,6 +288,16 @@ TEST_CASE("Transform3D toString", "[Math][Transform3D]")
 #endif
 }
 
+TEST_CASE("Transform3D cast", "[Math][Transform3D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);
+	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
+	constexpr auto scale = PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f);
+	const auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
+	const auto cast = static_cast<PonyEngine::Math::Transform3D<double>>(transform);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Transform3D<double>(static_cast<PonyEngine::Math::Vector3<double>>(position), static_cast<PonyEngine::Math::Quaternion<double>>(rotation), static_cast<PonyEngine::Math::Vector3<double>>(scale)), cast));
+}
+
 TEST_CASE("Transform3D copy-assignment", "[Math][Transform3D]")
 {
 	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);

@@ -251,8 +251,8 @@ export namespace PonyEngine::Math
 		explicit constexpr operator Matrix<U, RowCount, ColumnCount>() const noexcept;
 
 		/// @brief Gets a component by indices.
-		/// @param rowIndex Row index.
-		/// @param columnIndex Column index.
+		/// @param rowIndex Row index. Must be in range [0, RowCount).
+		/// @param columnIndex Column index. Must be in range [0, ColumnCount).
 		/// @return Component.
 		[[nodiscard("Pure operator")]]
 		constexpr T& operator [](std::size_t rowIndex, std::size_t columnIndex) noexcept;

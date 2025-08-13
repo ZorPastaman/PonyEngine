@@ -253,12 +253,12 @@ export namespace PonyEngine::Math
 		explicit constexpr operator Vector<U, Size>() const noexcept;
 
 		/// @brief Gets a component by the @p index.
-		/// @param index Component index. Must be in range [0, Size].
+		/// @param index Component index. Must be in range [0, Size).
 		/// @return Component.
 		[[nodiscard("Pure operator")]]
 		constexpr T& operator [](std::size_t index) noexcept;
 		/// @brief Gets a component by the @p index.
-		/// @param index Component index. Must be in range [0, Size].
+		/// @param index Component index. Must be in range [0, Size).
 		/// @return Component.
 		[[nodiscard("Pure operator")]]
 		constexpr const T& operator [](std::size_t index) const noexcept;

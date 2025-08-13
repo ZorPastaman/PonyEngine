@@ -303,6 +303,16 @@ TEST_CASE("Transform2D toString", "[Math][Transform2D]")
 #endif
 }
 
+TEST_CASE("Transform2D cast", "[Math][Transform2D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
+	constexpr float rotation = 0.4f;
+	constexpr auto scale = PonyEngine::Math::Vector2<float>(-2.f, 3.f);
+	const auto transform = PonyEngine::Math::Transform2D<float>(position, rotation, scale);
+	const auto cast = static_cast<PonyEngine::Math::Transform2D<double>>(transform);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Transform2D<double>(static_cast<PonyEngine::Math::Vector2<double>>(position), rotation, static_cast<PonyEngine::Math::Vector2<double>>(scale)), cast));
+}
+
 TEST_CASE("Transform2D copy-assignment", "[Math][Transform2D]")
 {
 	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);

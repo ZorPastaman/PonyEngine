@@ -54,7 +54,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets the rotation.
 		/// @return Rotation in radians.
 		[[nodiscard("Pure function")]]
-		T Rotation() const noexcept;
+		const T& Rotation() const noexcept;
 		/// @brief Sets the rotation.
 		/// @note The function normalizes the rotation to the range (-2π, 2π).
 		/// @param rotation Rotation in radians.
@@ -118,6 +118,11 @@ export namespace PonyEngine::Math
 		/// @return String representing the current state of the transform.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
+
+		/// @brief Converts the transform to another transform type.
+		/// @tparam U Target component type.
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Transform2D<U>() const noexcept;
 
 		Transform2D& operator =(const Transform2D& other) noexcept = default;
 		Transform2D& operator =(Transform2D&& other) noexcept = default;
@@ -208,7 +213,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	T Transform2D<T>::Rotation() const noexcept
+	const T& Transform2D<T>::Rotation() const noexcept
 	{
 		return rotation;
 	}
@@ -304,6 +309,13 @@ namespace PonyEngine::Math
 	std::string Transform2D<T>::ToString() const
 	{
 		return std::format("Position: {}, Rotation: {}, Scale: {}", position, rotation, scale);
+	}
+
+	template<std::floating_point T>
+	template<std::floating_point U>
+	constexpr Transform2D<T>::operator Transform2D<U>() const noexcept
+	{
+		return Transform2D<U>(static_cast<Vector2<U>>(position), static_cast<U>(rotation), static_cast<Vector2<U>>(scale));
 	}
 
 	template<std::floating_point T>

@@ -130,6 +130,11 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Converts the transform to another transform type.
+		/// @tparam U Target component type.
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Transform3D<U>() const noexcept;
+
 		Transform3D& operator =(const Transform3D& other) noexcept = default;
 		Transform3D& operator =(Transform3D&& other) noexcept = default;
 
@@ -327,6 +332,13 @@ namespace PonyEngine::Math
 	std::string Transform3D<T>::ToString() const
 	{
 		return std::format("Position: {}, Rotation: {}, Scale: {}", position, rotation, scale);
+	}
+
+	template<std::floating_point T>
+	template<std::floating_point U>
+	constexpr Transform3D<T>::operator Transform3D<U>() const noexcept
+	{
+		return Transform3D<U>(static_cast<Vector3<U>>(position), static_cast<Quaternion<U>>(rotation), static_cast<Vector3<U>>(scale));
 	}
 
 	template<std::floating_point T>
