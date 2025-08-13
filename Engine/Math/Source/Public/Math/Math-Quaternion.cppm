@@ -247,6 +247,13 @@ export namespace PonyEngine::Math
 		Vector4<T> components; ///< Component array in order x, y, z, w.
 	};
 
+	/// @brief Checks if all the components are finite numbers.
+	/// @tparam T Component type.
+	/// @param quaternion Quaternion to check.
+	/// @return @a True if all the components are finite; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool IsFinite(const Quaternion<T>& quaternion) noexcept;
+
 	/// @brief Computes a dot product of the two quaternions.
 	/// @tparam T Component type.
 	/// @param lhs Left quaternion.
@@ -336,6 +343,14 @@ export namespace PonyEngine::Math
 	/// @return @a True if the quaternions are almost equal; @a false otherwise.
 	template<bool AreUnit = true, std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Quaternion<T>& lhs, const Quaternion<T>& rhs, T tolerance = T{0.00001}) noexcept;
+
+	/// @brief Transforms the @p vector with the @p quaternion.
+	/// @tparam T Component type.
+	/// @param quaternion Quaternion.
+	/// @param vector Vector to transform.
+	/// @return Transformed vector.
+	template<std::floating_point T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> Rotate(const Vector3<T>& vector, const Quaternion<T>& quaternion) noexcept;
 
 	/// @brief Multiplies the @p left by the @p right.
 	/// @tparam T Component type.
@@ -675,6 +690,12 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	constexpr bool IsFinite(const Quaternion<T>& quaternion) noexcept
+	{
+		return quaternion.IsFinite();
+	}
+
+	template<std::floating_point T>
 	constexpr T Dot(const Quaternion<T>& lhs, const Quaternion<T>& rhs) noexcept
 	{
 		return Dot(lhs.Vector(), rhs.Vector());
@@ -761,6 +782,12 @@ namespace PonyEngine::Math
 		{
 			return AreAlmostEqual(lhs.Vector(), rhs.Vector(), tolerance);
 		}
+	}
+
+	template<std::floating_point T>
+	constexpr Vector3<T> Rotate(const Vector3<T>& vector, const Quaternion<T>& quaternion) noexcept
+	{
+		return quaternion * vector;
 	}
 
 	template<std::floating_point T>

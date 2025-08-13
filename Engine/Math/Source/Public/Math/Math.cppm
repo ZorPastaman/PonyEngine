@@ -9,11 +9,11 @@
 
 export module PonyEngine.Math;
 
+export import :Ball;
 export import :Color;
 export import :Common;
 export import :Matrix;
 export import :Quaternion;
 export import :Transformations;
-export import :Transform2D;
-export import :Transform3D;
+export import :Transform;
 export import :Vector;

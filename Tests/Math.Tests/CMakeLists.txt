@@ -3,6 +3,7 @@ add_executable(PonyEngine.Math.Tests)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Math.Tests PRIVATE
+	"Math/Ball.cpp"
 	"Math/Color.cpp"
 	"Math/Common.cpp"
 	"Math/Matrix.cpp"
@@ -11,7 +12,7 @@ target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"
 	"Math/Vector.cpp"
- )
+)
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Math.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})

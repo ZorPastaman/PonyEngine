@@ -334,6 +334,15 @@ export namespace PonyEngine::Math
 	template<Type::Arithmetic T>
 	using Matrix4x4 = Matrix<T, 4uz, 4uz>;
 
+	/// @brief Checks if all the components are finite numbers.
+	/// @tparam T Component type.
+	/// @tparam RowCount Row count.
+	/// @tparam ColumnCount Column count.
+	/// @param matrix Matrix to check.
+	/// @return @a True if all the components are finite; @a false otherwise.
+	template<std::floating_point T, std::size_t RowCount, std::size_t ColumnCount> [[nodiscard("Pure function")]]
+	constexpr bool IsFinite(const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz);
+
 	/// @brief Multiplies the @p lhs matrix by the @p rhs matrix component-wise.
 	/// @tparam T Component type.
 	/// @tparam RowCount Row count.
@@ -1121,6 +1130,12 @@ namespace PonyEngine::Math
 		}
 
 		return *this;
+	}
+
+	template<std::floating_point T, std::size_t RowCount, std::size_t ColumnCount>
+	constexpr bool IsFinite(const Matrix<T, RowCount, ColumnCount>& matrix) noexcept requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	{
+		return matrix.IsFinite();
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>
