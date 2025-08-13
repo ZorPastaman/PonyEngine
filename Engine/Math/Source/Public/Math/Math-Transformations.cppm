@@ -594,6 +594,21 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& axis, T angle) noexcept;
 
+	/// @brief Sums two rotation angles.
+	/// @tparam T Value type.
+	/// @param current Current rotation angle in radians.
+	/// @param added Added rotation angle in radians.
+	/// @return Summed rotation angle in radians.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr T SumRotations(T current, T added) noexcept;
+	/// @brief Sums two rotations.
+	/// @tparam T Value type.
+	/// @param current Current rotation.
+	/// @param added Added rotation.
+	/// @return Summed rotation.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Quaternion<T> SumRotations(const Quaternion<T>& current, const Quaternion<T>& added) noexcept;
+
 	/// @brief Applies the transformation matrix to the point vector.
 	/// @tparam PerspectiveDivision Whether to divide by a homogeneous divisor after transformation.
 	/// @tparam T Value type.
@@ -1491,6 +1506,18 @@ namespace PonyEngine::Math
 		const T mCos = T{1} - cos;
 
 		return vector * cos + cross * sin + axis * (dot * mCos);
+	}
+
+	template<std::floating_point T>
+	constexpr T SumRotations(const T current, const T added) noexcept
+	{
+		return current + added;
+	}
+
+	template<std::floating_point T>
+	constexpr Quaternion<T> SumRotations(const Quaternion<T>& current, const Quaternion<T>& added) noexcept
+	{
+		return added * current;
 	}
 
 	template<bool PerspectiveDivision, std::floating_point T, std::size_t Size>

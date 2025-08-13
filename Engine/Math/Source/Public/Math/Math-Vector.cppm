@@ -318,6 +318,14 @@ export namespace PonyEngine::Math
 	template<Type::Arithmetic T>
 	using Vector4 = Vector<T, 4uz>;
 
+	/// @brief Checks if all the components are finite numbers.
+	/// @tparam T Component type.
+	/// @tparam Size Component count.
+	/// @param vector Vector to check.
+	/// @return @a True if all the components are finite; @a false otherwise.
+	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
+	constexpr bool IsFinite(const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
+
 	/// @brief Computes a dot product of the two vectors.
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
@@ -1020,6 +1028,12 @@ namespace PonyEngine::Math
 		answer += ')';
 
 		return answer;
+	}
+
+	template<std::floating_point T, std::size_t Size>
+	constexpr bool IsFinite(const Vector<T, Size>& vector) noexcept requires (Size >= 1uz)
+	{
+		return vector.IsFinite();
 	}
 
 	template<Type::Arithmetic T, std::size_t Size>
