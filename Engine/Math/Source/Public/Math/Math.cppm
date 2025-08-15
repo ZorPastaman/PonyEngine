@@ -14,6 +14,7 @@ export import :Color;
 export import :Common;
 export import :Matrix;
 export import :Quaternion;
+export import :Ray;
 export import :Transformations;
 export import :Transform;
 export import :Vector;

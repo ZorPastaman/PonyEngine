@@ -98,7 +98,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Casts the ball to a ball of another type.
 		/// @tparam U Target type.
-		template<std::floating_point U>
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Ball<U, Size>() const noexcept;
 
 		constexpr Ball& operator =(const Ball& other) noexcept = default;

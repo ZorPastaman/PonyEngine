@@ -8,6 +8,7 @@ target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/Common.cpp"
 	"Math/Matrix.cpp"
 	"Math/Quaternion.cpp"
+	"Math/Ray.cpp"
 	"Math/Transform2D.cpp"
 	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"
