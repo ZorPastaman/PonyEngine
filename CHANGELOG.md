@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Core module.
+- Math module.
 - Application main module.
 - Log main module.
 - Log console module.

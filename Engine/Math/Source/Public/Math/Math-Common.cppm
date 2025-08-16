@@ -160,9 +160,8 @@ namespace PonyEngine::Math
 	constexpr bool AreAlmostEqual(const T lhs, const T rhs, const T tolerance) noexcept
 	{
 		const T diff = Abs(lhs - rhs);
-		const T largestMagnitude = std::max(Abs(lhs), Abs(rhs));
 
-		return diff <= largestMagnitude * tolerance || diff <= std::numeric_limits<T>::min();
+		return diff <= tolerance || diff <= std::max(Abs(lhs), Abs(rhs)) * tolerance;
 	}
 
 	template<Type::Signed T>

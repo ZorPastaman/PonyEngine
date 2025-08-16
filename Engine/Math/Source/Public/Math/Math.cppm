@@ -12,6 +12,7 @@ export module PonyEngine.Math;
 export import :Ball;
 export import :Color;
 export import :Common;
+export import :Flat;
 export import :Matrix;
 export import :Quaternion;
 export import :Ray;
