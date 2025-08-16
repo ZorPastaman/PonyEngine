@@ -27,6 +27,8 @@ export namespace PonyEngine::Math
 		using CenterType = Vector<T, Size>; ///< Center type.
 		using RadiusType = T; ///< Radius type.
 
+		static constexpr std::size_t Dimension = Size; ///< Dimension.
+
 		/// @brief Creates a zero ball.
 		[[nodiscard("Pure constructor")]]
 		constexpr Ball() noexcept = default;

@@ -26,6 +26,8 @@ export namespace PonyEngine::Math
 		using OriginType = Vector<T, Size>; ///< Origin type.
 		using DirectionType = Vector<T, Size>; ///< Direction type.
 
+		static constexpr std::size_t Dimension = Size; ///< Dimension.
+
 		/// @brief Creates a ray with a zero origin and a direction with the first element equal 1.
 		[[nodiscard("Pure constructor")]]
 		Ray() noexcept;

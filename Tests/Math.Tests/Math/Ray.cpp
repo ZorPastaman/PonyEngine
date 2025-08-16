@@ -19,12 +19,17 @@ TEST_CASE("Ray static", "[Math][Ray]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray1D<float>::ValueType, float>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray1D<float>::OriginType, PonyEngine::Math::Vector1<float>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray1D<float>::DirectionType, PonyEngine::Math::Vector1<float>>);
+	STATIC_REQUIRE(PonyEngine::Math::Ray1D<float>::Dimension == 1);
+
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray2D<float>::ValueType, float>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray2D<float>::OriginType, PonyEngine::Math::Vector2<float>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray2D<float>::DirectionType, PonyEngine::Math::Vector2<float>>);
+	STATIC_REQUIRE(PonyEngine::Math::Ray2D<float>::Dimension == 2);
+
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray3D<float>::ValueType, float>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray3D<float>::OriginType, PonyEngine::Math::Vector3<float>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ray3D<float>::DirectionType, PonyEngine::Math::Vector3<float>>);
+	STATIC_REQUIRE(PonyEngine::Math::Ray3D<float>::Dimension == 3);
 }
 
 TEST_CASE("Ray default constructor", "[Math][Ray]")

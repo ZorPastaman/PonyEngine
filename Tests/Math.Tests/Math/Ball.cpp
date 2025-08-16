@@ -19,14 +19,17 @@ TEST_CASE("Ball static", "[Math][Ball]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<float, 1>::ValueType, float>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<float, 1>::CenterType, PonyEngine::Math::Vector<float, 1>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<float, 1>::RadiusType, float>);
+	STATIC_REQUIRE(PonyEngine::Math::Ball<float, 1>::Dimension == 1);
 
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<double, 2>::ValueType, double>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<double, 2>::CenterType, PonyEngine::Math::Vector<double, 2>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<double, 2>::RadiusType, double>);
+	STATIC_REQUIRE(PonyEngine::Math::Ball<float, 2>::Dimension == 2);
 
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<float, 3>::ValueType, float>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<float, 3>::CenterType, PonyEngine::Math::Vector<float, 3>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Ball<float, 3>::RadiusType, float>);
+	STATIC_REQUIRE(PonyEngine::Math::Ball<float, 3>::Dimension == 3);
 }
 
 TEST_CASE("Ball default constructor", "[Math][Ball]")
