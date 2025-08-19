@@ -48,6 +48,12 @@ export namespace PonyEngine::Math
 
 		constexpr ~Ball() noexcept = default;
 
+		/// @brief Creates a bounding ball.
+		/// @param points Points to bound.
+		/// @return Bounding ball.
+		[[nodiscard("Pure function")]]
+		static Ball CreateBounds(std::span<const Vector<T, Size>> points) noexcept;
+
 		/// @brief Gets the center.
 		/// @return Center.
 		[[nodiscard("Pure function")]]
@@ -192,6 +198,43 @@ namespace PonyEngine::Math
 		center(center),
 		radius{Abs(radius)}
 	{
+	}
+
+	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
+	Ball<T, Size> Ball<T, Size>::CreateBounds(const std::span<const Vector<T, Size>> points) noexcept
+	{
+		if (points.size() == 0uz) [[unlikely]]
+		{
+			return Ball();
+		}
+		if (points.size() == 1uz) [[unlikely]]
+		{
+			return Ball(points[0], T{0});
+		}
+
+		auto bestPair = std::pair<const Vector<T, Size>*, const Vector<T, Size>*>(&points[0], &points[1]);
+		T distance = (points[0] - points[1]).MagnitudeSquared();
+		for (std::size_t i = 0uz; i < points.size(); ++i)
+		{
+			for (std::size_t j = i + 1uz; j < points.size(); ++j)
+			{
+				if (const T dist = (points[i] - points[j]).MagnitudeSquared(); dist > distance)
+				{
+					bestPair.first = &points[i];
+					bestPair.second = &points[j];
+					distance = dist;
+				}
+			}
+		}
+
+		const Vector<T, Size> center = Lerp(*bestPair.first, *bestPair.second, T{0.5});
+		T radius = T{0};
+		for (const Vector<T, Size>& point : points)
+		{
+			radius = std::max(radius, (point - center).MagnitudeSquared());
+		}
+
+		return Ball(center, std::nextafter(std::sqrt(radius), std::numeric_limits<T>::max()));
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
