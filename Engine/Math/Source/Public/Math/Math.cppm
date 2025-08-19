@@ -10,6 +10,7 @@
 export module PonyEngine.Math;
 
 export import :Ball;
+export import :Box;
 export import :Color;
 export import :Common;
 export import :Flat;

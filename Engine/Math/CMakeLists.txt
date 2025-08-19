@@ -7,6 +7,7 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Math PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math.cppm"
 	"Source/Public/Math/Math-Ball.cppm"
+	"Source/Public/Math/Math-Box.cppm"
 	"Source/Public/Math/Math-Color.cppm"
 	"Source/Public/Math/Math-Common.cppm"
 	"Source/Public/Math/Math-Flat.cppm"
