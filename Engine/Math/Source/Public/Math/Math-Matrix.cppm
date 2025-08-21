@@ -178,6 +178,16 @@ export namespace PonyEngine::Math
 		/// @return Submatrix.
 		[[nodiscard("Pure function")]]
 		constexpr Matrix<T, std::max(RowCount - 1uz, 1uz), std::max(ColumnCount - 1uz, 1uz)> Submatrix(std::size_t rowIndex, std::size_t columnIndex) const noexcept requires (RowCount > 1uz && ColumnCount > 1uz);
+		/// @brief Computes a submatrix.
+		/// @param rowIndex Index of a row to remove.
+		/// @return Submatrix.
+		[[nodiscard("Pure function")]]
+		constexpr Matrix<T, std::max(RowCount - 1uz, 1uz), ColumnCount> SubmatrixRow(std::size_t rowIndex) const noexcept requires (RowCount > 1uz);
+		/// @brief Computes a submatrix.
+		/// @param columnIndex Index of a column to remove.
+		/// @return Submatrix.
+		[[nodiscard("Pure function")]]
+		constexpr Matrix<T, RowCount, std::max(ColumnCount - 1uz, 1uz)> SubmatrixColumn(std::size_t columnIndex) const noexcept requires (ColumnCount > 1uz);
 
 		/// @brief Computes a minor.
 		/// @param rowIndex Minor row index.
@@ -185,20 +195,56 @@ export namespace PonyEngine::Math
 		/// @return Minor.
 		[[nodiscard("Pure function")]]
 		constexpr T Minor(std::size_t rowIndex, std::size_t columnIndex) const noexcept requires (RowCount == ColumnCount && RowCount > 1uz);
+		/// @brief Computes a minor.
+		/// @param rowIndex Minor row index.
+		/// @return Minor.
+		[[nodiscard("Pure function")]]
+		constexpr T Minor(std::size_t rowIndex) const noexcept requires (RowCount == ColumnCount + 1uz);
+		/// @brief Computes a minor.
+		/// @param columnIndex Minor column index
+		/// @return Minor.
+		[[nodiscard("Pure function")]]
+		constexpr T Minor(std::size_t columnIndex) const noexcept requires (ColumnCount == RowCount + 1uz);
 		/// @brief Computes a minor matrix.
 		/// @return Minor matrix.
 		[[nodiscard("Pure function")]]
 		constexpr Matrix MinorMatrix() const noexcept requires (RowCount == ColumnCount && RowCount > 1uz);
+		/// @brief Computes a minor vector.
+		/// @return Minor vector.
+		[[nodiscard("Pure function")]]
+		constexpr Vector<T, RowCount> MinorVector() const noexcept requires (RowCount == ColumnCount + 1uz);
+		/// @brief Computes a minor vector.
+		/// @return Minor vector.
+		[[nodiscard("Pure function")]]
+		constexpr Vector<T, ColumnCount> MinorVector() const noexcept requires (ColumnCount == RowCount + 1uz);
 		/// @brief Computes a cofactor.
 		/// @param rowIndex Cofactor row index.
 		/// @param columnIndex Cofactor column index
 		/// @return Cofactor.
 		[[nodiscard("Pure function")]]
 		constexpr T Cofactor(std::size_t rowIndex, std::size_t columnIndex) const noexcept requires (RowCount == ColumnCount && RowCount > 1uz);
+		/// @brief Computes a cofactor.
+		/// @param rowIndex Cofactor row index.
+		/// @return Cofactor.
+		[[nodiscard("Pure function")]]
+		constexpr T Cofactor(std::size_t rowIndex) const noexcept requires (RowCount == ColumnCount + 1uz);
+		/// @brief Computes a cofactor.
+		/// @param columnIndex Cofactor column index
+		/// @return Cofactor.
+		[[nodiscard("Pure function")]]
+		constexpr T Cofactor(std::size_t columnIndex) const noexcept requires (ColumnCount == RowCount + 1uz);
 		/// @brief Computes a cofactor matrix.
 		/// @return Cofactor matrix.
 		[[nodiscard("Pure function")]]
 		constexpr Matrix CofactorMatrix() const noexcept requires (RowCount == ColumnCount && RowCount > 1uz);
+		/// @brief Computes a cofactor vector.
+		/// @return Cofactor vector.
+		[[nodiscard("Pure function")]]
+		constexpr Vector<T, RowCount> CofactorVector() const noexcept requires (RowCount == ColumnCount + 1uz);
+		/// @brief Computes a cofactor vector.
+		/// @return Cofactor vector.
+		[[nodiscard("Pure function")]]
+		constexpr Vector<T, ColumnCount> CofactorVector() const noexcept requires (ColumnCount == RowCount + 1uz);
 		/// @brief Computes an adjugate of the matrix.
 		/// @return Adjugate.
 		[[nodiscard("Pure function")]]
@@ -867,9 +913,73 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr Matrix<T, std::max(RowCount - 1uz, 1uz), ColumnCount> Matrix<T, RowCount, ColumnCount>::SubmatrixRow(const std::size_t rowIndex) const noexcept requires (RowCount > 1uz)
+	{
+		Matrix<T, RowCount - 1uz, ColumnCount> answer;
+		if consteval
+		{
+			for (std::size_t i = 0uz; i < ColumnCount; ++i)
+			{
+				std::ranges::copy(Span(i).begin(), Span(i).begin() + rowIndex, answer.Span(i).begin());
+				std::ranges::copy(Span(i).begin() + rowIndex + 1uz, Span(i).begin() + RowCount, answer.Span(i).begin() + rowIndex);
+			}
+		}
+		else
+		{
+			const T* source = reinterpret_cast<const T*>(this);
+			T* destination = reinterpret_cast<T*>(&answer);
+			for (std::size_t i = 0uz; i < ColumnCount; ++i, source += RowCount, destination += RowCount - 1uz)
+			{
+				std::memcpy(destination, source, rowIndex * sizeof(T));
+				std::memcpy(destination + rowIndex, source + rowIndex + 1uz, (RowCount - 1uz - rowIndex) * sizeof(T));
+			}
+		}
+
+		return answer;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr Matrix<T, RowCount, std::max(ColumnCount - 1uz, 1uz)> Matrix<T, RowCount, ColumnCount>::SubmatrixColumn(const std::size_t columnIndex) const noexcept requires (ColumnCount > 1uz)
+	{
+		Matrix<T, RowCount, ColumnCount - 1uz> answer;
+		if consteval
+		{
+			for (std::size_t i = 0uz; i < columnIndex; ++i)
+			{
+				answer.Column(i, Column(i));
+			}
+			for (std::size_t i = columnIndex + 1uz; i < ColumnCount; ++i)
+			{
+				answer.Column(i - 1uz, Column(i));
+			}
+		}
+		else
+		{
+			const Vector<T, RowCount>* const source = reinterpret_cast<const Vector<T, RowCount>*>(this);
+			Vector<T, RowCount>* const destination = reinterpret_cast<Vector<T, RowCount>*>(&answer);
+			std::memcpy(destination, source, columnIndex * sizeof(Vector<T, RowCount>));
+			std::memcpy(destination + columnIndex, source + columnIndex + 1uz, (ColumnCount - 1uz - columnIndex) * sizeof(Vector<T, RowCount>));
+		}
+
+		return answer;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
 	constexpr T Matrix<T, RowCount, ColumnCount>::Minor(const std::size_t rowIndex, const std::size_t columnIndex) const noexcept requires (RowCount == ColumnCount && RowCount > 1uz)
 	{
 		return Submatrix(rowIndex, columnIndex).Determinant();
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr T Matrix<T, RowCount, ColumnCount>::Minor(const std::size_t rowIndex) const noexcept requires (RowCount == ColumnCount + 1uz)
+	{
+		return SubmatrixRow(rowIndex).Determinant();
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr T Matrix<T, RowCount, ColumnCount>::Minor(const std::size_t columnIndex) const noexcept requires (ColumnCount == RowCount + 1uz)
+	{
+		return SubmatrixColumn(columnIndex).Determinant();
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
@@ -888,11 +998,51 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr Vector<T, RowCount> Matrix<T, RowCount, ColumnCount>::MinorVector() const noexcept requires (RowCount == ColumnCount + 1uz)
+	{
+		Vector<T, RowCount> answer;
+		for (std::size_t i = 0uz; i < RowCount; ++i)
+		{
+			answer[i] = Minor(i);
+		}
+
+		return answer;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr Vector<T, ColumnCount> Matrix<T, RowCount, ColumnCount>::MinorVector() const noexcept requires (ColumnCount == RowCount + 1uz)
+	{
+		Vector<T, ColumnCount> answer;
+		for (std::size_t i = 0uz; i < ColumnCount; ++i)
+		{
+			answer[i] = Minor(i);
+		}
+
+		return answer;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
 	constexpr T Matrix<T, RowCount, ColumnCount>::Cofactor(const std::size_t rowIndex, const std::size_t columnIndex) const noexcept requires (RowCount == ColumnCount && RowCount > 1uz)
 	{
 		const T minor = Minor(rowIndex, columnIndex);
 
 		return IsOdd(rowIndex + columnIndex) ? -minor : minor;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr T Matrix<T, RowCount, ColumnCount>::Cofactor(const std::size_t rowIndex) const noexcept requires (RowCount == ColumnCount + 1uz)
+	{
+		const T minor = Minor(rowIndex);
+
+		return IsOdd(rowIndex) ? -minor : minor;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr T Matrix<T, RowCount, ColumnCount>::Cofactor(const std::size_t columnIndex) const noexcept requires (ColumnCount == RowCount + 1uz)
+	{
+		const T minor = Minor(columnIndex);
+
+		return IsOdd(columnIndex) ? -minor : minor;
 	}
 
 	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
@@ -905,6 +1055,30 @@ namespace PonyEngine::Math
 			{
 				answer[i, j] = Cofactor(i, j);
 			}
+		}
+
+		return answer;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr Vector<T, RowCount> Matrix<T, RowCount, ColumnCount>::CofactorVector() const noexcept requires (RowCount == ColumnCount + 1uz)
+	{
+		Vector<T, RowCount> answer;
+		for (std::size_t i = 0uz; i < RowCount; ++i)
+		{
+			answer[i] = Cofactor(i);
+		}
+
+		return answer;
+	}
+
+	template<Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount> requires (RowCount >= 1uz && ColumnCount >= 1uz)
+	constexpr Vector<T, ColumnCount> Matrix<T, RowCount, ColumnCount>::CofactorVector() const noexcept requires (ColumnCount == RowCount + 1uz)
+	{
+		Vector<T, ColumnCount> answer;
+		for (std::size_t i = 0uz; i < ColumnCount; ++i)
+		{
+			answer[i] = Cofactor(i);
 		}
 
 		return answer;

@@ -810,6 +810,56 @@ TEST_CASE("Matrix submatrix", "[Math][Matrix]")
 #endif
 }
 
+TEST_CASE("Matrix submatrix row", "[Math][Matrix]")
+{
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x3 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	constexpr auto expectedSubMatrix2x3 = PonyEngine::Math::Matrix<std::int32_t, 1, 3>(components[0], components[2], components[4]);
+	STATIC_REQUIRE(matrix2x3.SubmatrixRow(1uz) == expectedSubMatrix2x3);
+	REQUIRE(matrix2x3.SubmatrixRow(1uz) == expectedSubMatrix2x3);
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix4x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
+	constexpr auto expectedSubMatrix4x4 = PonyEngine::Math::Matrix<float, 3, 4>(components[0], components[2], components[3], components[4], components[6], components[7], components[8], components[10], components[11], components[12], components[14], components[15]);
+	STATIC_REQUIRE(matrix4x4.SubmatrixRow(1uz) == expectedSubMatrix4x4);
+	REQUIRE(matrix4x4.SubmatrixRow(1uz) == expectedSubMatrix4x4);
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).SubmatrixRow(1uz);
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).SubmatrixRow(1uz);
+	};
+#endif
+}
+
+TEST_CASE("Matrix submatrix column", "[Math][Matrix]")
+{
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x3 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	constexpr auto expectedSubMatrix2x3 = PonyEngine::Math::Matrix<std::int32_t, 2, 2>(components[0], components[1], components[4], components[5]);
+	STATIC_REQUIRE(matrix2x3.SubmatrixColumn(1uz) == expectedSubMatrix2x3);
+	REQUIRE(matrix2x3.SubmatrixColumn(1uz) == expectedSubMatrix2x3);
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix4x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
+	constexpr auto expectedSubMatrix4x4 = PonyEngine::Math::Matrix<float, 4, 3>(components[0], components[1], components[2], components[3], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
+	STATIC_REQUIRE(matrix4x4.SubmatrixColumn(1uz) == expectedSubMatrix4x4);
+	REQUIRE(matrix4x4.SubmatrixColumn(1uz) == expectedSubMatrix4x4);
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).SubmatrixColumn(1uz);
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).SubmatrixColumn(1uz);
+	};
+#endif
+}
+
 TEST_CASE("Matrix minor", "[Math][Matrix]")
 {
 	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
@@ -827,6 +877,48 @@ TEST_CASE("Matrix minor", "[Math][Matrix]")
 	BENCHMARK("Float")
 	{
 		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).Minor(2uz, 1uz);
+	};
+#endif
+}
+
+TEST_CASE("Matrix minor row", "[Math][Matrix]")
+{
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix<std::int32_t, 3, 2>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(matrix2x2.Minor(1) == -56);
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix<float, 4, 3>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(matrix4x4.Minor(2uz), -254.f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix<std::int32_t, 4, 3>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Minor(2uz);
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix<float, 4, 3>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Minor(2uz);
+	};
+#endif
+}
+
+TEST_CASE("Matrix minor column", "[Math][Matrix]")
+{
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(matrix2x2.Minor(1) == -6);
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix3x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(matrix4x4.Minor(2uz), -228.f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix3x4<std::int32_t>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Minor(2uz);
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix3x4<float>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Minor(2uz);
 	};
 #endif
 }
@@ -875,6 +967,88 @@ TEST_CASE("Matrix minor matrix", "[Math][Matrix]")
 #endif
 }
 
+TEST_CASE("Matrix minor vector row", "[Math][Matrix]")
+{
+	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Vector<T, RowCount>& minors) constexpr
+	{
+		for (std::size_t i = 0uz; i < RowCount; ++i)
+		{
+			if constexpr (std::is_floating_point_v<T>)
+			{
+				if (!PonyEngine::Math::AreAlmostEqual(minors[i], matrix.Minor(i)))
+				{
+					return false;
+				}
+			}
+			else if (minors[i] != matrix.Minor(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix<std::int32_t, 3, 2>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(check(matrix2x2, matrix2x2.MinorVector()));
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix<float, 4, 3>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(check(matrix4x4, matrix4x4.MinorVector()));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix<std::int32_t, 4, 3>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).MinorVector();
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix<float, 4, 3>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).MinorVector();
+	};
+#endif
+}
+
+TEST_CASE("Matrix minor vector column", "[Math][Matrix]")
+{
+	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Vector<T, ColumnCount>& minors) constexpr
+	{
+		for (std::size_t i = 0uz; i < ColumnCount; ++i)
+		{
+			if constexpr (std::is_floating_point_v<T>)
+			{
+				if (!PonyEngine::Math::AreAlmostEqual(minors[i], matrix.Minor(i)))
+				{
+					return false;
+				}
+			}
+			else if (minors[i] != matrix.Minor(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(check(matrix2x2, matrix2x2.MinorVector()));
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix3x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(check(matrix4x4, matrix4x4.MinorVector()));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix3x4<std::int32_t>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).MinorVector();
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix3x4<float>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).MinorVector();
+	};
+#endif
+}
+
 TEST_CASE("Matrix cofactor", "[Math][Matrix]")
 {
 	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
@@ -892,6 +1066,48 @@ TEST_CASE("Matrix cofactor", "[Math][Matrix]")
 	BENCHMARK("Float")
 	{
 		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).Cofactor(2uz, 1uz);
+	};
+#endif
+}
+
+TEST_CASE("Matrix cofactor row", "[Math][Matrix]")
+{
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix<std::int32_t, 3, 2>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(matrix2x2.Cofactor(1) == 56);
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix<float, 4, 3>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(matrix4x4.Cofactor(2uz), -254.f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix<std::int32_t, 4, 3>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Cofactor(2uz);
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix<float, 4, 3>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Cofactor(2uz);
+	};
+#endif
+}
+
+TEST_CASE("Matrix cofactor column", "[Math][Matrix]")
+{
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(matrix2x2.Cofactor(1) == 6);
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix3x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(matrix4x4.Cofactor(2uz), -228.f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix3x4<std::int32_t>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Cofactor(2uz);
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix3x4<float>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).Cofactor(2uz);
 	};
 #endif
 }
@@ -936,6 +1152,88 @@ TEST_CASE("Matrix cofactor matrix", "[Math][Matrix]")
 	BENCHMARK("Float")
 	{
 		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).CofactorMatrix();
+	};
+#endif
+}
+
+TEST_CASE("Matrix cofactor vector row", "[Math][Matrix]")
+{
+	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Vector<T, RowCount>&cofactors) constexpr
+	{
+		for (std::size_t i = 0uz; i < RowCount; ++i)
+		{
+			if constexpr (std::is_floating_point_v<T>)
+			{
+				if (!PonyEngine::Math::AreAlmostEqual(cofactors[i], matrix.Cofactor(i)))
+				{
+					return false;
+				}
+			}
+			else if (cofactors[i] != matrix.Cofactor(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix<std::int32_t, 3, 2>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(check(matrix2x2, matrix2x2.CofactorVector()));
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix<float, 4, 3>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(check(matrix4x4, matrix4x4.CofactorVector()));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix<std::int32_t, 4, 3>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).CofactorVector();
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix<float, 4, 3>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).CofactorVector();
+	};
+#endif
+}
+
+TEST_CASE("Matrix cofactor vector column", "[Math][Matrix]")
+{
+	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Vector<T, ColumnCount>&cofactors) constexpr
+	{
+		for (std::size_t i = 0uz; i < ColumnCount; ++i)
+		{
+			if constexpr (std::is_floating_point_v<T>)
+			{
+				if (!PonyEngine::Math::AreAlmostEqual(cofactors[i], matrix.Cofactor(i)))
+				{
+					return false;
+				}
+			}
+			else if (cofactors[i] != matrix.Cofactor(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x2 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(check(matrix2x2, matrix2x2.CofactorVector()));
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix3x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11]);
+	STATIC_REQUIRE(check(matrix4x4, matrix4x4.CofactorVector()));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Int")
+	{
+		return PonyEngine::Math::Matrix3x4<std::int32_t>(std::array<std::int32_t, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).CofactorVector();
+	};
+	BENCHMARK("Float")
+	{
+		return PonyEngine::Math::Matrix3x4<float>(std::array<float, 12uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5 }).CofactorVector();
 	};
 #endif
 }

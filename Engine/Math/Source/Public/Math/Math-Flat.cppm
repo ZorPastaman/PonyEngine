@@ -12,6 +12,7 @@ export module PonyEngine.Math:Flat;
 import std;
 
 import :Common;
+import :Matrix;
 import :Vector;
 
 export namespace PonyEngine::Math
@@ -29,16 +30,16 @@ export namespace PonyEngine::Math
 
 		static constexpr std::size_t Dimension = Size; ///< Dimension.
 
-		/// @brief Creates a flat that passes the origin and which normal has the first element equal 1.
+		/// @brief Creates a zero flat.
 		[[nodiscard("Pure constructor")]]
 		Flat() noexcept;
 		/// @brief Creates a flat.
-		/// @param normal Flat normal. It's normalized automatically. If it's zero, the direction will have the first element equal 1.
+		/// @param normal Flat normal. It's normalized automatically with a fallback to a zero vector.
 		/// @param distance Distance from the origin. If it's positive, the flat normal looks at the origin; otherwise it looks away from it.
 		[[nodiscard("Pure constructor")]]
 		explicit Flat(const Vector<T, Size>& normal, T distance = T{0}) noexcept;
 		/// @brief Creates a flat that passes the @p point.
-		/// @param normal Flat normal. It's normalized automatically. If it's zero, the direction will have the first element equal 1.
+		/// @param normal Flat normal. It's normalized automatically with a fallback to a zero vector.
 		/// @param point Point that is intersected by the flat.
 		[[nodiscard("Pure constructor")]]
 		Flat(const Vector<T, Size>& normal, const Vector<T, Size>& point) noexcept;
@@ -50,29 +51,19 @@ export namespace PonyEngine::Math
 		~Flat() noexcept = default;
 
 		/// @brief Creates a flat that passes the points.
-		/// @details The normal vector is a vector from the @p point0 to the @p point1 rotated by 90 degrees counter-clockwise.
 		/// @note The points must be unique.
-		/// @param point0 First point.
-		/// @param point1 Second point.
+		/// @note The vectors from the first point to the others must not be collinear.
+		/// @param points Points.
 		/// @return Flat.
 		[[nodiscard("Pure function")]]
-		static Flat CreateByPoints(const Vector<T, Size>& point0, const Vector<T, Size>& point1) noexcept requires (Size == 2);
-		/// @brief Creates a flat that passes the points.
-		/// @details The normal vector is a cross product of the vectors @p point0 to @p point1 and @p point0 to @p point2.
-		/// @note The points must be unique.
-		/// @param point0 First point.
-		/// @param point1 Second point.
-		/// @param point2 Third point.
-		/// @return Flat.
-		[[nodiscard("Pure function")]]
-		static Flat CreateByPoints(const Vector<T, Size>& point0, const Vector<T, Size>& point1, const Vector<T, Size>& point2) noexcept requires (Size == 3);
+		static Flat CreateByPoints(std::span<const Vector<T, Size>, Size> points) noexcept;
 
 		/// @brief Gets the normal.
 		/// @return Normal.
 		[[nodiscard("Pure function")]]
 		const Vector<T, Size>& Normal() const noexcept;
 		/// @brief Sets the normal.
-		/// @param normal Normal. It's normalized automatically. If it's zero, the direction will have the first element equal 1.
+		/// @param normal Normal. It's normalized automatically with a fallback to a zero vector.
 		void Normal(const Vector<T, Size>& normal) noexcept;
 		/// @brief Gets the flat distance from the origin.
 		/// @return Distance from the origin. If it's positive, the flat normal looks at the origin; otherwise it looks away from it.
@@ -127,8 +118,6 @@ export namespace PonyEngine::Math
 		bool operator ==(const Flat& other) const noexcept = default;
 
 	private:
-		static constexpr Vector<T, Size> DefaultNormal = Vector<T, Size>::CreateOneValue(T{1}, 0); ///< Default normal.
-
 		Vector<T, Size> normal; ///< Normal.
 		T distance; ///< Distance from the origin. If it's positive, the normal looks at the origin; otherwise it looks away from it.
 	};
@@ -192,35 +181,54 @@ namespace PonyEngine::Math
 {
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	Flat<T, Size>::Flat() noexcept :
-		normal(DefaultNormal),
+		normal(Vector<T, Size>::Zero()),
 		distance{0}
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	Flat<T, Size>::Flat(const Vector<T, Size>& normal, const T distance) noexcept :
-		normal(normal.Normalized(DefaultNormal)),
+		normal(normal.Normalized(Vector<T, Size>::Zero())),
 		distance{distance}
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	Flat<T, Size>::Flat(const Vector<T, Size>& normal, const Vector<T, Size>& point) noexcept :
-		normal(normal.Normalized(DefaultNormal)),
+		normal(normal.Normalized(Vector<T, Size>::Zero())),
 		distance{-Dot(this->normal, point)}
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	Flat<T, Size> Flat<T, Size>::CreateByPoints(const Vector<T, Size>& point0, const Vector<T, Size>& point1) noexcept requires (Size == 2)
+	Flat<T, Size> Flat<T, Size>::CreateByPoints(const std::span<const Vector<T, Size>, Size> points) noexcept
 	{
-		return Flat(Rotate90CCW(point1 - point0), point0);
-	}
+		if constexpr (Size == 1)
+		{
+			return Flat(Vector<T, Size>::One(), points[0]);
+		}
+		if constexpr (Size == 2)
+		{
+			return Flat(Rotate90CW(points[1] - points[0]), points[0]);
+		}
+		if constexpr (Size == 3)
+		{
+			return Flat(Cross(points[1] - points[0], points[2] - points[0]), points[0]);
+		}
+		else if constexpr (Size > 3)
+		{
+			Matrix<T, Size - 1, Size> matrix;
+			for (std::size_t i = 1uz; i < Size; ++i)
+			{
+				matrix.Row(i - 1uz, points[i] - points[0]);
+			}
 
-	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	Flat<T, Size> Flat<T, Size>::CreateByPoints(const Vector<T, Size>& point0, const Vector<T, Size>& point1, const Vector<T, Size>& point2) noexcept requires (Size == 3)
-	{
-		return Flat(Cross(point1 - point0, point2 - point0), point0);
+			return Flat(matrix.CofactorVector(), points[0]);
+		}
+		else
+		{
+			return Flat();
+		}
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
@@ -232,7 +240,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	void Flat<T, Size>::Normal(const Vector<T, Size>& normal) noexcept
 	{
-		this->normal = normal.Normalized(DefaultNormal);
+		this->normal = normal.Normalized(Vector<T, Size>::Zero());
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)

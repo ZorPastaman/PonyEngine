@@ -28,12 +28,12 @@ export namespace PonyEngine::Math
 
 		static constexpr std::size_t Dimension = Size; ///< Dimension.
 
-		/// @brief Creates a ray with a zero origin and a direction with the first element equal 1.
+		/// @brief Creates a ray with a zero ray.
 		[[nodiscard("Pure constructor")]]
 		Ray() noexcept;
 		/// @brief Creates a ray.
 		/// @param origin Ray origin.
-		/// @param direction Ray direction. It's normalized automatically. If it's zero, the direction will have the first element equal 1.
+		/// @param direction Ray direction. It's normalized automatically with a fallback to a zero vector.
 		[[nodiscard("Pure constructor")]]
 		Ray(const Vector<T, Size>& origin, const Vector<T, Size>& direction) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -62,7 +62,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		const Vector<T, Size>& Direction() const noexcept;
 		/// @brief Sets the ray direction.
-		/// @param direction Direction. It's normalized automatically. If it's zero, the direction will have the first element equal 1.
+		/// @param direction Direction. It's normalized automatically with a fallback to a zero vector.
 		void Direction(const Vector<T, Size>& direction) noexcept;
 
 		/// @brief Creates a ray with the same origin but an opposite direction.
@@ -111,8 +111,6 @@ export namespace PonyEngine::Math
 		bool operator ==(const Ray& other) const noexcept = default;
 
 	private:
-		static constexpr Vector<T, Size> DefaultDirection = Vector<T, Size>::CreateOneValue(T{1}, 0); ///< Default direction.
-
 		Vector<T, Size> origin; ///< Ray origin.
 		Vector<T, Size> direction; ///< Ray direction.
 	};
@@ -181,14 +179,14 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	Ray<T, Size>::Ray() noexcept :
 		origin(Vector<T, Size>::Zero()),
-		direction(DefaultDirection)
+		direction(Vector<T, Size>::Zero())
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	Ray<T, Size>::Ray(const Vector<T, Size>& origin, const Vector<T, Size>& direction) noexcept :
 		origin(origin),
-		direction(direction.Normalized(DefaultDirection))
+		direction(direction.Normalized(Vector<T, Size>::Zero()))
 	{
 	}
 
@@ -219,7 +217,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	void Ray<T, Size>::Direction(const Vector<T, Size>& direction) noexcept
 	{
-		this->direction = direction.Normalized(DefaultDirection);
+		this->direction = direction.Normalized(Vector<T, Size>::Zero());
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)

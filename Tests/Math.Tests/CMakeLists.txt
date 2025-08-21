@@ -4,6 +4,7 @@ add_executable(PonyEngine.Math.Tests)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/Ball.cpp"
+	"Math/Bounds.cpp"
 	"Math/Box.cpp"
 	"Math/Color.cpp"
 	"Math/Common.cpp"

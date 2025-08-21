@@ -51,7 +51,7 @@ export namespace PonyEngine::Math
 		/// @brief Creates a box with a zero center.
 		/// @param extents Extents.
 		[[nodiscard("Pure constructor")]]
-		constexpr Box(const Vector<T, Size>& extents) noexcept;
+		explicit constexpr Box(const Vector<T, Size>& extents) noexcept;
 		/// @brief Creates a box.
 		/// @param center Center.
 		/// @param extents Extents.
