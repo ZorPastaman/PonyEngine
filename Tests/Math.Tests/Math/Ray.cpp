@@ -34,10 +34,10 @@ TEST_CASE("Ray static", "[Math][Ray]")
 
 TEST_CASE("Ray default constructor", "[Math][Ray]")
 {
-	REQUIRE(PonyEngine::Math::Ray1D<float>() == PonyEngine::Math::Ray1D<float>(PonyEngine::Math::Vector1<float>(), PonyEngine::Math::Vector1<float>::Right()));
-	REQUIRE(PonyEngine::Math::Ray2D<float>() == PonyEngine::Math::Ray2D<float>(PonyEngine::Math::Vector2<float>(), PonyEngine::Math::Vector2<float>::Right()));
-	REQUIRE(PonyEngine::Math::Ray3D<float>() == PonyEngine::Math::Ray3D<float>(PonyEngine::Math::Vector3<float>(), PonyEngine::Math::Vector3<float>::Right()));
-	REQUIRE(PonyEngine::Math::Ray<float, 4>() == PonyEngine::Math::Ray<float, 4>(PonyEngine::Math::Vector4<float>(), PonyEngine::Math::Vector4<float>(1.f, 0.f, 0.f, 0.f)));
+	REQUIRE(PonyEngine::Math::Ray1D<float>() == PonyEngine::Math::Ray1D<float>(PonyEngine::Math::Vector1<float>(), PonyEngine::Math::Vector1<float>()));
+	REQUIRE(PonyEngine::Math::Ray2D<float>() == PonyEngine::Math::Ray2D<float>(PonyEngine::Math::Vector2<float>(), PonyEngine::Math::Vector2<float>()));
+	REQUIRE(PonyEngine::Math::Ray3D<float>() == PonyEngine::Math::Ray3D<float>(PonyEngine::Math::Vector3<float>(), PonyEngine::Math::Vector3<float>()));
+	REQUIRE(PonyEngine::Math::Ray<float, 4>() == PonyEngine::Math::Ray<float, 4>(PonyEngine::Math::Vector4<float>(), PonyEngine::Math::Vector4<float>()));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -57,7 +57,7 @@ TEST_CASE("Ray main constructor", "[Math][Ray]")
 
 	const auto ray1 = PonyEngine::Math::Ray3D<float>(origin, PonyEngine::Math::Vector3<float>::Zero());
 	REQUIRE(ray1.Origin() == origin);
-	REQUIRE(ray1.Direction() == PonyEngine::Math::Vector3<float>::Right());
+	REQUIRE(ray1.Direction() == PonyEngine::Math::Vector3<float>());
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Correct direction")
@@ -101,7 +101,7 @@ TEST_CASE("Ray create by target", "[Math][Ray]")
 
 	const auto ray1 = PonyEngine::Math::Ray3D<float>::CreateByTarget(origin, origin);
 	REQUIRE(ray1.Origin() == origin);
-	REQUIRE(ray1.Direction() == PonyEngine::Math::Vector3<float>::Right());
+	REQUIRE(ray1.Direction() == PonyEngine::Math::Vector3<float>());
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Correct direction")

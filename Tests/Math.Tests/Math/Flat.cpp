@@ -34,8 +34,8 @@ TEST_CASE("Flat static", "[Math][Flat]")
 
 TEST_CASE("Flat default constructor", "[Math][Flat]")
 {
-	REQUIRE(PonyEngine::Math::Line<float>() == PonyEngine::Math::Flat<float, 2>(PonyEngine::Math::Vector2<float>(1.f, 0.f), 0.f));
-	REQUIRE(PonyEngine::Math::Plane<float>() == PonyEngine::Math::Flat<float, 3>(PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f), 0.f));
+	REQUIRE(PonyEngine::Math::Line<float>() == PonyEngine::Math::Flat<float, 2>(PonyEngine::Math::Vector2<float>::Zero(), 0.f));
+	REQUIRE(PonyEngine::Math::Plane<float>() == PonyEngine::Math::Flat<float, 3>(PonyEngine::Math::Vector3<float>::Zero(), 0.f));
 }
 
 TEST_CASE("Flat main constructor", "[Math][Flat]")
@@ -92,27 +92,44 @@ TEST_CASE("Flat move constructor", "[Math][Flat]")
 
 TEST_CASE("Flat create by points", "[Math][Flat]")
 {
+	constexpr auto pointP0 = PonyEngine::Math::Vector1<float>(-4.f);
+	const auto ray = PonyEngine::Math::Flat<float, 1>::CreateByPoints(std::array<PonyEngine::Math::Vector1<float>, 1>{ pointP0 });
+	REQUIRE(ray.Normal() == PonyEngine::Math::Vector1<float>::One());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(ray.Distance(), 4.f, 0.0001f));
+
 	constexpr auto pointL0 = PonyEngine::Math::Vector2<float>(4.f, 3.f);
 	constexpr auto pointL1 = PonyEngine::Math::Vector2<float>(-5.f, 1.f);
-	const auto line = PonyEngine::Math::Line<float>::CreateByPoints(pointL0, pointL1);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Rotate90CCW((pointL1 - pointL0).Normalized()), line.Normal()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(2.061f, line.Distance(), 0.001f));
+	const auto line = PonyEngine::Math::Line<float>::CreateByPoints(std::array<PonyEngine::Math::Vector2<float>, 2>{ pointL0, pointL1 });
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Rotate90CW((pointL1 - pointL0).Normalized()), line.Normal()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(-2.061f, line.Distance(), 0.001f));
 
 	constexpr auto point0 = PonyEngine::Math::Vector3<float>(9.f, -4.f, 1.f);
 	constexpr auto point1 = PonyEngine::Math::Vector3<float>(2.f, -2.f, -5.f);
 	constexpr auto point2 = PonyEngine::Math::Vector3<float>(-5.f, 2.f, 4.f);
-	const auto plane = PonyEngine::Math::Plane<float>::CreateByPoints(point0, point1, point2);
+	const auto plane = PonyEngine::Math::Plane<float>::CreateByPoints(std::array<PonyEngine::Math::Vector3<float>, 3>{ point0, point1, point2 });
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.369f, 0.921f, -0.123f), plane.Normal(), 0.001f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(0.491f, plane.Distance(), 0.001f));
+
+	constexpr auto pointH0 = PonyEngine::Math::Vector4<float>(9.f, -4.f, 1.f, -1.f);
+	constexpr auto pointH1 = PonyEngine::Math::Vector4<float>(2.f, -2.f, -5.f, 6.f);
+	constexpr auto pointH2 = PonyEngine::Math::Vector4<float>(-5.f, 2.f, 4.f, -2.f);
+	constexpr auto pointH3 = PonyEngine::Math::Vector4<float>(-2.f, 5.f, -7.f, 2.f);
+	const auto planeH = PonyEngine::Math::Flat<float, 4>::CreateByPoints(std::array<PonyEngine::Math::Vector4<float>, 4>{ pointH0, pointH1, pointH2, pointH3 });
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector4<float>(-0.328f, -0.626f, -0.457f, -0.54f), planeH.Normal(), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(0.36f, planeH.Distance(), 0.001f));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Line")
 	{
-		return PonyEngine::Math::Line<float>::CreateByPoints(PonyEngine::Math::Vector2<float>(4.f, 3.f), PonyEngine::Math::Vector2<float>(-5.f, 1.f));
+		return PonyEngine::Math::Line<float>::CreateByPoints(std::array<PonyEngine::Math::Vector2<float>, 2>{ PonyEngine::Math::Vector2<float>(4.f, 3.f), PonyEngine::Math::Vector2<float>(-5.f, 1.f) });
 	};
 	BENCHMARK("Plane")
 	{
-		return PonyEngine::Math::Plane<float>::CreateByPoints(PonyEngine::Math::Vector3<float>(9.f, -4.f, 1.f), PonyEngine::Math::Vector3<float>(2.f, -2.f, -5.f), PonyEngine::Math::Vector3<float>(-5.f, 2.f, 4.f));
+		return PonyEngine::Math::Plane<float>::CreateByPoints(std::array<PonyEngine::Math::Vector3<float>, 3>{ PonyEngine::Math::Vector3<float>(9.f, -4.f, 1.f), PonyEngine::Math::Vector3<float>(2.f, -2.f, -5.f), PonyEngine::Math::Vector3<float>(-5.f, 2.f, 4.f) });
+	};
+	BENCHMARK("Hyper-plane")
+	{
+		return PonyEngine::Math::Flat<float, 4>::CreateByPoints(std::array<PonyEngine::Math::Vector4<float>, 4>{ PonyEngine::Math::Vector4<float>(9.f, -4.f, 1.f, -1.f), PonyEngine::Math::Vector4<float>(2.f, -2.f, -5.f, 6.f), PonyEngine::Math::Vector4<float>(-5.f, 2.f, 4.f, -2.f), PonyEngine::Math::Vector4<float>(-2.f, 5.f, -7.f, 2.f) });
 	};
 #endif
 }
