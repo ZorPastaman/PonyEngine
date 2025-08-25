@@ -1039,13 +1039,7 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size>
 	constexpr T Dot(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
-		T answer = T{0};
-		for (std::size_t i = 0uz; i < Size; ++i)
-		{
-			answer += lhs[i] * rhs[i];
-		}
-
-		return answer;
+		return Multiply(lhs, rhs).Sum();
 	}
 
 	template<Type::Arithmetic T>

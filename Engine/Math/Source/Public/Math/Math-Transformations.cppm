@@ -669,6 +669,15 @@ export namespace PonyEngine::Math
 	/// @return Homogeneous vector.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size + 1> CreateHomogeneous(const Vector<T, Size>& vector, T homogeneousComponent) noexcept;
+
+	/// @brief Transforms the @p vector from world space to local space using the given rotation matrix.
+	/// @tparam T Value type.
+	/// @tparam Size Dimension.
+	/// @param rotationMatrix Rotation matrix. Must be pure rotation matrix.
+	/// @param vector Vector in world space.
+	/// @return Vector in local space.
+	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
+	constexpr Vector<T, Size> TransformWorldToLocal(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept;
 }
 
 namespace PonyEngine::Math
@@ -1580,6 +1589,18 @@ namespace PonyEngine::Math
 		homogeneous[Size] = homogeneousComponent;
 
 		return homogeneous;
+	}
+
+	template<std::floating_point T, std::size_t Size>
+	constexpr Vector<T, Size> TransformWorldToLocal(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept
+	{
+		Vector<T, Size> answer;
+		for (std::size_t i = 0; i < Size; ++i)
+		{
+			answer[i] = Dot(rotationMatrix.Column(i), vector);
+		}
+
+		return answer;
 	}
 
 	template<std::floating_point T>

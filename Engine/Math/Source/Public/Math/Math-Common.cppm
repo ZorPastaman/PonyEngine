@@ -31,7 +31,7 @@ export namespace PonyEngine::Math
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the values are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(T lhs, T rhs, T tolerance = std::numeric_limits<T>::epsilon()) noexcept;
+	constexpr bool AreAlmostEqual(T lhs, T rhs, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Sign function.
 	/// @tparam T Value type.
@@ -159,9 +159,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const T lhs, const T rhs, const T tolerance) noexcept
 	{
-		const T diff = Abs(lhs - rhs);
-
-		return diff <= tolerance || diff <= std::max(Abs(lhs), Abs(rhs)) * tolerance;
+		return Abs(lhs - rhs) < std::max(std::max(Abs(lhs), Abs(rhs)) * tolerance, std::numeric_limits<T>::epsilon());
 	}
 
 	template<Type::Signed T>

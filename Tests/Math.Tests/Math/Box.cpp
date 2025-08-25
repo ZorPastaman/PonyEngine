@@ -20,14 +20,14 @@ TEST_CASE("Box static", "[Math][Box]")
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Box<std::int32_t, 2>::CenterType, PonyEngine::Math::Vector2<std::int32_t>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Box<std::int32_t, 2>::ExtentsType, PonyEngine::Math::Vector2<std::int32_t>>);
 	STATIC_REQUIRE(PonyEngine::Math::Box<std::int32_t, 2>::Dimension == 2uz);
-	STATIC_REQUIRE(PonyEngine::Math::Box<std::int32_t, 2>::Axes == std::array<PonyEngine::Math::Vector2<std::int32_t>, 2>{ PonyEngine::Math::Vector2<std::int32_t>::CreateOneValue(1, 0), PonyEngine::Math::Vector2<std::int32_t>::CreateOneValue(1, 1) });
+	STATIC_REQUIRE(PonyEngine::Math::Box<std::int32_t, 2>::Axes == PonyEngine::Math::Matrix2x2<std::int32_t>::Identity());
 	STATIC_REQUIRE(PonyEngine::Math::Box<std::int32_t, 2>::CornerCount == 4uz);
 
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Box<float, 3>::ValueType, float>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Box<float, 3>::CenterType, PonyEngine::Math::Vector3<float>>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Box<float, 3>::ExtentsType, PonyEngine::Math::Vector3<float>>);
 	STATIC_REQUIRE(PonyEngine::Math::Box<float, 3>::Dimension == 3uz);
-	STATIC_REQUIRE(PonyEngine::Math::Box<float, 3>::Axes == std::array<PonyEngine::Math::Vector3<float>, 3>{ PonyEngine::Math::Vector3<float>::CreateOneValue(1, 0), PonyEngine::Math::Vector3<float>::CreateOneValue(1, 1), PonyEngine::Math::Vector3<float>::CreateOneValue(1, 2) });
+	STATIC_REQUIRE(PonyEngine::Math::Box<float, 3>::Axes == PonyEngine::Math::Matrix3x3<float>::Identity());
 	STATIC_REQUIRE(PonyEngine::Math::Box<float, 3>::CornerCount == 8uz);
 }
 
@@ -159,48 +159,44 @@ TEST_CASE("Box edge", "[Math][Box]")
 
 TEST_CASE("Box surface", "[Math][Box]")
 {
-	constexpr auto center2 = PonyEngine::Math::Vector2<float>(4.f, -5.f);
 	constexpr auto extents2 = PonyEngine::Math::Vector2<float>(-3.f, 2.f);
-	constexpr auto rect = PonyEngine::Math::Rect<float>(center2, extents2);
+	constexpr auto rect = PonyEngine::Math::Rect<float>(extents2);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(20.f, rect.Surface()));
 
-	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
-	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
+	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(extents);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(288.f, cuboid.Surface()));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Rect")
 	{
-		return PonyEngine::Math::Rect<float>(PonyEngine::Math::Vector2<float>(4.f, -5.f), PonyEngine::Math::Vector2<float>(-3.f, 2.f)).Surface();
+		return PonyEngine::Math::Rect<float>(PonyEngine::Math::Vector2<float>(-3.f, 2.f)).Surface();
 	};
 	BENCHMARK("Cuboid")
 	{
-		return PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f)).Surface();
+		return PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f)).Surface();
 	};
 #endif
 }
 
 TEST_CASE("Box volume", "[Math][Box]")
 {
-	constexpr auto center2 = PonyEngine::Math::Vector2<float>(4.f, -5.f);
 	constexpr auto extents2 = PonyEngine::Math::Vector2<float>(-3.f, 2.f);
-	constexpr auto rect = PonyEngine::Math::Rect<float>(center2, extents2);
+	constexpr auto rect = PonyEngine::Math::Rect<float>(extents2);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(24.f, rect.Volume()));
 
-	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
-	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
+	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(extents);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(288.f, cuboid.Volume()));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Rect")
 	{
-		return PonyEngine::Math::Rect<float>(PonyEngine::Math::Vector2<float>(4.f, -5.f), PonyEngine::Math::Vector2<float>(-3.f, 2.f)).Volume();
+		return PonyEngine::Math::Rect<float>(PonyEngine::Math::Vector2<float>(-3.f, 2.f)).Volume();
 	};
 	BENCHMARK("Cuboid")
 	{
-		return PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f)).Volume();
+		return PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f)).Volume();
 	};
 #endif
 }

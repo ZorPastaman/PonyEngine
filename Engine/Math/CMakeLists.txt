@@ -14,6 +14,7 @@ target_sources(PonyEngine.Math PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Flat.cppm"
 	"Source/Public/Math/Math-InternalUtility.cppm"
 	"Source/Public/Math/Math-Matrix.cppm"
+	"Source/Public/Math/Math-OrientedBox.cppm"
 	"Source/Public/Math/Math-Quaternion.cppm"
 	"Source/Public/Math/Math-Ray.cppm"
 	"Source/Public/Math/Math-Transformations.cppm"

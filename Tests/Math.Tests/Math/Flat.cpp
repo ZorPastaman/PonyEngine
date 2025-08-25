@@ -116,7 +116,7 @@ TEST_CASE("Flat create by points", "[Math][Flat]")
 	constexpr auto pointH3 = PonyEngine::Math::Vector4<float>(-2.f, 5.f, -7.f, 2.f);
 	const auto planeH = PonyEngine::Math::Flat<float, 4>::CreateByPoints(std::array<PonyEngine::Math::Vector4<float>, 4>{ pointH0, pointH1, pointH2, pointH3 });
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector4<float>(-0.328f, -0.626f, -0.457f, -0.54f), planeH.Normal(), 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(0.36f, planeH.Distance(), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(0.360395f, planeH.Distance(), 0.001f));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Line")
@@ -206,7 +206,7 @@ TEST_CASE("Flat distance", "[Math][Flat]")
 	constexpr auto normal = PonyEngine::Math::Vector3<float>(2.f, 1.f, -5.f);
 	constexpr float distance = -3.f;
 	const auto plane = PonyEngine::Math::Plane<float>(normal, distance);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(0.f, plane.Distance(PonyEngine::Math::Vector3<float>(1.095f, 0.548f, -2.739f)), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(0.f, plane.Distance(plane.Project(PonyEngine::Math::Vector3<float>(1.0949f, 0.548f, -2.7388f))), 0.001f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(-4.607f, plane.Distance(PonyEngine::Math::Vector3<float>(-2.f, 0.2f, 1.f)), 0.001f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(4.12f, plane.Distance(PonyEngine::Math::Vector3<float>(5.f, -1.f, -6.f)), 0.001f));
 

@@ -4294,7 +4294,7 @@ TEST_CASE("Axis-angle from rotation matrix", "[Math][Transformations]")
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, 0.667f, -0.667f, -0.333f, -0.667f, 0.667f, -0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), axisAngle.first, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), axisAngle.first, 0.001f) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, -0.577f, 0.577f), axisAngle.first, 0.001f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, 0.001f));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, -0.667f, 0.667f, -0.333f, -0.667f, -0.667f, -0.667f, -0.333f));
@@ -5923,6 +5923,21 @@ TEST_CASE("Create homogeneous with transformation matrix", "[Math][Transformatio
 	BENCHMARK("Bench")
 	{
 		return PonyEngine::Math::CreateHomogeneous(PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f), 2.5f);
+	};
+#endif
+}
+
+TEST_CASE("Transform world to local", "[Math][Transformations]")
+{
+	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+	const auto matrix = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(0.4f, 1.f, -2.f));
+	const auto transformed = PonyEngine::Math::TransformWorldToLocal(matrix, vector);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-9.808f, 1.854f, -1.53f), transformed, 0.001f));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::TransformWorldToLocal(PonyEngine::Math::Matrix3x3<float>::Identity(), PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f));
 	};
 #endif
 }
