@@ -14,6 +14,7 @@ import std;
 import PonyEngine.Type;
 
 import :Common;
+import :Matrix;
 import :Vector;
 
 export namespace PonyEngine::Math
@@ -25,10 +26,6 @@ export namespace PonyEngine::Math
 	class Box final
 	{
 	private:
-		/// @brief Creates axes.
-		/// @return Axes.
-		[[nodiscard("Pure function")]]
-		static constexpr std::array<Vector<T, Size>, Size> CreatesAxes() noexcept;
 		/// @brief Calculates corner count.
 		/// @return Corner count.
 		[[nodiscard("Pure function")]]
@@ -40,7 +37,7 @@ export namespace PonyEngine::Math
 		using ExtentsType = Vector<T, Size>; ///< Extents type.
 
 		static constexpr std::size_t Dimension = Size; ///< Dimension.
-		static constexpr std::array<Vector<T, Size>, Size> Axes = CreatesAxes(); ///< Axes.
+		static constexpr Matrix<T, Size, Size> Axes = Matrix<T, Size, Size>::Identity(); ///< Axes.
 		static constexpr std::size_t CornerCount = CalculateCornerCount(); ///< Corner count.
 
 		using CornersType = std::array<Vector<T, Size>, CornerCount>; ///< Corners type.
@@ -235,18 +232,6 @@ struct std::formatter<PonyEngine::Math::Box<T, Size>, char>
 namespace PonyEngine::Math
 {
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr std::array<Vector<T, Size>, Size> Box<T, Size>::CreatesAxes() noexcept
-	{
-		std::array<Vector<T, Size>, Size> axes;
-		for (std::size_t i = 0uz; i < Size; ++i)
-		{
-			axes[i] = Vector<T, Size>::CreateOneValue(T{1}, i);
-		}
-
-		return axes;
-	}
-
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr std::size_t Box<T, Size>::CalculateCornerCount() noexcept
 	{
 		std::size_t cornerCount = 2uz;
@@ -288,7 +273,8 @@ namespace PonyEngine::Math
 			max = Math::Max(max, points[i]);
 		}
 
-		const Vector<T, Size> center = min + (max - min) / T{2};
+		using TimeType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
+		const Vector<T, Size> center = Lerp(min, max, TimeType{0.5});
 		Vector<T, Size> extents;
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{

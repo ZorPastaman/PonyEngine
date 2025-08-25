@@ -19,22 +19,22 @@ TEST_CASE("Matrix static", "[Math][Matrix]")
 {
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Matrix2x2<std::int32_t>::ValueType, std::int32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Matrix2x2<std::int32_t>::ColumnType, PonyEngine::Math::Vector<std::int32_t, 2>>);
-	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::int32_t>::Rows == 2uz);
-	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::int32_t>::Columns == 2uz);
+	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::int32_t>::RowCount == 2uz);
+	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::int32_t>::ColumnCount == 2uz);
 	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::int32_t>::ComponentCount == 4uz);
 	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::int32_t>::IsSquare);
 
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Matrix2x2<std::uint32_t>::ValueType, std::uint32_t>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Matrix2x2<std::uint32_t>::ColumnType, PonyEngine::Math::Vector<std::uint32_t, 2>>);
-	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::uint32_t>::Rows == 2uz);
-	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::uint32_t>::Columns == 2uz);
+	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::uint32_t>::RowCount == 2uz);
+	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::uint32_t>::ColumnCount == 2uz);
 	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::uint32_t>::ComponentCount == 4uz);
 	STATIC_REQUIRE(PonyEngine::Math::Matrix2x2<std::uint32_t>::IsSquare);
 
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Matrix3x4<float>::ValueType, float>);
 	STATIC_REQUIRE(std::is_same_v<PonyEngine::Math::Matrix3x4<float>::ColumnType, PonyEngine::Math::Vector<float, 3>>);
-	STATIC_REQUIRE(PonyEngine::Math::Matrix3x4<float>::Rows == 3uz);
-	STATIC_REQUIRE(PonyEngine::Math::Matrix3x4<float>::Columns == 4uz);
+	STATIC_REQUIRE(PonyEngine::Math::Matrix3x4<float>::RowCount == 3uz);
+	STATIC_REQUIRE(PonyEngine::Math::Matrix3x4<float>::ColumnCount == 4uz);
 	STATIC_REQUIRE(PonyEngine::Math::Matrix3x4<float>::ComponentCount == 12uz);
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Matrix3x4<float>::IsSquare);
 }
@@ -439,6 +439,43 @@ TEST_CASE("Matrix column span", "[Math][Matrix]")
 			for (std::size_t i = 0; i < RowCount; ++i)
 			{
 				if (copy.Span(j)[i] != values[i + j * RowCount])
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	};
+
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x3 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	STATIC_REQUIRE(checkValues(matrix2x3, std::span<const std::int16_t, 16uz>(components.data(), components.size())));
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix4x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
+	STATIC_REQUIRE(checkValues(matrix4x4, std::span<const std::int16_t, 16uz>(components.data(), components.size())));
+}
+
+TEST_CASE("Matrix span column", "[Math][Matrix]")
+{
+	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, std::span<const U, ComponentCount> values) constexpr
+	{
+		for (std::size_t j = 0; j < ColumnCount; ++j)
+		{
+			for (std::size_t i = 0; i < RowCount; ++i)
+			{
+				if (matrix.Columns()[j][i] != values[i + j * RowCount])
+				{
+					return false;
+				}
+			}
+		}
+		auto copy = matrix;
+		for (std::size_t j = 0; j < ColumnCount; ++j)
+		{
+			for (std::size_t i = 0; i < RowCount; ++i)
+			{
+				if (copy.Columns()[j][i] != values[i + j * RowCount])
 				{
 					return false;
 				}
