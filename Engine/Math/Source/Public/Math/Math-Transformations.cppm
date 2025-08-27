@@ -11,6 +11,7 @@ export module PonyEngine.Math:Transformations;
 
 import std;
 
+import :Common;
 import :Matrix;
 import :Quaternion;
 import :Vector;
@@ -670,14 +671,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size + 1> CreateHomogeneous(const Vector<T, Size>& vector, T homogeneousComponent) noexcept;
 
-	/// @brief Transforms the @p vector from world space to local space using the given rotation matrix.
+	/// @brief Transforms the @p vector with the inverse of the @p rotationMatrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
 	/// @param rotationMatrix Rotation matrix. Must be pure rotation matrix.
-	/// @param vector Vector in world space.
-	/// @return Vector in local space.
+	/// @param vector Vector.
+	/// @return Transformed vector.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Vector<T, Size> TransformWorldToLocal(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept;
+	constexpr Vector<T, Size> TransformInverse(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept;
 }
 
 namespace PonyEngine::Math
@@ -799,7 +800,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Quaternion<T> LookInRotationQuaternion(const Vector3<T>& forward, const Vector3<T>& up) noexcept
 	{
-		if (std::abs(Dot(forward, up)) > T{0.9999}) [[unlikely]]
+		if (AreAlmostEqual(std::min(std::abs(Dot(forward, up)), T{1}), T{1})) [[unlikely]]
 		{
 			return FromToRotationQuaternion(Vector3<T>::Forward(), forward);
 		}
@@ -913,7 +914,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Matrix3x3<T> LookInRotationMatrix(const Vector3<T>& forward, const Vector3<T>& up) noexcept
 	{
-		if (std::abs(Dot(forward, up)) > T{0.9999}) [[unlikely]]
+		if (AreAlmostEqual(std::min(std::abs(Dot(forward, up)), T{1}), T{1})) [[unlikely]]
 		{
 			return FromToRotationMatrix(Vector3<T>::Forward(), forward);
 		}
@@ -948,7 +949,7 @@ namespace PonyEngine::Math
 	Vector3<T> Euler(const Matrix3x3<T>& rotationMatrix) noexcept
 	{
 		Vector3<T> euler;
-		if (std::abs(rotationMatrix[1, 2]) > T{0.9999}) [[unlikely]] // singularity in the North Pole (-) or in the South Pole (+)
+		if (AreAlmostEqual(std::min(std::abs(rotationMatrix[1, 2]), T{1}), T{1})) [[unlikely]] // singularity in the North Pole (-) or in the South Pole (+)
 		{
 			euler.X() = std::copysign(std::numbers::pi_v<T> * T{0.5}, -rotationMatrix[1, 2]);
 			euler.Y() = std::atan2(-rotationMatrix[2, 0], rotationMatrix[0, 0]);
@@ -981,7 +982,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector3<T> LookInEuler(const Vector3<T>& forward, const Vector3<T>& up) noexcept
 	{
-		if (std::abs(Dot(forward, up)) > T{0.9999}) [[unlikely]]
+		if (AreAlmostEqual(std::min(std::abs(Dot(forward, up)), T{1}), T{1})) [[unlikely]]
 		{
 			return FromToEuler(Vector3<T>::Forward(), forward);
 		}
@@ -993,7 +994,7 @@ namespace PonyEngine::Math
 	std::pair<Vector3<T>, T> AxisAngle(const Quaternion<T>& quaternion) noexcept
 	{
 		std::pair<Vector3<T>, T> axisAngle;
-		if (std::abs(quaternion.W()) > T{0.9999}) [[unlikely]]
+		if (AreAlmostEqual(std::min(std::abs(quaternion.W()), T{1}), T{1})) [[unlikely]]
 		{
 			axisAngle.first = Vector3<T>::Forward();
 			axisAngle.second = T{0};
@@ -1026,18 +1027,21 @@ namespace PonyEngine::Math
 		const T dot = Dot(fromDirection, toDirection);
 
 		std::pair<Vector3<T>, T> axisAngle;
-		if (dot > T{0.9999}) [[unlikely]]
+		if (AreAlmostEqual(std::min(std::abs(dot), T{1}), T{1})) [[unlikely]]
 		{
-			axisAngle.first = Vector3<T>::Forward();
-			axisAngle.second = T{0};
-		}
-		else if (dot < T{-0.9999}) [[unlikely]]
-		{
-			axisAngle.first = std::abs(Dot(fromDirection, Vector3<T>::Up())) > T{0.5}
-				? Cross(fromDirection, Vector3<T>::Forward())
-				: Cross(fromDirection, Vector3<T>::Up());
-			axisAngle.first.Normalize();
-			axisAngle.second = std::numbers::pi_v<T>;
+			if (std::signbit(dot))
+			{
+				axisAngle.first = std::abs(Dot(fromDirection, Vector3<T>::Up())) > T{0.5}
+					? Cross(fromDirection, Vector3<T>::Forward())
+					: Cross(fromDirection, Vector3<T>::Up());
+				axisAngle.first.Normalize();
+				axisAngle.second = std::numbers::pi_v<T>;
+			}
+			else
+			{
+				axisAngle.first = Vector3<T>::Forward();
+				axisAngle.second = T{0};
+			}
 		}
 		else [[likely]]
 		{
@@ -1051,7 +1055,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	std::pair<Vector3<T>, T> LookInAxisAngle(const Vector3<T>& forward, const Vector3<T>& up) noexcept
 	{
-		if (std::abs(Dot(forward, up)) > T{0.9999}) [[unlikely]]
+		if (AreAlmostEqual(std::min(std::abs(Dot(forward, up)), T{1}), T{1})) [[unlikely]]
 		{
 			return FromToAxisAngle(Vector3<T>::Forward(), forward);
 		}
@@ -1592,7 +1596,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Vector<T, Size> TransformWorldToLocal(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept
+	constexpr Vector<T, Size> TransformInverse(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept
 	{
 		Vector<T, Size> answer;
 		for (std::size_t i = 0; i < Size; ++i)

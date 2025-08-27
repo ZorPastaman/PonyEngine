@@ -287,37 +287,37 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr bool IsBlack() const noexcept requires (HasColor);
 		/// @brief Check if the color is almost black with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if the color is almost black; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostBlack(T tolerance = T{0.00001}) const noexcept requires (HasColor && std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostBlack(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (HasColor && std::is_floating_point_v<T>);
 		/// @brief Checks if the color is white.
 		/// @return @a True if the color is white; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsWhite() const noexcept requires (HasFullColor);
 		/// @brief Check if the color is almost white with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if the color is almost white; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostWhite(T tolerance = T{0.00001}) const noexcept requires (HasFullColor && std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostWhite(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (HasFullColor && std::is_floating_point_v<T>);
 		/// @brief Checks if the color is transparent.
 		/// @return @a True if the color is transparent; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsTransparent() const noexcept requires (HasAlpha);
 		/// @brief Check if the color is almost transparent with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if the color is almost transparent; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostTransparent(T tolerance = T{0.00001}) const noexcept requires (HasAlpha && std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostTransparent(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (HasAlpha && std::is_floating_point_v<T>);
 		/// @brief Checks if the color is opaque.
 		/// @return @a True if the color is opaque; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsOpaque() const noexcept requires (HasAlpha);
 		/// @brief Check if the color is almost opaque with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if the color is almost opaque; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostOpaque(T tolerance = T{0.00001}) const noexcept requires (HasAlpha && std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostOpaque(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (HasAlpha && std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the channels are finite.
 		/// @return @a True if all the channels are finite; @a false otherwise.
@@ -595,10 +595,10 @@ export namespace PonyEngine::Math
 	/// @tparam FourthChannel Fourth channel.
 	/// @param lhs Left color.
 	/// @param rhs Right color.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if the colors are almost equal; @a false otherwise.
 	template<std::floating_point T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	constexpr bool AreAlmostEqual(const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& lhs, const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& rhs, T tolerance = T{0.00001}) noexcept;
+	constexpr bool AreAlmostEqual(const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& lhs, const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
 
 	/// @brief Sums the @p lhs and the @p rhs colors.
 	/// @note Integral types are clamped.
@@ -1018,7 +1018,8 @@ namespace PonyEngine::Math
 	}
 
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostBlack(const T tolerance) const noexcept requires (HasColor && std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostBlack(const Tolerance<U>& tolerance) const noexcept requires (HasColor && std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Black(), tolerance);
 	}
@@ -1030,7 +1031,8 @@ namespace PonyEngine::Math
 	}
 
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostWhite(const T tolerance) const noexcept requires (HasFullColor && std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostWhite(const Tolerance<U>& tolerance) const noexcept requires (HasFullColor && std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, White(), tolerance);
 	}
@@ -1042,7 +1044,8 @@ namespace PonyEngine::Math
 	}
 
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostTransparent(const T tolerance) const noexcept requires (HasAlpha && std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostTransparent(const Tolerance<U>& tolerance) const noexcept requires (HasAlpha && std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(A(), T{0}, tolerance);
 	}
@@ -1056,7 +1059,8 @@ namespace PonyEngine::Math
 	}
 
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostOpaque(const T tolerance) const noexcept requires (HasAlpha && std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::IsAlmostOpaque(const Tolerance<U>& tolerance) const noexcept requires (HasAlpha && std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(A(), T{1}, tolerance);
 	}
@@ -1064,7 +1068,7 @@ namespace PonyEngine::Math
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
 	Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel> Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::Gamma() const noexcept requires (std::is_floating_point_v<T>)
 	{
-		static constexpr auto ToGamma = [](const T channel) noexcept
+		static constexpr auto toGamma = [](const T channel) noexcept
 		{
 			const T value = channel > T{0.0031308}
 				? std::pow(channel, T{1} / GammaValue) * T{1.055} - T{0.055}
@@ -1075,15 +1079,15 @@ namespace PonyEngine::Math
 		Color gamma;
 		if constexpr (HasRed)
 		{
-			gamma.R() = ToGamma(R());
+			gamma.R() = toGamma(R());
 		}
 		if constexpr (HasGreen)
 		{
-			gamma.G() = ToGamma(G());
+			gamma.G() = toGamma(G());
 		}
 		if constexpr (HasBlue)
 		{
-			gamma.B() = ToGamma(B());
+			gamma.B() = toGamma(B());
 		}
 		if constexpr (HasAlpha)
 		{
@@ -1096,7 +1100,7 @@ namespace PonyEngine::Math
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
 	Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel> Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::Linear() const noexcept requires (std::is_floating_point_v<T>)
 	{
-		static constexpr auto ToLinear = [](const T channel) noexcept
+		static constexpr auto toLinear = [](const T channel) noexcept
 		{
 			const T value = channel > T{0.04045}
 				? std::pow((channel + T{0.055}) / T{1.055}, GammaValue)
@@ -1107,15 +1111,15 @@ namespace PonyEngine::Math
 		Color linear;
 		if constexpr (HasRed)
 		{
-			linear.R() = ToLinear(R());
+			linear.R() = toLinear(R());
 		}
 		if constexpr (HasGreen)
 		{
-			linear.G() = ToLinear(G());
+			linear.G() = toLinear(G());
 		}
 		if constexpr (HasBlue)
 		{
-			linear.B() = ToLinear(B());
+			linear.B() = toLinear(B());
 		}
 		if constexpr (HasAlpha)
 		{
@@ -1370,7 +1374,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	constexpr bool AreAlmostEqual(const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& lhs, const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& rhs, const T tolerance) noexcept
+	constexpr bool AreAlmostEqual(const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& lhs, const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
 		return AreAlmostEqual(lhs.Vector(), rhs.Vector(), tolerance);
 	}

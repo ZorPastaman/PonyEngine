@@ -223,7 +223,7 @@ TEST_CASE("Transform2D rotate", "[Math][Transform2D]")
 
 	constexpr float negativeRotation = -12.f;
 	transform.Rotate(negativeRotation);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), std::fmod(rotation + smallRotation + bigRotation + negativeRotation, std::numbers::pi_v<float> * 2.f), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), std::fmod(rotation + smallRotation + bigRotation + negativeRotation, std::numbers::pi_v<float> * 2.f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -399,15 +399,15 @@ TEST_CASE("Transform2D are almost equal", "[Math][Transform2D]")
 		pos[i] = 1.f;
 		transform.Translate(pos);
 		REQUIRE(!PonyEngine::Math::AreAlmostEqual(transform, copy));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, 10.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, PonyEngine::Math::Tolerance{.absolute = 10.f}));
 		transform.Position(position);
 	}
-	transform.Rotate(0.000001f);
+	transform.Rotate(0.0000001f);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy));
 	transform.Rotation(rotation);
 	transform.Rotate(1.f);
 	REQUIRE(!PonyEngine::Math::AreAlmostEqual(transform, copy));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, 10.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, PonyEngine::Math::Tolerance{.absolute = 10.f}));
 	transform.Rotation(rotation);
 	for (std::size_t i = 0; i < 2; ++i)
 	{
@@ -419,7 +419,7 @@ TEST_CASE("Transform2D are almost equal", "[Math][Transform2D]")
 		pos[i] = 1.f;
 		transform.Scale(scale + pos);
 		REQUIRE(!PonyEngine::Math::AreAlmostEqual(transform, copy));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, 10.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, PonyEngine::Math::Tolerance{.absolute = 10.f}));
 		transform.Scale(scale);
 	}
 

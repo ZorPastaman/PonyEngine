@@ -189,10 +189,10 @@ export namespace PonyEngine::Math
 	/// @tparam Size Dimension.
 	/// @param lhs Left box.
 	/// @param rhs Right box.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const OrientedBox<T, Size>& lhs, const OrientedBox<T, Size>& rhs, T tolerance = T{0.00001}) noexcept;
+	constexpr bool AreAlmostEqual(const OrientedBox<T, Size>& lhs, const OrientedBox<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
 
 	/// @brief Outputs a string representation of the @p box.
 	/// @tparam T Component type.
@@ -435,7 +435,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr Vector<T, Size> OrientedBox<T, Size>::ClosestPoint(const Vector<T, Size>& point) const noexcept
 	{
-		const Vector<T, Size> delta = Clamp(TransformWorldToLocal(axes, point - center), -extents, extents);
+		const Vector<T, Size> delta = Clamp(TransformInverse(axes, point - center), -extents, extents);
 
 		return center + axes * delta;
 	}
@@ -454,11 +454,11 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr bool AreAlmostEqual(const OrientedBox<T, Size>& lhs, const OrientedBox<T, Size>& rhs, const T tolerance) noexcept
+	constexpr bool AreAlmostEqual(const OrientedBox<T, Size>& lhs, const OrientedBox<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			if (!AreAlmostEqual(Dot(lhs.Axis(i), rhs.Axis(i)), T{1}, tolerance))
+			if (!AreAlmostEqual(std::min(std::abs(Dot(lhs.Axis(i), rhs.Axis(i))), T{1}), T{1}, tolerance))
 			{
 				return false;
 			}

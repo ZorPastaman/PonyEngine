@@ -15,6 +15,15 @@ import PonyEngine.Type;
 
 export namespace PonyEngine::Math
 {
+	/// @brief Tolerance.
+	/// @tparam T Value type.
+	template<std::floating_point T>
+	struct Tolerance final
+	{
+		T relative = T{0.00001}; ///< Relative tolerance. Must be positive.
+		T absolute = T{0.00000001}; ///< Absolute tolerance. Must be positive.
+	};
+
 	/// @brief Degrees to radians multiplier.
 	/// @tparam T Value type.
 	template<std::floating_point T>
@@ -28,10 +37,10 @@ export namespace PonyEngine::Math
 	/// @tparam T Floating point type.
 	/// @param lhs First value.
 	/// @param rhs Second value.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if the values are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(T lhs, T rhs, T tolerance = T{0.00001}) noexcept;
+	constexpr bool AreAlmostEqual(T lhs, T rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
 
 	/// @brief Sign function.
 	/// @tparam T Value type.
@@ -157,9 +166,9 @@ export namespace PonyEngine::Math
 namespace PonyEngine::Math
 {
 	template<std::floating_point T>
-	constexpr bool AreAlmostEqual(const T lhs, const T rhs, const T tolerance) noexcept
+	constexpr bool AreAlmostEqual(const T lhs, const T rhs, const Tolerance<T>& tolerance) noexcept
 	{
-		return Abs(lhs - rhs) < std::max(std::max(Abs(lhs), Abs(rhs)) * tolerance, std::numeric_limits<T>::epsilon());
+		return Abs(lhs - rhs) <= std::max(std::max(Abs(lhs), Abs(rhs)) * tolerance.relative, tolerance.absolute);
 	}
 
 	template<Type::Signed T>

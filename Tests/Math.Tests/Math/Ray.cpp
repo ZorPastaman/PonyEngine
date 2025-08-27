@@ -361,7 +361,7 @@ TEST_CASE("Ray are almost equal", "[Math][Ray]")
 		orig[i] -= 1.f;
 		copy.Origin(orig);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, ray));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, ray, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, ray, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 		copy.Origin(origin);
 
 		auto dir = direction;
@@ -371,7 +371,7 @@ TEST_CASE("Ray are almost equal", "[Math][Ray]")
 		dir[i] -= 1.f;
 		copy.Direction(dir);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, ray));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, ray, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, ray, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 		copy.Direction(direction);
 	}
 

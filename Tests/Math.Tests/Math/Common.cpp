@@ -26,10 +26,10 @@ TEST_CASE("AreAlmostEqual", "[Math][Common]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-10f));
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f, 3.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f, PonyEngine::Math::Tolerance{.relative = 0.6f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-10f));
 	REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f, 3.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 2.f, PonyEngine::Math::Tolerance{.absolute = 1.1f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")

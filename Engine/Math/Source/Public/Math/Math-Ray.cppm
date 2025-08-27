@@ -11,6 +11,7 @@ export module PonyEngine.Math:Ray;
 
 import std;
 
+import :Common;
 import :Vector;
 
 export namespace PonyEngine::Math
@@ -133,10 +134,10 @@ export namespace PonyEngine::Math
 	/// @tparam Size Dimension.
 	/// @param lhs Left ray.
 	/// @param rhs Right ray.
-	/// @param tolerance Tolerance. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const Ray<T, Size>& lhs, const Ray<T, Size>& rhs, T tolerance = T{0.00001}) noexcept requires (Size >= 1);
+	bool AreAlmostEqual(const Ray<T, Size>& lhs, const Ray<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size >= 1);
 
 	/// @brief Outputs a string representation of the @p ray.
 	/// @tparam T Component type.
@@ -276,9 +277,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	bool AreAlmostEqual(const Ray<T, Size>& lhs, const Ray<T, Size>& rhs, T tolerance) noexcept requires (Size >= 1)
+	bool AreAlmostEqual(const Ray<T, Size>& lhs, const Ray<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept requires (Size >= 1)
 	{
-		return AreAlmostEqual(lhs.Origin(), rhs.Origin(), tolerance) && AreAlmostEqual(Dot(lhs.Direction(), rhs.Direction()), T{1}, tolerance);
+		return AreAlmostEqual(lhs.Origin(), rhs.Origin(), tolerance) && AreAlmostEqual(std::min(Dot(lhs.Direction(), rhs.Direction()), T{1}), T{1}, tolerance);
 	}
 
 	template<std::floating_point T, std::size_t Size>

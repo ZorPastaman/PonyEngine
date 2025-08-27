@@ -207,28 +207,28 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr bool IsZero() const noexcept;
 		/// @brief Checks if all the components are almost zero with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return  @a True if this vector components are almost zero; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostZero(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this vector is unit.
 		/// @return @a True if this vector is unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsUnit() const noexcept;
 		/// @brief Checks if this vector is almost unit with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if this vector is almost unit; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostUnit(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostUnit(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this vector is uniform.
 		/// @return @a True if this vector is uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsUniform() const noexcept;
 		/// @brief Checks if this vector is almost uniform with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if this vector is almost uniform; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostUniform(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostUniform(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -518,10 +518,10 @@ export namespace PonyEngine::Math
 	/// @tparam Size Component count.
 	/// @param lhs Left vector.
 	/// @param rhs Right vector.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if the vectors are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs, T tolerance = T{0.00001}) noexcept requires (Size >= 1uz);
+	constexpr bool AreAlmostEqual(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size >= 1uz);
 
 	/// @brief Sums the @p lhs and the @p rhs vectors.
 	/// @tparam T Component type.
@@ -942,7 +942,8 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	constexpr bool Vector<T, Size>::IsAlmostZero(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Vector<T, Size>::IsAlmostZero(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Zero(), tolerance);
 	}
@@ -954,7 +955,8 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	constexpr bool Vector<T, Size>::IsAlmostUnit(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Vector<T, Size>::IsAlmostUnit(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(MagnitudeSquared(), T{1}, tolerance);
 	}
@@ -974,7 +976,8 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	constexpr bool Vector<T, Size>::IsAlmostUniform(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Vector<T, Size>::IsAlmostUniform(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		const auto [min, max] = MinMax();
 
@@ -1247,9 +1250,17 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr bool AreAlmostEqual(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs, const T tolerance) noexcept requires (Size >= 1uz)
+	constexpr bool AreAlmostEqual(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept requires (Size >= 1uz)
 	{
-		return DistanceSquared(lhs, rhs) <= tolerance * tolerance;
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			if (!AreAlmostEqual(lhs[i], rhs[i], tolerance))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
