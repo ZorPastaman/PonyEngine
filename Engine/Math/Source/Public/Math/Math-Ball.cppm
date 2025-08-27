@@ -143,10 +143,10 @@ export namespace PonyEngine::Math
 	/// @tparam Size Dimension.
 	/// @param lhs Left ball.
 	/// @param rhs Right ball.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Ball<T, Size>& lhs, const Ball<T, Size>& rhs, T tolerance = T{0.00001}) noexcept requires (Size >= 1);
+	constexpr bool AreAlmostEqual(const Ball<T, Size>& lhs, const Ball<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size >= 1);
 
 	/// @brief Outputs a string representation of the @p ball.
 	/// @tparam T Component type.
@@ -318,7 +318,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr bool Ball<T, Size>::Contains(const Vector<T, Size>& point) const noexcept
 	{
-		return AreAlmostEqual(point, center, radius);
+		return DistanceSquared(point, center) <= radius * radius;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
@@ -341,7 +341,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr bool AreAlmostEqual(const Ball<T, Size>& lhs, const Ball<T, Size>& rhs, const T tolerance) noexcept requires (Size >= 1)
+	constexpr bool AreAlmostEqual(const Ball<T, Size>& lhs, const Ball<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept requires (Size >= 1)
 	{
 		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.Radius(), rhs.Radius(), tolerance);
 	}

@@ -11,6 +11,7 @@ export module PonyEngine.Math:Transform;
 
 import std;
 
+import :Common;
 import :Matrix;
 import :Quaternion;
 import :Transformations;
@@ -174,10 +175,10 @@ export namespace PonyEngine::Math
 	/// @tparam Size Dimension.
 	/// @param left Left transform.
 	/// @param right Right transform.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if they're almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const Transform<T, Size>& left, const Transform<T, Size>& right, T tolerance = T{0.00001}) noexcept requires (Size == 2 || Size == 3);
+	bool AreAlmostEqual(const Transform<T, Size>& left, const Transform<T, Size>& right, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size == 2 || Size == 3);
 
 	/// @brief Puts the transform ToString() to the stream.
 	/// @tparam T Component type.
@@ -393,9 +394,10 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	bool AreAlmostEqual(const Transform<T, Size>& left, const Transform<T, Size>& right, const T tolerance) noexcept requires (Size == 2 || Size == 3)
+	bool AreAlmostEqual(const Transform<T, Size>& left, const Transform<T, Size>& right, const Tolerance<T>& tolerance) noexcept requires (Size == 2 || Size == 3)
 	{
-		return AreAlmostEqual(left.Position(), right.Position(), tolerance) && AreAlmostEqual(left.Rotation(), right.Rotation(), tolerance) && AreAlmostEqual(left.Scale(), right.Scale(), tolerance);
+		return AreAlmostEqual(left.Position(), right.Position(), tolerance) && AreAlmostEqual(left.Rotation(), right.Rotation(), tolerance) && 
+			AreAlmostEqual(left.Scale(), right.Scale(), tolerance);
 	}
 
 	template<std::floating_point T, std::size_t Size>

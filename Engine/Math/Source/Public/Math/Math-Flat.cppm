@@ -136,10 +136,10 @@ export namespace PonyEngine::Math
 	/// @tparam Size Dimension.
 	/// @param lhs Left flat.
 	/// @param rhs Right flat.
-	/// @param tolerance Tolerance. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const Flat<T, Size>& lhs, const Flat<T, Size>& rhs, T tolerance = T{0.00001}) noexcept requires (Size >= 1);
+	bool AreAlmostEqual(const Flat<T, Size>& lhs, const Flat<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size >= 1);
 
 	/// @brief Outputs a string representation of the @p flat.
 	/// @tparam T Component type.
@@ -310,9 +310,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	bool AreAlmostEqual(const Flat<T, Size>& lhs, const Flat<T, Size>& rhs, T tolerance) noexcept requires (Size >= 1)
+	bool AreAlmostEqual(const Flat<T, Size>& lhs, const Flat<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept requires (Size >= 1)
 	{
-		return AreAlmostEqual(Dot(lhs.Normal(), rhs.Normal()), T{1}, tolerance) && AreAlmostEqual(lhs.Distance(), rhs.Distance(), tolerance);
+		return AreAlmostEqual(std::min(Dot(lhs.Normal(), rhs.Normal()), T{1}), T{1}, tolerance) && AreAlmostEqual(lhs.Distance(), rhs.Distance(), tolerance);
 	}
 
 	template<std::floating_point T, std::size_t Size>

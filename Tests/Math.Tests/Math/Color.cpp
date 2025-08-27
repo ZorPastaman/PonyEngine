@@ -411,7 +411,7 @@ TEST_CASE("Color gamma", "[Math][Color]")
 	constexpr float a = 0.166f;
 	constexpr auto color = PonyEngine::Math::ColorRGBA<float>(r, g, b, a);
 	const auto gamma = color.Gamma();
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ColorRGBA<float>(0.729f, 0.849f, 0.026f, a), gamma, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ColorRGBA<float>(0.729f, 0.849f, 0.026f, a), gamma, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -429,7 +429,7 @@ TEST_CASE("Color linear", "[Math][Color]")
 	constexpr float a = 0.166f;
 	constexpr auto color = PonyEngine::Math::ColorRGBA<float>(r, g, b, a);
 	const auto gamma = color.Linear();
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ColorRGBA<float>(0.459f, 0.667f, 0.002f, a), gamma, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ColorRGBA<float>(0.459f, 0.667f, 0.002f, a), gamma, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -444,30 +444,30 @@ TEST_CASE("Color isBlack, isWhite, isTransparent, isOpaque", "[Math][Color]")
 	STATIC_REQUIRE(PonyEngine::Math::ColorRB<std::uint32_t>::Black().IsBlack());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorRGB<float>(0.000001f, 0.0000001f, 0.00000001f).IsBlack());
 	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>::Black().IsAlmostBlack());
-	STATIC_REQUIRE(PonyEngine::Math::ColorRG<float>(0.000001f, 0.0000001f).IsAlmostBlack());
+	STATIC_REQUIRE(PonyEngine::Math::ColorRG<float>(0.000000001f, 0.0000000001f).IsAlmostBlack());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorRG<float>(0.3f, 0.0000001f).IsAlmostBlack());
-	STATIC_REQUIRE(PonyEngine::Math::ColorRG<float>(0.3f, 0.0000001f).IsAlmostBlack(2.f));
+	STATIC_REQUIRE(PonyEngine::Math::ColorRG<float>(0.3f, 0.0000001f).IsAlmostBlack(PonyEngine::Math::Tolerance{.absolute = 2.f}));
 
 	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<std::uint32_t>::White().IsWhite());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorRGB<float>(0.99999999f, 0.999999f, 0.9999999f).IsWhite());
 	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>::White().IsAlmostWhite());
-	STATIC_REQUIRE(PonyEngine::Math::ColorRGB<float>(0.9999999f, 0.999999f, 0.9999999f).IsAlmostWhite());
+	STATIC_REQUIRE(PonyEngine::Math::ColorRGB<float>(0.9999999f, 0.9999999f, 0.9999999f).IsAlmostWhite());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorRGB<float>(0.8f, 0.9f, 0.7f).IsAlmostWhite());
-	STATIC_REQUIRE(PonyEngine::Math::ColorRGB<float>(0.8f, 0.9f, 0.7f).IsAlmostWhite(2.f));
+	STATIC_REQUIRE(PonyEngine::Math::ColorRGB<float>(0.8f, 0.9f, 0.7f).IsAlmostWhite(PonyEngine::Math::Tolerance{.absolute = 2.f}));
 
 	STATIC_REQUIRE(PonyEngine::Math::ColorA<std::uint32_t>::Clear().IsTransparent());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorBA<float>(0.0000001f, 0.000001f).IsTransparent());
 	STATIC_REQUIRE(PonyEngine::Math::ColorRA<float>::Clear().IsAlmostTransparent());
 	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>(0.0000001f, 0.0000001f, 0.0000001f, 0.00000000000000000000000000000000000001f).IsAlmostTransparent());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorRGBA<float>(0.4f, 0.5f, 0.7f, 0.1f).IsAlmostTransparent());
-	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>(0.4f, 0.5f, 0.7f, 0.1f).IsAlmostTransparent(2.f));
+	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>(0.4f, 0.5f, 0.7f, 0.1f).IsAlmostTransparent(PonyEngine::Math::Tolerance{.absolute = 2.f}));
 
 	STATIC_REQUIRE(PonyEngine::Math::ColorA<std::uint32_t>::Black().IsOpaque());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorBA<float>(0.0000001f, 0.95f).IsOpaque());
 	STATIC_REQUIRE(PonyEngine::Math::ColorRA<float>::Red().IsAlmostOpaque());
 	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>(0.4f, 0.2f, 0.8f, 0.9999999999999999999f).IsAlmostOpaque());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::ColorRGBA<float>(0.4f, 0.5f, 0.7f, 0.8f).IsAlmostOpaque());
-	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>(0.4f, 0.5f, 0.7f, 0.8f).IsAlmostOpaque(2.f));
+	STATIC_REQUIRE(PonyEngine::Math::ColorRGBA<float>(0.4f, 0.5f, 0.7f, 0.8f).IsAlmostOpaque(PonyEngine::Math::Tolerance{.absolute = 2.f}));
 }
 
 TEST_CASE("Color isFinite", "[Math][Color]")
@@ -962,7 +962,7 @@ TEST_CASE("Color are almost equal", "[Math][Color]")
 		REQUIRE(PonyEngine::Math::AreAlmostEqual(rgba, rgba1));
 		rgba1[i] -= 1.f;
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(rgba, rgba1));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(rgba, rgba1, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(rgba, rgba1, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 		rgba1[i] = prev;
 	}
 }

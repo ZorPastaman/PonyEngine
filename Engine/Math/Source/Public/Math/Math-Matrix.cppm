@@ -267,19 +267,19 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr bool IsZero() const noexcept;
 		/// @brief Checks if this matrix is almost equal to the zero matrix with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if this matrix is almost equal to the zero matrix; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostZero(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this matrix is equal to the identity matrix.
 		/// @return @a True if this matrix is equal to the identity matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsIdentity() const noexcept requires (RowSize == ColumnSize);
 		/// @brief Checks if this matrix is almost equal to the identity matrix with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if this matrix is almost equal to the identity matrix; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostIdentity(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T> && RowSize == ColumnSize);
+		template<std::same_as<T> U = T> [[nodiscard("Pure function")]]
+		constexpr bool IsAlmostIdentity(const Tolerance<U>& tolerance = Tolerance<U>()) const noexcept requires (std::is_floating_point_v<T> && RowSize == ColumnSize);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -431,10 +431,10 @@ export namespace PonyEngine::Math
 	/// @tparam ColumnSize Column count.
 	/// @param lhs Left matrix.
 	/// @param rhs Right matrix.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if the matrices are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs, T tolerance = T{0.00001}) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
+	constexpr bool AreAlmostEqual(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 
 	/// @brief Sums the @p lhs and @p rhs.
 	/// @tparam T Component type.
@@ -1123,7 +1123,8 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
-	constexpr bool Matrix<T, RowSize, ColumnSize>::IsAlmostZero(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
+	template<std::same_as<T> U>
+	constexpr bool Matrix<T, RowSize, ColumnSize>::IsAlmostZero(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Zero(), tolerance);
 	}
@@ -1135,7 +1136,8 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
-	constexpr bool Matrix<T, RowSize, ColumnSize>::IsAlmostIdentity(const T tolerance) const noexcept requires (std::is_floating_point_v<T> && RowSize == ColumnSize)
+	template<std::same_as<T> U>
+	constexpr bool Matrix<T, RowSize, ColumnSize>::IsAlmostIdentity(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T> && RowSize == ColumnSize)
 	{
 		return AreAlmostEqual(*this, Identity(), tolerance);
 	}
@@ -1342,16 +1344,17 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t RowSize, std::size_t ColumnSize>
-	constexpr bool AreAlmostEqual(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs, const T tolerance) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	constexpr bool AreAlmostEqual(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs, const Tolerance<T>& tolerance) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
-		const Matrix<T, RowSize, ColumnSize> diff = lhs - rhs;
-		T magnitudeSquared = T{0};
-		for (std::size_t j = 0uz; j < ColumnSize; ++j)
+		for (std::size_t i = 0uz; i < ColumnSize; ++i)
 		{
-			magnitudeSquared += diff.Column(j).MagnitudeSquared();
+			if (!AreAlmostEqual(lhs.Column(i), rhs.Column(i), tolerance))
+			{
+				return false;
+			}
 		}
 
-		return magnitudeSquared <= tolerance * tolerance;
+		return true;
 	}
 
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>

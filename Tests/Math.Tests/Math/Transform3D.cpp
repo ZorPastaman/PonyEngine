@@ -131,7 +131,7 @@ TEST_CASE("Transform3D trs", "[Math][Transform3D]")
 	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);
 	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
 	constexpr auto scale = PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f);
-	auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
+	const auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TrsMatrix(), PonyEngine::Math::TrsMatrix(position, rotation, scale)));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TrsMatrixCompact(), PonyEngine::Math::TrsMatrixCompact(position, rotation, scale)));
 }
@@ -384,7 +384,7 @@ TEST_CASE("Transform3D are almost equal", "[Math][Transform3D]")
 		pos[i] = 1.f;
 		transform.Translate(pos);
 		REQUIRE(!PonyEngine::Math::AreAlmostEqual(transform, copy));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, 10.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, PonyEngine::Math::Tolerance{.absolute = 10.f}));
 		transform.Position(position);
 	}
 	transform.Rotate(PonyEngine::Math::Quaternion<float>(0.000001f, 0.000001f, 0.000001f, 0.999999f));
@@ -392,7 +392,7 @@ TEST_CASE("Transform3D are almost equal", "[Math][Transform3D]")
 	transform.Rotation(rotation);
 	transform.Rotate(PonyEngine::Math::Quaternion<float>(1.000001f, 0.000001f, 2.000001f, 1.5f));
 	REQUIRE(!PonyEngine::Math::AreAlmostEqual(transform, copy));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, 10.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, PonyEngine::Math::Tolerance{.absolute = 10.f}));
 	transform.Rotation(rotation);
 	for (std::size_t i = 0; i < 3; ++i)
 	{
@@ -404,7 +404,7 @@ TEST_CASE("Transform3D are almost equal", "[Math][Transform3D]")
 		pos[i] = 1.f;
 		transform.Scale(scale + pos);
 		REQUIRE(!PonyEngine::Math::AreAlmostEqual(transform, copy));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, 10.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(transform, copy, PonyEngine::Math::Tolerance{.absolute = 10.f}));
 		transform.Scale(scale);
 	}
 

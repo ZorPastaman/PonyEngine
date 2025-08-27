@@ -1335,18 +1335,18 @@ TEST_CASE("Matrix isZero, isIdentity", "[Math][Matrix]")
 	constexpr auto matrix4x4 = PonyEngine::Math::Matrix4x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
 	STATIC_REQUIRE_FALSE(matrix4x4.IsZero());
 	STATIC_REQUIRE_FALSE(matrix4x4.IsAlmostZero());
-	STATIC_REQUIRE(matrix4x4.IsAlmostZero(100.f));
+	STATIC_REQUIRE(matrix4x4.IsAlmostZero(PonyEngine::Math::Tolerance{.absolute = 100.f}));
 	STATIC_REQUIRE_FALSE(matrix4x4.IsIdentity());
 	STATIC_REQUIRE_FALSE(matrix4x4.IsAlmostIdentity());
-	STATIC_REQUIRE(matrix4x4.IsAlmostIdentity(100.f));
+	STATIC_REQUIRE(matrix4x4.IsAlmostIdentity(PonyEngine::Math::Tolerance{.absolute = 100.f}));
 	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Zero().IsZero());
 	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Zero().IsAlmostZero());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Matrix4x4<float>::Zero().IsIdentity());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Matrix4x4<float>::Zero().IsAlmostIdentity());
-	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Zero().IsAlmostIdentity(10.f));
+	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Zero().IsAlmostIdentity(PonyEngine::Math::Tolerance{.absolute = 10.f}));
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Matrix4x4<float>::Identity().IsZero());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Matrix4x4<float>::Identity().IsAlmostZero());
-	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Identity().IsAlmostZero(10.f));
+	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Identity().IsAlmostZero(PonyEngine::Math::Tolerance{.absolute = 10.f}));
 	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Identity().IsIdentity());
 	STATIC_REQUIRE(PonyEngine::Math::Matrix4x4<float>::Identity().IsAlmostIdentity());
 }
@@ -2018,7 +2018,7 @@ TEST_CASE("Matrix are almost equal", "[Math][Matrix]")
 				{
 					return false;
 				}
-				if (!PonyEngine::Math::AreAlmostEqual(copy, matrix, 100.f))
+				if (!PonyEngine::Math::AreAlmostEqual(copy, matrix, PonyEngine::Math::Tolerance{.absolute = 100.f}))
 				{
 					return false;
 				}

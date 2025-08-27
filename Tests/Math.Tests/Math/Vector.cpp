@@ -414,11 +414,11 @@ TEST_CASE("Vector magnitude", "[Math][Vector]")
 
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	STATIC_REQUIRE(intVector.MagnitudeSquared() == 87);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(intVector.Magnitude<float>(), 9.327f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(intVector.Magnitude<float>(), 9.327f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 	constexpr auto floatVector = PonyEngine::Math::Vector4<float>(x, y, z, w);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector.MagnitudeSquared(), 87.f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector.Magnitude(), 9.327f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(floatVector.Magnitude(), 9.327f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Magnitude int")
@@ -629,7 +629,7 @@ TEST_CASE("Vector isZero, isUnit, isUniform", "[Math][Vector]")
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Vector3<std::int32_t>(2, 1, 4).IsZero());
 	STATIC_REQUIRE(PonyEngine::Math::Vector4<float>::Zero().IsZero());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Vector1<float>(2.f).IsZero());
-	STATIC_REQUIRE(PonyEngine::Math::Vector2<float>(0.0000001f, 0.000001f).IsAlmostZero());
+	STATIC_REQUIRE(PonyEngine::Math::Vector2<float>(0.000000000001f, 0.000000000001f).IsAlmostZero());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Vector2<float>(0.1f, 0.1f).IsAlmostZero());
 
 	STATIC_REQUIRE(PonyEngine::Math::Vector2<std::int32_t>::Up().IsUnit());
@@ -1232,12 +1232,12 @@ TEST_CASE("Vector2 angle", "[Math][Vector]")
 	auto vector2 = PonyEngine::Math::Rotate90CW(vector);
 	auto vector3 = -vector;
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector), 0.f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector1), 2.433f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector1), 2.433f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector2), std::numbers::pi_v<float> / 2.f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector3), std::numbers::pi_v<float>));
 
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector, vector1), 2.433f, 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector1, vector), -2.433f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector, vector1), 2.433f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector1, vector), -2.433f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Unsigned")
@@ -1265,13 +1265,13 @@ TEST_CASE("Vector3 angle", "[Math][Vector]")
 	auto vector2 = PonyEngine::Math::Vector3<float>(0.f, 4.f, -3.f);
 	auto vector3 = -vector;
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector), 0.f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector1), 2.553f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector1), 2.553f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector2), std::numbers::pi_v<float> / 2.f));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Angle(vector, vector3), std::numbers::pi_v<float>));
 
 	constexpr auto axis = PonyEngine::Math::Vector3<float>(1.f, 2.f, 4.f);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector, vector1, axis), 2.553f, 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector1, vector, axis), -2.553f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector, vector1, axis), 2.553f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::AngleSigned(vector1, vector, axis), -2.553f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Unsigned")
@@ -1338,7 +1338,7 @@ TEST_CASE("Vector project on plane", "[Math][Vector]")
 	constexpr auto vector2 = PonyEngine::Math::Rotate90CW(vector1);
 	auto normal = vector1.Normalized();
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ProjectOnPlane(vector, normal), PonyEngine::Math::Vector2<float>(-3.6f, -1.2f)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ProjectOnPlane(vector1, normal), PonyEngine::Math::Vector2<float>::Zero()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ProjectOnPlane(vector1, normal), PonyEngine::Math::Vector2<float>::Zero(), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ProjectOnPlane(vector2, normal), vector2));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ProjectOnPlane(-vector2, normal), -vector2));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ProjectOnPlane(PonyEngine::Math::Vector2<float>::Up(), PonyEngine::Math::Vector2<float>::Right()), PonyEngine::Math::Vector2<float>::Up()));

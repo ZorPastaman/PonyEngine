@@ -188,19 +188,19 @@ export namespace PonyEngine::Math
 		constexpr bool IsIdentity() const noexcept;
 		/// @brief Checks if this quaternion is almost equal to the identity quaternion with the tolerance value.
 		/// @tparam IsUnit Is this quaternion unit? If it's @a true, the code is more efficient.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if this quaternion is almost equal to the identity quaternion; @a false otherwise.
 		template<bool IsUnit = true> [[nodiscard("Pure function")]]
-		constexpr bool IsAlmostIdentity(T tolerance = T{0.00001}) const noexcept;
+		constexpr bool IsAlmostIdentity(const Tolerance<T>& tolerance = Tolerance<T>()) const noexcept;
 		/// @brief Checks if this quaternion is unit.
 		/// @return @a True if this quaternion is unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsUnit() const noexcept;
 		/// @brief Checks if this quaternion is almost unit with the tolerance value.
-		/// @param tolerance Tolerance. Must be positive.
+		/// @param tolerance Tolerance.
 		/// @return @a True if this quaternion is almost unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostUnit(T tolerance = T{0.00001}) const noexcept;
+		constexpr bool IsAlmostUnit(const Tolerance<T>& tolerance = Tolerance<T>()) const noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -339,10 +339,10 @@ export namespace PonyEngine::Math
 	/// @tparam AreUnit Are the quaternions unit? If it's @a true, the code is more efficient.
 	/// @param lhs Left quaternion.
 	/// @param rhs Right quaternion.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if the quaternions are almost equal; @a false otherwise.
 	template<bool AreUnit = true, std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Quaternion<T>& lhs, const Quaternion<T>& rhs, T tolerance = T{0.00001}) noexcept;
+	constexpr bool AreAlmostEqual(const Quaternion<T>& lhs, const Quaternion<T>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
 
 	/// @brief Transforms the @p vector with the @p quaternion.
 	/// @tparam T Component type.
@@ -629,7 +629,7 @@ namespace PonyEngine::Math
 
 	template<std::floating_point T>
 	template<bool IsUnit>
-	constexpr bool Quaternion<T>::IsAlmostIdentity(const T tolerance) const noexcept
+	constexpr bool Quaternion<T>::IsAlmostIdentity(const Tolerance<T>& tolerance) const noexcept
 	{
 		return AreAlmostEqual<IsUnit, T>(*this, Identity(), tolerance);
 	}
@@ -641,7 +641,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr bool Quaternion<T>::IsAlmostUnit(const T tolerance) const noexcept
+	constexpr bool Quaternion<T>::IsAlmostUnit(const Tolerance<T>& tolerance) const noexcept
 	{
 		return AreAlmostEqual(MagnitudeSquared(), T{1}, tolerance);
 	}
@@ -758,7 +758,7 @@ namespace PonyEngine::Math
 		const T dot = Dot(from, to);
 		const T halfCos = std::min(std::abs(dot), T{1});
 
-		if (halfCos > T{0.9999}) [[unlikely]]
+		if (AreAlmostEqual(halfCos, T{1})) [[unlikely]]
 		{
 			return Lerp(from, dot < T{0} ? Negate(to) : to, time).Normalized();
 		}
@@ -772,11 +772,11 @@ namespace PonyEngine::Math
 	}
 
 	template<bool AreUnit, std::floating_point T>
-	constexpr bool AreAlmostEqual(const Quaternion<T>& lhs, const Quaternion<T>& rhs, const T tolerance) noexcept
+	constexpr bool AreAlmostEqual(const Quaternion<T>& lhs, const Quaternion<T>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
 		if constexpr (AreUnit)
 		{
-			return AreAlmostEqual(Dot(lhs, rhs), T{1}, tolerance);
+			return AreAlmostEqual(std::min(Dot(lhs, rhs), T{1}), T{1}, tolerance);
 		}
 		else
 		{

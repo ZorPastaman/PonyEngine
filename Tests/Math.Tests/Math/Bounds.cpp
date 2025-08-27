@@ -21,7 +21,7 @@ TEST_CASE("Bounding box to ball", "[Math][Bounds]")
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
 	const auto sphere = PonyEngine::Math::BoundingBall(cuboid);
 	REQUIRE(sphere.Center() == center);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere.Radius(), 7.f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere.Radius(), 7.f, PonyEngine::Math::Tolerance{.relative = 0.001f}));
 	REQUIRE(sphere.Contains(center));
 	REQUIRE(sphere.Contains(center + extents));
 	REQUIRE(sphere.Contains(center - extents));
@@ -42,7 +42,7 @@ TEST_CASE("Bounding oriented box to ball", "[Math][Bounds]")
 	const auto cuboid = PonyEngine::Math::OrientedCuboid<float>(center, extents, axes);
 	const auto sphere = PonyEngine::Math::BoundingBall(cuboid);
 	REQUIRE(sphere.Center() == center);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere.Radius(), 7.f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere.Radius(), 7.f, PonyEngine::Math::Tolerance{ .relative = 0.001f }));
 	REQUIRE(sphere.Contains(center));
 	REQUIRE(sphere.Contains(center + extents));
 	REQUIRE(sphere.Contains(center - extents));
@@ -83,7 +83,7 @@ TEST_CASE("Bounding oriented box to box", "[Math][Bounds]")
 	const auto cuboid = PonyEngine::Math::OrientedCuboid<float>(center, extents, axes);
 	const auto aabb = PonyEngine::Math::AxisAlignedBoundingBox(cuboid);
 	REQUIRE(aabb.Center() == center);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(aabb.Extents(), PonyEngine::Math::Vector3<float>(6.936f, 4.392f, 5.226f), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(aabb.Extents(), PonyEngine::Math::Vector3<float>(6.936f, 4.392f, 5.226f), PonyEngine::Math::Tolerance{ .relative = 0.001f }));
 	REQUIRE(aabb.Contains(center));
 	for (std::size_t i = 0; i < PonyEngine::Math::OrientedCuboid<float>::CornerCount; ++i)
 	{

@@ -436,7 +436,7 @@ TEST_CASE("Box are almost equal", "[Math][Box]")
 		cent[i] += 1.f;
 		copy.Center(cent);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, cuboid));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, cuboid, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, cuboid, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 		copy.Center(center);
 
 		auto ext = extents;
@@ -446,7 +446,7 @@ TEST_CASE("Box are almost equal", "[Math][Box]")
 		ext[i] -= 1.f;
 		copy.Extents(ext);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, cuboid));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, cuboid, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, cuboid, PonyEngine::Math::Tolerance{ .absolute = 5.f }));
 		copy.Extents(extents);
 	}
 

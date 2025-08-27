@@ -188,10 +188,10 @@ export namespace PonyEngine::Math
 	/// @tparam Size Dimension.
 	/// @param lhs Left box.
 	/// @param rhs Right box.
-	/// @param tolerance Tolerance value. Must be positive.
+	/// @param tolerance Tolerance.
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Box<T, Size>& lhs, const Box<T, Size>& rhs, T tolerance = T{0.00001}) noexcept;
+	constexpr bool AreAlmostEqual(const Box<T, Size>& lhs, const Box<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
 
 	/// @brief Outputs a string representation of the @p box.
 	/// @tparam T Component type.
@@ -465,7 +465,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr bool AreAlmostEqual(const Box<T, Size>& lhs, const Box<T, Size>& rhs, T tolerance) noexcept
+	constexpr bool AreAlmostEqual(const Box<T, Size>& lhs, const Box<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
 		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.Extents(), rhs.Extents(), tolerance);
 	}

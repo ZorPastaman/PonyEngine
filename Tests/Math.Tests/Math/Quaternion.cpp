@@ -328,7 +328,7 @@ TEST_CASE("Quaternion vector", "[Math][Quaternion]")
 	constexpr float w = 1.f;
 	constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
 	STATIC_REQUIRE(quaternion.Vector() == PonyEngine::Math::Vector4<float>(x, y, z, w));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(PonyEngine::Math::Quaternion<float>(x - 2.f, y + 4.f, z + 1.f, w - 3.f), test(quaternion), 0.001f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(PonyEngine::Math::Quaternion<float>(x - 2.f, y + 4.f, z + 1.f, w - 3.f), test(quaternion), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 }
 
 TEST_CASE("Quaternion isIdentity, isUnit", "[Math][Quaternion]")
@@ -336,13 +336,13 @@ TEST_CASE("Quaternion isIdentity, isUnit", "[Math][Quaternion]")
 	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>::Identity().IsIdentity());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Quaternion<float>(0.00000001f, 0.00000001f, -0.0000000001f, 1.00000000001f).IsIdentity());
 	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>(0.00000001f, 0.00000001f, -0.0000000001f, 1.00000000001f).IsAlmostIdentity());
-	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>(0.00000001f, 0.00000001f, -0.0000000001f, 2.f).IsAlmostIdentity<false>(3.f));
+	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>(0.00000001f, 0.00000001f, -0.0000000001f, 2.f).IsAlmostIdentity<false>(PonyEngine::Math::Tolerance{.absolute = 3.f}));
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Quaternion<float>(0.00000001f, 0.00000001f, -0.0000000001f, 2.f).IsAlmostIdentity<false>());
 	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>::Identity().IsUnit());
 	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f).IsUnit());
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Quaternion<float>(1.0000001f, 0.f, 0.f, 0.f).IsUnit());
 	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>(1.0000001f, 0.f, 0.f, 0.f).IsAlmostUnit());
-	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>(1.0000000001f, 0.f, 0.f, 1.f).IsAlmostUnit(3.f));
+	STATIC_REQUIRE(PonyEngine::Math::Quaternion<float>(1.0000000001f, 0.f, 0.f, 1.f).IsAlmostUnit(PonyEngine::Math::Tolerance{.absolute = 3.f}));
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::Quaternion<float>(1.0000000001f, 0.f, 0.f, 1.f).IsAlmostUnit());
 
 #if PONY_ENGINE_TESTING_BENCHMARK
@@ -605,7 +605,7 @@ TEST_CASE("Quaternion angle", "[Math][Quaternion]")
 	float zL = -1;
 	float wL = 2;
 	auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.178f, PonyEngine::Math::Angle(quaternionL, quaternionR), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(1.178f, PonyEngine::Math::Angle(quaternionL, quaternionR), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	xR = 2;
 	yR = 3;
 	zR = 5;
@@ -616,7 +616,7 @@ TEST_CASE("Quaternion angle", "[Math][Quaternion]")
 	zL = 1;
 	wL = 2;
 	quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(2.662f, PonyEngine::Math::Angle(quaternionL, quaternionR), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(2.662f, PonyEngine::Math::Angle(quaternionL, quaternionR), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(0.f, PonyEngine::Math::Angle(quaternionL, quaternionL)));
 	xR = 3;
 	yR = 2;
@@ -639,7 +639,7 @@ TEST_CASE("Quaternion angle", "[Math][Quaternion]")
 	zL = -1;
 	wL = 2;
 	quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float> / 2.f, PonyEngine::Math::Angle(quaternionL, quaternionR), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float> / 2.f, PonyEngine::Math::Angle(quaternionL, quaternionR), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	const auto benchQuaternionL = PonyEngine::Math::Quaternion<float>(-3.f, 2.f, 1.f, -1.f).Normalized();
@@ -789,8 +789,8 @@ TEST_CASE("Quaternion slerp", "[Math][Quaternion]")
 
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.f), quaternionL));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR, 1.f), quaternionR));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.5f), PonyEngine::Math::Quaternion<float>(0.378f, 0.567f, 0.452f, 0.575f), 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR.Conjugate(), 0.5f), PonyEngine::Math::Quaternion<float>(0.46f, 0.69f, 0.55f, -0.1f), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.5f), PonyEngine::Math::Quaternion<float>(0.378f, 0.567f, 0.452f, 0.575f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR.Conjugate(), 0.5f), PonyEngine::Math::Quaternion<float>(0.46f, 0.69f, 0.55f, -0.1f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, PonyEngine::Math::Negate(quaternionL), 0.5f), quaternionL));
 
 	xR = 2;
@@ -803,7 +803,7 @@ TEST_CASE("Quaternion slerp", "[Math][Quaternion]")
 	zL = -5;
 	wL = 5;
 	quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.5f), PonyEngine::Math::Quaternion<float>(0.445f, 0.089f, 0.f, 0.891f), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.5f), PonyEngine::Math::Quaternion<float>(0.445f, 0.089f, 0.f, 0.891f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -827,14 +827,14 @@ TEST_CASE("Quaternion are almost equal", "[Math][Quaternion]")
 	constexpr auto quaternion1 = PonyEngine::Math::Quaternion<float>(x1, y1, z1, w1);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(quaternion, quaternion));
 	STATIC_REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual<false>(quaternion, quaternion1));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(quaternion, quaternion1, 5.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(quaternion, quaternion1, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(quaternion, PonyEngine::Math::Quaternion<float>(x + 0.0000001f, y - 0.0000001f, z - 0.00000001f, w + 0.00000001f)));
 
 	const auto quaternionN = quaternion.Normalized();
 	const auto quaternionN1 = quaternion1.Normalized();
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternionN, quaternionN));
 	REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(quaternionN, quaternionN1));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternionN, quaternionN1, 5.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternionN, quaternionN1, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternionN, PonyEngine::Math::Add(quaternionN, PonyEngine::Math::Quaternion<float>(0.0000000000001f, -0.00000000000001f, -0.0000000000001f, 0.00000000001f))));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
@@ -864,7 +864,7 @@ TEST_CASE("Quaternion product", "[Math][Quaternion]")
 
 	constexpr PonyEngine::Math::Quaternion<float> product = quaternionL * quaternionR;
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual<false>(quaternionL * quaternionR, PonyEngine::Math::Quaternion<float>(26.f, -13.f, 15.f, 8.f)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternionL.Normalized() * quaternionR.Normalized(), PonyEngine::Math::Quaternion<float>(0.772f, -0.386f, 0.445f, 0.238f), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternionL.Normalized() * quaternionR.Normalized(), PonyEngine::Math::Quaternion<float>(0.772f, -0.386f, 0.445f, 0.238f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -886,7 +886,7 @@ TEST_CASE("Quaternion product vector", "[Math][Quaternion]")
 	constexpr float wQ = 2;
 	constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(xQ, yQ, zQ, wQ);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternion * vector, PonyEngine::Math::Vector3<float>(66.f, 5.f, -99.f)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternion.Normalized() * vector, PonyEngine::Math::Vector3<float>(5.556f, -2.556f, -0.778f), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(quaternion.Normalized() * vector, PonyEngine::Math::Vector3<float>(5.556f, -2.556f, -0.778f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")

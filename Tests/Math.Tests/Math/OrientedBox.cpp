@@ -434,7 +434,7 @@ TEST_CASE("OrientedBox closest point", "[Math][OrientedBox]")
 	constexpr auto test = PonyEngine::Math::Vector3<float>(13.f, 15.f, -7.f);
 	expected = PonyEngine::Math::Vector3<float>(6.7964f, 5.8675f, 3.1484f);
 	const auto t = obb.ClosestPoint(test);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(expected, obb.ClosestPoint(test), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(expected, obb.ClosestPoint(test), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -563,20 +563,20 @@ TEST_CASE("OrientedBox are almost equal", "[Math][OrientedBox]")
 		cent[i] -= 1.f;
 		copy.Center(cent);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, obb));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 		copy.Center(center);
 	}
 
 	for (std::size_t i = 0; i < 3; ++i)
 	{
 		auto ext = extents;
-		ext[i] += 0.000001f;
+		ext[i] += 0.0000001f;
 		copy.Extents(ext);
 		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb));
 		ext[i] -= 1.f;
 		copy.Extents(ext);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, obb));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 		copy.Extents(extents);
 	}
 
@@ -591,7 +591,7 @@ TEST_CASE("OrientedBox are almost equal", "[Math][OrientedBox]")
 		copy.Axes(ax);
 		copy.Extents(extents);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, obb));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, 10.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, PonyEngine::Math::Tolerance{.absolute = 10.f}));
 		copy.Axes(axes);
 		copy.Extents(extents);
 	}

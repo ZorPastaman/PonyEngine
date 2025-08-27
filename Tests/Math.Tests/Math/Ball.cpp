@@ -97,7 +97,7 @@ TEST_CASE("Ball bounds", "[Math][Ball]")
 	REQUIRE(ball == PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f), 0.f));
 
 	ball = PonyEngine::Math::Sphere<float>::CreateBounds(std::array<PonyEngine::Math::Vector3<float>, 3>{ PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, -3.f), PonyEngine::Math::Vector3<float>(3.f, -4.f, 8.f) });
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(ball, PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(2.5f, 0.5f, 2.5f), 7.124f), 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(ball, PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(2.5f, 0.5f, 2.5f), 7.124f), PonyEngine::Math::Tolerance<float>{.absolute = 0.001f}));
 }
 
 TEST_CASE("Ball access", "[Math][Ball]")
@@ -143,9 +143,9 @@ TEST_CASE("Ball diameter", "[Math][Ball]")
 TEST_CASE("Ball surface", "[Math][Ball]")
 {
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector1<float>(5.f), 3.f).Surface(), 2.f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector2<float>(5.f, -4.f), 3.f).Surface(), 18.85f, 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector3<float>(5.f, -4.f, 1.f), 3.f).Surface(), 113.1f, 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector4<float>(5.f, -4.f, 1.f, -1.f), 3.f).Surface(), 532.959f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector2<float>(5.f, -4.f), 3.f).Surface(), 18.85f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector3<float>(5.f, -4.f, 1.f), 3.f).Surface(), 113.097f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector4<float>(5.f, -4.f, 1.f, -1.f), 3.f).Surface(), 532.959f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("1D")
@@ -169,10 +169,10 @@ TEST_CASE("Ball surface", "[Math][Ball]")
 
 TEST_CASE("Ball volume", "[Math][Ball]")
 {
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector1<float>(5.f), 3.f).Volume(), 6.f, 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector2<float>(5.f, -4.f), 3.f).Volume(), 28.274f, 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector3<float>(5.f, -4.f, 1.f), 3.f).Volume(), 113.097f, 0.001f));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector4<float>(5.f, -4.f, 1.f, -1.f), 3.f).Volume(), 399.719f, 0.001f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector1<float>(5.f), 3.f).Volume(), 6.f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector2<float>(5.f, -4.f), 3.f).Volume(), 28.274f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector3<float>(5.f, -4.f, 1.f), 3.f).Volume(), 113.097f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Ball(PonyEngine::Math::Vector4<float>(5.f, -4.f, 1.f, -1.f), 3.f).Volume(), 399.719f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("1D")
@@ -363,13 +363,13 @@ TEST_CASE("Ball are almost equal", "[Math][Ball]")
 	for (std::size_t i = 0; i < 3; ++i)
 	{
 		auto newCenter = center;
-		newCenter[i] += 0.000001f;
+		newCenter[i] += 0.0000001f;
 		copy.Center(newCenter);
 		REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere, copy));
 		newCenter[i] -= 2.f;
 		copy.Center(newCenter);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(sphere, copy));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere, copy, 5.f));
+		REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere, copy, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 		copy.Center(center);
 	}
 
@@ -377,7 +377,7 @@ TEST_CASE("Ball are almost equal", "[Math][Ball]")
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere, copy));
 	copy.Radius(radius + 1.f);
 	REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(sphere, copy));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere, copy, 5.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(sphere, copy, PonyEngine::Math::Tolerance{.absolute = 5.f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
