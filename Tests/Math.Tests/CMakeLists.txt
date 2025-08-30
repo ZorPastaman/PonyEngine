@@ -13,6 +13,7 @@ target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/OrientedBox.cpp"
 	"Math/Quaternion.cpp"
 	"Math/Ray.cpp"
+	"Math/RayIntersections.cpp"
 	"Math/Transform2D.cpp"
 	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"

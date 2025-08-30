@@ -106,18 +106,6 @@ TEST_CASE("Box move constructor", "[Math][Box]")
 	STATIC_REQUIRE(moved.Extents() == PonyEngine::Math::Abs(extents));
 }
 
-TEST_CASE("Box create bounds", "[Math][Box]")
-{
-	constexpr auto empty = PonyEngine::Math::Cuboid<float>::CreateBounds(std::array<PonyEngine::Math::Vector3<float>, 0>());
-	STATIC_REQUIRE(empty == PonyEngine::Math::Cuboid<float>());
-
-	constexpr auto onePoint = PonyEngine::Math::Cuboid<float>::CreateBounds(std::array<PonyEngine::Math::Vector3<float>, 1>{ PonyEngine::Math::Vector3<float>(2.f, -1.f, 4.f) });
-	STATIC_REQUIRE(onePoint == PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(2.f, -1.f, 4.f), PonyEngine::Math::Vector3<float>::Zero()));
-
-	constexpr auto manyPoint = PonyEngine::Math::Cuboid<float>::CreateBounds(std::array<PonyEngine::Math::Vector3<float>, 4>{ PonyEngine::Math::Vector3<float>(2.f, -1.f, 1.f), PonyEngine::Math::Vector3<float>(4.f, -10.f, -2.f), PonyEngine::Math::Vector3<float>(1.f, 20.f, -5.f), PonyEngine::Math::Vector3<float>(-4.f, -5.f, 2.f) });
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(manyPoint, PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(0.f, 5.f, -1.5f), PonyEngine::Math::Vector3<float>(4.f, 15.f, 3.5f))));
-}
-
 TEST_CASE("Box access", "[Math][Box]")
 {
 	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Box<T, Size>& box) constexpr

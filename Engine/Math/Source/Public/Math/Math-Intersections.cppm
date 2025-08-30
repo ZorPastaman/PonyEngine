@@ -290,6 +290,14 @@ namespace PonyEngine::Math
 	template<RayIntersectionMode Mode, std::floating_point T> [[nodiscard("Pure function")]]
 	bool IsIntersecting(const std::pair<std::optional<T>, std::optional<T>>& times) noexcept;
 
+	/// @brief Checks if a vector component is almost zero.
+	/// @tparam T Value type.
+	/// @tparam Size Dimension.
+	/// @param vector Vector.
+	/// @return @a True if a component is almost zero; @a false otherwise. Component-wise.
+	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
+	std::array<bool, Size> IsAlmostZero(const Vector<T, Size>& vector) noexcept;
+
 	template<std::floating_point T>
 	std::optional<T> IntersectionTime(const Ray2D<T>& lhs, const Ray2D<T>& rhs, const RayBounds<T>& lhsBounds, const RayBounds<T>& rhsBounds) noexcept
 	{
@@ -307,7 +315,7 @@ namespace PonyEngine::Math
 		const T tr = v * invDet;
 
 		return tl < lhsBounds.min || tl > lhsBounds.max || tr < rhsBounds.min || tr > rhsBounds.max
-			? std::nullopt
+			? std::optional<T>(std::nullopt)
 			: tl;
 	}
 
@@ -352,32 +360,30 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	std::pair<std::optional<T>, std::optional<T>> IntersectionTimes(const Ray<T, Size>& ray, const Box<T, Size>& box, const RayBounds<T>& rayBounds) noexcept requires (Size >= 2)
 	{
-		T enterTime = -std::numeric_limits<T>::infinity();
-		T exitTime = std::numeric_limits<T>::infinity();
+		const Vector<T, Size> min = box.Min() - ray.Origin();
+		const Vector<T, Size> max = box.Max() - ray.Origin();
+		const std::array<bool, Size> isZero = IsAlmostZero(ray.Direction());
 
 		for (std::size_t i = 0; i < Size; ++i)
 		{
-			const T min = box.Min(i) - ray.Origin()[i];
-			const T max = box.Max(i) - ray.Origin()[i];
-			const T direction = ray.Direction()[i];
-			if (AreAlmostEqual(direction, T{0})) [[unlikely]]
+			if (isZero[i] && (min[i] > T{0} || max[i] < T{0})) [[unlikely]]
 			{
-				if (min > T{0} || max < T{0})
-				{
-					return std::pair<std::optional<T>, std::optional<T>>(std::nullopt, std::nullopt);
-				}
-
-				continue;
+				return std::pair<std::optional<T>, std::optional<T>>(std::nullopt, std::nullopt);
 			}
+		}
 
-			const T invDirection = T{1} / direction;
-			const T invMin = min * invDirection;
-			const T invMax = max * invDirection;
-			const T t0 = std::min(invMin, invMax);
-			const T t1 = std::max(invMin, invMax);
+		const Vector<T, Size> invDirection = T{1} / ray.Direction();
+		const Vector<T, Size> invMin = Multiply(min, invDirection);
+		const Vector<T, Size> invMax = Multiply(max, invDirection);
+		const Vector<T, Size> enterTimes = Min(invMin, invMax);
+		const Vector<T, Size> exitTimes = Max(invMin, invMax);
 
-			enterTime = std::max(enterTime, t0);
-			exitTime = std::min(exitTime, t1);
+		T enterTime = -std::numeric_limits<T>::infinity();
+		T exitTime = std::numeric_limits<T>::infinity();
+		for (std::size_t i = 0; i < Size; ++i)
+		{
+			enterTime = isZero[i] ? enterTime : std::max(enterTime, enterTimes[i]);
+			exitTime = isZero[i] ? exitTime : std::min(exitTime, exitTimes[i]);
 		}
 
 		return enterTime <= exitTime
@@ -489,7 +495,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	std::optional<T> GetIntersectionTimeInBounds(const T time, const RayBounds<T>& rayBounds) noexcept
 	{
-		return time < rayBounds.min || time > rayBounds.max ? std::nullopt : time;
+		return time < rayBounds.min || time > rayBounds.max ? std::optional<T>(std::nullopt) : time;
 	}
 
 	template<std::floating_point T>
@@ -514,7 +520,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	std::optional<Vector<T, Size>> FindIntersectionPoint(const Ray<T, Size>& ray, const std::optional<T>& time) noexcept
 	{
-		return time ? ray.Unnormalize(time.value()) : std::nullopt;
+		return time ? ray.Unnormalize(time.value()) : std::optional<Vector<T, Size>>(std::nullopt);
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -542,5 +548,17 @@ namespace PonyEngine::Math
 		{
 			return times.first.has_value() && times.second.has_value();
 		}
+	}
+
+	template<std::floating_point T, std::size_t Size>
+	std::array<bool, Size> IsAlmostZero(const Vector<T, Size>& vector) noexcept
+	{
+		std::array<bool, Size> answer;
+		for (std::size_t i = 0; i < Size; ++i)
+		{
+			answer[i] = AreAlmostEqual(vector[i], T{0});
+		}
+
+		return answer;
 	}
 }
