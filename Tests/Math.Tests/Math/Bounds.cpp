@@ -14,6 +14,33 @@ import std;
 
 import PonyEngine.Math;
 
+TEST_CASE("Ball bounds", "[Math][Ball]")
+{
+	auto ball = PonyEngine::Math::BoundingBall<float, 3>(std::array<PonyEngine::Math::Vector3<float>, 0>{});
+	REQUIRE(ball == PonyEngine::Math::Sphere<float>());
+
+	ball = PonyEngine::Math::BoundingBall<float, 3>(std::array<PonyEngine::Math::Vector3<float>, 1>{ PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f) });
+	REQUIRE(ball == PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f), 0.f));
+
+	ball = PonyEngine::Math::BoundingBall<float, 3>(std::array<PonyEngine::Math::Vector3<float>, 3>{ PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, -3.f), PonyEngine::Math::Vector3<float>(3.f, -4.f, 8.f) });
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(ball, PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(2.5f, 0.5f, 2.5f), 7.124f), PonyEngine::Math::Tolerance<float>{.absolute = 0.001f}));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> dist(-100.f, 100.f);
+	std::array<PonyEngine::Math::Vector3<float>, 10000> points;
+	for (PonyEngine::Math::Vector3<float>& point : points)
+	{
+		point = PonyEngine::Math::Vector3<float>(dist(gen), dist(gen), dist(gen));
+	}
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::BoundingBall<float, 3>(points);
+	};
+#endif
+}
+
 TEST_CASE("Bounding box to ball", "[Math][Bounds]")
 {
 	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
@@ -51,6 +78,33 @@ TEST_CASE("Bounding oriented box to ball", "[Math][Bounds]")
 	BENCHMARK("Bench")
 	{
 		return PonyEngine::Math::BoundingBall(PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(3.f, 2.f, 6.f)));
+	};
+#endif
+}
+
+TEST_CASE("Box create bounds", "[Math][Box]")
+{
+	constexpr auto empty = PonyEngine::Math::AxisAlignedBoundingBox<float, 3>(std::array<PonyEngine::Math::Vector3<float>, 0>());
+	STATIC_REQUIRE(empty == PonyEngine::Math::Cuboid<float>());
+
+	constexpr auto onePoint = PonyEngine::Math::AxisAlignedBoundingBox<float, 3>(std::array<PonyEngine::Math::Vector3<float>, 1>{ PonyEngine::Math::Vector3<float>(2.f, -1.f, 4.f) });
+	STATIC_REQUIRE(onePoint == PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(2.f, -1.f, 4.f), PonyEngine::Math::Vector3<float>::Zero()));
+
+	constexpr auto manyPoint = PonyEngine::Math::AxisAlignedBoundingBox<float, 3>(std::array<PonyEngine::Math::Vector3<float>, 4>{ PonyEngine::Math::Vector3<float>(2.f, -1.f, 1.f), PonyEngine::Math::Vector3<float>(4.f, -10.f, -2.f), PonyEngine::Math::Vector3<float>(1.f, 20.f, -5.f), PonyEngine::Math::Vector3<float>(-4.f, -5.f, 2.f) });
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(manyPoint, PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(0.f, 5.f, -1.5f), PonyEngine::Math::Vector3<float>(4.f, 15.f, 3.5f))));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> dist(-100.f, 100.f);
+	std::array<PonyEngine::Math::Vector3<float>, 10000> points;
+	for (PonyEngine::Math::Vector3<float>& point : points)
+	{
+		point = PonyEngine::Math::Vector3<float>(dist(gen), dist(gen), dist(gen));
+	}
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::AxisAlignedBoundingBox<float, 3>(points);
 	};
 #endif
 }

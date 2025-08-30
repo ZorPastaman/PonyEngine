@@ -61,12 +61,6 @@ export namespace PonyEngine::Math
 
 		constexpr ~Box() noexcept = default;
 
-		/// @brief Creates an axis-aligned bounding box.
-		/// @param points Points to bound.
-		/// @return Axis-aligned bounding box.
-		[[nodiscard("Pure function")]]
-		static constexpr Box CreateBounds(std::span<const Vector<T, Size>> points) noexcept;
-
 		/// @brief Gets the center.
 		/// @return Center.
 		[[nodiscard("Pure function")]]
@@ -255,33 +249,6 @@ namespace PonyEngine::Math
 		center(center),
 		extents(Abs(extents))
 	{
-	}
-
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr Box<T, Size> Box<T, Size>::CreateBounds(const std::span<const Vector<T, Size>> points) noexcept
-	{
-		if (points.size() == 0uz) [[unlikely]]
-		{
-			return Box();
-		}
-
-		Vector<T, Size> min = points[0];
-		Vector<T, Size> max = points[0];
-		for (std::size_t i = 1uz; i < points.size(); ++i)
-		{
-			min = Math::Min(min, points[i]);
-			max = Math::Max(max, points[i]);
-		}
-
-		using TimeType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
-		const Vector<T, Size> center = Lerp(min, max, TimeType{0.5});
-		Vector<T, Size> extents;
-		for (std::size_t i = 0uz; i < Size; ++i)
-		{
-			extents[i] = std::max(max[i] - center[i], center[i] - min[i]);
-		}
-
-		return Box(center, extents);
 	}
 
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)

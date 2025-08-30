@@ -601,6 +601,22 @@ export namespace PonyEngine::Math
 	/// @return Quotient.
 	template<std::floating_point U = double, std::integral T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator /(const Vector<T, Size>& vector, U divisor) noexcept requires (Size >= 1uz);
+	/// @brief Divides the @p dividend by the @p vector components.
+	/// @tparam T Component type.
+	/// @tparam Size Component count.
+	/// @param dividend Dividend.
+	/// @param vector Divisor.
+	/// @return Quotient.
+	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	constexpr Vector<T, Size> operator /(T dividend, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
+	/// @brief Divides the @p dividend by the @p vector components.
+	/// @tparam T Component type.
+	/// @tparam Size Component count.
+	/// @param dividend Dividend.
+	/// @param vector Divisor.
+	/// @return Quotient.
+	template<std::floating_point U = double, std::integral T, std::size_t Size> [[nodiscard("Pure operator")]]
+	constexpr Vector<T, Size> operator /(U dividend, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
 
 	/// @brief Outputs a string representation of the @p vector.
 	/// @tparam T Component type.
@@ -1447,6 +1463,30 @@ namespace PonyEngine::Math
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
 			quotient[i] = static_cast<T>(vector[i] / divisor);
+		}
+
+		return quotient;
+	}
+
+	template<Type::Arithmetic T, std::size_t Size>
+	constexpr Vector<T, Size> operator /(const T dividend, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz)
+	{
+		Vector<T, Size> quotient;
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			quotient[i] = dividend / vector[i];
+		}
+
+		return quotient;
+	}
+
+	template<std::floating_point U, std::integral T, std::size_t Size>
+	constexpr Vector<T, Size> operator /(const U dividend, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz)
+	{
+		Vector<T, Size> quotient;
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			quotient[i] = static_cast<T>(dividend / vector[i]);
 		}
 
 		return quotient;

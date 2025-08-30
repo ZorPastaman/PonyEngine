@@ -1751,6 +1751,11 @@ TEST_CASE("Vector division", "[Math][Vector]")
 	constexpr auto floatVector = PonyEngine::Math::Vector2<float>(x, y);
 	STATIC_REQUIRE(floatVector / static_cast<float>(divisor) == PonyEngine::Math::Vector2<float>(x / static_cast<float>(divisor), y / static_cast<float>(divisor)));
 
+	STATIC_REQUIRE(divisor * 100 / intVector == PonyEngine::Math::Vector2<std::int32_t>(divisor * 100 / x, divisor * 100 / y));
+	STATIC_REQUIRE(static_cast<float>(divisor * 100) / intVector == PonyEngine::Math::Vector2<std::int32_t>(static_cast<std::int32_t>(static_cast<float>(divisor * 100) / x), static_cast<std::int32_t>(static_cast<float>(divisor * 100) / y)));
+
+	STATIC_REQUIRE(static_cast<float>(divisor) / floatVector == PonyEngine::Math::Vector2<float>(static_cast<float>(divisor) / x, static_cast<float>(divisor) / y));
+
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int by int")
 	{
@@ -1763,6 +1768,18 @@ TEST_CASE("Vector division", "[Math][Vector]")
 	BENCHMARK("Float")
 	{
 		return PonyEngine::Math::Vector4<float>(50.f, 30.f, -10.f, -20.f) / 4.f;
+	};
+	BENCHMARK("Int by int - Scalar")
+	{
+		return 400 / PonyEngine::Math::Vector4<std::int32_t>(50, 30, -10, -20);
+	};
+	BENCHMARK("Int by float - Scalar")
+	{
+		return 400.f / PonyEngine::Math::Vector4<std::int32_t>(50, 30, -10, -20);
+	};
+	BENCHMARK("Float - Scalar")
+	{
+		return 4.f / PonyEngine::Math::Vector4<float>(50.f, 30.f, -10.f, -20.f);
 	};
 #endif
 }

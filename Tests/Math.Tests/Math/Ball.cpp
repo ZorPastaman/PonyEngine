@@ -88,18 +88,6 @@ TEST_CASE("Ball move constructor", "[Math][Ball]")
 	STATIC_REQUIRE(moved == ball);
 }
 
-TEST_CASE("Ball bounds", "[Math][Ball]")
-{
-	auto ball = PonyEngine::Math::Sphere<float>::CreateBounds(std::array<PonyEngine::Math::Vector3<float>, 0>{});
-	REQUIRE(ball == PonyEngine::Math::Sphere<float>());
-
-	ball = PonyEngine::Math::Sphere<float>::CreateBounds(std::array<PonyEngine::Math::Vector3<float>, 1>{ PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f) });
-	REQUIRE(ball == PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f), 0.f));
-
-	ball = PonyEngine::Math::Sphere<float>::CreateBounds(std::array<PonyEngine::Math::Vector3<float>, 3>{ PonyEngine::Math::Vector3<float>(-2.f, 4.f, 6.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, -3.f), PonyEngine::Math::Vector3<float>(3.f, -4.f, 8.f) });
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(ball, PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(2.5f, 0.5f, 2.5f), 7.124f), PonyEngine::Math::Tolerance<float>{.absolute = 0.001f}));
-}
-
 TEST_CASE("Ball access", "[Math][Ball]")
 {
 	auto test = []<std::floating_point T, std::size_t Size>(const PonyEngine::Math::Ball<T, Size>& ball, const PonyEngine::Math::Vector<T, Size>& center, const T radius) constexpr
