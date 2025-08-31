@@ -839,8 +839,6 @@ TEST_CASE("Ray-box intersection. Missing bounds.", "[Math][RayIntersections]")
 #endif
 }
 
-#define PONY_ENGINE_TESTING_BENCHMARK true
-
 TEST_CASE("Ray-box intersection. Hit enter.", "[Math][RayIntersections]")
 {
 	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
@@ -856,11 +854,11 @@ TEST_CASE("Ray-box intersection. Hit enter.", "[Math][RayIntersections]")
 	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).first.value(), 8.221f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).second.has_value());
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<false>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).value(), 8.221f, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<false>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).value(), 8.221f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<true>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).has_value());
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).first.value(), ray.Unnormalize(8.221f), PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).first.value(), ray.Unnormalize(8.221f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).second.has_value());
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).value(), ray.Unnormalize(8.221f), PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).value(), ray.Unnormalize(8.221f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<true>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).has_value());
 
 #if PONY_ENGINE_TESTING_BENCHMARK
@@ -937,6 +935,330 @@ TEST_CASE("Ray-box intersection. Hit back.", "[Math][RayIntersections]")
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).second.value(), ray.Unnormalize(-3.464f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).value(), ray.Unnormalize(-13.856f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<true>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).value(), ray.Unnormalize(-3.464f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()});
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()});
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()});
+	};
+#endif
+}
+
+#define PONY_ENGINE_TESTING_BENCHMARK true
+
+TEST_CASE("Ray-oriented box intersection. Missing direction.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = PonyEngine::Math::Vector3<float>(8.f, 3.f, -7.f);
+	const auto direction = PonyEngine::Math::Vector3<float>(center + PonyEngine::Math::Vector3<float>(extents.Max() * 3.f) - origin).Normalized();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<false>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<true>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<false>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<true>(ray, box).has_value());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box);
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box);
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box);
+	};
+#endif
+}
+
+TEST_CASE("Ray-oriented box intersection. Missing origin.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = center + PonyEngine::Math::Vector3<float>(5.f);
+	const auto direction = (origin - center).Normalized();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<false>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<true>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<false>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<true>(ray, box).has_value());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box);
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box);
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box);
+	};
+#endif
+}
+
+TEST_CASE("Ray-oriented box intersection. Missing parallel.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = PonyEngine::Math::Vector3<float>(-2.f, -5.f, -5.f);
+	const auto origin1 = axes * (origin - center) + center;
+	const auto direction = axes * PonyEngine::Math::Vector3<float>::Forward();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin1, direction);
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<false>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<true>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<false>(ray, box).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<true>(ray, box).has_value());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box);
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box);
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box);
+	};
+#endif
+}
+
+TEST_CASE("Ray-oriented box intersection. Hit.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = PonyEngine::Math::Vector3<float>(8.f, 3.f, -7.f);
+	const auto direction = PonyEngine::Math::Vector3<float>(center + PonyEngine::Math::Vector3<float>::One() - origin).Normalized();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
+
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(ray, box).first.value(), 9.299f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(ray, box).second.value(), 16.03f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<false>(ray, box).value(), 9.299f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<true>(ray, box).value(), 16.03f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box).first.value(), ray.Unnormalize(9.299f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box).second.value(), ray.Unnormalize(16.03f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(ray, box).value(), ray.Unnormalize(9.299f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<true>(ray, box).value(), ray.Unnormalize(16.03f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box);
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box);
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box);
+	};
+#endif
+}
+
+TEST_CASE("Ray-oriented box intersection. Missing bounds.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = PonyEngine::Math::Vector3<float>(8.f, 3.f, -7.f);
+	const auto direction = PonyEngine::Math::Vector3<float>(center + PonyEngine::Math::Vector3<float>::One() - origin).Normalized();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
+
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<false>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<true>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<true>(ray, box, PonyEngine::Math::RayBounds{.max = 1.f}).has_value());
+
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<false>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<true>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).first.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).second.has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).has_value());
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<true>(ray, box, PonyEngine::Math::RayBounds{.min = 50.f}).has_value());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box, PonyEngine::Math::RayBounds{.max = 1.f});
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box, PonyEngine::Math::RayBounds{.max = 1.f});
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box, PonyEngine::Math::RayBounds{.max = 1.f});
+	};
+#endif
+}
+
+TEST_CASE("Ray-oriented box intersection. Hit enter.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = PonyEngine::Math::Vector3<float>(8.f, 3.f, -7.f);
+	const auto direction = PonyEngine::Math::Vector3<float>(center + PonyEngine::Math::Vector3<float>::One() - origin).Normalized();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
+
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).first.value(), 9.299f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).second.has_value());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<false>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).value(), 9.299f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<true>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).has_value());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).first.value(), ray.Unnormalize(9.299f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).second.has_value());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).value(), ray.Unnormalize(9.299f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<true>(ray, box, PonyEngine::Math::RayBounds{.max = 10.f}).has_value());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box, PonyEngine::Math::RayBounds{.max = 10.f});
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box, PonyEngine::Math::RayBounds{.max = 10.f});
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box, PonyEngine::Math::RayBounds{.max = 10.f});
+	};
+#endif
+}
+
+TEST_CASE("Ray-oriented box intersection. Hit exit.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = PonyEngine::Math::Vector3<float>(8.f, 3.f, -7.f);
+	const auto direction = PonyEngine::Math::Vector3<float>(center + PonyEngine::Math::Vector3<float>::One() - origin).Normalized();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
+
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}));
+	REQUIRE_FALSE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).first.has_value());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).second.value(), 16.03f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionTime<false>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).has_value());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<true>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).value(), 16.03f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).first.has_value());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).second.value(), ray.Unnormalize(16.03f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE_FALSE(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).has_value());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<true>(ray, box, PonyEngine::Math::RayBounds{.min = 10.f}).value(), ray.Unnormalize(16.03f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Time")
+	{
+		return PonyEngine::Math::IntersectionTime(ray, box, PonyEngine::Math::RayBounds{.min = 10.f});
+	};
+	BENCHMARK("Point")
+	{
+		return PonyEngine::Math::IntersectionPoint(ray, box, PonyEngine::Math::RayBounds{.min = 10.f});
+	};
+	BENCHMARK("Check")
+	{
+		return PonyEngine::Math::AreIntersecting(ray, box, PonyEngine::Math::RayBounds{.min = 10.f});
+	};
+#endif
+}
+
+TEST_CASE("Ray-oriented box intersection. Hit back.", "[Math][RayIntersections]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -6.f, 2.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 4.f, 3.5f);
+	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.5f, -1.3f, 0.5f));
+	const auto box = PonyEngine::Math::OrientedBox<float, 3>(center, extents, axes);
+	constexpr auto origin = center + PonyEngine::Math::Vector3<float>(5.f);
+	const auto direction = (origin - center).Normalized();
+	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).first.value(), -14.452f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).second.value(), -2.869f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<false>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).value(), -14.452f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<true>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).value(), -2.869f, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).first.value(), ray.Unnormalize(-14.452f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).second.value(), ray.Unnormalize(-2.869f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).value(), ray.Unnormalize(-14.452f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<true>(ray, box, PonyEngine::Math::RayBounds{.min = -std::numeric_limits<float>::infinity()}).value(), ray.Unnormalize(-2.869f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Time")
