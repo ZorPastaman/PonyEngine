@@ -192,25 +192,27 @@ TEST_CASE("Ray project", "[Math][Ray]")
 
 	auto vector = origin + direction * 6.f;
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(vector, ray.Project(vector)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction * 3.f, ray.Project(vector, 3.f)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction * 3.f, ray.Project(vector, PonyEngine::Math::RayBounds{.max = 3.f})));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction * 8.f, ray.Project(vector, PonyEngine::Math::RayBounds{.min = 8.f})));
 
 	vector = origin + direction * -2.f;
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin, ray.Project(vector)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin, ray.Project(vector, 3.f)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin, ray.Project(vector, PonyEngine::Math::RayBounds{.max = 3.f})));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction * -2.f, ray.Project(vector, PonyEngine::Math::RayBounds{.min = -8.f})));
 
 	vector = PonyEngine::Math::Vector3<float>(-3.f, 10.f, -2.f);
 	auto expected = origin + direction * PonyEngine::Math::Dot(direction, vector - origin);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(expected, ray.Project(vector)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction, ray.Project(vector, 1.f)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction, ray.Project(vector, PonyEngine::Math::RayBounds{.max = 1.f})));
 
 	vector = PonyEngine::Math::Vector3<float>(-6.f, -10.f, -5.f);
 	expected = origin + direction * PonyEngine::Math::Dot(direction, vector - origin);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(expected, ray.Project(vector)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction, ray.Project(vector, 1.f)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin + direction, ray.Project(vector, PonyEngine::Math::RayBounds{.max = 1.f})));
 
 	vector = PonyEngine::Math::Vector3<float>(5.f, -2.f, 0.5f);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin, ray.Project(vector)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin, ray.Project(vector, 1.f)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(origin, ray.Project(vector, PonyEngine::Math::RayBounds{.max = 1.f})));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")

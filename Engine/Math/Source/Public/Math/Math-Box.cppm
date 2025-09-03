@@ -383,10 +383,17 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr Box<T, Size>::CornersType Box<T, Size>::Corners() const noexcept requires (Size <= std::numeric_limits<std::size_t>::digits)
 	{
+		const Vector<T, Size> min = Min();
+		const Vector<T, Size> max = Max();
+
 		std::array<Vector<T, Size>, CornerCount> corners;
 		for (std::size_t i = 0uz; i < CornerCount; ++i)
 		{
-			corners[i] = Corner(i);
+			Vector<T, Size>& corner = corners[i];
+			for (std::size_t j = 0uz, index = i; j < Size; ++j, index >>= 1uz)
+			{
+				corner[j] = index & 1uz ? max[j] : min[j];
+			}
 		}
 
 		return corners;

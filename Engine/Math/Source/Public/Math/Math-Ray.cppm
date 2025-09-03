@@ -16,6 +16,28 @@ import :Vector;
 
 export namespace PonyEngine::Math
 {
+	/// @brief Ray bounds.
+	/// @tparam T Value type.
+	template<std::floating_point T>
+	struct RayBounds final
+	{
+		/// @brief Gets a full ray bounds [0, +inf).
+		/// @return Full ray bounds.
+		[[nodiscard("Pure function")]]
+		static constexpr const RayBounds& Full() noexcept;
+		/// @brief Gets a ray bounds that are default for intersection tests [default relative tolerance, +inf).
+		/// @return Intersection ray bounds.
+		[[nodiscard("Pure function")]]
+		static constexpr const RayBounds& Intersection() noexcept;
+		/// @brief Gets an infinite ray bounds (-inf, +inf).
+		/// @return Infinite ray bounds.
+		[[nodiscard("Pure function")]]
+		static constexpr const RayBounds& Infinite() noexcept;
+
+		T min = T{0}; /// Minimum bound.
+		T max = std::numeric_limits<T>::infinity(); ///< Maximum bound.
+	};
+
 	/// @brief Ray.
 	/// @tparam T Component type.
 	/// @tparam Size Dimension.
@@ -80,10 +102,10 @@ export namespace PonyEngine::Math
 
 		/// @brief Projects the @p point onto the ray.
 		/// @param point Point to project.
-		/// @param maxDistance Ray max distance.
+		/// @param bounds Ray bounds.
 		/// @return Projected point.
 		[[nodiscard("Pure function")]]
-		Vector<T, Size> Project(const Vector<T, Size>& point, T maxDistance = std::numeric_limits<T>::infinity()) const noexcept;
+		Vector<T, Size> Project(const Vector<T, Size>& point, const RayBounds<T>& bounds = RayBounds<T>::Full()) const noexcept;
 		/// @brief Normalizes the @p point.
 		/// @param point Point to normalize.
 		/// @return Normalized point.
@@ -177,6 +199,27 @@ struct std::formatter<PonyEngine::Math::Ray<T, Size>, char>
 
 namespace PonyEngine::Math
 {
+	template<std::floating_point T>
+	constexpr const RayBounds<T>& RayBounds<T>::Full() noexcept
+	{
+		static constexpr auto FullBounds = RayBounds{.min = T{0}, .max = std::numeric_limits<T>::infinity()};
+		return FullBounds;
+	}
+
+	template<std::floating_point T>
+	constexpr const RayBounds<T>& RayBounds<T>::Intersection() noexcept
+	{
+		static constexpr auto IntersectionBounds = RayBounds{.min = Tolerance<T>().relative, .max = std::numeric_limits<T>::infinity()};
+		return IntersectionBounds;
+	}
+
+	template<std::floating_point T>
+	constexpr const RayBounds<T>& RayBounds<T>::Infinite() noexcept
+	{
+		static constexpr auto InfiniteBounds = RayBounds{.min = -std::numeric_limits<T>::infinity(), .max = std::numeric_limits<T>::infinity()};
+		return InfiniteBounds;
+	}
+
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	Ray<T, Size>::Ray() noexcept :
 		origin(Vector<T, Size>::Zero()),
@@ -244,9 +287,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	Vector<T, Size> Ray<T, Size>::Project(const Vector<T, Size>& point, const T maxDistance) const noexcept
+	Vector<T, Size> Ray<T, Size>::Project(const Vector<T, Size>& point, const RayBounds<T>& bounds) const noexcept
 	{
-		const T normalized = std::clamp(Normalize(point), T{0}, maxDistance);
+		const T normalized = std::clamp(Normalize(point), bounds.min, bounds.max);
 
 		return Unnormalize(normalized);
 	}

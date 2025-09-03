@@ -416,6 +416,26 @@ export namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
 	constexpr Matrix<T, RowSize, ColumnSize> Divide(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 
+	/// @brief Multiplies a transpose of the @p lhs matrix by the @p rhs matrix component-wise.
+	/// @tparam T Component type.
+	/// @tparam RowSize Row count.
+	/// @tparam ColumnSize Column count.
+	/// @tparam RightColumnSize Right matrix column count.
+	/// @param lhs Multiplicand.
+	/// @param rhs Multiplier.
+	/// @return Product.
+	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize> [[nodiscard("Pure function")]]
+	constexpr Matrix<T, RowSize, RightColumnSize> MultiplyTranspose(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
+
+	/// @brief Computes absolute values of the @p matrix components.
+	/// @tparam T Component type.
+	/// @tparam RowSize Row count.
+	/// @tparam ColumnSize Column count.
+	/// @param matrix Source.
+	/// @return Absolute matrix.
+	template<std::floating_point T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
+	constexpr Matrix<T, RowSize, ColumnSize> Abs(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
+
 	/// @brief Normalizes the columns of the @p matrix.
 	/// @tparam T Component type.
 	/// @tparam RowSize Row count.
@@ -1331,6 +1351,33 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
+	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize>
+	constexpr Matrix<T, RowSize, RightColumnSize> MultiplyTranspose(const Matrix<T, ColumnSize, RowSize>& lhs, const Matrix<T, ColumnSize, RightColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz && RightColumnSize >= 1uz)
+	{
+		Matrix<T, RowSize, RightColumnSize> answer;
+		for (std::size_t j = 0uz; j < RightColumnSize; ++j)
+		{
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = Dot(lhs.Column(i), rhs.Column(j));
+			}
+		}
+
+		return answer;
+	}
+
+	template<std::floating_point T, std::size_t RowSize, std::size_t ColumnSize>
+	constexpr Matrix<T, RowSize, ColumnSize> Abs(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	{
+		Matrix<T, RowSize, ColumnSize> answer;
+		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		{
+			answer.Column(i, Abs(matrix.Column(i)));
+		}
+
+		return answer;
+	}
+
 	template<std::floating_point T, std::size_t RowSize, std::size_t ColumnSize>
 	Matrix<T, RowSize, ColumnSize> NormalizeColumns(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
@@ -1432,18 +1479,7 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize>
 	constexpr Matrix<T, RowSize, RightColumnSize> operator *(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, ColumnSize, RightColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz && RightColumnSize >= 1uz)
 	{
-		const Matrix<T, ColumnSize, RowSize> lhsT = lhs.Transpose();
-
-		Matrix<T, RowSize, RightColumnSize> answer;
-		for (std::size_t j = 0uz; j < RightColumnSize; ++j)
-		{
-			for (std::size_t i = 0uz; i < RowSize; ++i)
-			{
-				answer[i, j] = Dot(lhsT.Column(i), rhs.Column(j));
-			}
-		}
-
-		return answer;
+		return MultiplyTranspose(lhs.Transpose(), rhs);
 	}
 
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>

@@ -1972,6 +1972,33 @@ TEST_CASE("Matrix divide", "[Math][Matrix]")
 #endif
 }
 
+TEST_CASE("Matrix abs", "[Math][Matrix]")
+{
+	auto abs = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix)
+	{
+		auto copy = matrix;
+		for (std::size_t i = 0uz; i < ColumnCount; ++i)
+		{
+			copy.Column(i, Abs(copy.Column(i)));
+		}
+		return copy;
+	};
+
+	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
+	constexpr auto matrix2x3 = PonyEngine::Math::Matrix2x3<float>(components[0], components[1], components[2], components[3], components[4], components[5]);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(abs(matrix2x3), PonyEngine::Math::Abs(matrix2x3)));
+
+	constexpr auto matrix4x4 = PonyEngine::Math::Matrix4x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(abs(matrix4x4), PonyEngine::Math::Abs(matrix4x4)));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::Abs(PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }));
+	};
+#endif
+}
+
 TEST_CASE("Matrix normalize columns", "[Math][Matrix]")
 {
 	auto normalize = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix)
