@@ -382,10 +382,32 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr OrientedBox<T, Size>::CornersType OrientedBox<T, Size>::Corners() const noexcept requires (Size <= std::numeric_limits<std::size_t>::digits)
 	{
+		std::array<Vector<T, Size>, Size> scaledAxes;
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			scaledAxes[i] = axes.Column(i) * extents[i];
+		}
+
 		std::array<Vector<T, Size>, CornerCount> corners;
 		for (std::size_t i = 0uz; i < CornerCount; ++i)
 		{
-			corners[i] = Corner(i);
+			corners[i] = center;
+		}
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			const std::size_t step = 1uz << i;
+			std::size_t j = 0uz;
+			do
+			{
+				for (const std::size_t end = j + step; j < end; ++j)
+				{
+					corners[j] -= scaledAxes[i];
+				}
+				for (const std::size_t end = j + step; j < end; ++j)
+				{
+					corners[j] += scaledAxes[i];
+				}
+			} while (j < CornerCount);
 		}
 
 		return corners;

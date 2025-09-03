@@ -122,6 +122,10 @@ export namespace PonyEngine::Math
 		T distance; ///< Distance from the origin. If it's positive, the normal looks at the origin; otherwise it looks away from it.
 	};
 
+	/// @brief Directed point.
+	/// @tparam T Component type.
+	template<std::floating_point T>
+	using DirectedPoint = Flat<T, 1>;
 	/// @brief Line.
 	/// @tparam T Component type.
 	template<std::floating_point T>

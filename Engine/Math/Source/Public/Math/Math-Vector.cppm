@@ -1099,13 +1099,20 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Size>
 	constexpr T DistanceSquared(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
-		Vector<T, Size> diff;
-		for (std::size_t i = 0uz; i < Size; ++i)
+		if constexpr (std::is_floating_point_v<T>)
 		{
-			diff[i] = std::max(lhs[i], rhs[i]) - std::min(lhs[i], rhs[i]);
+			return (lhs - rhs).MagnitudeSquared();
 		}
+		else
+		{
+			Vector<T, Size> diff;
+			for (std::size_t i = 0uz; i < Size; ++i)
+			{
+				diff[i] = std::max(lhs[i], rhs[i]) - std::min(lhs[i], rhs[i]);
+			}
 
-		return diff.MagnitudeSquared();
+			return diff.MagnitudeSquared();
+		}
 	}
 
 	template<std::floating_point T, std::size_t Size>
