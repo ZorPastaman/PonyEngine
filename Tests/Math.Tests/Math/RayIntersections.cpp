@@ -1120,6 +1120,19 @@ TEST_CASE("Ray-oriented box intersection. Hit.", "[Math][RayIntersections]")
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(ray, box).value(), ray.Unnormalize(9.299f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<true>(ray, box).value(), ray.Unnormalize(16.03f), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Enter>(box, ray));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Exit>(box, ray));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Any>(box, ray));
+	REQUIRE(PonyEngine::Math::AreIntersecting<PonyEngine::Math::RayIntersectionMode::Both>(box, ray));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(box, ray).first.value(), 9.299f, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTimes(box, ray).second.value(), 16.03f, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<false>(box, ray).value(), 9.299f, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionTime<true>(box, ray).value(), 16.03f, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(box, ray).first.value(), ray.Unnormalize(9.299f), PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoints(box, ray).second.value(), ray.Unnormalize(16.03f), PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<false>(box, ray).value(), ray.Unnormalize(9.299f), PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::IntersectionPoint<true>(box, ray).value(), ray.Unnormalize(16.03f), PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Time")
 	{
