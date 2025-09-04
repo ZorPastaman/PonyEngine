@@ -221,6 +221,7 @@ TEST_CASE("Flat-oriented box intersection. Hit.", "[Math][FlatIntersections]")
 	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(3.f, -2.f, -1.f));
 	const auto box = PonyEngine::Math::OrientedCuboid<float>(center, extents, axes);
 	REQUIRE(PonyEngine::Math::AreIntersecting(plane, box));
+	REQUIRE(PonyEngine::Math::AreIntersecting(box, plane));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Check")

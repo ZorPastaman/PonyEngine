@@ -116,6 +116,7 @@ TEST_CASE("Ball-oriented box intersection. Hit.", "[Math][BallIntersections]")
 	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(2.f, 3.f, -1.f));
 	const auto box = PonyEngine::Math::OrientedCuboid<float>(center1, extents, axes);
 	REQUIRE(PonyEngine::Math::AreIntersecting(ball, box));
+	REQUIRE(PonyEngine::Math::AreIntersecting(box, ball));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")

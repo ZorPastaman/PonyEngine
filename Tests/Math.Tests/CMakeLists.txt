@@ -14,6 +14,7 @@ target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/FlatIntersections.cpp"
 	"Math/Matrix.cpp"
 	"Math/OrientedBox.cpp"
+	"Math/OrientedBoxIntersections.cpp"
 	"Math/Quaternion.cpp"
 	"Math/Ray.cpp"
 	"Math/RayIntersections.cpp"
