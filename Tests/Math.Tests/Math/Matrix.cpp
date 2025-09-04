@@ -1986,7 +1986,7 @@ TEST_CASE("Matrix multiply transpose", "[Math][Matrix]")
 	constexpr auto matrix4x4P = PonyEngine::Math::MultiplyTranspose(matrix4x4, matrix4x4M);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(matrix4x4.Transpose() * matrix4x4M, matrix4x4P));
 
-//#if PONY_ENGINE_TESTING_BENCHMARK
+#if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Int")
 	{
 		return PonyEngine::Math::MultiplyTranspose(PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }), PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ 2, 3, 1, -9, 3, 4, -8, 1, 3, -4, 4, 7, -1, 2, 5, 8 }));
@@ -1995,7 +1995,7 @@ TEST_CASE("Matrix multiply transpose", "[Math][Matrix]")
 	{
 		return PonyEngine::Math::MultiplyTranspose(PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }), PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ 2, 3, 1, -9, 3, 4, -8, 1, 3, -4, 4, 7, -1, 2, 5, 8 }));
 	};
-//#endif
+#endif
 }
 
 TEST_CASE("Matrix abs", "[Math][Matrix]")
