@@ -425,7 +425,7 @@ export namespace PonyEngine::Math
 	/// @param rhs Multiplier.
 	/// @return Product.
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, RowSize, RightColumnSize> MultiplyTranspose(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
+	constexpr Matrix<T, RowSize, RightColumnSize> MultiplyTranspose(const Matrix<T, ColumnSize, RowSize>& lhs, const Matrix<T, ColumnSize, RightColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz && RightColumnSize >= 1uz);
 
 	/// @brief Computes absolute values of the @p matrix components.
 	/// @tparam T Component type.
