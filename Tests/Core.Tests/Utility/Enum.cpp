@@ -55,10 +55,10 @@ ENUM_MASK_FORMATTER(Name, Permission)
 
 TEST_CASE("ENUM_VALUE_TO_STRING works for valid and invalid values", "[Utility][Enum]")
 {
-	REQUIRE(Name::ToString(Name::Color::Red) == Name::ColorNames[0]);
-	REQUIRE(Name::ToString(Name::Color::Green) == Name::ColorNames[1]);
-	REQUIRE(Name::ToString(Name::Color::Blue) == Name::ColorNames[2]);
-	REQUIRE(Name::ToString(static_cast<Name::Color>(99)) == Name::ColorNames[3]);
+	STATIC_REQUIRE(Name::ToString(Name::Color::Red) == Name::ColorNames[0]);
+	STATIC_REQUIRE(Name::ToString(Name::Color::Green) == Name::ColorNames[1]);
+	STATIC_REQUIRE(Name::ToString(Name::Color::Blue) == Name::ColorNames[2]);
+	STATIC_REQUIRE(Name::ToString(static_cast<Name::Color>(99)) == Name::ColorNames[3]);
 
 	std::ostringstream oss;
 	oss << Name::Color::Red;
@@ -89,71 +89,39 @@ TEST_CASE("ENUM_MASK_TO_STRING works for masks", "[Utility][Enum]")
 
 TEST_CASE("ENUM_MASK_OPERATORS work as expected", "[Utility][Enum]")
 {
-	Name::Permission p = Name::Permission::Read | Name::Permission::Write;
-	REQUIRE((p & Name::Permission::Read) == Name::Permission::Read);
-	REQUIRE((p & Name::Permission::Execute) == Name::Permission::None);
-	p |= Name::Permission::Execute;
-	REQUIRE(p == Name::Permission::All);
-	p &= Name::Permission::Write;
-	REQUIRE(p == Name::Permission::Write);
-	p ^= Name::Permission::Write;
-	REQUIRE(p == Name::Permission::None);
-	p = (Name::Permission::Read | Name::Permission::Write) ^ Name::Permission::Read;
-	REQUIRE(p == Name::Permission::Write);
-	REQUIRE(~Name::Permission::None == Name::Permission::All);
+	STATIC_REQUIRE(((Name::Permission::Read | Name::Permission::Write) & Name::Permission::Read) == Name::Permission::Read);
+	STATIC_REQUIRE(((Name::Permission::Read | Name::Permission::Write) & Name::Permission::Execute) == Name::Permission::None);
+	STATIC_REQUIRE((Name::Permission::Read | Name::Permission::Write | Name::Permission::Execute) == Name::Permission::All);
+	STATIC_REQUIRE(((Name::Permission::Read | Name::Permission::Write) ^ Name::Permission::Read) == Name::Permission::Write);
+	STATIC_REQUIRE(~Name::Permission::None == Name::Permission::All);
+	STATIC_REQUIRE(~Name::Permission::Write == (Name::Permission::Read | Name::Permission::Execute));
 }
 
 TEST_CASE("ENUM_VALUE_MASK conversions work", "[Utility][Enum]")
 {
-	REQUIRE(Name::ToMask(Name::Color::Red) == Name::Permission::Read);
-	REQUIRE(Name::ToMask(Name::Color::Green) == Name::Permission::Write);
-	REQUIRE(Name::ToMask(Name::Color::Blue) == Name::Permission::Execute);
+	STATIC_REQUIRE(Name::ToMask(Name::Color::Red) == Name::Permission::Read);
+	STATIC_REQUIRE(Name::ToMask(Name::Color::Green) == Name::Permission::Write);
+	STATIC_REQUIRE(Name::ToMask(Name::Color::Blue) == Name::Permission::Execute);
 
-	std::array colors = { Name::Color::Red, Name::Color::Blue };
-	REQUIRE(ToMask(std::span(colors)) == (Name::Permission::Read | Name::Permission::Execute));
+	constexpr std::array colors = { Name::Color::Red, Name::Color::Blue };
+	STATIC_REQUIRE(ToMask(std::span(colors)) == (Name::Permission::Read | Name::Permission::Execute));
 
-	auto mask = Name::Permission::Read | Name::Permission::Write;
-	REQUIRE(IsInMask(Name::Color::Red, mask));
-	REQUIRE(IsInMask(Name::Color::Green, mask));
-	REQUIRE_FALSE(IsInMask(Name::Color::Blue, mask));
+	constexpr auto mask = Name::Permission::Read | Name::Permission::Write;
+	STATIC_REQUIRE(IsInMask(Name::Color::Red, mask));
+	STATIC_REQUIRE(IsInMask(Name::Color::Green, mask));
+	STATIC_REQUIRE_FALSE(IsInMask(Name::Color::Blue, mask));
 
-	REQUIRE(Name::ToValue(Name::Permission::Write) == Name::Color::Green);
+	STATIC_REQUIRE(Name::ToValue(Name::Permission::Write) == Name::Color::Green);
 
-	std::array<Name::Color, 3> out{};
-	auto count = Name::ToValues(Name::Permission::Read | Name::Permission::Execute, std::span(out));
-	REQUIRE(count == 2);
-	REQUIRE(out[0] == Name::Color::Red);
-	REQUIRE(out[1] == Name::Color::Blue);
-}
-
-TEST_CASE("EnumMacro constexpr compilation test", "[Utility][Enum]")
-{
-	auto testOperators = []() constexpr
-	{
-		Name::Permission pOp = ~(Name::Permission::All & (Name::Permission::Write | Name::Permission::Read) ^ Name::Permission::Execute);
-		pOp &= Name::Permission::Write;
-		pOp |= Name::Permission::Read;
-		pOp ^= Name::Permission::Execute;
-
-		return pOp;
-	};
-	auto toMask = []() constexpr
-	{
-		const auto vec = std::vector<Name::Color> { Name::Color::Blue, Name::Color::Red };
-		return Name::ToMask(vec);
-	};
-	auto toValue = []() constexpr
+	auto toValues = [](const Name::Permission m) constexpr
 	{
 		auto arr = std::array<Name::Color, 3>();
-		Name::ToValues(Name::Permission::Read | Name::Permission::Write, arr);
-		return arr[0];
-	};
+		const std::size_t c = Name::ToValues(m, arr);
 
-	[[maybe_unused]] constexpr std::string_view valueStr = Name::ToString(Name::Color::Blue);
-	[[maybe_unused]] constexpr Name::Permission pOp = testOperators();
-	[[maybe_unused]] constexpr Name::Permission pV = Name::ToMask(Name::Color::Blue);
-	[[maybe_unused]] constexpr Name::Permission pM = toMask();
-	[[maybe_unused]] constexpr bool isInMask = Name::IsInMask(Name::Color::Blue, Name::Permission::Read);
-	[[maybe_unused]] constexpr Name::Color cV = Name::ToValue(Name::Permission::Read);
-	[[maybe_unused]] constexpr Name::Color cM = toValue();
+		return std::pair(arr, c);
+	};
+	constexpr auto out = toValues(Name::Permission::Read | Name::Permission::Execute);
+	STATIC_REQUIRE(out.second == 2);
+	STATIC_REQUIRE(out.first[0] == Name::Color::Red);
+	STATIC_REQUIRE(out.first[1] == Name::Color::Blue);
 }

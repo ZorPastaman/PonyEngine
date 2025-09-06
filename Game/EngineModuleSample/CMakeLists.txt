@@ -14,6 +14,7 @@ pony_clean_build_options()
 set(PONY_ENGINE_APPLICATION_MAIN TRUE)
 
 # Add PonyEngine project.
+message(STATUS "Fetching PonyEngine")
 FetchContent_Declare(
   PonyEngine
   GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine
