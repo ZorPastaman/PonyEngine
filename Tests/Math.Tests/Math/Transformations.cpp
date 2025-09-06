@@ -5931,13 +5931,13 @@ TEST_CASE("Transform world to local", "[Math][Transformations]")
 {
 	constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
 	const auto matrix = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(0.4f, 1.f, -2.f));
-	const auto transformed = PonyEngine::Math::TransformInverse(matrix, vector);
+	const auto transformed = PonyEngine::Math::TransformTranspose(matrix, vector);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-9.808f, 1.854f, -1.53f), transformed, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::Math::TransformInverse(matrix, PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f));
+		return PonyEngine::Math::TransformTranspose(matrix, PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f));
 	};
 #endif
 }

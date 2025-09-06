@@ -1179,18 +1179,24 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::Multiply(const Matrix& multiplier) noexcept
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i).Multiply(multiplier.Column(i));
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] *= multiplier[i, j];
+			}
 		}
 	}
 
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::Divide(const Matrix& divisor) noexcept
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i).Divide(divisor.Column(i));
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] /= divisor[i, j];
+			}
 		}
 	}
 
@@ -1250,9 +1256,12 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator +=(const Matrix& other) noexcept
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i) += other.Column(i);
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] += other[i, j];
+			}
 		}
 
 		return *this;
@@ -1261,9 +1270,12 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator -=(const Matrix& other) noexcept
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i) -= other.Column(i);
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] -= other[i, j];
+			}
 		}
 
 		return *this;
@@ -1272,9 +1284,12 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator *=(const T multiplier) noexcept
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i) *= multiplier;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] *= multiplier;
+			}
 		}
 
 		return *this;
@@ -1284,9 +1299,12 @@ namespace PonyEngine::Math
 	template<std::floating_point U>
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator *=(const U multiplier) noexcept requires (std::is_integral_v<T>)
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i) *= multiplier;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] = static_cast<T>((*this)[i, j] * multiplier);
+			}
 		}
 
 		return *this;
@@ -1301,9 +1319,12 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator /=(const T divisor) noexcept
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i) /= divisor;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] /= divisor;
+			}
 		}
 
 		return *this;
@@ -1313,9 +1334,12 @@ namespace PonyEngine::Math
 	template<std::floating_point U>
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator /=(const U divisor) noexcept requires (std::is_integral_v<T>)
 	{
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			Column(i) /= divisor;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				(*this)[i, j] = static_cast<T>((*this)[i, j] / divisor);
+			}
 		}
 
 		return *this;
@@ -1331,9 +1355,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> Multiply(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = Multiply(lhs.Column(i), rhs.Column(i));
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = lhs[i, j] * rhs[i, j];
+			}
 		}
 
 		return answer;
@@ -1343,9 +1370,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> Divide(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = Divide(lhs.Column(i), rhs.Column(i));
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = lhs[i, j] / rhs[i, j];
+			}
 		}
 
 		return answer;
@@ -1370,9 +1400,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> Abs(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i, Abs(matrix.Column(i)));
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = Abs(matrix[i, j]);
+			}
 		}
 
 		return answer;
@@ -1408,9 +1441,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> operator +(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = lhs.Column(i) + rhs.Column(i);
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = lhs[i, j] + rhs[i, j];
+			}
 		}
 
 		return answer;
@@ -1420,9 +1456,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> operator -(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = -matrix.Column(i);
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = -matrix[i, j];
+			}
 		}
 
 		return answer;
@@ -1432,9 +1471,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> operator -(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = lhs.Column(i) - rhs.Column(i);
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = lhs[i, j] - rhs[i, j];
+			}
 		}
 
 		return answer;
@@ -1444,9 +1486,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> operator *(const Matrix<T, RowSize, ColumnSize>& matrix, const T multiplier) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = matrix.Column(i) * multiplier;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = matrix[i, j] * multiplier;
+			}
 		}
 
 		return answer;
@@ -1456,9 +1501,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> operator *(const Matrix<T, RowSize, ColumnSize>& matrix, const U multiplier) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = matrix.Column(i) * multiplier;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = static_cast<T>(matrix[i, j] * multiplier);
+			}
 		}
 
 		return answer;
@@ -1498,9 +1546,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> operator /(const Matrix<T, RowSize, ColumnSize>& matrix, const T divisor) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = matrix.Column(i) / divisor;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = matrix[i, j] / divisor;
+			}
 		}
 
 		return answer;
@@ -1510,9 +1561,12 @@ namespace PonyEngine::Math
 	constexpr Matrix<T, RowSize, ColumnSize> operator /(const Matrix<T, RowSize, ColumnSize>& matrix, const U divisor) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
-		for (std::size_t i = 0uz; i < ColumnSize; ++i)
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
 		{
-			answer.Column(i) = matrix.Column(i) / divisor;
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = static_cast<T>(matrix[i, j] / divisor);
+			}
 		}
 
 		return answer;
