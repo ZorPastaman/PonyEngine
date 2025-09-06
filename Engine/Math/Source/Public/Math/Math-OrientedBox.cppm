@@ -457,7 +457,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr Vector<T, Size> OrientedBox<T, Size>::ClosestPoint(const Vector<T, Size>& point) const noexcept
 	{
-		const Vector<T, Size> delta = Clamp(TransformInverse(axes, point - center), -extents, extents);
+		const Vector<T, Size> delta = Clamp(TransformTranspose(axes, point - center), -extents, extents);
 
 		return center + axes * delta;
 	}

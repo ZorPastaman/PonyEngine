@@ -721,8 +721,8 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	std::pair<std::optional<T>, std::optional<T>> IntersectionTimes(const Ray<T, Size>& ray, const OrientedBox<T, Size>& box, const RayBounds<T>& rayBounds) noexcept requires (Size >= 1)
 	{
-		const Vector<T, Size> rayOrigin = TransformInverse(box.Axes(), ray.Origin() - box.Center());
-		const Vector<T, Size> rayDirection = TransformInverse(box.Axes(), ray.Direction());
+		const Vector<T, Size> rayOrigin = TransformTranspose(box.Axes(), ray.Origin() - box.Center());
+		const Vector<T, Size> rayDirection = TransformTranspose(box.Axes(), ray.Direction());
 		const auto newRay = Ray<T, Size>(rayOrigin, rayDirection);
 		const auto newBox = Box<T, Size>(box.Extents());
 
@@ -970,7 +970,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	bool AreIntersecting(const Flat<T, Size>& flat, const OrientedBox<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		return std::abs(flat.Distance(box.Center())) <= Dot(box.Extents(), Abs(TransformInverse(box.Axes(), flat.Normal())));
+		return std::abs(flat.Distance(box.Center())) <= Dot(box.Extents(), Abs(TransformTranspose(box.Axes(), flat.Normal())));
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -1001,7 +1001,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr bool AreIntersecting(const Ball<T, Size>& ball, const OrientedBox<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		const Vector<T, Size> delta = TransformInverse(box.Axes(), ball.Center() - box.Center());
+		const Vector<T, Size> delta = TransformTranspose(box.Axes(), ball.Center() - box.Center());
 		const Vector<T, Size> point = Clamp(delta, -box.Extents(), box.Extents());
 		return (delta - point).MagnitudeSquared() <= ball.Radius() * ball.Radius();
 	}
@@ -1091,7 +1091,7 @@ namespace PonyEngine::Math
 		const Matrix<T, Size, Size> rotation = MultiplyTranspose(lhs.Axes(), rhs.Axes());
 		const Matrix<T, Size, Size> rotationAbs = Abs(rotation);
 		const Vector<T, Size> delta = rhs.Center() - lhs.Center();
-		const Vector<T, Size> rotatedDelta = TransformInverse(lhs.Axes(), delta);
+		const Vector<T, Size> rotatedDelta = TransformTranspose(lhs.Axes(), delta);
 
 		const Vector<T, Size> rightProjections = rotationAbs * rhs.Extents();
 		for (std::size_t i = 0; i < Size; ++i)

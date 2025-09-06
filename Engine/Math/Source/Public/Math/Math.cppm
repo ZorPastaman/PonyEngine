@@ -15,6 +15,7 @@ export import :Box;
 export import :Color;
 export import :Common;
 export import :Flat;
+export import :Insides;
 export import :Intersections;
 export import :Matrix;
 export import :OrientedBox;

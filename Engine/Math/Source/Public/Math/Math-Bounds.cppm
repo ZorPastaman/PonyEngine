@@ -194,13 +194,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr Box<T, Size> AxisAlignedBoundingBox(const OrientedBox<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		Vector<T, Size> extents = Vector<T, Size>::Zero();
-		for (std::size_t i = 0uz; i < Size; ++i)
-		{
-			extents += Abs(box.Axis(i)) * box.Extent(i);
-		}
-
-		return Box<T, Size>(box.Center(), extents);
+		return Box<T, Size>(box.Center(), Abs(box.Axes()) * box.Extents());
 	}
 
 	template<std::floating_point T, std::size_t Size>

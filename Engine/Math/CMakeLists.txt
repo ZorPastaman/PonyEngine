@@ -12,6 +12,7 @@ target_sources(PonyEngine.Math PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Color.cppm"
 	"Source/Public/Math/Math-Common.cppm"
 	"Source/Public/Math/Math-Flat.cppm"
+	"Source/Public/Math/Math-Insides.cppm"
 	"Source/Public/Math/Math-InternalUtility.cppm"
 	"Source/Public/Math/Math-Intersections.cppm"
 	"Source/Public/Math/Math-Matrix.cppm"

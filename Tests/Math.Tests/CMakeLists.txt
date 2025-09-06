@@ -4,9 +4,11 @@ add_executable(PonyEngine.Math.Tests)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/Ball.cpp"
+	"Math/BallInsides.cpp"
 	"Math/BallIntersections.cpp"
 	"Math/Bounds.cpp"
 	"Math/Box.cpp"
+	"Math/BoxInsides.cpp"
 	"Math/BoxIntersections.cpp"
 	"Math/Color.cpp"
 	"Math/Common.cpp"
@@ -14,6 +16,7 @@ target_sources(PonyEngine.Math.Tests PRIVATE
 	"Math/FlatIntersections.cpp"
 	"Math/Matrix.cpp"
 	"Math/OrientedBox.cpp"
+	"Math/OrientedBoxInsides.cpp"
 	"Math/OrientedBoxIntersections.cpp"
 	"Math/Quaternion.cpp"
 	"Math/Ray.cpp"

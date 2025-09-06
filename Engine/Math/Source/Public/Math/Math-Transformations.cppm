@@ -671,14 +671,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size + 1> CreateHomogeneous(const Vector<T, Size>& vector, T homogeneousComponent) noexcept;
 
-	/// @brief Transforms the @p vector with the inverse of the @p rotationMatrix.
+	/// @brief Transforms the @p vector with the transpose of the @p rotationMatrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
-	/// @param rotationMatrix Rotation matrix. Must be pure rotation matrix.
+	/// @param rotationMatrix Rotation matrix.
 	/// @param vector Vector.
 	/// @return Transformed vector.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Vector<T, Size> TransformInverse(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept;
+	constexpr Vector<T, Size> TransformTranspose(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept;
 }
 
 namespace PonyEngine::Math
@@ -1596,7 +1596,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Vector<T, Size> TransformInverse(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept
+	constexpr Vector<T, Size> TransformTranspose(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& vector) noexcept
 	{
 		Vector<T, Size> answer;
 		for (std::size_t i = 0; i < Size; ++i)
