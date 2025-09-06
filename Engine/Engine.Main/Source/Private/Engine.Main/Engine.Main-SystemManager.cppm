@@ -78,9 +78,9 @@ namespace PonyEngine::Engine
 		std::ranges::sort(systemFactories, [](const ISystemFactory* const lhs, const ISystemFactory* const rhs) noexcept { return lhs->InitOrder() < rhs->InitOrder(); });
 		if constexpr (IsInMask(Log::LogType::Warning, PONY_LOG_MASK))
 		{
-			for (std::size_t i = 0z; i < systemFactories.size(); ++i)
+			for (std::size_t i = 0uz; i < systemFactories.size(); ++i)
 			{
-				for (std::size_t j = i + 1z; j < systemFactories.size() && systemFactories[i]->InitOrder() == systemFactories[j]->InitOrder(); ++j)
+				for (std::size_t j = i + 1uz; j < systemFactories.size() && systemFactories[i]->InitOrder() == systemFactories[j]->InitOrder(); ++j)
 				{
 					PONY_LOG(this->engine->Logger(), Log::LogType::Warning, "'{}' and '{}' systems have the same init order. It may cause unpredictable results.", 
 						typeid(*systemFactories[i]).name(), typeid(*systemFactories[j]).name());
@@ -88,7 +88,7 @@ namespace PonyEngine::Engine
 			}
 		}
 
-		std::size_t begunSystemCount = 0z;
+		std::size_t begunSystemCount = 0uz;
 		try
 		{
 			Initialize(systemFactories);
@@ -215,9 +215,9 @@ namespace PonyEngine::Engine
 		tickableSystems.reserve(systemData.size());
 		if constexpr (IsInMask(Log::LogType::Warning, PONY_LOG_MASK))
 		{
-			for (std::size_t i = 0z; i < systemData.size(); ++i)
+			for (std::size_t i = 0uz; i < systemData.size(); ++i)
 			{
-				for (std::size_t j = i + 1z; j < systemData.size() && systemData[i].second == systemData[j].second; ++j)
+				for (std::size_t j = i + 1uz; j < systemData.size() && systemData[i].second == systemData[j].second; ++j)
 				{
 					PONY_LOG(this->engine->Logger(), Log::LogType::Warning, "'{}' and '{}' systems have the same tick order. It may cause unpredictable results.",
 						typeid(*std::get<std::shared_ptr<ITickableSystem>>(systemData[i].first.system)).name(), typeid(*std::get<std::shared_ptr<ITickableSystem>>(systemData[j].first.system)).name());
@@ -235,7 +235,7 @@ namespace PonyEngine::Engine
 	void SystemManager::Finalize() noexcept
 	{
 		PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing engine systems...");
-		for (std::size_t i = systems.size(); i-- > 0z; )
+		for (std::size_t i = systems.size(); i-- > 0uz; )
 		{
 			std::shared_ptr<ISystem>& system = systems[i];
 			PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing '{}' system.", typeid(*system).name());
@@ -274,7 +274,7 @@ namespace PonyEngine::Engine
 	void SystemManager::End(const std::size_t count) noexcept
 	{
 		PONY_LOG(engine->Logger(), Log::LogType::Info, "Ending engine systems...");
-		for (std::size_t i = count; i-- > 0z; )
+		for (std::size_t i = count; i-- > 0uz; )
 		{
 			const std::shared_ptr<ISystem>& system = systems[i];
 			try

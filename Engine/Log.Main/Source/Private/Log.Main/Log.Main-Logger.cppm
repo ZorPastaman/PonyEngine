@@ -109,9 +109,9 @@ namespace PonyEngine::Log
 		std::ranges::sort(subLoggerFactories, [](const ISubLoggerFactory* const lhs, const ISubLoggerFactory* const rhs) noexcept { return lhs->Order() < rhs->Order(); });
 		if constexpr (IsInMask(LogType::Warning, PONY_LOG_MASK))
 		{
-			for (std::size_t i = 0z; i < subLoggers.size(); ++i)
+			for (std::size_t i = 0uz; i < subLoggers.size(); ++i)
 			{
-				for (std::size_t j = i + 1z; j < subLoggers.size() && subLoggerFactories[i]->Order() == subLoggerFactories[j]->Order(); ++j)
+				for (std::size_t j = i + 1uz; j < subLoggers.size() && subLoggerFactories[i]->Order() == subLoggerFactories[j]->Order(); ++j)
 				{
 					PONY_LOG(this->application->Logger(), LogType::Warning, "'{}' and '{}' sub-loggers have the same order. It may cause unpredictable results.", 
 						typeid(*subLoggerFactories[i]).name(), typeid(*subLoggerFactories[j]).name());
@@ -210,7 +210,7 @@ namespace PonyEngine::Log
 	void Logger::Finalize() noexcept
 	{
 		PONY_LOG(this->application->Logger(), LogType::Info, "Releasing sub-loggers...");
-		for (std::size_t i = subLoggers.size(); i-- > 0z; )
+		for (std::size_t i = subLoggers.size(); i-- > 0uz; )
 		{
 			std::shared_ptr<ISubLogger>& subLogger = subLoggers[i];
 			PONY_LOG(this->application->Logger(), LogType::Info, "Releasing '{}' sub-logger.", typeid(*subLogger).name());
@@ -249,7 +249,7 @@ namespace PonyEngine::Log
 	void Logger::End(const std::size_t count) noexcept
 	{
 		PONY_LOG(application->Logger(), LogType::Info, "Ending sub-loggers...");
-		for (std::size_t i = count; i-- > 0z; )
+		for (std::size_t i = count; i-- > 0uz; )
 		{
 			const std::shared_ptr<ISubLogger>& subLogger = subLoggers[i];
 			try
