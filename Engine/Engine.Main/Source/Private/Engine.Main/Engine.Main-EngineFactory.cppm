@@ -16,7 +16,6 @@ export module PonyEngine.Engine.Main:EngineFactory;
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Core;
 import PonyEngine.Engine.Extension;
 import PonyEngine.Log;
 
@@ -25,37 +24,37 @@ import :Engine;
 export namespace PonyEngine::Engine
 {
 	/// @brief Engine factory.
-	class EngineFactory final : public Core::IEngineFactory
+	class EngineFactory final : public Application::IServiceFactory
 	{
 	public:
 		/// @brief Creates an engine factory.
 		/// @param context Module context.
 		[[nodiscard("Pure constructor")]]
-		explicit EngineFactory(Core::IModuleContext& context) noexcept;
+		explicit EngineFactory(Application::IModuleContext& context) noexcept;
 		EngineFactory(const EngineFactory&) = delete;
 		EngineFactory(EngineFactory&&) = delete;
 
 		~EngineFactory() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Core::IEngine> Create() override;
+		virtual Application::ServiceData Create(Application::IApplicationContext& application) override;
 
 		EngineFactory& operator =(const EngineFactory&) = delete;
 		EngineFactory& operator =(EngineFactory&&) = delete;
 
 	private:
-		Core::IModuleContext* context; ///< Module context.
+		Application::IModuleContext* context; ///< Module context.
 	};
 }
 
 namespace PonyEngine::Engine
 {
-	EngineFactory::EngineFactory(Core::IModuleContext& context) noexcept :
+	EngineFactory::EngineFactory(Application::IModuleContext& context) noexcept :
 		context{&context}
 	{
 	}
 
-	std::shared_ptr<Core::IEngine> EngineFactory::Create()
+	Application::ServiceData EngineFactory::Create(Application::IApplicationContext& application)
 	{
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting engine system factories.");
 		const std::size_t systemFactoryCount = context->DataCount<ISystemFactory>();
@@ -67,6 +66,12 @@ namespace PonyEngine::Engine
 		}
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing engine.");
-		return std::make_shared<Engine>(context->Application(), systemFactories);
+		const auto engine = std::make_shared<Engine>(context->Application(), systemFactories);
+
+		Application::ServiceData data;
+		data.service = std::static_pointer_cast<Application::ITickableService>(engine);
+		data.tickOrder = PONY_ENGINE_ENGINE_MAIN_TICK_ORDER;
+
+		return data;
 	}
 }

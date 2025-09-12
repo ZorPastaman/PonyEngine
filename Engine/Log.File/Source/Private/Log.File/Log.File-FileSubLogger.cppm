@@ -32,9 +32,6 @@ export namespace PonyEngine::Log
 
 		~FileSubLogger() noexcept;
 
-		virtual void Begin() override;
-		virtual void End() override;
-
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
@@ -69,14 +66,6 @@ namespace PonyEngine::Log
 				PONY_CONSOLE_E(e, "On closing log file.");
 			}
 		}
-	}
-
-	void FileSubLogger::Begin()
-	{
-	}
-
-	void FileSubLogger::End()
-	{
 	}
 
 	void FileSubLogger::Log(const LogEntry& logEntry) noexcept

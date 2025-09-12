@@ -23,5 +23,6 @@ export namespace PonyEngine::Engine
 	{
 		std::variant<std::shared_ptr<ISystem>, std::shared_ptr<ITickableSystem>> system; ///< System.
 		Utility::ObjectInterfaces publicInterfaces; ///< System public interfaces.
+		std::int32_t tickOrder = 0; ///< Tick order. It's used only the @p system is a tickable system.
 	};
 }

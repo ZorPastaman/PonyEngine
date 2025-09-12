@@ -16,17 +16,15 @@ export module PonyEngine.Engine.Main:Engine;
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Core;
 import PonyEngine.Engine.Extension;
 
 import :EngineLogger;
-import :ExitCodes;
 import :SystemManager;
 
 export namespace PonyEngine::Engine
 {
 	/// @brief Engine.
-	class Engine final : public Core::IEngine, private IEngine
+	class Engine final : public Application::ITickableService
 	{
 	public:
 		/// @brief Creates an engine.
@@ -39,17 +37,8 @@ export namespace PonyEngine::Engine
 
 		~Engine() noexcept;
 
-		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Engine::IEngine& PublicEngine() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const PonyEngine::Engine::IEngine& PublicEngine() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual bool IsRunning() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual int ExitCode() const noexcept override;
-		virtual void Stop(int exitCode = 0) noexcept override;
-
+		virtual void Begin() override;
+		virtual void End() noexcept override;
 		virtual void Tick() override;
 
 		Engine& operator =(const Engine&) = delete;
@@ -87,12 +76,6 @@ export namespace PonyEngine::Engine
 			[[nodiscard("Pure function")]]
 			virtual std::uint64_t FrameCount() const noexcept override;
 
-			[[nodiscard("Pure function")]]
-			virtual bool IsRunning() const noexcept override;
-			[[nodiscard("Pure function")]]
-			virtual int ExitCode() const noexcept override;
-			virtual void Stop(int exitCode) noexcept override;
-
 			EngineContext& operator =(const EngineContext&) = delete;
 			EngineContext& operator =(EngineContext&&) = delete;
 
@@ -101,9 +84,6 @@ export namespace PonyEngine::Engine
 		};
 
 		std::uint64_t frameCount; ///< Frame count.
-		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
-		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
-		bool isTicking; ///< @a True if the engine is ticking now; @a false otherwise.
 
 		Application::IApplicationContext* application; ///< Application.
 
@@ -118,9 +98,6 @@ namespace PonyEngine::Engine
 {
 	Engine::Engine(Application::IApplicationContext& application, const std::span<ISystemFactory*> systemFactories) :
 		frameCount{0ull},
-		exitCode{ExitCodes::InitialExitCode},
-		isRunning{true},
-		isTicking{false},
 		application{&application},
 		engineContext(*this)
 	{
@@ -140,68 +117,23 @@ namespace PonyEngine::Engine
 		logger.reset();
 	}
 
-	PonyEngine::Engine::IEngine& Engine::PublicEngine() noexcept
+	void Engine::Begin()
 	{
-		return *this;
+		PONY_LOG(*logger, Log::LogType::Info, "Beginning system manager.");
+		systemManager->Begin();
 	}
 
-	const PonyEngine::Engine::IEngine& Engine::PublicEngine() const noexcept
+	void Engine::End() noexcept
 	{
-		return *this;
-	}
-
-	bool Engine::IsRunning() const noexcept
-	{
-		return isRunning;
-	}
-
-	int Engine::ExitCode() const noexcept
-	{
-		return exitCode;
-	}
-
-	void Engine::Stop(const int exitCode) noexcept
-	{
-		if (isRunning)
-		{
-			this->exitCode = exitCode;
-			isRunning = false;
-			PONY_LOG(*logger, Log::LogType::Info, "Engine is stopped. Exit code: '{}'.", exitCode);
-		}
-		else
-		{
-			PONY_LOG(*logger, Log::LogType::Verbose, "Engine is stopped when it's not running. Ignoring.");
-		}
+		PONY_LOG(*logger, Log::LogType::Info, "Ending system manager.");
+		systemManager->End();
 	}
 
 	void Engine::Tick()
 	{
-		if (!isRunning) [[unlikely]]
-		{
-			throw std::logic_error("Engine is ticked when it's already been stopped.");
-		}
+		PONY_LOG(*logger, Log::LogType::Verbose, "Ticking system manager.");
+		systemManager->Tick();
 
-		if (isTicking) [[unlikely]]
-		{
-			throw std::logic_error("Engine is ticked inside another tick.");
-		}
-
-		isTicking = true;
-
-		PONY_LOG(*logger, Log::LogType::Verbose, "Ticking systems.");
-		try
-		{
-			systemManager->Tick();
-		}
-		catch (...)
-		{
-			Stop(ExitCodes::TickException);
-			isTicking = false;
-
-			throw;
-		}
-
-		isTicking = false;
 		++frameCount;
 	}
 
@@ -243,20 +175,5 @@ namespace PonyEngine::Engine
 	std::uint64_t Engine::EngineContext::FrameCount() const noexcept
 	{
 		return engine->frameCount;
-	}
-
-	bool Engine::EngineContext::IsRunning() const noexcept
-	{
-		return engine->isRunning;
-	}
-
-	int Engine::EngineContext::ExitCode() const noexcept
-	{
-		return engine->exitCode;
-	}
-
-	void Engine::EngineContext::Stop(const int exitCode) noexcept
-	{
-		engine->Stop(exitCode);
 	}
 }

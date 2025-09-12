@@ -24,11 +24,6 @@ export namespace PonyEngine::Log
 	{
 		INTERFACE_BODY(ISubLogger)
 
-		/// @brief Begins logging.
-		virtual void Begin() = 0;
-		/// @brief Ends logging.
-		virtual void End() = 0;
-
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.
 		virtual void Log(const LogEntry& logEntry) noexcept = 0;

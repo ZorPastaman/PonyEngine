@@ -4,8 +4,9 @@ message(VERBOSE "Validating settings")
 if(NOT PONY_ENGINE_LOG_FILE_ORDER)
 	message(FATAL_ERROR "PONY_ENGINE_LOG_FILE is set but PONY_ENGINE_LOG_FILE_ORDER isn't")
 endif()
-if(NOT PONY_ENGINE_LOG_FILE_ORDER MATCHES "^-?[0-9]+$")
-	message(FATAL_ERROR "PONY_ENGINE_LOG_FILE_ORDER isn't a number")
+string(SUBSTRING "${PONY_ENGINE_LOG_FILE_ORDER}" 0 1 ORDER_FIRST_CHAR)
+if(NOT ORDER_FIRST_CHAR MATCHES "^[b-y]$")
+	message(FATAL_ERROR "PONY_ENGINE_LOG_FILE_ORDER is incorrect. Its first letter must be inside b-y range")
 endif()
 
 if(NOT PONY_ENGINE_LOG_FILE_PATH)
@@ -33,7 +34,7 @@ add_library(PonyEngine.Log.File STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Log.File PUBLIC
-	"Include/Public"
+	"Include/Public/Common"
 )
 
 message(VERBOSE "Configuring sources")
@@ -51,8 +52,9 @@ target_sources(PonyEngine.Log.File PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Log.File PRIVATE PONY_ENGINE_LOG_FILE_ORDER=${PONY_ENGINE_LOG_FILE_ORDER})
-target_compile_definitions(PonyEngine.Log.File PRIVATE PONY_ENGINE_LOG_FILE_PATH=${PONY_ENGINE_LOG_FILE_PATH})
+target_compile_definitions(PonyEngine.Log.File PUBLIC
+	PONY_ENGINE_LOG_FILE_ORDER=${PONY_ENGINE_LOG_FILE_ORDER} PONY_ENGINE_LOG_FILE_PATH=${PONY_ENGINE_LOG_FILE_PATH}
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.File PROPERTIES 
@@ -64,4 +66,5 @@ message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.File PUBLIC
 	PonyEngine.Core
 	PonyEngine.Log.Extension
+	PonyEngine.Path
 )

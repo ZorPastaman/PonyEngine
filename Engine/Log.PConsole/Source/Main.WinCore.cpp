@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Core/Module.h"
+#include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/WinCore/PlatformConsoleModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::WinCore::GetPlatformConsoleModule, PonyEngineWinCorePlatformConsoleSubLogger);
+PONY_MODULE(PonyEngine::Log::WinCore::GetPlatformConsoleModule, PonyEngineWinCorePlatformConsoleSubLogger, PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER);

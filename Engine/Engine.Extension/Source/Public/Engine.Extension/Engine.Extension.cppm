@@ -9,8 +9,6 @@
 
 export module PonyEngine.Engine.Extension;
 
-export import PonyEngine.Engine;
-
 export import :IEngineContext;
 export import :ISystem;
 export import :ISystemFactory;

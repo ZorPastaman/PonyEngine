@@ -15,7 +15,7 @@ export module PonyEngine.Log.Console:ConsoleSubLoggerFactory;
 
 import std;
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 import PonyEngine.Log.Extension;
 
 import :ConsoleSubLogger;
@@ -29,41 +29,33 @@ export namespace PonyEngine::Log
 		/// @brief Creates a console sub-logger factory.
 		/// @param context Module context.
 		[[nodiscard("Pure constructor")]]
-		explicit ConsoleSubLoggerFactory(Core::IModuleContext& context) noexcept;
+		explicit ConsoleSubLoggerFactory(Application::IModuleContext& context) noexcept;
 		ConsoleSubLoggerFactory(const ConsoleSubLoggerFactory&) = delete;
 		ConsoleSubLoggerFactory(ConsoleSubLoggerFactory&&) = delete;
 
 		~ConsoleSubLoggerFactory() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<ISubLogger> CreateSubLogger(ILoggerContext& logger) override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::int32_t Order() const noexcept override;
+		virtual SubLoggerData CreateSubLogger(ILoggerContext& logger) override;
 
 		ConsoleSubLoggerFactory& operator =(const ConsoleSubLoggerFactory&) = delete;
 		ConsoleSubLoggerFactory& operator =(ConsoleSubLoggerFactory&&) = delete;
 
 	private:
-		Core::IModuleContext* context; ///< Module context.
+		Application::IModuleContext* context; ///< Module context.
 	};
 }
 
 namespace PonyEngine::Log
 {
-	ConsoleSubLoggerFactory::ConsoleSubLoggerFactory(Core::IModuleContext& context) noexcept :
+	ConsoleSubLoggerFactory::ConsoleSubLoggerFactory(Application::IModuleContext& context) noexcept :
 		context{&context}
 	{
 	}
 
-	std::shared_ptr<ISubLogger> ConsoleSubLoggerFactory::CreateSubLogger(ILoggerContext&)
+	SubLoggerData ConsoleSubLoggerFactory::CreateSubLogger(ILoggerContext&)
 	{
 		PONY_LOG(context->Logger(), LogType::Debug, "Constructing console sub-logger.");
-		return std::make_shared<ConsoleSubLogger>();
-	}
-
-	std::int32_t ConsoleSubLoggerFactory::Order() const noexcept
-	{
-		return PONY_ENGINE_LOG_CONSOLE_ORDER;
+		return SubLoggerData{.subLogger = std::make_shared<ConsoleSubLogger>()};
 	}
 }

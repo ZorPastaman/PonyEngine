@@ -13,10 +13,9 @@ module;
 
 export module PonyEngine.Application:IApplicationContext;
 
-import PonyEngine.Engine;
 import PonyEngine.Log;
 
-import :ApplicationPaths;
+import :IServiceManager;
 
 export namespace PonyEngine::Application
 {
@@ -34,18 +33,28 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 
-		/// @brief Gets the engine.
-		/// @return Engine. It's not nullptr between ENGINE_CHECKPOINT on startup and ENGINE_CHECKPOINT on shutdown.
+		/// @brief Gets the service manager.
+		/// @return Service manager.
 		[[nodiscard("Pure function")]]
-		virtual Engine::IEngine* Engine() noexcept = 0;
-		/// @brief Gets the engine.
-		/// @return Engine. It's not nullptr between ENGINE_CHECKPOINT on startup and ENGINE_CHECKPOINT on shutdown.
+		virtual IServiceManager& ServiceManager() noexcept = 0;
+		/// @brief Gets the service manager.
+		/// @return Service manager.
 		[[nodiscard("Pure function")]]
-		virtual const Engine::IEngine* Engine() const noexcept = 0;
+		virtual const IServiceManager& ServiceManager() const noexcept = 0;
 
-		/// @brief Gets the application paths.
-		/// @return Application paths.
+		/// @brief Did the application receive an exit code?
+		/// @remark Exit code can be gotten via @p ExitCode().
+		/// @return @a False if the application received an exit code; @a true otherwise;
 		[[nodiscard("Pure function")]]
-		virtual const ApplicationPaths& Paths() const noexcept = 0;
+		virtual bool IsRunning() const noexcept = 0;
+		/// @brief Gets the exit code.
+		/// @note Mustn't be called if @p IsRunning() returns @a true.
+		/// @return Exit code.
+		[[nodiscard("Pure function")]]
+		virtual int ExitCode() const noexcept = 0;
+		/// @brief Stops the application with the @p exitCode.
+		/// @remark If the application is already stopped, the invocation of this function is ignored.
+		/// @param exitCode Exit code.
+		virtual void Stop(int exitCode = 0) noexcept = 0;
 	};
 }

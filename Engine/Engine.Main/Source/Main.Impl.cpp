@@ -9,14 +9,14 @@
 
 #include "PonyEngine/Engine/EngineModule.h"
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 import PonyEngine.Engine.Main;
 
 namespace PonyEngine::Engine
 {
 	EngineModule EngineModule; ///< Engine module.
 
-	Core::IModule* GetEngineModule()
+	Application::IModule* GetEngineModule()
 	{
 		return &EngineModule;
 	}

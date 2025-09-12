@@ -13,8 +13,6 @@ module;
 
 export module PonyEngine.Engine.Extension:ISystem;
 
-import PonyEngine.Engine;
-
 import :IEngineContext;
 
 export namespace PonyEngine::Engine

@@ -16,11 +16,6 @@ import PonyEngine.Application.Main.Windows;
 import PonyEngine.Log;
 import PonyEngine.Utility;
 
-/// @brief Creates an application.
-/// @return Application.
-[[nodiscard("Pure function")]]
-std::unique_ptr<PonyEngine::Application::App> CreateApp();
-
 int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 {
 	int exitCode = PonyEngine::Application::ExitCodes::Success;
@@ -34,24 +29,31 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 
 		try
 		{
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creating application...");
-			std::unique_ptr<PonyEngine::Application::App> app = CreateApp();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creating application done.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application...");
+			auto app = std::make_unique<PonyEngine::Application::App>();
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application done.");
+
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing loop.");
+			bool shouldExit = false;
+			auto loop = std::make_unique<PonyEngine::Application::Loop<2>>(
+				std::function<void()>([&]()
+				{
+					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Ticking application.");
+					shouldExit = app->Tick(exitCode);
+				}),
+				std::function<void()>([&]()
+				{
+					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Checking for quit message.");
+					shouldExit = PonyEngine::Application::Windows::CheckForQuit(exitCode);
+				})
+			);
 
 			try
 			{
 				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop start.");
-				bool shouldExit = false;
 				while (!shouldExit)
 				{
-					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Ticking application.");
-					shouldExit = app->Tick(exitCode);
-
-					if (!shouldExit) [[likely]]
-					{
-						PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Checking for quit message.");
-						shouldExit = PonyEngine::Application::Windows::CheckForQuit(exitCode);
-					}
+					loop->Next();
 				}
 				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop finish. Exit code: '{}'.", exitCode);
 			}
@@ -70,6 +72,8 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 				exitCode = PonyEngine::Application::ExitCodes::TickException;
 			}
 
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Releasing loop.");
+			loop.reset();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Releasing application.");
 			app.reset();
 		}
@@ -108,13 +112,4 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 	}
 
 	return exitCode;
-}
-
-std::unique_ptr<PonyEngine::Application::App> CreateApp()
-{
-	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Getting platform paths.");
-	const PonyEngine::Application::PlatformPaths paths = PonyEngine::Application::Windows::GetPlatformPaths();
-
-	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application.");
-	return std::make_unique<PonyEngine::Application::App>(paths);
 }

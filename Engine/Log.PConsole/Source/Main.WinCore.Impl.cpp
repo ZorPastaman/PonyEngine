@@ -9,14 +9,14 @@
 
 #include "PonyEngine/Log/WinCore/PlatformConsoleModule.h"
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 import PonyEngine.Log.PlatformConsole.WinCore;
 
 namespace PonyEngine::Log::WinCore
 {
 	PlatformConsoleSubLoggerModule PlatformConsoleModule; ///< WinCore platform console sub-logger module.
 
-	Core::IModule* GetPlatformConsoleModule()
+	Application::IModule* GetPlatformConsoleModule()
 	{
 		return &PlatformConsoleModule;
 	}

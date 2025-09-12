@@ -10,6 +10,7 @@ target_sources(PonyEngine.Log.Extension PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Log.Extension/Log.Extension-ISubLogger.cppm"
 	"Source/Public/Log.Extension/Log.Extension-ISubLoggerFactory.cppm"
 	"Source/Public/Log.Extension/Log.Extension-LogEntry.cppm"
+	"Source/Public/Log.Extension/Log.Extension-SubLoggerData.cppm"
 )
 
 message(VERBOSE "Setting properties")

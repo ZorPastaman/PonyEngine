@@ -18,13 +18,12 @@ export module PonyEngine.Log.Main:Logger;
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Core;
 import PonyEngine.Log.Extension;
 
 export namespace PonyEngine::Log
 {
 	/// @brief Logger.
-	class Logger final : public Core::ILogger, private ILogger
+	class Logger final : public Application::IService, private ILogger
 	{
 	public:
 		/// @brief Creates a logger.
@@ -37,13 +36,20 @@ export namespace PonyEngine::Log
 
 		~Logger() noexcept;
 
+		virtual void Begin() override;
+		virtual void End() override;
+
 		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
 		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept override;
 
+		/// @brief Gets the public logger interface.
+		/// @return Logger interface.
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& PublicLogger() noexcept override;
+		ILogger& PublicLogger() noexcept;
+		/// @brief Gets the public logger interface.
+		/// @return Logger interface.
 		[[nodiscard("Pure function")]]
-		virtual const Log::ILogger& PublicLogger() const noexcept override;
+		const ILogger& PublicLogger() const noexcept;
 
 		Logger& operator =(const Logger&) = delete;
 		Logger& operator =(Logger&&) = delete;
@@ -80,13 +86,6 @@ export namespace PonyEngine::Log
 		/// @brief Finalizes the logger.
 		void Finalize() noexcept;
 
-		/// @brief Begins the sub-loggers.
-		/// @param count How many sub-loggers are begun.
-		void Begin(std::size_t& count);
-		/// @brief Ends the sub-loggers.
-		/// @param count How many sub-loggers to end.
-		void End(std::size_t count) noexcept;
-
 		/// @brief Logs the entry.
 		/// @param logEntry Log entry to log.
 		void Log(const LogEntry& logEntry) const noexcept;
@@ -105,29 +104,12 @@ namespace PonyEngine::Log
 		application{&application},
 		loggerContext(*this)
 	{
-		PONY_LOG(this->application->Logger(), LogType::Debug, "Sorting sub-logger factories.");
-		std::ranges::sort(subLoggerFactories, [](const ISubLoggerFactory* const lhs, const ISubLoggerFactory* const rhs) noexcept { return lhs->Order() < rhs->Order(); });
-		if constexpr (IsInMask(LogType::Warning, PONY_LOG_MASK))
-		{
-			for (std::size_t i = 0uz; i < subLoggers.size(); ++i)
-			{
-				for (std::size_t j = i + 1uz; j < subLoggers.size() && subLoggerFactories[i]->Order() == subLoggerFactories[j]->Order(); ++j)
-				{
-					PONY_LOG(this->application->Logger(), LogType::Warning, "'{}' and '{}' sub-loggers have the same order. It may cause unpredictable results.", 
-						typeid(*subLoggerFactories[i]).name(), typeid(*subLoggerFactories[j]).name());
-				}
-			}
-		}
-
-		std::size_t subLoggerCount = 0;
 		try
 		{
 			Initialize(subLoggerFactories);
-			Begin(subLoggerCount);
 		}
 		catch (...)
 		{
-			End(subLoggerCount);
 			Finalize();
 
 			throw;
@@ -136,8 +118,15 @@ namespace PonyEngine::Log
 
 	Logger::~Logger() noexcept
 	{
-		End(subLoggers.size());
 		Finalize();
+	}
+
+	void Logger::Begin()
+	{
+	}
+
+	void Logger::End()
+	{
 	}
 
 	void Logger::Log(const LogType logType, const LogInput& logInput) const noexcept
@@ -152,12 +141,12 @@ namespace PonyEngine::Log
 		Log(logEntry);
 	}
 
-	Log::ILogger& Logger::PublicLogger() noexcept
+	ILogger& Logger::PublicLogger() noexcept
 	{
 		return *this;
 	}
 
-	const Log::ILogger& Logger::PublicLogger() const noexcept
+	const ILogger& Logger::PublicLogger() const noexcept
 	{
 		return *this;
 	}
@@ -186,10 +175,10 @@ namespace PonyEngine::Log
 			try
 			{
 				PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-logger... Factory: '{}'.", typeid(*factory).name());
-				std::shared_ptr<ISubLogger> subLogger = factory->CreateSubLogger(loggerContext);
-				assert(subLogger && "The created sub-logger is nullptr!");
-				PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-logger done. Sub-logger: '{}'.", typeid(*subLogger).name());
-				subLoggers.push_back(std::move(subLogger));
+				SubLoggerData subLogger = factory->CreateSubLogger(loggerContext);
+				assert(subLogger.subLogger && "The created sub-logger is nullptr!");
+				PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-logger done. Sub-logger: '{}'.", typeid(*subLogger.subLogger).name());
+				subLoggers.push_back(std::move(subLogger.subLogger));
 			}
 			catch (const std::exception& e)
 			{
@@ -217,56 +206,6 @@ namespace PonyEngine::Log
 			subLogger.reset();
 		}
 		PONY_LOG(this->application->Logger(), LogType::Info, "Releasing sub-loggers done.");
-	}
-
-	void Logger::Begin(std::size_t& count)
-	{
-		PONY_LOG(application->Logger(), LogType::Info, "Beginning sub-loggers...");
-		for (const std::shared_ptr<ISubLogger>& subLogger : subLoggers)
-		{
-			try
-			{
-				PONY_LOG(application->Logger(), LogType::Info, "Beginning '{}' sub-logger.", typeid(*subLogger).name());
-				subLogger->Begin();
-				++count;
-			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On beginning '{}' sub-logger.", typeid(*subLogger).name());
-
-				throw;
-			}
-			catch (...)
-			{
-				PONY_LOG(application->Logger(), LogType::Exception, "Unknown exception on beginning '{}' sub-logger.", typeid(*subLogger).name());
-
-				throw;
-			}
-		}
-		PONY_LOG(application->Logger(), LogType::Info, "Beginning sub-loggers done.");
-	}
-
-	void Logger::End(const std::size_t count) noexcept
-	{
-		PONY_LOG(application->Logger(), LogType::Info, "Ending sub-loggers...");
-		for (std::size_t i = count; i-- > 0uz; )
-		{
-			const std::shared_ptr<ISubLogger>& subLogger = subLoggers[i];
-			try
-			{
-				PONY_LOG(application->Logger(), LogType::Info, "Ending '{}' sub-logger.", typeid(*subLogger).name());
-				subLogger->End();
-			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On ending '{}' sub-logger.", typeid(*subLogger).name());
-			}
-			catch (...)
-			{
-				PONY_LOG(application->Logger(), LogType::Exception, "Unknown exception on ending '{}' sub-logger.", typeid(*subLogger).name());
-			}
-		}
-		PONY_LOG(application->Logger(), LogType::Info, "Ending sub-loggers done.");
 	}
 
 	void Logger::Log(const LogEntry& logEntry) const noexcept

@@ -15,10 +15,8 @@ export module PonyEngine.Log.Extension:ISubLoggerFactory;
 
 import std;
 
-import PonyEngine.Core;
-
 import :ILoggerContext;
-import :ISubLogger;
+import :SubLoggerData;
 
 export namespace PonyEngine::Log
 {
@@ -28,14 +26,8 @@ export namespace PonyEngine::Log
 
 		/// @brief Creates a sub-logger.
 		/// @param logger Logger context.
-		/// @return Created sub-logger.
+		/// @return Created sub-logger data.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<ISubLogger> CreateSubLogger(ILoggerContext& logger) = 0;
-
-		/// @brief Gets the sub-logger order.
-		/// @note The order must remain the same for the whole engine lifetime.
-		/// @return Sub-logger order.
-		[[nodiscard("Pure function")]]
-		virtual std::int32_t Order() const noexcept = 0;
+		virtual SubLoggerData CreateSubLogger(ILoggerContext& logger) = 0;
 	};
 }

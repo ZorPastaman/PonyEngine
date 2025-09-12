@@ -41,6 +41,10 @@ export namespace PonyEngine::Engine
 		[[nodiscard("Pure function")]]
 		virtual const void* FindSystem(const std::type_info& typeInfo) const noexcept override;
 
+		/// @brief Begins the systems.
+		void Begin();
+		/// @brief Ends the systems.
+		void End() noexcept;
 		/// @brief Ticks the systems.
 		void Tick();
 
@@ -66,6 +70,7 @@ export namespace PonyEngine::Engine
 		std::vector<std::shared_ptr<ISystem>> systems; ///< Systems.
 		std::vector<ITickableSystem*> tickableSystems; ///< Tickable systems.
 		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
+		std::unordered_map<ISystem*, std::vector<std::type_index>> systemInterfacesMap; ///< System to interfaces map.
 	};
 }
 
@@ -74,38 +79,19 @@ namespace PonyEngine::Engine
 	SystemManager::SystemManager(IEngineContext& engine, const std::span<ISystemFactory*> systemFactories) :
 		engine{&engine}
 	{
-		PONY_LOG(this->engine->Logger(), Log::LogType::Debug, "Sorting engine system factories.");
-		std::ranges::sort(systemFactories, [](const ISystemFactory* const lhs, const ISystemFactory* const rhs) noexcept { return lhs->InitOrder() < rhs->InitOrder(); });
-		if constexpr (IsInMask(Log::LogType::Warning, PONY_LOG_MASK))
-		{
-			for (std::size_t i = 0uz; i < systemFactories.size(); ++i)
-			{
-				for (std::size_t j = i + 1uz; j < systemFactories.size() && systemFactories[i]->InitOrder() == systemFactories[j]->InitOrder(); ++j)
-				{
-					PONY_LOG(this->engine->Logger(), Log::LogType::Warning, "'{}' and '{}' systems have the same init order. It may cause unpredictable results.", 
-						typeid(*systemFactories[i]).name(), typeid(*systemFactories[j]).name());
-				}
-			}
-		}
-
-		std::size_t begunSystemCount = 0uz;
 		try
 		{
 			Initialize(systemFactories);
-			Begin(begunSystemCount);
 		}
 		catch (...)
 		{
-			End(begunSystemCount);
 			Finalize();
-
 			throw;
 		}
 	}
 
 	SystemManager::~SystemManager() noexcept
 	{
-		End(systems.size());
 		Finalize();
 	}
 
@@ -127,6 +113,25 @@ namespace PonyEngine::Engine
 		}
 
 		return nullptr;
+	}
+
+	void SystemManager::Begin()
+	{
+		std::size_t begunSystemCount = 0uz;
+		try
+		{
+			Begin(begunSystemCount);
+		}
+		catch (...)
+		{
+			End(begunSystemCount);
+			throw;
+		}
+	}
+
+	void SystemManager::End() noexcept
+	{
+		End(systems.size());
 	}
 
 	void SystemManager::Tick()
@@ -157,31 +162,46 @@ namespace PonyEngine::Engine
 	void SystemManager::Initialize(const std::span<ISystemFactory*> systemFactories)
 	{
 		PONY_LOG(engine->Logger(), Log::LogType::Info, "Creating engine systems...");
-		std::vector<std::pair<SystemData, std::int32_t>> systemData;
-		systemData.reserve(systemFactories.size());
+
+		std::vector<std::pair<ITickableSystem*, std::int32_t>> tickableSystemsRaw;
+		tickableSystemsRaw.reserve(systemFactories.size());
 		systems.reserve(systemFactories.size());
-		std::size_t interfaceCount = 0;
+
 		for (ISystemFactory* const factory : systemFactories)
 		{
 			try
 			{
 				PONY_LOG(engine->Logger(), Log::LogType::Info, "Creating engine system... Factory: '{}'.", typeid(*factory).name());
-				SystemData system = factory->Create(*engine);
-				std::visit([&]<typename SystemPtr>(const SystemPtr& systemPtr) noexcept
+
+				SystemData systemData = factory->Create(*engine);
+				std::shared_ptr<ISystem> system = nullptr;
+				switch (systemData.system.index())
 				{
-					if constexpr (std::is_same_v<std::shared_ptr<ISystem>, SystemPtr> || std::is_same_v<std::shared_ptr<ITickableSystem>, SystemPtr>)
-					{
-						assert(systemPtr && "The created system is nullptr!");
-						systems.push_back(systemPtr);
-						PONY_LOG(engine->Logger(), Log::LogType::Info, "Creating engine system done. System: '{}'.", typeid(*systemPtr).name());
-					}
-					else
-					{
-						static_assert(false, "Unsupported engine system type!");
-					}
-				}, system.system);
-				interfaceCount += system.publicInterfaces.Count();
-				systemData.emplace_back(std::move(system), factory->TickOrder());
+				case 0:
+					system = std::get<0>(systemData.system);
+					break;
+				case 1:
+					system = std::get<1>(systemData.system);
+					tickableSystemsRaw.emplace_back(std::get<1>(systemData.system).get(), systemData.tickOrder);
+					break;
+				default:
+					assert(false && "Unexpected variant index.");
+					break;
+				}
+				assert(system && "The system is nullptr.");
+				systems.push_back(system);
+
+				PONY_LOG(engine->Logger(), Log::LogType::Debug, "Adding system interfaces.");
+				std::vector<std::type_index>& interfaces = systemInterfacesMap[system.get()];
+				for (const auto& [type, interface] : systemData.publicInterfaces.Span())
+				{
+					PONY_LOG(engine->Logger(), Log::LogType::Debug, "Interface: '{}'.", type.get().name());
+					assert(!systemInterfaces.contains(type.get()) && "The interface has already been added.");
+					systemInterfaces[type.get()] = interface;
+					interfaces.push_back(type.get());
+				}
+
+				PONY_LOG(engine->Logger(), Log::LogType::Info, "Creating engine system done. System: '{}'.", typeid(*system).name());
 			}
 			catch (const std::exception& e)
 			{
@@ -194,42 +214,24 @@ namespace PonyEngine::Engine
 				throw;
 			}
 		}
-		PONY_LOG(engine->Logger(), Log::LogType::Info, "Creating engine systems done.");
 
-		PONY_LOG(engine->Logger(), Log::LogType::Debug, "Getting interfaces.");
-		systemInterfaces.reserve(interfaceCount);
-		for (std::size_t i = 0; i < systemData.size(); ++i)
-		{
-			PONY_LOG(engine->Logger(), Log::LogType::Debug, "System: '{}'.", typeid(*systems[i]).name());
-			for (const auto& [type, interface] : systemData[i].first.publicInterfaces.Span())
-			{
-				PONY_LOG(engine->Logger(), Log::LogType::Debug, "Interface: '{}'.", type.get().name());
-				assert(!systemInterfaces.contains(type.get()) && "The interface has already been added.");
-				systemInterfaces[type.get()] = interface;
-			}
-		}
-
-		PONY_LOG(engine->Logger(), Log::LogType::Debug, "Caching tickable systems.");
-		std::erase_if(systemData, [](const auto& p) { return !std::get_if<std::shared_ptr<ITickableSystem>>(&p.first.system); });
-		std::ranges::sort(systemData, [](const auto& lhs, const auto& rhs) noexcept { return lhs.second < rhs.second; });
-		tickableSystems.reserve(systemData.size());
+		std::ranges::sort(tickableSystemsRaw, [](const std::pair<ITickableSystem*, std::int32_t>& lhs, const std::pair<ITickableSystem*, std::int32_t>& rhs) noexcept { return lhs.second < rhs.second; });
 		if constexpr (IsInMask(Log::LogType::Warning, PONY_LOG_MASK))
 		{
-			for (std::size_t i = 0uz; i < systemData.size(); ++i)
+			for (std::size_t i = 1uz; i < tickableSystemsRaw.size(); ++i)
 			{
-				for (std::size_t j = i + 1uz; j < systemData.size() && systemData[i].second == systemData[j].second; ++j)
-				{
-					PONY_LOG(this->engine->Logger(), Log::LogType::Warning, "'{}' and '{}' systems have the same tick order. It may cause unpredictable results.",
-						typeid(*std::get<std::shared_ptr<ITickableSystem>>(systemData[i].first.system)).name(), typeid(*std::get<std::shared_ptr<ITickableSystem>>(systemData[j].first.system)).name());
-				}
+				PONY_LOG_IF(tickableSystemsRaw[i - 1uz].second == tickableSystemsRaw[i].second, this->engine->Logger(), Log::LogType::Warning, 
+					"'{}' and '{}' systems have the same tick order. It may cause unpredictable results.", typeid(*tickableSystemsRaw[i - 1uz].first).name(), typeid(*tickableSystemsRaw[i].first).name());
 			}
 		}
-		for (SystemData& system : std::views::keys(systemData))
+		tickableSystems.reserve(tickableSystemsRaw.size());
+		for (ITickableSystem* const system : std::views::keys(tickableSystemsRaw))
 		{
-			const auto tickableSystem = std::get<std::shared_ptr<ITickableSystem>>(system.system);
-			PONY_LOG(engine->Logger(), Log::LogType::Debug, typeid(*tickableSystem).name());
-			tickableSystems.push_back(tickableSystem.get());
+			PONY_LOG(engine->Logger(), Log::LogType::Debug, typeid(*system).name());
+			tickableSystems.push_back(system);
 		}
+
+		PONY_LOG(engine->Logger(), Log::LogType::Info, "Creating engine systems done.");
 	}
 
 	void SystemManager::Finalize() noexcept
@@ -239,6 +241,12 @@ namespace PonyEngine::Engine
 		{
 			std::shared_ptr<ISystem>& system = systems[i];
 			PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing '{}' system.", typeid(*system).name());
+
+			for (const std::type_index type : systemInterfacesMap[system.get()])
+			{
+				systemInterfaces.erase(type);
+			}
+
 			system.reset();
 		}
 		PONY_LOG(engine->Logger(), Log::LogType::Debug, "Releasing engine systems done.");

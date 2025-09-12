@@ -15,3 +15,4 @@ export import :ILoggerContext;
 export import :ISubLogger;
 export import :ISubLoggerFactory;
 export import :LogEntry;
+export import :SubLoggerData;

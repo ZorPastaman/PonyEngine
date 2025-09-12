@@ -15,7 +15,7 @@ export module PonyEngine.Log.Console:ConsoleSubLoggerModule;
 
 import std;
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :ConsoleSubLoggerFactory;
@@ -23,7 +23,7 @@ import :ConsoleSubLoggerFactory;
 export namespace PonyEngine::Log
 {
 	/// @brief Console sub-logger module.
-	class ConsoleSubLoggerModule final : public Core::IModule
+	class ConsoleSubLoggerModule final : public Application::IModule
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -33,11 +33,8 @@ export namespace PonyEngine::Log
 
 		~ConsoleSubLoggerModule() noexcept = default;
 
-		virtual void StartUp(Core::IModuleContext& context) override;
-		virtual void ShutDown(const Core::IModuleContext& context) override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual void StartUp(Application::IModuleContext& context) override;
+		virtual void ShutDown(const Application::IModuleContext& context) override;
 
 		ConsoleSubLoggerModule& operator =(const ConsoleSubLoggerModule&) = delete;
 		ConsoleSubLoggerModule& operator =(ConsoleSubLoggerModule&&) = delete;
@@ -46,18 +43,13 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	void ConsoleSubLoggerModule::StartUp(Core::IModuleContext& context)
+	void ConsoleSubLoggerModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(ConsoleSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
 		context.AddData<ISubLoggerFactory>(std::make_shared<ConsoleSubLoggerFactory>(context));
 	}
 
-	void ConsoleSubLoggerModule::ShutDown(const Core::IModuleContext&)
+	void ConsoleSubLoggerModule::ShutDown(const Application::IModuleContext&)
 	{
-	}
-
-	std::string_view ConsoleSubLoggerModule::Name() const noexcept
-	{
-		return "PonyEngineConsoleSubLogger";
 	}
 }

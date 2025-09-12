@@ -15,13 +15,12 @@ export module PonyEngine.Application.Main:DefaultLogger;
 
 import std;
 
-import PonyEngine.Core;
 import PonyEngine.Log;
 
 export namespace PonyEngine::Application
 {
 	/// @brief Console logger.
-	class DefaultLogger final : public Core::ILogger, private Log::ILogger
+	class DefaultLogger final : public Log::ILogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -33,11 +32,6 @@ export namespace PonyEngine::Application
 
 		virtual void Log(Log::LogType logType, const Log::LogInput& logInput) const noexcept override;
 		virtual void Log(const std::exception& exception, const Log::LogInput& logInput) const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& PublicLogger() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const Log::ILogger& PublicLogger() const noexcept override;
 
 		DefaultLogger& operator =(const DefaultLogger&) = delete;
 		DefaultLogger& operator =(DefaultLogger&&) = delete;
@@ -71,15 +65,5 @@ namespace PonyEngine::Application
 			};
 			Log::LogToConsole(exception, logData, logInput.message);
 		}
-	}
-
-	Log::ILogger& DefaultLogger::PublicLogger() noexcept
-	{
-		return *this;
-	}
-
-	const Log::ILogger& DefaultLogger::PublicLogger() const noexcept
-	{
-		return *this;
 	}
 }

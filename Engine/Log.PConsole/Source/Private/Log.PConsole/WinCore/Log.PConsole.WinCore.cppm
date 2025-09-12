@@ -9,6 +9,6 @@
 
 export module PonyEngine.Log.PlatformConsole.WinCore;
 
-export import PonyEngine.Log;
+export import PonyEngine.Log.PlatformConsole;
 
 export import :PlatformConsoleSubLoggerModule;

@@ -8,8 +8,9 @@ endif()
 if(NOT PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER)
 	message(FATAL_ERROR "PONY_ENGINE_LOG_PLATFORM_CONSOLE is set but PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER isn't")
 endif()
-if(NOT PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER MATCHES "^-?[0-9]+$")
-	message(FATAL_ERROR "PONY_ENGINE_LOG_PLATFORM_CONSOLE isn't a number")
+string(SUBSTRING "${PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER}" 0 1 ORDER_FIRST_CHAR)
+if(NOT ORDER_FIRST_CHAR MATCHES "^[b-y]$")
+	message(FATAL_ERROR "PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER is incorrect. Its first letter must be inside b-y range")
 endif()
 
 if(NOT TARGET PonyEngine.Log.Extension)
@@ -19,14 +20,17 @@ endif()
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Log.PlatformConsole STATIC)
 
-if(PONY_WINCORE)
-	message(VERBOSE "Configuring headers for WinCore")
-	target_include_directories(PonyEngine.Log.PlatformConsole  PUBLIC
-		"Include/Public/WinCore"
-	)
-endif()
+message(VERBOSE "Configuring sources")
+target_sources(PonyEngine.Log.PlatformConsole PRIVATE FILE_SET CXX_MODULES FILES 
+	"Source/Private/Log.PConsole/Log.PConsole.cppm"
+)
 
 if(PONY_WINCORE)
+	message(VERBOSE "Configuring headers for WinCore")
+	target_include_directories(PonyEngine.Log.PlatformConsole PUBLIC
+		"Include/Public/WinCore"
+	)
+
 	message(VERBOSE "Configuring sources for WinCore")
 	target_sources(PonyEngine.Log.PlatformConsole PUBLIC
 		"Source/Main.WinCore.cpp"
@@ -43,7 +47,7 @@ if(PONY_WINCORE)
 endif()
 
 message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Log.PlatformConsole PRIVATE PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER=${PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER})
+target_compile_definitions(PonyEngine.Log.PlatformConsole PUBLIC PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER=${PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER})
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.PlatformConsole PROPERTIES 

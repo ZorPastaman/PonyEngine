@@ -9,14 +9,14 @@
 
 #include "PonyEngine/Log/FileModule.h"
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 import PonyEngine.Log.File;
 
 namespace PonyEngine::Log
 {
 	FileSubLoggerModule FileModule; ///< File sub-logger module.
 
-	Core::IModule* GetFileModule()
+	Application::IModule* GetFileModule()
 	{
 		return &FileModule;
 	}

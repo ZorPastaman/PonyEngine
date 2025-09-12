@@ -30,9 +30,6 @@ export namespace PonyEngine::Log
 
 		~ConsoleSubLogger() noexcept = default;
 
-		virtual void Begin() override;
-		virtual void End() override;
-
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
@@ -42,14 +39,6 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	void ConsoleSubLogger::Begin()
-	{
-	}
-
-	void ConsoleSubLogger::End()
-	{
-	}
-
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		try

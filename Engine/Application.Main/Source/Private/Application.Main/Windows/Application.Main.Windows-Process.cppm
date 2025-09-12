@@ -28,7 +28,7 @@ namespace PonyEngine::Application::Windows
 {
 	void SetProcessPriority(const DWORD priority)
 	{
-		if (!SetPriorityClass(GetCurrentProcess(), priority))
+		if (!SetPriorityClass(GetCurrentProcess(), priority)) [[unlikely]]
 		{
 			throw std::runtime_error(Utility::SafeFormat("Failed to set process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError()));
 		}

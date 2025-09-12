@@ -1,0 +1,140 @@
+﻿cmake_minimum_required(VERSION 3.31)
+
+# Set environment
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "0e5b6991-d74f-4b3d-a41c-cf096e0b2508")
+set(CMAKE_CXX_MODULE_STD ON)
+include(FetchContent)
+
+# Set game project.
+project(${PONY_PROJECT_NAME} VERSION ${PONY_PROJECT_VERSION} LANGUAGES CXX)
+pony_clean_build_options()
+
+set(PONY_ENGINE_APPLICATION_MAIN TRUE)
+
+# Add PonyEngine project.
+message(STATUS "Fetching PonyEngine")
+FetchContent_Declare(
+  PonyEngine
+  GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine
+  GIT_TAG develop
+)
+FetchContent_MakeAvailable(PonyEngine)
+
+# Group modules
+set(PONY_BASE_MODULES "")
+set(PONY_LOG_MODULES "")
+set(PONY_ENGINE_MODULES "")
+set(PONY_GAME_MODULES "")
+
+# Set PonyEngine options.
+pony_set_log_defines(PonyEngine.Core ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_build_options(PonyEngine.Core ${PONY_ENGINE_OPTIMIZATION})
+if(TARGET PonyEngine.Math)
+	pony_set_log_defines(PonyEngine.Math ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Math ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.Path)
+	pony_set_log_defines(PonyEngine.Path ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Path ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.Path.Main)
+	pony_set_log_defines(PonyEngine.Path.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Path.Main ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_BASE_MODULES PonyEngine.Path.Main)
+endif()
+if(TARGET PonyEngine.Log.Extension)
+	pony_set_log_defines(PonyEngine.Log.Extension ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Log.Extension ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.Log.Main)
+	pony_set_log_defines(PonyEngine.Log.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Log.Main ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_LOG_MODULES PonyEngine.Log.Main)
+endif()
+if(TARGET PonyEngine.Log.Console)
+	pony_set_log_defines(PonyEngine.Log.Console ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Log.Console ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_LOG_MODULES PonyEngine.Log.Console)
+endif()
+if(TARGET PonyEngine.Log.PlatformConsole)
+	pony_set_log_defines(PonyEngine.Log.PlatformConsole ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Log.PlatformConsole ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_LOG_MODULES PonyEngine.Log.PlatformConsole)
+endif()
+if(TARGET PonyEngine.Log.File)
+	pony_set_log_defines(PonyEngine.Log.File ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Log.File ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_LOG_MODULES PonyEngine.Log.File)
+endif()
+if(TARGET PonyEngine.Engine.Extension)
+	pony_set_log_defines(PonyEngine.Engine.Extension ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Engine.Extension ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.Engine.Main)
+	pony_set_log_defines(PonyEngine.Engine.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyEngine.Engine.Main ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_ENGINE_MODULES PonyEngine.Engine.Main)
+endif()
+pony_set_log_defines(PonyEngine.Application.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_build_options(PonyEngine.Application.Main ${PONY_ENGINE_OPTIMIZATION})
+
+# Add game modules.
+add_subdirectory("GameSample")
+# Set Game options.
+pony_set_log_defines(GameSample ${PONY_GAME_LOG_LEVEL} ${PONY_GAME_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_build_options(GameSample ${PONY_GAME_OPTIMIZATION})
+list(APPEND PONY_GAME_MODULES GameSample)
+
+# Create groups, link to the application and make install list.
+set(PONY_INSTALL_TARGETS "")
+if(PONY_MAKE_GROUPS)
+	if(PONY_BASE_MODULES)
+		pony_make_module_group(PONY_BASE_MODULES PonyEngine.Base.Group "PonyEngine.Base" 23)
+		pony_set_log_defines(PonyEngine.Base.Group ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+		pony_set_build_options(PonyEngine.Base.Group ${PONY_ENGINE_OPTIMIZATION})
+		target_link_libraries(PonyEngine.Application.Main PRIVATE PonyEngine.Base.Group)
+		list(APPEND PONY_INSTALL_TARGETS PonyEngine.Base.Group)
+	endif()
+	if(PONY_LOG_MODULES)
+		pony_make_module_group(PONY_LOG_MODULES PonyEngine.Log.Group "PonyEngine.Log" 23)
+		pony_set_log_defines(PonyEngine.Log.Group ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+		pony_set_build_options(PonyEngine.Log.Group ${PONY_ENGINE_OPTIMIZATION})
+		target_link_libraries(PonyEngine.Application.Main PRIVATE PonyEngine.Log.Group)
+		list(APPEND PONY_INSTALL_TARGETS PonyEngine.Log.Group)
+	endif()
+
+	if(PONY_ENGINE_MODULES)
+		pony_make_module_group(PONY_ENGINE_MODULES PonyEngine.Engine.Group "PonyEngine.Engine" 23)
+		pony_set_log_defines(PonyEngine.Engine.Group ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+		pony_set_build_options(PonyEngine.Engine.Group ${PONY_ENGINE_OPTIMIZATION})
+		target_link_libraries(PonyEngine.Application.Main PRIVATE PonyEngine.Engine.Group)
+		list(APPEND PONY_INSTALL_TARGETS PonyEngine.Engine.Group)
+	endif()
+
+	pony_make_module_group(PONY_GAME_MODULES PonyGame.Group "PonyGame" 23)
+	pony_set_log_defines(PonyGame.Group ${PONY_GAME_LOG_LEVEL} ${PONY_GAME_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+	pony_set_build_options(PonyGame.Group ${PONY_GAME_OPTIMIZATION})
+	target_link_libraries(PonyEngine.Application.Main PRIVATE PonyGame.Group)
+	list(APPEND PONY_INSTALL_TARGETS PonyGame.Group)
+else()
+	if(PONY_BASE_MODULES)
+		target_link_libraries(PonyEngine.Application.Main PRIVATE ${PONY_BASE_MODULES})
+	endif()
+	if(PONY_LOG_MODULES)
+		target_link_libraries(PonyEngine.Application.Main PRIVATE ${PONY_LOG_MODULES})
+	endif()
+	if(PONY_ENGINE_MODULES)
+		target_link_libraries(PonyEngine.Application.Main PRIVATE ${PONY_ENGINE_MODULES})
+	endif()
+	target_link_libraries(PonyEngine.Application.Main PRIVATE ${PONY_GAME_MODULES})
+endif()
+list(APPEND PONY_INSTALL_TARGETS PonyEngine.Application.Main)
+
+# Install targets.
+message(STATUS "Install list: ${PONY_INSTALL_TARGETS}")
+install(TARGETS ${PONY_INSTALL_TARGETS}
+	RUNTIME DESTINATION .
+	LIBRARY DESTINATION
+)

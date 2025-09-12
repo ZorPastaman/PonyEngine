@@ -1,0 +1,162 @@
+﻿{
+	"version": 9,
+	"configurePresets": [
+		{
+			"name": "Base",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/Output/Build/${presetName}",
+			"installDir": "${sourceDir}/Output/Install/${presetName}",
+			"cacheVariables": {
+				"PONY_COMPANY_NAME": "PonyGameCompany",
+				"PONY_PROJECT_NAME": "PonyEngineGameSample",
+				"PONY_PROJECT_VERSION": "1.0.0.0",
+				"PONY_CONSOLE_LOG": "TRUE",
+				"PONY_ENGINE_MATH": "TRUE",
+				"PONY_ENGINE_PATH": "TRUE",
+				"PONY_ENGINE_PATH_MAIN": "TRUE",
+				"PONY_ENGINE_LOG_EXTENSION": "TRUE",
+				"PONY_ENGINE_LOG_MAIN": "TRUE",
+				"PONY_ENGINE_LOG_CONSOLE": "TRUE",
+				"PONY_ENGINE_LOG_FILE": "TRUE",
+				"PONY_ENGINE_ENGINE_EXTENSION": "TRUE",
+				"PONY_ENGINE_ENGINE_MAIN": "TRUE",
+				"PONY_ENGINE_APPLICATION_MAIN": "TRUE",
+				"PONY_ENGINE_PATH_ROOT_PATH": "",
+				"PONY_ENGINE_PATH_LOG_PATH": "Logs/",
+				"PONY_ENGINE_LOG_FILE_PATH": "Log.log",
+				"PONY_ENGINE_PATH_MAIN_ORDER": "bz",
+				"PONY_ENGINE_LOG_CONSOLE_ORDER": "da",
+				"PONY_ENGINE_LOG_FILE_ORDER": "dh",
+				"PONY_ENGINE_LOG_MAIN_ORDER": "dz",
+				"PONY_ENGINE_ENGINE_MAIN_ORDER": "tz",
+				"PONY_ENGINE_ENGINE_MAIN_TICK_ORDER": "0"
+			}
+		},
+		{
+			"name": "Debug",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_GAME_OPTIMIZATION": "Debug",
+				"PONY_ENGINE_OPTIMIZATION": "Debug",
+				"PONY_GAME_LOG_LEVEL": "Debug",
+				"PONY_ENGINE_LOG_LEVEL": "Debug",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Error",
+				"PONY_MAKE_GROUPS": "TRUE"
+			}
+		},
+		{
+			"name": "Development",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_GAME_OPTIMIZATION": "Debug",
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_GAME_LOG_LEVEL": "Debug",
+				"PONY_ENGINE_LOG_LEVEL": "Info",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_MAKE_GROUPS": "TRUE"
+			}
+		},
+		{
+			"name": "Release",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
+				"PONY_GAME_OPTIMIZATION": "Release",
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_GAME_LOG_LEVEL": "Info",
+				"PONY_ENGINE_LOG_LEVEL": "Warning",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception"
+			}
+		},
+		{
+			"name": "Shipping",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"PONY_GAME_OPTIMIZATION": "Release",
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_GAME_LOG_LEVEL": "Error",
+				"PONY_ENGINE_LOG_LEVEL": "Error",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception"
+			}
+		},
+		{
+			"name": "WinCore",
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
+				"PONY_ENGINE_LOG_PLATFORM_CONSOLE": "TRUE",
+				"PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER": "db"
+			}
+		},
+		{
+			"name": "Windows",
+			"inherits": "WinCore",
+			"hidden": true,
+			"toolchainFile": "CMake/Toolchains/Windows.cmake",
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"toolset": {
+				"value": "v143",
+				"strategy": "external"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "Windows-Debug",
+			"inherits": [ "Debug", "Windows" ],
+			"cacheVariables": {
+				"PONY_ENGINE_CREATE_CONSOLE": "TRUE"
+			}
+		},
+		{
+			"name": "Windows-Development",
+			"inherits": [ "Development", "Windows" ],
+			"cacheVariables": {
+				"PONY_ENGINE_CREATE_CONSOLE": "TRUE"
+			}
+		},
+		{
+			"name": "Windows-Release",
+			"inherits": [ "Release", "Windows" ]
+		},
+		{
+			"name": "Windows-Shipping",
+			"inherits": [ "Shipping", "Windows" ]
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "Windows-Debug",
+			"configurePreset": "Windows-Debug"
+		},
+		{
+			"name": "Windows-Development",
+			"configurePreset": "Windows-Development"
+		},
+		{
+			"name": "Windows-Release",
+			"configurePreset": "Windows-Release"
+		},
+		{
+			"name": "Windows-Shipping",
+			"configurePreset": "Windows-Shipping"
+		}
+	]
+}
