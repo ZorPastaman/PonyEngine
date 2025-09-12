@@ -15,7 +15,7 @@ export module PonyEngine.Log.PlatformConsole.WinCore:PlatformConsoleSubLoggerMod
 
 import std;
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :PlatformConsoleSubLoggerFactory;
@@ -23,7 +23,7 @@ import :PlatformConsoleSubLoggerFactory;
 export namespace PonyEngine::Log::WinCore
 {
 	/// @brief WinCore platform console sub-logger module.
-	class PlatformConsoleSubLoggerModule final : public Core::IModule
+	class PlatformConsoleSubLoggerModule final : public Application::IModule
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -33,11 +33,8 @@ export namespace PonyEngine::Log::WinCore
 
 		~PlatformConsoleSubLoggerModule() noexcept = default;
 
-		virtual void StartUp(Core::IModuleContext& context) override;
-		virtual void ShutDown(const Core::IModuleContext& context) override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual void StartUp(Application::IModuleContext& context) override;
+		virtual void ShutDown(const Application::IModuleContext& context) override;
 
 		PlatformConsoleSubLoggerModule& operator =(const PlatformConsoleSubLoggerModule&) = delete;
 		PlatformConsoleSubLoggerModule& operator =(PlatformConsoleSubLoggerModule&&) = delete;
@@ -46,18 +43,13 @@ export namespace PonyEngine::Log::WinCore
 
 namespace PonyEngine::Log::WinCore
 {
-	void PlatformConsoleSubLoggerModule::StartUp(Core::IModuleContext& context)
+	void PlatformConsoleSubLoggerModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(PlatformConsoleSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
 		context.AddData<ISubLoggerFactory>(std::make_shared<PlatformConsoleSubLoggerFactory>(context));
 	}
 
-	void PlatformConsoleSubLoggerModule::ShutDown(const Core::IModuleContext&)
+	void PlatformConsoleSubLoggerModule::ShutDown(const Application::IModuleContext&)
 	{
-	}
-
-	std::string_view PlatformConsoleSubLoggerModule::Name() const noexcept
-	{
-		return "PonyEngineWinCorePlatformConsoleSubLogger";
 	}
 }

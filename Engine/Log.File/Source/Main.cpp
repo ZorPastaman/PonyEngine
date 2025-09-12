@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Core/Module.h"
+#include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/FileModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::GetFileModule, PonyEngineFileSubLogger);
+PONY_MODULE(PonyEngine::Log::GetFileModule, PonyEngineFileSubLogger, PONY_ENGINE_LOG_FILE_ORDER);

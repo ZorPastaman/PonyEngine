@@ -7,16 +7,6 @@ if(PONY_ENGINE_CREATE_CONSOLE)
 	endif()
 endif()
 
-if(NOT PONY_COMPANY_NAME)
-	message(FATAL_ERROR "PONY_COMPANY_NAME isn't set")
-endif()
-if(NOT PONY_PROJECT_NAME)
-	message(FATAL_ERROR "PONY_PROJECT_NAME isn't set")
-endif()
-if(NOT PONY_PROJECT_VERSION)
-	message(FATAL_ERROR "PONY_PROJECT_VERSION isn't set")
-endif()
-
 message(VERBOSE "Configuring target")
 if(PONY_WINDOWS)
 	add_executable(PonyEngine.Application.Main WIN32)
@@ -30,22 +20,15 @@ target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application.Main/Application.Main-App.cppm"
 	"Source/Private/Application.Main/Application.Main-DefaultLogger.cppm"
 	"Source/Private/Application.Main/Application.Main-ExitCodes.cppm"
-	"Source/Private/Application.Main/Application.Main-PlatformPaths.cppm"
+	"Source/Private/Application.Main/Application.Main-Loop.cppm"
+	"Source/Private/Application.Main/Application.Main-ServiceManager.cppm"
 )
-
-if(PONY_WINCORE)
-	message(VERBOSE "Configuring sources for WinCore")
-	target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
-		"Source/Private/Application.Main/WinCore/Application.Main.WinCore.cppm"
-	)
-endif()
 
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Application.Main/Windows/Application.Main.Windows.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-Console.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-Paths.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-Process.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-QuitChecker.cppm"
 	)
@@ -61,6 +44,9 @@ endif()
 message(VERBOSE "Configuring defines")
 if(PONY_ENGINE_CREATE_CONSOLE)
 	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_ENGINE_CREATE_CONSOLE)
+endif()
+if(PONY_ENGINE_DEFAULT_LOGGER)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_ENGINE_DEFAULT_LOGGER)
 endif()
 target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_COMPANY_NAME=${PONY_COMPANY_NAME} PONY_PROJECT_NAME=${PONY_PROJECT_NAME})
 

@@ -9,14 +9,14 @@
 
 #include "PonyEngine/Log/ConsoleModule.h"
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 import PonyEngine.Log.Console;
 
 namespace PonyEngine::Log
 {
 	ConsoleSubLoggerModule ConsoleModule; ///< Console sub-logger module.
 
-	Core::IModule* GetConsoleModule()
+	Application::IModule* GetConsoleModule()
 	{
 		return &ConsoleModule;
 	}

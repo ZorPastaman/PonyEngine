@@ -18,7 +18,6 @@ export module PonyEngine.Log.Main:LoggerFactory;
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Core;
 import PonyEngine.Log.Extension;
 
 import :Logger;
@@ -26,35 +25,37 @@ import :Logger;
 export namespace PonyEngine::Log
 {
 	/// @brief Logger factory.
-	class LoggerFactory final : public Core::ILoggerFactory
+	class LoggerFactory final : public Application::IServiceFactory
 	{
 	public:
+		/// @brief Creates a logger factory.
+		/// @param context Module context.
 		[[nodiscard("Pure constructor")]]
-		explicit LoggerFactory(Core::IModuleContext& context) noexcept;
+		explicit LoggerFactory(Application::IModuleContext& context) noexcept;
 		LoggerFactory(const LoggerFactory&) = delete;
 		LoggerFactory(LoggerFactory&&) = delete;
 
 		~LoggerFactory() noexcept = default;
 
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<Core::ILogger> Create() override;
+		[[nodiscard("Redundant call")]]
+		virtual Application::ServiceData Create(Application::IApplicationContext& application) override;
 
 		LoggerFactory& operator =(const LoggerFactory&) = delete;
 		LoggerFactory& operator =(LoggerFactory&&) = delete;
 
 	private:
-		Core::IModuleContext* context; ///< Module context.
+		Application::IModuleContext* context; ///< Module context.
 	};
 }
 
 namespace PonyEngine::Log
 {
-	LoggerFactory::LoggerFactory(Core::IModuleContext& context) noexcept :
+	LoggerFactory::LoggerFactory(Application::IModuleContext& context) noexcept :
 		context{&context}
 	{
 	}
 
-	std::shared_ptr<Core::ILogger> LoggerFactory::Create()
+	Application::ServiceData LoggerFactory::Create(Application::IApplicationContext& application)
 	{
 		PONY_LOG(context->Logger(), LogType::Info, "Getting sub-logger factories.");
 		const std::size_t subLoggerFactoryCount = context->DataCount<ISubLoggerFactory>();
@@ -66,6 +67,12 @@ namespace PonyEngine::Log
 		}
 
 		PONY_LOG(context->Logger(), LogType::Info, "Constructing logger.");
-		return std::make_shared<Logger>(context->Application(), subLoggerFactories);
+		const auto logger = std::make_shared<Logger>(context->Application(), subLoggerFactories);
+
+		Application::ServiceData data;
+		data.service = logger;
+		data.publicInterfaces.AddInterface<ILogger>(logger->PublicLogger());
+
+		return data;
 	}
 }

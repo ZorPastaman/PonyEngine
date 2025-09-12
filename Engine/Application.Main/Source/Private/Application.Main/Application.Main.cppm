@@ -9,6 +9,8 @@
 
 export module PonyEngine.Application.Main;
 
+export import PonyEngine.Application;
+
 export import :App;
 export import :ExitCodes;
-export import :PlatformPaths;
+export import :Loop;

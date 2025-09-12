@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Core/Module.h"
+#include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Engine/EngineModule.h"
 
-PONY_MODULE_ENGINE(PonyEngine::Engine::GetEngineModule, PonyEngineEngine);
+PONY_MODULE(PonyEngine::Engine::GetEngineModule, PonyEngineEngine, PONY_ENGINE_ENGINE_MAIN_ORDER);

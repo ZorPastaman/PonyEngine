@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Core/Module.h"
+#include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/ConsoleModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::GetConsoleModule, PonyEngineConsoleSubLogger);
+PONY_MODULE(PonyEngine::Log::GetConsoleModule, PonyEngineConsoleSubLogger, PONY_ENGINE_LOG_CONSOLE_ORDER);

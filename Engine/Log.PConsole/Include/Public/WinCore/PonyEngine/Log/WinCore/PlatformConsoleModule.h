@@ -11,11 +11,11 @@
 
 #include "PonyEngine/Utility/Compiler.h"
 
-import PonyEngine.Core;
+import PonyEngine.Application;
 
 namespace PonyEngine::Log::WinCore
 {
 	/// @brief Gets the WinCore platform console sub-logger module.
 	/// @return Platform console sub-logger module.
-	PONY_DLL_EXPORT Core::IModule* GetPlatformConsoleModule();
+	PONY_DLL_EXPORT Application::IModule* GetPlatformConsoleModule();
 }
