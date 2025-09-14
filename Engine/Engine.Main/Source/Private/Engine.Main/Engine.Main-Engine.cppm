@@ -69,9 +69,9 @@ export namespace PonyEngine::Engine
 			virtual const Log::ILogger& Logger() const noexcept override;
 
 			[[nodiscard("Pure function")]]
-			virtual ISystemManager& SystemManager() noexcept override;
+			virtual void* FindSystem(const std::type_info& typeInfo) noexcept override;
 			[[nodiscard("Pure function")]]
-			virtual const ISystemManager& SystemManager() const noexcept override;
+			virtual const void* FindSystem(const std::type_info& typeInfo) const noexcept override;
 
 			[[nodiscard("Pure function")]]
 			virtual std::uint64_t FrameCount() const noexcept override;
@@ -162,14 +162,14 @@ namespace PonyEngine::Engine
 		return *engine->logger;
 	}
 
-	ISystemManager& Engine::EngineContext::SystemManager() noexcept
+	void* Engine::EngineContext::FindSystem(const std::type_info& typeInfo) noexcept
 	{
-		return *engine->systemManager;
+		return engine->systemManager->FindSystem(typeInfo);
 	}
 
-	const ISystemManager& Engine::EngineContext::SystemManager() const noexcept
+	const void* Engine::EngineContext::FindSystem(const std::type_info& typeInfo) const noexcept
 	{
-		return *engine->systemManager;
+		return engine->systemManager->FindSystem(typeInfo);
 	}
 
 	std::uint64_t Engine::EngineContext::FrameCount() const noexcept

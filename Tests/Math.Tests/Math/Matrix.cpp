@@ -2052,6 +2052,28 @@ TEST_CASE("Matrix normalize columns", "[Math][Matrix]")
 #endif
 }
 
+TEST_CASE("Matrix round to integral", "[Math][Matrix]")
+{
+	constexpr float x = 5.4f;
+	constexpr float y = 30.9f;
+	constexpr float z = -2.6f;
+	constexpr float w = -6.2f;
+
+	constexpr auto matrix = PonyEngine::Math::Matrix2x2<float>(x, y, z, w);
+	constexpr auto intMatrix = PonyEngine::Math::RoundToIntegral<std::int32_t>(matrix);
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(x) == intMatrix[0, 0]);
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(y) == intMatrix[1, 0]);
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(z) == intMatrix[0, 1]);
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(w) == intMatrix[1, 1]);
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::RoundToIntegral<std::int32_t>(PonyEngine::Math::Matrix4x4<float>(5.1f, -5.9f, -10.1f, 8.8f, -2.5f, 21.0f, -78.6f, 71.2f, 0.9f, -0.2f, 64.f, 22.5f, 9.8f, -8.6f, -5.1f, 6.6f));
+	};
+#endif
+}
+
 TEST_CASE("Matrix are almost equal", "[Math][Matrix]")
 {
 	auto test = []<std::floating_point T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr

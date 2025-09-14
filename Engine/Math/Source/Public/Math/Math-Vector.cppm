@@ -513,6 +513,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point U = double, std::integral T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Lerp(const Vector<T, Size>& from, const Vector<T, Size>& to, U time) noexcept requires (Size >= 1uz);
 
+	/// @brief Rounds the floating point vector to an integral vector component-wise and returns it as an integral value.
+	/// @tparam From Input type.
+	/// @tparam To Output type.
+	/// @param from Input value.
+	/// @return Rounded integral.
+	template<std::integral To, std::floating_point From, std::size_t Size> [[nodiscard("Pure function")]]
+	constexpr Vector<To, Size> RoundToIntegral(const Vector<From, Size>& from) noexcept requires (Size >= 1uz);
+
 	/// @brief Checks if the two vectors are almost equal with the tolerance value.
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
@@ -1267,6 +1275,18 @@ namespace PonyEngine::Math
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
 			answer[i] = static_cast<T>(from[i] + (to[i] >= from[i] ? (to[i] - from[i]) * time : (from[i] - to[i]) * -time));
+		}
+
+		return answer;
+	}
+
+	template<std::integral To, std::floating_point From, std::size_t Size>
+	constexpr Vector<To, Size> RoundToIntegral(const Vector<From, Size>& from) noexcept requires (Size >= 1uz)
+	{
+		Vector<To, Size> answer;
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			answer[i] = RoundToIntegral<To>(from[i]);
 		}
 
 		return answer;

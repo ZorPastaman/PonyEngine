@@ -1607,6 +1607,28 @@ TEST_CASE("Vector lerp", "[Math][Vector]")
 #endif
 }
 
+TEST_CASE("Vector round to integral", "[Math][Vector]")
+{
+	constexpr float x = 5.4f;
+	constexpr float y = 30.9f;
+	constexpr float z = -2.6f;
+	constexpr float w = -6.2f;
+
+	constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+	constexpr auto intVector = PonyEngine::Math::RoundToIntegral<std::int32_t>(vector);
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(x) == intVector.X());
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(y) == intVector.Y());
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(z) == intVector.Z());
+	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<std::int32_t>(w) == intVector.W());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::RoundToIntegral<std::int32_t>(PonyEngine::Math::Vector4<float>(5.1f, -5.9f, -10.1f, 8.8f));
+	};
+#endif
+}
+
 TEST_CASE("Vector are almost equal", "[Math][Vector]")
 {
 	constexpr std::int16_t x = -5;

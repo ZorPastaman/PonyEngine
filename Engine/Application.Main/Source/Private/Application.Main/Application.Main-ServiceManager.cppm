@@ -24,7 +24,7 @@ import PonyEngine.Utility;
 export namespace PonyEngine::Application
 {
 	/// @brief Service manager.
-	class ServiceManager final : public IServiceManager
+	class ServiceManager final
 	{
 	public:
 		/// @brief Creates a service manager.
@@ -37,9 +37,9 @@ export namespace PonyEngine::Application
 		~ServiceManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual void* FindService(const std::type_info& type) noexcept override;
+		void* FindService(const std::type_info& type) noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const void* FindService(const std::type_info& type) const noexcept override;
+		const void* FindService(const std::type_info& type) const noexcept;
 
 		/// @brief Adds a service.
 		/// @param factory Service factory.

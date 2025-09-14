@@ -23,7 +23,7 @@ import PonyEngine.Log;
 export namespace PonyEngine::Engine
 {
 	/// @brief System manager.
-	class SystemManager final : public ISystemManager
+	class SystemManager final
 	{
 	public:
 		/// @brief Creates a system manager.
@@ -37,9 +37,9 @@ export namespace PonyEngine::Engine
 		~SystemManager() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual void* FindSystem(const std::type_info& typeInfo) noexcept override;
+		void* FindSystem(const std::type_info& typeInfo) noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const void* FindSystem(const std::type_info& typeInfo) const noexcept override;
+		const void* FindSystem(const std::type_info& typeInfo) const noexcept;
 
 		/// @brief Begins the systems.
 		void Begin();

@@ -13,9 +13,9 @@ module;
 
 export module PonyEngine.Application:IApplicationContext;
 
-import PonyEngine.Log;
+import std;
 
-import :IServiceManager;
+import PonyEngine.Log;
 
 export namespace PonyEngine::Application
 {
@@ -33,14 +33,26 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 
-		/// @brief Gets the service manager.
-		/// @return Service manager.
+		/// @brief Tries to find a service by its type.
+		/// @param type Service type. Must be a public service interface.
+		/// @return Pointer to the service if it's found; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		virtual IServiceManager& ServiceManager() noexcept = 0;
-		/// @brief Gets the service manager.
-		/// @return Service manager.
+		virtual void* FindService(const std::type_info& type) noexcept = 0;
+		/// @brief Tries to find a service by its type.
+		/// @tparam T Service type. Must be a public service interface.
+		/// @return Pointer to the service if it's found; nullptr if it's not found.
+		template<typename T> [[nodiscard("Pure function")]]
+		T* FindService() noexcept;
+		/// @brief Tries to find a service by its type.
+		/// @param type Service type. Must be a public service interface.
+		/// @return Pointer to the service if it's found; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		virtual const IServiceManager& ServiceManager() const noexcept = 0;
+		virtual const void* FindService(const std::type_info& type) const noexcept = 0;
+		/// @brief Tries to find a service by its type.
+		/// @tparam T Service type. Must be a public service interface.
+		/// @return Pointer to the service if it's found; nullptr if it's not found.
+		template<typename T> [[nodiscard("Pure function")]]
+		const T* FindService() const noexcept;
 
 		/// @brief Did the application receive an exit code?
 		/// @remark Exit code can be gotten via @p ExitCode().
@@ -57,4 +69,19 @@ export namespace PonyEngine::Application
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = 0) noexcept = 0;
 	};
+}
+
+namespace PonyEngine::Application
+{
+	template<typename T>
+	T* IApplicationContext::FindService() noexcept
+	{
+		return static_cast<T*>(FindService(typeid(T)));
+	}
+
+	template<typename T>
+	const T* IApplicationContext::FindService() const noexcept
+	{
+		return static_cast<const T*>(FindService(typeid(T)));
+	}
 }
