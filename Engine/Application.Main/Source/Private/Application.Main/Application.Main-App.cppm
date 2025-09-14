@@ -70,9 +70,9 @@ export namespace PonyEngine::Application
 			virtual const Log::ILogger& Logger() const noexcept override;
 
 			[[nodiscard("Pure function")]]
-			virtual IServiceManager& ServiceManager() noexcept override;
+			virtual void* FindService(const std::type_info& type) noexcept override;
 			[[nodiscard("Pure function")]]
-			virtual const IServiceManager& ServiceManager() const noexcept override;
+			virtual const void* FindService(const std::type_info& type) const noexcept override;
 
 			[[nodiscard("Pure function")]]
 			virtual bool IsRunning() const noexcept override;
@@ -302,14 +302,14 @@ namespace PonyEngine::Application
 		return *application->logger;
 	}
 
-	IServiceManager& App::AppContext::ServiceManager() noexcept
+	void* App::AppContext::FindService(const std::type_info& type) noexcept
 	{
-		return *application->serviceManager;
+		return application->serviceManager->FindService(type);
 	}
 
-	const IServiceManager& App::AppContext::ServiceManager() const noexcept
+	const void* App::AppContext::FindService(const std::type_info& type) const noexcept
 	{
-		return *application->serviceManager;
+		return application->serviceManager->FindService(type);
 	}
 
 	bool App::AppContext::IsRunning() const noexcept

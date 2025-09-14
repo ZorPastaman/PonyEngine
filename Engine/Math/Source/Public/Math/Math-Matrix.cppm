@@ -444,6 +444,13 @@ export namespace PonyEngine::Math
 	/// @return Normalized matrix.
 	template<std::floating_point T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
 	Matrix<T, RowSize, ColumnSize> NormalizeColumns(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
+	/// @brief Rounds the floating point matrix to an integral matrix component-wise and returns it as an integral value.
+	/// @tparam From Input type.
+	/// @tparam To Output type.
+	/// @param from Input value.
+	/// @return Rounded integral.
+	template<std::integral To, std::floating_point From, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
+	constexpr Matrix<To, RowSize, ColumnSize> RoundToIntegral(const Matrix<From, RowSize, ColumnSize>& from) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 
 	/// @brief Checks if the two matrices are almost equal with the tolerance value.
 	/// @tparam T Component type.
@@ -1418,6 +1425,21 @@ namespace PonyEngine::Math
 		for (std::size_t i = 0uz; i < ColumnSize; ++i)
 		{
 			answer.Column(i, matrix.Column(i).Normalized());
+		}
+
+		return answer;
+	}
+
+	template<std::integral To, std::floating_point From, std::size_t RowSize, std::size_t ColumnSize>
+	constexpr Matrix<To, RowSize, ColumnSize> RoundToIntegral(const Matrix<From, RowSize, ColumnSize>& from) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	{
+		Matrix<To, RowSize, ColumnSize> answer;
+		for (std::size_t j = 0uz; j < ColumnSize; ++j)
+		{
+			for (std::size_t i = 0uz; i < RowSize; ++i)
+			{
+				answer[i, j] = RoundToIntegral<To>(from[i, j]);
+			}
 		}
 
 		return answer;

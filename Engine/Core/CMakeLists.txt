@@ -19,7 +19,6 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Application/Application-IModuleContext.cppm"
 	"Source/Public/Application/Application-IService.cppm"
 	"Source/Public/Application/Application-IServiceFactory.cppm"
-	"Source/Public/Application/Application-IServiceManager.cppm"
 	"Source/Public/Application/Application-ITickableService.cppm"
 	"Source/Public/Application/Application-ServiceData.cppm"
 	"Source/Public/Log/Log.cppm"
