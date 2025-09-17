@@ -14,3 +14,4 @@ export import :SurfaceParams;
 export import :SurfacePositionMode;
 export import :SurfaceStyle;
 export import :Utility;
+export import :WindowRect;

@@ -19,8 +19,8 @@ import PonyEngine.Utility;
 
 export namespace PonyEngine::Platform::Windows
 {
-	/// @brief Gets this dll module.
-	/// @return Dll module.
+	/// @brief Gets this exe/dll module.
+	/// @return Exe/dll module.
 	[[nodiscard("Pure function")]]
 	HMODULE GetModule();
 }

@@ -1,0 +1,60 @@
+message(STATUS "Configuring PonyEngine.Surface.Main")
+
+message(VERBOSE "Validating settings")
+if(NOT TARGET PonyEngine.Math)
+	message(FATAL_ERROR "PonyEngine.Math wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Surface)
+	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
+endif()
+
+if(NOT PONY_ENGINE_SURFACE_MAIN_ORDER)
+	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN is set but PONY_ENGINE_SURFACE_MAIN_ORDER isn't")
+endif()
+string(SUBSTRING "${PONY_ENGINE_SURFACE_MAIN_ORDER}" 0 1 ORDER_FIRST_CHAR)
+if(NOT ORDER_FIRST_CHAR MATCHES "^[b-y]$")
+	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN_ORDER is incorrect. Its first letter must be inside b-y range")
+endif()
+if(${PONY_ENGINE_SURFACE_MAIN_TICK_ORDER} STREQUAL "")
+	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN is set but PONY_ENGINE_SURFACE_MAIN_TICK_ORDER isn't")
+endif()
+if(NOT PONY_ENGINE_SURFACE_MAIN_TICK_ORDER MATCHES "^-?[0-9]+$")
+	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN_TICK_ORDER isn't a number")
+endif()
+
+message(VERBOSE "Configuring target")
+add_library(PonyEngine.Surface.Main STATIC)
+
+message(VERBOSE "Configuring sources")
+target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES 
+	"Source/Private/Surface.Main/Surface.Main.cppm"
+	"Source/Private/Surface.Main/Surface.Main-Utility.cppm"
+)
+
+message(VERBOSE "Configuring defines")
+target_compile_definitions(PonyEngine.Surface.Main PUBLIC
+	PONY_ENGINE_SURFACE_MAIN_ORDER=${PONY_ENGINE_SURFACE_MAIN_ORDER} PONY_ENGINE_SURFACE_MAIN_TICK_ORDER=${PONY_ENGINE_SURFACE_MAIN_TICK_ORDER}
+)
+
+if(PONY_WINDOWS)
+	message(VERBOSE "Configuring sources for Windows")
+	target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Private/Surface.Main/Windows/Surface.Main.Windows.cppm"
+		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-MessageHandler.cppm"
+		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-SurfaceService.cppm"
+		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-WindowClass.cppm"
+	)
+endif()
+
+message(VERBOSE "Setting properties")
+set_target_properties(PonyEngine.Surface.Main PROPERTIES 
+	CXX_STANDARD 23
+	POSITION_INDEPENDENT_CODE TRUE
+)
+
+message(VERBOSE "Configuring dependencies")
+target_link_libraries(PonyEngine.Surface.Main PUBLIC
+	PonyEngine.Core
+	PonyEngine.Math
+	PonyEngine.Surface
+)

@@ -28,17 +28,16 @@ namespace PonyEngine::Application::Windows
 	bool CheckForQuit(int& exitCode)
 	{
 		MSG message;
-		while (PeekMessageA(&message, nullptr, 0, 0, PM_REMOVE | PM_NOYIELD))
+		while (PeekMessageA(&message, reinterpret_cast<HWND>(-1), 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
-			TranslateMessage(&message);
-			DispatchMessageA(&message);
-
 			if (message.message == WM_QUIT) [[unlikely]]
 			{
 				exitCode = static_cast<int>(message.wParam);
-
 				return true;
 			}
+
+			TranslateMessage(&message);
+			DispatchMessageA(&message);
 		}
 
 		return false;
