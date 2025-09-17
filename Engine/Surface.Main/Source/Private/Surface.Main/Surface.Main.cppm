@@ -7,12 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface.Windows;
+export module PonyEngine.Surface.Main;
 
 export import PonyEngine.Surface;
 
-export import :IMessageObserver;
-export import :IRawInputObserver;
-export import :ISurfaceService;
-export import :SurfaceParams;
 export import :Utility;

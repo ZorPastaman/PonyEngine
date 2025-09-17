@@ -44,7 +44,7 @@ export namespace PonyEngine::Path
 
 		/// @brief Fills predefined paths.
 		/// @param pathService Path service.
-		virtual void FillPaths(PathService& pathService) = 0;
+		virtual void FillPaths(IPathService& pathService) = 0;
 
 		Application::IModuleContext* context; ///< Module context.
 	};
@@ -62,7 +62,7 @@ namespace PonyEngine::Path
 		data.publicInterfaces.AddInterface<IPathService>(pathService->PublicPathService());
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Filling default paths.");
-		FillPaths(*pathService);
+		FillPaths(pathService->PublicPathService());
 
 		return data;
 	}

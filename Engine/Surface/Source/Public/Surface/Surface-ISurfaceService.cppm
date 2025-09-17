@@ -19,6 +19,7 @@ import PonyEngine.Math;
 
 import :SurfacePositionMode;
 import :SurfaceStyle;
+import :WindowRect;
 
 export namespace PonyEngine::Surface
 {
@@ -26,6 +27,14 @@ export namespace PonyEngine::Surface
 	class ISurfaceService
 	{
 		INTERFACE_BODY(ISurfaceService)
+
+		/// @brief Rectangle request parameters.
+		struct RectRequest final
+		{
+			bool relativePosition = false; ///< Whether the position is relative or absolute?
+			bool relativeSize = false; ///< Whether the size is relative or absolute?
+			SurfacePositionMode positionMode = SurfacePositionMode::LeftTopCorner; ///< Position mode.
+		};
 
 		/// @brief Gets a screen resolution.
 		/// @return Screen resolution.
@@ -41,43 +50,15 @@ export namespace PonyEngine::Surface
 		/// @remark If the platform doesn't support client titles, the function does nothing.
 		virtual void Title(std::string_view title) = 0;
 
-		/// @brief Gets an absolute client position.
-		/// @param positionMode Position mode.
-		/// @return Absolute client position.
+		/// @brief Gets a window rectangle.
+		/// @param request Rectangle request parameters.
+		/// @return Window rectangle.
 		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> PositionAbsolute(SurfacePositionMode positionMode = SurfacePositionMode::LeftTopCorner) const = 0;
-		/// @brief Gets a relative client position.
-		/// @param positionMode Position mode.
-		/// @return Relative client position.
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<float> PositionRelative(SurfacePositionMode positionMode = SurfacePositionMode::LeftTopCorner) const = 0;
-		/// @brief Sets an absolute client position.
-		/// @param position Absolute client position.
-		/// @param positionMode Position mode.
-		/// @remark If the platform doesn't support client positions, the function does nothing.
-		virtual void PositionAbsolute(const Math::Vector2<std::int32_t>& position, SurfacePositionMode positionMode = SurfacePositionMode::LeftTopCorner) = 0;
-		/// @brief Sets a relative client position.
-		/// @param position Relative client position.
-		/// @param positionMode Position mode.
-		/// @remark If the platform doesn't support client positions, the function does nothing.
-		virtual void PositionRelative(const Math::Vector2<float>& position, SurfacePositionMode positionMode = SurfacePositionMode::LeftTopCorner) = 0;
-
-		/// @brief Gets an absolute client size.
-		/// @return Absolute client size.
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> SizeAbsolute() const = 0;
-		/// @brief Gets an absolute client size.
-		/// @return Absolute client size.
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<float> SizeRelative() const = 0;
-		/// @brief Sets an absolute client size.
-		/// @param size Absolute client size.
-		/// @remark If the platform doesn't support client sizes, the function does nothing.
-		virtual void SizeAbsolute(const Math::Vector2<std::int32_t>& size) = 0;
-		/// @brief Sets a relative client size.
-		/// @param size Relative client size.
-		/// @remark If the platform doesn't support client sizes, the function does nothing.
-		virtual void SizeRelative(const Math::Vector2<float>& size) = 0;
+		virtual WindowRect Rect(const RectRequest& request = RectRequest()) const = 0;
+		/// @brief Sets a window rectangle.
+		/// @param rect Window rectangle.
+		/// @remark If the platform doesn't support windows, the function does nothing.
+		virtual void Rect(const WindowRect& rect) = 0;
 
 		/// @brief Gets a surface style.
 		/// @return Surface style.
@@ -87,15 +68,6 @@ export namespace PonyEngine::Surface
 		/// @param style Surface style.
 		/// @rematk If the platform doesn't support a style flag, it'll be ignored.
 		virtual void Style(SurfaceStyle style) = 0;
-
-		/// @brief Gets if the surface is visible.
-		/// @return @a True if it's visible; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsVisible() const = 0;
-		/// @brief Sets the surface visibility.
-		/// @param isVisible Should the surface become visible?
-		/// @remark If the platform doesn't support a surface visibility, the function does nothing.
-		virtual void Visible(bool isVisible) = 0;
 
 		/// @brief Converts the client point to a screen point.
 		/// @param clientPoint Client point.

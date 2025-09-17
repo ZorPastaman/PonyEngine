@@ -40,7 +40,7 @@ export namespace PonyEngine::Path::Windows
 		PathServiceFactory& operator =(PathServiceFactory&&) = delete;
 
 	protected:
-		virtual void FillPaths(PathService& pathService) override;
+		virtual void FillPaths(IPathService& pathService) override;
 	};
 }
 
@@ -51,7 +51,7 @@ namespace PonyEngine::Path::Windows
 	{
 	}
 
-	void PathServiceFactory::FillPaths(PathService& pathService)
+	void PathServiceFactory::FillPaths(IPathService& pathService)
 	{
 		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting paths.");
 		const std::filesystem::path executablePath = GetExecutablePath();

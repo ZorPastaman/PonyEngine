@@ -7,12 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface.Windows;
+module;
 
-export import PonyEngine.Surface;
+#include "PonyEngine/Platform/Windows/Framework.h"
 
-export import :IMessageObserver;
-export import :IRawInputObserver;
-export import :ISurfaceService;
-export import :SurfaceParams;
-export import :Utility;
+export module PonyEngine.Surface.Windows:SurfaceParams;
+
+export namespace PonyEngine::Surface::Windows
+{
+	/// @brief Surface parameters.
+	struct SurfaceParams final
+	{
+		HICON icon = nullptr; ///< Main application icon.
+		HICON smallIcon = nullptr; ///< Small application icon.
+		HCURSOR cursor = nullptr; ///< Cursor icon.
+	};
+}

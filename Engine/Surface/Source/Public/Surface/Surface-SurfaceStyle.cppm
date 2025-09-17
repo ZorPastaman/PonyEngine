@@ -19,12 +19,12 @@ namespace PonyEngine::Surface
 {
 	constexpr std::array<std::string_view, 7> SurfaceStyleNames
 	{
-		"Border"
-		"Title"
-		"Close"
-		"Maximize"
-		"Minimize"
-		"Resizable"
+		"Border",
+		"Title",
+		"Close",
+		"Maximize",
+		"Minimize",
+		"Resizable",
 		"AlwaysOnTop"
 	};
 }

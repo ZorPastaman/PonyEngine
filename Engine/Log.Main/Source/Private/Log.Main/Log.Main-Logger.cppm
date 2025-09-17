@@ -39,9 +39,6 @@ export namespace PonyEngine::Log
 		virtual void Begin() override;
 		virtual void End() override;
 
-		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
-		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept override;
-
 		/// @brief Gets the public logger interface.
 		/// @return Logger interface.
 		[[nodiscard("Pure function")]]
@@ -55,6 +52,9 @@ export namespace PonyEngine::Log
 		Logger& operator =(Logger&&) = delete;
 
 	private:
+		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
+		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept override;
+
 		/// @brief Logger context.
 		class LoggerContext final : public ILoggerContext
 		{
@@ -129,6 +129,16 @@ namespace PonyEngine::Log
 	{
 	}
 
+	ILogger& Logger::PublicLogger() noexcept
+	{
+		return *this;
+	}
+
+	const ILogger& Logger::PublicLogger() const noexcept
+	{
+		return *this;
+	}
+
 	void Logger::Log(const LogType logType, const LogInput& logInput) const noexcept
 	{
 		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
@@ -139,16 +149,6 @@ namespace PonyEngine::Log
 	{
 		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 		Log(logEntry);
-	}
-
-	ILogger& Logger::PublicLogger() noexcept
-	{
-		return *this;
-	}
-
-	const ILogger& Logger::PublicLogger() const noexcept
-	{
-		return *this;
 	}
 
 	Logger::LoggerContext::LoggerContext(Logger& logger) noexcept :

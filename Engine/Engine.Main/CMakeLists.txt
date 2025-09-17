@@ -40,7 +40,6 @@ target_sources(PonyEngine.Engine.Main PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Engine.Main/Engine.Main-EngineFactory.cppm"
 	"Source/Private/Engine.Main/Engine.Main-EngineLogger.cppm"
 	"Source/Private/Engine.Main/Engine.Main-EngineModule.cppm"
-	
 	"Source/Private/Engine.Main/Engine.Main-SystemManager.cppm"
 )
 

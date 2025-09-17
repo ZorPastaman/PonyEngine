@@ -1,5 +1,10 @@
 message(STATUS "Configuring PonyEngine.Surface")
 
+message(VERBOSE "Validating settings")
+if(NOT TARGET PonyEngine.Math)
+	message(FATAL_ERROR "PonyEngine.Math wasn't configured")
+endif()
+
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface STATIC)
 
@@ -11,6 +16,7 @@ target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Surface/Surface-SurfacePositionMode.cppm"
 	"Source/Public/Surface/Surface-SurfaceStyle.cppm"
 	"Source/Public/Surface/Surface-Utility.cppm"
+	"Source/Public/Surface/Surface-WindowRect.cppm"
 )
 
 if(PONY_WINDOWS)
@@ -20,6 +26,8 @@ if(PONY_WINDOWS)
 		"Source/Public/Surface/Windows/Surface.Windows-IMessageObserver.cppm"
 		"Source/Public/Surface/Windows/Surface.Windows-IRawInputObserver.cppm"
 		"Source/Public/Surface/Windows/Surface.Windows-ISurfaceService.cppm"
+		"Source/Public/Surface/Windows/Surface.Windows-SurfaceParams.cppm"
+		"Source/Public/Surface/Windows/Surface.Windows-Utility.cppm"
 	)
 endif()
 
@@ -31,6 +39,6 @@ set_target_properties(PonyEngine.Surface PROPERTIES
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Surface PUBLIC
-	PonyEngine.Core,
+	PonyEngine.Core
 	PonyEngine.Math
 )
