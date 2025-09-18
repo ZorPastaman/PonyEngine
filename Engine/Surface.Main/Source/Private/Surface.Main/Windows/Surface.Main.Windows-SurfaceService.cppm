@@ -34,7 +34,8 @@ export namespace PonyEngine::Surface::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title, const WindowRect& rect, SurfaceStyle style);
+		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title, const WindowRect& rect, 
+			const Math::Vector2<int>& minimalWindowSize, SurfaceStyle style);
 		SurfaceService(const SurfaceService&) = delete;
 		SurfaceService(SurfaceService&&) = delete;
 
@@ -53,8 +54,6 @@ export namespace PonyEngine::Surface::Windows
 		SurfaceService& operator =(SurfaceService&&) = delete;
 
 	private:
-		static constexpr auto MinimalWindowSize = Math::Vector2<int>(640, 480);
-
 		[[nodiscard("Pure funtion")]]
 		virtual Math::Vector2<std::int32_t> ScreenResolution() const override;
 
@@ -98,7 +97,7 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		static WindowRect CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request);
 		[[nodiscard("Pure function")]]
-		static std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateRect(const WindowRect& rect, DWORD style, DWORD styleEx);
+		std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateRect(const WindowRect& rect, DWORD style, DWORD styleEx);
 		[[nodiscard("Pure function")]]
 		static Math::Vector2<int> GetResolution();
 
@@ -111,7 +110,19 @@ export namespace PonyEngine::Surface::Windows
 		void RegisterRawInputType(USHORT usagePage, USHORT usage, DWORD flags);
 
 		void ObserveMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
-		void ObserveRawInput(LPARAM lParam) noexcept;
+
+		[[nodiscard("The value must be returned to the system")]]
+		static LRESULT ObserveCreate() noexcept;
+		[[nodiscard("The value must be returned to the system")]]
+		LRESULT ObserveDestroy() noexcept;
+		[[nodiscard("The value must be returned to the system")]]
+		LRESULT ObserveGetMinMaxInfo(LPARAM lParam) noexcept;
+		[[nodiscard("The value must be returned to the system")]]
+		static LRESULT ObserveEraseBackground() noexcept;
+		[[nodiscard("The value must be returned to the system")]]
+		LRESULT ObservePaint() noexcept;
+		[[nodiscard("The value must be returned to the system")]]
+		LRESULT ObserveRawInput(LPARAM lParam) noexcept;
 
 		[[nodiscard("Pure function")]]
 		static DWORD GetHidType(const RAWINPUT& input);
@@ -124,6 +135,7 @@ export namespace PonyEngine::Surface::Windows
 		Application::IApplicationContext* application;
 
 		std::shared_ptr<WindowClass> windowClass;
+		Math::Vector2<int> minimalWindowSize;
 
 		HWND windowHandle;
 
@@ -138,9 +150,10 @@ export namespace PonyEngine::Surface::Windows
 namespace PonyEngine::Surface::Windows
 {
 	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, 
-		const std::string_view title, const WindowRect& rect, const SurfaceStyle style) :
+		const std::string_view title, const WindowRect& rect, const Math::Vector2<int>& minimalWindowSize, const SurfaceStyle style) :
 		application{&application},
-		windowClass(windowClass)
+		windowClass(windowClass),
+		minimalWindowSize(minimalWindowSize)
 	{
 		assert(this->windowClass && "The window class is nullptr!");
 
@@ -288,11 +301,11 @@ namespace PonyEngine::Surface::Windows
 			}
 			if (request.relativeSize)
 			{
-				windowRect.size = AbsoluteToRelative(static_cast<Math::Vector2<std::int32_t>>(MinimalWindowSize), ScreenResolution());
+				windowRect.size = AbsoluteToRelative(static_cast<Math::Vector2<std::int32_t>>(minimalWindowSize), ScreenResolution());
 			}
 			else
 			{
-				windowRect.size = static_cast<Math::Vector2<std::int32_t>>(MinimalWindowSize);
+				windowRect.size = static_cast<Math::Vector2<std::int32_t>>(minimalWindowSize);
 			}
 			windowRect.positionMode = request.positionMode;
 
@@ -380,7 +393,7 @@ namespace PonyEngine::Surface::Windows
 
 	Math::Vector2<std::int32_t> SurfaceService::MinimalSize() const
 	{
-		return static_cast<Math::Vector2<std::int32_t>>(MinimalWindowSize);
+		return static_cast<Math::Vector2<std::int32_t>>(minimalWindowSize);
 	}
 
 	HWND SurfaceService::Handle() noexcept
@@ -584,14 +597,21 @@ namespace PonyEngine::Surface::Windows
 
 		switch (uMsg)
 		{
+		case WM_CREATE:
+			return ObserveCreate();
+		case WM_DESTROY:
+			return ObserveDestroy();
+		case WM_GETMINMAXINFO:
+			return ObserveGetMinMaxInfo(lParam);
+		case WM_ERASEBKGND:
+			return ObserveEraseBackground();
+		case WM_PAINT:
+			return ObservePaint();
 		case WM_INPUT:
-			ObserveRawInput(lParam);
-			break;
+			return ObserveRawInput(lParam);
 		default:
-			break;
+			return DefWindowProcA(windowHandle, uMsg, wParam, lParam);
 		}
-
-		return DefWindowProcA(windowHandle, uMsg, wParam, lParam);
 	}
 
 	WindowRect SurfaceService::CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request)
@@ -625,7 +645,7 @@ namespace PonyEngine::Surface::Windows
 	{
 		const auto resolution = static_cast<Math::Vector2<std::int32_t>>(GetResolution());
 		const Math::Vector2<std::int32_t> delta = rect.position.index() ? std::get<1>(rect.position) : RelativeToAbsolute(std::get<0>(rect.position), resolution);
-		const Math::Vector2<std::int32_t> size = rect.size.index() ? std::get<1>(rect.size) : RelativeToAbsolute(std::get<0>(rect.size), resolution);
+		const Math::Vector2<std::int32_t> size = Math::Max(rect.size.index() ? std::get<1>(rect.size) : RelativeToAbsolute(std::get<0>(rect.size), resolution), minimalWindowSize);
 		const Math::Vector2<std::int32_t> position = CalculatePosition(delta, size, resolution, rect.positionMode);
 
 		auto windowRect = RECT
@@ -686,22 +706,37 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::SetStyle(const DWORD style, const DWORD styleEx)
 	{
+		const WindowRect rect = Rect(RectRequest{.relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner});
+		const auto [currentStyle, currentStyleEx] = GetStyle();
+
 		SetLastError(DWORD{0});
 
-		if (!SetWindowLongPtrA(windowHandle, GWL_STYLE, static_cast<LONG_PTR>(style))) [[unlikely]]
+		try
 		{
-			if (const auto error = GetLastError()) [[unlikely]]
+			if (!SetWindowLongPtrA(windowHandle, GWL_STYLE, static_cast<LONG_PTR>(style))) [[unlikely]]
 			{
-				throw std::runtime_error(Utility::SafeFormat("Failed to set window style. Error code: '0x{:X}'.", error));
+				if (const auto error = GetLastError()) [[unlikely]]
+				{
+					throw std::runtime_error(Utility::SafeFormat("Failed to set window style. Error code: '0x{:X}'.", error));
+				}
 			}
-		}
 
-		if (!SetWindowLongPtrA(windowHandle, GWL_EXSTYLE, static_cast<LONG_PTR>(styleEx))) [[unlikely]]
-		{
-			if (const auto error = GetLastError()) [[unlikely]]
+			if (!SetWindowLongPtrA(windowHandle, GWL_EXSTYLE, static_cast<LONG_PTR>(styleEx))) [[unlikely]]
 			{
-				throw std::runtime_error(Utility::SafeFormat("Failed to set extended window style. Error code: '0x{:X}'.", error));
+				if (const auto error = GetLastError()) [[unlikely]]
+				{
+					throw std::runtime_error(Utility::SafeFormat("Failed to set extended window style. Error code: '0x{:X}'.", error));
+				}
 			}
+
+			Rect(rect);
+		}
+		catch (...)
+		{
+			SetWindowLongPtrA(windowHandle, GWL_STYLE, static_cast<LONG_PTR>(currentStyle));
+			SetWindowLongPtrA(windowHandle, GWL_EXSTYLE, static_cast<LONG_PTR>(currentStyleEx));
+
+			throw;
 		}
 	}
 
@@ -751,7 +786,52 @@ namespace PonyEngine::Surface::Windows
 		}
 	}
 
-	void SurfaceService::ObserveRawInput(const LPARAM lParam) noexcept
+	LRESULT SurfaceService::ObserveCreate() noexcept
+	{
+		return 0;
+	}
+
+	LRESULT SurfaceService::ObserveDestroy() noexcept
+	{
+		application->Stop();
+		PostQuitMessage(0);
+
+		return 0;
+	}
+
+	LRESULT SurfaceService::ObserveGetMinMaxInfo(const LPARAM lParam) noexcept
+	{
+		const auto minMax = reinterpret_cast<MINMAXINFO*>(lParam);
+
+		RECT rect = {.left = 0, .top = 0, .right = static_cast<LONG>(minimalWindowSize.X()), .bottom = static_cast<LONG>(minimalWindowSize.Y())};
+		const auto [style, styleEx] = GetStyle();
+		if (!AdjustWindowRectEx(&rect, style, false, styleEx)) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError());
+		}
+
+		minMax->ptMinTrackSize.x = rect.right - rect.left;
+		minMax->ptMinTrackSize.y = rect.bottom - rect.top;
+
+		return 0;
+	}
+
+	LRESULT SurfaceService::ObserveEraseBackground() noexcept
+	{
+		return 1;
+	}
+
+	LRESULT SurfaceService::ObservePaint() noexcept
+	{
+		if (!ValidateRect(windowHandle, nullptr)) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to validate rect. Error code: '0x{:X}'.", GetLastError());
+		}
+
+		return 0;
+	}
+
+	LRESULT SurfaceService::ObserveRawInput(const LPARAM lParam) noexcept
 	{
 		const auto hRawInput = reinterpret_cast<HRAWINPUT>(lParam);
 
@@ -759,11 +839,11 @@ namespace PonyEngine::Surface::Windows
 		if (GetRawInputData(hRawInput, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER))) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to get raw input size. Error code: '0x{:X}'.", GetLastError());
-			return;
+			return 0;
 		}
 		if (size < 1u) [[unlikely]]
 		{
-			return;
+			return 0;
 		}
 
 		try
@@ -773,12 +853,12 @@ namespace PonyEngine::Surface::Windows
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(application->Logger(), e, "On resizing raw input cache.");
-			return;
+			return 0;
 		}
 		if (GetRawInputData(hRawInput, RID_INPUT, rawInputCache.data(), &size, sizeof(RAWINPUTHEADER)) != rawInputCache.size()) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
-			return;
+			return 0;
 		}
 
 		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(rawInputCache.data());
@@ -800,12 +880,12 @@ namespace PonyEngine::Surface::Windows
 			catch (const std::exception& e)
 			{
 				PONY_LOG_E(application->Logger(), e, "On getting hid type.");
-				return;
+				return 0;
 			}
 			break;
 		default: [[unlikely]]
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Unexpected raw input type.");
-			return;
+			return 0;
 		}
 
 		if (const auto observerPosition = rawInputObservers.find(usageType); observerPosition != rawInputObservers.cend())
@@ -826,6 +906,8 @@ namespace PonyEngine::Surface::Windows
 				}
 			}
 		}
+
+		return 0;
 	}
 
 	DWORD SurfaceService::GetHidType(const RAWINPUT& input)
