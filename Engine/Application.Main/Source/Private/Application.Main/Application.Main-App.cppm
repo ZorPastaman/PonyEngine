@@ -231,6 +231,12 @@ namespace PonyEngine::Application
 		PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager.");
 		serviceManager->Clear();
 		Finalize(reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(IModule**));
+
+		PONY_LOG(*logger, Log::LogType::Info, "Releasing service manager.");
+		serviceManager.reset(); 
+
+		PONY_CONSOLE(Log::LogType::Info, "Releasing default logger.");
+		defaultLogger.reset();
 	}
 
 	bool App::Tick(int& exitCode)

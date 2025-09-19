@@ -7,9 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface.Main.Windows;
+#pragma once
 
-export import PonyEngine.Surface.Main;
-export import PonyEngine.Surface.Windows;
+#include "PonyEngine/Utility/Compiler.h"
 
-export import :SurfaceServiceModule;
+import PonyEngine.Application;
+
+namespace PonyEngine::Surface::Windows
+{
+	/// @brief Gets the Windows surface module.
+	/// @return Surface module.
+	PONY_DLL_EXPORT Application::IModule* GetSurfaceModule();
+}

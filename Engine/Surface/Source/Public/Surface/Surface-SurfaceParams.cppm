@@ -17,10 +17,10 @@ import :SurfacePositionMode;
 import :SurfaceStyle;
 import :WindowRect;
 
-namespace PonyEngine::Surface
+export namespace PonyEngine::Surface
 {
 	/// @brief Surface parameters.
-	struct SurfaceParams final
+	struct SurfaceParams
 	{
 		std::string title = "Pony Engine Window"; ///< Title.
 		WindowRect rect; ///< Window rect. On platforms that don't support windows, it's ignored.

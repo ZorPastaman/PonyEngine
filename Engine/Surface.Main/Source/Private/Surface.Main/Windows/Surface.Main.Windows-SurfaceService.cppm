@@ -112,17 +112,17 @@ export namespace PonyEngine::Surface::Windows
 		void ObserveMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 
 		[[nodiscard("The value must be returned to the system")]]
-		static LRESULT ObserveCreate() noexcept;
+		LRESULT ObserveCreate(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("The value must be returned to the system")]]
-		LRESULT ObserveDestroy() noexcept;
+		LRESULT ObserveDestroy(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("The value must be returned to the system")]]
-		LRESULT ObserveGetMinMaxInfo(LPARAM lParam) noexcept;
+		LRESULT ObserveGetMinMaxInfo(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("The value must be returned to the system")]]
-		static LRESULT ObserveEraseBackground() noexcept;
+		LRESULT ObserveEraseBackground(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("The value must be returned to the system")]]
-		LRESULT ObservePaint() noexcept;
+		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("The value must be returned to the system")]]
-		LRESULT ObserveRawInput(LPARAM lParam) noexcept;
+		LRESULT ObserveRawInput(WPARAM wParam, LPARAM lParam) noexcept;
 
 		[[nodiscard("Pure function")]]
 		static DWORD GetHidType(const RAWINPUT& input);
@@ -144,6 +144,9 @@ export namespace PonyEngine::Surface::Windows
 
 		mutable std::string titleCache;
 		std::vector<BYTE> rawInputCache;
+
+		bool erased;
+		bool painted;
 	};
 }
 
@@ -153,7 +156,9 @@ namespace PonyEngine::Surface::Windows
 		const std::string_view title, const WindowRect& rect, const Math::Vector2<int>& minimalWindowSize, const SurfaceStyle style) :
 		application{&application},
 		windowClass(windowClass),
-		minimalWindowSize(minimalWindowSize)
+		minimalWindowSize(minimalWindowSize),
+		erased{false},
+		painted{false}
 	{
 		assert(this->windowClass && "The window class is nullptr!");
 
@@ -598,17 +603,17 @@ namespace PonyEngine::Surface::Windows
 		switch (uMsg)
 		{
 		case WM_CREATE:
-			return ObserveCreate();
+			return ObserveCreate(wParam, lParam);
 		case WM_DESTROY:
-			return ObserveDestroy();
+			return ObserveDestroy(wParam, lParam);
 		case WM_GETMINMAXINFO:
-			return ObserveGetMinMaxInfo(lParam);
+			return ObserveGetMinMaxInfo(wParam, lParam);
 		case WM_ERASEBKGND:
-			return ObserveEraseBackground();
+			return ObserveEraseBackground(wParam, lParam);
 		case WM_PAINT:
-			return ObservePaint();
+			return ObservePaint(wParam, lParam);
 		case WM_INPUT:
-			return ObserveRawInput(lParam);
+			return ObserveRawInput(wParam, lParam);
 		default:
 			return DefWindowProcA(windowHandle, uMsg, wParam, lParam);
 		}
@@ -786,12 +791,12 @@ namespace PonyEngine::Surface::Windows
 		}
 	}
 
-	LRESULT SurfaceService::ObserveCreate() noexcept
+	LRESULT SurfaceService::ObserveCreate(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		return 0;
 	}
 
-	LRESULT SurfaceService::ObserveDestroy() noexcept
+	LRESULT SurfaceService::ObserveDestroy(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		application->Stop();
 		PostQuitMessage(0);
@@ -799,7 +804,7 @@ namespace PonyEngine::Surface::Windows
 		return 0;
 	}
 
-	LRESULT SurfaceService::ObserveGetMinMaxInfo(const LPARAM lParam) noexcept
+	LRESULT SurfaceService::ObserveGetMinMaxInfo(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		const auto minMax = reinterpret_cast<MINMAXINFO*>(lParam);
 
@@ -816,22 +821,34 @@ namespace PonyEngine::Surface::Windows
 		return 0;
 	}
 
-	LRESULT SurfaceService::ObserveEraseBackground() noexcept
+	LRESULT SurfaceService::ObserveEraseBackground(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		return 1;
-	}
-
-	LRESULT SurfaceService::ObservePaint() noexcept
-	{
-		if (!ValidateRect(windowHandle, nullptr)) [[unlikely]]
+		if (erased) [[likely]]
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to validate rect. Error code: '0x{:X}'.", GetLastError());
+			return 1;
 		}
 
-		return 0;
+		erased = true;
+		return DefWindowProcA(windowHandle, WM_ERASEBKGND, wParam, lParam);
 	}
 
-	LRESULT SurfaceService::ObserveRawInput(const LPARAM lParam) noexcept
+	LRESULT SurfaceService::ObservePaint(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		if (painted) [[likely]]
+		{
+			if (!ValidateRect(windowHandle, nullptr)) [[unlikely]]
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to validate rect. Error code: '0x{:X}'.", GetLastError());
+			}
+
+			return 0;
+		}
+
+		painted = true;
+		return DefWindowProcA(windowHandle, WM_PAINT, wParam, lParam);
+	}
+
+	LRESULT SurfaceService::ObserveRawInput(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		const auto hRawInput = reinterpret_cast<HRAWINPUT>(lParam);
 
