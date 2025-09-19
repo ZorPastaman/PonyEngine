@@ -17,6 +17,7 @@ import std;
 
 namespace PonyEngine::Surface
 {
+	/// @brief Surface style names.
 	constexpr std::array<std::string_view, 7> SurfaceStyleNames
 	{
 		"Border",
@@ -31,16 +32,19 @@ namespace PonyEngine::Surface
 
 export namespace PonyEngine::Surface
 {
+	/// @brief Surface style.
+	/// @remark Unsupported styles are just ignored.
+	/// @remark Some styles may force other styles on some platforms.
 	enum class SurfaceStyle : std::uint8_t
 	{
 		None = 0,
-		Border = 1 << 0,
-		Title = 1 << 1,
-		Close = 1 << 2,
-		Maximize = 1 << 3,
-		Minimize = 1 << 4,
-		Resizable = 1 << 5,
-		AlwaysOnTop = 1 << 6,
+		Border = 1 << 0, ///< Draw border.
+		Title = 1 << 1, ///< Draw title.
+		Close = 1 << 2, ///< Draw close button.
+		Maximize = 1 << 3, ///< Draw maximize button.
+		Minimize = 1 << 4, ///< Draw minimize button.
+		Resizable = 1 << 5, ///< Resizable surface.
+		AlwaysOnTop = 1 << 6, ///< Show always on top.
 		All = Border | Title | Close | Maximize | Minimize | Resizable | AlwaysOnTop
 	};
 

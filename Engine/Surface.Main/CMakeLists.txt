@@ -31,20 +31,33 @@ target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Surface.Main/Surface.Main-Utility.cppm"
 )
 
-message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Surface.Main PUBLIC
-	PONY_ENGINE_SURFACE_MAIN_ORDER=${PONY_ENGINE_SURFACE_MAIN_ORDER} PONY_ENGINE_SURFACE_MAIN_TICK_ORDER=${PONY_ENGINE_SURFACE_MAIN_TICK_ORDER}
-)
-
 if(PONY_WINDOWS)
+	message(VERBOSE "Configuring headers for Windows")
+	target_include_directories(PonyEngine.Surface.Main PUBLIC
+		"Include/Public/Windows"
+	)
+
 	message(VERBOSE "Configuring sources for Windows")
+	target_sources(PonyEngine.Surface.Main PUBLIC
+		"Source/Main.Windows.cpp"
+	)
+	target_sources(PonyEngine.Surface.Main PRIVATE
+		"Source/Main.Windows.Impl.cpp"
+	)
 	target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows.cppm"
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-MessageHandler.cppm"
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-SurfaceService.cppm"
+		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-SurfaceServiceFactory.cppm"
+		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-SurfaceServiceModule.cppm"
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-WindowClass.cppm"
 	)
 endif()
+
+message(VERBOSE "Configuring defines")
+target_compile_definitions(PonyEngine.Surface.Main PUBLIC
+	PONY_ENGINE_SURFACE_MAIN_ORDER=${PONY_ENGINE_SURFACE_MAIN_ORDER} PONY_ENGINE_SURFACE_MAIN_TICK_ORDER=${PONY_ENGINE_SURFACE_MAIN_TICK_ORDER}
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface.Main PROPERTIES 
