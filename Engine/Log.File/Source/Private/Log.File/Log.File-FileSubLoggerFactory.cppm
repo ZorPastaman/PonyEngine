@@ -64,7 +64,7 @@ namespace PonyEngine::Log
 			throw std::logic_error("Path service not found.");
 		}
 
-		const std::filesystem::path* const logFolderPath = pathService->FindPath(Path::PathIds::Log);
+		const std::filesystem::path* const logFolderPath = pathService->FindPath(Path::MainPathIds::Log);
 		if (!logFolderPath) [[unlikely]]
 		{
 			throw std::logic_error("Log folder path not found.");

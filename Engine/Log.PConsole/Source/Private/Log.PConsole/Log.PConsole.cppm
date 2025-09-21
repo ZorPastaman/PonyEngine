@@ -9,4 +9,4 @@
 
 export module PonyEngine.Log.PlatformConsole;
 
-export import PonyEngine.Log;
+export import PonyEngine.Log.Extension;

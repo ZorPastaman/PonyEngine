@@ -11,56 +11,41 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Path.Main.Windows:PathHelper;
+export module PonyEngine.Platform.Windows:Path;
 
 import std;
 
 import PonyEngine.Platform.WinCore;
 import PonyEngine.Utility;
 
-export namespace PonyEngine::Path::Windows
-{
-	/// @brief Gets a game executable path. It's @p GetGameDataPath + a game executable name.
-	/// @return Game executable path.
-	[[nodiscard("Pure function")]]
-	std::filesystem::path GetExecutablePath();
-	/// @brief Gets a local data path. It's a directory for files that the application produces.
-	/// @return Local data path.
-	[[nodiscard("Pure function")]]
-	std::filesystem::path GetLocalDataPath();
-	/// @brief Gets a user data path. It's a directory for files that a user produces.
-	/// @return User data path.
-	[[nodiscard("Pure function")]]
-	std::filesystem::path GetUserDataPath();
-}
+import :Module;
 
-namespace PonyEngine::Path::Windows
+export namespace PonyEngine::Platform::Windows
 {
+	/// @brief Gets a module path.
+	/// @param module Module. If it's null, the path to the executable module of the current process is returned.
+	/// @return Module path.
+	[[nodiscard("Pure function")]]
+	std::filesystem::path GetModulePath(HMODULE module);
+
 	/// @brief Gets a known path.
 	/// @param folderId Folder id.
-	/// @return Known path. It includes company and game folders.
+	/// @return Known path.
 	[[nodiscard("Pure function")]]
 	std::filesystem::path GetKnownPath(REFKNOWNFOLDERID folderId);
+}
 
-	std::filesystem::path GetExecutablePath()
+namespace PonyEngine::Platform::Windows
+{
+	std::filesystem::path GetModulePath(const HMODULE module)
 	{
 		auto path = std::array<wchar_t, MAX_PATH>();
-		if (!GetModuleFileNameW(nullptr, path.data(), static_cast<DWORD>(path.size()))) [[unlikely]]
+		if (!GetModuleFileNameW(module, path.data(), static_cast<DWORD>(path.size()))) [[unlikely]]
 		{
 			throw std::runtime_error(Utility::SafeFormat("Failed to get module name. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return std::filesystem::path(path.data());
-	}
-
-	std::filesystem::path GetLocalDataPath()
-	{
-		return GetKnownPath(FOLDERID_LocalAppData);
-	}
-
-	std::filesystem::path GetUserDataPath()
-	{
-		return GetKnownPath(FOLDERID_SavedGames);
 	}
 
 	std::filesystem::path GetKnownPath(REFKNOWNFOLDERID folderId)

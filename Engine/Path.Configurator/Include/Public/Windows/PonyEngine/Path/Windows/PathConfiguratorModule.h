@@ -7,7 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Path;
+#pragma once
 
-export import :IPathService;
-export import :MainPathIds;
+#include "PonyEngine/Utility/Compiler.h"
+
+import PonyEngine.Application;
+
+namespace PonyEngine::Path::Windows
+{
+	/// @brief Gets the Windows path configurator module.
+	/// @return Path configurator module.
+	PONY_DLL_EXPORT Application::IModule* GetPathConfiguratorModule();
+}
