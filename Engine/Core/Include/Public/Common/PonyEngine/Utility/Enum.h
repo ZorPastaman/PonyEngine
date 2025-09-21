@@ -172,6 +172,25 @@
 		return left = left ^ right; \
 	} \
 
+/// @brief Creates mask enum check functions.
+/// @param Mask Mask enum type.
+#define ENUM_MASK_CHECKS(Mask) \
+	[[nodiscard("Pure function")]] \
+	constexpr bool All(const Mask value, const Mask mask) noexcept \
+	{ \
+		return (value & mask) == value; \
+	} \
+	[[nodiscard("Pure function")]] \
+	constexpr bool Any(const Mask value, const Mask mask) noexcept \
+	{ \
+		return std::to_underlying(value & mask); \
+	} \
+	[[nodiscard("Pure function")]] \
+	constexpr bool None(const Mask value, const Mask mask) noexcept \
+	{ \
+		return !Any(value, mask); \
+	} \
+
 /// @brief Creates functions for the value enum and mask enum pair.
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
@@ -244,7 +263,7 @@
 /// @brief Creates all the mask enum features except a formatter.
 /// @note All the restrictions of the features are applied to this.
 /// @param Mask Mask enum type.
-#define ENUM_MASK_FEATURES(Mask, MaskNames) ENUM_MASK_TO_STRING(Mask, MaskNames) ENUM_MASK_OPERATORS(Mask)
+#define ENUM_MASK_FEATURES(Mask, MaskNames) ENUM_MASK_TO_STRING(Mask, MaskNames) ENUM_MASK_OPERATORS(Mask) ENUM_MASK_CHECKS(Mask)
 /// @brief Creates all the value enum and mask enum features except formatters.
 /// @note All the restrictions of the features are applied to this.
 /// @param Value Value enum type.
