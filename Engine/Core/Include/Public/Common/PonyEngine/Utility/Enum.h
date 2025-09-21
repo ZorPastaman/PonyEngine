@@ -268,8 +268,7 @@
 /// @note All the restrictions of the features are applied to this.
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
-#define ENUM_VALUE_MASK_FEATURES(Value, ValueNames, Mask, MaskNames) ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_MASK_FEATURES(Mask, MaskNames) \
-	ENUM_VALUE_MASK(Value, Mask)
+#define ENUM_VALUE_MASK_FEATURES(Value, ValueNames, Mask, MaskNames) ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_MASK_FEATURES(Mask, MaskNames) ENUM_VALUE_MASK(Value, Mask)
 /// @brief Creates formatter for value and mask enums.
 /// @param Namespace Enum namespace.
 /// @param Value Value enum type.
