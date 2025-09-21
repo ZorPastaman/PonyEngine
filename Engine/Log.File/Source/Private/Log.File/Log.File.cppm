@@ -9,4 +9,6 @@
 
 export module PonyEngine.Log.File;
 
+export import PonyEngine.Log.Extension;
+
 export import :FileSubLoggerModule;

@@ -13,3 +13,4 @@ export import PonyEngine.Platform.WinCore;
 
 export import :Cursor;
 export import :Module;
+export import :Path;

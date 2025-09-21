@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/Log.h"
 

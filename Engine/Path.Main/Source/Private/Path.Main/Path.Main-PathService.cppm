@@ -37,6 +37,14 @@ export namespace PonyEngine::Path
 		virtual void Begin() override;
 		virtual void End() override;
 
+		[[nodiscard("Pure function")]]
+		virtual std::size_t PathCount() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::string_view PathId(std::size_t index) const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path* FindPath(std::string_view pathId) const noexcept override;
+		virtual void AddPath(std::string_view pathId, const std::filesystem::path& path) override;
+
 		/// @brief Gets a public path service.
 		/// @return Public path service.
 		[[nodiscard("Pure function")]]
@@ -50,14 +58,6 @@ export namespace PonyEngine::Path
 		PathService& operator =(PathService&&) = delete;
 
 	private:
-		[[nodiscard("Pure function")]]
-		virtual std::size_t PathCount() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual std::string_view PathId(std::size_t index) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const std::filesystem::path* FindPath(std::string_view pathId) const noexcept override;
-		virtual void AddPath(std::string_view pathId, const std::filesystem::path& path) override;
-
 		Application::IApplicationContext* application; ///< Application context.
 
 		std::unordered_map<std::string_view, std::filesystem::path> paths; ///< Path ID to path map.
@@ -78,16 +78,6 @@ namespace PonyEngine::Path
 
 	void PathService::End()
 	{
-	}
-
-	IPathService& PathService::PublicPathService() noexcept
-	{
-		return *this;
-	}
-
-	const IPathService& PathService::PublicPathService() const noexcept
-	{
-		return *this;
 	}
 
 	std::size_t PathService::PathCount() const noexcept
@@ -133,5 +123,15 @@ namespace PonyEngine::Path
 		}
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Path added. PathId: '{}', Path: '{}'.", pathIds.back(), paths[pathIds.back()].string());
+	}
+
+	IPathService& PathService::PublicPathService() noexcept
+	{
+		return *this;
+	}
+
+	const IPathService& PathService::PublicPathService() const noexcept
+	{
+		return *this;
 	}
 }

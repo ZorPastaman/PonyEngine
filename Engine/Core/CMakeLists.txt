@@ -61,6 +61,7 @@ if(PONY_WINDOWS)
 		"Source/Public/Platform/Windows/Platform.Windows.cppm"
 		"Source/Public/Platform/Windows/Platform.Windows-Cursor.cppm"
 		"Source/Public/Platform/Windows/Platform.Windows-Module.cppm"
+		"Source/Public/Platform/Windows/Platform.Windows-Path.cppm"
 	)
 endif()
 

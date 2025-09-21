@@ -7,7 +7,7 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Path PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Path/Path.cppm"
 	"Source/Public/Path/Path-IPathService.cppm"
-	"Source/Public/Path/Path-PathIds.cppm"
+	"Source/Public/Path/Path-MainPathIds.cppm"
 )
 
 message(VERBOSE "Setting properties")

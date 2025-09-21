@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Log.Main:LoggerFactory;
@@ -63,7 +61,12 @@ namespace PonyEngine::Log
 		subLoggerFactories.reserve(subLoggerFactoryCount);
 		for (std::size_t i = 0uz; i < subLoggerFactoryCount; ++i)
 		{
-			subLoggerFactories.push_back(context->GetData<ISubLoggerFactory>(i).get());
+			const auto factory = context->GetData<ISubLoggerFactory>(i);
+			if (!factory) [[unlikely]]
+			{
+				throw std::logic_error("Sub-logger factory is nullptr.");
+			}
+			subLoggerFactories.push_back(factory.get());
 		}
 
 		PONY_LOG(context->Logger(), LogType::Info, "Constructing logger.");

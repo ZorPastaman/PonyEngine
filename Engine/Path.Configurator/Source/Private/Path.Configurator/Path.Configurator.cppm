@@ -7,7 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Path;
+export module PonyEngine.Path.Configurator;
 
-export import :IPathService;
-export import :MainPathIds;
+export import PonyEngine.Path.Extension;
+
+export import :Utility;

@@ -11,16 +11,16 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Path:PathIds;
+export module PonyEngine.Path:MainPathIds;
 
 import std;
 
 export namespace PonyEngine::Path
 {
-	/// @brief Predefined path IDs.
-	struct PathIds final
+	/// @brief Main path IDs. These paths are always present.
+	struct MainPathIds final
 	{
-		NON_CONSTRUCTIBLE_BODY(PathIds)
+		NON_CONSTRUCTIBLE_BODY(MainPathIds)
 
 		static constexpr std::string_view Root = "Root"; ///< Path to an application root folder.
 		static constexpr std::string_view Executable = "Executable"; ///< Path to an executable.

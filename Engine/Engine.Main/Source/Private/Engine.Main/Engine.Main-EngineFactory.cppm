@@ -62,7 +62,12 @@ namespace PonyEngine::Engine
 		systemFactories.reserve(systemFactoryCount);
 		for (std::size_t i = 0uz; i < systemFactoryCount; ++i)
 		{
-			systemFactories.push_back(context->GetData<ISystemFactory>(i).get());
+			const auto factory = context->GetData<ISystemFactory>(i);
+			if (!factory) [[unlikely]]
+			{
+				throw std::logic_error("System factory is nullptr.");
+			}
+			systemFactories.push_back(factory.get());
 		}
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing engine.");
