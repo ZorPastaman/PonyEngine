@@ -46,19 +46,19 @@ namespace PonyEngine::Surface::Windows
 	{
 		DWORD windowsStyle = 0;
 		windowsStyle |= style == SurfaceStyle::None ? WS_POPUP : 0;
-		windowsStyle |= (style & SurfaceStyle::Border) != SurfaceStyle::None ? WS_BORDER : 0;
-		windowsStyle |= (style & SurfaceStyle::Title) != SurfaceStyle::None ? WS_BORDER | WS_CAPTION : 0;
-		windowsStyle |= (style & SurfaceStyle::Close) != SurfaceStyle::None ? WS_BORDER | WS_CAPTION | WS_SYSMENU : 0;
-		windowsStyle |= (style & SurfaceStyle::Maximize) != SurfaceStyle::None ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX : 0;
-		windowsStyle |= (style & SurfaceStyle::Minimize) != SurfaceStyle::None ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX : 0;
-		windowsStyle |= (style & SurfaceStyle::Resizable) != SurfaceStyle::None ? WS_BORDER | WS_THICKFRAME : 0;
+		windowsStyle |= Any(SurfaceStyle::Border, style) ? WS_BORDER : 0;
+		windowsStyle |= Any(SurfaceStyle::Title, style) ? WS_BORDER | WS_CAPTION : 0;
+		windowsStyle |= Any(SurfaceStyle::Close, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU : 0;
+		windowsStyle |= Any(SurfaceStyle::Maximize, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX : 0;
+		windowsStyle |= Any(SurfaceStyle::Minimize, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX : 0;
+		windowsStyle |= Any(SurfaceStyle::Resizable, style) ? WS_BORDER | WS_THICKFRAME : 0;
 
 		return windowsStyle;
 	}
 
 	constexpr DWORD ConvertToWindowsStyleEx(const SurfaceStyle style) noexcept
 	{
-		return (style & SurfaceStyle::AlwaysOnTop) != SurfaceStyle::None ? WS_EX_TOPMOST : 0;
+		return Any(SurfaceStyle::AlwaysOnTop, style) ? WS_EX_TOPMOST : 0;
 	}
 
 	constexpr SurfaceStyle ConvertToSurfaceStyle(const DWORD style) noexcept
