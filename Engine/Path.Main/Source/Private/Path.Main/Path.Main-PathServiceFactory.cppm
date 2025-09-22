@@ -58,9 +58,14 @@ namespace PonyEngine::Path
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting path parameters.");
 		if (context->DataCount<PathParams>() == 0uz) [[unlikely]]
 		{
-			throw std::logic_error("Path params not found.");
+			throw std::logic_error("Path parameters not found.");
 		}
+		PONY_LOG_IF(context->DataCount<PathParams>() > 1uz, context->Logger(), Log::LogType::Warning, "Multiple path parameters found. Using the first one.");
 		const auto params = context->GetData<PathParams>(0uz);
+		if (!params) [[unlikely]]
+		{
+			throw std::logic_error("Path parameters is nullptr.");
+		}
 		if (!params->rootPath.is_relative()) [[unlikely]]
 		{
 			throw std::logic_error("Root path is not relative.");

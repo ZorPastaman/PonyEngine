@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Utility/Macro.h"
 
@@ -65,10 +67,7 @@ namespace PonyEngine::Log
 		}
 
 		const std::filesystem::path* const logFolderPath = pathService->FindPath(Path::MainPathIds::Log);
-		if (!logFolderPath) [[unlikely]]
-		{
-			throw std::logic_error("Log folder path not found.");
-		}
+		assert(logFolderPath && "Log folder path not found.");
 
 		const std::filesystem::path logPath = (*logFolderPath / PONY_STRINGIFY_VALUE(PONY_ENGINE_LOG_FILE_PATH)).lexically_normal();
 		if (std::filesystem::exists(logPath)) [[likely]]
