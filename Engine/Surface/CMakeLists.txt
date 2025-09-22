@@ -12,7 +12,6 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Surface/Surface.cppm"
 	"Source/Public/Surface/Surface-ISurfaceService.cppm"
-	"Source/Public/Surface/Surface-SurfaceParams.cppm"
 	"Source/Public/Surface/Surface-SurfacePositionMode.cppm"
 	"Source/Public/Surface/Surface-SurfaceStyle.cppm"
 	"Source/Public/Surface/Surface-Utility.cppm"
@@ -26,8 +25,6 @@ if(PONY_WINDOWS)
 		"Source/Public/Surface/Windows/Surface.Windows-IMessageObserver.cppm"
 		"Source/Public/Surface/Windows/Surface.Windows-IRawInputObserver.cppm"
 		"Source/Public/Surface/Windows/Surface.Windows-ISurfaceService.cppm"
-		"Source/Public/Surface/Windows/Surface.Windows-SurfaceParams.cppm"
-		"Source/Public/Surface/Windows/Surface.Windows-Utility.cppm"
 	)
 endif()
 

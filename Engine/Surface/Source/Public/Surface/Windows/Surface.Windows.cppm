@@ -14,5 +14,3 @@ export import PonyEngine.Surface;
 export import :IMessageObserver;
 export import :IRawInputObserver;
 export import :ISurfaceService;
-export import :SurfaceParams;
-export import :Utility;

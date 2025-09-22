@@ -7,15 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface:SurfaceParams;
+export module PonyEngine.Surface.Extension:SurfaceParams;
 
 import std;
 
 import PonyEngine.Math;
-
-import :SurfacePositionMode;
-import :SurfaceStyle;
-import :WindowRect;
+import PonyEngine.Surface;
 
 export namespace PonyEngine::Surface
 {
