@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/Log.h"
 
@@ -396,6 +398,7 @@ namespace PonyEngine::Application
 
 	void App::StartingUpModuleContext::AddService(const std::shared_ptr<IServiceFactory>& factory)
 	{
+		assert(factory && "The service factory is nullptr!");
 		application->serviceManager->AddService(*factory);
 	}
 
