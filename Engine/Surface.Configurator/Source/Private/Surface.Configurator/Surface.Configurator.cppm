@@ -7,8 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface.Main;
+export module PonyEngine.Surface.Configurator;
 
 export import PonyEngine.Surface.Extension;
-
-export import :Utility;

@@ -7,21 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+#include "PonyEngine/Surface/Windows/SurfaceConfiguratorModule.h"
 
-#include "PonyEngine/Platform/Windows/Framework.h"
+import PonyEngine.Application;
+import PonyEngine.Surface.Configurator.Windows;
 
-export module PonyEngine.Surface.Windows:SurfaceParams;
-
-import PonyEngine.Surface;
-
-export namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface::Windows
 {
-	/// @brief Surface parameters.
-	struct SurfaceParams final : Surface::SurfaceParams
+	SurfaceConfiguratorModule SurfaceConfiguratorModule; ///< Windows surface configurator module.
+
+	Application::IModule* GetSurfaceConfiguratorModule()
 	{
-		HICON icon = nullptr; ///< Main application icon.
-		HICON smallIcon = nullptr; ///< Small application icon.
-		HCURSOR cursor = nullptr; ///< Cursor icon.
-	};
+		return &SurfaceConfiguratorModule;
+	}
 }

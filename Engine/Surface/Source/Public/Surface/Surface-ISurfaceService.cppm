@@ -80,9 +80,13 @@ export namespace PonyEngine::Surface
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const = 0;
 
-		/// @brief Gets a minimal client size.
+		/// @brief Gets the minimal client size.
 		/// @return Minimal client size.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> MinimalSize() const = 0;
+		/// @brief Sets the minimal client size.
+		/// @param size Minimal client size.
+		/// @remark If the platform doesn't support windows, the function does nothing.
+		virtual void MinimalSize(const Math::Vector2<std::int32_t>& size) = 0;
 	};
 }

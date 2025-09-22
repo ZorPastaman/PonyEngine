@@ -61,7 +61,7 @@ target_sources(PonyEngine.Path.Configurator PRIVATE FILE_SET CXX_MODULES FILES
 
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring headers for Windows")
-	target_include_directories(PonyEngine.Path.Configurator  PUBLIC
+	target_include_directories(PonyEngine.Path.Configurator PUBLIC
 		"Include/Public/Windows"
 	)
 

@@ -10,7 +10,6 @@
 export module PonyEngine.Surface;
 
 export import :ISurfaceService;
-export import :SurfaceParams;
 export import :SurfacePositionMode;
 export import :SurfaceStyle;
 export import :Utility;

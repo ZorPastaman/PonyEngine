@@ -7,6 +7,9 @@ endif()
 if(NOT TARGET PonyEngine.Surface)
 	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
 endif()
+if(NOT TARGET PonyEngine.Surface.Extension)
+	message(FATAL_ERROR "PonyEngine.Surface.Extension wasn't configured")
+endif()
 
 if(NOT PONY_ENGINE_SURFACE_MAIN_ORDER)
 	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN is set but PONY_ENGINE_SURFACE_MAIN_ORDER isn't")
@@ -70,4 +73,5 @@ target_link_libraries(PonyEngine.Surface.Main PUBLIC
 	PonyEngine.Core
 	PonyEngine.Math
 	PonyEngine.Surface
+	PonyEngine.Surface.Extension
 )

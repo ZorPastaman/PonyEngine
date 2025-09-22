@@ -60,7 +60,7 @@ namespace PonyEngine::Path
 		{
 			throw std::logic_error("Path parameters not found.");
 		}
-		PONY_LOG_IF(context->DataCount<PathParams>() > 1uz, context->Logger(), Log::LogType::Warning, "Multiple path parameters found. Using the first one.");
+		PONY_LOG_IF(context->DataCount<PathParams>() > 1uz, context->Logger(), Log::LogType::Warning, "Multiple path parameters found. First one will be used.");
 		const auto params = context->GetData<PathParams>(0uz);
 		if (!params) [[unlikely]]
 		{

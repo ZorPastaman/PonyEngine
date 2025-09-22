@@ -45,15 +45,6 @@ export namespace PonyEngine::Surface::Windows
 		virtual void End() override;
 		virtual void Tick() override;
 
-		[[nodiscard("Pure function")]]
-		ISurfaceService& PublicSurfaceService() noexcept;
-		[[nodiscard("Pure function")]]
-		const ISurfaceService& PublicSurfaceService() const noexcept;
-
-		SurfaceService& operator =(const SurfaceService&) = delete;
-		SurfaceService& operator =(SurfaceService&&) = delete;
-
-	private:
 		[[nodiscard("Pure funtion")]]
 		virtual Math::Vector2<std::int32_t> ScreenResolution() const override;
 
@@ -76,6 +67,7 @@ export namespace PonyEngine::Surface::Windows
 
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> MinimalSize() const override;
+		virtual void MinimalSize(const Math::Vector2<std::int32_t>& size) override;
 
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept override;
@@ -95,6 +87,15 @@ export namespace PonyEngine::Surface::Windows
 		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 		[[nodiscard("Pure function")]]
+		ISurfaceService& PublicSurfaceService() noexcept;
+		[[nodiscard("Pure function")]]
+		const ISurfaceService& PublicSurfaceService() const noexcept;
+
+		SurfaceService& operator =(const SurfaceService&) = delete;
+		SurfaceService& operator =(SurfaceService&&) = delete;
+
+	private:
+		[[nodiscard("Pure function")]]
 		static WindowRect CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request);
 		[[nodiscard("Pure function")]]
 		std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateRect(const WindowRect& rect, DWORD style, DWORD styleEx);
@@ -104,10 +105,32 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		std::pair<DWORD, DWORD> GetStyle() const;
 		void SetStyle(DWORD style, DWORD styleEx);
+		/// @brief Converts an engine style to a Windows style.
+		/// @param style Engine style.
+		/// @return Windows style.
+		[[nodiscard("Pure function")]]
+		static constexpr DWORD ConvertToWindowsStyle(SurfaceStyle style) noexcept;
+		/// @brief Converts an engine style to a Windows style ex.
+		/// @param style Engine style.
+		/// @return Windows style ex.
+		[[nodiscard("Pure function")]]
+		static constexpr DWORD ConvertToWindowsStyleEx(SurfaceStyle style) noexcept;
+		/// @brief Converts a Windows style to a surface style.
+		/// @param style Windows style.
+		/// @return Surface style.
+		[[nodiscard("Pure function")]]
+		static constexpr SurfaceStyle ConvertToSurfaceStyle(DWORD style) noexcept;
+		/// @brief Converts a Windows style ex to a surface style.
+		/// @param style Windows style ex.
+		/// @return Surface style.
+		[[nodiscard("Pure function")]]
+		static constexpr SurfaceStyle ConvertExToSurfaceStyle(DWORD style) noexcept;
 
 		void RegisterRawInputType(USHORT usagePage, USHORT usage);
 		void UnregisterRawInputType(USHORT usagePage, USHORT usage);
 		void RegisterRawInputType(USHORT usagePage, USHORT usage, DWORD flags);
+		[[nodiscard("Pure function")]]
+		static DWORD GetHidType(const RAWINPUT& input);
 
 		void ObserveMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 
@@ -123,9 +146,6 @@ export namespace PonyEngine::Surface::Windows
 		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveRawInput(WPARAM wParam, LPARAM lParam) noexcept;
-
-		[[nodiscard("Pure function")]]
-		static DWORD GetHidType(const RAWINPUT& input);
 
 		[[nodiscard("Pure function")]]
 		static constexpr DWORD Pack(USHORT first, USHORT second) noexcept;
@@ -230,16 +250,6 @@ namespace PonyEngine::Surface::Windows
 			TranslateMessage(&message);
 			DispatchMessageA(&message);
 		}
-	}
-
-	ISurfaceService& SurfaceService::PublicSurfaceService() noexcept
-	{
-		return *this;
-	}
-
-	const ISurfaceService& SurfaceService::PublicSurfaceService() const noexcept
-	{
-		return *this;
 	}
 
 	Math::Vector2<std::int32_t> SurfaceService::ScreenResolution() const
@@ -399,6 +409,18 @@ namespace PonyEngine::Surface::Windows
 	Math::Vector2<std::int32_t> SurfaceService::MinimalSize() const
 	{
 		return static_cast<Math::Vector2<std::int32_t>>(minimalWindowSize);
+	}
+
+	void SurfaceService::MinimalSize(const Math::Vector2<std::int32_t>& size)
+	{
+		WindowRect currentRect = Rect(RectRequest{.relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner});
+		Math::Vector2<std::int32_t>& currentSize = std::get<1>(currentRect.size);
+		if (currentSize.X() < size.X() || currentSize.Y() < size.Y())
+		{
+			currentSize = Math::Max(currentSize, size);
+			Rect(currentRect);
+		}
+		minimalWindowSize = size;
 	}
 
 	HWND SurfaceService::Handle() noexcept
@@ -619,6 +641,16 @@ namespace PonyEngine::Surface::Windows
 		}
 	}
 
+	ISurfaceService& SurfaceService::PublicSurfaceService() noexcept
+	{
+		return *this;
+	}
+
+	const ISurfaceService& SurfaceService::PublicSurfaceService() const noexcept
+	{
+		return *this;
+	}
+
 	WindowRect SurfaceService::CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request)
 	{
 		const auto resolution = static_cast<Math::Vector2<std::int32_t>>(GetResolution());
@@ -745,6 +777,43 @@ namespace PonyEngine::Surface::Windows
 		}
 	}
 
+	constexpr DWORD SurfaceService::ConvertToWindowsStyle(const SurfaceStyle style) noexcept
+	{
+		DWORD windowsStyle = 0;
+		windowsStyle |= style == SurfaceStyle::None ? WS_POPUP : 0;
+		windowsStyle |= Any(SurfaceStyle::Border, style) ? WS_BORDER : 0;
+		windowsStyle |= Any(SurfaceStyle::Title, style) ? WS_BORDER | WS_CAPTION : 0;
+		windowsStyle |= Any(SurfaceStyle::Close, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU : 0;
+		windowsStyle |= Any(SurfaceStyle::Maximize, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX : 0;
+		windowsStyle |= Any(SurfaceStyle::Minimize, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX : 0;
+		windowsStyle |= Any(SurfaceStyle::Resizable, style) ? WS_BORDER | WS_THICKFRAME : 0;
+
+		return windowsStyle;
+	}
+
+	constexpr DWORD SurfaceService::ConvertToWindowsStyleEx(const SurfaceStyle style) noexcept
+	{
+		return Any(SurfaceStyle::AlwaysOnTop, style) ? WS_EX_TOPMOST : 0;
+	}
+
+	constexpr SurfaceStyle SurfaceService::ConvertToSurfaceStyle(const DWORD style) noexcept
+	{
+		auto surfaceStyle = SurfaceStyle::None;
+		surfaceStyle |= style & (WS_BORDER | WS_CAPTION | WS_THICKFRAME) ? SurfaceStyle::Border : SurfaceStyle::None;
+		surfaceStyle |= style & WS_CAPTION ? SurfaceStyle::Title : SurfaceStyle::None;
+		surfaceStyle |= style & WS_SYSMENU ? SurfaceStyle::Close : SurfaceStyle::None;
+		surfaceStyle |= style & WS_MAXIMIZEBOX ? SurfaceStyle::Maximize : SurfaceStyle::None;
+		surfaceStyle |= style & WS_MINIMIZEBOX ? SurfaceStyle::Minimize : SurfaceStyle::None;
+		surfaceStyle |= style & WS_THICKFRAME ? SurfaceStyle::Resizable : SurfaceStyle::None;
+
+		return surfaceStyle;
+	}
+
+	constexpr SurfaceStyle SurfaceService::ConvertExToSurfaceStyle(const DWORD style) noexcept
+	{
+		return style & WS_EX_TOPMOST ? SurfaceStyle::AlwaysOnTop : SurfaceStyle::None;
+	}
+
 	void SurfaceService::RegisterRawInputType(const USHORT usagePage, const USHORT usage)
 	{
 		RegisterRawInputType(usagePage, usage, DWORD{0});
@@ -771,6 +840,23 @@ namespace PonyEngine::Surface::Windows
 		{
 			throw std::runtime_error(Utility::SafeFormat("Failed to register raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
 		}
+	}
+
+	DWORD SurfaceService::GetHidType(const RAWINPUT& input)
+	{
+		auto info = RID_DEVICE_INFO{ .cbSize = sizeof(RID_DEVICE_INFO) };
+		UINT size = sizeof(info);
+		if (!GetRawInputDeviceInfoA(input.header.hDevice, RIDI_DEVICEINFO, &info, &size)) [[unlikely]]
+		{
+			throw std::runtime_error(Utility::SafeFormat("Failed to get hid device info. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		if (info.dwType != RIM_TYPEHID) [[unlikely]]
+		{
+			throw std::runtime_error("Wrong hid device!");
+		}
+
+		return Pack(info.hid.usUsagePage, info.hid.usUsage);
 	}
 
 	void SurfaceService::ObserveMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
@@ -925,23 +1011,6 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		return 0;
-	}
-
-	DWORD SurfaceService::GetHidType(const RAWINPUT& input)
-	{
-		auto info = RID_DEVICE_INFO{.cbSize = sizeof(RID_DEVICE_INFO)};
-		UINT size = sizeof(info);
-		if (!GetRawInputDeviceInfoA(input.header.hDevice, RIDI_DEVICEINFO, &info, &size)) [[unlikely]]
-		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to get hid device info. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		if (info.dwType != RIM_TYPEHID) [[unlikely]]
-		{
-			throw std::runtime_error("Wrong hid device!");
-		}
-
-		return Pack(info.hid.usUsagePage, info.hid.usUsage);
 	}
 
 	constexpr DWORD SurfaceService::Pack(const USHORT first, const USHORT second) noexcept
