@@ -34,7 +34,7 @@ export namespace PonyEngine::Surface::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title, const WindowRect& rect, 
+		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title, const SurfaceRect& rect, 
 			const Math::Vector2<int>& minimalWindowSize, SurfaceStyle style);
 		SurfaceService(const SurfaceService&) = delete;
 		SurfaceService(SurfaceService&&) = delete;
@@ -53,8 +53,11 @@ export namespace PonyEngine::Surface::Windows
 		virtual void Title(std::string_view title) override;
 
 		[[nodiscard("Pure function")]]
-		virtual WindowRect Rect(const RectRequest& request) const override;
-		virtual void Rect(const WindowRect& rect) override;
+		virtual SurfaceRect Rect(const RectRequest& request) const override;
+		virtual void Rect(const SurfaceRect& rect) override;
+		[[nodiscard("Pure function")]]
+		virtual Math::Vector2<std::int32_t> MinimalSize() const override;
+		virtual void MinimalSize(const Math::Vector2<std::int32_t>& size) override;
 
 		[[nodiscard("Pure function")]]
 		virtual SurfaceStyle Style() const override;
@@ -64,10 +67,6 @@ export namespace PonyEngine::Surface::Windows
 		virtual Math::Vector2<std::int32_t> ClientToScreen(const Math::Vector2<std::int32_t>& clientPoint) const override;
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const override;
-
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> MinimalSize() const override;
-		virtual void MinimalSize(const Math::Vector2<std::int32_t>& size) override;
 
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept override;
@@ -96,9 +95,9 @@ export namespace PonyEngine::Surface::Windows
 
 	private:
 		[[nodiscard("Pure function")]]
-		static WindowRect CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request);
+		static SurfaceRect CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request);
 		[[nodiscard("Pure function")]]
-		std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateRect(const WindowRect& rect, DWORD style, DWORD styleEx);
+		std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateRect(const SurfaceRect& rect, DWORD style, DWORD styleEx);
 		[[nodiscard("Pure function")]]
 		static Math::Vector2<int> GetResolution();
 
@@ -173,7 +172,7 @@ export namespace PonyEngine::Surface::Windows
 namespace PonyEngine::Surface::Windows
 {
 	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, 
-		const std::string_view title, const WindowRect& rect, const Math::Vector2<int>& minimalWindowSize, const SurfaceStyle style) :
+		const std::string_view title, const SurfaceRect& rect, const Math::Vector2<int>& minimalWindowSize, const SurfaceStyle style) :
 		application{&application},
 		windowClass(windowClass),
 		minimalWindowSize(minimalWindowSize),
@@ -301,11 +300,11 @@ namespace PonyEngine::Surface::Windows
 		}
 	}
 
-	WindowRect SurfaceService::Rect(const RectRequest& request) const
+	SurfaceRect SurfaceService::Rect(const RectRequest& request) const
 	{
 		if (!IsWindow(windowHandle)) [[unlikely]]
 		{
-			WindowRect windowRect;
+			SurfaceRect windowRect;
 			if (request.relativePosition)
 			{
 				windowRect.position = Math::Vector2<float>::Zero();
@@ -338,7 +337,7 @@ namespace PonyEngine::Surface::Windows
 		return CalculateRect(position, size, request);
 	}
 
-	void SurfaceService::Rect(const WindowRect& rect)
+	void SurfaceService::Rect(const SurfaceRect& rect)
 	{
 		if (!IsWindow(windowHandle)) [[unlikely]]
 		{
@@ -351,6 +350,23 @@ namespace PonyEngine::Surface::Windows
 		{
 			throw std::runtime_error(Utility::SafeFormat("Failed to set window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
+	}
+
+	Math::Vector2<std::int32_t> SurfaceService::MinimalSize() const
+	{
+		return static_cast<Math::Vector2<std::int32_t>>(minimalWindowSize);
+	}
+
+	void SurfaceService::MinimalSize(const Math::Vector2<std::int32_t>& size)
+	{
+		SurfaceRect currentRect = Rect(RectRequest{ .relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner });
+		Math::Vector2<std::int32_t>& currentSize = std::get<1>(currentRect.size);
+		if (currentSize.X() < size.X() || currentSize.Y() < size.Y())
+		{
+			currentSize = Math::Max(currentSize, size);
+			Rect(currentRect);
+		}
+		minimalWindowSize = size;
 	}
 
 	SurfaceStyle SurfaceService::Style() const
@@ -404,23 +420,6 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(clientPoint.x), static_cast<std::int32_t>(clientPoint.y));
-	}
-
-	Math::Vector2<std::int32_t> SurfaceService::MinimalSize() const
-	{
-		return static_cast<Math::Vector2<std::int32_t>>(minimalWindowSize);
-	}
-
-	void SurfaceService::MinimalSize(const Math::Vector2<std::int32_t>& size)
-	{
-		WindowRect currentRect = Rect(RectRequest{.relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner});
-		Math::Vector2<std::int32_t>& currentSize = std::get<1>(currentRect.size);
-		if (currentSize.X() < size.X() || currentSize.Y() < size.Y())
-		{
-			currentSize = Math::Max(currentSize, size);
-			Rect(currentRect);
-		}
-		minimalWindowSize = size;
 	}
 
 	HWND SurfaceService::Handle() noexcept
@@ -651,12 +650,12 @@ namespace PonyEngine::Surface::Windows
 		return *this;
 	}
 
-	WindowRect SurfaceService::CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request)
+	SurfaceRect SurfaceService::CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request)
 	{
 		const auto resolution = static_cast<Math::Vector2<std::int32_t>>(GetResolution());
 		const Math::Vector2<std::int32_t> delta = CalculateDelta(position, size, resolution, request.positionMode);
 
-		WindowRect answer;
+		SurfaceRect answer;
 		if (request.relativePosition)
 		{
 			answer.position = AbsoluteToRelative(delta, resolution);
@@ -678,7 +677,7 @@ namespace PonyEngine::Surface::Windows
 		return answer;
 	}
 
-	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::CalculateRect(const WindowRect& rect, const DWORD style, const DWORD styleEx)
+	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::CalculateRect(const SurfaceRect& rect, const DWORD style, const DWORD styleEx)
 	{
 		const auto resolution = static_cast<Math::Vector2<std::int32_t>>(GetResolution());
 		const Math::Vector2<std::int32_t> delta = rect.position.index() ? std::get<1>(rect.position) : RelativeToAbsolute(std::get<0>(rect.position), resolution);
@@ -743,7 +742,7 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::SetStyle(const DWORD style, const DWORD styleEx)
 	{
-		const WindowRect rect = Rect(RectRequest{.relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner});
+		const SurfaceRect rect = Rect(RectRequest{.relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner});
 		const auto [currentStyle, currentStyleEx] = GetStyle();
 
 		SetLastError(DWORD{0});

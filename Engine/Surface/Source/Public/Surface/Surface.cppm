@@ -11,6 +11,6 @@ export module PonyEngine.Surface;
 
 export import :ISurfaceService;
 export import :SurfacePositionMode;
+export import :SurfaceRect;
 export import :SurfaceStyle;
 export import :Utility;
-export import :WindowRect;

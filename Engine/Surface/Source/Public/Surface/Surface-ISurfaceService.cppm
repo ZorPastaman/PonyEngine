@@ -18,8 +18,8 @@ import std;
 import PonyEngine.Math;
 
 import :SurfacePositionMode;
+import :SurfaceRect;
 import :SurfaceStyle;
-import :WindowRect;
 
 export namespace PonyEngine::Surface
 {
@@ -50,15 +50,23 @@ export namespace PonyEngine::Surface
 		/// @remark If the platform doesn't support client titles, the function does nothing.
 		virtual void Title(std::string_view title) = 0;
 
-		/// @brief Gets a window rectangle.
+		/// @brief Gets a surface rectangle.
 		/// @param request Rectangle request parameters.
-		/// @return Window rectangle.
+		/// @return Surface rectangle.
 		[[nodiscard("Pure function")]]
-		virtual WindowRect Rect(const RectRequest& request = RectRequest()) const = 0;
-		/// @brief Sets a window rectangle.
-		/// @param rect Window rectangle.
-		/// @remark If the platform doesn't support windows, the function does nothing.
-		virtual void Rect(const WindowRect& rect) = 0;
+		virtual SurfaceRect Rect(const RectRequest& request = RectRequest()) const = 0;
+		/// @brief Sets a surface rectangle.
+		/// @param rect Surface rectangle.
+		/// @remark If the platform doesn't support surface rectangles, the function does nothing.
+		virtual void Rect(const SurfaceRect& rect) = 0;
+		/// @brief Gets the minimal client size.
+		/// @return Minimal client size.
+		[[nodiscard("Pure function")]]
+		virtual Math::Vector2<std::int32_t> MinimalSize() const = 0;
+		/// @brief Sets the minimal client size.
+		/// @param size Minimal client size.
+		/// @remark If the platform doesn't support surface rectangles, the function does nothing.
+		virtual void MinimalSize(const Math::Vector2<std::int32_t>& size) = 0;
 
 		/// @brief Gets a surface style.
 		/// @return Surface style.
@@ -79,14 +87,5 @@ export namespace PonyEngine::Surface
 		/// @return Client point.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const = 0;
-
-		/// @brief Gets the minimal client size.
-		/// @return Minimal client size.
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> MinimalSize() const = 0;
-		/// @brief Sets the minimal client size.
-		/// @param size Minimal client size.
-		/// @remark If the platform doesn't support windows, the function does nothing.
-		virtual void MinimalSize(const Math::Vector2<std::int32_t>& size) = 0;
 	};
 }

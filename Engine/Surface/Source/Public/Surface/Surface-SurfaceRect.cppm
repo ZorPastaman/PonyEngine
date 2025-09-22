@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface:WindowRect;
+export module PonyEngine.Surface:SurfaceRect;
 
 import std;
 
@@ -17,8 +17,8 @@ import :SurfacePositionMode;
 
 export namespace PonyEngine::Surface
 {
-	/// @brief Window rectangle.
-	struct WindowRect final
+	/// @brief Surface rectangle.
+	struct SurfaceRect final
 	{
 		/// @brief Surface position. If it's a floating point, it's treated as a relative rect; otherwise, it's an absolute rect.
 		std::variant<Math::Vector2<float>, Math::Vector2<std::int32_t>> position = Math::Vector2<std::int32_t>::Zero();

@@ -47,6 +47,7 @@ if(PONY_WINDOWS)
 	target_sources(PonyEngine.Core.Tests PRIVATE
 		"Platform/Windows/Cursor.cpp"
 		"Platform/Windows/Module.cpp"
+		"Platform/Windows/Path.cpp"
 	)
 endif()
 

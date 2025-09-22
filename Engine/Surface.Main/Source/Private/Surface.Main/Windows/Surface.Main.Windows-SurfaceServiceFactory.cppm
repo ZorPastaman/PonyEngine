@@ -68,12 +68,7 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows window class.");
-		const HBRUSH backgroundBrush = CreateSolidBrush(RGB(params->backgroundColor.R(), params->backgroundColor.G(), params->backgroundColor.B()));
-		if (!backgroundBrush) [[unlikely]]
-		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to create background brush. Error code: '0x{:X}'.", GetLastError()));
-		}
-		const auto windowClass = std::make_shared<WindowClass>(application, params->icon, params->smallIcon, params->cursor, backgroundBrush);
+		const auto windowClass = std::make_shared<WindowClass>(application, params->icon, params->smallIcon, params->cursor, params->backgroundColor);
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows surface service.");
 		const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, params->title, params->rect, params->minimalSize, params->style);
