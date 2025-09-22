@@ -10,7 +10,7 @@ target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Surface/Surface-SurfacePositionMode.cppm"
 	"Source/Public/Surface/Surface-SurfaceStyle.cppm"
 	"Source/Public/Surface/Surface-Utility.cppm"
-	"Source/Public/Surface/Surface-WindowRect.cppm"
+	"Source/Public/Surface/Surface-SurfaceRect.cppm"
 )
 
 if(PONY_WINDOWS)

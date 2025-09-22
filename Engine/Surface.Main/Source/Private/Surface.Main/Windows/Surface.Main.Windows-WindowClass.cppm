@@ -15,6 +15,8 @@ module;
 export module PonyEngine.Surface.Main.Windows:WindowClass;
 
 import PonyEngine.Application;
+import PonyEngine.Log;
+import PonyEngine.Math;
 import PonyEngine.Platform.Windows;
 import PonyEngine.Utility;
 
@@ -33,7 +35,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @param cursor Cursor.
 		/// @param backgroundColor Background color.
 		[[nodiscard("Pure constructor")]]
-		WindowClass(Application::IApplicationContext& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor, HBRUSH backgroundColor);
+		WindowClass(Application::IApplicationContext& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor, const Math::ColorRGB<std::uint8_t>& backgroundColor);
 		WindowClass(const WindowClass&) = delete;
 		WindowClass(WindowClass&&) = delete;
 
@@ -55,16 +57,25 @@ export namespace PonyEngine::Surface::Windows
 		Application::IApplicationContext* application; ///< Application.
 
 		HMODULE moduleHandle; ///< Module instance handle.
+		HBRUSH backgroundBrush; ///< Background brush.
 		ATOM classHandle; /// Registered class handle.
 	};
 }
 
 namespace PonyEngine::Surface::Windows
 {
-	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor, const HBRUSH backgroundColor) :
+	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor, const Math::ColorRGB<std::uint8_t>& backgroundColor) :
 		application{&application},
 		moduleHandle(Platform::Windows::GetModule())
 	{
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating background brush... Color: '{}'.", backgroundColor);
+		backgroundBrush = CreateSolidBrush(RGB(backgroundColor.R(), backgroundColor.G(), backgroundColor.B()));
+		if (!backgroundBrush) [[unlikely]]
+		{
+			throw std::runtime_error(Utility::SafeFormat("Failed to create background brush. Error code: '0x{:X}'.", GetLastError()));
+		}
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating background brush done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush));
+
 		const auto wc = WNDCLASSEXA
 		{
 			.cbSize = sizeof(WNDCLASSEXA),
@@ -75,15 +86,14 @@ namespace PonyEngine::Surface::Windows
 			.hInstance = moduleHandle,
 			.hIcon = mainIcon,
 			.hCursor = cursor,
-			.hbrBackground = backgroundColor,
+			.hbrBackground = backgroundBrush,
 			.lpszMenuName = nullptr,
 			.lpszClassName = "Pony Engine Class",
 			.hIconSm = smallIcon
 		};
-
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class... Class name: '{}'; Module: '0x{:X}'; Main icon: '0x{:X}'; Small icon: '0x{:X}'; Cursor: '0x{:X}'.",
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class... Class name: '{}'; Module: '0x{:X}'; Main icon: '0x{:X}'; Small icon: '0x{:X}'; Cursor: '0x{:X}'; Background brush: '0x{:X}'.",
 			wc.lpszClassName, reinterpret_cast<std::uintptr_t>(wc.hInstance), reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hIconSm),
-			reinterpret_cast<std::uintptr_t>(wc.hCursor));
+			reinterpret_cast<std::uintptr_t>(wc.hCursor), reinterpret_cast<std::uintptr_t>(backgroundBrush));
 		classHandle = RegisterClassExA(&wc);
 		if (!classHandle) [[unlikely]]
 		{
@@ -100,6 +110,13 @@ namespace PonyEngine::Surface::Windows
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to unregister class. Error code: '0x{:X}'.", GetLastError());
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Unregistering window class done.");
+
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Deleting background brush... Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush));
+		if (!DeleteObject(backgroundBrush)) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to delete background brush. Error code: '0x{:X}'.", GetLastError());
+		}
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Deleting background brush done.");
 	}
 
 	HMODULE WindowClass::ModuleHandle() const noexcept
