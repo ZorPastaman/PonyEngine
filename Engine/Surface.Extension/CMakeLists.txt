@@ -4,9 +4,6 @@ message(VERBOSE "Validating settings")
 if(NOT TARGET PonyEngine.Surface)
 	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
 endif()
-if(NOT TARGET PonyEngine.Math)
-	message(FATAL_ERROR "PonyEngine.Math wasn't configured")
-endif()
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface.Extension STATIC)
@@ -34,6 +31,5 @@ set_target_properties(PonyEngine.Surface.Extension PROPERTIES
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Surface.Extension PUBLIC
 	PonyEngine.Core
-	PonyEngine.Math
 	PonyEngine.Surface
 )
