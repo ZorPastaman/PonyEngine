@@ -171,7 +171,7 @@ namespace PonyEngine::Log
 			switch ((stacktrace != nullptr) << 2 | !message.empty() << 1 | (exception != nullptr) << 0)
 			{
 			case 0:
-				return LogFormat(logType, timePoint, frameCount);
+				return LogFormat(logType, message, timePoint, frameCount);
 			case 1:
 				return LogFormat(logType, exception->what(), timePoint, frameCount);
 			case 2:
@@ -179,7 +179,7 @@ namespace PonyEngine::Log
 			case 3:
 				return LogFormat(logType, exception->what(), message, timePoint, frameCount);
 			case 4:
-				return LogFormat(logType, timePoint, frameCount, *stacktrace);
+				return LogFormat(logType, message, timePoint, frameCount, *stacktrace);
 			case 5:
 				return LogFormat(logType, exception->what(), timePoint, frameCount, *stacktrace);
 			case 6:
