@@ -18,6 +18,5 @@ export namespace PonyEngine::Log
 	{
 		std::string_view message; ///< Log message.
 		const std::basic_stacktrace<std::allocator<std::stacktrace_entry>>* stacktrace = nullptr; ///< Stacktrace.
-		std::optional<std::uint64_t> frameCount = std::nullopt; ///< Engine frame count.
 	};
 }

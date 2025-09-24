@@ -80,6 +80,9 @@ export namespace PonyEngine::Application
 			virtual int ExitCode() const noexcept override;
 			virtual void Stop(int exitCode) noexcept override;
 
+			[[nodiscard("Pure function")]]
+			virtual std::uint64_t FrameCount() const noexcept override;
+
 			AppContext& operator =(const AppContext&) = delete;
 			AppContext& operator =(AppContext&&) = delete;
 
@@ -180,6 +183,8 @@ export namespace PonyEngine::Application
 		void OnLoggerAdded(const IService* loggerService, void* loggerInterface);
 		void OnLoggerRemoved(const IService* service) noexcept;
 
+		std::uint64_t frameCount; ///< Frame count.
+
 		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 		bool isTicking; ///< @a True if the engine is ticking now; @a false otherwise.
@@ -199,6 +204,7 @@ namespace PonyEngine::Application
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) IModule** LastModule = nullptr;
 
 	App::App() :
+		frameCount{0ull},
 		exitCode{ExitCodes::InitialExitCode},
 		isRunning{true},
 		isTicking{false},
@@ -257,6 +263,7 @@ namespace PonyEngine::Application
 		serviceManager->Tick();
 
 		isTicking = false;
+		++frameCount;
 
 		if (isRunning) [[likely]]
 		{
@@ -331,6 +338,11 @@ namespace PonyEngine::Application
 	void App::AppContext::Stop(const int exitCode) noexcept
 	{
 		application->Stop(exitCode);
+	}
+
+	std::uint64_t App::AppContext::FrameCount() const noexcept
+	{
+		return application->frameCount;
 	}
 
 	App::StartingUpModuleContext::StartingUpModuleContext(App& application) noexcept :

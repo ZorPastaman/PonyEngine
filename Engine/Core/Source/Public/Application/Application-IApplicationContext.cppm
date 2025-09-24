@@ -68,6 +68,11 @@ export namespace PonyEngine::Application
 		/// @remark If the application is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = 0) noexcept = 0;
+
+		/// @brief Gets the current frame count.
+		/// @return Current frame count.
+		[[nodiscard("Pure function")]]
+		virtual std::uint64_t FrameCount() const noexcept = 0;
 	};
 }
 

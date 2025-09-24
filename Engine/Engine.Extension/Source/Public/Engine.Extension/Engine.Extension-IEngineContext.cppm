@@ -63,11 +63,6 @@ export namespace PonyEngine::Engine
 		/// @return Pointer to the system if it's found; nullptr if it's not found.
 		template<typename T> [[nodiscard("Pure function")]]
 		const T* FindSystem() const noexcept;
-
-		/// @brief Gets the current frame count.
-		/// @return Current frame count.
-		[[nodiscard("Pure function")]]
-		virtual std::uint64_t FrameCount() const noexcept = 0;
 	};
 }
 
