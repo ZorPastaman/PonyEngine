@@ -211,7 +211,7 @@ namespace PonyEngine::Application
 		appContext(*this)
 	{
 		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger.");
-		defaultLogger = std::make_shared<DefaultLogger>();
+		defaultLogger = std::make_shared<DefaultLogger>(appContext);
 		logger = defaultLogger.get();
 
 		PONY_LOG(*logger, Log::LogType::Info, "Constructing service manager.");
