@@ -31,7 +31,7 @@ export namespace PonyEngine::Log
 		/// @param frameCount Frame when the log entry has been created.
 		/// @param logType Log type.
 		[[nodiscard("Pure constructor")]]
-		LogEntry(std::string_view message, const std::stacktrace* stacktrace, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::uint64_t> frameCount, LogType logType) noexcept;
+		LogEntry(std::string_view message, const std::stacktrace* stacktrace, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount, LogType logType) noexcept;
 		LogEntry(const LogEntry&) = delete;
 		LogEntry(LogEntry&&) = delete;
 
@@ -79,7 +79,7 @@ export namespace PonyEngine::Log
 		const std::stacktrace* const stacktrace; ///< Stacktrace attached to the log entry.
 		const std::exception* const exception; ///< Exception attached to the log entry.
 		const std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
-		const std::optional<std::uint64_t> frameCount; ///< Frame when the log entry is created.
+		const std::uint64_t frameCount; ///< Frame when the log entry is created.
 		const Log::LogType logType; ///< Log type.
 
 		const std::string logString; ///< Log string.
@@ -118,7 +118,7 @@ struct std::formatter<PonyEngine::Log::LogEntry, char>
 
 namespace PonyEngine::Log
 {
-	LogEntry::LogEntry(const std::string_view message, const std::stacktrace* const stacktrace, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::uint64_t> frameCount, const Log::LogType logType) noexcept :
+	LogEntry::LogEntry(const std::string_view message, const std::stacktrace* const stacktrace, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount, const Log::LogType logType) noexcept :
 		message{message},
 		stacktrace{stacktrace},
 		exception{exception},
@@ -168,42 +168,26 @@ namespace PonyEngine::Log
 	{
 		try
 		{
-			switch ((stacktrace != nullptr) << 3 | !message.empty() << 2 | (exception != nullptr) << 1 | frameCount.has_value() << 0)
+			switch ((stacktrace != nullptr) << 2 | !message.empty() << 1 | (exception != nullptr) << 0)
 			{
 			case 0:
-				return LogFormat(logType, timePoint);
+				return LogFormat(logType, timePoint, frameCount);
 			case 1:
-				return LogFormat(logType, timePoint, frameCount.value());
+				return LogFormat(logType, exception->what(), timePoint, frameCount);
 			case 2:
-				return LogFormat(logType, exception->what(), timePoint);
+				return LogFormat(logType, message, timePoint, frameCount);
 			case 3:
-				return LogFormat(logType, exception->what(), timePoint, frameCount.value());
+				return LogFormat(logType, exception->what(), message, timePoint, frameCount);
 			case 4:
-				return LogFormat(logType, message, timePoint);
+				return LogFormat(logType, timePoint, frameCount, *stacktrace);
 			case 5:
-				return LogFormat(logType, message, timePoint, frameCount.value());
+				return LogFormat(logType, exception->what(), timePoint, frameCount, *stacktrace);
 			case 6:
-				return LogFormat(logType, exception->what(), message, timePoint);
+				return LogFormat(logType, message, timePoint, frameCount, *stacktrace);
 			case 7:
-				return LogFormat(logType, exception->what(), message, timePoint, frameCount.value());
-			case 8:
-				return LogFormat(logType, timePoint, *stacktrace);
-			case 9:
-				return LogFormat(logType, timePoint, frameCount.value(), *stacktrace);
-			case 10:
-				return LogFormat(logType, exception->what(), timePoint, *stacktrace);
-			case 11:
-				return LogFormat(logType, exception->what(), timePoint, frameCount.value(), *stacktrace);
-			case 12:
-				return LogFormat(logType, message, timePoint, *stacktrace);
-			case 13:
-				return LogFormat(logType, message, timePoint, frameCount.value(), *stacktrace);
-			case 14:
-				return LogFormat(logType, exception->what(), message, timePoint, *stacktrace);
-			case 15:
-				return LogFormat(logType, exception->what(), message, timePoint, frameCount.value(), *stacktrace);
+				return LogFormat(logType, exception->what(), message, timePoint, frameCount, *stacktrace);
 			default: [[unlikely]]
-				return LogFormat(logType, exception ? exception->what() : "Unknown exception", message.empty() ? "Unknown message" : message, timePoint, frameCount.value_or(0));
+				return LogFormat(logType, exception ? exception->what() : "Unknown exception", message.empty() ? "Unknown message" : message, timePoint, frameCount);
 			}
 		}
 		catch (const std::exception& e)

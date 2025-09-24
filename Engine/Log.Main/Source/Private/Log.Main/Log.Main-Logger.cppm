@@ -131,13 +131,13 @@ namespace PonyEngine::Log
 
 	void Logger::Log(const LogType logType, const LogInput& logInput) const noexcept
 	{
-		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
+		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, nullptr, std::chrono::system_clock::now(), application->FrameCount(), logType);
 		Log(logEntry);
 	}
 
 	void Logger::Log(const std::exception& exception, const LogInput& logInput) const noexcept
 	{
-		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
+		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, &exception, std::chrono::system_clock::now(), application->FrameCount(), LogType::Exception);
 		Log(logEntry);
 	}
 
