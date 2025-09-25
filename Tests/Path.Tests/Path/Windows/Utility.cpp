@@ -11,19 +11,21 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-import PonyEngine.Platform.Windows;
+import std;
 
-TEST_CASE("GetModulePath returns a current module path", "[Platform][Path]")
+import PonyEngine.Path.Windows;
+
+TEST_CASE("GetModulePath returns a current module path", "[Path][Utility]")
 {
 	auto path = std::array<wchar_t, MAX_PATH>();
 	GetModuleFileNameW(nullptr, path.data(), static_cast<DWORD>(path.size()));
-	REQUIRE(std::wstring(path.data()) == PonyEngine::Platform::Windows::GetModulePath(nullptr).wstring());
+	REQUIRE(std::wstring(path.data()) == PonyEngine::Path::Windows::GetModulePath(nullptr).wstring());
 }
 
-TEST_CASE("GetKnowsPath returns a local data path", "[Platform][Path]")
+TEST_CASE("GetKnowsPath returns a local data path", "[Path][Utility]")
 {
 	wchar_t* pathRaw = nullptr;
 	SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &pathRaw);
-	REQUIRE(std::wstring(pathRaw) == PonyEngine::Platform::Windows::GetKnownPath(FOLDERID_LocalAppData));
+	REQUIRE(std::wstring(pathRaw) == PonyEngine::Path::Windows::GetKnownPath(FOLDERID_LocalAppData));
 	CoTaskMemFree(pathRaw);
 }

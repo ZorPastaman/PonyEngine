@@ -15,12 +15,6 @@ string(SUBSTRING "${PONY_ENGINE_SURFACE_MAIN_ORDER}" 0 1 ORDER_FIRST_CHAR)
 if(NOT ORDER_FIRST_CHAR MATCHES "^[b-y]$")
 	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN_ORDER is incorrect. Its first letter must be inside b-y range")
 endif()
-if(${PONY_ENGINE_SURFACE_MAIN_TICK_ORDER} STREQUAL "")
-	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN is set but PONY_ENGINE_SURFACE_MAIN_TICK_ORDER isn't")
-endif()
-if(NOT PONY_ENGINE_SURFACE_MAIN_TICK_ORDER MATCHES "^-?[0-9]+$")
-	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN_TICK_ORDER isn't a number")
-endif()
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface.Main STATIC)
@@ -56,7 +50,7 @@ endif()
 
 message(VERBOSE "Configuring defines")
 target_compile_definitions(PonyEngine.Surface.Main PUBLIC
-	PONY_ENGINE_SURFACE_MAIN_ORDER=${PONY_ENGINE_SURFACE_MAIN_ORDER} PONY_ENGINE_SURFACE_MAIN_TICK_ORDER=${PONY_ENGINE_SURFACE_MAIN_TICK_ORDER}
+	PONY_ENGINE_SURFACE_MAIN_ORDER=${PONY_ENGINE_SURFACE_MAIN_ORDER}
 )
 
 message(VERBOSE "Setting properties")

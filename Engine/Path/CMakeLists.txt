@@ -10,6 +10,14 @@ target_sources(PonyEngine.Path PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Path/Path-MainPathIds.cppm"
 )
 
+if(PONY_WINDOWS)
+	message(VERBOSE "Configuring sources for Windows")
+	target_sources(PonyEngine.Path PUBLIC FILE_SET CXX_MODULES FILES
+		"Source/Public/Path/Windows/Path.Windows.cppm" 
+		"Source/Public/Path/Windows/Path.Windows-Utility.cppm"
+	)
+endif()
+
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Path PROPERTIES 
 	CXX_STANDARD 23

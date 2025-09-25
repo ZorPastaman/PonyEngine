@@ -13,4 +13,3 @@ export import PonyEngine.Application;
 
 export import :App;
 export import :ExitCodes;
-export import :Loop;

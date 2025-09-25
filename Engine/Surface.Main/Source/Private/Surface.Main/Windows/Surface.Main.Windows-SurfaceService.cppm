@@ -30,7 +30,7 @@ import :WindowClass;
 
 export namespace PonyEngine::Surface::Windows
 {
-	class SurfaceService final : public Application::ITickableService, private ISurfaceService, private IMessageHandler
+	class SurfaceService final : public Application::IService, private ISurfaceService, private IMessageHandler
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -43,7 +43,6 @@ export namespace PonyEngine::Surface::Windows
 
 		virtual void Begin() override;
 		virtual void End() override;
-		virtual void Tick() override;
 
 		[[nodiscard("Pure funtion")]]
 		virtual Math::Vector2<std::int32_t> ScreenResolution() const override;
@@ -238,17 +237,6 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::End()
 	{
-	}
-
-	void SurfaceService::Tick()
-	{
-		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Peeking messages.");
-		MSG message;
-		while (PeekMessageA(&message, windowHandle, 0, 0, PM_REMOVE | PM_NOYIELD))
-		{
-			TranslateMessage(&message);
-			DispatchMessageA(&message);
-		}
 	}
 
 	Math::Vector2<std::int32_t> SurfaceService::ScreenResolution() const
@@ -617,7 +605,7 @@ namespace PonyEngine::Surface::Windows
 
 	LRESULT SurfaceService::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' command.", uMsg);
+		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' message.", uMsg);
 
 		ObserveMessage(uMsg, wParam, lParam);
 

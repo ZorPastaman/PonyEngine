@@ -12,6 +12,7 @@ export module PonyEngine.Path.Main.Windows:PathServiceFactory;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Path.Extension.Windows;
 import PonyEngine.Path.Main;
 import PonyEngine.Platform.Windows;
 
@@ -48,6 +49,6 @@ namespace PonyEngine::Path::Windows
 
 	std::filesystem::path PathServiceFactory::GetExecutablePath() const
 	{
-		return Platform::Windows::GetModulePath(nullptr);
+		return GetModulePath(nullptr);
 	}
 }
