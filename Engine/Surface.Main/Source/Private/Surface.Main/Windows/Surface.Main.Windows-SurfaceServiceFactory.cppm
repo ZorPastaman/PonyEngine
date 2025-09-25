@@ -74,10 +74,9 @@ namespace PonyEngine::Surface::Windows
 		const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, params->title, params->rect, params->minimalSize, params->style);
 
 		Application::ServiceData data;
-		data.service = std::static_pointer_cast<Application::ITickableService>(surfaceService);
+		data.service = surfaceService;
 		data.publicInterfaces.AddInterface<Surface::ISurfaceService>(surfaceService->PublicSurfaceService());
 		data.publicInterfaces.AddInterface<ISurfaceService>(surfaceService->PublicSurfaceService());
-		data.tickOrder = PONY_ENGINE_SURFACE_MAIN_TICK_ORDER;
 
 		return data;
 	}

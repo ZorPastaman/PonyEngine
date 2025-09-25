@@ -59,7 +59,7 @@ namespace PonyEngine::Log
 
 	SubLoggerData FileSubLoggerFactory::CreateSubLogger(ILoggerContext&)
 	{
-		PONY_LOG(context->Logger(), LogType::Debug, "Preparing log files.");
+		PONY_LOG(context->Logger(), LogType::Debug, "Preparing log files...");
 		const Path::IPathService* const pathService = context->FindService<Path::IPathService>();
 		if (!pathService) [[unlikely]]
 		{
@@ -79,8 +79,14 @@ namespace PonyEngine::Log
 		{
 			std::filesystem::create_directories(logPath.parent_path());
 		}
+		PONY_LOG(context->Logger(), LogType::Debug, "Preparing log files done.");
 
-		PONY_LOG(context->Logger(), LogType::Debug, "Constructing file sub-logger. Log path: '{}'.", logPath.string());
-		return SubLoggerData{.subLogger = std::make_shared<FileSubLogger>(logPath)};
+		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}'... Log path: '{}'.", typeid(FileSubLogger).name(), logPath.string());
+		const auto fileSubLogger = std::make_shared<FileSubLogger>(logPath);
+		SubLoggerData data;
+		data.subLogger = fileSubLogger;
+		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}' done.", typeid(FileSubLogger).name());
+
+		return data;
 	}
 }

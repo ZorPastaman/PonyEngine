@@ -177,8 +177,8 @@ namespace PonyEngine::Log
 				PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-logger... Factory: '{}'.", typeid(*factory).name());
 				SubLoggerData subLogger = factory->CreateSubLogger(loggerContext);
 				assert(subLogger.subLogger && "The sub-logger is nullptr!");
+				subLoggers.push_back(subLogger.subLogger);
 				PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-logger done. Sub-logger: '{}'.", typeid(*subLogger.subLogger).name());
-				subLoggers.push_back(std::move(subLogger.subLogger));
 			}
 			catch (const std::exception& e)
 			{
@@ -202,8 +202,10 @@ namespace PonyEngine::Log
 		for (std::size_t i = subLoggers.size(); i-- > 0uz; )
 		{
 			std::shared_ptr<ISubLogger>& subLogger = subLoggers[i];
-			PONY_LOG(this->application->Logger(), LogType::Info, "Releasing '{}' sub-logger.", typeid(*subLogger).name());
+			const char* const subLoggerName = typeid(*subLogger).name();
+			PONY_LOG(this->application->Logger(), LogType::Info, "Releasing '{}' sub-logger...", subLoggerName);
 			subLogger.reset();
+			PONY_LOG(this->application->Logger(), LogType::Info, "Releasing '{}' sub-logger done.", subLoggerName);
 		}
 		PONY_LOG(this->application->Logger(), LogType::Info, "Releasing sub-loggers done.");
 	}

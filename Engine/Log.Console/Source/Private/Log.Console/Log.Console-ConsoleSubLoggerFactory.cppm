@@ -55,7 +55,12 @@ namespace PonyEngine::Log
 
 	SubLoggerData ConsoleSubLoggerFactory::CreateSubLogger(ILoggerContext&)
 	{
-		PONY_LOG(context->Logger(), LogType::Debug, "Constructing console sub-logger.");
-		return SubLoggerData{.subLogger = std::make_shared<ConsoleSubLogger>()};
+		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}'...", typeid(ConsoleSubLogger).name());
+		const auto consoleSubLogger = std::make_shared<ConsoleSubLogger>();
+		SubLoggerData data;
+		data.subLogger = consoleSubLogger;
+		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}' done.", typeid(ConsoleSubLogger).name());
+
+		return data;
 	}
 }

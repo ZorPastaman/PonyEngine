@@ -93,26 +93,30 @@ namespace PonyEngine::Engine
 		application{&application},
 		engineContext(*this)
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Constructing system manager.");
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Constructing system manager...");
 		systemManager = std::make_unique<SystemManager>(engineContext, systemFactories);
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Constructing system manager done.");
 	}
 
 	Engine::~Engine() noexcept
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing system manager.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing system manager...");
 		systemManager.reset();
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing system manager done.");
 	}
 
 	void Engine::Begin()
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning system manager.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning system manager...");
 		systemManager->Begin();
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning system manager done.");
 	}
 
 	void Engine::End() noexcept
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending system manager.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending system manager...");
 		systemManager->End();
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending system manager done.");
 	}
 
 	void Engine::Tick()

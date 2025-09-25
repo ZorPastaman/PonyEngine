@@ -211,7 +211,8 @@ namespace PonyEngine::Application
 		for (std::size_t i = services.size(); i-- > 0uz; )
 		{
 			std::shared_ptr<IService>& service = services[i];
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing '{}' service.", typeid(*service).name());
+			const char* const serviceName = typeid(*service).name();
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing '{}' service...", serviceName);
 
 			if (const auto position = onServiceRemovedHooks.find(service.get()); position != onServiceRemovedHooks.cend())
 			{
@@ -238,6 +239,7 @@ namespace PonyEngine::Application
 			}
 
 			service.reset();
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing '{}' service done.", serviceName);
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing application services done.");
 
@@ -309,8 +311,9 @@ namespace PonyEngine::Application
 		{
 			try
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service.", typeid(*service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service...", typeid(*service).name());
 				service->Begin();
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service done.", typeid(*service).name());
 				++count;
 			}
 			catch (const std::exception& e)
@@ -335,8 +338,9 @@ namespace PonyEngine::Application
 			const std::shared_ptr<IService>& service = services[i];
 			try
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service.", typeid(*service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service...", typeid(*service).name());
 				service->End();
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service done.", typeid(*service).name());
 			}
 			catch (const std::exception& e)
 			{

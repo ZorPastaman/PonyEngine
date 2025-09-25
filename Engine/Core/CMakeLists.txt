@@ -75,10 +75,13 @@ if(PONY_WINDOWS)
 
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+		"Source/Public/Application/Windows/Application.Windows.cppm"
+		"Source/Public/Application/Windows/Application.Windows-IMainDataService.cppm"
+		"Source/Public/Application/Windows/Application.Windows-IMessageLoopService.cppm"
+		"Source/Public/Application/Windows/Application.Windows-IMessageObserver.cppm"
 		"Source/Public/Platform/Windows/Platform.Windows.cppm"
 		"Source/Public/Platform/Windows/Platform.Windows-Cursor.cppm"
 		"Source/Public/Platform/Windows/Platform.Windows-Module.cppm"
-		"Source/Public/Platform/Windows/Platform.Windows-Path.cppm"
 	)
 endif()
 

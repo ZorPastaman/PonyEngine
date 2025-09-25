@@ -38,17 +38,10 @@ export namespace PonyEngine::Application
 
 		~App() noexcept;
 
-		/// @brief Ticks the application.
-		/// @param exitCode Exit code. Set if the function returns @a true.
-		/// @return @a True if the application should exit; @a false otherwise.
-		[[nodiscard("Return value must be checked: true means no further ticks should be called")]]
-		bool Tick(int& exitCode);
-
-		[[nodiscard("Pure function")]]
-		bool IsRunning() const noexcept;
-		[[nodiscard("Pure function")]]
-		int ExitCode() const noexcept;
-		void Stop(int exitCode) noexcept;
+		/// @brief Runs the application.
+		/// @return Exit code.
+		[[nodiscard("Must be returned from main")]]
+		int Run();
 
 		App& operator =(const App&) = delete;
 		App& operator =(App&&) = delete;
@@ -177,17 +170,22 @@ export namespace PonyEngine::Application
 		/// @param lastModule Last module pointer.
 		void Finalize(std::uintptr_t lastModule) noexcept;
 
+		/// @brief Stops the application.
+		/// @param exitCode Exit code. It's ignored if the application is already stopped.
+		void Stop(int exitCode) noexcept;
+
 		/// @brief On logger added hook.
 		/// @param loggerService Logger service.
 		/// @param loggerInterface Logger interface.
 		void OnLoggerAdded(const IService* loggerService, void* loggerInterface);
+		/// @brief On logger removed hook.
+		/// @param service Logger service.
 		void OnLoggerRemoved(const IService* service) noexcept;
 
 		std::uint64_t frameCount; ///< Frame count.
 
 		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
-		bool isTicking; ///< @a True if the engine is ticking now; @a false otherwise.
 
 		AppContext appContext; ///< Application context.
 
@@ -207,16 +205,17 @@ namespace PonyEngine::Application
 		frameCount{0ull},
 		exitCode{ExitCodes::InitialExitCode},
 		isRunning{true},
-		isTicking{false},
 		appContext(*this)
 	{
-		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger.");
+		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger...");
 		defaultLogger = std::make_shared<DefaultLogger>(appContext);
 		logger = defaultLogger.get();
+		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger done.");
 
-		PONY_LOG(*logger, Log::LogType::Info, "Constructing service manager.");
+		PONY_LOG(*logger, Log::LogType::Info, "Constructing service manager...");
 		serviceManager = std::make_unique<ServiceManager>(appContext);
 		serviceManager->AddInterfaceAddedHook(typeid(Log::ILogger), std::bind(&App::OnLoggerAdded, this, std::placeholders::_1, std::placeholders::_2));
+		PONY_LOG(*logger, Log::LogType::Info, "Constructing service manager done.");
 
 		std::uintptr_t lastModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
 		try
@@ -225,8 +224,9 @@ namespace PonyEngine::Application
 		}
 		catch (...)
 		{
-			PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager.");
+			PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager...");
 			serviceManager->Clear();
+			PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager done.");
 			Finalize(lastModule);
 			throw;
 		}
@@ -234,70 +234,38 @@ namespace PonyEngine::Application
 
 	App::~App() noexcept
 	{
-		PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager.");
+		PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager...");
 		serviceManager->Clear();
+		PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager done.");
 		Finalize(reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(IModule**));
 
-		PONY_LOG(*logger, Log::LogType::Info, "Releasing service manager.");
-		serviceManager.reset(); 
+		PONY_LOG(*logger, Log::LogType::Info, "Releasing service manager...");
+		serviceManager.reset();
+		PONY_LOG(*logger, Log::LogType::Info, "Releasing service manager done.");
 
-		PONY_CONSOLE(Log::LogType::Info, "Releasing default logger.");
+		PONY_CONSOLE(Log::LogType::Info, "Releasing default logger...");
 		defaultLogger.reset();
+		PONY_CONSOLE(Log::LogType::Info, "Releasing default logger done.");
 	}
 
-	bool App::Tick(int& exitCode)
+	int App::Run()
 	{
 		if (!isRunning) [[unlikely]]
 		{
-			throw std::logic_error("Application is ticked when it's already been stopped.");
+			throw std::logic_error("Application has already run.");
 		}
 
-		if (isTicking) [[unlikely]]
+		PONY_LOG(*logger, Log::LogType::Info, "Starting application main loop.");
+		while (isRunning)
 		{
-			throw std::logic_error("Application is ticked inside another tick.");
+			PONY_LOG(*logger, Log::LogType::Verbose, "Ticking service manager.");
+			serviceManager->Tick();
+
+			++frameCount;
 		}
+		PONY_LOG(*logger, Log::LogType::Info, "Finishing application main loop. Exit code: '{}'.", exitCode);
 
-		isTicking = true;
-
-		PONY_LOG(*logger, Log::LogType::Verbose, "Ticking service manager.");
-		serviceManager->Tick();
-
-		isTicking = false;
-		++frameCount;
-
-		if (isRunning) [[likely]]
-		{
-			return false;
-		}
-		else [[unlikely]]
-		{
-			exitCode = this->exitCode;
-			return true;
-		}
-	}
-
-	bool App::IsRunning() const noexcept
-	{
-		return isRunning;
-	}
-
-	int App::ExitCode() const noexcept
-	{
 		return exitCode;
-	}
-
-	void App::Stop(const int exitCode) noexcept
-	{
-		if (isRunning)
-		{
-			this->exitCode = exitCode;
-			isRunning = false;
-			PONY_LOG(*logger, Log::LogType::Info, "Application is stopped. Exit code: '{}'.", exitCode);
-		}
-		else
-		{
-			PONY_LOG(*logger, Log::LogType::Verbose, "Application is stopped when it's not running. Ignoring.");
-		}
 	}
 
 	App::AppContext::AppContext(App& application) noexcept :
@@ -479,7 +447,7 @@ namespace PonyEngine::Application
 			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
 			{
 				IModule* const module = *modulePtr;
-				PONY_LOG(*logger, Log::LogType::Info, "Starting up '{}' module.", typeid(*&*module).name());
+				PONY_LOG(*logger, Log::LogType::Info, "Starting up '{}' module...", typeid(*&*module).name());
 				try
 				{
 					module->StartUp(moduleContext);
@@ -494,6 +462,7 @@ namespace PonyEngine::Application
 					PONY_LOG(*logger, Log::LogType::Exception, "Unknown exception on starting up '{}' module.", typeid(*&*module).name());
 					throw;
 				}
+				PONY_LOG(*logger, Log::LogType::Info, "Starting up '{}' module done.", typeid(*&*module).name());
 				lastModule = current;
 			}
 		}
@@ -511,7 +480,7 @@ namespace PonyEngine::Application
 			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
 			{
 				IModule* const module = *modulePtr;
-				PONY_LOG(*logger, Log::LogType::Info, "Shutting down '{}' module.", typeid(*&*module).name());
+				PONY_LOG(*logger, Log::LogType::Info, "Shutting down '{}' module...", typeid(*&*module).name());
 				try
 				{
 					module->ShutDown(moduleContext);
@@ -524,9 +493,24 @@ namespace PonyEngine::Application
 				{
 					PONY_LOG(*logger, Log::LogType::Exception, "Unknown exception on shutting down '{}' module.", typeid(*&*module).name());
 				}
+				PONY_LOG(*logger, Log::LogType::Info, "Shutting down '{}' module done.", typeid(*&*module).name());
 			}
 		}
 		PONY_LOG(*logger, Log::LogType::Info, "Shutting down modules done.")
+	}
+
+	void App::Stop(const int exitCode) noexcept
+	{
+		if (isRunning)
+		{
+			this->exitCode = exitCode;
+			isRunning = false;
+			PONY_LOG(*logger, Log::LogType::Info, "Application is stopped. Exit code: '{}'.", exitCode);
+		}
+		else
+		{
+			PONY_LOG(*logger, Log::LogType::Verbose, "Application is stopped when it's not running. Ignoring.");
+		}
 	}
 
 	void App::OnLoggerAdded(const IService* const loggerService, void* const loggerInterface)

@@ -11,16 +11,14 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Platform.Windows:Path;
+export module PonyEngine.Path.Windows:Utility;
 
 import std;
 
-import PonyEngine.Platform.WinCore;
+import PonyEngine.Platform.Windows;
 import PonyEngine.Utility;
 
-import :Module;
-
-export namespace PonyEngine::Platform::Windows
+export namespace PonyEngine::Path::Windows
 {
 	/// @brief Gets a module path.
 	/// @param module Module. If it's null, the path to the executable module of the current process is returned.
@@ -35,7 +33,7 @@ export namespace PonyEngine::Platform::Windows
 	std::filesystem::path GetKnownPath(REFKNOWNFOLDERID folderId);
 }
 
-namespace PonyEngine::Platform::Windows
+namespace PonyEngine::Path::Windows
 {
 	std::filesystem::path GetModulePath(const HMODULE module)
 	{

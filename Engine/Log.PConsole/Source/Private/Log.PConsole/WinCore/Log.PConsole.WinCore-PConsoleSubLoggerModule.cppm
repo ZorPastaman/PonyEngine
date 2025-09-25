@@ -45,8 +45,12 @@ namespace PonyEngine::Log::WinCore
 {
 	void PlatformConsoleSubLoggerModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(PlatformConsoleSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
-		context.AddData<ISubLoggerFactory>(std::make_shared<PlatformConsoleSubLoggerFactory>(context));
+		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}'...", typeid(PlatformConsoleSubLoggerFactory).name());
+		const auto platformConsoleSubLoggerFactory = std::make_shared<PlatformConsoleSubLoggerFactory>(context);
+		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' done.", typeid(PlatformConsoleSubLoggerFactory).name());
+		PONY_LOG(context.Logger(), LogType::Debug, "Adding '{}' as data of type '{}'...", typeid(PlatformConsoleSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
+		context.AddData<ISubLoggerFactory>(platformConsoleSubLoggerFactory);
+		PONY_LOG(context.Logger(), LogType::Debug, "Adding '{}' as data of type '{}' done.", typeid(PlatformConsoleSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
 	}
 
 	void PlatformConsoleSubLoggerModule::ShutDown(const Application::IModuleContext&)

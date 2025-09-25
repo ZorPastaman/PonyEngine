@@ -9,8 +9,9 @@
 
 export module PonyEngine.Application.Main.Windows;
 
+export import PonyEngine.Application.Windows;
 export import PonyEngine.Application.Main;
 
 export import :Console;
+export import :MessageLoopServiceModule;
 export import :Process;
-export import :QuitChecker;

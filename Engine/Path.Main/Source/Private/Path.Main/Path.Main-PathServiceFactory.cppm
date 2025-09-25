@@ -55,7 +55,7 @@ namespace PonyEngine::Path
 {
 	Application::ServiceData PathServiceFactory::Create(Application::IApplicationContext& application)
 	{
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting path parameters.");
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting path parameters...");
 		if (context->DataCount<PathParams>() == 0uz) [[unlikely]]
 		{
 			throw std::logic_error("Path parameters not found.");
@@ -90,26 +90,26 @@ namespace PonyEngine::Path
 		{
 			throw std::logic_error("Root path doesn't exist.");
 		}
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting path parameters.");
 
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Creating main path directories.");
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Creating main path directories...");
 		std::filesystem::create_directories(params->localDataPath);
 		std::filesystem::create_directories(params->userDataPath);
 		std::filesystem::create_directories(params->logPath);
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Creating main path directories done.");
 
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing path service.");
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(PathService).name());
 		auto pathService = std::make_shared<PathService>(application);
-
-		Application::ServiceData data;
-		data.service = pathService;
-		data.publicInterfaces.AddInterface<IPathService>(pathService->PublicPathService());
-
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Adding main paths.");
 		pathService->AddPath(MainPathIds::Root, rootPath);
 		pathService->AddPath(MainPathIds::Executable, executablePath);
 		pathService->AddPath(MainPathIds::ExecutableDirectory, executableDirectoryPath);
 		pathService->AddPath(MainPathIds::LocalData, params->localDataPath);
 		pathService->AddPath(MainPathIds::UserData, params->userDataPath);
 		pathService->AddPath(MainPathIds::Log, params->logPath);
+		Application::ServiceData data;
+		data.service = pathService;
+		data.publicInterfaces.AddInterface<IPathService>(pathService->PublicPathService());
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing '{}' done", typeid(PathService).name());
 
 		return data;
 	}

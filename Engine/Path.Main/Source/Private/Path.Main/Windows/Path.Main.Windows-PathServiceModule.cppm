@@ -45,8 +45,13 @@ namespace PonyEngine::Path::Windows
 {
 	void PathServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' and adding it to context as service factory.", typeid(PathServiceFactory).name());
-		context.AddService(std::make_shared<PathServiceFactory>(context));
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(PathServiceFactory).name());
+		const auto pathServiceFactory = std::make_shared<PathServiceFactory>(context);
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done.", typeid(PathServiceFactory).name());
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service...", typeid(PathServiceFactory).name());
+		context.AddService(pathServiceFactory);
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service done.", typeid(PathServiceFactory).name());
+
 	}
 
 	void PathServiceModule::ShutDown(const Application::IModuleContext&)

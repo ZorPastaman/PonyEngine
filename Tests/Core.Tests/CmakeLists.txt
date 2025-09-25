@@ -47,12 +47,14 @@ if(PONY_WINDOWS)
 	target_sources(PonyEngine.Core.Tests PRIVATE
 		"Platform/Windows/Cursor.cpp"
 		"Platform/Windows/Module.cpp"
-		"Platform/Windows/Path.cpp"
 	)
 endif()
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+if(PONY_ENGINE_TESTING_BENCHMARK)
+	target_compile_definitions(PonyEngine.Core.Tests PRIVATE PONY_ENGINE_TESTING_BENCHMARK)
+endif()
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core.Tests PROPERTIES 
