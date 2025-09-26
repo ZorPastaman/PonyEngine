@@ -20,6 +20,13 @@ endif()
 if(NOT PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER MATCHES "^-?[0-9]+$")
 	message(FATAL_ERROR "PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER isn't a number")
 endif()
+if(NOT PONY_ENGINE_MAIN_DATA_ORDER)
+	message(FATAL_ERROR "PONY_ENGINE_APPLICATION_MAIN is set but PONY_ENGINE_MAIN_DATA_ORDER isn't")
+endif()
+string(SUBSTRING "${PONY_ENGINE_MAIN_DATA_ORDER}" 0 1 MAIN_DATA_ORDER_FIRST_CHAR)
+if(NOT MAIN_DATA_ORDER_FIRST_CHAR MATCHES "^[b-y]$")
+	message(FATAL_ERROR "PONY_ENGINE_MAIN_DATA_ORDER is incorrect. Its first letter must be inside b-y range")
+endif()
 
 message(VERBOSE "Configuring target")
 if(PONY_WINDOWS)
@@ -42,6 +49,9 @@ if(PONY_WINDOWS)
 	target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Application.Main/Windows/Application.Main.Windows.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-Console.cppm"
+		"Source/Private/Application.Main/Windows/Application.Main.Windows-MainDataService.cppm"
+		"Source/Private/Application.Main/Windows/Application.Main.Windows-MainDataServiceFactory.cppm"
+		"Source/Private/Application.Main/Windows/Application.Main.Windows-MainDataServiceModule.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopService.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopServiceFactory.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopServiceModule.cppm"

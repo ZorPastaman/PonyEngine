@@ -17,12 +17,19 @@ import PonyEngine.Application.Main.Windows;
 import PonyEngine.Log;
 import PonyEngine.Utility;
 
+PonyEngine::Application::Windows::MainDataServiceModule MainDataModule; ///< Main data service module.
 PonyEngine::Application::Windows::MessageLoopServiceModule MessageLoopModule; ///< Message loop module.
 
+/// @brief Gets the main data module.
+/// @return Main data module.
+[[nodiscard("Pure function")]]
+PonyEngine::Application::IModule* GetMainDataModule();
 /// @brief Gets the message loop module.
 /// @return Message loop module.
+[[nodiscard("Pure function")]]
 PonyEngine::Application::IModule* GetMessageLoopModule();
 
+PONY_MODULE(GetMainDataModule, PonyEngineMainDataService, PONY_ENGINE_MAIN_DATA_ORDER);
 PONY_MODULE(GetMessageLoopModule, PonyEngineMessageLoopService, PONY_ENGINE_MESSAGE_LOOP_ORDER);
 
 int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd)
@@ -35,6 +42,8 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 #if PONY_ENGINE_CREATE_CONSOLE
 		PonyEngine::Application::Windows::CreateConsole(CP_UTF8);
 #endif
+
+		PonyEngine::Application::Windows::MainDataServiceModule::Setup(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 
 		try
 		{
@@ -102,6 +111,11 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 	}
 
 	return exitCode;
+}
+
+PonyEngine::Application::IModule* GetMainDataModule()
+{
+	return &MainDataModule;
 }
 
 PonyEngine::Application::IModule* GetMessageLoopModule()

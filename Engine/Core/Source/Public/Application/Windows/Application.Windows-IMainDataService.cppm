@@ -24,15 +24,15 @@ export namespace PonyEngine::Application::Windows
 		/// @brief Gets the instance handle of the application.
 		/// @return Instance handle of the application.
 		[[nodiscard("Pure function")]]
-		virtual HINSTANCE Instance() noexcept = 0;
+		virtual HINSTANCE Instance() const noexcept = 0;
 		/// @brief Gets the previous instance handle of the application.
 		/// @return Previous instance handle of the application.
 		[[nodiscard("Pure function")]]
-		virtual HINSTANCE PrevInstance() noexcept = 0;
+		virtual HINSTANCE PrevInstance() const noexcept = 0;
 		/// @brief Gets the command line string for the application, excluding the program name.
 		/// @return Command line string for the application.
 		[[nodiscard("Pure function")]]
-		virtual PSTR CommandLine() noexcept = 0;
+		virtual const char* CommandLine() const noexcept = 0;
 		/// @brief Gets the show command for the application.
 		/// @return Show command.
 		[[nodiscard("Pure function")]]
