@@ -45,7 +45,6 @@ endif()
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Core.Tests PRIVATE
-		"Platform/Windows/Cursor.cpp"
 		"Platform/Windows/Module.cpp"
 	)
 endif()

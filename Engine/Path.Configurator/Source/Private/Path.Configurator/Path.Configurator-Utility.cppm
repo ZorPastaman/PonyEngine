@@ -15,13 +15,16 @@ export module PonyEngine.Path.Configurator:Utility;
 
 import std;
 
+import PonyEngine.Application;
+
 export namespace PonyEngine::Path
 {
 	/// @brief Adds a project tail to the path.
 	/// @param path Path.
+	/// @param application Application context.
 	/// @return Path with a project tail.
 	[[nodiscard("Pure function")]]
-	std::filesystem::path AddProjectTail(const std::filesystem::path& path);
+	std::filesystem::path AddProjectTail(const std::filesystem::path& path, const Application::IApplicationContext& application);
 	/// @brief Adds a log tail to the path.
 	/// @param path Path.
 	/// @return Path with a log tail.
@@ -31,9 +34,9 @@ export namespace PonyEngine::Path
 
 namespace PonyEngine::Path
 {
-	std::filesystem::path AddProjectTail(const std::filesystem::path& path)
+	std::filesystem::path AddProjectTail(const std::filesystem::path& path, const Application::IApplicationContext& application)
 	{
-		return path / PONY_STRINGIFY_VALUE(PONY_COMPANY_NAME) / PONY_STRINGIFY_VALUE(PONY_PROJECT_NAME);
+		return path / application.CompanyName() / application.ProjectName();
 	}
 
 	std::filesystem::path AddLogTail(const std::filesystem::path& path)

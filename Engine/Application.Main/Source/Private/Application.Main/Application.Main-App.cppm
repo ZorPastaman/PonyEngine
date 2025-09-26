@@ -13,6 +13,7 @@ module;
 
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Utility/Compiler.h"
 
 export module PonyEngine.Application.Main:App;
 
@@ -56,6 +57,17 @@ export namespace PonyEngine::Application
 			AppContext(AppContext&&) = delete;
 
 			~AppContext() noexcept = default;
+
+			[[nodiscard("Pure function")]]
+			virtual std::string_view CompanyName() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual std::string_view ProjectName() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual std::string_view ProjectVersion() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual std::string_view CompanyTitle() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual std::string_view ProjectTitle() const noexcept override;
 
 			[[nodiscard("Pure function")]]
 			virtual Log::ILogger& Logger() noexcept override;
@@ -271,6 +283,31 @@ namespace PonyEngine::Application
 	App::AppContext::AppContext(App& application) noexcept :
 		application{&application}
 	{
+	}
+
+	std::string_view App::AppContext::CompanyName() const noexcept
+	{
+		return PONY_STRINGIFY_VALUE(PONY_COMPANY_NAME);
+	}
+
+	std::string_view App::AppContext::ProjectName() const noexcept
+	{
+		return PONY_STRINGIFY_VALUE(PONY_PROJECT_NAME);
+	}
+
+	std::string_view App::AppContext::ProjectVersion() const noexcept
+	{
+		return PONY_STRINGIFY_VALUE(PONY_PROJECT_VERSION);
+	}
+
+	std::string_view App::AppContext::CompanyTitle() const noexcept
+	{
+		return PONY_STRINGIFY_VALUE(PONY_COMPANY_TITLE);
+	}
+
+	std::string_view App::AppContext::ProjectTitle() const noexcept
+	{
+		return PONY_STRINGIFY_VALUE(PONY_PROJECT_TITLE);
 	}
 
 	Log::ILogger& App::AppContext::Logger() noexcept

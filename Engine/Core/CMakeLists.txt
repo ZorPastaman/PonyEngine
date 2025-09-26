@@ -80,7 +80,6 @@ if(PONY_WINDOWS)
 		"Source/Public/Application/Windows/Application.Windows-IMessageLoopService.cppm"
 		"Source/Public/Application/Windows/Application.Windows-IMessageObserver.cppm"
 		"Source/Public/Platform/Windows/Platform.Windows.cppm"
-		"Source/Public/Platform/Windows/Platform.Windows-Cursor.cppm"
 		"Source/Public/Platform/Windows/Platform.Windows-Module.cppm"
 	)
 endif()

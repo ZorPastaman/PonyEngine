@@ -11,23 +11,23 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Platform.Windows:Cursor;
+export module PonyEngine.Surface.Windows:Utility;
 
 import std;
 
 import PonyEngine.Utility;
 
-export namespace PonyEngine::Platform::Windows
+export namespace PonyEngine::Surface::Windows
 {
 	/// @brief Gets a default cursor.
 	/// @return Default cursor.
 	[[nodiscard("Pure function")]]
-	HCURSOR DefaultCursor();
+	HCURSOR GetDefaultCursor();
 }
 
-namespace PonyEngine::Platform::Windows
+namespace PonyEngine::Surface::Windows
 {
-	HCURSOR DefaultCursor()
+	HCURSOR GetDefaultCursor()
 	{
 		const auto cursor = static_cast<HCURSOR>(LoadImageA(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)

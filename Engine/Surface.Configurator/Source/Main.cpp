@@ -7,9 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface.Configurator.Windows;
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/Surface/SurfaceConfiguratorModule.h"
 
-export import PonyEngine.Surface.Configurator;
-export import PonyEngine.Surface.Extension.Windows;
-
-export import :SurfaceConfiguratorModule;
+PONY_MODULE(PonyEngine::Surface::GetSurfaceConfiguratorModule, PonyEngineSurfaceConfigurator, PONY_ENGINE_SURFACE_CONFIGURATOR_ORDER);

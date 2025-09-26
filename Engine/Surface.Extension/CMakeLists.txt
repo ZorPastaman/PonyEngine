@@ -18,7 +18,6 @@ if(PONY_WINDOWS)
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Surface.Extension PUBLIC FILE_SET CXX_MODULES FILES
 		"Source/Public/Surface.Extension/Windows/Surface.Extension.Windows.cppm"
-		"Source/Public/Surface.Extension/Windows/Surface.Extension.Windows-SurfaceParams.cppm"
 	)
 endif()
 

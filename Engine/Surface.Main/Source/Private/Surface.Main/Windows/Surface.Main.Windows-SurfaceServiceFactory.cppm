@@ -68,15 +68,14 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows window class.");
-		const auto windowClass = std::make_shared<WindowClass>(application, params->icon, params->smallIcon, params->cursor, params->backgroundColor);
+		const auto windowClass = std::make_shared<WindowClass>(application, nullptr, nullptr, GetDefaultCursor(), params->backgroundColor);
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows surface service.");
 		const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, params->title, params->rect, params->minimalSize, params->style);
 
 		Application::ServiceData data;
 		data.service = surfaceService;
-		data.publicInterfaces.AddInterface<Surface::ISurfaceService>(surfaceService->PublicSurfaceService());
-		data.publicInterfaces.AddInterface<ISurfaceService>(surfaceService->PublicSurfaceService());
+		data.publicInterfaces.AddInterfacesDeduced<Surface::ISurfaceService, ISurfaceService>(surfaceService->PublicSurfaceService());
 
 		return data;
 	}

@@ -7,21 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Surface.Extension.Windows:SurfaceParams;
+#include <catch2/catch_test_macros.hpp>
 
-import PonyEngine.Surface.Extension;
+import PonyEngine.Surface.Windows;
 
-export namespace PonyEngine::Surface::Windows
+TEST_CASE("DefaultCursor returns default cursor", "[Platform][Cursor]")
 {
-	/// @brief Surface parameters.
-	struct SurfaceParams final : Surface::SurfaceParams
-	{
-		HICON icon = nullptr; ///< Main application icon.
-		HICON smallIcon = nullptr; ///< Small application icon.
-		HCURSOR cursor = nullptr; ///< Cursor icon.
-	};
+	REQUIRE(static_cast<HCURSOR>(LoadImageA(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) == PonyEngine::Surface::Windows::GetDefaultCursor());
 }

@@ -10,3 +10,5 @@
 export module PonyEngine.Surface.Configurator;
 
 export import PonyEngine.Surface.Extension;
+
+export import :SurfaceConfigurator;
