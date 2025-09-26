@@ -17,5 +17,6 @@ namespace PonyEngine::Path::Windows
 {
 	/// @brief Gets the Windows path service module.
 	/// @return Path service module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetPathModule();
 }

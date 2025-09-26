@@ -17,5 +17,6 @@ namespace PonyEngine::Surface::Windows
 {
 	/// @brief Gets the Windows surface module.
 	/// @return Surface module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetSurfaceModule();
 }

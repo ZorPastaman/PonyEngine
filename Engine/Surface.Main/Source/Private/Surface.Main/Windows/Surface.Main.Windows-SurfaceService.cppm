@@ -18,7 +18,7 @@ export module PonyEngine.Surface.Main.Windows:SurfaceService;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Windows;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Surface.Main;
@@ -208,7 +208,9 @@ namespace PonyEngine::Surface::Windows
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window done. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Debug, "Show window.");
-		ShowWindow(windowHandle, SW_NORMAL);
+		const auto mainData = this->application->FindService<Application::Windows::IMainDataService>();
+		assert(mainData && "The main data service is nullptr.");
+		ShowWindow(windowHandle, mainData->ShowCommand());
 	}
 
 	SurfaceService::~SurfaceService() noexcept

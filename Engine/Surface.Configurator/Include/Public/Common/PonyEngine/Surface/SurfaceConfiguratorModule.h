@@ -17,5 +17,6 @@ namespace PonyEngine::Surface
 {
 	/// @brief Gets the surface configurator module.
 	/// @return Surface configurator module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetSurfaceConfiguratorModule();
 }

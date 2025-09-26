@@ -17,5 +17,6 @@ namespace PonyEngine::Log::WinCore
 {
 	/// @brief Gets the WinCore platform console sub-logger module.
 	/// @return Platform console sub-logger module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetPlatformConsoleModule();
 }

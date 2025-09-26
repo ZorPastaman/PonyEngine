@@ -17,5 +17,6 @@ namespace PonyEngine::Path::Windows
 {
 	/// @brief Gets the Windows path configurator module.
 	/// @return Path configurator module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetPathConfiguratorModule();
 }

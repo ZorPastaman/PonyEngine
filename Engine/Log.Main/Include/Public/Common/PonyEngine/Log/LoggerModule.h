@@ -17,5 +17,6 @@ namespace PonyEngine::Log
 {
 	/// @brief Gets the logger module.
 	/// @return Logger module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetLoggerModule();
 }

@@ -13,5 +13,6 @@ export import PonyEngine.Application.Windows;
 export import PonyEngine.Application.Main;
 
 export import :Console;
+export import :MainDataServiceModule;
 export import :MessageLoopServiceModule;
 export import :Process;
