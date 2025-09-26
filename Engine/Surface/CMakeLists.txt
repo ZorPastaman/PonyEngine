@@ -20,6 +20,7 @@ if(PONY_WINDOWS)
 		"Source/Public/Surface/Windows/Surface.Windows-IMessageObserver.cppm"
 		"Source/Public/Surface/Windows/Surface.Windows-IRawInputObserver.cppm"
 		"Source/Public/Surface/Windows/Surface.Windows-ISurfaceService.cppm"
+		"Source/Public/Surface/Windows/Surface.Windows-Utility.cppm"
 	)
 endif()
 

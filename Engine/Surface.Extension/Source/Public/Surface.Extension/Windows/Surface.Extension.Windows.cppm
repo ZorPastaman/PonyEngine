@@ -11,5 +11,3 @@ export module PonyEngine.Surface.Extension.Windows;
 
 export import PonyEngine.Surface.Windows;
 export import PonyEngine.Surface.Extension;
-
-export import :SurfaceParams;

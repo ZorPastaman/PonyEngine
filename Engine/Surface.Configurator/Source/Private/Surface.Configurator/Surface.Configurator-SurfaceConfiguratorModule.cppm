@@ -10,21 +10,19 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 #include "PonyEngine/Utility/Macro.h"
 
-export module PonyEngine.Surface.Configurator.Windows:SurfaceConfiguratorModule;
+export module PonyEngine.Surface.Configurator:SurfaceConfigurator;
 
 import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log;
-import PonyEngine.Platform.Windows;
-import PonyEngine.Surface.Extension.Windows;
+import PonyEngine.Surface.Extension;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
-	/// @brief Windows surface configurator module.
+	/// @brief Surface configurator module.
 	class SurfaceConfiguratorModule final : public Application::IModule
 	{
 	public:
@@ -43,17 +41,14 @@ export namespace PonyEngine::Surface::Windows
 	};
 }
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	void SurfaceConfiguratorModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' and adding it to context as data.", typeid(SurfaceParams).name());
 		const auto params = std::make_shared<SurfaceParams>();
-		params->title = PONY_STRINGIFY_VALUE(PONY_PROJECT_NAME);
-		params->cursor = Platform::Windows::DefaultCursor();
+		params->title = context.Application().ProjectTitle();
 		context.AddData<SurfaceParams>(params);
-		context.AddData<Surface::SurfaceParams>(params);
-		// TODO: Add other data.
 	}
 
 	void SurfaceConfiguratorModule::ShutDown(const Application::IModuleContext&)

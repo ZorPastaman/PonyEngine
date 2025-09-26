@@ -19,34 +19,26 @@ endif()
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface.Configurator STATIC)
 
-message(VERBOSE "Configuring sources")
-target_sources(PonyEngine.Surface.Configurator PRIVATE FILE_SET CXX_MODULES FILES
-	"Source/Private/Surface.Configurator/Surface.Configurator.cppm"
+message(VERBOSE "Configuring headers")
+target_include_directories(PonyEngine.Surface.Configurator PUBLIC
+	"Include/Public/Common"
 )
 
-if(PONY_WINDOWS)
-	message(VERBOSE "Configuring headers for Windows")
-	target_include_directories(PonyEngine.Surface.Configurator PUBLIC
-		"Include/Public/Windows"
-	)
-
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Surface.Configurator PUBLIC
-		"Source/Main.Windows.cpp"
-	)
-	target_sources(PonyEngine.Surface.Configurator PRIVATE
-		"Source/Main.Windows.Impl.cpp"
-	)
-	target_sources(PonyEngine.Surface.Configurator PRIVATE FILE_SET CXX_MODULES FILES
-		"Source/Private/Surface.Configurator/Windows/Surface.Configurator.Windows.cppm"
-		"Source/Private/Surface.Configurator/Windows/Surface.Configurator.Windows-SurfaceConfiguratorModule.cppm"
-	)
-endif()
+message(VERBOSE "Configuring sources")
+target_sources(PonyEngine.Surface.Configurator PUBLIC
+	"Source/Main.cpp"
+)
+target_sources(PonyEngine.Surface.Configurator PRIVATE
+	"Source/Main.Impl.cpp"
+)
+target_sources(PonyEngine.Surface.Configurator PRIVATE FILE_SET CXX_MODULES FILES
+	"Source/Private/Surface.Configurator/Surface.Configurator.cppm"
+	"Source/Private/Surface.Configurator/Surface.Configurator-SurfaceConfiguratorModule.cppm"
+)
 
 message(VERBOSE "Configuring defines")
 target_compile_definitions(PonyEngine.Surface.Configurator PUBLIC
 	PONY_ENGINE_SURFACE_CONFIGURATOR_ORDER=${PONY_ENGINE_SURFACE_CONFIGURATOR_ORDER}
-	PONY_PROJECT_NAME=${PONY_PROJECT_NAME}
 )
 
 message(VERBOSE "Setting properties")

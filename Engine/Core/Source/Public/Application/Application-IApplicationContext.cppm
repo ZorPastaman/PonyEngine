@@ -24,6 +24,31 @@ export namespace PonyEngine::Application
 	{
 		INTERFACE_BODY(IApplicationContext)
 
+		/// @brief Gets the company name.
+		/// @return Company name.
+		/// @remark The name is a string to use in code. To get a fancy name for views, use @p CompanyTitle().
+		[[nodiscard("Pure function")]]
+		virtual std::string_view CompanyName() const noexcept = 0;
+		/// @brief Gets the project name.
+		/// @return Project name.
+		/// @remark The name is a string to use in code. To get a fancy name for views, use @p ProjectTitle().
+		[[nodiscard("Pure function")]]
+		virtual std::string_view ProjectName() const noexcept = 0;
+		/// @brief Gets the project version.
+		/// @return Project version.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view ProjectVersion() const noexcept = 0;
+		/// @brief Gets the company title.
+		/// @return Company title.
+		/// @remark The title is a string to use in views. To get a name for code, use @p CompanyName().
+		[[nodiscard("Pure function")]]
+		virtual std::string_view CompanyTitle() const noexcept = 0;
+		/// @brief Gets the project title.
+		/// @return Project title.
+		/// @remark The title is a string to use in views. To get a name for code, use @p ProjectName().
+		[[nodiscard("Pure function")]]
+		virtual std::string_view ProjectTitle() const noexcept = 0;
+
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
