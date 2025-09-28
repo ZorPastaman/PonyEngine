@@ -45,6 +45,11 @@ target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 if(PONY_WINDOWS)
+	message(VERBOSE "Configuring headers for Windows")
+	target_include_directories(PonyEngine.Application.Main PRIVATE
+		"Include/Private/Windows"
+	)
+
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Application.Main/Windows/Application.Main.Windows.cppm"
@@ -61,9 +66,11 @@ if(PONY_WINDOWS)
 		"Source/Main.Windows.cpp"
 	)
 
-	message(VERBOSE "Configuring manifest for Windows")
+	message(VERBOSE "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
 	target_sources(PonyEngine.Application.Main PRIVATE Application.manifest)
+	configure_file("Data/Windows/Resources.rc.in" Resources.rc)
+	target_sources(PonyEngine.Application.Main PRIVATE Resources.rc)
 endif()
 
 message(VERBOSE "Configuring defines")

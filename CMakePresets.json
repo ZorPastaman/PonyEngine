@@ -133,6 +133,9 @@
 				"type": "equals",
 				"lhs": "${hostSystemName}",
 				"rhs": "Windows"
+			},
+			"cacheVariables": {
+				"PONY_APP_ICON": "${sourceDir}/Logo/Windows/Logo.ico"
 			}
 		},
 		{
