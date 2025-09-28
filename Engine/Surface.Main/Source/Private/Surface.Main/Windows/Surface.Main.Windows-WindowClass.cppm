@@ -48,7 +48,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @brief Gets the class handle.
 		/// @return Class handle.
 		[[nodiscard("Pure function")]]
-		ATOM ClassHandle() const noexcept;
+		ATOM ClassHandle() noexcept;
 
 		WindowClass& operator =(const WindowClass&) = delete;
 		WindowClass& operator =(WindowClass&&) = delete;
@@ -57,7 +57,6 @@ export namespace PonyEngine::Surface::Windows
 		Application::IApplicationContext* application; ///< Application.
 
 		HMODULE moduleHandle; ///< Module instance handle.
-		HBRUSH backgroundBrush; ///< Background brush.
 		ATOM classHandle; /// Registered class handle.
 	};
 }
@@ -69,7 +68,7 @@ namespace PonyEngine::Surface::Windows
 		moduleHandle(Platform::Windows::GetModule())
 	{
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating background brush... Color: '{}'.", backgroundColor);
-		backgroundBrush = CreateSolidBrush(RGB(backgroundColor.R(), backgroundColor.G(), backgroundColor.B()));
+		const HBRUSH backgroundBrush = CreateSolidBrush(RGB(backgroundColor.R(), backgroundColor.G(), backgroundColor.B()));
 		if (!backgroundBrush) [[unlikely]]
 		{
 			throw std::runtime_error(Utility::SafeFormat("Failed to create background brush. Error code: '0x{:X}'.", GetLastError()));
@@ -97,6 +96,11 @@ namespace PonyEngine::Surface::Windows
 		classHandle = RegisterClassExA(&wc);
 		if (!classHandle) [[unlikely]]
 		{
+			if (!DeleteObject(backgroundBrush)) [[unlikely]]
+			{
+				PONY_LOG(this->application->Logger(), Log::LogType::Error, "Failed to delete background brush. Handle: '0x{:X}', Error code: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush), GetLastError());
+			}
+
 			throw std::runtime_error(Utility::SafeFormat("Failed to register class. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class done. Handle: '0x{:X}'.", classHandle);
@@ -110,13 +114,6 @@ namespace PonyEngine::Surface::Windows
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to unregister class. Error code: '0x{:X}'.", GetLastError());
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Unregistering window class done.");
-
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Deleting background brush... Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush));
-		if (!DeleteObject(backgroundBrush)) [[unlikely]]
-		{
-			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to delete background brush. Error code: '0x{:X}'.", GetLastError());
-		}
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Deleting background brush done.");
 	}
 
 	HMODULE WindowClass::ModuleHandle() const noexcept
@@ -124,7 +121,7 @@ namespace PonyEngine::Surface::Windows
 		return moduleHandle;
 	}
 
-	ATOM WindowClass::ClassHandle() const noexcept
+	ATOM WindowClass::ClassHandle() noexcept
 	{
 		return classHandle;
 	}
