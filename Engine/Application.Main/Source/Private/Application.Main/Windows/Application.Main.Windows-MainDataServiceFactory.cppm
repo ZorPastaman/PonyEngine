@@ -73,18 +73,29 @@ namespace PonyEngine::Application::Windows
 	ServiceData MainDataServiceFactory::Create(IApplicationContext& application)
 	{
 		HICON appIcon = nullptr;
+		HCURSOR appCursor = nullptr;
+		const HMODULE appModule = Platform::Windows::GetModule();
 #if PONY_APP_ICON
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application icon...");
-		appIcon = LoadIconA(Platform::Windows::GetModule(), MAKEINTRESOURCEA(IDI_APP_ICON));
+		appIcon = LoadIconA(appModule, MAKEINTRESOURCEA(IDI_APP_ICON));
 		if (!appIcon) [[unlikely]]
 		{
 			throw std::runtime_error(Utility::SafeFormat("Failed to load application icon. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application icon done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appIcon));
 #endif
+#if PONY_APP_CURSOR
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application cursor...");
+		appCursor = LoadCursorA(appModule, MAKEINTRESOURCEA(IDC_APP_CURSOR));
+		if (!appCursor) [[unlikely]]
+		{
+			throw std::runtime_error(Utility::SafeFormat("Failed to load application cursor. Error code: '0x{:X}'.", GetLastError()));
+		}
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application cursor done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appCursor));
+#endif
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(MainDataService).name());
-		const auto mainData = std::make_shared<MainDataService>(instance, prevInstance, commandLine, showCommand, appIcon);
+		const auto mainData = std::make_shared<MainDataService>(instance, prevInstance, commandLine, showCommand, appIcon, appCursor);
 		ServiceData data;
 		data.service = mainData;
 		data.publicInterfaces.AddInterface<IMainDataService>(mainData->PublicMainDataService());

@@ -46,9 +46,8 @@ namespace PonyEngine::Engine
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(EngineFactory).name());
 		const auto engineFactory = std::make_shared<EngineFactory>(context);
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done.", typeid(EngineFactory).name());
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service...", typeid(EngineFactory).name());
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service.", typeid(EngineFactory).name());
 		context.AddService(engineFactory);
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service done.", typeid(EngineFactory).name());
 	}
 
 	void EngineModule::ShutDown(const Application::IModuleContext&)

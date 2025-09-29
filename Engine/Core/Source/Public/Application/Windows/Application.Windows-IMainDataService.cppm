@@ -42,5 +42,9 @@ export namespace PonyEngine::Application::Windows
 		/// @return Application icon.
 		[[nodiscard("Pure function")]]
 		virtual HICON AppIcon() const noexcept = 0;
+		/// @brief Gets the application cursor.
+		/// @return Application cursor.
+		[[nodiscard("Pure function")]]
+		virtual HCURSOR AppCursor() const noexcept = 0;
 	};
 }

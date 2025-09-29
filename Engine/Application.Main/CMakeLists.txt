@@ -85,6 +85,9 @@ endif()
 if(PONY_APP_ICON)
 	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_APP_ICON)
 endif()
+if(PONY_APP_CURSOR)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_APP_CURSOR)
+endif()
 target_compile_definitions(PonyEngine.Application.Main PRIVATE 
 	PONY_COMPANY_NAME=${PONY_COMPANY_NAME} PONY_PROJECT_NAME=${PONY_PROJECT_NAME} PONY_PROJECT_VERSION=${PONY_PROJECT_VERSION}
 	PONY_COMPANY_TITLE=${PONY_COMPANY_TITLE} PONY_PROJECT_TITLE=${PONY_PROJECT_TITLE}

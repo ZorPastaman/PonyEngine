@@ -60,7 +60,7 @@ namespace PonyEngine::Surface::Windows
 
 	Application::ServiceData SurfaceServiceFactory::Create(Application::IApplicationContext& application)
 	{
-		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting surface parameters...");
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting surface parameters.");
 		if (context->DataCount<SurfaceParams>() == 0) [[unlikely]]
 		{
 			throw std::runtime_error("Surface parameters not found.");
@@ -71,16 +71,13 @@ namespace PonyEngine::Surface::Windows
 		{
 			throw std::runtime_error("Surface parameters is nullptr.");
 		}
-		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting surface parameters done.");
-
-		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting application icon...");
 		const auto mainData = application.FindService<Application::Windows::IMainDataService>();
 		assert(mainData);
 		const HICON mainIcon = mainData->AppIcon();
-		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting application icon done. Icon: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mainIcon));
+		const HCURSOR mainCursor = mainData->AppCursor() ? mainData->AppCursor() : GetDefaultCursor();
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows window class...");
-		const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, GetDefaultCursor(), params->backgroundColor);
+		const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor, params->backgroundColor);
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows surface service...");
