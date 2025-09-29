@@ -55,11 +55,11 @@ namespace PonyEngine::Log
 
 	SubLoggerData ConsoleSubLoggerFactory::CreateSubLogger(ILoggerContext&)
 	{
-		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}'...", typeid(ConsoleSubLogger).name());
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}'...", typeid(ConsoleSubLogger).name());
 		const auto consoleSubLogger = std::make_shared<ConsoleSubLogger>();
 		SubLoggerData data;
 		data.subLogger = consoleSubLogger;
-		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}' done.", typeid(ConsoleSubLogger).name());
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}' done.", typeid(ConsoleSubLogger).name());
 
 		return data;
 	}

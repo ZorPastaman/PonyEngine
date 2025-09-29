@@ -26,8 +26,9 @@ export namespace PonyEngine::Application::Windows
 		/// @param prevInstance Previous instance.
 		/// @param commandLine Command line.
 		/// @param showCommand Show command.
+		/// @param appIcon Application icon.
 		[[nodiscard("Pure constructor")]]
-		MainDataService(HINSTANCE instance, HINSTANCE prevInstance, const char* commandLine, int showCommand) noexcept;
+		MainDataService(HINSTANCE instance, HINSTANCE prevInstance, const char* commandLine, int showCommand, HICON appIcon) noexcept;
 		MainDataService(const MainDataService&) = delete;
 		MainDataService(MainDataService&&) = delete;
 
@@ -44,6 +45,9 @@ export namespace PonyEngine::Application::Windows
 		virtual const char* CommandLine() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual int ShowCommand() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual HICON AppIcon() const noexcept override;
 
 		/// @brief Gets the public main data service.
 		/// @return Public main data service.
@@ -62,16 +66,19 @@ export namespace PonyEngine::Application::Windows
 		HINSTANCE prevInstance; ///< Previous instance.
 		const char* commandLine; ///< Command line.
 		int showCommand; ///< Show command.
+
+		HICON appIcon; ///< Application icon.
 	};
 }
 
 namespace PonyEngine::Application::Windows
 {
-	MainDataService::MainDataService(const HINSTANCE instance, const HINSTANCE prevInstance, const char* const commandLine, const int showCommand) noexcept :
+	MainDataService::MainDataService(const HINSTANCE instance, const HINSTANCE prevInstance, const char* const commandLine, const int showCommand, const HICON appIcon) noexcept :
 		instance{instance},
 		prevInstance{prevInstance},
 		commandLine{commandLine},
-		showCommand{showCommand}
+		showCommand{showCommand},
+		appIcon(appIcon)
 	{
 	}
 
@@ -101,6 +108,11 @@ namespace PonyEngine::Application::Windows
 	int MainDataService::ShowCommand() const noexcept
 	{
 		return showCommand;
+	}
+
+	HICON MainDataService::AppIcon() const noexcept
+	{
+		return appIcon;
 	}
 
 	IMainDataService& MainDataService::PublicMainDataService() noexcept

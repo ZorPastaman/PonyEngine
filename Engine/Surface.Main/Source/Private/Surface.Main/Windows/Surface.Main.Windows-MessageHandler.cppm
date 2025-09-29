@@ -75,16 +75,9 @@ namespace PonyEngine::Surface::Windows
 			return UnsetHandlerPointer(hWnd, uMsg, wParam, lParam);
 		}
 
-		SetLastError(DWORD{0});
-
 		if (const auto windowProc = reinterpret_cast<IMessageHandler*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA))) [[likely]]
 		{
 			return windowProc->HandleMessage(uMsg, wParam, lParam);
-		}
-
-		if (const DWORD errorCode = GetLastError()) [[likely]]
-		{
-			throw std::runtime_error(Utility::SafeFormat("Error on window proc. Error code: '0x{:X}'.", errorCode));
 		}
 
 		return DefWindowProcA(hWnd, uMsg, wParam, lParam);

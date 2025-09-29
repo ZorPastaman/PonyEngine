@@ -68,9 +68,11 @@ if(PONY_WINDOWS)
 
 	message(VERBOSE "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
-	target_sources(PonyEngine.Application.Main PRIVATE Application.manifest)
 	configure_file("Data/Windows/Resources.rc.in" Resources.rc)
-	target_sources(PonyEngine.Application.Main PRIVATE Resources.rc)
+	target_sources(PonyEngine.Application.Main PRIVATE 
+		Application.manifest
+		Resources.rc
+	)
 endif()
 
 message(VERBOSE "Configuring defines")
@@ -79,6 +81,9 @@ if(PONY_ENGINE_CREATE_CONSOLE)
 endif()
 if(PONY_ENGINE_DEFAULT_LOGGER)
 	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_ENGINE_DEFAULT_LOGGER)
+endif()
+if(PONY_APP_ICON)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_APP_ICON)
 endif()
 target_compile_definitions(PonyEngine.Application.Main PRIVATE 
 	PONY_COMPANY_NAME=${PONY_COMPANY_NAME} PONY_PROJECT_NAME=${PONY_PROJECT_NAME} PONY_PROJECT_VERSION=${PONY_PROJECT_VERSION}

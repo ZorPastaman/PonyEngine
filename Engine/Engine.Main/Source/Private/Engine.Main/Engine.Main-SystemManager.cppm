@@ -251,7 +251,7 @@ namespace PonyEngine::Engine
 			system.reset();
 			PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing '{}' system done.", systemName);
 		}
-		PONY_LOG(engine->Logger(), Log::LogType::Debug, "Releasing engine systems done.");
+		PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing engine systems done.");
 	}
 
 	void SystemManager::Begin(std::size_t& count)

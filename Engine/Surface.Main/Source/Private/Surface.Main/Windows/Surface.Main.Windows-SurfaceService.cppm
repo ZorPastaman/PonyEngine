@@ -30,9 +30,17 @@ import :WindowClass;
 
 export namespace PonyEngine::Surface::Windows
 {
+	/// @brief Windows surface service.
 	class SurfaceService final : public Application::IService, private ISurfaceService, private IMessageHandler
 	{
 	public:
+		/// @brief Creates a Windows surface service.
+		/// @param application Application context.
+		/// @param windowClass Window class.
+		/// @param title Window title.
+		/// @param rect Client rect.
+		/// @param minimalWindowSize Minimal window size.
+		/// @param style Window style.
 		[[nodiscard("Pure constructor")]]
 		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title, const SurfaceRect& rect, 
 			const Math::Vector2<int>& minimalWindowSize, SurfaceStyle style);
@@ -84,8 +92,12 @@ export namespace PonyEngine::Surface::Windows
 
 		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
+		/// @brief Gets the public surface service.
+		/// @return Public surface service.
 		[[nodiscard("Pure function")]]
 		ISurfaceService& PublicSurfaceService() noexcept;
+		/// @brief Gets the public surface service.
+		/// @return Public surface service.
 		[[nodiscard("Pure function")]]
 		const ISurfaceService& PublicSurfaceService() const noexcept;
 
@@ -93,15 +105,32 @@ export namespace PonyEngine::Surface::Windows
 		SurfaceService& operator =(SurfaceService&&) = delete;
 
 	private:
+		/// @brief Calculates a platform independent rectangle.
+		/// @param position Window client position.
+		/// @param size Window client size.
+		/// @param request Request parameters.
+		/// @return Platform independent rectangle.
 		[[nodiscard("Pure function")]]
 		static SurfaceRect CalculateRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const RectRequest& request);
+		/// @brief Calculates a Windows rectangle.
+		/// @param rect Platform independent rectangle.
+		/// @param style Style.
+		/// @param styleEx Extended style.
+		/// @return Windows rectangle position and size.
 		[[nodiscard("Pure function")]]
-		std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateRect(const SurfaceRect& rect, DWORD style, DWORD styleEx);
+		std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateRect(const SurfaceRect& rect, DWORD style, DWORD styleEx) const;
+		/// @brief Gets a screen resolution.
+		/// @return Screen resolution.
 		[[nodiscard("Pure function")]]
 		static Math::Vector2<int> GetResolution();
 
+		/// @brief Gets a window style.
+		/// @return Window style and extended style.
 		[[nodiscard("Pure function")]]
 		std::pair<DWORD, DWORD> GetStyle() const;
+		/// @brief Sets a window style.
+		/// @param style Style.
+		/// @param styleEx Extended style.
 		void SetStyle(DWORD style, DWORD styleEx);
 		/// @brief Converts an engine style to a Windows style.
 		/// @param style Engine style.
@@ -124,47 +153,96 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		static constexpr SurfaceStyle ConvertExToSurfaceStyle(DWORD style) noexcept;
 
+		/// @brief Registers a raw input type.
+		/// @param usagePage Usage page.
+		/// @param usage Usage.
 		void RegisterRawInputType(USHORT usagePage, USHORT usage);
+		/// @brief Unregisters a raw input type.
+		/// @param usagePage Usage page.
+		/// @param usage Usage.
 		void UnregisterRawInputType(USHORT usagePage, USHORT usage);
+		/// @brief Registers/unregisters a raw input type.
+		/// @param usagePage Usage page.
+		/// @param usage Usage.
+		/// @param flags Registration flags.
 		void RegisterRawInputType(USHORT usagePage, USHORT usage, DWORD flags);
+		/// @brief Gets a hid type from the raw input.
+		/// @param input Raw input.
+		/// @return Hid type.
 		[[nodiscard("Pure function")]]
 		static DWORD GetHidType(const RAWINPUT& input);
 
+		/// @brief Calls message observers.
+		/// @param uMsg Message type.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
 		void ObserveMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 
+		/// @brief Observes the WM_CREATE message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveCreate(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_DESTROY message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveDestroy(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_GETMINMAXINFO message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveGetMinMaxInfo(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_ERASEBKGND message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveEraseBackground(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_PAINT message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_INPUT message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveRawInput(WPARAM wParam, LPARAM lParam) noexcept;
 
+		/// @brief Packs the two USHORT values into a DWORD.
+		/// @param first High bit value.
+		/// @param second Low bit value.
+		/// @return Value pack.
 		[[nodiscard("Pure function")]]
 		static constexpr DWORD Pack(USHORT first, USHORT second) noexcept;
+		/// @brief Unpacks the DWORD value into two USHORT values.
+		/// @param value Value.
+		/// @return High bit value and low bit value.
 		[[nodiscard("Pure function")]]
 		static constexpr std::pair<USHORT, USHORT> Unpack(DWORD value) noexcept;
 
-		Application::IApplicationContext* application;
+		Application::IApplicationContext* application; ///< Application context.
 
-		std::shared_ptr<WindowClass> windowClass;
-		Math::Vector2<int> minimalWindowSize;
+		Math::Vector2<int> minimalWindowSize; ///< Minimal window size.
 
-		HWND windowHandle;
+		std::shared_ptr<WindowClass> windowClass; ///< Window class.
 
-		std::unordered_map<UINT, std::vector<IMessageObserver*>> messageObservers;
-		std::unordered_map<DWORD, std::vector<IRawInputObserver*>> rawInputObservers;
+		HWND windowHandle; ///< Window handle.
 
-		mutable std::string titleCache;
-		std::vector<BYTE> rawInputCache;
+		std::unordered_map<UINT, std::vector<IMessageObserver*>> messageObservers; ///< Message observers.
+		std::unordered_map<DWORD, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 
-		bool erased;
-		bool painted;
+		mutable std::string titleCache; ///< Title cache.
+		std::vector<BYTE> rawInputCache; ///< Raw input cache.
+
+		bool erased; ///< Is the background erased? It's erased only once. A render system must paint the window after that.
+		bool painted; ///< Is the window painted? It's painted only once. A render system must paint the window after that.
 	};
 }
 
@@ -173,8 +251,8 @@ namespace PonyEngine::Surface::Windows
 	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, 
 		const std::string_view title, const SurfaceRect& rect, const Math::Vector2<int>& minimalWindowSize, const SurfaceStyle style) :
 		application{&application},
-		windowClass(windowClass),
 		minimalWindowSize(minimalWindowSize),
+		windowClass(windowClass),
 		erased{false},
 		painted{false}
 	{
@@ -185,7 +263,7 @@ namespace PonyEngine::Surface::Windows
 		const DWORD exStyle = ConvertToWindowsStyleEx(style) | WS_EX_APPWINDOW;
 		const auto [position, size] = CalculateRect(rect, usualStyle, exStyle);
 
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window... Window class: '0x{:X}'; Title: '{}'; Position: '{}'; Size: '{}'; Style: {}.", 
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window... Window class: '0x{:X}'; Title: '{}'; Position: '{}'; Size: '{}'; Style: '{}'.", 
 			windowClass->ClassHandle(), title, position, size, style);
 		windowHandle = CreateWindowExA(
 			exStyle,
@@ -229,8 +307,9 @@ namespace PonyEngine::Surface::Windows
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Skip destroying window 'cause it's already been destroyed.");
 		}
 
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing window class.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing window class...");
 		windowClass.reset();
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing window class done.");
 	}
 
 	void SurfaceService::Begin()
@@ -349,7 +428,7 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::MinimalSize(const Math::Vector2<std::int32_t>& size)
 	{
-		SurfaceRect currentRect = Rect(RectRequest{ .relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner });
+		SurfaceRect currentRect = Rect(RectRequest{.relativePosition = false, .relativeSize = false, .positionMode = SurfacePositionMode::LeftTopCorner});
 		Math::Vector2<std::int32_t>& currentSize = std::get<1>(currentRect.size);
 		if (currentSize.X() < size.X() || currentSize.Y() < size.Y())
 		{
@@ -553,7 +632,7 @@ namespace PonyEngine::Surface::Windows
 					}
 					catch (...)
 					{
-						PONY_LOG_E(application->Logger(), Log::LogType::Exception, "Unknown exception on unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+						PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 					}
 				}
 
@@ -596,7 +675,7 @@ namespace PonyEngine::Surface::Windows
 					}
 					catch (...)
 					{
-						PONY_LOG_E(application->Logger(), Log::LogType::Exception, "Unknown exception on unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+						PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 					}
 				}
 			}
@@ -667,11 +746,11 @@ namespace PonyEngine::Surface::Windows
 		return answer;
 	}
 
-	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::CalculateRect(const SurfaceRect& rect, const DWORD style, const DWORD styleEx)
+	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::CalculateRect(const SurfaceRect& rect, const DWORD style, const DWORD styleEx) const
 	{
 		const auto resolution = static_cast<Math::Vector2<std::int32_t>>(GetResolution());
-		const Math::Vector2<std::int32_t> delta = rect.position.index() ? std::get<1>(rect.position) : RelativeToAbsolute(std::get<0>(rect.position), resolution);
-		const Math::Vector2<std::int32_t> size = Math::Max(rect.size.index() ? std::get<1>(rect.size) : RelativeToAbsolute(std::get<0>(rect.size), resolution), minimalWindowSize);
+		const Math::Vector2<std::int32_t> delta = rect.position.index() != 0uz ? std::get<1>(rect.position) : RelativeToAbsolute(std::get<0>(rect.position), resolution);
+		const Math::Vector2<std::int32_t> size = Math::Max(rect.size.index() != 0uz ? std::get<1>(rect.size) : RelativeToAbsolute(std::get<0>(rect.size), resolution), minimalWindowSize);
 		const Math::Vector2<std::int32_t> position = CalculatePosition(delta, size, resolution, rect.positionMode);
 
 		auto windowRect = RECT
@@ -805,14 +884,16 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::RegisterRawInputType(const USHORT usagePage, const USHORT usage)
 	{
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Registering raw input type... Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 		RegisterRawInputType(usagePage, usage, DWORD{0});
-		PONY_LOG(application->Logger(), Log::LogType::Debug, "Raw input type registered. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Registering raw input type done. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 	}
 
 	void SurfaceService::UnregisterRawInputType(const USHORT usagePage, const USHORT usage)
 	{
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Unregistering raw input type... Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 		RegisterRawInputType(usagePage, usage, RIDEV_REMOVE);
-		PONY_LOG(application->Logger(), Log::LogType::Debug, "Raw input type unregistered. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Unregistering raw input type done. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 	}
 
 	void SurfaceService::RegisterRawInputType(const USHORT usagePage, const USHORT usage, const DWORD flags)
@@ -827,13 +908,13 @@ namespace PonyEngine::Surface::Windows
 
 		if (!RegisterRawInputDevices(&rid, 1u, sizeof(rid))) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to register raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
+			throw std::runtime_error(Utility::SafeFormat("Failed to register/unregister raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
 		}
 	}
 
 	DWORD SurfaceService::GetHidType(const RAWINPUT& input)
 	{
-		auto info = RID_DEVICE_INFO{ .cbSize = sizeof(RID_DEVICE_INFO) };
+		auto info = RID_DEVICE_INFO{.cbSize = sizeof(RID_DEVICE_INFO)};
 		UINT size = sizeof(info);
 		if (!GetRawInputDeviceInfoA(input.header.hDevice, RIDI_DEVICEINFO, &info, &size)) [[unlikely]]
 		{
@@ -925,10 +1006,9 @@ namespace PonyEngine::Surface::Windows
 
 	LRESULT SurfaceService::ObserveRawInput(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		const auto hRawInput = reinterpret_cast<HRAWINPUT>(lParam);
-
+		const auto rawInputInfo = reinterpret_cast<HRAWINPUT>(lParam);
 		UINT size = 0u;
-		if (GetRawInputData(hRawInput, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER))) [[unlikely]]
+		if (GetRawInputData(rawInputInfo, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER))) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to get raw input size. Error code: '0x{:X}'.", GetLastError());
 			return 0;
@@ -937,7 +1017,6 @@ namespace PonyEngine::Surface::Windows
 		{
 			return 0;
 		}
-
 		try
 		{
 			rawInputCache.resize(size);
@@ -947,14 +1026,13 @@ namespace PonyEngine::Surface::Windows
 			PONY_LOG_E(application->Logger(), e, "On resizing raw input cache.");
 			return 0;
 		}
-		if (GetRawInputData(hRawInput, RID_INPUT, rawInputCache.data(), &size, sizeof(RAWINPUTHEADER)) != rawInputCache.size()) [[unlikely]]
+		if (GetRawInputData(rawInputInfo, RID_INPUT, rawInputCache.data(), &size, sizeof(RAWINPUTHEADER)) != rawInputCache.size()) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
 			return 0;
 		}
 
 		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(rawInputCache.data());
-
 		DWORD usageType;
 		switch (input->header.dwType)
 		{

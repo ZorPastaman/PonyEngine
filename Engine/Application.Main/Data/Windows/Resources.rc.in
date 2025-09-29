@@ -9,4 +9,6 @@
 
 #include "PonyEngine/Platform/Windows/Resource.h"
 
+#if PONY_APP_ICON
 IDI_APP_ICON ICON "${PONY_APP_ICON}"
+#endif

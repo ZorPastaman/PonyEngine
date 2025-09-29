@@ -42,8 +42,12 @@ namespace PonyEngine::Surface::Windows
 {
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' and adding it to context as service factory.", typeid(SurfaceServiceModule).name());
-		context.AddService(std::make_shared<SurfaceServiceFactory>(context));
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(SurfaceServiceFactory).name());
+		const auto surfaceServiceFactory = std::make_shared<SurfaceServiceFactory>(context);
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done.", typeid(SurfaceServiceFactory).name());
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service...", typeid(SurfaceServiceFactory).name());
+		context.AddService(surfaceServiceFactory);
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service done.", typeid(SurfaceServiceFactory).name());
 	}
 
 	void SurfaceServiceModule::ShutDown(const Application::IModuleContext&)

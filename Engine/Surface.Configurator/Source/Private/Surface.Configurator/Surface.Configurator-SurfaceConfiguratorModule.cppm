@@ -45,9 +45,11 @@ namespace PonyEngine::Surface
 {
 	void SurfaceConfiguratorModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' and adding it to context as data.", typeid(SurfaceParams).name());
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(SurfaceParams).name());
 		const auto params = std::make_shared<SurfaceParams>();
 		params->title = context.Application().ProjectTitle();
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done. Title: {}.", typeid(SurfaceParams).name(), params->title);
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as data of type '{}'.", typeid(SurfaceParams).name(), typeid(SurfaceParams).name());
 		context.AddData<SurfaceParams>(params);
 	}
 
