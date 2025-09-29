@@ -20,9 +20,21 @@ import PonyEngine.Surface;
 
 export namespace PonyEngine::Surface
 {
+	/// @brief Calculates a client position delta.
+	/// @param position Client position.
+	/// @param size Client size.
+	/// @param resolution Screen resolution.
+	/// @param positionMode Position mode.
+	/// @return Client position delta.
 	[[nodiscard("Pure function")]]
 	constexpr Math::Vector2<std::int32_t> CalculateDelta(const Math::Vector2<std::int32_t>& position, const Math::Vector2<std::int32_t>& size,
 		const Math::Vector2<std::int32_t>& resolution, SurfacePositionMode positionMode) noexcept;
+	/// @brief Calculates a client position.
+	/// @param delta Client position delta.
+	/// @param size Client size.
+	/// @param resolution Screen resolution.
+	/// @param positionMode Position mode.
+	/// @return Client position.
 	[[nodiscard("Pure function")]]
 	constexpr Math::Vector2<std::int32_t> CalculatePosition(const Math::Vector2<std::int32_t>& delta, const Math::Vector2<std::int32_t>& size,
 		const Math::Vector2<std::int32_t>& resolution, SurfacePositionMode positionMode) noexcept;

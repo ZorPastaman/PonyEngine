@@ -55,7 +55,7 @@ namespace PonyEngine::Path
 {
 	Application::ServiceData PathServiceFactory::Create(Application::IApplicationContext& application)
 	{
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting path parameters...");
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting path parameters...");
 		if (context->DataCount<PathParams>() == 0uz) [[unlikely]]
 		{
 			throw std::logic_error("Path parameters not found.");
@@ -90,7 +90,7 @@ namespace PonyEngine::Path
 		{
 			throw std::logic_error("Root path doesn't exist.");
 		}
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting path parameters.");
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting path parameters.");
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Creating main path directories...");
 		std::filesystem::create_directories(params->localDataPath);

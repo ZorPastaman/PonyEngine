@@ -53,6 +53,7 @@ namespace PonyEngine::Application
 
 	void DefaultLogger::Log(const Log::LogType logType, const Log::LogInput& logInput) const noexcept
 	{
+#if PONY_ENGINE_DEFAULT_LOGGER
 		if constexpr (PONY_CONSOLE_LOG_MASK != Log::LogTypeMask::None)
 		{
 			if (Log::IsInMask(logType, PONY_CONSOLE_LOG_MASK))
@@ -63,10 +64,12 @@ namespace PonyEngine::Application
 				Log::LogToConsole(logType, log);
 			}
 		}
+#endif
 	}
 
 	void DefaultLogger::Log(const std::exception& exception, const Log::LogInput& logInput) const noexcept
 	{
+#if PONY_ENGINE_DEFAULT_LOGGER
 		if constexpr (Log::IsInMask(Log::LogType::Exception, PONY_CONSOLE_LOG_MASK))
 		{
 			const std::string log = logInput.stacktrace
@@ -74,5 +77,6 @@ namespace PonyEngine::Application
 				: Log::LogFormat(Log::LogType::Exception, exception.what(), logInput.message, std::chrono::system_clock::now(), application->FrameCount());
 			Log::LogToConsole(Log::LogType::Exception, log);
 		}
+#endif
 	}
 }

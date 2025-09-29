@@ -38,9 +38,8 @@ namespace PonyEngine::Log
 		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}'...", typeid(FileSubLoggerFactory).name());
 		const auto fileSubLoggerFactory = std::make_shared<FileSubLoggerFactory>(context);
 		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' done.", typeid(FileSubLoggerFactory).name());
-		PONY_LOG(context.Logger(), LogType::Debug, "Adding '{}' as data of type '{}'...", typeid(FileSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
+		PONY_LOG(context.Logger(), LogType::Debug, "Adding '{}' as data of type '{}'.", typeid(FileSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
 		context.AddData<ISubLoggerFactory>(fileSubLoggerFactory);
-		PONY_LOG(context.Logger(), LogType::Debug, "Adding '{}' as data of type '{}' done.", typeid(FileSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
 	}
 
 	void FileSubLoggerModule::ShutDown(const Application::IModuleContext&)

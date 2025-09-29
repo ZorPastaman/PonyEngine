@@ -56,7 +56,7 @@ namespace PonyEngine::Engine
 
 	Application::ServiceData EngineFactory::Create(Application::IApplicationContext& application)
 	{
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting engine system factories...");
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting engine system factories...");
 		const std::size_t systemFactoryCount = context->DataCount<ISystemFactory>();
 		std::vector<ISystemFactory*> systemFactories;
 		systemFactories.reserve(systemFactoryCount);
@@ -69,7 +69,7 @@ namespace PonyEngine::Engine
 			}
 			systemFactories.push_back(factory.get());
 		}
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting engine system factories done.");
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting engine system factories done.");
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(Engine).name());
 		const auto engine = std::make_shared<Engine>(context->Application(), systemFactories);

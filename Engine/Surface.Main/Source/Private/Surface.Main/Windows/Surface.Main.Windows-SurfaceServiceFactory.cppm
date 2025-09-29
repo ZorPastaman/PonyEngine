@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
@@ -16,7 +18,7 @@ export module PonyEngine.Surface.Main.Windows:SurfaceServiceFactory;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Windows;
 import PonyEngine.Log;
 import PonyEngine.Surface.Extension.Windows;
 import PonyEngine.Utility;
@@ -55,7 +57,7 @@ namespace PonyEngine::Surface::Windows
 
 	Application::ServiceData SurfaceServiceFactory::Create(Application::IApplicationContext& application)
 	{
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Getting surface parameters.");
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting surface parameters...");
 		if (context->DataCount<SurfaceParams>() == 0) [[unlikely]]
 		{
 			throw std::runtime_error("Surface parameters not found.");
@@ -66,16 +68,24 @@ namespace PonyEngine::Surface::Windows
 		{
 			throw std::runtime_error("Surface parameters is nullptr.");
 		}
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting surface parameters done.");
 
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows window class.");
-		const auto windowClass = std::make_shared<WindowClass>(application, nullptr, nullptr, GetDefaultCursor(), params->backgroundColor);
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting application icon...");
+		const auto mainData = application.FindService<Application::Windows::IMainDataService>();
+		assert(mainData);
+		const HICON mainIcon = mainData->AppIcon();
+		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting application icon done. Icon: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mainIcon));
 
-		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows surface service.");
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows window class...");
+		const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, GetDefaultCursor(), params->backgroundColor);
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
+
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows surface service...");
 		const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, params->title, params->rect, params->minimalSize, params->style);
-
 		Application::ServiceData data;
 		data.service = surfaceService;
 		data.publicInterfaces.AddInterfacesDeduced<Surface::ISurfaceService, ISurfaceService>(surfaceService->PublicSurfaceService());
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows surface service done.");
 
 		return data;
 	}

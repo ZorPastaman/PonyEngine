@@ -59,33 +59,35 @@ namespace PonyEngine::Log
 
 	SubLoggerData FileSubLoggerFactory::CreateSubLogger(ILoggerContext&)
 	{
-		PONY_LOG(context->Logger(), LogType::Debug, "Preparing log files...");
+		PONY_LOG(context->Logger(), LogType::Debug, "Getting log folder...");
 		const Path::IPathService* const pathService = context->FindService<Path::IPathService>();
 		if (!pathService) [[unlikely]]
 		{
 			throw std::logic_error("Path service not found.");
 		}
-
 		const std::filesystem::path* const logFolderPath = pathService->FindPath(Path::MainPathIds::Log);
 		assert(logFolderPath && "Log folder path not found.");
+		PONY_LOG(context->Logger(), LogType::Debug, "Getting log folder done. Folder: '{}'.", logFolderPath->string());
 
+		PONY_LOG(context->Logger(), LogType::Info, "Preparing log files...");
 		const std::filesystem::path logPath = (*logFolderPath / PONY_STRINGIFY_VALUE(PONY_ENGINE_LOG_FILE_PATH)).lexically_normal();
 		if (std::filesystem::exists(logPath)) [[likely]]
 		{
 			const std::filesystem::path prevLogPath = logPath.parent_path() / (logPath.stem().string() + "_prev" + logPath.extension().string());
 			std::filesystem::copy_file(logPath, prevLogPath, std::filesystem::copy_options::overwrite_existing);
+			PONY_LOG(context->Logger(), LogType::Info, "Preparing log files done. New log file path: {}; Old log file path: {}.", logPath.string(), prevLogPath.string());
 		}
 		else [[unlikely]]
 		{
 			std::filesystem::create_directories(logPath.parent_path());
+			PONY_LOG(context->Logger(), LogType::Info, "Preparing log files done. New log file path: {}.", logPath.string());
 		}
-		PONY_LOG(context->Logger(), LogType::Debug, "Preparing log files done.");
 
-		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}'... Log path: '{}'.", typeid(FileSubLogger).name(), logPath.string());
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}'... Log path: '{}'.", typeid(FileSubLogger).name(), logPath.string());
 		const auto fileSubLogger = std::make_shared<FileSubLogger>(logPath);
 		SubLoggerData data;
 		data.subLogger = fileSubLogger;
-		PONY_LOG(context->Logger(), LogType::Debug, "Constructing '{}' done.", typeid(FileSubLogger).name());
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}' done.", typeid(FileSubLogger).name());
 
 		return data;
 	}

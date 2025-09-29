@@ -16,7 +16,7 @@ export module PonyEngine.Application.Windows:IMainDataService;
 
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Main data service. It provides access to WinMain parameters.
+	/// @brief Main data service. It provides access to WinMain parameters and application resources.
 	class IMainDataService
 	{
 		INTERFACE_BODY(IMainDataService)
@@ -37,5 +37,10 @@ export namespace PonyEngine::Application::Windows
 		/// @return Show command.
 		[[nodiscard("Pure function")]]
 		virtual int ShowCommand() const noexcept = 0;
+
+		/// @brief Gets the application icon.
+		/// @return Application icon.
+		[[nodiscard("Pure function")]]
+		virtual HICON AppIcon() const noexcept = 0;
 	};
 }

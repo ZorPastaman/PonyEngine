@@ -11,6 +11,7 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
+#include "PonyEngine/Platform/Windows/Resource.h"
 
 export module PonyEngine.Application.Main.Windows:MainDataServiceFactory;
 
@@ -18,6 +19,8 @@ import std;
 
 import PonyEngine.Application.Windows;
 import PonyEngine.Log;
+import PonyEngine.Platform.Windows;
+import PonyEngine.Utility;
 
 import :MainDataService;
 
@@ -69,8 +72,19 @@ namespace PonyEngine::Application::Windows
 
 	ServiceData MainDataServiceFactory::Create(IApplicationContext& application)
 	{
+		HICON appIcon = nullptr;
+#if PONY_APP_ICON
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application icon...");
+		appIcon = LoadIconA(Platform::Windows::GetModule(), MAKEINTRESOURCEA(IDI_APP_ICON));
+		if (!appIcon) [[unlikely]]
+		{
+			throw std::runtime_error(Utility::SafeFormat("Failed to load application icon. Error code: '0x{:X}'.", GetLastError()));
+		}
+		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application icon done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appIcon));
+#endif
+
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(MainDataService).name());
-		const auto mainData = std::make_shared<MainDataService>(instance, prevInstance, commandLine, showCommand);
+		const auto mainData = std::make_shared<MainDataService>(instance, prevInstance, commandLine, showCommand, appIcon);
 		ServiceData data;
 		data.service = mainData;
 		data.publicInterfaces.AddInterface<IMainDataService>(mainData->PublicMainDataService());
