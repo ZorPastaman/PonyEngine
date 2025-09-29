@@ -59,7 +59,7 @@ namespace PonyEngine::Log
 
 	SubLoggerData FileSubLoggerFactory::CreateSubLogger(ILoggerContext&)
 	{
-		PONY_LOG(context->Logger(), LogType::Debug, "Getting log folder...");
+		PONY_LOG(context->Logger(), LogType::Debug, "Getting log folder.");
 		const Path::IPathService* const pathService = context->FindService<Path::IPathService>();
 		if (!pathService) [[unlikely]]
 		{
@@ -67,7 +67,6 @@ namespace PonyEngine::Log
 		}
 		const std::filesystem::path* const logFolderPath = pathService->FindPath(Path::MainPathIds::Log);
 		assert(logFolderPath && "Log folder path not found.");
-		PONY_LOG(context->Logger(), LogType::Debug, "Getting log folder done. Folder: '{}'.", logFolderPath->string());
 
 		PONY_LOG(context->Logger(), LogType::Info, "Preparing log files...");
 		const std::filesystem::path logPath = (*logFolderPath / PONY_STRINGIFY_VALUE(PONY_ENGINE_LOG_FILE_PATH)).lexically_normal();

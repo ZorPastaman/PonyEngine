@@ -78,9 +78,8 @@ namespace PonyEngine::Application::Windows
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(MainDataServiceFactory).name());
 		const auto mainDataFactory = std::make_shared<MainDataServiceFactory>(context, instance, prevInstance, commandLine, showCommand);
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done.", typeid(MainDataServiceFactory).name());
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service...", typeid(MainDataServiceFactory).name());
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service.", typeid(MainDataServiceFactory).name());
 		context.AddService(mainDataFactory);
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service done.", typeid(MainDataServiceFactory).name());
 	}
 
 	void MainDataServiceModule::ShutDown(const IModuleContext& context)

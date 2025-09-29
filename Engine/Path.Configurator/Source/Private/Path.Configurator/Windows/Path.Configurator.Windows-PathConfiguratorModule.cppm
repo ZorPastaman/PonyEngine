@@ -53,9 +53,8 @@ namespace PonyEngine::Path::Windows
 		params->userDataPath = AddProjectTail(GetKnownPath(FOLDERID_SavedGames), context.Application());
 		params->logPath = AddLogTail(params->localDataPath);
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done.", typeid(PathParams).name());
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as data...", typeid(PathParams).name());
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as data.", typeid(PathParams).name());
 		context.AddData<PathParams>(params);
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as data done.", typeid(PathParams).name());
 	}
 
 	void PathConfiguratorModule::ShutDown(const Application::IModuleContext&)

@@ -46,9 +46,8 @@ namespace PonyEngine::Application::Windows
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(MessageLoopServiceFactory).name());
 		const auto messageLoopFactory = std::make_shared<MessageLoopServiceFactory>(context);
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done.", typeid(MessageLoopServiceFactory).name());
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service...", typeid(MessageLoopServiceFactory).name());
+		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service.", typeid(MessageLoopServiceFactory).name());
 		context.AddService(messageLoopFactory);
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service done.", typeid(MessageLoopServiceFactory).name());
 	}
 
 	void MessageLoopServiceModule::ShutDown(const IModuleContext& context)
