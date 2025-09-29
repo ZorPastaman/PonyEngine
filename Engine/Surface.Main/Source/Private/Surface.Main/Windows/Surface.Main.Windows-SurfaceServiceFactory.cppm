@@ -27,9 +27,12 @@ import :SurfaceService;
 
 export namespace PonyEngine::Surface::Windows
 {
+	/// @brief Windows surface service factory.
 	class SurfaceServiceFactory final : public Application::IServiceFactory
 	{
 	public:
+		/// @brief Creates a Windows surface service factory.
+		/// @param context Module context.
 		[[nodiscard("Pure constructor")]]
 		explicit SurfaceServiceFactory(Application::IModuleContext& context) noexcept;
 		SurfaceServiceFactory(const SurfaceServiceFactory&) = delete;
@@ -44,7 +47,7 @@ export namespace PonyEngine::Surface::Windows
 		SurfaceServiceFactory& operator =(SurfaceServiceFactory&&) = delete;
 
 	private:
-		Application::IModuleContext* context;
+		Application::IModuleContext* context; ///< Module context.
 	};
 }
 

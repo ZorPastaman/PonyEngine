@@ -1,6 +1,11 @@
 message(STATUS "Configuring PonyEngine.Surface.Tests")
 add_executable(PonyEngine.Surface.Tests)
 
+message(VERBOSE "Configuring sources")
+target_sources(PonyEngine.Surface.Tests PRIVATE
+	"Surface/Utility.cpp"
+)
+
 if (PONY_WINDOWS)
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Surface.Tests PRIVATE

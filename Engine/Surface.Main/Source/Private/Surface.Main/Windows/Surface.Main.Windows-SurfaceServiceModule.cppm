@@ -20,6 +20,7 @@ import :SurfaceServiceFactory;
 
 export namespace PonyEngine::Surface::Windows
 {
+	/// @brief Windows surface service module.
 	class SurfaceServiceModule final : public Application::IModule
 	{
 	public:
