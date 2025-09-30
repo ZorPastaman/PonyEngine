@@ -201,7 +201,7 @@ export namespace PonyEngine::Application
 
 		AppContext appContext; ///< Application context.
 
-		std::shared_ptr<DefaultLogger> defaultLogger; ///< Default logger.
+		std::unique_ptr<DefaultLogger> defaultLogger; ///< Default logger.
 		Log::ILogger* logger; ///< Current logger.
 
 		std::unique_ptr<ServiceManager> serviceManager;
@@ -220,7 +220,7 @@ namespace PonyEngine::Application
 		appContext(*this)
 	{
 		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger...");
-		defaultLogger = std::make_shared<DefaultLogger>(appContext);
+		defaultLogger = std::make_unique<DefaultLogger>(appContext);
 		logger = defaultLogger.get();
 		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger done.");
 
@@ -251,13 +251,13 @@ namespace PonyEngine::Application
 		PONY_LOG(*logger, Log::LogType::Info, "Clearing service manager done.");
 		Finalize(reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(IModule**));
 
-		PONY_LOG(*logger, Log::LogType::Info, "Releasing service manager...");
+		PONY_LOG(*logger, Log::LogType::Info, "Destructing service manager...");
 		serviceManager.reset();
-		PONY_LOG(*logger, Log::LogType::Info, "Releasing service manager done.");
+		PONY_LOG(*logger, Log::LogType::Info, "Destructing service manager done.");
 
-		PONY_CONSOLE(Log::LogType::Info, "Releasing default logger...");
+		PONY_CONSOLE(Log::LogType::Info, "Destructing default logger...");
 		defaultLogger.reset();
-		PONY_CONSOLE(Log::LogType::Info, "Releasing default logger done.");
+		PONY_CONSOLE(Log::LogType::Info, "Destructing default logger done.");
 	}
 
 	int App::Run()
@@ -267,15 +267,33 @@ namespace PonyEngine::Application
 			throw std::logic_error("Application has already run.");
 		}
 
-		PONY_LOG(*logger, Log::LogType::Info, "Starting application main loop.");
-		while (isRunning)
-		{
-			PONY_LOG(*logger, Log::LogType::Verbose, "Ticking service manager.");
-			serviceManager->Tick();
+		PONY_LOG(*logger, Log::LogType::Info, "Beginning service manager...");
+		serviceManager->Begin();
+		PONY_LOG(*logger, Log::LogType::Info, "Beginning service manager done.");
 
-			++frameCount;
+		try
+		{
+			PONY_LOG(*logger, Log::LogType::Info, "Starting application main loop.");
+			while (isRunning)
+			{
+				PONY_LOG(*logger, Log::LogType::Verbose, "Ticking service manager.");
+				serviceManager->Tick();
+
+				++frameCount;
+			}
+			PONY_LOG(*logger, Log::LogType::Info, "Finishing application main loop. Exit code: '{}'.", exitCode);
 		}
-		PONY_LOG(*logger, Log::LogType::Info, "Finishing application main loop. Exit code: '{}'.", exitCode);
+		catch (...)
+		{
+			PONY_LOG(*logger, Log::LogType::Info, "Ending service manager...");
+			serviceManager->End();
+			PONY_LOG(*logger, Log::LogType::Info, "Ending service manager done.");
+			throw;
+		}
+
+		PONY_LOG(*logger, Log::LogType::Info, "Ending service manager...");
+		serviceManager->End();
+		PONY_LOG(*logger, Log::LogType::Info, "Ending service manager done.");
 
 		return exitCode;
 	}

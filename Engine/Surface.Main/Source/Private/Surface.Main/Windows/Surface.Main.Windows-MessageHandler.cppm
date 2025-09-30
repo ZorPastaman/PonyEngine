@@ -17,11 +17,14 @@ export module PonyEngine.Surface.Main.Windows:MessageHandler;
 
 import std;
 
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Utility;
 
 export namespace PonyEngine::Surface::Windows
 {
+	Application::IApplicationContext* messageHandlerApp; ///< Application context for logging.
+
 	/// @brief Windows message handler.
 	class IMessageHandler
 	{
@@ -92,7 +95,7 @@ namespace PonyEngine::Surface::Windows
 			{
 				if (const DWORD errorCode = GetLastError()) [[unlikely]]
 				{
-					PONY_CONSOLE(Log::LogType::Error, Utility::SafeFormat("Error on setting message handler. Error code: '0x{:X}'.", errorCode));
+					PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on setting message handler. Error code: '0x{:X}'.", errorCode));
 
 					return -1;
 				}
@@ -101,7 +104,7 @@ namespace PonyEngine::Surface::Windows
 			return windowProc->HandleMessage(uMsg, wParam, lParam);
 		}
 
-		PONY_CONSOLE(Log::LogType::Error, "Wrong Windows window has been created. No IMessageHandler interface found.");
+		PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, "Wrong Windows window has been created. No IMessageHandler interface found.");
 
 		return -1;
 	}
@@ -116,14 +119,14 @@ namespace PonyEngine::Surface::Windows
 			{
 				if (const DWORD errorCode = GetLastError()) [[likely]]
 				{
-					PONY_CONSOLE(Log::LogType::Error, Utility::SafeFormat("Error on unsetting message handler. Error code: '0x{:X}'.", errorCode));
+					PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on unsetting message handler. Error code: '0x{:X}'.", errorCode));
 				}
 			}
 
 			return windowProc->HandleMessage(uMsg, wParam, lParam);
 		}
 
-		PONY_CONSOLE(Log::LogType::Error, "Wrong Windows window has been destroyed. No IMessageHandler interface found.");
+		PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, "Wrong Windows window has been destroyed. No IMessageHandler interface found.");
 
 		return DefWindowProcA(hWnd, uMsg, wParam, lParam);
 	}

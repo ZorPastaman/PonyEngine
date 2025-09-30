@@ -82,7 +82,6 @@ namespace PonyEngine::Path
 		{
 			throw std::logic_error("Log path is not absolute.");
 		}
-
 		const std::filesystem::path executablePath = GetExecutablePath();
 		const std::filesystem::path executableDirectoryPath = executablePath.parent_path();
 		const std::filesystem::path rootPath = executableDirectoryPath / params->rootPath;
@@ -90,7 +89,6 @@ namespace PonyEngine::Path
 		{
 			throw std::logic_error("Root path doesn't exist.");
 		}
-		PONY_LOG(context->Logger(), Log::LogType::Debug, "Getting path parameters.");
 
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Creating main path directories...");
 		std::filesystem::create_directories(params->localDataPath);

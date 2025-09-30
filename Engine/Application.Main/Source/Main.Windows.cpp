@@ -72,9 +72,9 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 				exitCode = PonyEngine::Application::ExitCodes::TickException;
 			}
 
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Releasing application...");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destructing application...");
 			app.reset();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Releasing application done.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destructing application done.");
 		}
 		catch (const std::exception& e)
 		{

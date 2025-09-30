@@ -100,9 +100,9 @@ namespace PonyEngine::Engine
 
 	Engine::~Engine() noexcept
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing system manager...");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Destructing system manager...");
 		systemManager.reset();
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing system manager done.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Destructing system manager done.");
 	}
 
 	void Engine::Begin()
