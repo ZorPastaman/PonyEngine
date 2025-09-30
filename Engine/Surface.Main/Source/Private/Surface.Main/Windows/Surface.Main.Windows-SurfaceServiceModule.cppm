@@ -16,6 +16,7 @@ export module PonyEngine.Surface.Main.Windows:SurfaceServiceModule;
 import PonyEngine.Application;
 import PonyEngine.Log;
 
+import :MessageHandler;
 import :SurfaceServiceFactory;
 
 export namespace PonyEngine::Surface::Windows
@@ -43,6 +44,8 @@ namespace PonyEngine::Surface::Windows
 {
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		messageHandlerApp = &context.Application();
+
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(SurfaceServiceFactory).name());
 		const auto surfaceServiceFactory = std::make_shared<SurfaceServiceFactory>(context);
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}' done.", typeid(SurfaceServiceFactory).name());
@@ -52,5 +55,6 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceServiceModule::ShutDown(const Application::IModuleContext&)
 	{
+		messageHandlerApp = nullptr;
 	}
 }

@@ -191,7 +191,7 @@ namespace PonyEngine::Application
 				throw;
 			}
 
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Creating application service done. System: '{}'.", typeid(*service).name());
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Creating application service done. Service: '{}'.", typeid(*service).name());
 		}
 		catch (const std::exception& e)
 		{
