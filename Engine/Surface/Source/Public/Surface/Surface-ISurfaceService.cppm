@@ -101,15 +101,15 @@ export namespace PonyEngine::Surface
 		/// @remark if the platform doesn't support cursors, the function does nothing.
 		virtual void ShowCursor(bool visible) = 0;
 		/// @brief Gets a cursor clipping rectangle.
-		/// @return Cursor clipping rectangle. If it's @a std::nullopt, the cursor isn't clipped.
+		/// @return Cursor clipping rectangle in client coordinates. If it's @a std::nullopt, the cursor isn't clipped. The range is [-1, 1].
 		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
-		virtual std::optional<Math::Rect<std::int32_t>> CursorClippingRect() const = 0;
+		virtual std::optional<Math::Rect<float>> CursorClippingRect() const = 0;
 		/// @brief Sets a cursor clipping rectangle.
-		/// @param rect Cursor clipping rectangle. If it's @a std::nullopt, the cursor isn't clipped.
+		/// @param rect Cursor clipping rectangle in client coordinates. If it's @a std::nullopt, the cursor isn't clipped. The range is [-1, 1].
 		/// @remark The reference point is a screen center.
 		/// @remark if the platform doesn't support cursors, the function does nothing.
-		virtual void CursorClippingRect(const std::optional<Math::Rect<std::int32_t>>& rect) = 0;
+		virtual void CursorClippingRect(const std::optional<Math::Rect<float>>& rect) = 0;
 
 		/// @brief Converts the client point to a screen point.
 		/// @param clientPoint Client point.

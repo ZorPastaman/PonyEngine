@@ -142,6 +142,9 @@ TEST_CASE("Box edge", "[Math][Box]")
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(6.f, cuboid.Edge(0)));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(4.f, cuboid.Edge(1)));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(12.f, cuboid.Edge(2)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(6.f, cuboid.Width()));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(4.f, cuboid.Height()));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(12.f, cuboid.Depth()));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(6.f, 4.f, 12.f), cuboid.Edges()));
 }
 
