@@ -46,6 +46,7 @@ namespace Name
 	};
 	ENUM_MASK_TO_STRING(Permission, PermissionNames)
 	ENUM_MASK_OPERATORS(Permission)
+	ENUM_MASK_CHECKS(Permission)
 
 	ENUM_VALUE_MASK(Color, Permission)
 }
@@ -95,6 +96,16 @@ TEST_CASE("ENUM_MASK_OPERATORS work as expected", "[Utility][Enum]")
 	STATIC_REQUIRE(((Name::Permission::Read | Name::Permission::Write) ^ Name::Permission::Read) == Name::Permission::Write);
 	STATIC_REQUIRE(~Name::Permission::None == Name::Permission::All);
 	STATIC_REQUIRE(~Name::Permission::Write == (Name::Permission::Read | Name::Permission::Execute));
+}
+
+TEST_CASE("ENUM_MASK_CHECKS work as expected", "[Utility][Enum]")
+{
+	STATIC_REQUIRE(Name::All(Name::Permission::Read | Name::Permission::Execute, Name::Permission::All));
+	STATIC_REQUIRE_FALSE(Name::All(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Read));
+	STATIC_REQUIRE(Name::Any(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Read | Name::Permission::Write));
+	STATIC_REQUIRE_FALSE(Name::Any(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Write));
+	STATIC_REQUIRE_FALSE(Name::None(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Read | Name::Permission::Write));
+	STATIC_REQUIRE(Name::None(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Write));
 }
 
 TEST_CASE("ENUM_VALUE_MASK conversions work", "[Utility][Enum]")

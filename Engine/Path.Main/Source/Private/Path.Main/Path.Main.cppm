@@ -9,7 +9,7 @@
 
 export module PonyEngine.Path.Main;
 
-export import PonyEngine.Path;
+export import PonyEngine.Path.Extension;
 
 export import :PathService;
 export import :PathServiceFactory;

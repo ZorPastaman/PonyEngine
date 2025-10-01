@@ -10,4 +10,4 @@
 export module PonyEngine.Path;
 
 export import :IPathService;
-export import :PathIds;
+export import :MainPathIds;

@@ -17,4 +17,5 @@
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 #include <windowsx.h>
+#include <hidusage.h>
 #include <shlobj.h>

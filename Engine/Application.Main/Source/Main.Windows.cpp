@@ -7,6 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
@@ -16,7 +17,22 @@ import PonyEngine.Application.Main.Windows;
 import PonyEngine.Log;
 import PonyEngine.Utility;
 
-int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
+PonyEngine::Application::Windows::MainDataServiceModule MainDataModule; ///< Main data service module.
+PonyEngine::Application::Windows::MessageLoopServiceModule MessageLoopModule; ///< Message loop module.
+
+/// @brief Gets the main data module.
+/// @return Main data module.
+[[nodiscard("Pure function")]]
+PonyEngine::Application::IModule* GetMainDataModule();
+/// @brief Gets the message loop module.
+/// @return Message loop module.
+[[nodiscard("Pure function")]]
+PonyEngine::Application::IModule* GetMessageLoopModule();
+
+PONY_MODULE(GetMainDataModule, PonyEngineMainDataService, PONY_ENGINE_MAIN_DATA_ORDER);
+PONY_MODULE(GetMessageLoopModule, PonyEngineMessageLoopService, PONY_ENGINE_MESSAGE_LOOP_ORDER);
+
+int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd)
 {
 	int exitCode = PonyEngine::Application::ExitCodes::Success;
 
@@ -27,35 +43,19 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 		PonyEngine::Application::Windows::CreateConsole(CP_UTF8);
 #endif
 
+		PonyEngine::Application::Windows::MainDataServiceModule::Setup(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+
 		try
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application...");
 			auto app = std::make_unique<PonyEngine::Application::App>();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application done.");
 
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing loop.");
-			bool shouldExit = false;
-			auto loop = std::make_unique<PonyEngine::Application::Loop<2>>(
-				std::function<void()>([&]()
-				{
-					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Ticking application.");
-					shouldExit = app->Tick(exitCode);
-				}),
-				std::function<void()>([&]()
-				{
-					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Checking for quit message.");
-					shouldExit = PonyEngine::Application::Windows::CheckForQuit(exitCode);
-				})
-			);
-
 			try
 			{
-				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop start.");
-				while (!shouldExit)
-				{
-					loop->Next();
-				}
-				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop finish. Exit code: '{}'.", exitCode);
+				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Running application...");
+				exitCode = app->Run();
+				PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Running application done. Exit code: '{}'.", exitCode);
 			}
 			catch (const std::exception& e)
 			{
@@ -72,10 +72,9 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 				exitCode = PonyEngine::Application::ExitCodes::TickException;
 			}
 
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Releasing loop.");
-			loop.reset();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Releasing application.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destructing application...");
 			app.reset();
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destructing application done.");
 		}
 		catch (const std::exception& e)
 		{
@@ -112,4 +111,14 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 	}
 
 	return exitCode;
+}
+
+PonyEngine::Application::IModule* GetMainDataModule()
+{
+	return &MainDataModule;
+}
+
+PonyEngine::Application::IModule* GetMessageLoopModule()
+{
+	return &MessageLoopModule;
 }

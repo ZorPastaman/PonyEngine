@@ -17,5 +17,6 @@ namespace PonyEngine::Log
 {
 	/// @brief Gets the console sub-logger module.
 	/// @return Console sub-logger module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetConsoleModule();
 }

@@ -18,7 +18,6 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Engine.Extension;
 
-import :EngineLogger;
 import :SystemManager;
 
 export namespace PonyEngine::Engine
@@ -69,12 +68,9 @@ export namespace PonyEngine::Engine
 			virtual const Log::ILogger& Logger() const noexcept override;
 
 			[[nodiscard("Pure function")]]
-			virtual ISystemManager& SystemManager() noexcept override;
+			virtual void* FindSystem(const std::type_info& typeInfo) noexcept override;
 			[[nodiscard("Pure function")]]
-			virtual const ISystemManager& SystemManager() const noexcept override;
-
-			[[nodiscard("Pure function")]]
-			virtual std::uint64_t FrameCount() const noexcept override;
+			virtual const void* FindSystem(const std::type_info& typeInfo) const noexcept override;
 
 			EngineContext& operator =(const EngineContext&) = delete;
 			EngineContext& operator =(EngineContext&&) = delete;
@@ -83,13 +79,10 @@ export namespace PonyEngine::Engine
 			Engine* engine; ///< Engine.
 		};
 
-		std::uint64_t frameCount; ///< Frame count.
-
 		Application::IApplicationContext* application; ///< Application.
 
 		EngineContext engineContext; ///< Engine context.
 
-		std::unique_ptr<EngineLogger> logger; ///< Engine logger.
 		std::unique_ptr<SystemManager> systemManager; ///< System manager.
 	};
 }
@@ -97,44 +90,39 @@ export namespace PonyEngine::Engine
 namespace PonyEngine::Engine
 {
 	Engine::Engine(Application::IApplicationContext& application, const std::span<ISystemFactory*> systemFactories) :
-		frameCount{0ull},
 		application{&application},
 		engineContext(*this)
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Constructing engine logger.");
-		logger = std::make_unique<EngineLogger>(engineContext);
-
-		PONY_LOG(*logger, Log::LogType::Info, "Constructing system manager.");
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Constructing system manager...");
 		systemManager = std::make_unique<SystemManager>(engineContext, systemFactories);
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Constructing system manager done.");
 	}
 
 	Engine::~Engine() noexcept
 	{
-		PONY_LOG(*logger, Log::LogType::Info, "Releasing system manager.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Destructing system manager...");
 		systemManager.reset();
-
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Releasing logger.");
-		logger.reset();
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Destructing system manager done.");
 	}
 
 	void Engine::Begin()
 	{
-		PONY_LOG(*logger, Log::LogType::Info, "Beginning system manager.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning system manager...");
 		systemManager->Begin();
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning system manager done.");
 	}
 
 	void Engine::End() noexcept
 	{
-		PONY_LOG(*logger, Log::LogType::Info, "Ending system manager.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending system manager...");
 		systemManager->End();
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending system manager done.");
 	}
 
 	void Engine::Tick()
 	{
-		PONY_LOG(*logger, Log::LogType::Verbose, "Ticking system manager.");
+		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking system manager.");
 		systemManager->Tick();
-
-		++frameCount;
 	}
 
 	Engine::EngineContext::EngineContext(Engine& engine) noexcept :
@@ -154,26 +142,21 @@ namespace PonyEngine::Engine
 
 	Log::ILogger& Engine::EngineContext::Logger() noexcept
 	{
-		return *engine->logger;
+		return engine->application->Logger();
 	}
 
 	const Log::ILogger& Engine::EngineContext::Logger() const noexcept
 	{
-		return *engine->logger;
+		return engine->application->Logger();
 	}
 
-	ISystemManager& Engine::EngineContext::SystemManager() noexcept
+	void* Engine::EngineContext::FindSystem(const std::type_info& typeInfo) noexcept
 	{
-		return *engine->systemManager;
+		return engine->systemManager->FindSystem(typeInfo);
 	}
 
-	const ISystemManager& Engine::EngineContext::SystemManager() const noexcept
+	const void* Engine::EngineContext::FindSystem(const std::type_info& typeInfo) const noexcept
 	{
-		return *engine->systemManager;
-	}
-
-	std::uint64_t Engine::EngineContext::FrameCount() const noexcept
-	{
-		return engine->frameCount;
+		return engine->systemManager->FindSystem(typeInfo);
 	}
 }

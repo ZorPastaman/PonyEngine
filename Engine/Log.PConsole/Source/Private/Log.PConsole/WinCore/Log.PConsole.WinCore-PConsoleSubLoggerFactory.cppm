@@ -55,7 +55,12 @@ namespace PonyEngine::Log::WinCore
 
 	SubLoggerData PlatformConsoleSubLoggerFactory::CreateSubLogger(ILoggerContext&)
 	{
-		PONY_LOG(context->Logger(), LogType::Debug, "Constructing WinCore console sub-logger.");
-		return SubLoggerData{.subLogger = std::make_shared<PlatformConsoleSubLogger>()};
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}'...", typeid(PlatformConsoleSubLogger).name());
+		const auto platformConsoleSubLogger = std::make_shared<PlatformConsoleSubLogger>();
+		SubLoggerData data;
+		data.subLogger = platformConsoleSubLogger;
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}' done.", typeid(PlatformConsoleSubLogger).name());
+
+		return data;
 	}
 }

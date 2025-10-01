@@ -56,7 +56,6 @@ class MockLogger final : public PonyEngine::Log::ILogger
 public:
 	mutable PonyEngine::Log::LogType lastLogType;
 	mutable std::string lastMsg;
-	mutable std::optional<std::uint64_t> lastFrame;
 	mutable std::string lastExceptionMsg;
 	mutable std::stacktrace lastStacktrace;
 	mutable bool logCalled = false;
@@ -67,7 +66,6 @@ public:
 		logCalled = true;
 		lastLogType = logType;
 		lastMsg = logInput.message;
-		lastFrame = logInput.frameCount;
 		lastStacktrace = logInput.stacktrace ? *logInput.stacktrace : std::stacktrace();
 	}
 
@@ -76,7 +74,6 @@ public:
 		logExceptionCalled = true;
 		lastExceptionMsg = exception.what();
 		lastMsg = logInput.message;
-		lastFrame = logInput.frameCount;
 		lastStacktrace = logInput.stacktrace ? *logInput.stacktrace : std::stacktrace();
 	}
 };

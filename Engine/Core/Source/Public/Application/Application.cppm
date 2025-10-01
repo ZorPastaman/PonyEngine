@@ -14,6 +14,5 @@ export import :IModule;
 export import :IModuleContext;
 export import :IService;
 export import :IServiceFactory;
-export import :IServiceManager;
 export import :ITickableService;
 export import :ServiceData;

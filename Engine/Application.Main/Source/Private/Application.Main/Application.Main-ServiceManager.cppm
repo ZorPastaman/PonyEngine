@@ -24,7 +24,7 @@ import PonyEngine.Utility;
 export namespace PonyEngine::Application
 {
 	/// @brief Service manager.
-	class ServiceManager final : public IServiceManager
+	class ServiceManager final
 	{
 	public:
 		/// @brief Creates a service manager.
@@ -37,9 +37,9 @@ export namespace PonyEngine::Application
 		~ServiceManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual void* FindService(const std::type_info& type) noexcept override;
+		void* FindService(const std::type_info& type) noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const void* FindService(const std::type_info& type) const noexcept override;
+		const void* FindService(const std::type_info& type) const noexcept;
 
 		/// @brief Adds a service.
 		/// @param factory Service factory.
@@ -136,7 +136,7 @@ namespace PonyEngine::Application
 				assert(false && "Unexpected variant index.");
 				break;
 			}
-			assert(service && "The service is nullptr.");
+			assert(service && "The service is nullptr!");
 
 			services.push_back(service);
 			try
@@ -191,7 +191,7 @@ namespace PonyEngine::Application
 				throw;
 			}
 
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Creating application service done. System: '{}'.", typeid(*service).name());
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Creating application service done. Service: '{}'.", typeid(*service).name());
 		}
 		catch (const std::exception& e)
 		{
@@ -211,7 +211,8 @@ namespace PonyEngine::Application
 		for (std::size_t i = services.size(); i-- > 0uz; )
 		{
 			std::shared_ptr<IService>& service = services[i];
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing '{}' service.", typeid(*service).name());
+			const char* const serviceName = typeid(*service).name();
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing '{}' service...", serviceName);
 
 			if (const auto position = onServiceRemovedHooks.find(service.get()); position != onServiceRemovedHooks.cend())
 			{
@@ -238,6 +239,7 @@ namespace PonyEngine::Application
 			}
 
 			service.reset();
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing '{}' service done.", serviceName);
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Releasing application services done.");
 
@@ -309,8 +311,9 @@ namespace PonyEngine::Application
 		{
 			try
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service.", typeid(*service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service...", typeid(*service).name());
 				service->Begin();
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service done.", typeid(*service).name());
 				++count;
 			}
 			catch (const std::exception& e)
@@ -335,8 +338,9 @@ namespace PonyEngine::Application
 			const std::shared_ptr<IService>& service = services[i];
 			try
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service.", typeid(*service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service...", typeid(*service).name());
 				service->End();
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service done.", typeid(*service).name());
 			}
 			catch (const std::exception& e)
 			{
