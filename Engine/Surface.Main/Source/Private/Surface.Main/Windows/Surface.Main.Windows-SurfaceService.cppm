@@ -975,12 +975,12 @@ namespace PonyEngine::Surface::Windows
 		DWORD windowsStyle = 0;
 		windowsStyle |= style == SurfaceStyle::None ? WS_POPUP : 0;
 		windowsStyle |= Any(SurfaceStyle::Border, style) ? WS_BORDER : 0;
-		windowsStyle |= Any(SurfaceStyle::Title, style) ? WS_BORDER | WS_CAPTION : 0;
-		windowsStyle |= Any(SurfaceStyle::Close, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU : 0;
-		windowsStyle |= Any(SurfaceStyle::Maximize, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX : 0;
-		windowsStyle |= Any(SurfaceStyle::Minimize, style) ? WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX : 0;
-		windowsStyle |= Any(SurfaceStyle::Movable, style) ? WS_BORDER | WS_CAPTION : 0;
-		windowsStyle |= Any(SurfaceStyle::Resizable, style) ? WS_BORDER | WS_THICKFRAME : 0;
+		windowsStyle |= Any(SurfaceStyle::Title, style) ? WS_CAPTION : 0;
+		windowsStyle |= Any(SurfaceStyle::Close, style) ? WS_SYSMENU : 0;
+		windowsStyle |= Any(SurfaceStyle::Maximize, style) ? WS_SYSMENU | WS_MAXIMIZEBOX : 0;
+		windowsStyle |= Any(SurfaceStyle::Minimize, style) ? WS_SYSMENU | WS_MINIMIZEBOX : 0;
+		windowsStyle |= Any(SurfaceStyle::Movable, style) ? WS_BORDER : 0;
+		windowsStyle |= Any(SurfaceStyle::Resizable, style) ? WS_THICKFRAME : 0;
 
 		return windowsStyle;
 	}
@@ -993,12 +993,12 @@ namespace PonyEngine::Surface::Windows
 	constexpr SurfaceStyle SurfaceService::ConvertToSurfaceStyle(const DWORD style) noexcept
 	{
 		auto surfaceStyle = SurfaceStyle::None;
-		surfaceStyle |= style & (WS_BORDER | WS_CAPTION | WS_THICKFRAME) ? SurfaceStyle::Border : SurfaceStyle::None;
-		surfaceStyle |= style & WS_CAPTION ? SurfaceStyle::Title : SurfaceStyle::None;
+		surfaceStyle |= style & (WS_BORDER | WS_DLGFRAME | WS_THICKFRAME | WS_SYSMENU) ? SurfaceStyle::Border : SurfaceStyle::None;
+		surfaceStyle |= style & (WS_BORDER | WS_DLGFRAME | WS_THICKFRAME | WS_SYSMENU) ? SurfaceStyle::Title : SurfaceStyle::None;
 		surfaceStyle |= style & WS_SYSMENU ? SurfaceStyle::Close : SurfaceStyle::None;
-		surfaceStyle |= style & WS_MAXIMIZEBOX ? SurfaceStyle::Maximize : SurfaceStyle::None;
-		surfaceStyle |= style & WS_MINIMIZEBOX ? SurfaceStyle::Minimize : SurfaceStyle::None;
-		surfaceStyle |= style & (WS_CAPTION | WS_SYSMENU) ? SurfaceStyle::Movable : SurfaceStyle::None;
+		surfaceStyle |= style & WS_MAXIMIZEBOX && style & WS_SYSMENU ? SurfaceStyle::Maximize : SurfaceStyle::None;
+		surfaceStyle |= style & WS_MINIMIZEBOX && style & WS_SYSMENU ? SurfaceStyle::Minimize : SurfaceStyle::None;
+		surfaceStyle |= style & (WS_BORDER | WS_DLGFRAME | WS_THICKFRAME | WS_SYSMENU) ? SurfaceStyle::Movable : SurfaceStyle::None;
 		surfaceStyle |= style & WS_THICKFRAME ? SurfaceStyle::Resizable : SurfaceStyle::None;
 
 		return surfaceStyle;
