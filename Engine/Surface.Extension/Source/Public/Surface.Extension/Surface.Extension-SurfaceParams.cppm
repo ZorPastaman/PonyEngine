@@ -20,9 +20,11 @@ export namespace PonyEngine::Surface
 	struct SurfaceParams
 	{
 		std::string title = "Pony Engine"; ///< Title.
-		SurfaceRect rect = SurfaceRect{.position = Math::Vector2<std::int32_t>::Zero(), .size = Math::Vector2<std::int32_t>(640, 480), .positionMode = SurfacePositionMode::Center}; ///< Window rect. On platforms that don't support windows, it's ignored.
-		Math::Vector2<std::int32_t> minimalSize = Math::Vector2<std::int32_t>(640, 480); ///< Minimal size. On platforms that don't support windows, it's ignored.
+		Math::Rect<std::int32_t> clientRect = Math::Rect<std::int32_t>(Math::Vector2<std::int32_t>(320, 240)); ///< Client rectangle. On platforms that don't support client rectangles, it's ignored.
+		Math::Vector2<std::int32_t> minimalClientSize = Math::Vector2<std::int32_t>(640, 480); ///< Minimal size. On platforms that don't support client rectangles, it's ignored.
 		Math::ColorRGB<std::uint8_t> backgroundColor = Math::ColorRGB<std::uint8_t>::Black(); ///< Background color.
 		SurfaceStyle style = SurfaceStyle::Border | SurfaceStyle::Title | SurfaceStyle::Close | SurfaceStyle::Maximize | SurfaceStyle::Minimize | SurfaceStyle::Resizable; ///< Surface style.
+		std::optional<Math::Rect<std::int32_t>> cursorClippingRect; ///< Cursor clipping rect. On platforms that don't support cursors, it's ignored.
+		bool showCursor = true; ///< Show cursor. On platforms that don't support cursors, it's ignored.
 	};
 }
