@@ -9,7 +9,6 @@ target_sources(PonyEngine.Engine.Extension PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Engine.Extension/Engine.Extension-IEngineContext.cppm"
 	"Source/Public/Engine.Extension/Engine.Extension-ISystem.cppm"
 	"Source/Public/Engine.Extension/Engine.Extension-ISystemFactory.cppm"
-	"Source/Public/Engine.Extension/Engine.Extension-ISystemManager.cppm"
 	"Source/Public/Engine.Extension/Engine.Extension-ITickableSystem.cppm"
 	"Source/Public/Engine.Extension/Engine.Extension-SystemData.cppm"
 )

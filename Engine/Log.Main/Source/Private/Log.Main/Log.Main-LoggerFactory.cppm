@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Log.Main:LoggerFactory;
@@ -57,21 +55,26 @@ namespace PonyEngine::Log
 
 	Application::ServiceData LoggerFactory::Create(Application::IApplicationContext& application)
 	{
-		PONY_LOG(context->Logger(), LogType::Info, "Getting sub-logger factories.");
+		PONY_LOG(context->Logger(), LogType::Debug, "Getting sub-logger factories.");
 		const std::size_t subLoggerFactoryCount = context->DataCount<ISubLoggerFactory>();
 		std::vector<ISubLoggerFactory*> subLoggerFactories;
 		subLoggerFactories.reserve(subLoggerFactoryCount);
 		for (std::size_t i = 0uz; i < subLoggerFactoryCount; ++i)
 		{
-			subLoggerFactories.push_back(context->GetData<ISubLoggerFactory>(i).get());
+			const auto factory = context->GetData<ISubLoggerFactory>(i);
+			if (!factory) [[unlikely]]
+			{
+				throw std::logic_error("Sub-logger factory is nullptr.");
+			}
+			subLoggerFactories.push_back(factory.get());
 		}
 
-		PONY_LOG(context->Logger(), LogType::Info, "Constructing logger.");
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}'...", typeid(Logger).name());
 		const auto logger = std::make_shared<Logger>(context->Application(), subLoggerFactories);
-
 		Application::ServiceData data;
 		data.service = logger;
 		data.publicInterfaces.AddInterface<ILogger>(logger->PublicLogger());
+		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}' done.", typeid(Logger).name());
 
 		return data;
 	}

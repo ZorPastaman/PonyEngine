@@ -23,7 +23,7 @@ import PonyEngine.Log;
 export namespace PonyEngine::Engine
 {
 	/// @brief System manager.
-	class SystemManager final : public ISystemManager
+	class SystemManager final
 	{
 	public:
 		/// @brief Creates a system manager.
@@ -37,9 +37,9 @@ export namespace PonyEngine::Engine
 		~SystemManager() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual void* FindSystem(const std::type_info& typeInfo) noexcept override;
+		void* FindSystem(const std::type_info& typeInfo) noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const void* FindSystem(const std::type_info& typeInfo) const noexcept override;
+		const void* FindSystem(const std::type_info& typeInfo) const noexcept;
 
 		/// @brief Begins the systems.
 		void Begin();
@@ -188,7 +188,7 @@ namespace PonyEngine::Engine
 					assert(false && "Unexpected variant index.");
 					break;
 				}
-				assert(system && "The system is nullptr.");
+				assert(system && "The system is nullptr!");
 				systems.push_back(system);
 
 				PONY_LOG(engine->Logger(), Log::LogType::Debug, "Adding system interfaces.");
@@ -240,7 +240,8 @@ namespace PonyEngine::Engine
 		for (std::size_t i = systems.size(); i-- > 0uz; )
 		{
 			std::shared_ptr<ISystem>& system = systems[i];
-			PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing '{}' system.", typeid(*system).name());
+			const char* const systemName = typeid(*system).name();
+			PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing '{}' system...", systemName);
 
 			for (const std::type_index type : systemInterfacesMap[system.get()])
 			{
@@ -248,8 +249,9 @@ namespace PonyEngine::Engine
 			}
 
 			system.reset();
+			PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing '{}' system done.", systemName);
 		}
-		PONY_LOG(engine->Logger(), Log::LogType::Debug, "Releasing engine systems done.");
+		PONY_LOG(engine->Logger(), Log::LogType::Info, "Releasing engine systems done.");
 	}
 
 	void SystemManager::Begin(std::size_t& count)
@@ -259,8 +261,9 @@ namespace PonyEngine::Engine
 		{
 			try
 			{
-				PONY_LOG(engine->Logger(), Log::LogType::Info, "Beginning '{}' system.", typeid(*system).name());
+				PONY_LOG(engine->Logger(), Log::LogType::Info, "Beginning '{}' system...", typeid(*system).name());
 				system->Begin();
+				PONY_LOG(engine->Logger(), Log::LogType::Info, "Beginning '{}' system done.", typeid(*system).name());
 				++count;
 			}
 			catch (const std::exception& e)
@@ -287,8 +290,9 @@ namespace PonyEngine::Engine
 			const std::shared_ptr<ISystem>& system = systems[i];
 			try
 			{
-				PONY_LOG(engine->Logger(), Log::LogType::Info, "Ending '{}' system.", typeid(*system).name());
+				PONY_LOG(engine->Logger(), Log::LogType::Info, "Ending '{}' system...", typeid(*system).name());
 				system->End();
+				PONY_LOG(engine->Logger(), Log::LogType::Info, "Ending '{}' system done.", typeid(*system).name());
 			}
 			catch (const std::exception& e)
 			{

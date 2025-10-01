@@ -34,13 +34,11 @@ target_sources(PonyEngine.Engine.Main PUBLIC
 target_sources(PonyEngine.Engine.Main PRIVATE
 	"Source/Main.Impl.cpp"
 )
-target_sources(PonyEngine.Engine.Main PRIVATE FILE_SET CXX_MODULES FILES 
+target_sources(PonyEngine.Engine.Main PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Engine.Main/Engine.Main.cppm"
 	"Source/Private/Engine.Main/Engine.Main-Engine.cppm"
 	"Source/Private/Engine.Main/Engine.Main-EngineFactory.cppm"
-	"Source/Private/Engine.Main/Engine.Main-EngineLogger.cppm"
 	"Source/Private/Engine.Main/Engine.Main-EngineModule.cppm"
-	
 	"Source/Private/Engine.Main/Engine.Main-SystemManager.cppm"
 )
 

@@ -17,5 +17,6 @@ namespace PonyEngine::Engine
 {
 	/// @brief Gets the engine module.
 	/// @return Engine module.
+	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetEngineModule();
 }

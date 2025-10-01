@@ -11,5 +11,4 @@ export module PonyEngine.Platform.Windows;
 
 export import PonyEngine.Platform.WinCore;
 
-export import :Cursor;
 export import :Module;

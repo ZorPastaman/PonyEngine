@@ -18,8 +18,6 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Log;
 
-import :ISystemManager;
-
 export namespace PonyEngine::Engine
 {
 	/// @brief Engine context.
@@ -45,18 +43,40 @@ export namespace PonyEngine::Engine
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 
-		/// @brief Gets the engine system manager.
-		/// @return Engine system manager.
+		/// @brief Tries to find a system of the type described by the @p typeInfo.
+		/// @param typeInfo System type info.
+		/// @return Pointer to the system if it's found; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& SystemManager() noexcept = 0;
-		/// @brief Gets the engine system manager.
-		/// @return Engine system manager.
+		virtual void* FindSystem(const std::type_info& typeInfo) noexcept = 0;
+		/// @brief Tries to find a system of the type @p T.
+		/// @tparam T System type.
+		/// @return Pointer to the system if it's found; nullptr if it's not found.
+		template<typename T> [[nodiscard("Pure function")]]
+		T* FindSystem() noexcept;
+		/// @brief Tries to find a system of the type described by the @p typeInfo.
+		/// @param typeInfo System type info.
+		/// @return Pointer to the system if it's found; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		virtual const ISystemManager& SystemManager() const noexcept = 0;
-
-		/// @brief Gets the current frame count.
-		/// @return Current frame count.
-		[[nodiscard("Pure function")]]
-		virtual std::uint64_t FrameCount() const noexcept = 0;
+		virtual const void* FindSystem(const std::type_info& typeInfo) const noexcept = 0;
+		/// @brief Tries to find a system of the type @p T.
+		/// @tparam T System type.
+		/// @return Pointer to the system if it's found; nullptr if it's not found.
+		template<typename T> [[nodiscard("Pure function")]]
+		const T* FindSystem() const noexcept;
 	};
+}
+
+namespace PonyEngine::Engine
+{
+	template<typename T>
+	T* IEngineContext::FindSystem() noexcept
+	{
+		return static_cast<T*>(FindSystem(typeid(T)));
+	}
+
+	template<typename T>
+	const T* IEngineContext::FindSystem() const noexcept
+	{
+		return static_cast<const T*>(FindSystem(typeid(T)));
+	}
 }

@@ -9,6 +9,6 @@
 
 export module PonyEngine.Log.Console;
 
-export import PonyEngine.Log;
+export import PonyEngine.Log.Extension;
 
 export import :ConsoleSubLoggerModule;

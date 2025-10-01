@@ -13,21 +13,12 @@ import std;
 
 import PonyEngine.Log;
 
-TEST_CASE("LogFormat: logType and timePoint", "[Log][LogFormat]") 
+TEST_CASE("LogFormat: logType, message", "[Log][LogFormat]")
 {
-	constexpr auto lt = PonyEngine::Log::LogType::Verbose;
-	const auto tp = std::chrono::system_clock::from_time_t(1717430400);
-	std::string expected = std::format("[{}] [{:%F %R:%OS UTC}]\n", lt, tp);
-	REQUIRE(PonyEngine::Log::LogFormat(lt, tp) == expected);
-}
-
-TEST_CASE("LogFormat: logType, timePoint, frameCount", "[Log][LogFormat]") 
-{
-	constexpr auto lt = PonyEngine::Log::LogType::Warning;
-	const auto tp = std::chrono::system_clock::from_time_t(1717430400);
-	constexpr std::uint64_t frame = 42;
-	std::string expected = std::format("[{}] [{:%F %R:%OS UTC} ({})]\n", lt, tp, frame);
-	REQUIRE(PonyEngine::Log::LogFormat(lt, tp, frame) == expected);
+	constexpr auto lt = PonyEngine::Log::LogType::Error;
+	constexpr std::string_view message = "Hello";
+	std::string expected = std::format("[{}] {}\n", lt, message);
+	REQUIRE(PonyEngine::Log::LogFormat(lt, message) == expected);
 }
 
 TEST_CASE("LogFormat: logType, message, timePoint", "[Log][LogFormat]") 
@@ -47,6 +38,15 @@ TEST_CASE("LogFormat: logType, message, timePoint, frameCount", "[Log][LogFormat
 	constexpr std::uint64_t frame = 42;
 	std::string expected = std::format("[{}] [{:%F %R:%OS UTC} ({})] {}\n", lt, tp, frame, message);
 	REQUIRE(PonyEngine::Log::LogFormat(lt, message, tp, frame) == expected);
+}
+
+TEST_CASE("LogFormat: logType, firstMessage, secondMessage", "[Log][LogFormat]")
+{
+	constexpr auto lt = PonyEngine::Log::LogType::Exception;
+	constexpr std::string_view firstMessage = "Foo";
+	constexpr std::string_view secondMessage = "Bar";
+	std::string expected = std::format("[{}] {} - {}\n", lt, firstMessage, secondMessage);
+	REQUIRE(PonyEngine::Log::LogFormat(lt, firstMessage, secondMessage) == expected);
 }
 
 TEST_CASE("LogFormat: logType, firstMessage, secondMessage, timePoint", "[Log][LogFormat]") 
@@ -70,23 +70,13 @@ TEST_CASE("LogFormat: logType, firstMessage, secondMessage, timePoint, frameCoun
 	REQUIRE(PonyEngine::Log::LogFormat(lt, firstMessage, secondMessage, tp, frame) == expected);
 }
 
-TEST_CASE("LogFormat: logType, timePoint, stacktrace", "[Log][LogFormat]")
+TEST_CASE("LogFormat: logType, message, stacktrace", "[Log][LogFormat]")
 {
 	constexpr auto lt = PonyEngine::Log::LogType::Error;
-	const auto tp = std::chrono::system_clock::from_time_t(1717430400);
+	constexpr std::string_view message = "Stacktrace test";
 	const std::stacktrace stacktrace = std::stacktrace::current();
-	std::string expected = std::format("[{}] [{:%F %R:%OS UTC}]\n{}\n", lt, tp, stacktrace);
-	REQUIRE(PonyEngine::Log::LogFormat(lt, tp, stacktrace) == expected);
-}
-
-TEST_CASE("LogFormat: logType, timePoint, frameCount, stacktrace", "[Log][LogFormat]")
-{
-	constexpr auto lt = PonyEngine::Log::LogType::Error;
-	const auto tp = std::chrono::system_clock::from_time_t(1717430400);
-	constexpr std::uint64_t frame = 42;
-	const std::stacktrace stacktrace = std::stacktrace::current();
-	std::string expected = std::format("[{}] [{:%F %R:%OS UTC} ({})]\n{}\n", lt, tp, frame, stacktrace);
-	REQUIRE(PonyEngine::Log::LogFormat(lt, tp, frame, stacktrace) == expected);
+	std::string expected = std::format("[{}] {}\n{}\n", lt, message, stacktrace);
+	REQUIRE(PonyEngine::Log::LogFormat(lt, message, stacktrace) == expected);
 }
 
 TEST_CASE("LogFormat: logType, message, timePoint, stacktrace", "[Log][LogFormat]")
@@ -108,6 +98,17 @@ TEST_CASE("LogFormat: logType, message, timePoint, frameCount, stacktrace", "[Lo
 	const std::stacktrace stacktrace = std::stacktrace::current();
 	std::string expected = std::format("[{}] [{:%F %R:%OS UTC} ({})] {}\n{}\n", lt, tp, frame, message, stacktrace);
 	REQUIRE(PonyEngine::Log::LogFormat(lt, message, tp, frame, stacktrace) == expected);
+}
+
+TEST_CASE("LogFormat: logType, firstMessage, secondMessage, stacktrace", "[Log][LogFormat]")
+{
+	constexpr auto lt = PonyEngine::Log::LogType::Exception;
+	const auto tp = std::chrono::system_clock::from_time_t(1717430400);
+	constexpr std::string_view firstMessage = "First";
+	constexpr std::string_view secondMessage = "Second";
+	const std::stacktrace stacktrace = std::stacktrace::current();
+	std::string expected = std::format("[{}] {} - {}\n{}\n", lt, firstMessage, secondMessage, stacktrace);
+	REQUIRE(PonyEngine::Log::LogFormat(lt, firstMessage, secondMessage, stacktrace) == expected);
 }
 
 TEST_CASE("LogFormat: logType, firstMessage, secondMessage, timePoint, stacktrace", "[Log][LogFormat]")
