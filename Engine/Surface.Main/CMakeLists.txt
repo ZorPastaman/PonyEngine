@@ -22,7 +22,6 @@ add_library(PonyEngine.Surface.Main STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Surface.Main/Surface.Main.cppm"
-	"Source/Private/Surface.Main/Surface.Main-Utility.cppm"
 )
 
 if(PONY_WINDOWS)

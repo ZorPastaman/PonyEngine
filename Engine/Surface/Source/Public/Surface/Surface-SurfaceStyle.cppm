@@ -18,13 +18,14 @@ import std;
 namespace PonyEngine::Surface
 {
 	/// @brief Surface style names.
-	constexpr std::array<std::string_view, 7> SurfaceStyleNames
+	constexpr std::array<std::string_view, 8> SurfaceStyleNames
 	{
 		"Border",
 		"Title",
 		"Close",
 		"Maximize",
 		"Minimize",
+		"Movable",
 		"Resizable",
 		"AlwaysOnTop"
 	};
@@ -43,9 +44,10 @@ export namespace PonyEngine::Surface
 		Close = 1 << 2, ///< Draw close button.
 		Maximize = 1 << 3, ///< Draw maximize button.
 		Minimize = 1 << 4, ///< Draw minimize button.
-		Resizable = 1 << 5, ///< Resizable surface.
-		AlwaysOnTop = 1 << 6, ///< Show always on top.
-		All = Border | Title | Close | Maximize | Minimize | Resizable | AlwaysOnTop
+		Movable = 1 << 5, ///< Movable surface.
+		Resizable = 1 << 6, ///< Resizable surface.
+		AlwaysOnTop = 1 << 7, ///< Show always on top.
+		All = Border | Title | Close | Maximize | Minimize | Movable | Resizable | AlwaysOnTop
 	};
 
 	ENUM_MASK_FEATURES(SurfaceStyle, SurfaceStyleNames)

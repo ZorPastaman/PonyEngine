@@ -85,6 +85,18 @@ export namespace PonyEngine::Math
 		/// @param extent Extent.
 		constexpr void Extent(std::size_t index, T extent) noexcept;
 
+		/// @brief Calculates the width.
+		/// @return Width.
+		[[nodiscard("Pure function")]]
+		constexpr T Width() const noexcept;
+		/// @brief Calculates the height.
+		/// @return Height.
+		[[nodiscard("Pure function")]]
+		constexpr T Height() const noexcept requires (Size >= 2);
+		/// @brief Calculates the depth.
+		/// @return Depth.
+		[[nodiscard("Pure function")]]
+		constexpr T Depth() const noexcept requires (Size >= 3);
 		/// @brief Calculates the edge length.
 		/// @param index Edge index. Must be in range [0, Size).
 		/// @return Edge length.
@@ -285,6 +297,24 @@ namespace PonyEngine::Math
 	constexpr void Box<T, Size>::Extent(const std::size_t index, const T extent) noexcept
 	{
 		extents[index] = Abs(extent);
+	}
+
+	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
+	constexpr T Box<T, Size>::Width() const noexcept
+	{
+		return Edge(0uz);
+	}
+
+	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
+	constexpr T Box<T, Size>::Height() const noexcept requires (Size >= 2)
+	{
+		return Edge(1uz);
+	}
+
+	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
+	constexpr T Box<T, Size>::Depth() const noexcept requires (Size >= 3)
+	{
+		return Edge(2uz);
 	}
 
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1)
