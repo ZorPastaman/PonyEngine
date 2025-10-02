@@ -7,254 +7,170 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
-#include "PonyEngine/Log/Log.h"
-#ifdef PONY_PLATFORM_CONSOLE_LOG
-#ifdef PONY_WINCORE
-#include "PonyEngine/Platform/WinCore/Framework.h"
-#endif
-#endif
-
 export module PonyEngine.Log:LogHelper;
 
 import std;
 
 import PonyEngine.Utility;
 
-import :ILogger;
-import :LogData;
 import :LogFormat;
-import :LogInput;
 import :LogType;
 
 export namespace PonyEngine::Log
 {
-	/// @brief Logs to the @p logger.
-	/// @param logger Logger.
-	/// @param logType Log type.
-	/// @param logData Log data.
-	/// @param message Log message.
-	void LogToLogger(const ILogger& logger, LogType logType, const LogData& logData, std::string_view message = std::string_view()) noexcept;
-	/// @brief Logs to the @p logger.
-	/// @tparam Args Format argument types.
-	/// @param logger Logger.
-	/// @param logType Log type.
-	/// @param logData Log data.
-	/// @param format Format.
-	/// @param args Format arguments.
-	template<typename... Args>
-	void LogToLogger(const ILogger& logger, LogType logType, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
-	/// @brief Logs to the @p logger.
-	/// @param logger Logger.
-	/// @param exception Exception.
-	/// @param logData Log data.
-	/// @param message Log message.
-	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, std::string_view message = std::string_view()) noexcept;
-	/// @brief Logs to the @p logger.
-	/// @tparam Args Format argument types.
-	/// @param logger Logger.
-	/// @param exception Exception.
-	/// @param logData Log data.
-	/// @param format Format.
-	/// @param args Format arguments.
-	template<typename... Args>
-	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
+	// Functions here are used by PonyEngine/Log/Log.h
 
-	/// @brief Logs to a standard console and a platform console.
-	/// @param logType Log type.
-	/// @param logData Log data.
-	/// @param message Log message.
-	void LogToConsole(LogType logType, const LogData& logData, std::string_view message = std::string_view()) noexcept;
-	/// @brief Logs to a standard console and a platform console.
-	/// @tparam Args Format argument types.
-	/// @param logType Log type.
-	/// @param logData Log data.
-	/// @param format Format.
-	/// @param args Format arguments.
-	template<typename... Args>
-	void LogToConsole(LogType logType, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
-	/// @brief Logs to a standard console and a platform console.
-	/// @param exception Exception.
-	/// @param logData Log data.
-	/// @param message Log message.
-	void LogToConsole(const std::exception& exception, const LogData& logData, std::string_view message = std::string_view()) noexcept;
-	/// @brief Logs to a standard console and a platform console.
-	/// @tparam Args Format argument types.
-	/// @param exception Exception.
-	/// @param logData Log data.
-	/// @param format Format.
-	/// @param args Format arguments.
-	template<typename... Args>
-	void LogToConsole(const std::exception& exception, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
-	/// @brief Logs to a standard console and a platform console.
-	/// @param logType Log type.
-	/// @param log Formatted log message.
-	void LogToConsole(LogType logType, std::string_view log) noexcept;
-
-	/// @brief Chooses a console output stream by the @p logType.
-	/// @param logType Log type.
-	/// @return Chosen stream.
+	/// @brief Returns the same message.
+	/// @param message Message.
+	/// @return Message.
 	[[nodiscard("Pure function")]]
-	std::ostream& ChooseConsoleStream(LogType logType) noexcept;
+	std::string_view LogString(std::string_view message) noexcept;
+	/// @brief Safe formats the string.
+	/// @tparam Args Argument types.
+	/// @param format Format.
+	/// @param args Arguments.
+	/// @return Formatted string.
+	template<typename... Args> [[nodiscard("Pure function")]]
+	std::string LogString(std::format_string<Args...> format, Args&&... args) noexcept;
+
+	/// @brief Safe formats the string.
+	/// @param logType Log type.
+	/// @param message Message.
+	/// @return Formatted string.
+	[[nodiscard("Pure function")]]
+	std::string LogString(LogType logType, std::string_view message) noexcept;
+	/// @brief Safe formats the string.
+	/// @tparam Args Argument types.
+	/// @param logType Log type.
+	/// @param format Format.
+	/// @param args Arguments.
+	/// @return Formatted string.
+	template<typename... Args> [[nodiscard("Pure function")]]
+	std::string LogString(LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Safe formats the string.
+	/// @param logType Log type.
+	/// @param stacktrace Stacktrace.
+	/// @param message Message.
+	/// @return Formatted string.
+	[[nodiscard("Pure function")]]
+	std::string LogString(LogType logType, const std::stacktrace& stacktrace, std::string_view message) noexcept;
+	/// @brief Safe formats the string.
+	/// @tparam Args Argument types.
+	/// @param logType Log type.
+	/// @param stacktrace Stacktrace.
+	/// @param format Format.
+	/// @param args Arguments.
+	/// @return Formatted string.
+	template<typename... Args> [[nodiscard("Pure function")]]
+	std::string LogString(LogType logType, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
+
+	/// @brief Safe formats the string.
+	/// @param exception Exception.
+	/// @return Formatted string.
+	[[nodiscard("Pure function")]]
+	std::string LogString(const std::exception& exception) noexcept;
+	/// @brief Safe formats the string.
+	/// @param exception Exception.
+	/// @param message Message.
+	/// @return Formatted string.
+	[[nodiscard("Pure function")]]
+	std::string LogString(const std::exception& exception, std::string_view message) noexcept;
+	/// @brief Safe formats the string.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @return Formatted string.
+	[[nodiscard("Pure function")]]
+	std::string LogString(const std::exception& exception, const std::stacktrace& stacktrace) noexcept;
+	/// @brief Safe formats the string.
+	/// @tparam Args Argument types.
+	/// @param exception Exception.
+	/// @param format Format.
+	/// @param args Arguments.
+	/// @return Formatted string.
+	template<typename... Args> [[nodiscard("Pure function")]]
+	std::string LogString(const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Safe formats the string.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @param message Message.
+	/// @return Formatted string.
+	[[nodiscard("Pure function")]]
+	std::string LogString(const std::exception& exception, const std::stacktrace& stacktrace, std::string_view message) noexcept;
+	/// @brief Safe formats the string.
+	/// @tparam Args Argument types.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @param format Format.
+	/// @param args Arguments.
+	/// @return Formatted string.
+	template<typename... Args> [[nodiscard("Pure function")]]
+	std::string LogString(const std::exception& exception, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
 }
 
 namespace PonyEngine::Log
 {
-	/// @brief Passes exceptions to a console.
-	struct ConsoleExceptionHandler final
+	std::string_view LogString(const std::string_view message) noexcept
 	{
-		/// @brief Passes exceptions to a console.
-		/// @param e Exception to pass.
-		void operator ()(const std::exception& e) const noexcept;
-	};
-
-	/// @brief Formats the log.
-	/// @param logType Log type.
-	/// @param logData Log data.
-	/// @param message Log massage.
-	/// @return Formatted log.
-	[[nodiscard("Pure function")]]
-	std::string Format(LogType logType, const LogData& logData, std::string_view message);
-	/// @brief Formats the log.
-	/// @param exception Exception.
-	/// @param logData Log data.
-	/// @param message Log massage.
-	/// @return Formatted log.
-	[[nodiscard("Pure function")]]
-	std::string Format(const std::exception& exception, const LogData& logData, std::string_view message);
-	/// @brief @p std::format() wrapper that doesn't throw. If @p std::format() throws, the exception is passed to the @p ConsoleExceptionHandler.
-	/// @tparam Args Format argument types.
-	/// @param format Format.
-	/// @param args Format arguments.
-	/// @return Format result or empty string if std::format() threw.
-	template<typename... Args> [[nodiscard("Pure function")]]
-	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept;
-
-	void LogToLogger(const ILogger& logger, const LogType logType, const LogData& logData, const std::string_view message) noexcept
-	{
-		const auto logInput = LogInput{.message = message, .stacktrace = logData.stacktrace.has_value() ? &logData.stacktrace.value() : nullptr};
-		logger.Log(logType, logInput);
+		return message;
 	}
 
 	template<typename... Args>
-	void LogToLogger(const ILogger& logger, const LogType logType, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
+	std::string LogString(const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogToLogger(logger, logType, logData, SafeFormat(format, std::forward<Args>(args)...));
+		return Utility::SafeFormat(format, std::forward<Args>(args)...);
 	}
 
-	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, const std::string_view message) noexcept
+	std::string LogString(const LogType logType, const std::string_view message) noexcept
 	{
-		const auto logInput = LogInput{.message = message, .stacktrace = logData.stacktrace.has_value() ? &logData.stacktrace.value() : nullptr};
-		logger.Log(exception, logInput);
-	}
-
-	template<typename... Args>
-	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
-	{
-		LogToLogger(logger, exception, logData, SafeFormat(format, std::forward<Args>(args)...));
-	}
-
-	void LogToConsole(const LogType logType, const LogData& logData, const std::string_view message) noexcept
-	{
-		try
-		{
-			const std::string log = Format(logType, logData, message);
-			LogToConsole(logType, log);
-		}
-		catch (...)
-		{
-			// Something totally wrong happened.
-		}
+		return LogFormat(logType, message);
 	}
 
 	template<typename... Args>
-	void LogToConsole(const LogType logType, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
+	std::string LogString(const LogType logType, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogToConsole(logType, logData, SafeFormat(format, std::forward<Args>(args)...));
+		return LogFormat(logType, LogString(format, std::forward<Args>(args)...));
 	}
 
-	void LogToConsole(const std::exception& exception, const LogData& logData, const std::string_view message) noexcept
+	std::string LogString(const LogType logType, const std::stacktrace& stacktrace, const std::string_view message) noexcept
 	{
-		try
-		{
-			const std::string log = Format(exception, logData, message);
-			LogToConsole(LogType::Exception, log);
-		}
-		catch (...)
-		{
-			// Something totally wrong happened.
-		}
+		return LogFormat(logType, message, stacktrace);
 	}
 
 	template<typename... Args>
-	void LogToConsole(const std::exception& exception, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
+	std::string LogString(const LogType logType, const std::stacktrace& stacktrace, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogToConsole(exception, logData, SafeFormat(format, std::forward<Args>(args)...));
+		return LogFormat(logType, LogString(format, std::forward<Args>(args)...), stacktrace);
 	}
 
-	void LogToConsole(const LogType logType, const std::string_view log) noexcept
+	std::string LogString(const std::exception& exception) noexcept
 	{
-#ifdef PONY_CONSOLE_LOG
-		try
-		{
-			ChooseConsoleStream(logType) << log;
-		}
-		catch (...)
-		{
-			// Something totally wrong happened.
-		}
-#endif
-#ifdef PONY_PLATFORM_CONSOLE_LOG
-#ifdef PONY_WINCORE
-		OutputDebugStringA(log.data());
-#endif
-#endif
+		return LogFormat(LogType::Exception, exception.what());
 	}
 
-	std::ostream& ChooseConsoleStream(const LogType logType) noexcept
+	std::string LogString(const std::exception& exception, const std::string_view message) noexcept
 	{
-		switch (logType)
-		{
-		case LogType::Verbose:
-		case LogType::Debug:
-		case LogType::Info:
-			return std::cout;
-		case LogType::Warning:
-			return std::clog;
-		case LogType::Error:
-		case LogType::Exception:
-			return std::cerr;
-		default: [[unlikely]]
-			assert(false && "Invalid log type.");
-			return std::cerr;
-		}
+		return LogFormat(LogType::Exception, exception.what(), message);
 	}
 
-	std::string Format(const LogType logType, const LogData& logData, const std::string_view message)
+	std::string LogString(const std::exception& exception, const std::stacktrace& stacktrace) noexcept
 	{
-		return logData.stacktrace
-			? LogFormat(logType, message, logData.stacktrace.value())
-			: LogFormat(logType, message);
-	}
-
-	std::string Format(const std::exception& exception, const LogData& logData, const std::string_view message)
-	{
-		return logData.stacktrace
-			? LogFormat(LogType::Exception, exception.what(), message, logData.stacktrace.value())
-			: LogFormat(LogType::Exception, exception.what(), message);
+		return LogFormat(LogType::Exception, exception.what(), stacktrace);
 	}
 
 	template<typename... Args>
-	std::string SafeFormat(const std::format_string<Args...> format, Args&&... args) noexcept
+	std::string LogString(const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
+		return LogFormat(LogType::Exception, exception.what(), LogString(format, std::forward<Args>(args)...));
 	}
 
-	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
+	std::string LogString(const std::exception& exception, const std::stacktrace& stacktrace, const std::string_view message) noexcept
 	{
-		PONY_CONSOLE_E_S(e);
+		return LogFormat(LogType::Exception, exception.what(), message, stacktrace);
+	}
+
+	template<typename ... Args>
+	std::string LogString(const std::exception& exception, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		return LogFormat(LogType::Exception, exception.what(), LogString(format, std::forward<Args>(args)...), stacktrace);
 	}
 }

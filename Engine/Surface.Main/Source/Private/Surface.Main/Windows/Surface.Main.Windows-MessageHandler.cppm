@@ -23,7 +23,7 @@ import PonyEngine.Utility;
 
 export namespace PonyEngine::Surface::Windows
 {
-	Application::IApplicationContext* messageHandlerApp; ///< Application context for logging.
+	Application::IApplicationContext* MessageHandlerApp; ///< Application context for logging.
 
 	/// @brief Windows message handler.
 	class IMessageHandler
@@ -95,7 +95,7 @@ namespace PonyEngine::Surface::Windows
 			{
 				if (const DWORD errorCode = GetLastError()) [[unlikely]]
 				{
-					PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on setting message handler. Error code: '0x{:X}'.", errorCode));
+					PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on setting message handler. Error code: '0x{:X}'.", errorCode));
 
 					return -1;
 				}
@@ -104,7 +104,7 @@ namespace PonyEngine::Surface::Windows
 			return windowProc->HandleMessage(uMsg, wParam, lParam);
 		}
 
-		PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, "Wrong Windows window has been created. No IMessageHandler interface found.");
+		PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, "Wrong Windows window has been created. No IMessageHandler interface found.");
 
 		return -1;
 	}
@@ -119,14 +119,14 @@ namespace PonyEngine::Surface::Windows
 			{
 				if (const DWORD errorCode = GetLastError()) [[likely]]
 				{
-					PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on unsetting message handler. Error code: '0x{:X}'.", errorCode));
+					PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on unsetting message handler. Error code: '0x{:X}'.", errorCode));
 				}
 			}
 
 			return windowProc->HandleMessage(uMsg, wParam, lParam);
 		}
 
-		PONY_LOG_IF(messageHandlerApp, messageHandlerApp->Logger(), Log::LogType::Error, "Wrong Windows window has been destroyed. No IMessageHandler interface found.");
+		PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, "Wrong Windows window has been destroyed. No IMessageHandler interface found.");
 
 		return DefWindowProcA(hWnd, uMsg, wParam, lParam);
 	}
