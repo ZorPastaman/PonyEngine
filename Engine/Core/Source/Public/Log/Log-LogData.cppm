@@ -18,6 +18,6 @@ export namespace PonyEngine::Log
 	/// @brief Log data.
 	struct LogData final
 	{
-		std::optional<std::basic_stacktrace<std::allocator<std::stacktrace_entry>>> stacktrace = std::nullopt; ///< Stacktrace.
+		const std::stacktrace* stacktrace = nullptr; ///< Stacktrace.
 	};
 }

@@ -57,7 +57,7 @@ namespace PonyEngine::Log
 	{
 	}
 
-	SubLoggerData FileSubLoggerFactory::CreateSubLogger(ILoggerContext&)
+	SubLoggerData FileSubLoggerFactory::CreateSubLogger(ILoggerContext& logger)
 	{
 		PONY_LOG(context->Logger(), LogType::Debug, "Getting log folder.");
 		const Path::IPathService* const pathService = context->FindService<Path::IPathService>();
@@ -83,7 +83,7 @@ namespace PonyEngine::Log
 		}
 
 		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}'... Log path: '{}'.", typeid(FileSubLogger).name(), logPath.string());
-		const auto fileSubLogger = std::make_shared<FileSubLogger>(logPath);
+		const auto fileSubLogger = std::make_shared<FileSubLogger>(logger, logPath);
 		SubLoggerData data;
 		data.subLogger = fileSubLogger;
 		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}' done.", typeid(FileSubLogger).name());

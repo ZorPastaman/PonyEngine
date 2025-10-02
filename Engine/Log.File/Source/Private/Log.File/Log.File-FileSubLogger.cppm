@@ -24,9 +24,10 @@ export namespace PonyEngine::Log
 	{
 	public:
 		/// @brief Creates a file sub-logger.
+		/// @param logger Logger context.
 		/// @param path Log file path.
 		[[nodiscard("Pure constructor")]]
-		explicit FileSubLogger(const std::filesystem::path& path);
+		FileSubLogger(ILoggerContext& logger, const std::filesystem::path& path);
 		FileSubLogger(const FileSubLogger&) = delete;
 		FileSubLogger(FileSubLogger&&) = delete;
 
@@ -38,13 +39,16 @@ export namespace PonyEngine::Log
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
 
 	private:
+		ILoggerContext* logger; ///< Logger context.
+
 		std::ofstream logFile; ///< Log file.
 	};
 }
 
 namespace PonyEngine::Log
 {
-	FileSubLogger::FileSubLogger(const std::filesystem::path& path) :
+	FileSubLogger::FileSubLogger(ILoggerContext& logger, const std::filesystem::path& path) :
+		logger{&logger},
 		logFile(path)
 	{
 		if (!logFile.is_open()) [[unlikely]]
@@ -63,7 +67,7 @@ namespace PonyEngine::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CONSOLE_E(e, "On closing log file.");
+				PONY_CONSOLE_E(logger->Application(), e, "On closing log file.");
 			}
 		}
 	}
@@ -76,7 +80,7 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE_E(e, "On writing to file.");
+			PONY_CONSOLE_E(logger->Application(), e, "On writing to log file.");
 		}
 	}
 }

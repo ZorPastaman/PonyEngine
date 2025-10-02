@@ -39,10 +39,19 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Application.Main/Application.Main.cppm"
 	"Source/Private/Application.Main/Application.Main-App.cppm"
+	"Source/Private/Application.Main/Application.Main-Console.cppm"
 	"Source/Private/Application.Main/Application.Main-DefaultLogger.cppm"
 	"Source/Private/Application.Main/Application.Main-ExitCodes.cppm"
 	"Source/Private/Application.Main/Application.Main-ServiceManager.cppm"
 )
+
+if(PONY_WINCORE)
+	message(VERBOSE "Configuring sources for WinCore")
+	target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Private/Application.Main/WinCore/Application.Main.WinCore.cppm"
+		"Source/Private/Application.Main/WinCore/Application.Main.WinCore-Console.cppm"
+	)
+endif()
 
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring headers for Windows")
@@ -78,6 +87,12 @@ endif()
 message(VERBOSE "Configuring defines")
 if(PONY_ENGINE_CREATE_CONSOLE)
 	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_ENGINE_CREATE_CONSOLE)
+endif()
+if(PONY_CONSOLE_LOG)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_CONSOLE_LOG)
+endif()
+if(PONY_PLATFORM_CONSOLE_LOG)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_PLATFORM_CONSOLE_LOG)
 endif()
 if(PONY_ENGINE_DEFAULT_LOGGER)
 	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_ENGINE_DEFAULT_LOGGER)

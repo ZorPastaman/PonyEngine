@@ -57,6 +57,10 @@ export namespace PonyEngine::Application
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
+		/// @brief Log to console.
+		/// @param logType Log type.
+		/// @param message Log message.
+		virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept = 0;
 
 		/// @brief Tries to find a service by its type.
 		/// @param type Service type. Must be a public service interface.

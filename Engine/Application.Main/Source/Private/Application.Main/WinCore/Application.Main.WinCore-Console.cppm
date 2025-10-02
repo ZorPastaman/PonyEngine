@@ -7,16 +7,25 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log:LogInput;
+module;
+
+#include "PonyEngine/Platform/WinCore/Framework.h"
+
+export module PonyEngine.Application.Main.WinCore:Console;
 
 import std;
 
-export namespace PonyEngine::Log
+export namespace PonyEngine::Application::WinCore
 {
-	/// @brief Log data input.
-	struct LogInput final
+	/// @brief Log to WinCore console.
+	/// @param message Message.
+	void LogToConsole(std::string_view message) noexcept;
+}
+
+namespace PonyEngine::Application::WinCore
+{
+	void LogToConsole(const std::string_view message) noexcept
 	{
-		std::string_view message; ///< Log message.
-		const std::basic_stacktrace<std::allocator<std::stacktrace_entry>>* stacktrace = nullptr; ///< Stacktrace.
-	};
+		OutputDebugStringA(message.data());
+	}
 }
