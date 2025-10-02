@@ -13,6 +13,7 @@
 				"PONY_COMPANY_TITLE": "Pony Engine",
 				"PONY_PROJECT_TITLE": "Pony Engine Game",
 				"PONY_CONSOLE_LOG": "TRUE",
+				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
 				"PONY_ENGINE_DEFAULT_LOGGER": "TRUE",
 				"PONY_ENGINE_PATH": "TRUE",
 				"PONY_ENGINE_PATH_EXTENSION": "TRUE",
@@ -20,7 +21,6 @@
 				"PONY_ENGINE_PATH_MAIN": "TRUE",
 				"PONY_ENGINE_LOG_EXTENSION": "TRUE",
 				"PONY_ENGINE_LOG_MAIN": "TRUE",
-				"PONY_ENGINE_LOG_CONSOLE": "TRUE",
 				"PONY_ENGINE_LOG_FILE": "TRUE",
 				"PONY_ENGINE_SURFACE": "TRUE",
 				"PONY_ENGINE_SURFACE_EXTENSION": "TRUE",
@@ -34,7 +34,6 @@
 				"PONY_ENGINE_LOG_FILE_PATH": "Log.log",
 				"PONY_ENGINE_PATH_CONFIGURATOR_ORDER": "ba",
 				"PONY_ENGINE_PATH_MAIN_ORDER": "bz",
-				"PONY_ENGINE_LOG_CONSOLE_ORDER": "da",
 				"PONY_ENGINE_LOG_FILE_ORDER": "dh",
 				"PONY_ENGINE_LOG_MAIN_ORDER": "dz",
 				"PONY_ENGINE_MAIN_DATA_ORDER": "ea",
@@ -106,12 +105,7 @@
 		},
 		{
 			"name": "WinCore",
-			"hidden": true,
-			"cacheVariables": {
-				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
-				"PONY_ENGINE_LOG_PLATFORM_CONSOLE": "TRUE",
-				"PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER": "db"
-			}
+			"hidden": true
 		},
 		{
 			"name": "Windows",
@@ -130,6 +124,9 @@
 				"type": "equals",
 				"lhs": "${hostSystemName}",
 				"rhs": "Windows"
+			},
+			"cacheVariables": {
+				"PONY_APP_ICON": "${sourceDir}/Logo/Windows/Logo.ico"
 			}
 		},
 		{
