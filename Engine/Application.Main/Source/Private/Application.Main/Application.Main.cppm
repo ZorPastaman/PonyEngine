@@ -12,4 +12,5 @@ export module PonyEngine.Application.Main;
 export import PonyEngine.Application;
 
 export import :App;
+export import :Console;
 export import :ExitCodes;

@@ -28,12 +28,16 @@ import :ServiceManager;
 
 export namespace PonyEngine::Application
 {
+	using LogFunction = void(*)(Log::LogType, std::string_view); ///< Log function.
+
+	/// @brief Main application.
 	class App final
 	{
 	public:
 		/// @brief Creates application.
+		/// @param logFunction Log function.
 		[[nodiscard("Pure constructor")]]
-		App();
+		explicit App(LogFunction logFunction);
 		App(const App&) = delete;
 		App(App&&) = delete;
 
@@ -73,6 +77,7 @@ export namespace PonyEngine::Application
 			virtual Log::ILogger& Logger() noexcept override;
 			[[nodiscard("Pure function")]]
 			virtual const Log::ILogger& Logger() const noexcept override;
+			virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept override;
 
 			[[nodiscard("Pure function")]]
 			virtual void* FindService(const std::type_info& type) noexcept override;
@@ -199,6 +204,8 @@ export namespace PonyEngine::Application
 		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 
+		LogFunction logFunction; ///< Log function.
+
 		AppContext appContext; ///< Application context.
 
 		std::unique_ptr<DefaultLogger> defaultLogger; ///< Default logger.
@@ -213,16 +220,17 @@ namespace PonyEngine::Application
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) IModule** FirstModule = nullptr;
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) IModule** LastModule = nullptr;
 
-	App::App() :
+	App::App(const LogFunction logFunction) :
 		frameCount{0ull},
 		exitCode{ExitCodes::InitialExitCode},
 		isRunning{true},
+		logFunction{logFunction},
 		appContext(*this)
 	{
-		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger...");
+		PONY_CONSOLE(appContext, Log::LogType::Info, "Constructing default logger...");
 		defaultLogger = std::make_unique<DefaultLogger>(appContext);
 		logger = defaultLogger.get();
-		PONY_CONSOLE(Log::LogType::Info, "Constructing default logger done.");
+		PONY_CONSOLE(appContext, Log::LogType::Info, "Constructing default logger done.");
 
 		PONY_LOG(*logger, Log::LogType::Info, "Constructing service manager...");
 		serviceManager = std::make_unique<ServiceManager>(appContext);
@@ -255,9 +263,9 @@ namespace PonyEngine::Application
 		serviceManager.reset();
 		PONY_LOG(*logger, Log::LogType::Info, "Destructing service manager done.");
 
-		PONY_CONSOLE(Log::LogType::Info, "Destructing default logger...");
+		PONY_CONSOLE(appContext, Log::LogType::Info, "Destructing default logger...");
 		defaultLogger.reset();
-		PONY_CONSOLE(Log::LogType::Info, "Destructing default logger done.");
+		PONY_CONSOLE(appContext, Log::LogType::Info, "Destructing default logger done.");
 	}
 
 	int App::Run()
@@ -336,6 +344,11 @@ namespace PonyEngine::Application
 	const Log::ILogger& App::AppContext::Logger() const noexcept
 	{
 		return *application->logger;
+	}
+
+	void App::AppContext::LogToConsole(const Log::LogType logType, const std::string_view message) const noexcept
+	{
+		application->logFunction(logType, message);
 	}
 
 	void* App::AppContext::FindService(const std::type_info& type) noexcept

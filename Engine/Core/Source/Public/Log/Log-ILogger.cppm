@@ -15,7 +15,7 @@ export module PonyEngine.Log:ILogger;
 
 import std;
 
-import :LogInput;
+import :LogData;
 import :LogType;
 
 export namespace PonyEngine::Log
@@ -27,11 +27,13 @@ export namespace PonyEngine::Log
 
 		/// @brief Logs the message.
 		/// @param logType Log type.
-		/// @param logInput Log input.
-		virtual void Log(LogType logType, const LogInput& logInput) const noexcept = 0;
+		/// @param message Log message.
+		/// @param logData Log data.
+		virtual void Log(LogType logType, std::string_view message, const LogData& logData = LogData()) const noexcept = 0;
 		/// @brief Logs the exception.
 		/// @param exception Exception to log.
-		/// @param logInput Log input.
-		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept = 0;
+		/// @param message Log message.
+		/// @param logData Log data.
+		virtual void Log(const std::exception& exception, std::string_view message, const LogData& logData = LogData()) const noexcept = 0;
 	};
 }

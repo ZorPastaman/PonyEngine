@@ -7,17 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/ConsoleModule.h"
+export module PonyEngine.Application.WinCore;
 
-import PonyEngine.Application;
-import PonyEngine.Log.Console;
-
-namespace PonyEngine::Log
-{
-	ConsoleSubLoggerModule ConsoleModule; ///< Console sub-logger module.
-
-	Application::IModule* GetConsoleModule()
-	{
-		return &ConsoleModule;
-	}
-}
+export import PonyEngine.Application;

@@ -44,7 +44,7 @@ namespace PonyEngine::Surface::Windows
 {
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		messageHandlerApp = &context.Application();
+		MessageHandlerApp = &context.Application();
 
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Constructing '{}'...", typeid(SurfaceServiceFactory).name());
 		const auto surfaceServiceFactory = std::make_shared<SurfaceServiceFactory>(context);
@@ -55,6 +55,6 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceServiceModule::ShutDown(const Application::IModuleContext&)
 	{
-		messageHandlerApp = nullptr;
+		MessageHandlerApp = nullptr;
 	}
 }
