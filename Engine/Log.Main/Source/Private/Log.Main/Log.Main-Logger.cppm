@@ -39,8 +39,8 @@ export namespace PonyEngine::Log
 		virtual void Begin() override;
 		virtual void End() override;
 
-		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
-		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept override;
+		virtual void Log(LogType logType, std::string_view message, const LogData& logData = LogData()) const noexcept override;
+		virtual void Log(const std::exception& exception, std::string_view message, const LogData& logData = LogData()) const noexcept override;
 
 		/// @brief Gets the public logger interface.
 		/// @return Logger interface.
@@ -129,15 +129,15 @@ namespace PonyEngine::Log
 	{
 	}
 
-	void Logger::Log(const LogType logType, const LogInput& logInput) const noexcept
+	void Logger::Log(const LogType logType, const std::string_view message, const LogData& logData) const noexcept
 	{
-		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, nullptr, std::chrono::system_clock::now(), application->FrameCount(), logType);
+		const auto logEntry = LogEntry(message, logData.stacktrace, nullptr, std::chrono::system_clock::now(), application->FrameCount(), logType);
 		Log(logEntry);
 	}
 
-	void Logger::Log(const std::exception& exception, const LogInput& logInput) const noexcept
+	void Logger::Log(const std::exception& exception, const std::string_view message, const LogData& logData) const noexcept
 	{
-		const auto logEntry = LogEntry(logInput.message, logInput.stacktrace, &exception, std::chrono::system_clock::now(), application->FrameCount(), LogType::Exception);
+		const auto logEntry = LogEntry(message, logData.stacktrace, &exception, std::chrono::system_clock::now(), application->FrameCount(), LogType::Exception);
 		Log(logEntry);
 	}
 
@@ -212,6 +212,8 @@ namespace PonyEngine::Log
 
 	void Logger::Log(const LogEntry& logEntry) const noexcept
 	{
+		application->LogToConsole(logEntry.LogType(), logEntry.ToString());
+
 		for (const std::shared_ptr<ISubLogger>& subLogger : subLoggers)
 		{
 			subLogger->Log(logEntry);

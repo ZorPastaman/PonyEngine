@@ -33,8 +33,8 @@ export namespace PonyEngine::Application
 
 		~DefaultLogger() noexcept = default;
 
-		virtual void Log(Log::LogType logType, const Log::LogInput& logInput) const noexcept override;
-		virtual void Log(const std::exception& exception, const Log::LogInput& logInput) const noexcept override;
+		virtual void Log(Log::LogType logType, std::string_view message, const Log::LogData& logData = Log::LogData()) const noexcept override;
+		virtual void Log(const std::exception& exception, std::string_view message, const Log::LogData& logData = Log::LogData()) const noexcept override;
 
 		DefaultLogger& operator =(const DefaultLogger&) = delete;
 		DefaultLogger& operator =(DefaultLogger&&) = delete;
@@ -51,31 +51,31 @@ namespace PonyEngine::Application
 	{
 	}
 
-	void DefaultLogger::Log(const Log::LogType logType, const Log::LogInput& logInput) const noexcept
+	void DefaultLogger::Log(const Log::LogType logType, const std::string_view message, const Log::LogData& logData) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
-		if constexpr (PONY_CONSOLE_LOG_MASK != Log::LogTypeMask::None)
+		if constexpr (PONY_LOG_MASK != Log::LogTypeMask::None)
 		{
-			if (Log::IsInMask(logType, PONY_CONSOLE_LOG_MASK))
+			if (Log::IsInMask(logType, PONY_LOG_MASK))
 			{
-				const std::string log = logInput.stacktrace
-					? Log::LogFormat(logType, logInput.message, std::chrono::system_clock::now(), application->FrameCount(), *logInput.stacktrace)
-					: Log::LogFormat(logType, logInput.message, std::chrono::system_clock::now(), application->FrameCount());
-				Log::LogToConsole(logType, log);
+				const std::string log = logData.stacktrace
+					? Log::LogFormat(logType, message, std::chrono::system_clock::now(), application->FrameCount(), *logData.stacktrace)
+					: Log::LogFormat(logType, message, std::chrono::system_clock::now(), application->FrameCount());
+				application->LogToConsole(logType, log);
 			}
 		}
 #endif
 	}
 
-	void DefaultLogger::Log(const std::exception& exception, const Log::LogInput& logInput) const noexcept
+	void DefaultLogger::Log(const std::exception& exception, const std::string_view message, const Log::LogData& logData) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
-		if constexpr (Log::IsInMask(Log::LogType::Exception, PONY_CONSOLE_LOG_MASK))
+		if constexpr (Log::IsInMask(Log::LogType::Exception, PONY_LOG_MASK))
 		{
-			const std::string log = logInput.stacktrace
-				? Log::LogFormat(Log::LogType::Exception, exception.what(), logInput.message, std::chrono::system_clock::now(), application->FrameCount(), *logInput.stacktrace)
-				: Log::LogFormat(Log::LogType::Exception, exception.what(), logInput.message, std::chrono::system_clock::now(), application->FrameCount());
-			Log::LogToConsole(Log::LogType::Exception, log);
+			const std::string log = logData.stacktrace
+				? Log::LogFormat(Log::LogType::Exception, exception.what(), message, std::chrono::system_clock::now(), application->FrameCount(), *logData.stacktrace)
+				: Log::LogFormat(Log::LogType::Exception, exception.what(), message, std::chrono::system_clock::now(), application->FrameCount());
+			application->LogToConsole(Log::LogType::Exception, log);
 		}
 #endif
 	}

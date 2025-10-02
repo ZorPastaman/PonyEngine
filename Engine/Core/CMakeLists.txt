@@ -26,7 +26,6 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Log/Log-LogData.cppm"
 	"Source/Public/Log/Log-LogFormat.cppm"
 	"Source/Public/Log/Log-LogHelper.cppm"
-	"Source/Public/Log/Log-LogInput.cppm"
 	"Source/Public/Log/Log-LogType.cppm"
 	"Source/Public/Math/Math.cppm"
 	"Source/Public/Math/Math-Ball.cppm"
@@ -61,6 +60,7 @@ if(PONY_WINCORE)
 
 	message(VERBOSE "Configuring sources for WinCore")
 	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+		"Source/Public/Application/WinCore/Application.WinCore.cppm"
 		"Source/Public/Platform/WinCore/Platform.WinCore.cppm"
 		"Source/Public/Platform/WinCore/Platform.WinCore-GUID.cppm"
 		"Source/Public/Platform/WinCore/Platform.WinCore-Utility.cppm"

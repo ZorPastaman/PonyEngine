@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.Log.Extension:LogEntry;
 
 import std;
@@ -166,34 +162,26 @@ namespace PonyEngine::Log
 
 	std::string LogEntry::MakeString() const noexcept
 	{
-		try
+		switch ((stacktrace != nullptr) << 2 | !message.empty() << 1 | (exception != nullptr) << 0)
 		{
-			switch ((stacktrace != nullptr) << 2 | !message.empty() << 1 | (exception != nullptr) << 0)
-			{
-			case 0:
-				return LogFormat(logType, message, timePoint, frameCount);
-			case 1:
-				return LogFormat(logType, exception->what(), timePoint, frameCount);
-			case 2:
-				return LogFormat(logType, message, timePoint, frameCount);
-			case 3:
-				return LogFormat(logType, exception->what(), message, timePoint, frameCount);
-			case 4:
-				return LogFormat(logType, message, timePoint, frameCount, *stacktrace);
-			case 5:
-				return LogFormat(logType, exception->what(), timePoint, frameCount, *stacktrace);
-			case 6:
-				return LogFormat(logType, message, timePoint, frameCount, *stacktrace);
-			case 7:
-				return LogFormat(logType, exception->what(), message, timePoint, frameCount, *stacktrace);
-			default: [[unlikely]]
-				return LogFormat(logType, exception ? exception->what() : "Unknown exception", message.empty() ? "Unknown message" : message, timePoint, frameCount);
-			}
-		}
-		catch (const std::exception& e)
-		{
-			PONY_CONSOLE_E(e, "On making a log string");
-			return std::string();
+		case 0:
+			return LogFormat(logType, message, timePoint, frameCount);
+		case 1:
+			return LogFormat(logType, exception->what(), timePoint, frameCount);
+		case 2:
+			return LogFormat(logType, message, timePoint, frameCount);
+		case 3:
+			return LogFormat(logType, exception->what(), message, timePoint, frameCount);
+		case 4:
+			return LogFormat(logType, message, timePoint, frameCount, *stacktrace);
+		case 5:
+			return LogFormat(logType, exception->what(), timePoint, frameCount, *stacktrace);
+		case 6:
+			return LogFormat(logType, message, timePoint, frameCount, *stacktrace);
+		case 7:
+			return LogFormat(logType, exception->what(), message, timePoint, frameCount, *stacktrace);
+		default: [[unlikely]]
+			return LogFormat(logType, exception ? exception->what() : "Unknown exception", message.empty() ? "Unknown message" : message, timePoint, frameCount);
 		}
 	}
 

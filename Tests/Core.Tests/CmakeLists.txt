@@ -4,7 +4,6 @@ add_executable(PonyEngine.Core.Tests)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
 	"Log/LogFormat.cpp"
-	"Log/LogHelper.cpp"
 	"Log/LogMacro.cpp"
 	"Math/Ball.cpp"
 	"Math/BallInsides.cpp"

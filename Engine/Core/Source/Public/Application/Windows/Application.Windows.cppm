@@ -9,7 +9,7 @@
 
 export module PonyEngine.Application.Windows;
 
-export import PonyEngine.Application;
+export import PonyEngine.Application.WinCore;
 
 export import :IMainDataService;
 export import :IMessageLoopService;
