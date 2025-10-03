@@ -42,6 +42,7 @@ target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application.Main/Application.Main-Console.cppm"
 	"Source/Private/Application.Main/Application.Main-DefaultLogger.cppm"
 	"Source/Private/Application.Main/Application.Main-ExitCodes.cppm"
+	"Source/Private/Application.Main/Application.Main-Path.cppm"
 	"Source/Private/Application.Main/Application.Main-ServiceManager.cppm"
 )
 
@@ -69,6 +70,7 @@ if(PONY_WINDOWS)
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopService.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopServiceFactory.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopServiceModule.cppm"
+		"Source/Private/Application.Main/Windows/Application.Main.Windows-Path.cppm"
 		"Source/Private/Application.Main/Windows/Application.Main.Windows-Process.cppm"
 	)
 	 target_sources(PonyEngine.Application.Main PRIVATE
@@ -103,9 +105,13 @@ endif()
 if(PONY_APP_CURSOR)
 	target_compile_definitions(PonyEngine.Application.Main PRIVATE PONY_APP_CURSOR)
 endif()
+if(NOT PONY_ENGINE_ROOT_PATH)
+	set(PONY_ENGINE_ROOT_PATH "")
+endif()
 target_compile_definitions(PonyEngine.Application.Main PRIVATE 
 	PONY_COMPANY_NAME=${PONY_COMPANY_NAME} PONY_PROJECT_NAME=${PONY_PROJECT_NAME} PONY_PROJECT_VERSION=${PONY_PROJECT_VERSION}
 	PONY_COMPANY_TITLE=${PONY_COMPANY_TITLE} PONY_PROJECT_TITLE=${PONY_PROJECT_TITLE}
+	PONY_ENGINE_ROOT_PATH=${PONY_ENGINE_ROOT_PATH}
 	PONY_ENGINE_MAIN_DATA_ORDER=${PONY_ENGINE_MAIN_DATA_ORDER}
 	PONY_ENGINE_MESSAGE_LOOP_ORDER=${PONY_ENGINE_MESSAGE_LOOP_ORDER} PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER=${PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER}
 )

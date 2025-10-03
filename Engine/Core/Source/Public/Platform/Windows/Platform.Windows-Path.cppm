@@ -11,14 +11,14 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Path.Windows:Utility;
+export module PonyEngine.Platform.Windows:Path;
 
 import std;
 
-import PonyEngine.Platform.Windows;
+import PonyEngine.Platform.WinCore;
 import PonyEngine.Utility;
 
-export namespace PonyEngine::Path::Windows
+export namespace PonyEngine::Platform::Windows
 {
 	/// @brief Gets a module path.
 	/// @param module Module. If it's null, the path to the executable module of the current process is returned.
@@ -31,9 +31,13 @@ export namespace PonyEngine::Path::Windows
 	/// @return Known path.
 	[[nodiscard("Pure function")]]
 	std::filesystem::path GetKnownPath(REFKNOWNFOLDERID folderId);
+	/// @brief Gets a temporary directory.
+	/// @return Temporary directory.
+	[[nodiscard("Pure function")]]
+	std::filesystem::path GetTemporaryPath();
 }
 
-namespace PonyEngine::Path::Windows
+namespace PonyEngine::Platform::Windows
 {
 	std::filesystem::path GetModulePath(const HMODULE module)
 	{
@@ -56,5 +60,16 @@ namespace PonyEngine::Path::Windows
 		const auto path = std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)>(pathRaw, &CoTaskMemFree);
 
 		return std::filesystem::path(path.get());
+	}
+
+	std::filesystem::path GetTemporaryPath()
+	{
+		auto path = std::array<wchar_t, MAX_PATH>();
+		if (!GetTempPath2W(MAX_PATH, path.data()))
+		{
+			throw std::runtime_error(Utility::SafeFormat("Failed to get temp directory. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		return std::filesystem::path(path.data());
 	}
 }

@@ -15,4 +15,5 @@ export import PonyEngine.Application.Main.WinCore;
 export import :Console;
 export import :MainDataServiceModule;
 export import :MessageLoopServiceModule;
+export import :Path;
 export import :Process;

@@ -88,6 +88,8 @@ public:
 	mutable PonyEngine::Log::LogType lastType;
 	mutable std::string lastMsg;
 
+	static inline auto EmptyPath = std::filesystem::path();
+
 	[[nodiscard("Pure function")]]
 	virtual std::string_view CompanyName() const noexcept override
 	{
@@ -116,6 +118,42 @@ public:
 	virtual std::string_view ProjectTitle() const noexcept override
 	{
 		return std::string_view();
+	}
+
+	[[nodiscard("Pure function")]]
+	virtual const std::filesystem::path& ExecutableFile() const noexcept override
+	{
+		return EmptyPath;
+	}
+
+	[[nodiscard("Pure function")]]
+	virtual const std::filesystem::path& ExecutableDirectory() const noexcept override
+	{
+		return EmptyPath;
+	}
+
+	[[nodiscard("Pure function")]]
+	virtual const std::filesystem::path& RootDirectory() const noexcept override
+	{
+		return EmptyPath;
+	}
+
+	[[nodiscard("Pure function")]]
+	virtual const std::filesystem::path& LocalDataDirectory() const noexcept override
+	{
+		return EmptyPath;
+	}
+
+	[[nodiscard("Pure function")]]
+	virtual const std::filesystem::path& UserDataDirectory() const noexcept override
+	{
+		return EmptyPath;
+	}
+
+	[[nodiscard("Pure function")]]
+	virtual const std::filesystem::path& TempDataDirectory() const noexcept override
+	{
+		return EmptyPath;
 	}
 
 	[[nodiscard("Pure function")]]

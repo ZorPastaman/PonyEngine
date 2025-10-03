@@ -15,28 +15,34 @@
  /// @param type Log type.
  /// @param message Message.
 #define PONY_APP_CONSOLE(type, message, ...) \
-	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_STACKTRACE_MASK)) \
+	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_MASK)) \
 	{ \
-		const auto stacktrace = std::stacktrace::current(); \
-		LogToConsole(type, PonyEngine::Log::LogFormat(type, PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__), stacktrace)); \
-	} \
-	else \
-	{ \
-		LogToConsole(type, PonyEngine::Log::LogFormat(type, PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__))); \
+		if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_STACKTRACE_MASK)) \
+		{ \
+			const auto stacktrace = std::stacktrace::current(); \
+			LogToConsole(type, PonyEngine::Log::LogFormat(type, PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__), stacktrace)); \
+		} \
+		else \
+		{ \
+			LogToConsole(type, PonyEngine::Log::LogFormat(type, PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__))); \
+		} \
 	} \
 
  /// @brief Logs to console.
  /// @param exception Exception.
  /// @param message Message.
 #define PONY_APP_CONSOLE_E(exception, message, ...) \
-	if constexpr (PonyEngine::Log::IsInMask(PonyEngine::Log::LogType::Exception, PONY_LOG_STACKTRACE_MASK)) \
+	if constexpr (PonyEngine::Log::IsInMask(PonyEngine::Log::LogType::Exception, PONY_LOG_MASK)) \
 	{ \
-		const auto stacktrace = std::stacktrace::current(); \
-		LogToConsole(PonyEngine::Log::LogType::Exception, PonyEngine::Log::LogFormat(PonyEngine::Log::LogType::Exception, exception.what(), PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__), stacktrace)); \
-	} \
-	else \
-	{ \
-		LogToConsole(PonyEngine::Log::LogType::Exception, PonyEngine::Log::LogFormat(PonyEngine::Log::LogType::Exception, exception.what(), PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__))); \
+		if constexpr (PonyEngine::Log::IsInMask(PonyEngine::Log::LogType::Exception, PONY_LOG_STACKTRACE_MASK)) \
+		{ \
+			const auto stacktrace = std::stacktrace::current(); \
+			LogToConsole(PonyEngine::Log::LogType::Exception, PonyEngine::Log::LogFormat(PonyEngine::Log::LogType::Exception, exception.what(), PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__), stacktrace)); \
+		} \
+		else \
+		{ \
+			LogToConsole(PonyEngine::Log::LogType::Exception, PonyEngine::Log::LogFormat(PonyEngine::Log::LogType::Exception, exception.what(), PonyEngine::Log::LogString(message __VA_OPT__(,) __VA_ARGS__))); \
+		} \
 	} \
 
 import std;
@@ -81,7 +87,12 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 		try
 		{
 			PONY_APP_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application...");
-			auto app = std::make_unique<PonyEngine::Application::App>(&LogToConsole);
+			auto app = std::make_unique<PonyEngine::Application::App>(
+				PonyEngine::Application::Windows::ExecutableFile(), 
+				PonyEngine::Application::Windows::LocalDataDirectory(),
+				PonyEngine::Application::Windows::UserDataDirectory(),
+				PonyEngine::Application::Windows::TempDataDirectory(),
+				&LogToConsole);
 			PONY_APP_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application done.");
 
 			try

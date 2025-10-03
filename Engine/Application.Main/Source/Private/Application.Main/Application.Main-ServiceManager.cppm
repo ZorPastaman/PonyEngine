@@ -136,7 +136,7 @@ namespace PonyEngine::Application
 				assert(false && "Unexpected variant index.");
 				break;
 			}
-			assert(service && "The service is nullptr!");
+			assert(service && "The service is nullptr.");
 
 			services.push_back(service);
 			try

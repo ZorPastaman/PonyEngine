@@ -176,7 +176,7 @@ namespace PonyEngine::Log
 			{
 				PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-logger... Factory: '{}'.", typeid(*factory).name());
 				SubLoggerData subLogger = factory->CreateSubLogger(loggerContext);
-				assert(subLogger.subLogger && "The sub-logger is nullptr!");
+				assert(subLogger.subLogger && "The sub-logger is nullptr.");
 				subLoggers.push_back(subLogger.subLogger);
 				PONY_LOG(this->application->Logger(), LogType::Info, "Creating sub-logger done. Sub-logger: '{}'.", typeid(*subLogger.subLogger).name());
 			}
