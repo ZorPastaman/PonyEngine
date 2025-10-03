@@ -24,6 +24,7 @@ import PonyEngine.Log;
 
 import :DefaultLogger;
 import :ExitCodes;
+import :Path;
 import :ServiceManager;
 
 export namespace PonyEngine::Application
@@ -35,9 +36,14 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates application.
+		/// @param executableFile Path to the executable.
+		/// @param localDataDirectory Local data directory
+		/// @param userDataDirectory User data directory.
+		/// @param tempDataDirectory Temporal data directory.
 		/// @param logFunction Log function.
 		[[nodiscard("Pure constructor")]]
-		explicit App(LogFunction logFunction);
+		explicit App(const std::filesystem::path& executableFile, const std::filesystem::path& localDataDirectory, const std::filesystem::path& userDataDirectory, 
+			const std::filesystem::path& tempDataDirectory, LogFunction logFunction);
 		App(const App&) = delete;
 		App(App&&) = delete;
 
@@ -52,6 +58,7 @@ export namespace PonyEngine::Application
 		App& operator =(App&&) = delete;
 
 	private:
+		/// @brief Application context.
 		class AppContext final : public IApplicationContext
 		{
 		public:
@@ -72,6 +79,19 @@ export namespace PonyEngine::Application
 			virtual std::string_view CompanyTitle() const noexcept override;
 			[[nodiscard("Pure function")]]
 			virtual std::string_view ProjectTitle() const noexcept override;
+
+			[[nodiscard("Pure function")]]
+			virtual const std::filesystem::path& ExecutableFile() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const std::filesystem::path& ExecutableDirectory() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const std::filesystem::path& RootDirectory() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const std::filesystem::path& LocalDataDirectory() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const std::filesystem::path& UserDataDirectory() const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const std::filesystem::path& TempDataDirectory() const noexcept override;
 
 			[[nodiscard("Pure function")]]
 			virtual Log::ILogger& Logger() noexcept override;
@@ -100,6 +120,7 @@ export namespace PonyEngine::Application
 			App* application; ///< Application.
 		};
 
+		/// @brief Starting up module context.
 		class StartingUpModuleContext final : public IModuleContext
 		{
 		public:
@@ -141,6 +162,7 @@ export namespace PonyEngine::Application
 			std::unordered_map<std::type_index, std::vector<std::shared_ptr<void>>> dataMap; ///< Data map.
 		};
 
+		/// @brief Shutting down module context.
 		class ShuttingDownModuleContext final : public IModuleContext
 		{
 		public:
@@ -204,6 +226,13 @@ export namespace PonyEngine::Application
 		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 
+		std::filesystem::path executableFile; ///< Path to the executable.
+		std::filesystem::path executableDirectory; ///< Executable directory.
+		std::filesystem::path rootDirectory; ///< Root directory.
+		std::filesystem::path localDataDirectory; ///< Local data directory.
+		std::filesystem::path userDataDirectory; ///< User data directory.
+		std::filesystem::path tempDataDirectory; ///< Temporal data directory.
+
 		LogFunction logFunction; ///< Log function.
 
 		AppContext appContext; ///< Application context.
@@ -211,7 +240,7 @@ export namespace PonyEngine::Application
 		std::unique_ptr<DefaultLogger> defaultLogger; ///< Default logger.
 		Log::ILogger* logger; ///< Current logger.
 
-		std::unique_ptr<ServiceManager> serviceManager;
+		std::unique_ptr<ServiceManager> serviceManager; ///< Service manager.
 	};
 }
 
@@ -220,13 +249,29 @@ namespace PonyEngine::Application
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) IModule** FirstModule = nullptr;
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) IModule** LastModule = nullptr;
 
-	App::App(const LogFunction logFunction) :
+	App::App(const std::filesystem::path& executableFile, const std::filesystem::path& localDataDirectory, const std::filesystem::path& userDataDirectory, 
+		const std::filesystem::path& tempDataDirectory, const LogFunction logFunction) :
 		frameCount{0ull},
 		exitCode{ExitCodes::InitialExitCode},
 		isRunning{true},
+		executableFile(executableFile),
+		executableDirectory(this->executableFile.parent_path()),
+		rootDirectory((executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_ROOT_PATH)).lexically_normal()),
+		localDataDirectory(localDataDirectory),
+		userDataDirectory(userDataDirectory),
+		tempDataDirectory(tempDataDirectory),
 		logFunction{logFunction},
 		appContext(*this)
 	{
+		assert(std::filesystem::exists(this->executableFile) && "The path to the executable is invalid.");
+		assert(std::filesystem::exists(executableDirectory) && "The executable directory is invalid.");
+		assert(std::filesystem::exists(rootDirectory) && "The root directory is invalid.");
+		assert(std::filesystem::exists(this->localDataDirectory) && "The local data directory is invalid.");
+		assert(std::filesystem::exists(this->userDataDirectory) && "The user data directory is invalid.");
+		assert(std::filesystem::exists(this->tempDataDirectory) && "The temporal data directory is invalid.");
+
+		assert(this->logFunction && "The log function is nullptr.");
+
 		PONY_CONSOLE(appContext, Log::LogType::Info, "Constructing default logger...");
 		defaultLogger = std::make_unique<DefaultLogger>(appContext);
 		logger = defaultLogger.get();
@@ -313,27 +358,57 @@ namespace PonyEngine::Application
 
 	std::string_view App::AppContext::CompanyName() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_COMPANY_NAME);
+		return Application::CompanyName();
 	}
 
 	std::string_view App::AppContext::ProjectName() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_PROJECT_NAME);
+		return Application::ProjectName();
 	}
 
 	std::string_view App::AppContext::ProjectVersion() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_PROJECT_VERSION);
+		return Application::ProjectVersion();
 	}
 
 	std::string_view App::AppContext::CompanyTitle() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_COMPANY_TITLE);
+		return Application::CompanyTitle();
 	}
 
 	std::string_view App::AppContext::ProjectTitle() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_PROJECT_TITLE);
+		return Application::ProjectTitle();
+	}
+
+	const std::filesystem::path& App::AppContext::ExecutableFile() const noexcept
+	{
+		return application->executableFile;
+	}
+
+	const std::filesystem::path& App::AppContext::RootDirectory() const noexcept
+	{
+		return application->rootDirectory;
+	}
+
+	const std::filesystem::path& App::AppContext::ExecutableDirectory() const noexcept
+	{
+		return application->executableDirectory;
+	}
+
+	const std::filesystem::path& App::AppContext::LocalDataDirectory() const noexcept
+	{
+		return application->localDataDirectory;
+	}
+
+	const std::filesystem::path& App::AppContext::UserDataDirectory() const noexcept
+	{
+		return application->userDataDirectory;
+	}
+
+	const std::filesystem::path& App::AppContext::TempDataDirectory() const noexcept
+	{
+		return application->tempDataDirectory;
 	}
 
 	Log::ILogger& App::AppContext::Logger() noexcept
@@ -446,7 +521,7 @@ namespace PonyEngine::Application
 
 	void App::StartingUpModuleContext::AddService(const std::shared_ptr<IServiceFactory>& factory)
 	{
-		assert(factory && "The service factory is nullptr!");
+		assert(factory && "The service factory is nullptr.");
 		application->serviceManager->AddService(*factory);
 	}
 

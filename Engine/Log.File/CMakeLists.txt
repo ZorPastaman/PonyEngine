@@ -66,5 +66,4 @@ message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.File PUBLIC
 	PonyEngine.Core
 	PonyEngine.Log.Extension
-	PonyEngine.Path
 )

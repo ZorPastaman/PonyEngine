@@ -12,3 +12,4 @@ export module PonyEngine.Platform.Windows;
 export import PonyEngine.Platform.WinCore;
 
 export import :Module;
+export import :Path;

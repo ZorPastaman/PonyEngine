@@ -49,6 +49,31 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual std::string_view ProjectTitle() const noexcept = 0;
 
+		/// @brief Gets a path to the executable.
+		/// @return Path to the executable.
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& ExecutableFile() const noexcept = 0;
+		/// @brief Gets an executable directory.
+		/// @return Executable directory.
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& ExecutableDirectory() const noexcept = 0;
+		/// @brief Gets a root directory.
+		/// @return Root directory.
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& RootDirectory() const noexcept = 0;
+		/// @brief Gets a local data directory.
+		/// @return Local data directory.
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& LocalDataDirectory() const noexcept = 0;
+		/// @brief Gets a user data directory.
+		/// @return User data directory.
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& UserDataDirectory() const noexcept = 0;
+		/// @brief Gets a temporal data directory.
+		/// @return Temporal data directory.
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& TempDataDirectory() const noexcept = 0;
+
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]

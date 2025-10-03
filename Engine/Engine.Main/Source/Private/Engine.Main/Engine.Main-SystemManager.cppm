@@ -188,7 +188,7 @@ namespace PonyEngine::Engine
 					assert(false && "Unexpected variant index.");
 					break;
 				}
-				assert(system && "The system is nullptr!");
+				assert(system && "The system is nullptr.");
 				systems.push_back(system);
 
 				PONY_LOG(engine->Logger(), Log::LogType::Debug, "Adding system interfaces.");

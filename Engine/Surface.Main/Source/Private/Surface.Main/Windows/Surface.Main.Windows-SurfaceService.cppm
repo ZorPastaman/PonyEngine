@@ -340,7 +340,7 @@ namespace PonyEngine::Surface::Windows
 		painted{false},
 		windowClass(windowClass)
 	{
-		assert(this->windowClass && "The window class is nullptr!");
+		assert(this->windowClass && "The window class is nullptr.");
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Debug, "Calculating window rect.");
 		const DWORD usualStyle = ConvertToWindowsStyle(style);
@@ -1136,7 +1136,7 @@ namespace PonyEngine::Surface::Windows
 
 		if (info.dwType != RIM_TYPEHID) [[unlikely]]
 		{
-			throw std::runtime_error("Wrong hid device!");
+			throw std::runtime_error("Wrong hid device.");
 		}
 
 		return Pack(info.hid.usUsagePage, info.hid.usUsage);

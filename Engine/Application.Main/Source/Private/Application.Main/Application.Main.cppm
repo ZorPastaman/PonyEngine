@@ -14,3 +14,4 @@ export import PonyEngine.Application;
 export import :App;
 export import :Console;
 export import :ExitCodes;
+export import :Path;
