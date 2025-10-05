@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Utility/Macro.h"
+#include "PonyEngine/Macro/Text.h"
 
 export module PonyEngine.Application.Main:Path;
 

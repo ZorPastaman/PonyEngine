@@ -9,8 +9,8 @@
 
 module;
 
+#include "PonyEngine/Object/Body.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
-#include "PonyEngine/Utility/ObjectBody.h"
 
 export module PonyEngine.Application.Windows:IMessageObserver;
 

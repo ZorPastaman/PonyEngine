@@ -34,7 +34,7 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Text/Format.cpp"
 	"Text/Convert.cpp"
 	"Type/Common.cpp"
-	"Utility/Enum.cpp"
+	"Type/Enum.cpp"
 )
 
 message(VERBOSE "Configuring defines")
