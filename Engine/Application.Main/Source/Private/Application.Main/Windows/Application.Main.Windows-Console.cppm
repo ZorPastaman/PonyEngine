@@ -17,7 +17,7 @@ export module PonyEngine.Application.Main.Windows:Console;
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 export namespace PonyEngine::Application::Windows
 {
@@ -38,7 +38,7 @@ namespace PonyEngine::Application::Windows
 	{
 		if (!AllocConsole()) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to allocate console. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to allocate console. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		SetConsoleCodePage(codePageID);
@@ -46,15 +46,15 @@ namespace PonyEngine::Application::Windows
 		FILE* fp;
 		if (const errno_t error = freopen_s(&fp, "CONOUT$", "w", stdout)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stdout. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Text::FormatSafe("Failed to reassign stdout. Error code: '0x{:X}'.", error));
 		}
 		if (const errno_t error = freopen_s(&fp, "CONOUT$", "w", stderr)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stderr. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Text::FormatSafe("Failed to reassign stderr. Error code: '0x{:X}'.", error));
 		}
 		if (const errno_t error = freopen_s(&fp, "CONIN$", "r", stdin)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stdin. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Text::FormatSafe("Failed to reassign stdin. Error code: '0x{:X}'.", error));
 		}
 	}
 
@@ -63,20 +63,20 @@ namespace PonyEngine::Application::Windows
 		FILE* fp;
 		if (const errno_t error = freopen_s(&fp, "NUL", "w", stdout)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stdout. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Text::FormatSafe("Failed to reassign stdout. Error code: '0x{:X}'.", error));
 		}
 		if (const errno_t error = freopen_s(&fp, "NUL", "w", stderr)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stderr. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Text::FormatSafe("Failed to reassign stderr. Error code: '0x{:X}'.", error));
 		}
 		if (const errno_t error = freopen_s(&fp, "NUL", "r", stdin)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stdin. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Text::FormatSafe("Failed to reassign stdin. Error code: '0x{:X}'.", error));
 		}
 
 		if (!FreeConsole()) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to free console. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to free console. Error code: '0x{:X}'.", GetLastError()));
 		}
 	}
 
@@ -84,11 +84,11 @@ namespace PonyEngine::Application::Windows
 	{
 		if (!SetConsoleCP(codePageID)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to set console code page to '{}'. Error code: '0x{:X}'.", codePageID, GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to set console code page to '{}'. Error code: '0x{:X}'.", codePageID, GetLastError()));
 		}
 		if (!SetConsoleOutputCP(codePageID)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to set console output code page to '{}'. Error code: '0x{:X}'.", codePageID, GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to set console output code page to '{}'. Error code: '0x{:X}'.", codePageID, GetLastError()));
 		}
 	}
 }

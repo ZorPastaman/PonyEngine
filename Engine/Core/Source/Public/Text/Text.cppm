@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Utility;
+export module PonyEngine.Text;
 
-export import :ObjectInterfaces;
-export import :SafeFormat;
+export import :Convert;
+export import :Format;

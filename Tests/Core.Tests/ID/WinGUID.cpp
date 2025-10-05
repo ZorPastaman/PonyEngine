@@ -7,18 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#if PONY_WINCORE
 #include "PonyEngine/Platform/WinCore/Framework.h"
+#endif
 
 #include <catch2/catch_test_macros.hpp>
 
 import std;
 
-import PonyEngine.Platform.WinCore;
+import PonyEngine.ID;
 
-TEST_CASE("AcquireGuid returns unique GUIDs", "[Platform][GUID]")
+#if PONY_WINCORE
+TEST_CASE("AcquireGuid returns unique GUIDs", "[ID][WinGUID]")
 {
-	const GUID guid1 = PonyEngine::Platform::WinCore::AcquireGuid();
-	const GUID guid2 = PonyEngine::Platform::WinCore::AcquireGuid();
+	const GUID guid1 = PonyEngine::ID::WinCore::AcquireGuid();
+	const GUID guid2 = PonyEngine::ID::WinCore::AcquireGuid();
 
 	const auto isZero = [](const GUID& g)
 	{
@@ -32,28 +35,29 @@ TEST_CASE("AcquireGuid returns unique GUIDs", "[Platform][GUID]")
 	REQUIRE_FALSE(areEqual);
 }
 
-TEST_CASE("ToString produces a valid GUID string", "[Platform][GUID]")
+TEST_CASE("ToString produces a valid GUID string", "[ID][WinGUID]")
 {
-	const GUID guid = PonyEngine::Platform::WinCore::AcquireGuid();
-	const std::string guidStr = PonyEngine::Platform::WinCore::ToString(guid);
+	const GUID guid = PonyEngine::ID::WinCore::AcquireGuid();
+	const std::string guidStr = PonyEngine::ID::WinCore::ToString(guid);
 
 	auto buffer = std::wstring(39, L'\0');
 	StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
 	REQUIRE(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1) == std::wstring(guidStr.cbegin(), guidStr.cend()));
 }
 
-TEST_CASE("operator << outputs GUID as string", "[Platform][GUID]") {
-	const GUID guid = PonyEngine::Platform::WinCore::AcquireGuid();
+TEST_CASE("operator << outputs GUID as string", "[ID][WinGUID]") {
+	const GUID guid = PonyEngine::ID::WinCore::AcquireGuid();
 	std::ostringstream oss;
 	oss << guid;
 	const std::string guidStr = oss.str();
 
-	REQUIRE(guidStr == PonyEngine::Platform::WinCore::ToString(guid));
+	REQUIRE(guidStr == PonyEngine::ID::WinCore::ToString(guid));
 }
 
-TEST_CASE("std::format supports GUID", "[Platform][GUID]") {
-	const GUID guid = PonyEngine::Platform::WinCore::AcquireGuid();
+TEST_CASE("std::format supports GUID", "[ID][WinGUID]") {
+	const GUID guid = PonyEngine::ID::WinCore::AcquireGuid();
 	const std::string formatted = std::format("{}", guid);
 
-	REQUIRE(formatted == PonyEngine::Platform::WinCore::ToString(guid));
+	REQUIRE(formatted == PonyEngine::ID::WinCore::ToString(guid));
 }
+#endif

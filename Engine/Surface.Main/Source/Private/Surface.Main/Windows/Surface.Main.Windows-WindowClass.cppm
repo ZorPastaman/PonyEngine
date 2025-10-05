@@ -15,10 +15,10 @@ module;
 export module PonyEngine.Surface.Main.Windows:WindowClass;
 
 import PonyEngine.Application;
+import PonyEngine.File;
 import PonyEngine.Log;
 import PonyEngine.Math;
-import PonyEngine.Platform.Windows;
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 import :MessageHandler;
 
@@ -65,13 +65,13 @@ namespace PonyEngine::Surface::Windows
 {
 	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor, const Math::ColorRGB<std::uint8_t>& backgroundColor) :
 		application{&application},
-		moduleHandle(Platform::Windows::GetModule())
+		moduleHandle(File::Windows::GetModule())
 	{
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating background brush... Color: '{}'.", backgroundColor);
 		const HBRUSH backgroundBrush = CreateSolidBrush(RGB(backgroundColor.R(), backgroundColor.G(), backgroundColor.B()));
 		if (!backgroundBrush) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to create background brush. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to create background brush. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating background brush done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush));
 
@@ -101,7 +101,7 @@ namespace PonyEngine::Surface::Windows
 				PONY_LOG(this->application->Logger(), Log::LogType::Error, "Failed to delete background brush. Handle: '0x{:X}', Error code: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush), GetLastError());
 			}
 
-			throw std::runtime_error(Utility::SafeFormat("Failed to register class. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to register class. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class done. Handle: '0x{:X}'.", classHandle);
 	}

@@ -21,6 +21,11 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Application/Application-IServiceFactory.cppm"
 	"Source/Public/Application/Application-ITickableService.cppm"
 	"Source/Public/Application/Application-ServiceData.cppm"
+	"Source/Public/File/File.cppm"
+	"Source/Public/File/File-Module.cppm"
+	"Source/Public/File/File-Path.cppm"
+	"Source/Public/ID/ID.cppm"
+	"Source/Public/ID/ID-WinGUID.cppm"
 	"Source/Public/Log/Log.cppm"
 	"Source/Public/Log/Log-ILogger.cppm"
 	"Source/Public/Log/Log-LogData.cppm"
@@ -44,12 +49,14 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Transformations.cppm"
 	"Source/Public/Math/Math-Transform.cppm"
 	"Source/Public/Math/Math-Vector.cppm"
-	"Source/Public/Platform/Platform.cppm"
+	"Source/Public/Memory/Memory.cppm"
+	"Source/Public/Memory/Memory-Mutability.cppm"
+	"Source/Public/Memory/Memory-TypedPtr.cppm"
+	"Source/Public/Text/Text.cppm"
+	"Source/Public/Text/Text-Convert.cppm"
+	"Source/Public/Text/Text-Format.cppm"
 	"Source/Public/Type/Type.cppm"
 	"Source/Public/Type/Type-Common.cppm"
-	"Source/Public/Utility/Utility.cppm"
-	"Source/Public/Utility/Utility-ObjectInterfaces.cppm"
-	"Source/Public/Utility/Utility-SafeFormat.cppm"
 )
 
 if(PONY_WINCORE)
@@ -61,9 +68,6 @@ if(PONY_WINCORE)
 	message(VERBOSE "Configuring sources for WinCore")
 	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 		"Source/Public/Application/WinCore/Application.WinCore.cppm"
-		"Source/Public/Platform/WinCore/Platform.WinCore.cppm"
-		"Source/Public/Platform/WinCore/Platform.WinCore-GUID.cppm"
-		"Source/Public/Platform/WinCore/Platform.WinCore-Utility.cppm"
 	)
 endif()
 
@@ -79,9 +83,6 @@ if(PONY_WINDOWS)
 		"Source/Public/Application/Windows/Application.Windows-IMainDataService.cppm"
 		"Source/Public/Application/Windows/Application.Windows-IMessageLoopService.cppm"
 		"Source/Public/Application/Windows/Application.Windows-IMessageObserver.cppm"
-		"Source/Public/Platform/Windows/Platform.Windows.cppm"
-		"Source/Public/Platform/Windows/Platform.Windows-Module.cppm"
-		"Source/Public/Platform/Windows/Platform.Windows-Path.cppm"
 	)
 endif()
 

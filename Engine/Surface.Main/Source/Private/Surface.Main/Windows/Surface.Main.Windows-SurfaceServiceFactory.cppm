@@ -20,8 +20,8 @@ import std;
 
 import PonyEngine.Application.Windows;
 import PonyEngine.Log;
+import PonyEngine.Memory;
 import PonyEngine.Surface.Extension.Windows;
-import PonyEngine.Utility;
 
 import :SurfaceService;
 
@@ -85,7 +85,8 @@ namespace PonyEngine::Surface::Windows
 			params->showCursor, params->cursorClippingRect);
 		Application::ServiceData data;
 		data.service = surfaceService;
-		data.publicInterfaces.AddInterfacesDeduced<Surface::ISurfaceService, ISurfaceService>(surfaceService->PublicSurfaceService());
+		data.publicInterfaces.push_back(Memory::TypedPtr(static_cast<Surface::ISurfaceService*>(&surfaceService->PublicSurfaceService())));
+		data.publicInterfaces.push_back(Memory::TypedPtr(&surfaceService->PublicSurfaceService()));
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing Windows surface service done.");
 
 		return data;

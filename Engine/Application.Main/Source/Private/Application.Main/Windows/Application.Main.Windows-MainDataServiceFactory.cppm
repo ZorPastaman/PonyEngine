@@ -18,9 +18,10 @@ export module PonyEngine.Application.Main.Windows:MainDataServiceFactory;
 import std;
 
 import PonyEngine.Application.Windows;
+import PonyEngine.File;
 import PonyEngine.Log;
-import PonyEngine.Platform.Windows;
-import PonyEngine.Utility;
+import PonyEngine.Memory;
+import PonyEngine.Text;
 
 import :MainDataService;
 
@@ -74,13 +75,13 @@ namespace PonyEngine::Application::Windows
 	{
 		HICON appIcon = nullptr;
 		HCURSOR appCursor = nullptr;
-		const HMODULE appModule = Platform::Windows::GetModule();
+		const HMODULE appModule = File::Windows::GetModule();
 #if PONY_APP_ICON
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application icon...");
 		appIcon = LoadIconA(appModule, MAKEINTRESOURCEA(IDI_APP_ICON));
 		if (!appIcon) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to load application icon. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to load application icon. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application icon done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appIcon));
 #endif
@@ -89,7 +90,7 @@ namespace PonyEngine::Application::Windows
 		appCursor = LoadCursorA(appModule, MAKEINTRESOURCEA(IDC_APP_CURSOR));
 		if (!appCursor) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to load application cursor. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to load application cursor. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Loading application cursor done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appCursor));
 #endif
@@ -98,7 +99,7 @@ namespace PonyEngine::Application::Windows
 		const auto mainData = std::make_shared<MainDataService>(instance, prevInstance, commandLine, showCommand, appIcon, appCursor);
 		ServiceData data;
 		data.service = mainData;
-		data.publicInterfaces.AddInterface<IMainDataService>(mainData->PublicMainDataService());
+		data.publicInterfaces.push_back(Memory::TypedPtr(&mainData->PublicMainDataService()));
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(MainDataService).name());
 
 		return data;

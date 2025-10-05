@@ -11,7 +11,7 @@ export module PonyEngine.Engine.Extension:SystemData;
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Memory;
 
 import :ISystem;
 import :ITickableSystem;
@@ -22,7 +22,7 @@ export namespace PonyEngine::Engine
 	struct SystemData final
 	{
 		std::variant<std::shared_ptr<ISystem>, std::shared_ptr<ITickableSystem>> system; ///< System.
-		Utility::ObjectInterfaces publicInterfaces; ///< System public interfaces.
+		std::vector<Memory::TypedPtr<>> publicInterfaces; ///< System public interfaces.
 		std::int32_t tickOrder = 0; ///< Tick order. It's used only the @p system is a tickable system.
 	};
 }

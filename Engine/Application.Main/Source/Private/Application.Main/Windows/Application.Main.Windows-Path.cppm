@@ -16,7 +16,7 @@ export module PonyEngine.Application.Main.Windows:Path;
 import std;
 
 import PonyEngine.Application.Main;
-import PonyEngine.Platform.Windows;
+import PonyEngine.File;
 
 export namespace PonyEngine::Application::Windows
 {
@@ -49,22 +49,22 @@ namespace PonyEngine::Application::Windows
 
 	std::filesystem::path ExecutableFile()
 	{
-		return Platform::Windows::GetModulePath(nullptr).lexically_normal();
+		return File::Windows::GetModulePath(nullptr).lexically_normal();
 	}
 
 	std::filesystem::path LocalDataDirectory()
 	{
-		return CreateTailedPath(Platform::Windows::GetKnownPath(FOLDERID_LocalAppData));
+		return CreateTailedPath(File::Windows::GetKnownPath(FOLDERID_LocalAppData));
 	}
 
 	std::filesystem::path UserDataDirectory()
 	{
-		return CreateTailedPath(Platform::Windows::GetKnownPath(FOLDERID_SavedGames));
+		return CreateTailedPath(File::Windows::GetKnownPath(FOLDERID_SavedGames));
 	}
 
 	std::filesystem::path TempDataDirectory()
 	{
-		return CreateTailedPath(Platform::Windows::GetTemporaryPath());
+		return CreateTailedPath(File::Windows::GetTemporaryPath());
 	}
 
 	std::filesystem::path CreateTailedPath(const std::filesystem::path& path)

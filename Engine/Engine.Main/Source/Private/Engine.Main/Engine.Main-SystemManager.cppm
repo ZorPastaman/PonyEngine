@@ -19,6 +19,7 @@ import std;
 
 import PonyEngine.Engine.Extension;
 import PonyEngine.Log;
+import PonyEngine.Memory;
 
 export namespace PonyEngine::Engine
 {
@@ -193,12 +194,12 @@ namespace PonyEngine::Engine
 
 				PONY_LOG(engine->Logger(), Log::LogType::Debug, "Adding system interfaces.");
 				std::vector<std::type_index>& interfaces = systemInterfacesMap[system.get()];
-				for (const auto& [type, interface] : systemData.publicInterfaces.Span())
+				for (const Memory::TypedPtr<>& interface : systemData.publicInterfaces)
 				{
-					PONY_LOG(engine->Logger(), Log::LogType::Debug, "Interface: '{}'.", type.get().name());
-					assert(!systemInterfaces.contains(type.get()) && "The interface has already been added.");
-					systemInterfaces[type.get()] = interface;
-					interfaces.push_back(type.get());
+					PONY_LOG(engine->Logger(), Log::LogType::Debug, "Interface: '{}'.", interface.Type().name());
+					assert(!systemInterfaces.contains(interface.Type()) && "The interface has already been added.");
+					systemInterfaces[interface.Type()] = interface.Get();
+					interfaces.push_back(interface.Type());
 				}
 
 				PONY_LOG(engine->Logger(), Log::LogType::Info, "Creating engine system done. System: '{}'.", typeid(*system).name());

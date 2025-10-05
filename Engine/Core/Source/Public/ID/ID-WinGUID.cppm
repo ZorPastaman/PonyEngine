@@ -9,17 +9,18 @@
 
 module;
 
+#if PONY_WINCORE
 #include "PonyEngine/Platform/WinCore/Framework.h"
+#endif
 
-export module PonyEngine.Platform.WinCore:GUID;
+export module PonyEngine.ID:WinGUID;
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
-import :Utility;
-
-export namespace PonyEngine::Platform::WinCore
+#if PONY_WINCORE
+export namespace PonyEngine::ID::WinCore
 {
 	/// @brief Acquires GUID.
 	/// @return GUID.
@@ -39,7 +40,7 @@ export namespace PonyEngine::Platform::WinCore
 /// @return Reference to the output stream.
 export std::ostream& operator <<(std::ostream& stream, const GUID& guid)
 {
-	return stream << PonyEngine::Platform::WinCore::ToString(guid);
+	return stream << PonyEngine::ID::WinCore::ToString(guid);
 }
 
 /// @brief WinCore GUID formatter.
@@ -62,18 +63,20 @@ struct std::formatter<GUID, char>
 
 	static auto format(const GUID& guid, std::format_context& context)
 	{
-		return std::ranges::copy(PonyEngine::Platform::WinCore::ToString(guid), context.out()).out;
+		return std::ranges::copy(PonyEngine::ID::WinCore::ToString(guid), context.out()).out;
 	}
 };
+#endif
 
-namespace PonyEngine::Platform::WinCore
+#if PONY_WINCORE
+namespace PonyEngine::ID::WinCore
 {
 	GUID AcquireGuid()
 	{
 		GUID acquiredGuid;
 		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to get guid. Result: '0x{:X}'.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(Text::FormatSafe("Failed to get guid. Result: '0x{:X}'.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return acquiredGuid;
@@ -84,6 +87,7 @@ namespace PonyEngine::Platform::WinCore
 		auto buffer = std::wstring(39, L'\0');
 		StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
 
-		return ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
+		return Text::WinCore::ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
 	}
 }
+#endif

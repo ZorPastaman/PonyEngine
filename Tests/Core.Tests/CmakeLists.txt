@@ -3,6 +3,9 @@ add_executable(PonyEngine.Core.Tests)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
+	"File/Module.cpp"
+	"File/Path.cpp"
+	"ID/WinGUID.cpp"
 	"Log/LogFormat.cpp"
 	"Log/LogMacro.cpp"
 	"Math/Ball.cpp"
@@ -27,27 +30,12 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"
 	"Math/Vector.cpp"
+	"Memory/TypedPtr.cpp"
+	"Text/Format.cpp"
+	"Text/Convert.cpp"
 	"Type/Common.cpp"
 	"Utility/Enum.cpp"
-	"Utility/ObjectInterfaces.cpp"
-	"Utility/SafeFormat.cpp"
 )
-
-if(PONY_WINCORE)
-	message(VERBOSE "Configuring sources for WinCore")
-	target_sources(PonyEngine.Core.Tests PRIVATE
-		"Platform/WinCore/GUID.cpp"
-		"Platform/WinCore/Utility.cpp"
-	)
-endif()
-
-if(PONY_WINDOWS)
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Core.Tests PRIVATE
-		"Platform/Windows/Module.cpp"
-		"Platform/Windows/Path.cpp"
-	)
-endif()
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})

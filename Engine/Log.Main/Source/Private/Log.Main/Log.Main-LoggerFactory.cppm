@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log.Extension;
+import PonyEngine.Memory;
 
 import :Logger;
 
@@ -73,7 +74,7 @@ namespace PonyEngine::Log
 		const auto logger = std::make_shared<Logger>(context->Application(), subLoggerFactories);
 		Application::ServiceData data;
 		data.service = logger;
-		data.publicInterfaces.AddInterface<ILogger>(logger->PublicLogger());
+		data.publicInterfaces.push_back(Memory::TypedPtr(&logger->PublicLogger()));
 		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}' done.", typeid(Logger).name());
 
 		return data;

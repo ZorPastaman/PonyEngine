@@ -15,7 +15,7 @@ export module PonyEngine.Surface.Windows:Utility;
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 export namespace PonyEngine::Surface::Windows
 {
@@ -32,7 +32,7 @@ namespace PonyEngine::Surface::Windows
 		const auto cursor = static_cast<HCURSOR>(LoadImageA(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to load default cursor. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Text::FormatSafe("Failed to load default cursor. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return cursor;
