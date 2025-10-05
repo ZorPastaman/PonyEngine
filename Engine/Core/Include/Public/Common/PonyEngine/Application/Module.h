@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "PonyEngine/Utility/Compiler.h"
-#include "PonyEngine/Utility/Macro.h"
+#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Macro/Text.h"
 
 /// @brief Creates a module section name.
 /// @param order Section order.

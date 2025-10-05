@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Utility/ObjectBody.h"
+#include "PonyEngine/Object/Body.h"
 
 export module PonyEngine.Log.Extension:ILoggerContext;
 

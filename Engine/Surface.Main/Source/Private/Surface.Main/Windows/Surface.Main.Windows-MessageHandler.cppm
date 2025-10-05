@@ -10,8 +10,8 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Object/Body.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
-#include "PonyEngine/Utility/ObjectBody.h"
 
 export module PonyEngine.Surface.Main.Windows:MessageHandler;
 

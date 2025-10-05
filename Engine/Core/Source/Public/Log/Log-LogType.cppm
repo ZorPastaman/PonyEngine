@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Utility/Enum.h"
+#include "PonyEngine/Type/Enum.h"
 
 export module PonyEngine.Log:LogType;
 

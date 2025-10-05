@@ -12,7 +12,7 @@ module;
 #include <cassert>
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Utility/Macro.h"
+#include "PonyEngine/Macro/Text.h"
 
 export module PonyEngine.Log.File:FileSubLoggerFactory;
 
