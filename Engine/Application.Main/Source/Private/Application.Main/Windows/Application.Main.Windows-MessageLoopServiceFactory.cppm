@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Application.Windows;
 import PonyEngine.Log;
+import PonyEngine.Memory;
 
 import :MessageLoopService;
 
@@ -59,7 +60,7 @@ namespace PonyEngine::Application::Windows
 		const auto loop = std::make_shared<MessageLoopService>(context->Application());
 		ServiceData data;
 		data.service = std::static_pointer_cast<ITickableService>(loop);
-		data.publicInterfaces.AddInterface<IMessageLoopService>(loop->PublicMessageLoopService());
+		data.publicInterfaces.push_back(Memory::TypedPtr(&loop->PublicMessageLoopService()));
 		data.tickOrder = PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER;
 		PONY_LOG(context->Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(MessageLoopService).name());
 

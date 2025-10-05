@@ -7,19 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
+#endif
 
 #include <catch2/catch_test_macros.hpp>
 
-import PonyEngine.Platform.Windows;
+import PonyEngine.File;
 
 void Dummy()
 {
 }
 
-TEST_CASE("GetModule returns a current module", "[Platform][Module]")
+#if PONY_WINDOWS
+TEST_CASE("GetModule returns a current module", "[File][Module]")
 {
 	HMODULE moduleHandle;
 	GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(&Dummy), &moduleHandle);
-	REQUIRE(moduleHandle == PonyEngine::Platform::Windows::GetModule());
+	REQUIRE(moduleHandle == PonyEngine::File::Windows::GetModule());
 }
+#endif

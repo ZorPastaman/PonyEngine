@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Utility:SafeFormat;
+export module PonyEngine.Text:Format;
 
 import std;
 
-export namespace PonyEngine::Utility
+export namespace PonyEngine::Text
 {
 	/// @brief The concept is satisfied if @p T has a function that accepts @p const @p std::exception& like this: @p exceptionHandler(e).
 	template<typename T>
@@ -26,7 +26,7 @@ export namespace PonyEngine::Utility
 	/// @param args Format arguments.
 	/// @return Format result or exception string.
 	template<typename... Args> [[nodiscard("Pure function")]]
-	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept;
+	std::string FormatSafe(std::format_string<Args...> format, Args&&... args) noexcept;
 	/// @brief @p std::format() wrapper that doesn't throw. If @p std::format() throws, the exception is passed to the @p ExceptionHandler.
 	/// @tparam ExceptionHandler Exception handler type.
 	/// @tparam Args Format argument types.
@@ -34,7 +34,7 @@ export namespace PonyEngine::Utility
 	/// @param args Format arguments.
 	/// @return Format result or exception string.
 	template<ExceptionHandler ExceptionHandler, typename... Args> [[nodiscard("Pure function")]]
-	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>);
+	std::string FormatSafe(std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>);
 	/// @brief @p std::format() wrapper that doesn't throw. If @p std::format() throws, the exception is passed to the @p exceptionHandler.
 	/// @tparam ExceptionHandler Exception handler type.
 	/// @tparam Args Format argument types.
@@ -43,10 +43,10 @@ export namespace PonyEngine::Utility
 	/// @param args Format arguments.
 	/// @return Format result or exception string.
 	template<ExceptionHandler ExceptionHandler, typename... Args> [[nodiscard("Pure function")]]
-	std::string SafeFormat(ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept;
+	std::string FormatSafe(ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept;
 }
 
-namespace PonyEngine::Utility
+namespace PonyEngine::Text
 {
 	/// @brief Exception handler that does nothing.
 	struct EmptyExceptionHandler final
@@ -58,21 +58,21 @@ namespace PonyEngine::Utility
 	};
 
 	template<typename... Args>
-	std::string SafeFormat(const std::format_string<Args...> format, Args&&... args) noexcept
+	std::string FormatSafe(const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return SafeFormat<EmptyExceptionHandler>(format, std::forward<Args>(args)...);
+		return FormatSafe<EmptyExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
 	template<ExceptionHandler ExceptionHandler, typename... Args>
-	std::string SafeFormat(const std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>)
+	std::string FormatSafe(const std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>)
 	{
 		auto handler = ExceptionHandler();
 
-		return SafeFormat(handler, format, std::forward<Args>(args)...);
+		return FormatSafe(handler, format, std::forward<Args>(args)...);
 	}
 
 	template<ExceptionHandler ExceptionHandler, typename... Args>
-	std::string SafeFormat(ExceptionHandler& exceptionHandler, const std::format_string<Args...> format, Args&&... args) noexcept
+	std::string FormatSafe(ExceptionHandler& exceptionHandler, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		try
 		{

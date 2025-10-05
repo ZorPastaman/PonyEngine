@@ -11,7 +11,7 @@ export module PonyEngine.Log:LogFormat;
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 import :LogType;
 
@@ -120,61 +120,61 @@ namespace PonyEngine::Log
 {
 	std::string LogFormat(const LogType logType, const std::string_view message) noexcept
 	{
-		return Utility::SafeFormat("[{}] {}\n", logType, message);
+		return Text::FormatSafe("[{}] {}\n", logType, message);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view message, const std::chrono::time_point<std::chrono::system_clock> timePoint) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC}] {}\n", logType, timePoint, message);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC}] {}\n", logType, timePoint, message);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view message, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC} ({})] {}\n", logType, timePoint, frameCount, message);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC} ({})] {}\n", logType, timePoint, frameCount, message);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage) noexcept
 	{
-		return Utility::SafeFormat("[{}] {} - {}\n", logType, firstMessage, secondMessage);
+		return Text::FormatSafe("[{}] {} - {}\n", logType, firstMessage, secondMessage);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage, const std::chrono::time_point<std::chrono::system_clock> timePoint) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC}] {} - {}\n", logType, timePoint, firstMessage, secondMessage);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC}] {} - {}\n", logType, timePoint, firstMessage, secondMessage);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC} ({})] {} - {}\n", logType, timePoint, frameCount, firstMessage, secondMessage);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC} ({})] {} - {}\n", logType, timePoint, frameCount, firstMessage, secondMessage);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view message, const std::stacktrace& stacktrace) noexcept
 	{
-		return Utility::SafeFormat("[{}] {}\n{}\n", logType, message, stacktrace);
+		return Text::FormatSafe("[{}] {}\n{}\n", logType, message, stacktrace);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view message, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::stacktrace& stacktrace) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC}] {}\n{}\n", logType, timePoint, message, stacktrace);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC}] {}\n{}\n", logType, timePoint, message, stacktrace);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view message, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount, const std::stacktrace& stacktrace) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC} ({})] {}\n{}\n", logType, timePoint, frameCount, message, stacktrace);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC} ({})] {}\n{}\n", logType, timePoint, frameCount, message, stacktrace);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage, const std::stacktrace& stacktrace) noexcept
 	{
-		return Utility::SafeFormat("[{}] {} - {}\n{}\n", logType, firstMessage, secondMessage, stacktrace);
+		return Text::FormatSafe("[{}] {} - {}\n{}\n", logType, firstMessage, secondMessage, stacktrace);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::stacktrace& stacktrace) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC}] {} - {}\n{}\n", logType, timePoint, firstMessage, secondMessage, stacktrace);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC}] {} - {}\n{}\n", logType, timePoint, firstMessage, secondMessage, stacktrace);
 	}
 
 	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount, const std::stacktrace& stacktrace) noexcept
 	{
-		return Utility::SafeFormat("[{}] [{:%F %R:%OS UTC} ({})] {} - {}\n{}\n", logType, timePoint, frameCount, firstMessage, secondMessage, stacktrace);
+		return Text::FormatSafe("[{}] [{:%F %R:%OS UTC} ({})] {} - {}\n{}\n", logType, timePoint, frameCount, firstMessage, secondMessage, stacktrace);
 	}
 }

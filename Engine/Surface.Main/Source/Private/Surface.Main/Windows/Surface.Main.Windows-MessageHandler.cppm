@@ -19,7 +19,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log;
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 export namespace PonyEngine::Surface::Windows
 {
@@ -95,7 +95,7 @@ namespace PonyEngine::Surface::Windows
 			{
 				if (const DWORD errorCode = GetLastError()) [[unlikely]]
 				{
-					PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on setting message handler. Error code: '0x{:X}'.", errorCode));
+					PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, Text::FormatSafe("Error on setting message handler. Error code: '0x{:X}'.", errorCode));
 
 					return -1;
 				}
@@ -119,7 +119,7 @@ namespace PonyEngine::Surface::Windows
 			{
 				if (const DWORD errorCode = GetLastError()) [[likely]]
 				{
-					PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, Utility::SafeFormat("Error on unsetting message handler. Error code: '0x{:X}'.", errorCode));
+					PONY_LOG_IF(MessageHandlerApp, MessageHandlerApp->Logger(), Log::LogType::Error, Text::FormatSafe("Error on unsetting message handler. Error code: '0x{:X}'.", errorCode));
 				}
 			}
 

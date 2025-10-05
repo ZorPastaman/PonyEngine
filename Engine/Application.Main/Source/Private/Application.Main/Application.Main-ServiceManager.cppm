@@ -19,7 +19,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log;
-import PonyEngine.Utility;
+import PonyEngine.Memory;
 
 export namespace PonyEngine::Application
 {
@@ -143,18 +143,18 @@ namespace PonyEngine::Application
 			{
 				PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces.");
 				std::vector<std::type_index>& interfaces = serviceInterfacesMap[service.get()];
-				for (const auto& [type, interface] : data.publicInterfaces.Span())
+				for (const Memory::TypedPtr<>& interface : data.publicInterfaces)
 				{
-					PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", type.get().name());
-					assert(!serviceInterfaces.contains(type.get()) && "The interface has already been added.");
-					serviceInterfaces[type.get()] = interface;
-					interfaces.push_back(type.get());
+					PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interface.Type().name());
+					assert(!serviceInterfaces.contains(interface.Type()) && "The interface has already been added.");
+					serviceInterfaces[interface.Type()] = interface.Get();
+					interfaces.push_back(interface.Type());
 
-					if (const auto position = onInterfaceAddedHooks.find(type.get()); position != onInterfaceAddedHooks.cend())
+					if (const auto position = onInterfaceAddedHooks.find(interface.Type()); position != onInterfaceAddedHooks.cend())
 					{
 						for (const std::function<void(const IService*, void*)>& hook : position->second)
 						{
-							hook(service.get(), interface);
+							hook(service.get(), interface.Get());
 						}
 					}
 				}
@@ -182,9 +182,9 @@ namespace PonyEngine::Application
 			catch (...)
 			{
 				serviceInterfacesMap.erase(service.get());
-				for (const std::reference_wrapper<const std::type_info>& type : std::views::keys(data.publicInterfaces.Span()))
+				for (const Memory::TypedPtr<>& interface : data.publicInterfaces)
 				{
-					serviceInterfaces.erase(type.get());
+					serviceInterfaces.erase(interface.Type());
 				}
 				services.pop_back();
 

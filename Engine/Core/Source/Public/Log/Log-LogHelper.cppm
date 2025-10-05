@@ -11,7 +11,7 @@ export module PonyEngine.Log:LogHelper;
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 import :LogFormat;
 import :LogType;
@@ -117,7 +117,7 @@ namespace PonyEngine::Log
 	template<typename... Args>
 	std::string LogString(const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return Utility::SafeFormat(format, std::forward<Args>(args)...);
+		return Text::FormatSafe(format, std::forward<Args>(args)...);
 	}
 
 	std::string LogString(const LogType logType, const std::string_view message) noexcept

@@ -11,7 +11,7 @@
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 struct TestExceptionHandler
 {
@@ -42,29 +42,29 @@ struct std::formatter<ThrowingType, char>
 	}
 };
 
-TEST_CASE("SafeFormat returns formatted string on success", "[Utility][SafeFormat]")
+TEST_CASE("SafeFormat returns formatted string on success", "[Text][Format]")
 {
-	std::string result = PonyEngine::Utility::SafeFormat("Hello, {}!", "World");
+	std::string result = PonyEngine::Text::FormatSafe("Hello, {}!", "World");
 	REQUIRE(result == "Hello, World!");
 }
 
-TEST_CASE("SafeFormat returns exception message on format error", "[Utility][SafeFormat]")
+TEST_CASE("SafeFormat returns exception message on format error", "[Text][Format]")
 {
-	std::string result = PonyEngine::Utility::SafeFormat("Value: {}", ThrowingType{});
+	std::string result = PonyEngine::Text::FormatSafe("Value: {}", ThrowingType{});
 	REQUIRE(result.find("Custom formatter error") != std::string::npos);
 }
 
-TEST_CASE("SafeFormat with custom ExceptionHandler is called on error", "[Utility][SafeFormat]")
+TEST_CASE("SafeFormat with custom ExceptionHandler is called on error", "[Text][Format]")
 {
 	TestExceptionHandler handler;
-	std::string result = PonyEngine::Utility::SafeFormat(handler, "Value: {}", ThrowingType{});
+	std::string result = PonyEngine::Text::FormatSafe(handler, "Value: {}", ThrowingType{});
 	REQUIRE(handler.wasCalled);
 	REQUIRE(!handler.message.empty());
 	REQUIRE(result == handler.message);
 }
 
-TEST_CASE("SafeFormat with default-constructible ExceptionHandler", "[Utility][SafeFormat]")
+TEST_CASE("SafeFormat with default-constructible ExceptionHandler", "[Text][Format]")
 {
-	std::string result = PonyEngine::Utility::SafeFormat<TestExceptionHandler>("Value: {}", ThrowingType{});
+	std::string result = PonyEngine::Text::FormatSafe<TestExceptionHandler>("Value: {}", ThrowingType{});
 	REQUIRE(result.find("Custom formatter error") != std::string::npos);
 }

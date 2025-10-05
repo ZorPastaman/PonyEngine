@@ -7,4 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Platform;
+export module PonyEngine.Memory;
+
+export import :Mutability;
+export import :TypedPtr;

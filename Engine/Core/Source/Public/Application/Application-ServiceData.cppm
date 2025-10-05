@@ -11,7 +11,7 @@ export module PonyEngine.Application:ServiceData;
 
 import std;
 
-import PonyEngine.Utility;
+import PonyEngine.Memory;
 
 import :IService;
 import :ITickableService;
@@ -22,7 +22,7 @@ export namespace PonyEngine::Application
 	struct ServiceData final
 	{
 		std::variant<std::shared_ptr<IService>, std::shared_ptr<ITickableService>> service; ///< Service.
-		Utility::ObjectInterfaces publicInterfaces; ///< Service public interfaces.
+		std::vector<Memory::TypedPtr<>> publicInterfaces; ///< Service public interfaces.
 		std::int32_t tickOrder = 0; ///< Service tick order. It's used only the @p service is a tickable service.
 	};
 }

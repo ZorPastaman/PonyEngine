@@ -49,7 +49,7 @@ import std;
 
 import PonyEngine.Application.Main.Windows;
 import PonyEngine.Log;
-import PonyEngine.Utility;
+import PonyEngine.Text;
 
 PonyEngine::Application::Windows::MainDataServiceModule MainDataModule; ///< Main data service module.
 PonyEngine::Application::Windows::MessageLoopServiceModule MessageLoopModule; ///< Message loop module.
@@ -104,7 +104,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 			catch (const std::exception& e)
 			{
 				PONY_APP_CONSOLE_E(e, "On application tick.");
-				MessageBoxA(nullptr, PonyEngine::Utility::SafeFormat("Exception on application tick: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
+				MessageBoxA(nullptr, PonyEngine::Text::FormatSafe("Exception on application tick: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
 
 				exitCode = PonyEngine::Application::ExitCodes::TickException;
 			}
@@ -123,7 +123,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 		catch (const std::exception& e)
 		{
 			PONY_APP_CONSOLE_E(e, "On application.");
-			MessageBoxA(nullptr, PonyEngine::Utility::SafeFormat("Exception on application: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
+			MessageBoxA(nullptr, PonyEngine::Text::FormatSafe("Exception on application: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
 
 			exitCode = PonyEngine::Application::ExitCodes::ApplicationException;
 		}
@@ -142,7 +142,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 	catch (const std::exception& e)
 	{
 		PONY_APP_CONSOLE_E(e, "On main.");
-		MessageBoxA(nullptr, PonyEngine::Utility::SafeFormat("Exception on main: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
+		MessageBoxA(nullptr, PonyEngine::Text::FormatSafe("Exception on main: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
 
 		exitCode = PonyEngine::Application::ExitCodes::MainException;
 	}
