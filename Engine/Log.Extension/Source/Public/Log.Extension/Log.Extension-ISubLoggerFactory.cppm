@@ -20,6 +20,7 @@ import :SubLoggerData;
 
 export namespace PonyEngine::Log
 {
+	/// @brief Sub-logger factory.
 	class ISubLoggerFactory
 	{
 		INTERFACE_BODY(ISubLoggerFactory)

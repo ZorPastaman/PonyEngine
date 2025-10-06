@@ -31,7 +31,6 @@ target_sources(PonyEngine.Log.Main PRIVATE
 target_sources(PonyEngine.Log.Main PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Log.Main/Log.Main.cppm"
 	"Source/Private/Log.Main/Log.Main-Logger.cppm"
-	"Source/Private/Log.Main/Log.Main-LoggerFactory.cppm"
 	"Source/Private/Log.Main/Log.Main-LoggerModule.cppm"
 )
 

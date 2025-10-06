@@ -11,9 +11,15 @@ module;
 
 #include "PonyEngine/Macro/Text.h"
 
+#if PONY_WINDOWS
+#include "PonyEngine/Platform/Windows/Framework.h"
+#endif
+
 export module PonyEngine.Application.Main:Path;
 
 import std;
+
+import PonyEngine.File;
 
 export namespace PonyEngine::Application
 {
@@ -43,6 +49,11 @@ export namespace PonyEngine::Application
 	/// @return Path with a tail.
 	[[nodiscard("Pure function")]]
 	std::filesystem::path AddTail(const std::filesystem::path& path);
+	/// @brief Creates a tailed path.
+	/// @param path Path.
+	/// @return Tailed path.
+	[[nodiscard("Pure function")]]
+	std::filesystem::path CreateTailedPath(const std::filesystem::path& path);
 }
 
 namespace PonyEngine::Application
@@ -75,5 +86,13 @@ namespace PonyEngine::Application
 	std::filesystem::path AddTail(const std::filesystem::path& path)
 	{
 		return (path / CompanyName() / ProjectName()).lexically_normal();
+	}
+
+	std::filesystem::path CreateTailedPath(const std::filesystem::path& path)
+	{
+		const std::filesystem::path tailedPath = AddTail(path);
+		std::filesystem::create_directories(tailedPath);
+
+		return tailedPath;
 	}
 }

@@ -12,51 +12,44 @@ module;
 #include <cassert>
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Application.Main.Windows:MessageLoopService;
+#if PONY_WINDOWS
+#include "PonyEngine/Platform/Windows/Framework.h"
+#endif
+
+export module PonyEngine.Application.Main:MessageLoopManager;
 
 import std;
 
-import PonyEngine.Application.Windows;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
+#if PONY_WINDOWS
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Message loop service.
-	class MessageLoopService final : public ITickableService, private IMessageLoopService
+	/// @brief Message loop manager.
+	class MessageLoopManager final
 	{
 	public:
-		/// @brief Creates a message loop service.
+		/// @brief Creates a message loop manager.
 		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
-		explicit MessageLoopService(IApplicationContext& application) noexcept;
-		MessageLoopService(const MessageLoopService&) = delete;
-		MessageLoopService(MessageLoopService&&) = delete;
+		explicit MessageLoopManager(IApplicationContext& application) noexcept;
+		MessageLoopManager(const MessageLoopManager&) = delete;
+		MessageLoopManager(MessageLoopManager&&) = delete;
 
-		~MessageLoopService() noexcept = default;
+		~MessageLoopManager() noexcept = default;
 
-		virtual void Begin() override;
-		virtual void End() override;
-		virtual void Tick() override;
+		void Tick() noexcept;
 
-		virtual void AddMessageObserver(IMessageObserver& observer, UINT messageType) override;
-		virtual void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer) noexcept override;
+		void AddMessageObserver(IMessageObserver& observer, UINT messageType);
+		void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes);
+		void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept;
+		void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept;
+		void RemoveMessageObserver(IMessageObserver& observer) noexcept;
 
-		/// @brief Gets the public message loop service.
-		/// @return Public message loop service.
-		[[nodiscard("Pure function")]]
-		IMessageLoopService& PublicMessageLoopService() noexcept;
-		/// @brief Gets the public message loop service.
-		/// @return Public message loop service.
-		[[nodiscard("Pure function")]]
-		const IMessageLoopService& PublicMessageLoopService() const noexcept;
-
-		MessageLoopService& operator =(const MessageLoopService&) = delete;
-		MessageLoopService& operator =(MessageLoopService&&) = delete;
+		MessageLoopManager& operator =(const MessageLoopManager&) = delete;
+		MessageLoopManager& operator =(MessageLoopManager&&) = delete;
 
 	private:
 		/// @brief Calls message observers of the specified message type.
@@ -70,30 +63,23 @@ export namespace PonyEngine::Application::Windows
 		std::unordered_map<UINT, std::vector<IMessageObserver*>> messageObservers; ///< Message observers.
 	};
 }
+#endif
 
+#if PONY_WINDOWS
 namespace PonyEngine::Application::Windows
 {
-	MessageLoopService::MessageLoopService(IApplicationContext& application) noexcept :
+	MessageLoopManager::MessageLoopManager(IApplicationContext& application) noexcept :
 		application{&application}
 	{
 	}
 
-	void MessageLoopService::Begin()
-	{
-	}
-
-	void MessageLoopService::End()
-	{
-	}
-
-	void MessageLoopService::Tick()
+	void MessageLoopManager::Tick() noexcept
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Peeking messages.");
 		MSG message;
 		while (PeekMessageA(&message, nullptr, 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' message for '{}'.", 
-				message.message, message.hwnd ? std::format("0x{:X}", reinterpret_cast<std::uintptr_t>(message.hwnd)).c_str() : "nullptr");
+			PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' message for hwnd '0x{:X}'.", message.message, reinterpret_cast<std::uintptr_t>(message.hwnd));
 
 			if (!message.hwnd) [[unlikely]]
 			{
@@ -111,14 +97,14 @@ namespace PonyEngine::Application::Windows
 		}
 	}
 
-	void MessageLoopService::AddMessageObserver(IMessageObserver& observer, const UINT messageType)
+	void MessageLoopManager::AddMessageObserver(IMessageObserver& observer, const UINT messageType)
 	{
 		std::vector<IMessageObserver*>& observers = messageObservers[messageType];
 		assert(std::ranges::find(observers, &observer) == observers.cend() && "The observer has already been added.");
 		observers.push_back(&observer);
 	}
 
-	void MessageLoopService::AddMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes)
+	void MessageLoopManager::AddMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes)
 	{
 		for (std::size_t i = 0uz; i < messageTypes.size(); ++i)
 		{
@@ -138,7 +124,7 @@ namespace PonyEngine::Application::Windows
 		}
 	}
 
-	void MessageLoopService::RemoveMessageObserver(IMessageObserver& observer, const UINT messageType) noexcept
+	void MessageLoopManager::RemoveMessageObserver(IMessageObserver& observer, const UINT messageType) noexcept
 	{
 		if (const auto position = messageObservers.find(messageType); position != messageObservers.cend()) [[likely]]
 		{
@@ -152,7 +138,7 @@ namespace PonyEngine::Application::Windows
 		PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove observer of '{}' message type but it hadn't been added.", messageType);
 	}
 
-	void MessageLoopService::RemoveMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes) noexcept
+	void MessageLoopManager::RemoveMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes) noexcept
 	{
 		for (const UINT messageType : messageTypes)
 		{
@@ -160,7 +146,7 @@ namespace PonyEngine::Application::Windows
 		}
 	}
 
-	void MessageLoopService::RemoveMessageObserver(IMessageObserver& observer) noexcept
+	void MessageLoopManager::RemoveMessageObserver(IMessageObserver& observer) noexcept
 	{
 		std::size_t erased = 0uz;
 
@@ -176,17 +162,7 @@ namespace PonyEngine::Application::Windows
 		PONY_LOG_IF(erased == 0uz, application->Logger(), Log::LogType::Warning, "Tried to remove message observer but it hadn't been added.");
 	}
 
-	IMessageLoopService& MessageLoopService::PublicMessageLoopService() noexcept
-	{
-		return *this;
-	}
-
-	const IMessageLoopService& MessageLoopService::PublicMessageLoopService() const noexcept
-	{
-		return *this;
-	}
-
-	void MessageLoopService::ObserveMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
+	void MessageLoopManager::ObserveMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		if (const auto position = messageObservers.find(uMsg); position != messageObservers.cend())
 		{
@@ -204,3 +180,4 @@ namespace PonyEngine::Application::Windows
 		}
 	}
 }
+#endif

@@ -14,7 +14,6 @@ target_sources(GameSample PRIVATE
 target_sources(GameSample PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Game/Game.cppm"
 	"Source/Private/Game/Game-GameService.cppm"
-	"Source/Private/Game/Game-GameServiceFactory.cppm"
 	"Source/Private/Game/Game-GameServiceModule.cppm"
 )
 

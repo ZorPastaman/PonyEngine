@@ -18,7 +18,7 @@ import std;
 import PonyEngine.Log;
 
 import :IApplicationContext;
-import :IServiceFactory;
+import :ServiceData;
 
 export namespace PonyEngine::Application
 {
@@ -98,8 +98,8 @@ export namespace PonyEngine::Application
 		template<typename T> [[nodiscard("Pure function")]]
 		const T* FindService() const noexcept;
 		/// @brief Adds a service.
-		/// @param factory Service factory.
-		virtual void AddService(const std::shared_ptr<IServiceFactory>& factory) = 0;
+		/// @param data Service data.
+		virtual void AddService(const ServiceData& data) = 0;
 	};
 }
 

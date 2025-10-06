@@ -7,27 +7,6 @@ if(PONY_ENGINE_CREATE_CONSOLE)
 	endif()
 endif()
 
-if(NOT PONY_ENGINE_MESSAGE_LOOP_ORDER)
-	message(FATAL_ERROR "PONY_ENGINE_APPLICATION_MAIN is set but PONY_ENGINE_MESSAGE_LOOP_ORDER isn't")
-endif()
-string(SUBSTRING "${PONY_ENGINE_MESSAGE_LOOP_ORDER}" 0 1 MESSAGE_LOOP_ORDER_FIRST_CHAR)
-if(NOT MESSAGE_LOOP_ORDER_FIRST_CHAR MATCHES "^[b-y]$")
-	message(FATAL_ERROR "PONY_ENGINE_MESSAGE_LOOP_ORDER is incorrect. Its first letter must be inside b-y range")
-endif()
-if(${PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER} STREQUAL "")
-	message(FATAL_ERROR "PONY_ENGINE_APPLICATION_MAIN is set but PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER isn't")
-endif()
-if(NOT PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER MATCHES "^-?[0-9]+$")
-	message(FATAL_ERROR "PONY_ENGINE_MESSAGE_LOOP_TICK_ORDER isn't a number")
-endif()
-if(NOT PONY_ENGINE_MAIN_DATA_ORDER)
-	message(FATAL_ERROR "PONY_ENGINE_APPLICATION_MAIN is set but PONY_ENGINE_MAIN_DATA_ORDER isn't")
-endif()
-string(SUBSTRING "${PONY_ENGINE_MAIN_DATA_ORDER}" 0 1 MAIN_DATA_ORDER_FIRST_CHAR)
-if(NOT MAIN_DATA_ORDER_FIRST_CHAR MATCHES "^[b-y]$")
-	message(FATAL_ERROR "PONY_ENGINE_MAIN_DATA_ORDER is incorrect. Its first letter must be inside b-y range")
-endif()
-
 message(VERBOSE "Configuring target")
 if(PONY_WINDOWS)
 	add_executable(PonyEngine.Application.Main WIN32)
@@ -35,24 +14,28 @@ else()
 	add_executable(PonyEngine.Application.Main)
 endif()
 
+message(VERBOSE "Configuring headers")
+target_include_directories(PonyEngine.Application.Main PRIVATE
+	"Include/Private/Common"
+)
+
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Application.Main/Application.Main.cppm"
 	"Source/Private/Application.Main/Application.Main-App.cppm"
+	"Source/Private/Application.Main/Application.Main-AppDataManager.cppm"
 	"Source/Private/Application.Main/Application.Main-Console.cppm"
 	"Source/Private/Application.Main/Application.Main-DefaultLogger.cppm"
 	"Source/Private/Application.Main/Application.Main-ExitCodes.cppm"
+	"Source/Private/Application.Main/Application.Main-FlowManager.cppm"
+	"Source/Private/Application.Main/Application.Main-LoggerManager.cppm"
+	"Source/Private/Application.Main/Application.Main-MessageLoopManager.cppm"
+	"Source/Private/Application.Main/Application.Main-ModuleManager.cppm"
 	"Source/Private/Application.Main/Application.Main-Path.cppm"
+	"Source/Private/Application.Main/Application.Main-PathManager.cppm"
+	"Source/Private/Application.Main/Application.Main-Process.cppm"
 	"Source/Private/Application.Main/Application.Main-ServiceManager.cppm"
 )
-
-if(PONY_WINCORE)
-	message(VERBOSE "Configuring sources for WinCore")
-	target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
-		"Source/Private/Application.Main/WinCore/Application.Main.WinCore.cppm"
-		"Source/Private/Application.Main/WinCore/Application.Main.WinCore-Console.cppm"
-	)
-endif()
 
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring headers for Windows")
@@ -60,29 +43,16 @@ if(PONY_WINDOWS)
 		"Include/Private/Windows"
 	)
 
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES 
-		"Source/Private/Application.Main/Windows/Application.Main.Windows.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-Console.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-MainDataService.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-MainDataServiceFactory.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-MainDataServiceModule.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopService.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopServiceFactory.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-MessageLoopServiceModule.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-Path.cppm"
-		"Source/Private/Application.Main/Windows/Application.Main.Windows-Process.cppm"
-	)
 	 target_sources(PonyEngine.Application.Main PRIVATE
 		"Source/Main.Windows.cpp"
 	)
 
 	message(VERBOSE "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
-	configure_file("Data/Windows/Resources.rc.in" Resources.rc)
+	configure_file("Data/Windows/Resource.rc.in" Resource.rc)
 	target_sources(PonyEngine.Application.Main PRIVATE 
 		Application.manifest
-		Resources.rc
+		Resource.rc
 	)
 endif()
 

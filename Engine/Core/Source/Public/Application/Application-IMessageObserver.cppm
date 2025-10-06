@@ -11,22 +11,25 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application:IServiceFactory;
+#if PONY_WINDOWS
+#include "PonyEngine/Platform/Windows/Framework.h"
+#endif
 
-import :IApplicationContext;
-import :ServiceData;
+export module PonyEngine.Application:IMessageObserver;
 
-export namespace PonyEngine::Application
+#if PONY_WINDOWS
+export namespace PonyEngine::Application::Windows
 {
-	/// @brief Service factory.
-	class IServiceFactory
+	/// @brief Message observer.
+	class IMessageObserver
 	{
-		INTERFACE_BODY(IServiceFactory)
+		INTERFACE_BODY(IMessageObserver)
 
-		/// @brief Creates a service.
-		/// @param application Application context.
-		/// @return Created service data.
-		[[nodiscard("Redundant call")]]
-		virtual ServiceData Create(IApplicationContext& application) = 0;
+		/// @brief Observes a message.
+		/// @param uMsg Message type.
+		/// @param wParam wParam.
+		/// @param lParam lParam.
+		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 	};
 }
+#endif
