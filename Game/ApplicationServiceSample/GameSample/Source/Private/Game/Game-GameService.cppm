@@ -1,13 +1,8 @@
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module Game:GameService;
 
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
 
 export namespace Game
 {
@@ -41,32 +36,27 @@ namespace Game
 	{
 		// Constructor logic can be added here.
 		// The service may initialize its dependencies here.
-		PONY_LOG(this->application->Logger(), PonyEngine::Log::LogType::Info, "Game service constructed.");
 	}
 
 	GameService::~GameService() noexcept
 	{
 		// Destructor logic can be added here.
 		// The service has to clean up here.
-		PONY_LOG(this->application->Logger(), PonyEngine::Log::LogType::Info, "Game service destructed.");
 	}
 
 	void GameService::Begin()
 	{
 		// Prepare the service for ticking.
-		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Game service begun.");
 	}
 
 	void GameService::End()
 	{
 		// Clean up the service after ticking.
-		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Game service ended.");
 	}
 
 	void GameService::Tick()
 	{
 		// The service tick logic goes here.
 		// This is the place to update the service state, process events, etc.
-		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Verbose, "Game service ticked.");
 	}
 }

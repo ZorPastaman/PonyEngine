@@ -15,10 +15,10 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Application/Application.cppm"
 	"Source/Public/Application/Application-IApplicationContext.cppm"
+	"Source/Public/Application/Application-IMessageObserver.cppm"
 	"Source/Public/Application/Application-IModule.cppm"
 	"Source/Public/Application/Application-IModuleContext.cppm"
 	"Source/Public/Application/Application-IService.cppm"
-	"Source/Public/Application/Application-IServiceFactory.cppm"
 	"Source/Public/Application/Application-ITickableService.cppm"
 	"Source/Public/Application/Application-ServiceData.cppm"
 	"Source/Public/File/File.cppm"
@@ -64,25 +64,12 @@ if(PONY_WINCORE)
 	target_include_directories(PonyEngine.Core PUBLIC 
 		"Include/Public/WinCore"
 	)
-
-	message(VERBOSE "Configuring sources for WinCore")
-	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Application/WinCore/Application.WinCore.cppm"
-	)
 endif()
 
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring headers for Windows")
 	target_include_directories(PonyEngine.Core PUBLIC 
 		"Include/Public/Windows"
-	)
-
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Application/Windows/Application.Windows.cppm"
-		"Source/Public/Application/Windows/Application.Windows-IMainDataService.cppm"
-		"Source/Public/Application/Windows/Application.Windows-IMessageLoopService.cppm"
-		"Source/Public/Application/Windows/Application.Windows-IMessageObserver.cppm"
 	)
 endif()
 

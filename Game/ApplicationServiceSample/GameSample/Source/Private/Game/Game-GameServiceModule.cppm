@@ -1,15 +1,10 @@
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module Game:GameServiceModule;
 
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
 
-import :GameServiceFactory;
+import :GameService;
 
 export namespace Game
 {
@@ -25,13 +20,16 @@ namespace Game
 {
 	void GameServiceModule::StartUp(PonyEngine::Application::IModuleContext& context)
 	{
-		// Add game service factory.
-		PONY_LOG(context.Logger(), PonyEngine::Log::LogType::Info, "Constructing game service factory.");
-		context.AddService(std::make_shared<GameServiceFactory>(context));
+		// Starting up module.
+		const auto game = std::make_shared<GameService>(context.Application());
+		PonyEngine::Application::ServiceData data;
+		data.service = std::static_pointer_cast<PonyEngine::Application::ITickableService>(game);
+		data.tickOrder = 5;
+		context.AddService(data);
 	}
 
 	void GameServiceModule::ShutDown(const PonyEngine::Application::IModuleContext& context)
 	{
-		// Nothing to do here. The factory will be destroyed automatically.
+		// Shutting down module.
 	}
 }

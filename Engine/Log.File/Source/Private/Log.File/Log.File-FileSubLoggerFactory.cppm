@@ -64,12 +64,12 @@ namespace PonyEngine::Log
 		{
 			const std::filesystem::path prevLogPath = logPath.parent_path() / (logPath.stem().string() + "_prev" + logPath.extension().string());
 			std::filesystem::copy_file(logPath, prevLogPath, std::filesystem::copy_options::overwrite_existing);
-			PONY_LOG(context->Logger(), LogType::Info, "Preparing log files done. New log file path: {}; Old log file path: {}.", logPath.string(), prevLogPath.string());
+			PONY_LOG(context->Logger(), LogType::Info, "Preparing log files done. New log file path: '{}'; Old log file path: '{}'.", logPath.string(), prevLogPath.string());
 		}
 		else [[unlikely]]
 		{
 			std::filesystem::create_directories(logPath.parent_path());
-			PONY_LOG(context->Logger(), LogType::Info, "Preparing log files done. New log file path: {}.", logPath.string());
+			PONY_LOG(context->Logger(), LogType::Info, "Preparing log files done. New log file path: '{}'.", logPath.string());
 		}
 
 		PONY_LOG(context->Logger(), LogType::Info, "Constructing '{}'... Log path: '{}'.", typeid(FileSubLogger).name(), logPath.string());

@@ -41,7 +41,6 @@ if(PONY_WINDOWS)
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows.cppm"
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-MessageHandler.cppm"
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-SurfaceService.cppm"
-		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-SurfaceServiceFactory.cppm"
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-SurfaceServiceModule.cppm"
 		"Source/Private/Surface.Main/Windows/Surface.Main.Windows-WindowClass.cppm"
 	)

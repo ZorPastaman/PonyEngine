@@ -10,9 +10,9 @@
 export module PonyEngine.Application;
 
 export import :IApplicationContext;
+export import :IMessageObserver;
 export import :IModule;
 export import :IModuleContext;
 export import :IService;
-export import :IServiceFactory;
 export import :ITickableService;
 export import :ServiceData;

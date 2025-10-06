@@ -168,7 +168,7 @@ namespace PonyEngine::Log
 		return LogFormat(LogType::Exception, exception.what(), message, stacktrace);
 	}
 
-	template<typename ... Args>
+	template<typename... Args>
 	std::string LogString(const std::exception& exception, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		return LogFormat(LogType::Exception, exception.what(), LogString(format, std::forward<Args>(args)...), stacktrace);

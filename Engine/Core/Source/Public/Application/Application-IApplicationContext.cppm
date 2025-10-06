@@ -11,14 +11,33 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
+#if PONY_WINDOWS
+#include "PonyEngine/Platform/Windows/Framework.h"
+#endif
+
 export module PonyEngine.Application:IApplicationContext;
 
 import std;
 
 import PonyEngine.Log;
 
+import :IMessageObserver;
+
 export namespace PonyEngine::Application
 {
+#if PONY_WINDOWS
+	namespace Windows
+	{
+		/// @brief Windows application context.
+		class IApplicationContext;
+	}
+
+	/// @brief Windows application context.
+	using INativeApplicationContext = Windows::IApplicationContext;
+#else
+#error "Unsupported platform!"
+#endif
+
 	/// @brief Application context. It exists for the whole life of an application.
 	class IApplicationContext
 	{
@@ -74,6 +93,11 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual const std::filesystem::path& TempDataDirectory() const noexcept = 0;
 
+		/// @brief Gets the command line excluding an executable name.
+		/// @return Command line.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view CommandLine() const noexcept = 0;
+
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
@@ -127,8 +151,80 @@ export namespace PonyEngine::Application
 		/// @return Current frame count.
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t FrameCount() const noexcept = 0;
+
+		/// @brief Gets the native application context.
+		/// @return Native application context.
+		[[nodiscard("Pure function")]]
+		INativeApplicationContext& Native() noexcept;
+		/// @brief Gets the native application context.
+		/// @return Native application context.
+		[[nodiscard("Pure function")]]
+		const INativeApplicationContext& Native() const noexcept;
+		/// @brief Gets the native application context.
+		/// @return Native application context.
+		[[nodiscard("Pure function")]]
+		INativeApplicationContext* NativePtr() noexcept;
+		/// @brief Gets the native application context.
+		/// @return Native application context.
+		[[nodiscard("Pure function")]]
+		const INativeApplicationContext* NativePtr() const noexcept;
 	};
 }
+
+#if PONY_WINDOWS
+export namespace PonyEngine::Application::Windows
+{
+	/// @brief Windows application context.
+	class IApplicationContext : public Application::IApplicationContext
+	{
+		INTERFACE_BODY(IApplicationContext)
+
+		/// @brief Gets the instance handle of the application.
+		/// @return Instance handle of the application.
+		[[nodiscard("Pure function")]]
+		virtual HINSTANCE Instance() const noexcept = 0;
+		/// @brief Gets the previous instance handle of the application.
+		/// @return Previous instance handle of the application.
+		[[nodiscard("Pure function")]]
+		virtual HINSTANCE PrevInstance() const noexcept = 0;
+		/// @brief Gets the show command for the application.
+		/// @return Show command.
+		[[nodiscard("Pure function")]]
+		virtual int ShowCommand() const noexcept = 0;
+
+		/// @brief Gets the application icon.
+		/// @return Application icon.
+		[[nodiscard("Pure function")]]
+		virtual HICON AppIcon() const noexcept = 0;
+		/// @brief Gets the application cursor.
+		/// @return Application cursor.
+		[[nodiscard("Pure function")]]
+		virtual HCURSOR AppCursor() const noexcept = 0;
+
+		/// @brief Adds the message observer.
+		/// @param observer Observer to add.
+		/// @param messageType Message type to observe. Example: WM_QUIT.
+		/// @remark It observes only global messages, not window-specific messages.
+		virtual void AddMessageObserver(IMessageObserver& observer, UINT messageType) = 0;
+		/// @brief Adds the message observer.
+		/// @param observer Observer to add.
+		/// @param messageTypes Message types to observe. Example: WM_QUIT.
+		/// @remark It observes only global messages, not window-specific messages.
+		virtual void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
+		/// @brief Removes the message observer from the specified message type.
+		/// @param observer Observer to remove.
+		/// @param messageType Message type to observe. Example: WM_QUIT.
+		virtual void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept = 0;
+		/// @brief Removes the message observer from the specified message types.
+		/// @param observer Observer to remove.
+		/// @param messageTypes Message types to observe. Example: WM_QUIT.
+		virtual void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept = 0;
+		/// @brief Removes the message observer from all the message types.
+		/// @param observer Observer to remove.
+		virtual void RemoveMessageObserver(IMessageObserver& observer) noexcept = 0;
+	};
+}
+#endif
 
 namespace PonyEngine::Application
 {
@@ -142,5 +238,25 @@ namespace PonyEngine::Application
 	const T* IApplicationContext::FindService() const noexcept
 	{
 		return static_cast<const T*>(FindService(typeid(T)));
+	}
+
+	INativeApplicationContext& IApplicationContext::Native() noexcept
+	{
+		return static_cast<INativeApplicationContext&>(*this);
+	}
+
+	const INativeApplicationContext& IApplicationContext::Native() const noexcept
+	{
+		return static_cast<const INativeApplicationContext&>(*this);
+	}
+
+	INativeApplicationContext* IApplicationContext::NativePtr() noexcept
+	{
+		return static_cast<INativeApplicationContext*>(this);
+	}
+
+	const INativeApplicationContext* IApplicationContext::NativePtr() const noexcept
+	{
+		return static_cast<const INativeApplicationContext*>(this);
 	}
 }

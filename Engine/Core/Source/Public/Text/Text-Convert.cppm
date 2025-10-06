@@ -41,7 +41,7 @@ namespace PonyEngine::Text::WinCore
 {
 	std::string ConvertToString(const std::wstring_view source)
 	{
-		if (source.empty())
+		if (source.empty()) [[unlikely]]
 		{
 			return std::string();
 		}
@@ -63,7 +63,7 @@ namespace PonyEngine::Text::WinCore
 
 	std::wstring ConvertToWideString(const std::string_view source)
 	{
-		if (source.empty())
+		if (source.empty()) [[unlikely]]
 		{
 			return std::wstring();
 		}
