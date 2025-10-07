@@ -9,4 +9,4 @@
 
 export module PonyEngine.Surface.Main;
 
-export import PonyEngine.Surface.Extension;
+export import PonyEngine.Surface;

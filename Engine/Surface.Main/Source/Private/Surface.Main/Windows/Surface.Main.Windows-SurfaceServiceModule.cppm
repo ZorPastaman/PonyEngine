@@ -47,26 +47,23 @@ namespace PonyEngine::Surface::Windows
 		MessageHandlerApp = &context.Application();
 
 		PONY_LOG(context.Logger(), Log::LogType::Debug, "Getting surface parameters.");
-		if (context.DataCount<SurfaceParams>() == 0) [[unlikely]]
-		{
-			throw std::runtime_error("Surface parameters not found.");
-		}
-		PONY_LOG_IF(context.DataCount<SurfaceParams>() > 1uz, context.Logger(), Log::LogType::Warning, "Multiple surface parameters found. First one will be used.");
-		const auto params = context.GetData<SurfaceParams>(0uz);
-		if (!params) [[unlikely]]
-		{
-			throw std::runtime_error("Surface parameters is nullptr.");
-		}
+		// TODO: Load some data via configurator service.
+		const std::string_view title = context.Application().ProjectTitle();
+		constexpr auto clientRect = Math::Rect<std::int32_t>(Math::Vector2<std::int32_t>(320, 240));
+		constexpr auto minimalClientSize = Math::Vector2<std::int32_t>(320, 240);
+		constexpr auto backgroundColor = Math::ColorRGB<std::uint8_t>::Black();
+		constexpr auto style = SurfaceStyle::All;
+		constexpr bool showCursor = true;
+		constexpr std::optional<Math::Rect<float>> cursorClippingRect = Math::Rect<float>(Math::Vector2<float>::One());
 		const HICON mainIcon = context.Application().Native().AppIcon();
 		const HCURSOR mainCursor = context.Application().Native().AppCursor() ? context.Application().Native().AppCursor() : GetDefaultCursor();
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class...");
-		const auto windowClass = std::make_shared<WindowClass>(context.Application(), mainIcon, nullptr, mainCursor, params->backgroundColor);
+		const auto windowClass = std::make_shared<WindowClass>(context.Application(), mainIcon, nullptr, mainCursor, backgroundColor);
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows surface service...");
-		const auto surfaceService = std::make_shared<SurfaceService>(context.Application(), windowClass, params->title, params->clientRect, params->minimalClientSize, params->style,
-			params->showCursor, params->cursorClippingRect);
+		const auto surfaceService = std::make_shared<SurfaceService>(context.Application(), windowClass, title, clientRect, minimalClientSize, style, showCursor, cursorClippingRect);
 		Application::ServiceData data;
 		data.service = surfaceService;
 		data.publicInterfaces.push_back(Memory::TypedPtr(static_cast<Surface::ISurfaceService*>(&surfaceService->PublicSurfaceService())));
