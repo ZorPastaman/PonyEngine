@@ -6,8 +6,6 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"File/Module.cpp"
 	"File/Path.cpp"
 	"ID/WinGUID.cpp"
-	"Log/LogFormat.cpp"
-	"Log/LogMacro.cpp"
 	"Math/Ball.cpp"
 	"Math/BallInsides.cpp"
 	"Math/BallIntersections.cpp"
@@ -30,7 +28,6 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"
 	"Math/Vector.cpp"
-	"Memory/TypedPtr.cpp"
 	"Text/Format.cpp"
 	"Text/Convert.cpp"
 	"Type/Common.cpp"
@@ -39,9 +36,9 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
-if(PONY_ENGINE_TESTING_BENCHMARK)
-	target_compile_definitions(PonyEngine.Core.Tests PRIVATE PONY_ENGINE_TESTING_BENCHMARK)
-endif()
+target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
+	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core.Tests PROPERTIES 
