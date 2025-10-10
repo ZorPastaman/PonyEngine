@@ -263,18 +263,18 @@ export namespace PonyEngine::Surface::Windows
 		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveGetMinMaxInfo(WPARAM wParam, LPARAM lParam) noexcept;
-		/// @brief Observes the WM_MOVE message.
+		/// @brief Observes the WM_ENTERSIZEMOVE message.
 		/// @param wParam WParam.
 		/// @param lParam LParam.
 		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
-		LRESULT ObserveMove(WPARAM wParam, LPARAM lParam) noexcept;
-		/// @brief Observes the WM_SIZE message.
+		LRESULT ObserveEnterSizeMove(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_EXITSIZEMOVE message.
 		/// @param wParam WParam.
 		/// @param lParam LParam.
 		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
-		LRESULT ObserveSize(WPARAM wParam, LPARAM lParam) noexcept;
+		LRESULT ObserveExitSizeMove(WPARAM wParam, LPARAM lParam) noexcept;
 		/// @brief Observes the WM_ERASEBKGND message.
 		/// @param wParam WParam.
 		/// @param lParam LParam.
@@ -860,10 +860,10 @@ namespace PonyEngine::Surface::Windows
 			return ObserveKillFocus(wParam, lParam);
 		case WM_GETMINMAXINFO:
 			return ObserveGetMinMaxInfo(wParam, lParam);
-		case WM_MOVE:
-			return ObserveMove(wParam, lParam);
-		case WM_SIZE:
-			return ObserveSize(wParam, lParam);
+		case WM_ENTERSIZEMOVE:
+			return ObserveEnterSizeMove(wParam, lParam);
+		case WM_EXITSIZEMOVE:
+			return ObserveExitSizeMove(wParam, lParam);
 		case WM_ERASEBKGND:
 			return ObserveEraseBackground(wParam, lParam);
 		case WM_PAINT:
@@ -1250,21 +1250,45 @@ namespace PonyEngine::Surface::Windows
 		return 0;
 	}
 
-	LRESULT SurfaceService::ObserveMove(const WPARAM wParam, const LPARAM lParam) noexcept
+	LRESULT SurfaceService::ObserveEnterSizeMove(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		if (cursorClippingRect)
+		if (windowActive && cursorClippingRect)
 		{
-			ClipCursor(cursorClippingRect);
+			try
+			{
+				ClipCursor(std::nullopt);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On freeing cursor on window deactivation.");
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on freeing cursor on window deactivation.");
+			}
 		}
 
 		return 0;
 	}
 
-	LRESULT SurfaceService::ObserveSize(const WPARAM wParam, const LPARAM lParam) noexcept
+	LRESULT SurfaceService::ObserveExitSizeMove(WPARAM wParam, LPARAM lParam) noexcept
 	{
-		if (cursorClippingRect)
+		if (windowActive && cursorClippingRect)
 		{
-			ClipCursor(cursorClippingRect);
+			try
+			{
+				ClipCursor(cursorClippingRect);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On clipping cursor on window activation.");
+				cursorClippingRect = std::nullopt;
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on clipping cursor on window activation.");
+				cursorClippingRect = std::nullopt;
+			}
 		}
 
 		return 0;
