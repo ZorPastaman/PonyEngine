@@ -15,7 +15,7 @@ export module PonyEngine.Log.Main:LoggerModule;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 import PonyEngine.Log;
 
 import :Logger;
@@ -34,10 +34,14 @@ export namespace PonyEngine::Log
 		~LoggerModule() noexcept = default;
 
 		virtual void StartUp(Application::IModuleContext& context) override;
-		virtual void ShutDown(const Application::IModuleContext& context) override;
+		virtual void ShutDown(Application::IModuleContext& context) override;
 
 		LoggerModule& operator =(const LoggerModule&) = delete;
 		LoggerModule& operator =(LoggerModule&&) = delete;
+
+	private:
+		Application::ModuleDataHandle loggerModuleHandle; ///< Logger module handle.
+		Application::LoggerHandle loggerHandle; ///< Logger handle.
 	};
 }
 
@@ -45,31 +49,32 @@ namespace PonyEngine::Log
 {
 	void LoggerModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), LogType::Debug, "Getting sub-logger factories.");
-		const std::size_t subLoggerFactoryCount = context.DataCount<ISubLoggerFactory>();
-		std::vector<ISubLoggerFactory*> subLoggerFactories;
-		subLoggerFactories.reserve(subLoggerFactoryCount);
-		for (std::size_t i = 0uz; i < subLoggerFactoryCount; ++i)
-		{
-			const auto factory = context.GetData<ISubLoggerFactory>(i);
-			if (!factory) [[unlikely]]
-			{
-				throw std::logic_error("Sub-logger factory is nullptr.");
-			}
-			subLoggerFactories.push_back(factory.get());
-		}
-
 		PONY_LOG(context.Logger(), LogType::Info, "Constructing '{}'...", typeid(Logger).name());
-		const auto logger = std::make_shared<Logger>(context.Application(), subLoggerFactories);
-		Application::ServiceData data;
-		data.service = logger;
-		data.publicInterfaces.push_back(Memory::TypedPtr(&logger->PublicLogger()));
+		try
+		{
+			loggerHandle = context.LoggerModuleContext().SetLogger([&](Application::ILoggerContext& loggerContext)
+			{
+				const auto logger = std::make_shared<Logger>(loggerContext);
+				loggerModuleHandle = context.AddData(std::shared_ptr<ILoggerModuleContext>(logger, &logger->PublicLoggerModule()));
+				return std::shared_ptr<ILogger>(logger, &logger->PublicLogger());
+			});
+		}
+		catch (...)
+		{
+			if (loggerModuleHandle.IsValid())
+			{
+				context.RemoveData(loggerModuleHandle);
+			}
+			throw;
+		}
 		PONY_LOG(context.Logger(), LogType::Info, "Constructing '{}' done.", typeid(Logger).name());
-		PONY_LOG(context.Logger(), Log::LogType::Debug, "Adding '{}' as service.", typeid(Logger).name());
-		context.AddService(data);
 	}
 
-	void LoggerModule::ShutDown(const Application::IModuleContext&)
+	void LoggerModule::ShutDown(Application::IModuleContext& context)
 	{
+		PONY_LOG(context.Logger(), LogType::Info, "Releasing '{}'...", typeid(Logger).name());
+		context.LoggerModuleContext().UnsetLogger(loggerHandle);
+		context.RemoveData(loggerModuleHandle);
+		PONY_LOG(context.Logger(), LogType::Info, "Releasing '{}' done.", typeid(Logger).name());
 	}
 }

@@ -11,16 +11,35 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
+#if PONY_WINDOWS
+#include "PonyEngine/Platform/Windows/Framework.h"
+#endif
+
 export module PonyEngine.Surface:ISurfaceService;
 
 import std;
 
 import PonyEngine.Math;
 
+import :IMessageObserver;
+import :IRawInputObserver;
 import :SurfaceStyle;
 
 export namespace PonyEngine::Surface
 {
+#if PONY_WINDOWS
+	namespace Windows
+	{
+		/// @brief Windows service surface.
+		class ISurfaceService;
+	}
+
+	/// @brief Windows service surface.
+	using INativeSurfaceService = Windows::ISurfaceService;
+#else
+#error "Unsupported platform!"
+#endif
+
 	/// @brief Surface service.
 	class ISurfaceService
 	{
@@ -123,5 +142,103 @@ export namespace PonyEngine::Surface
 		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const = 0;
+
+		/// @brief Gets the native service surface.
+		/// @return Native service surface.
+		[[nodiscard("Pure function")]]
+		INativeSurfaceService& Native() noexcept;
+		/// @brief Gets the native service surface.
+		/// @return Native service surface.
+		[[nodiscard("Pure function")]]
+		const INativeSurfaceService& Native() const noexcept;
+		/// @brief Gets the native service surface.
+		/// @return Native service surface.
+		[[nodiscard("Pure function")]]
+		INativeSurfaceService* NativePtr() noexcept;
+		/// @brief Gets the native service surface.
+		/// @return Native service surface.
+		[[nodiscard("Pure function")]]
+		const INativeSurfaceService* NativePtr() const noexcept;
 	};
+}
+
+#if PONY_WINDOWS
+export namespace PonyEngine::Surface::Windows
+{
+	/// @brief Windows surface service.
+	class ISurfaceService : public Surface::ISurfaceService
+	{
+		INTERFACE_BODY(ISurfaceService)
+
+		/// @brief Gets the native handle.
+		/// @return Native handle.
+		[[nodiscard("Pure function")]]
+		virtual HWND Handle() noexcept = 0;
+
+		/// @brief Adds the message observer.
+		/// @param observer Observer to add.
+		/// @param messageType Message type to observe. Examples: WM_KEYDOWN, WM_KEYUP.
+		virtual void AddMessageObserver(IMessageObserver& observer, UINT messageType) = 0;
+		/// @brief Adds the message observer.
+		/// @param observer Observer to add.
+		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
+		virtual void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
+		/// @brief Removes the message observer from the specified message type.
+		/// @param observer Observer to remove.
+		/// @param messageType Message type to observe. Examples: WM_KEYDOWN, WM_KEYUP.
+		virtual void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept = 0;
+		/// @brief Removes the message observer from the specified message types.
+		/// @param observer Observer to remove.
+		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
+		virtual void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept = 0;
+		/// @brief Removes the message observer from all the message types.
+		/// @param observer Observer to remove.
+		virtual void RemoveMessageObserver(IMessageObserver& observer) noexcept = 0;
+
+		/// @brief Adds the raw input observer.
+		/// @param observer Observer to add.
+		/// @param usagePage Usage page.
+		/// @param usage Usage.
+		virtual void AddRawInputObserver(IRawInputObserver& observer, USHORT usagePage, USHORT usage) = 0;
+		/// @brief Adds the raw input observer.
+		/// @param observer Observer to add.
+		/// @param rawInputUsages Pairs of usage page and usage.
+		virtual void AddRawInputObserver(IRawInputObserver& observer, std::span<const std::pair<USHORT, USHORT>> rawInputUsages) = 0;
+		/// @brief Removes the raw input observer from the specified message type.
+		/// @param observer Observer to remove.
+		/// @param usagePage Usage page.
+		/// @param usage Usage.
+		virtual void RemoveRawInputObserver(IRawInputObserver& observer, USHORT usagePage, USHORT usage) noexcept = 0;
+		/// @brief Removes the raw input observer from the specified message types.
+		/// @param observer Observer to remove.
+		/// @param rawInputUsages Pairs of usage page and usage.
+		virtual void RemoveRawInputObserver(IRawInputObserver& observer, std::span<const std::pair<USHORT, USHORT>> rawInputUsages) noexcept = 0;
+		/// @brief Removes the raw input observer from all the message types.
+		/// @param observer Observer to remove.
+		virtual void RemoveRawInputObserver(IRawInputObserver& observer) noexcept = 0;
+	};
+}
+#endif
+
+namespace PonyEngine::Surface
+{
+	INativeSurfaceService& ISurfaceService::Native() noexcept
+	{
+		return static_cast<INativeSurfaceService&>(*this);
+	}
+
+	const INativeSurfaceService& ISurfaceService::Native() const noexcept
+	{
+		return static_cast<const INativeSurfaceService&>(*this);
+	}
+
+	INativeSurfaceService* ISurfaceService::NativePtr() noexcept
+	{
+		return static_cast<INativeSurfaceService*>(this);
+	}
+
+	const INativeSurfaceService* ISurfaceService::NativePtr() const noexcept
+	{
+		return static_cast<const INativeSurfaceService*>(this);
+	}
 }

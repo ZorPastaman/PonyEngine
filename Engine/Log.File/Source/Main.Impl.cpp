@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Log/FileModule.h"
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 import PonyEngine.Log.File;
 
 namespace PonyEngine::Log

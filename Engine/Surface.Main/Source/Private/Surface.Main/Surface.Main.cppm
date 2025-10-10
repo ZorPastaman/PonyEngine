@@ -10,3 +10,5 @@
 export module PonyEngine.Surface.Main;
 
 export import PonyEngine.Surface;
+
+export import :SurfaceServiceModule;

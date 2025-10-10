@@ -47,13 +47,15 @@ target_sources(PonyEngine.Log.File PRIVATE
 target_sources(PonyEngine.Log.File PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Log.File/Log.File.cppm"
 	"Source/Private/Log.File/Log.File-FileSubLogger.cppm"
-	"Source/Private/Log.File/Log.File-FileSubLoggerFactory.cppm"
 	"Source/Private/Log.File/Log.File-FileSubLoggerModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")
 target_compile_definitions(PonyEngine.Log.File PUBLIC
-	PONY_ENGINE_LOG_FILE_ORDER=${PONY_ENGINE_LOG_FILE_ORDER} PONY_ENGINE_LOG_FILE_PATH=${PONY_ENGINE_LOG_FILE_PATH}
+	PONY_ENGINE_LOG_FILE_ORDER=${PONY_ENGINE_LOG_FILE_ORDER}
+)
+target_compile_definitions(PonyEngine.Log.File PRIVATE
+	PONY_ENGINE_LOG_FILE_PATH=${PONY_ENGINE_LOG_FILE_PATH}
 )
 
 message(VERBOSE "Setting properties")
@@ -63,7 +65,9 @@ set_target_properties(PonyEngine.Log.File PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.File PUBLIC
-	PonyEngine.Core
+target_link_libraries(PonyEngine.Log.File PRIVATE
+	PonyEngine.Log
 	PonyEngine.Log.Extension
+	PonyEngine.Core
+	PonyEngine.Application.Extension
 )

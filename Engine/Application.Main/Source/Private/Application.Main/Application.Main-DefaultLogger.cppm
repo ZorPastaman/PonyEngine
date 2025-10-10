@@ -15,8 +15,10 @@ export module PonyEngine.Application.Main:DefaultLogger;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 import PonyEngine.Log;
+
+import :Console;
 
 export namespace PonyEngine::Application
 {
@@ -61,7 +63,7 @@ namespace PonyEngine::Application
 				const std::string log = logData.stacktrace
 					? Log::LogFormat(logType, message, std::chrono::system_clock::now(), application->FrameCount(), *logData.stacktrace)
 					: Log::LogFormat(logType, message, std::chrono::system_clock::now(), application->FrameCount());
-				application->LogToConsole(logType, log);
+				LogToConsole(logType, log);
 			}
 		}
 #endif
@@ -75,7 +77,7 @@ namespace PonyEngine::Application
 			const std::string log = logData.stacktrace
 				? Log::LogFormat(Log::LogType::Exception, exception.what(), message, std::chrono::system_clock::now(), application->FrameCount(), *logData.stacktrace)
 				: Log::LogFormat(Log::LogType::Exception, exception.what(), message, std::chrono::system_clock::now(), application->FrameCount());
-			application->LogToConsole(Log::LogType::Exception, log);
+			LogToConsole(Log::LogType::Exception, log);
 		}
 #endif
 	}

@@ -13,7 +13,8 @@ module;
 
 export module PonyEngine.Log.Extension:ILoggerContext;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
+import PonyEngine.Log;
 
 export namespace PonyEngine::Log
 {
@@ -30,5 +31,10 @@ export namespace PonyEngine::Log
 		/// @return Application context.
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+
+		/// @brief Logs to console.
+		/// @param logType Log type.
+		/// @param message Log message.
+		virtual void LogToConsole(LogType logType, std::string_view message) const noexcept = 0;
 	};
 }
