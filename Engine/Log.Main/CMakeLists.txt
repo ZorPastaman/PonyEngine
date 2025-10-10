@@ -35,7 +35,9 @@ target_sources(PonyEngine.Log.Main PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Log.Main PUBLIC PONY_ENGINE_LOG_MAIN_ORDER=${PONY_ENGINE_LOG_MAIN_ORDER})
+target_compile_definitions(PonyEngine.Log.Main PUBLIC 
+	PONY_ENGINE_LOG_MAIN_ORDER=${PONY_ENGINE_LOG_MAIN_ORDER}
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Main PROPERTIES 
@@ -45,6 +47,8 @@ set_target_properties(PonyEngine.Log.Main PROPERTIES
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Main PUBLIC
-	PonyEngine.Core
+	PonyEngine.Log
 	PonyEngine.Log.Extension
+	PonyEngine.Core
+	PonyEngine.Application.Extension
 )

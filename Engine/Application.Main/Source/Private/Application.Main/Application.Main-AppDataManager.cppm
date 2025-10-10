@@ -20,7 +20,7 @@ export module PonyEngine.Application.Main:AppDataManager;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 import PonyEngine.File;
 import PonyEngine.Log;
 import PonyEngine.Text;

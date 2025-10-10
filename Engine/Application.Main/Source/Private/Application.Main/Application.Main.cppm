@@ -9,7 +9,7 @@
 
 export module PonyEngine.Application.Main;
 
-export import PonyEngine.Application;
+export import PonyEngine.Application.Extension;
 
 export import :App;
 export import :Console;

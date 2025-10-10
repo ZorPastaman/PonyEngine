@@ -15,7 +15,7 @@ export module PonyEngine.Application.Main:LoggerManager;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 import PonyEngine.Log;
 
 import :DefaultLogger;
@@ -23,7 +23,7 @@ import :DefaultLogger;
 export namespace PonyEngine::Application
 {
 	/// @brief Logger manager.
-	class LoggerManager final
+	class LoggerManager final : private ILoggerContext, private ILoggerModuleContext
 	{
 	public:
 		/// @brief Creates a logger manager.
@@ -34,7 +34,17 @@ export namespace PonyEngine::Application
 		LoggerManager(const LoggerManager&) = delete;
 		LoggerManager(LoggerManager&&) = delete;
 
-		~LoggerManager() noexcept = default;
+		~LoggerManager() noexcept;
+
+		[[nodiscard("Pure function")]]
+		virtual IApplicationContext& Application() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IApplicationContext& Application() const noexcept override;
+		virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept override;
+
+		[[nodiscard("Must be used to unset")]]
+		virtual LoggerHandle SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory) override;
+		virtual void UnsetLogger(LoggerHandle handle) override;
 
 		/// @brief Gets the logger.
 		/// @return Logger.
@@ -45,9 +55,14 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		const Log::ILogger& Logger() const noexcept;
 
-		/// @brief Sets the logger.
-		/// @param logger Logger. If nullptr, sets a default logger.
-		void Logger(Log::ILogger* logger) noexcept;
+		/// @brief Gets a public logger module context.
+		/// @return Public logger module context.
+		[[nodiscard("Pure function")]]
+		ILoggerModuleContext& PublicLoggerModuleContext() noexcept;
+		/// @brief Gets a public logger module context.
+		/// @return Public logger module context.
+		[[nodiscard("Pure function")]]
+		const ILoggerModuleContext& PublicLoggerModuleContext() const noexcept;
 
 		LoggerManager& operator =(const LoggerManager&) = delete;
 		LoggerManager& operator =(LoggerManager&&) = delete;
@@ -56,6 +71,7 @@ export namespace PonyEngine::Application
 		IApplicationContext* application; ///< Application context.
 
 		std::unique_ptr<DefaultLogger> defaultLogger; ///< Default logger.
+		std::shared_ptr<Log::ILogger> externalLogger; ///< External logger.
 		Log::ILogger* logger; ///< Current logger.
 	};
 }
@@ -69,6 +85,77 @@ namespace PonyEngine::Application
 	{
 	}
 
+	LoggerManager::~LoggerManager() noexcept
+	{
+		if (externalLogger) [[unlikely]]
+		{
+			PONY_LOG(*logger, Log::LogType::Error, "External logger wasn't removed. Logger: '{}'.", typeid(*externalLogger).name())
+		}
+	}
+
+	IApplicationContext& LoggerManager::Application() noexcept
+	{
+		return *application;
+	}
+
+	const IApplicationContext& LoggerManager::Application() const noexcept
+	{
+		return *application;
+	}
+
+	void LoggerManager::LogToConsole(const Log::LogType logType, const std::string_view message) const noexcept
+	{
+		Application::LogToConsole(logType, message);
+	}
+
+	LoggerHandle LoggerManager::SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory)
+	{
+		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
+		{
+			throw std::logic_error("Logger can be added only on start-up.");
+		}
+		if (externalLogger) [[unlikely]]
+		{
+			throw std::logic_error("External logger has already been set.");
+		}
+
+		const std::shared_ptr<Log::ILogger> newLogger = factory(*this);
+		if (!newLogger) [[unlikely]]
+		{
+			throw std::logic_error("Created logger is nullptr.");
+		}
+
+		externalLogger = newLogger;
+		logger = externalLogger.get();
+		PONY_LOG(*logger, Log::LogType::Info, "External logger set. Logger: '{}'.", typeid(*externalLogger).name());
+
+		return LoggerHandle{.id = externalLogger.get()};
+	}
+
+	void LoggerManager::UnsetLogger(const LoggerHandle handle)
+	{
+		if (application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
+		{
+			throw std::logic_error("Logger can be removed only on shut-down.");
+		}
+		if (!handle.IsValid()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid handle.");
+		}
+		if (!externalLogger) [[unlikely]]
+		{
+			throw std::logic_error("No external logger was set.");
+		}
+		if (externalLogger.get() != handle.id) [[unlikely]]
+		{
+			throw std::logic_error("Incorrect handle.");
+		}
+
+		PONY_LOG(*logger, Log::LogType::Info, "External logger unset.");
+		logger = defaultLogger.get();
+		externalLogger = nullptr;
+	}
+
 	Log::ILogger& LoggerManager::Logger() noexcept
 	{
 		return *logger;
@@ -79,11 +166,13 @@ namespace PonyEngine::Application
 		return *logger;
 	}
 
-	void LoggerManager::Logger(Log::ILogger* const logger) noexcept
+	ILoggerModuleContext& LoggerManager::PublicLoggerModuleContext() noexcept
 	{
-		Log::ILogger* const nextLogger = logger ? logger : defaultLogger.get();
-		PONY_LOG(*this->logger, Log::LogType::Info, "Setting '{}' logger...", typeid(*nextLogger).name());
-		this->logger = nextLogger;
-		PONY_LOG(*this->logger, Log::LogType::Info, "Setting '{}' logger done.", typeid(*nextLogger).name());
+		return *this;
+	}
+
+	const ILoggerModuleContext& LoggerManager::PublicLoggerModuleContext() const noexcept
+	{
+		return *this;
 	}
 }

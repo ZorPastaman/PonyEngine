@@ -21,7 +21,7 @@ export module PonyEngine.Application.Main:MessageLoopManager;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 import PonyEngine.Log;
 
 #if PONY_WINDOWS

@@ -9,6 +9,8 @@
 
 export module PonyEngine.Surface;
 
+export import :IMessageObserver;
+export import :IRawInputObserver;
 export import :ISurfaceService;
 export import :SurfaceStyle;
 export import :Utility;
