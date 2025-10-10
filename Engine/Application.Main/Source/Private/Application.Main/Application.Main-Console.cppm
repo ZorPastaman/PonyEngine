@@ -12,10 +12,6 @@ module;
 #include <cassert>
 #include <stdio.h>
 
-#if PONY_WINCORE
-#include "PonyEngine/Platform/WinCore/Framework.h"
-#endif
-
 #if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
 #endif
