@@ -26,5 +26,6 @@ set_target_properties(GameSample PROPERTIES
 # Set dependencies.
 target_link_libraries(GameSample PUBLIC
 	PonyEngine.Core
-	PonyEngine.Engine.Extension
+	PonyEngine.Log
+	PonyEngine.Application.Extension
 )

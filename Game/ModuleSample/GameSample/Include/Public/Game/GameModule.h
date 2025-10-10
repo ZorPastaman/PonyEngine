@@ -2,7 +2,7 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 
 namespace Game
 {

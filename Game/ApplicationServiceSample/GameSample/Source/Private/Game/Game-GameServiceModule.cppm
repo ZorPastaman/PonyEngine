@@ -2,7 +2,7 @@ export module Game:GameServiceModule;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 
 import :GameService;
 
@@ -12,7 +12,10 @@ export namespace Game
 	{
 	public:
 		virtual void StartUp(PonyEngine::Application::IModuleContext& context) override;
-		virtual void ShutDown(const PonyEngine::Application::IModuleContext& context) override;
+		virtual void ShutDown(PonyEngine::Application::IModuleContext& context) override;
+
+	private:
+		PonyEngine::Application::ServiceHandle gameServiceHandle;
 	};
 }
 
@@ -20,16 +23,17 @@ namespace Game
 {
 	void GameServiceModule::StartUp(PonyEngine::Application::IModuleContext& context)
 	{
-		// Starting up module.
-		const auto game = std::make_shared<GameService>(context.Application());
-		PonyEngine::Application::ServiceData data;
-		data.service = std::static_pointer_cast<PonyEngine::Application::ITickableService>(game);
-		data.tickOrder = 5;
-		context.AddService(data);
+		gameServiceHandle = context.ServiceModuleContext().AddService([&](PonyEngine::Application::IApplicationContext& application)
+		{
+			const auto game = std::make_shared<GameService>(application);
+			PonyEngine::Application::ServiceData data;
+			data.SetService(game, 0);
+			return data;
+		});
 	}
 
-	void GameServiceModule::ShutDown(const PonyEngine::Application::IModuleContext& context)
+	void GameServiceModule::ShutDown(PonyEngine::Application::IModuleContext& context)
 	{
-		// Shutting down module.
+		context.ServiceModuleContext().RemoveService(gameServiceHandle);
 	}
 }

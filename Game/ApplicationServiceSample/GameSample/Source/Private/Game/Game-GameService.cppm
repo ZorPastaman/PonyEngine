@@ -2,7 +2,7 @@ export module Game:GameService;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Extension;
 
 export namespace Game
 {
@@ -32,7 +32,7 @@ export namespace Game
 namespace Game
 {
 	GameService::GameService(PonyEngine::Application::IApplicationContext& application) noexcept :
-		application{&application }
+		application{&application}
 	{
 		// Constructor logic can be added here.
 		// The service may initialize its dependencies here.
