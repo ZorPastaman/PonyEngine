@@ -17,6 +17,9 @@ set_target_properties(PonyEngine.Log.Extension.Tests PROPERTIES
 
 message(VERBOSE "Setting build options")
 pony_set_build_options(PonyEngine.Log.Extension.Tests ${PONY_ENGINE_OPTIMIZATION})
+target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
+	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
+)
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Extension.Tests PRIVATE 

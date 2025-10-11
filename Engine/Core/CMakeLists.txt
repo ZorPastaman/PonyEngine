@@ -2,6 +2,7 @@ message(STATUS "Configuring PonyEngine.Core")
 
 message(VERBOSE "Configuring environment")
 include("CMake/Log.cmake")
+include("CMake/Target.cmake")
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Core STATIC)
@@ -13,20 +14,11 @@ target_include_directories(PonyEngine.Core PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/Application/Application.cppm"
-	"Source/Public/Application/Application-IApplicationContext.cppm"
-	"Source/Public/Application/Application-IModule.cppm"
-	"Source/Public/Application/Application-IModuleContext.cppm"
-	"Source/Public/Application/Application-IService.cppm"
-	"Source/Public/Application/Application-IServiceFactory.cppm"
-	"Source/Public/Application/Application-ITickableService.cppm"
-	"Source/Public/Application/Application-ServiceData.cppm"
-	"Source/Public/Log/Log.cppm"
-	"Source/Public/Log/Log-ILogger.cppm"
-	"Source/Public/Log/Log-LogData.cppm"
-	"Source/Public/Log/Log-LogFormat.cppm"
-	"Source/Public/Log/Log-LogHelper.cppm"
-	"Source/Public/Log/Log-LogType.cppm"
+	"Source/Public/File/File.cppm"
+	"Source/Public/File/File-Module.cppm"
+	"Source/Public/File/File-Path.cppm"
+	"Source/Public/ID/ID.cppm"
+	"Source/Public/ID/ID-WinGUID.cppm"
 	"Source/Public/Math/Math.cppm"
 	"Source/Public/Math/Math-Ball.cppm"
 	"Source/Public/Math/Math-Bounds.cppm"
@@ -44,26 +36,17 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Transformations.cppm"
 	"Source/Public/Math/Math-Transform.cppm"
 	"Source/Public/Math/Math-Vector.cppm"
-	"Source/Public/Platform/Platform.cppm"
+	"Source/Public/Text/Text.cppm"
+	"Source/Public/Text/Text-Convert.cppm"
+	"Source/Public/Text/Text-Format.cppm"
 	"Source/Public/Type/Type.cppm"
 	"Source/Public/Type/Type-Common.cppm"
-	"Source/Public/Utility/Utility.cppm"
-	"Source/Public/Utility/Utility-ObjectInterfaces.cppm"
-	"Source/Public/Utility/Utility-SafeFormat.cppm"
-)
+ )
 
 if(PONY_WINCORE)
 	message(VERBOSE "Configuring headers for WinCore")
 	target_include_directories(PonyEngine.Core PUBLIC 
 		"Include/Public/WinCore"
-	)
-
-	message(VERBOSE "Configuring sources for WinCore")
-	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Application/WinCore/Application.WinCore.cppm"
-		"Source/Public/Platform/WinCore/Platform.WinCore.cppm"
-		"Source/Public/Platform/WinCore/Platform.WinCore-GUID.cppm"
-		"Source/Public/Platform/WinCore/Platform.WinCore-Utility.cppm"
 	)
 endif()
 
@@ -72,25 +55,13 @@ if(PONY_WINDOWS)
 	target_include_directories(PonyEngine.Core PUBLIC 
 		"Include/Public/Windows"
 	)
-
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Application/Windows/Application.Windows.cppm"
-		"Source/Public/Application/Windows/Application.Windows-IMainDataService.cppm"
-		"Source/Public/Application/Windows/Application.Windows-IMessageLoopService.cppm"
-		"Source/Public/Application/Windows/Application.Windows-IMessageObserver.cppm"
-		"Source/Public/Platform/Windows/Platform.Windows.cppm"
-		"Source/Public/Platform/Windows/Platform.Windows-Module.cppm"
-	)
 endif()
 
 message(VERBOSE "Configuring defines")
-if(PONY_WINCORE)
-	target_compile_definitions(PonyEngine.Core PUBLIC PONY_WINCORE)
-endif()
-if(PONY_WINDOWS)
-	target_compile_definitions(PonyEngine.Core PUBLIC PONY_WINDOWS)
-endif()
+target_compile_definitions(PonyEngine.Core PUBLIC
+	$<$<BOOL:${PONY_WINCORE}>:PONY_WINCORE>
+	$<$<BOOL:${PONY_WINDOWS}>:PONY_WINDOWS>
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES 

@@ -1,15 +1,10 @@
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module Game:GameServiceModule;
 
 import std;
 
-import PonyEngine.Application;
-import PonyEngine.Log;
+import PonyEngine.Application.Extension;
 
-import :GameServiceFactory;
+import :GameService;
 
 export namespace Game
 {
@@ -17,7 +12,10 @@ export namespace Game
 	{
 	public:
 		virtual void StartUp(PonyEngine::Application::IModuleContext& context) override;
-		virtual void ShutDown(const PonyEngine::Application::IModuleContext& context) override;
+		virtual void ShutDown(PonyEngine::Application::IModuleContext& context) override;
+
+	private:
+		PonyEngine::Application::ServiceHandle gameServiceHandle;
 	};
 }
 
@@ -25,13 +23,17 @@ namespace Game
 {
 	void GameServiceModule::StartUp(PonyEngine::Application::IModuleContext& context)
 	{
-		// Add game service factory.
-		PONY_LOG(context.Logger(), PonyEngine::Log::LogType::Info, "Constructing game service factory.");
-		context.AddService(std::make_shared<GameServiceFactory>(context));
+		gameServiceHandle = context.ServiceModuleContext().AddService([&](PonyEngine::Application::IApplicationContext& application)
+		{
+			const auto game = std::make_shared<GameService>(application);
+			PonyEngine::Application::ServiceData data;
+			data.SetService(game, 0);
+			return data;
+		});
 	}
 
-	void GameServiceModule::ShutDown(const PonyEngine::Application::IModuleContext& context)
+	void GameServiceModule::ShutDown(PonyEngine::Application::IModuleContext& context)
 	{
-		// Nothing to do here. The factory will be destroyed automatically.
+		context.ServiceModuleContext().RemoveService(gameServiceHandle);
 	}
 }

@@ -14,7 +14,6 @@ target_sources(GameSample PRIVATE
 target_sources(GameSample PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Game/Game.cppm"
 	"Source/Private/Game/Game-GameService.cppm"
-	"Source/Private/Game/Game-GameServiceFactory.cppm"
 	"Source/Private/Game/Game-GameServiceModule.cppm"
 )
 
@@ -27,5 +26,6 @@ set_target_properties(GameSample PROPERTIES
 # Set dependencies.
 target_link_libraries(GameSample PUBLIC
 	PonyEngine.Core
-	PonyEngine.Engine.Extension
+	PonyEngine.Log
+	PonyEngine.Application.Extension
 )
