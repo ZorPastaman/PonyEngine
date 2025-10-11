@@ -1,0 +1,262 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/Log/Log.h"
+
+export module PonyEngine.Application.Main:ModuleManager;
+
+import std;
+
+import PonyEngine.Application.Extension;
+import PonyEngine.Log;
+
+export namespace PonyEngine::Application
+{
+	/// @brief Module manager.
+	class ModuleManager final : private IModuleContext
+	{
+	public:
+		/// @brief Creates a module manager.
+		/// @param application Application context.
+		/// @param loggerModuleContext Logger module context.
+		/// @param serviceModuleContext Service module context.
+		[[nodiscard("Pure function")]]
+		ModuleManager(IApplicationContext& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext);
+		ModuleManager(const ModuleManager&) = delete;
+		ModuleManager(ModuleManager&&) = delete;
+
+		~ModuleManager() noexcept;
+
+		[[nodiscard("Pure function")]]
+		virtual Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const Log::ILogger& Logger() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual ILoggerModuleContext& LoggerModuleContext() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const ILoggerModuleContext& LoggerModuleContext() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual IServiceModuleContext& ServiceModuleContext() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IServiceModuleContext& ServiceModuleContext() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual void* GetData(const std::type_info& type) const override;
+		virtual ModuleDataHandle AddData(const std::type_info& type, const std::shared_ptr<void>& data) override;
+		virtual void RemoveData(ModuleDataHandle handle) override;
+
+		ModuleManager& operator =(const ModuleManager&) = delete;
+		ModuleManager& operator =(ModuleManager&&) = delete;
+
+	private:
+		/// @brief Initializes the modules.
+		/// @param lastModule Last module pointer.
+		void Initialize(std::uintptr_t& lastModule);
+		/// @brief Finalizes the modules.
+		/// @param lastModule Last module pointer.
+		void Finalize(std::uintptr_t lastModule) noexcept;
+
+		IApplicationContext* application; ///< Application context.
+
+		ILoggerModuleContext* loggerModuleContext; ///< Logger module context.
+		IServiceModuleContext* serviceModuleContext; ///< Service module context.
+		std::unordered_map<const std::type_info*, std::shared_ptr<void>> data; ///< Data.
+	};
+}
+
+namespace PonyEngine::Application
+{
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) IModule** FirstModule = nullptr; ///< Module begin pointer.
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) IModule** LastModule = nullptr; ///< Module end pointer.
+
+	ModuleManager::ModuleManager(IApplicationContext& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext) :
+		application{&application},
+		loggerModuleContext{&loggerModuleContext},
+		serviceModuleContext{&serviceModuleContext}
+	{
+		std::uintptr_t lastModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
+		try
+		{
+			Initialize(lastModule);
+		}
+		catch (...)
+		{
+			Finalize(lastModule);
+			throw;
+		}
+	}
+
+	ModuleManager::~ModuleManager() noexcept
+	{
+		Finalize(reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(IModule**));
+
+		if (data.size() > 0uz) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Data wasn't removed:");
+			for (const std::type_info* type : std::views::keys(data))
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Data of type: '{}'.", type->name());
+			}
+		}
+	}
+
+	Log::ILogger& ModuleManager::Logger() noexcept
+	{
+		return application->Logger();
+	}
+
+	const Log::ILogger& ModuleManager::Logger() const noexcept
+	{
+		return application->Logger();
+	}
+
+	ILoggerModuleContext& ModuleManager::LoggerModuleContext() noexcept
+	{
+		return *loggerModuleContext;
+	}
+
+	const ILoggerModuleContext& ModuleManager::LoggerModuleContext() const noexcept
+	{
+		return *loggerModuleContext;
+	}
+
+	IServiceModuleContext& ModuleManager::ServiceModuleContext() noexcept
+	{
+		return *serviceModuleContext;
+	}
+
+	const IServiceModuleContext& ModuleManager::ServiceModuleContext() const noexcept
+	{
+		return *serviceModuleContext;
+	}
+
+	void* ModuleManager::GetData(const std::type_info& type) const
+	{
+		if (const auto position = data.find(&type); position != data.cend())
+		{
+			return position->second.get();
+		}
+
+		return nullptr;
+	}
+
+	ModuleDataHandle ModuleManager::AddData(const std::type_info& type, const std::shared_ptr<void>& data)
+	{
+		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
+		{
+			throw std::logic_error("Data can be added only on start-up.");
+		}
+
+		if (this->data.contains(&type)) [[unlikely]]
+		{
+			throw std::invalid_argument("Type has already been added.");
+		}
+
+		this->data[&type] = data;
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' added to module context.", type.name());
+
+		return ModuleDataHandle{.id = &type};
+	}
+
+	void ModuleManager::RemoveData(const ModuleDataHandle handle)
+	{
+		if (application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
+		{
+			throw std::logic_error("Data can be removed only on shut-down.");
+		}
+
+		if (!handle.IsValid()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid handle.");
+		}
+
+		if (const auto position = data.find(static_cast<const std::type_info*>(handle.id)); position != data.cend()) [[likely]]
+		{
+			const char* const typeName = position->first->name();
+			this->data.erase(position);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' removed from module context.", typeName);
+
+			return;
+		}
+
+		throw std::invalid_argument("Data not found.");
+	}
+
+	void ModuleManager::Initialize(std::uintptr_t& lastModule)
+	{
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up modules...")
+
+		for (std::uintptr_t current = reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(IModule**); 
+			current < reinterpret_cast<std::uintptr_t>(&LastModule); 
+			current += sizeof(IModule**))
+		{
+			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
+			{
+				IModule* const module = *modulePtr;
+				if (!module) [[unlikely]]
+				{
+					throw std::logic_error("Module is nullptr.");
+				}
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*&*module).name());
+				try
+				{
+					module->StartUp(*this);
+				}
+				catch (const std::exception& e)
+				{
+					PONY_LOG_E(application->Logger(), e, "On starting up '{}' module.", typeid(*&*module).name());
+					throw;
+				}
+				catch (...)
+				{
+					PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on starting up '{}' module.", typeid(*&*module).name());
+					throw;
+				}
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module done.", typeid(*&*module).name());
+				lastModule = current;
+			}
+		}
+
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up modules done.")
+	}
+
+	void ModuleManager::Finalize(const std::uintptr_t lastModule) noexcept
+	{
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down modules...")
+
+		for (std::uintptr_t current = lastModule; 
+			current > reinterpret_cast<std::uintptr_t>(&FirstModule); 
+			current -= sizeof(IModule**))
+		{
+			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
+			{
+				IModule* const module = *modulePtr;
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module...", typeid(*&*module).name());
+				try
+				{
+					module->ShutDown(*this);
+				}
+				catch (const std::exception& e)
+				{
+					PONY_LOG_E(application->Logger(), e, "On shutting down '{}' module.", typeid(*&*module).name());
+				}
+				catch (...)
+				{
+					PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on shutting down '{}' module.", typeid(*&*module).name());
+				}
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module done.", typeid(*&*module).name());
+			}
+		}
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down modules done.")
+	}
+}

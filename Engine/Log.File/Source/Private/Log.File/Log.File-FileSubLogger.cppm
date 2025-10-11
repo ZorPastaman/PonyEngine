@@ -67,7 +67,10 @@ namespace PonyEngine::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CONSOLE_E(logger->Application(), e, "On closing log file.");
+				if constexpr (IsInMask(LogType::Exception, PONY_LOG_MASK))
+				{
+					logger->LogToConsole(LogType::Exception, LogFormat(LogType::Exception, e.what(), "On closing log file."));
+				}
 			}
 		}
 	}
@@ -80,7 +83,10 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE_E(logger->Application(), e, "On writing to log file.");
+			if constexpr (IsInMask(LogType::Exception, PONY_LOG_MASK))
+			{
+				logger->LogToConsole(LogType::Exception, LogFormat(LogType::Exception, e.what(), "On writing to log file."));
+			}
 		}
 	}
 }

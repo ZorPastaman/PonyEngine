@@ -31,12 +31,13 @@ target_sources(PonyEngine.Log.Main PRIVATE
 target_sources(PonyEngine.Log.Main PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Log.Main/Log.Main.cppm"
 	"Source/Private/Log.Main/Log.Main-Logger.cppm"
-	"Source/Private/Log.Main/Log.Main-LoggerFactory.cppm"
 	"Source/Private/Log.Main/Log.Main-LoggerModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Log.Main PUBLIC PONY_ENGINE_LOG_MAIN_ORDER=${PONY_ENGINE_LOG_MAIN_ORDER})
+target_compile_definitions(PonyEngine.Log.Main PUBLIC 
+	PONY_ENGINE_LOG_MAIN_ORDER=${PONY_ENGINE_LOG_MAIN_ORDER}
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Main PROPERTIES 
@@ -46,6 +47,8 @@ set_target_properties(PonyEngine.Log.Main PROPERTIES
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Main PUBLIC
-	PonyEngine.Core
+	PonyEngine.Log
 	PonyEngine.Log.Extension
+	PonyEngine.Core
+	PonyEngine.Application.Extension
 )

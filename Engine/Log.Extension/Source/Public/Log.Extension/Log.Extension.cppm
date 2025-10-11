@@ -12,7 +12,7 @@ export module PonyEngine.Log.Extension;
 export import PonyEngine.Log;
 
 export import :ILoggerContext;
+export import :ILoggerModuleContext;
 export import :ISubLogger;
-export import :ISubLoggerFactory;
 export import :LogEntry;
-export import :SubLoggerData;
+export import :SubLoggerHandle;

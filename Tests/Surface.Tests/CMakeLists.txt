@@ -6,13 +6,6 @@ target_sources(PonyEngine.Surface.Tests PRIVATE
 	"Surface/Utility.cpp"
 )
 
-if (PONY_WINDOWS)
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Surface.Tests PRIVATE
-		"Surface/Windows/Utility.cpp"
-	)
-endif()
-
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Surface.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 
@@ -24,6 +17,9 @@ set_target_properties(PonyEngine.Surface.Tests PROPERTIES
 
 message(VERBOSE "Setting build options")
 pony_set_build_options(PonyEngine.Surface.Tests ${PONY_ENGINE_OPTIMIZATION})
+target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
+	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
+)
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Surface.Tests PRIVATE 
