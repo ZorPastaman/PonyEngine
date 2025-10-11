@@ -93,13 +93,17 @@ namespace PonyEngine::Application::Windows
 		executableFile = File::Windows::GetModulePath(nullptr).lexically_normal();
 		executableDirectory = executableFile.parent_path();
 		rootDirectory = (executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_ROOT_PATH)).lexically_normal();
+		if (!std::filesystem::exists(rootDirectory)) [[unlikely]]
+		{
+			throw std::logic_error("Root directory doesn't exist.");
+		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting executable file done. File: '{}'; Directory: '{}'; Root: '{}'.", 
 			executableFile.string(), executableDirectory.string(), rootDirectory.string());
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting data directories...");
-		localDataDirectory = CreateTailedPath(File::Windows::GetKnownPath(FOLDERID_LocalAppData));
-		userDataDirectory = CreateTailedPath(File::Windows::GetKnownPath(FOLDERID_SavedGames));
-		tempDataDirectory = CreateTailedPath(File::Windows::GetTemporaryPath());
+		localDataDirectory = AddTail(File::Windows::GetKnownPath(FOLDERID_LocalAppData));
+		userDataDirectory = AddTail(File::Windows::GetKnownPath(FOLDERID_SavedGames));
+		tempDataDirectory = AddTail(File::Windows::GetTemporaryPath());
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting data directories done. Local data: '{}'; User data: '{}'; Temp data: '{}'.",
 			localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
 	}
