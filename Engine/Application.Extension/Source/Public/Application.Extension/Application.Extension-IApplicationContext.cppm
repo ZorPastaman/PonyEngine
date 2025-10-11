@@ -83,14 +83,17 @@ export namespace PonyEngine::Application
 		virtual const std::filesystem::path& RootDirectory() const noexcept = 0;
 		/// @brief Gets a local data directory.
 		/// @return Local data directory.
+		/// @remark The directory isn't created automatically.
 		[[nodiscard("Pure function")]]
 		virtual const std::filesystem::path& LocalDataDirectory() const noexcept = 0;
 		/// @brief Gets a user data directory.
 		/// @return User data directory.
+		/// @remark The directory isn't created automatically.
 		[[nodiscard("Pure function")]]
 		virtual const std::filesystem::path& UserDataDirectory() const noexcept = 0;
 		/// @brief Gets a temporal data directory.
 		/// @return Temporal data directory.
+		/// @remark The directory isn't created automatically.
 		[[nodiscard("Pure function")]]
 		virtual const std::filesystem::path& TempDataDirectory() const noexcept = 0;
 
