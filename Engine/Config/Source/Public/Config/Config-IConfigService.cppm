@@ -106,7 +106,7 @@ namespace PonyEngine::Config
 	std::any IConfigService::GetValue(const std::type_info& type, const std::string_view key, const std::any& defaultValue) const noexcept
 	{
 		const std::any value = GetValue(type, key);
-		return value ? value : defaultValue;
+		return value.has_value() ? value : defaultValue;
 	}
 
 	template<typename T>
@@ -119,13 +119,13 @@ namespace PonyEngine::Config
 	std::optional<T> IConfigService::GetValue(const std::string_view key) const noexcept
 	{
 		const std::any value = GetValue(typeid(T), key);
-		return value ? std::optional<T>(std::any_cast<T>(value)) : std::nullopt;
+		return value.has_value() ? std::optional<T>(std::any_cast<T>(value)) : std::nullopt;
 	}
 
 	template<typename T>
 	T IConfigService::GetValue(const std::string_view key, const T& defaultValue) const noexcept
 	{
 		const std::any value = GetValue(typeid(T), key);
-		return value ? std::any_cast<T>(value) : defaultValue;
+		return value.has_value() ? std::any_cast<T>(value) : defaultValue;
 	}
 }

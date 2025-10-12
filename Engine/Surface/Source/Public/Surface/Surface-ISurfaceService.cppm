@@ -21,9 +21,10 @@ import std;
 
 import PonyEngine.Math;
 
+import :CursorStyle;
 import :IMessageObserver;
 import :IRawInputObserver;
-import :SurfaceStyle;
+import :RectStyle;
 
 export namespace PonyEngine::Surface
 {
@@ -45,6 +46,21 @@ export namespace PonyEngine::Surface
 	{
 		INTERFACE_BODY(ISurfaceService)
 
+		/// @brief Gets the rectangle style.
+		/// @return Rectangle style.
+		[[nodiscard("Pure function")]]
+		virtual const struct RectStyle& RectStyle() const noexcept = 0;
+		/// @brief Sets the rectangle style.
+		/// @param style Rectangle style.
+		virtual void RectStyle(const struct RectStyle& style) = 0;
+		/// @brief Gets the cursor style.
+		/// @return Cursor style.
+		[[nodiscard("Pure function")]]
+		virtual const struct CursorStyle& CursorStyle() const noexcept = 0;
+		/// @brief Sets the cursor style.
+		/// @param style Cursor style.
+		virtual void CursorStyle(const struct CursorStyle& style) = 0;
+
 		/// @brief Gets a screen resolution.
 		/// @return Screen resolution.
 		[[nodiscard("Pure funtion")]]
@@ -54,19 +70,6 @@ export namespace PonyEngine::Surface
 		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Rect<std::int32_t> ClientRect() const = 0;
-		/// @brief Sets a client rectangle.
-		/// @param rect Client rectangle.
-		/// @remark The reference point is a screen center.
-		/// @remark If the platform doesn't support client rectangles, the function does nothing.
-		virtual void ClientRect(const Math::Rect<std::int32_t>& rect) = 0;
-		/// @brief Gets the minimal client size.
-		/// @return Minimal client size.
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> MinimalClientSize() const = 0;
-		/// @brief Sets the minimal client size.
-		/// @param size Minimal client size.
-		/// @remark If the platform doesn't support surface rectangles, the function does nothing.
-		virtual void MinimalClientSize(const Math::Vector2<std::int32_t>& size) = 0;
 
 		/// @brief Checks if the surface is active.
 		/// @return @a True if the surface is active; @a false otherwise.
@@ -86,15 +89,6 @@ export namespace PonyEngine::Surface
 		/// @remark If the platform doesn't support client titles, the function does nothing.
 		virtual void Title(std::string_view title) = 0;
 
-		/// @brief Gets a surface style.
-		/// @return Surface style.
-		[[nodiscard("Pure function")]]
-		virtual SurfaceStyle Style() const = 0;
-		/// @brief Sets a surface style.
-		/// @param style Surface style.
-		/// @rematk If the platform doesn't support a style flag, it'll be ignored.
-		virtual void Style(SurfaceStyle style) = 0;
-
 		/// @brief Gets a cursor position.
 		/// @return Cursor position in screen coordinates.
 		/// @remark The reference point is a screen center.
@@ -109,26 +103,6 @@ export namespace PonyEngine::Surface
 		/// @return @a True if a cursor is visible; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsCursorVisible() const = 0;
-		/// @brief Gets if a cursor is really visible.
-		/// @details Some platforms control the cursor visibility by a value counter. The surface service by itself adds either -1 or 0.
-		///          This function checks the real visibility state.
-		/// @return @a True if a cursor is visible; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsCursorReallyVisible() const = 0;
-		/// @brief Shows or hides a cursor.
-		/// @param visible If it's @a true, shows a cursor; otherwise, hides it.
-		/// @remark if the platform doesn't support cursors, the function does nothing.
-		virtual void ShowCursor(bool visible) = 0;
-		/// @brief Gets a cursor clipping rectangle.
-		/// @return Cursor clipping rectangle in client coordinates. If it's @a std::nullopt, the cursor isn't clipped. The range is [-1, 1].
-		/// @remark The reference point is a screen center.
-		[[nodiscard("Pure function")]]
-		virtual std::optional<Math::Rect<float>> CursorClippingRect() const = 0;
-		/// @brief Sets a cursor clipping rectangle.
-		/// @param rect Cursor clipping rectangle in client coordinates. If it's @a std::nullopt, the cursor isn't clipped. The range is [-1, 1].
-		/// @remark The reference point is a screen center.
-		/// @remark if the platform doesn't support cursors, the function does nothing.
-		virtual void CursorClippingRect(const std::optional<Math::Rect<float>>& rect) = 0;
 
 		/// @brief Converts the client point to a screen point.
 		/// @param clientPoint Client point.
