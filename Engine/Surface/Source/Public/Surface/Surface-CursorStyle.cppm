@@ -7,11 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface;
+export module PonyEngine.Surface:CursorStyle;
 
-export import :CursorStyle;
-export import :IMessageObserver;
-export import :IRawInputObserver;
-export import :ISurfaceService;
-export import :RectStyle;
-export import :Utility;
+import std;
+
+import PonyEngine.Math;
+
+export namespace PonyEngine::Surface
+{
+	/// @brief Cursor style.
+	struct CursorStyle final
+	{
+		std::optional<Math::Rect<float>> clippingRect = Math::Rect<float>(Math::Vector2<float>::One()); ///< Cursor clipping rectangle. It's in normalized client rectangle coordinates.
+		bool visible = true; ///< Is the cursor visible?
+	};
+}
