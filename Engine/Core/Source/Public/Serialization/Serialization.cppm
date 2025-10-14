@@ -7,7 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Type;
+export module PonyEngine.Serialization;
 
-export import :Common;
-export import :Limits;
+export import :Basic;
