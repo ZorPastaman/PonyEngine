@@ -36,12 +36,15 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Transformations.cppm"
 	"Source/Public/Math/Math-Transform.cppm"
 	"Source/Public/Math/Math-Vector.cppm"
+	"Source/Public/Serialization/Serialization.cppm"
+	"Source/Public/Serialization/Serialization-Basic.cppm"
 	"Source/Public/Text/Text.cppm"
 	"Source/Public/Text/Text-Convert.cppm"
 	"Source/Public/Text/Text-Format.cppm"
 	"Source/Public/Type/Type.cppm"
 	"Source/Public/Type/Type-Common.cppm"
- )
+	"Source/Public/Type/Type-Limits.cppm"
+)
 
 if(PONY_WINCORE)
 	message(VERBOSE "Configuring headers for WinCore")
