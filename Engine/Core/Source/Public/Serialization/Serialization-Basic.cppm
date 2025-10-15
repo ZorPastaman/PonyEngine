@@ -35,29 +35,31 @@ export namespace PonyEngine::Serialization
 
 	/// @brief Serializes the @p value to the binary @p data.
 	/// @tparam T Value type.
+	/// @tparam DataSize Data byte count.
 	/// @param value Value.
 	/// @param data Binary data.
-	template<typename T>
-	void SerializeBinary(T value, std::span<std::byte, sizeof(T)> data) noexcept;
+	template<typename T, std::size_t DataSize>
+	std::byte* SerializeBinary(const T& value, std::span<std::byte, DataSize> data) noexcept(DataSize != std::dynamic_extent) requires(DataSize == std::dynamic_extent || DataSize >= sizeof(T));
 	/// @brief Deserializes the @p value from the binary @p data.
 	/// @tparam T Value type.
+	/// @tparam DataSize Data byte count.
 	/// @param data Binary data.
 	/// @param value Value.
-	template<typename T>
-	void DeserializeBinary(std::span<const std::byte, sizeof(T)> data, T& value) noexcept;
+	template<typename T, std::size_t DataSize>
+	const std::byte* DeserializeBinary(std::span<const std::byte, DataSize> data, T& value) noexcept(DataSize != std::dynamic_extent) requires(DataSize == std::dynamic_extent || DataSize >= sizeof(T));
 
 	/// @brief Serializes the @p value to the text @p data.
 	/// @tparam T Value type.
 	/// @param value Value.
 	/// @param data Text data.
-	/// @return Pointer after the end of the written data.
+	/// @return Pointer after the last element of the written data.
 	template<Type::Arithmetic T>
 	char* SerializeText(T value, std::span<char> data);
 	/// @brief Deserializes the @p value from the text @p data.
 	/// @tparam T Value type.
 	/// @param data Text data.
 	/// @param value Value.
-	/// @return Pointer after the end of the read data.
+	/// @return Pointer after the last element of the read data.
 	template<Type::Arithmetic T>
 	const char* DeserializeText(std::span<const char> data, T& value);
 }
@@ -97,16 +99,38 @@ namespace PonyEngine::Serialization
 		}
 	}
 
-	template<typename T>
-	void SerializeBinary(const T value, const std::span<std::byte, sizeof(T)> data) noexcept
+	template<typename T, std::size_t DataSize>
+	std::byte* SerializeBinary(const T& value, const std::span<std::byte, DataSize> data) noexcept(DataSize != std::dynamic_extent) requires (DataSize == std::dynamic_extent || DataSize >= sizeof(T))
 	{
-		std::memcpy(data.data(), &value, sizeof(T));
+		constexpr std::size_t byteCount = sizeof(T);
+
+		if constexpr (DataSize == std::dynamic_extent)
+		{
+			if (byteCount > data.size()) [[unlikely]]
+			{
+				throw std::invalid_argument("Data is too small.");
+			}
+		}
+
+		std::memcpy(data.data(), &value, byteCount);
+		return data.data() + byteCount;
 	}
 
-	template<typename T>
-	void DeserializeBinary(const std::span<const std::byte, sizeof(T)> data, T& value) noexcept
+	template<typename T, std::size_t DataSize>
+	const std::byte* DeserializeBinary(const std::span<const std::byte, DataSize> data, T& value) noexcept(DataSize != std::dynamic_extent) requires (DataSize == std::dynamic_extent || DataSize >= sizeof(T))
 	{
-		std::memcpy(&value, data.data(), sizeof(T));
+		constexpr std::size_t byteCount = sizeof(T);
+
+		if constexpr (DataSize == std::dynamic_extent)
+		{
+			if (byteCount > data.size()) [[unlikely]]
+			{
+				throw std::invalid_argument("Data is too small.");
+			}
+		}
+
+		std::memcpy(&value, data.data(), byteCount);
+		return data.data() + byteCount;
 	}
 
 	template<Type::Arithmetic T>

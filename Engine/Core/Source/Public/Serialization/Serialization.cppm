@@ -9,4 +9,5 @@
 
 export module PonyEngine.Serialization;
 
+export import :Array;
 export import :Basic;

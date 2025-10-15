@@ -39,29 +39,7 @@ export namespace PonyEngine::Config
 		/// @return @a True if it contains a value that can be parsed; @a false otherwise.
 		template<typename T> [[nodiscard("Pure function")]]
 		bool HasValue(std::string_view key) const noexcept;
-		/// @brief Checks if the config service contains a default value associated with the @p key.
-		/// @param key Key.
-		/// @return @a True if it contains a value; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool HasValueDefault(std::string_view key) const noexcept = 0;
-		/// @brief Checks if the config service contains a default value associated with the @p key that can be parsed as the @p type.
-		/// @param type Value type.
-		/// @param key Key.
-		/// @return @a True if it contains a value that can be parsed; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool HasValueDefault(const std::type_info& type, std::string_view key) const noexcept = 0;
-		/// @brief Checks if the config service contains a default value associated with the @p key that can be parsed as the @p T.
-		/// @tparam T Value type.
-		/// @param key Key.
-		/// @return @a True if it contains a value that can be parsed; @a false otherwise.
-		template<typename T> [[nodiscard("Pure function")]]
-		bool HasValueDefault(std::string_view key) const noexcept;
 
-		/// @brief Gets a raw value associated with the @p key.
-		/// @param key Key.
-		/// @return Requested raw value if the config has it; empty string otherwise.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view GetValue(std::string_view key) const noexcept = 0;
 		/// @brief Gets a value associated with the @p key and parsed as the @p type.
 		/// @param type Value type.
 		/// @param key Key.
@@ -88,37 +66,6 @@ export namespace PonyEngine::Config
 		/// @return Requested value if the config has it and it can be parsed as @p T; @p defaultValue otherwise.
 		template<typename T> [[nodiscard("Pure function")]]
 		T GetValue(std::string_view key, const T& defaultValue) const noexcept;
-		/// @brief Gets a raw default value associated with the @p key.
-		/// @param key Key.
-		/// @return Requested raw default value if the config has it; empty string otherwise.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view GetValueDefault(std::string_view key) const noexcept = 0;
-		/// @brief Gets a default value associated with the @p key and parsed as the @p type.
-		/// @param type Value type.
-		/// @param key Key.
-		/// @return Requested default value if the config has it and it can be parsed as @p type; empty any otherwise.
-		[[nodiscard("Pure function")]]
-		virtual std::any GetValueDefault(const std::type_info& type, std::string_view key) const noexcept = 0;
-		/// @brief Gets a default value associated with the @p key and parsed as the @p type or the @p defaultValue otherwise.
-		/// @param type Value type.
-		/// @param key Key.
-		/// @param defaultValue Default value.
-		/// @return Requested default value if the config has it and it can be parsed as @p type; @p defaultValue otherwise.
-		[[nodiscard("Pure function")]]
-		std::any GetValueDefault(const std::type_info& type, std::string_view key, const std::any& defaultValue) const noexcept;
-		/// @brief Gets a default value associated with the @p key and parsed as the @p T.
-		/// @tparam T Value type.
-		/// @param key Key.
-		/// @return Requested default value if the config has it and it can be parsed as @p T; nullopt otherwise.
-		template<typename T> [[nodiscard("Pure function")]]
-		std::optional<T> GetValueDefault(std::string_view key) const noexcept;
-		/// @brief Gets a default value associated with the @p key and parsed as the @p T or the @p defaultValue otherwise.
-		/// @tparam T Value type.
-		/// @param key Key.
-		/// @param defaultValue Default value.
-		/// @return Requested default value if the config has it and it can be parsed as @p T; @p defaultValue otherwise.
-		template<typename T> [[nodiscard("Pure function")]]
-		T GetValueDefault(std::string_view key, const T& defaultValue) const noexcept;
 
 		/// @brief Sets the @p value associated with the @p key.
 		/// @param key Key.
@@ -157,12 +104,6 @@ namespace PonyEngine::Config
 		return HasValue(typeid(T), key);
 	}
 
-	template<typename T>
-	bool IConfigService::HasValueDefault(const std::string_view key) const noexcept
-	{
-		return HasValueDefault(typeid(T), key);
-	}
-
 	std::any IConfigService::GetValue(const std::type_info& type, const std::string_view key, const std::any& defaultValue) const noexcept
 	{
 		const std::any value = GetValue(type, key);
@@ -180,26 +121,6 @@ namespace PonyEngine::Config
 	T IConfigService::GetValue(const std::string_view key, const T& defaultValue) const noexcept
 	{
 		const std::any value = GetValue(typeid(T), key);
-		return value.has_value() ? std::any_cast<T>(value) : defaultValue;
-	}
-
-	std::any IConfigService::GetValueDefault(const std::type_info& type, const std::string_view key, const std::any& defaultValue) const noexcept
-	{
-		const std::any value = GetValueDefault(type, key);
-		return value.has_value() ? value : defaultValue;
-	}
-
-	template<typename T>
-	std::optional<T> IConfigService::GetValueDefault(const std::string_view key) const noexcept
-	{
-		const std::any value = GetValueDefault(typeid(T), key);
-		return value.has_value() ? std::optional<T>(std::any_cast<T>(value)) : std::nullopt;
-	}
-
-	template<typename T>
-	T IConfigService::GetValueDefault(const std::string_view key, const T& defaultValue) const noexcept
-	{
-		const std::any value = GetValueDefault(typeid(T), key);
 		return value.has_value() ? std::any_cast<T>(value) : defaultValue;
 	}
 }
