@@ -42,10 +42,16 @@ TEST_CASE("Serialize binary", "[Serialization][Basic]")
 	auto test = []<PonyEngine::Type::Arithmetic T>(const T value)
 	{
 		std::array<std::byte, sizeof(T)> data;
-		PonyEngine::Serialization::SerializeBinary(value, data);
+		std::byte* serializedPoint = PonyEngine::Serialization::SerializeBinary(value, std::span<std::byte, sizeof(T)>(data.data(), data.size()));
 		T deserialized;
-		PonyEngine::Serialization::DeserializeBinary(data, deserialized);
+		const std::byte* deserializedPoint = PonyEngine::Serialization::DeserializeBinary(std::span<const std::byte, sizeof(T)>(data.data(), data.size()), deserialized);
 		REQUIRE(deserialized == value);
+		REQUIRE(serializedPoint == deserializedPoint);
+
+		serializedPoint = PonyEngine::Serialization::SerializeBinary(value, std::span<std::byte>(data.data(), data.size()));
+		deserializedPoint = PonyEngine::Serialization::DeserializeBinary(std::span<const std::byte>(data.data(), data.size()), deserialized);
+		REQUIRE(deserialized == value);
+		REQUIRE(serializedPoint == deserializedPoint);
 	};
 
 	test(false);

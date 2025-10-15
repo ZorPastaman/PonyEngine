@@ -28,6 +28,7 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"
 	"Math/Vector.cpp"
+	"Serialization/Array.cpp"
 	"Serialization/Basic.cpp"
 	"Text/Format.cpp"
 	"Text/Convert.cpp"

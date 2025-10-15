@@ -37,6 +37,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Transform.cppm"
 	"Source/Public/Math/Math-Vector.cppm"
 	"Source/Public/Serialization/Serialization.cppm"
+	"Source/Public/Serialization/Serialization-Array.cppm"
 	"Source/Public/Serialization/Serialization-Basic.cppm"
 	"Source/Public/Text/Text.cppm"
 	"Source/Public/Text/Text-Convert.cppm"
