@@ -28,9 +28,9 @@ set(PONY_DEBUG_MODULES "")
 set(PONY_GAME_MODULES "")
 
 # Set PonyEngine options.
-pony_set_log_defines(PonyEngine.Core ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_log_defines(PonyEngine.Core ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG})
 pony_set_build_options(PonyEngine.Core ${PONY_ENGINE_OPTIMIZATION})
-pony_set_log_defines(PonyEngine.Log ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_log_defines(PonyEngine.Log ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 pony_set_build_options(PonyEngine.Log ${PONY_ENGINE_OPTIMIZATION})
 pony_set_log_defines(PonyEngine.Application.Extension ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
 pony_set_build_options(PonyEngine.Application.Extension ${PONY_ENGINE_OPTIMIZATION})

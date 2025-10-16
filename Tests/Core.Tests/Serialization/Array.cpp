@@ -30,7 +30,7 @@ TEST_CASE("Serialized array text length", "[Serialization][Array]")
 	STATIC_REQUIRE(PonyEngine::Serialization::GetSerializedArrayTextLength<double>(3) == 74);
 }
 
-TEST_CASE("Serialize array binary", "[Serialization][Basic]")
+TEST_CASE("Serialize array binary", "[Serialization][Array]")
 {
 	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const std::span<const T, Size> values)
 	{
@@ -69,7 +69,7 @@ TEST_CASE("Serialize array binary", "[Serialization][Basic]")
 	test(std::span<const double, 6>(doubleArray.data(), doubleArray.size()));
 }
 
-TEST_CASE("Serialize array text", "[Serialization][Basic]")
+TEST_CASE("Serialize array text", "[Serialization][Array]")
 {
 	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const std::span<const T, Size> values)
 	{

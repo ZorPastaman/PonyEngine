@@ -1,5 +1,8 @@
 message(STATUS "Configuring PonyEngine.Application.Extension")
 
+message(VERBOSE "Configuring environment")
+include("CMake/Module.cmake")
+
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Application.Extension STATIC)
 
@@ -34,7 +37,7 @@ set_target_properties(PonyEngine.Application.Extension PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Application.Extension PUBLIC
+target_link_libraries(PonyEngine.Application.Extension PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
 )

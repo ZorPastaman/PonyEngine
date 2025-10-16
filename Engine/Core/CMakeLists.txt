@@ -1,7 +1,6 @@
 message(STATUS "Configuring PonyEngine.Core")
 
 message(VERBOSE "Configuring environment")
-include("CMake/Log.cmake")
 include("CMake/Target.cmake")
 
 message(VERBOSE "Configuring target")
@@ -61,14 +60,14 @@ if(PONY_WINDOWS)
 	)
 endif()
 
-message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Core PUBLIC
-	$<$<BOOL:${PONY_WINCORE}>:PONY_WINCORE>
-	$<$<BOOL:${PONY_WINDOWS}>:PONY_WINDOWS>
-)
-
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES 
 	CXX_STANDARD 23
 	POSITION_INDEPENDENT_CODE TRUE
+)
+
+message(VERBOSE "Configuring defines")
+target_compile_definitions(PonyEngine.Core PUBLIC
+	$<$<BOOL:${PONY_WINCORE}>:PONY_WINCORE>
+	$<$<BOOL:${PONY_WINDOWS}>:PONY_WINDOWS>
 )

@@ -1,5 +1,8 @@
 message(STATUS "Configuring PonyEngine.Log")
 
+message(VERBOSE "Configuring environment")
+include("CMake/Log.cmake")
+
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Log STATIC)
 
@@ -25,6 +28,6 @@ set_target_properties(PonyEngine.Log PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log PUBLIC
+target_link_libraries(PonyEngine.Log PRIVATE
 	PonyEngine.Core
 )

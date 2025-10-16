@@ -5,13 +5,7 @@ if(NOT TARGET PonyEngine.Log.Extension)
 	message(FATAL_ERROR "PonyEngine.Log.Extension wasn't configured")
 endif()
 
-if(NOT PONY_ENGINE_LOG_MAIN_ORDER)
-	message(FATAL_ERROR "PONY_ENGINE_LOG_MAIN is set but PONY_ENGINE_LOG_MAIN_ORDER isn't")
-endif()
-string(SUBSTRING "${PONY_ENGINE_LOG_MAIN_ORDER}" 0 1 ORDER_FIRST_CHAR)
-if(NOT ORDER_FIRST_CHAR MATCHES "^[b-y]$")
-	message(FATAL_ERROR "PONY_ENGINE_LOG_MAIN_ORDER is incorrect. Its first letter must be inside b-y range")
-endif()
+pony_validate_module_order(PONY_ENGINE_LOG_MAIN_ORDER)
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Log.Main STATIC)
@@ -47,8 +41,10 @@ set_target_properties(PonyEngine.Log.Main PROPERTIES
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Main PUBLIC
-	PonyEngine.Log
-	PonyEngine.Log.Extension
 	PonyEngine.Core
 	PonyEngine.Application.Extension
+)
+target_link_libraries(PonyEngine.Log.Main PRIVATE
+	PonyEngine.Log
+	PonyEngine.Log.Extension
 )

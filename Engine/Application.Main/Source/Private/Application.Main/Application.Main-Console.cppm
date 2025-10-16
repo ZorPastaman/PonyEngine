@@ -51,7 +51,7 @@ namespace PonyEngine::Application
 
 	void LogToConsole(const Log::LogType logType, const std::string_view message) noexcept
 	{
-#if PONY_CONSOLE_LOG
+#if PONY_ENGINE_CONSOLE_LOG
 		try
 		{
 			ChooseConsoleStream(logType) << message;
@@ -62,7 +62,7 @@ namespace PonyEngine::Application
 		}
 #endif
 
-#if PONY_PLATFORM_CONSOLE_LOG
+#if PONY_ENGINE_PLATFORM_CONSOLE_LOG
 #if PONY_WINCORE
 		OutputDebugStringA(message.data());
 #endif
