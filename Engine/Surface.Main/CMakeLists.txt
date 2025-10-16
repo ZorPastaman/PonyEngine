@@ -5,13 +5,7 @@ if(NOT TARGET PonyEngine.Surface)
 	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
 endif()
 
-if(NOT PONY_ENGINE_SURFACE_MAIN_ORDER)
-	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN is set but PONY_ENGINE_SURFACE_MAIN_ORDER isn't")
-endif()
-string(SUBSTRING "${PONY_ENGINE_SURFACE_MAIN_ORDER}" 0 1 ORDER_FIRST_CHAR)
-if(NOT ORDER_FIRST_CHAR MATCHES "^[b-y]$")
-	message(FATAL_ERROR "PONY_ENGINE_SURFACE_MAIN_ORDER is incorrect. Its first letter must be inside b-y range")
-endif()
+pony_validate_module_order(PONY_ENGINE_SURFACE_MAIN_ORDER)
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface.Main STATIC)
@@ -31,6 +25,7 @@ target_sources(PonyEngine.Surface.Main PRIVATE
 target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Surface.Main/Surface.Main.cppm"
 	"Source/Private/Surface.Main/Surface.Main-MessageHandler.cppm"
+	"Source/Private/Surface.Main/Surface.Main-ParamProvider.cppm"
 	"Source/Private/Surface.Main/Surface.Main-SurfaceService.cppm"
 	"Source/Private/Surface.Main/Surface.Main-SurfaceServiceModule.cppm"
 	"Source/Private/Surface.Main/Surface.Main-WindowClass.cppm"
@@ -40,6 +35,11 @@ message(VERBOSE "Configuring defines")
 target_compile_definitions(PonyEngine.Surface.Main PUBLIC
 	PONY_ENGINE_SURFACE_MAIN_ORDER=${PONY_ENGINE_SURFACE_MAIN_ORDER}
 )
+if(PONY_ENGINE_SURFACE_BACKGROUND_COLOR)
+	target_compile_definitions(PonyEngine.Surface.Main PRIVATE
+		PONY_ENGINE_SURFACE_BACKGROUND_COLOR=${PONY_ENGINE_SURFACE_BACKGROUND_COLOR}
+	)
+endif()
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface.Main PROPERTIES 
@@ -49,8 +49,10 @@ set_target_properties(PonyEngine.Surface.Main PROPERTIES
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Surface.Main PUBLIC
-	PonyEngine.Surface
 	PonyEngine.Core
-	PonyEngine.Log
 	PonyEngine.Application.Extension
+)
+target_link_libraries(PonyEngine.Surface.Main PRIVATE
+	PonyEngine.Surface
+	PonyEngine.Log
 )
