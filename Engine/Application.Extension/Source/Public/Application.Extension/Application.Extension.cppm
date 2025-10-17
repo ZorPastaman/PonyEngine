@@ -13,7 +13,6 @@ export import :FlowState;
 export import :IApplicationContext;
 export import :ILoggerContext;
 export import :ILoggerModuleContext;
-export import :IMessageObserver;
 export import :IModule;
 export import :IModuleContext;
 export import :IService;

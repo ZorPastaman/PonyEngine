@@ -89,12 +89,6 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept override;
 
-		virtual void AddMessageObserver(IMessageObserver& observer, UINT messageType) override;
-		virtual void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer) noexcept override;
-
 		virtual void AddRawInputObserver(IRawInputObserver& observer, USHORT usagePage, USHORT usage) override;
 		virtual void AddRawInputObserver(IRawInputObserver& observer, std::span<const std::pair<USHORT, USHORT>> rawInputUsages) override;
 		virtual void RemoveRawInputObserver(IRawInputObserver& observer, USHORT usagePage, USHORT usage) noexcept override;
@@ -203,12 +197,6 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		static DWORD GetHidType(const RAWINPUT& input);
 
-		/// @brief Calls message observers.
-		/// @param uMsg Message type.
-		/// @param wParam WParam.
-		/// @param lParam LParam.
-		void ObserveMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
-
 		/// @brief Observes the WM_CREATE message.
 		/// @param wParam WParam.
 		/// @param lParam LParam.
@@ -316,7 +304,6 @@ export namespace PonyEngine::Surface::Windows
 
 		HWND windowHandle; ///< Window handle.
 
-		std::unordered_map<UINT, std::vector<IMessageObserver*>> messageObservers; ///< Message observers.
 		std::unordered_map<DWORD, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 
 		mutable std::string titleCache; ///< Title cache.
@@ -682,71 +669,6 @@ namespace PonyEngine::Surface::Windows
 		return windowHandle;
 	}
 
-	void SurfaceService::AddMessageObserver(IMessageObserver& observer, const UINT messageType)
-	{
-		std::vector<IMessageObserver*>& observers = messageObservers[messageType];
-		assert(std::ranges::find(observers, &observer) == observers.cend() && "The observer has already been added.");
-		observers.push_back(&observer);
-	}
-
-	void SurfaceService::AddMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes)
-	{
-		for (std::size_t i = 0uz; i < messageTypes.size(); ++i)
-		{
-			try
-			{
-				AddMessageObserver(observer, messageTypes[i]);
-			}
-			catch (...)
-			{
-				while (i-- > 0uz)
-				{
-					RemoveMessageObserver(observer, messageTypes[i]);
-				}
-
-				throw;
-			}
-		}
-	}
-
-	void SurfaceService::RemoveMessageObserver(IMessageObserver& observer, const UINT messageType) noexcept
-	{
-		if (const auto position = messageObservers.find(messageType); position != messageObservers.cend()) [[likely]]
-		{
-			if (const auto pos = std::ranges::find(position->second, &observer); pos != position->second.cend()) [[likely]]
-			{
-				position->second.erase(pos);
-				return;
-			}
-		}
-
-		PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove observer of '{}' message type but it hadn't been added.", messageType);
-	}
-
-	void SurfaceService::RemoveMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes) noexcept
-	{
-		for (const UINT messageType : messageTypes)
-		{
-			RemoveMessageObserver(observer, messageType);
-		}
-	}
-
-	void SurfaceService::RemoveMessageObserver(IMessageObserver& observer) noexcept
-	{
-		std::size_t erased = 0uz;
-
-		for (std::vector<IMessageObserver*>& observers : std::views::values(messageObservers))
-		{
-			if (const auto position = std::ranges::find(observers, &observer); position != observers.cend())
-			{
-				observers.erase(position);
-				++erased;
-			}
-		}
-
-		PONY_LOG_IF(erased == 0uz, application->Logger(), Log::LogType::Warning, "Tried to remove message observer but it hadn't been added.");
-	}
-
 	void SurfaceService::AddRawInputObserver(IRawInputObserver& observer, const USHORT usagePage, const USHORT usage)
 	{
 		const DWORD usageType = Pack(usagePage, usage);
@@ -873,8 +795,6 @@ namespace PonyEngine::Surface::Windows
 	LRESULT SurfaceService::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' message.", uMsg);
-
-		ObserveMessage(uMsg, wParam, lParam);
 
 		switch (uMsg)
 		{
@@ -1150,24 +1070,6 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		return Pack(info.hid.usUsagePage, info.hid.usUsage);
-	}
-
-	void SurfaceService::ObserveMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
-	{
-		if (const auto position = messageObservers.find(uMsg); position != messageObservers.cend())
-		{
-			for (IMessageObserver* const observer : position->second)
-			{
-				try
-				{
-					observer->Observe(uMsg, wParam, lParam);
-				}
-				catch (const std::exception& e)
-				{
-					PONY_LOG_E(application->Logger(), e, "On calling '{}' Windows message observer.", typeid(*observer).name());
-				}
-			}
-		}
 	}
 
 	LRESULT SurfaceService::ObserveCreate(const WPARAM wParam, const LPARAM lParam) noexcept

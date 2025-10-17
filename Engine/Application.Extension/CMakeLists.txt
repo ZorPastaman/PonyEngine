@@ -18,7 +18,6 @@ target_sources(PonyEngine.Application.Extension PUBLIC FILE_SET CXX_MODULES FILE
 	"Source/Public/Application.Extension/Application.Extension-IApplicationContext.cppm"
 	"Source/Public/Application.Extension/Application.Extension-ILoggerContext.cppm"
 	"Source/Public/Application.Extension/Application.Extension-ILoggerModuleContext.cppm"
-	"Source/Public/Application.Extension/Application.Extension-IMessageObserver.cppm"
 	"Source/Public/Application.Extension/Application.Extension-IModule.cppm"
 	"Source/Public/Application.Extension/Application.Extension-IModuleContext.cppm"
 	"Source/Public/Application.Extension/Application.Extension-IService.cppm"

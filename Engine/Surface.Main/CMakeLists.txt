@@ -25,7 +25,6 @@ target_sources(PonyEngine.Surface.Main PRIVATE
 target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Surface.Main/Surface.Main.cppm"
 	"Source/Private/Surface.Main/Surface.Main-MessageHandler.cppm"
-	"Source/Private/Surface.Main/Surface.Main-ParamProvider.cppm"
 	"Source/Private/Surface.Main/Surface.Main-SurfaceService.cppm"
 	"Source/Private/Surface.Main/Surface.Main-SurfaceServiceModule.cppm"
 	"Source/Private/Surface.Main/Surface.Main-WindowClass.cppm"

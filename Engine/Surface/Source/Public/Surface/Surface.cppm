@@ -10,7 +10,6 @@
 export module PonyEngine.Surface;
 
 export import :CursorStyle;
-export import :IMessageObserver;
 export import :IRawInputObserver;
 export import :ISurfaceService;
 export import :RectStyle;
