@@ -21,7 +21,6 @@ import std;
 
 import PonyEngine.Math;
 
-import :CursorStyle;
 import :IRawInputObserver;
 import :RectStyle;
 
@@ -48,17 +47,10 @@ export namespace PonyEngine::Surface
 		/// @brief Gets the rectangle style.
 		/// @return Rectangle style.
 		[[nodiscard("Pure function")]]
-		virtual const struct RectStyle& RectStyle() const noexcept = 0;
+		virtual Surface::RectStyle RectStyle() const noexcept = 0;
 		/// @brief Sets the rectangle style.
-		/// @param style Rectangle style.
-		virtual void RectStyle(const struct RectStyle& style) = 0;
-		/// @brief Gets the cursor style.
-		/// @return Cursor style.
-		[[nodiscard("Pure function")]]
-		virtual const struct CursorStyle& CursorStyle() const noexcept = 0;
-		/// @brief Sets the cursor style.
-		/// @param style Cursor style.
-		virtual void CursorStyle(const struct CursorStyle& style) = 0;
+		/// @param rectStyle Rectangle style.
+		virtual void RectStyle(const Surface::RectStyle& rectStyle) = 0;
 
 		/// @brief Gets a screen resolution.
 		/// @return Screen resolution.
@@ -69,7 +61,21 @@ export namespace PonyEngine::Surface
 		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Rect<std::int32_t> ClientRect() const = 0;
+		/// @brief Sets a client rectangle.
+		/// @param clientRect Client rectangle.
+		virtual void ClientRect(const Math::Rect<std::int32_t>& clientRect) = 0;
+		/// @brief Gets a client rectangle minimal size.
+		/// @return Client rectangle minimal size.
+		[[nodiscard("Pure funtion")]]
+		virtual Math::Vector2<std::int32_t> MinimalSize() const = 0;
+		/// @brief Sets a client rectangle minimal size.
+		/// @param minimalSize Client rectangle minimal size.
+		virtual void MinimalSize(const Math::Vector2<std::int32_t>& minimalSize) = 0;
 
+		/// @brief Checks if the surface is alive.
+		/// @return @a True if the surface is alive; @a false otherwise.
+		[[nodiscard("Pure funtion")]]
+		virtual bool IsAlive() const = 0;
 		/// @brief Checks if the surface is active.
 		/// @return @a True if the surface is active; @a false otherwise.
 		[[nodiscard("Pure funtion")]]
@@ -88,6 +94,20 @@ export namespace PonyEngine::Surface
 		/// @remark If the platform doesn't support client titles, the function does nothing.
 		virtual void Title(std::string_view title) = 0;
 
+		/// @brief Gets if a cursor is controlled as visible.
+		/// @return @a True if a cursor is controlled visible; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool CursorVisibility() const = 0;
+		/// @brief Sets if a cursor is controlled as visible.
+		/// @param visible Should cursor be visible?
+		virtual void CursorVisibility(bool visible) = 0;
+		/// @brief Gets a cursor clipping rectangle.
+		/// @return Cursor clipping rectangle.
+		[[nodiscard("Pure function")]]
+		virtual std::optional<Math::Rect<float>> CursorClippingRect() const = 0;
+		/// @brief Sets a cursor clipping rectangle.
+		/// @param clippingRect Cursor clipping rectangle.
+		virtual void CursorClippingRect(const std::optional<Math::Rect<float>>& clippingRect) = 0;
 		/// @brief Gets a cursor position.
 		/// @return Cursor position in screen coordinates.
 		/// @remark The reference point is a screen center.

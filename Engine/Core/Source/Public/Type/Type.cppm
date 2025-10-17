@@ -11,3 +11,4 @@ export module PonyEngine.Type;
 
 export import :Common;
 export import :Limits;
+export import :Variant;

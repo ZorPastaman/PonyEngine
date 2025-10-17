@@ -6,7 +6,6 @@ add_library(PonyEngine.Surface STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Surface/Surface.cppm"
-	"Source/Public/Surface/Surface-CursorStyle.cppm"
 	"Source/Public/Surface/Surface-IRawInputObserver.cppm"
 	"Source/Public/Surface/Surface-ISurfaceService.cppm"
 	"Source/Public/Surface/Surface-RectStyle.cppm"

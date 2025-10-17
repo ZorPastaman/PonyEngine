@@ -15,18 +15,24 @@ import PonyEngine.Math;
 
 export namespace PonyEngine::Surface
 {
-	/// @brief Rectangle style.
-	struct RectStyle final
+	/// @brief Fullscreen rectangle style.
+	struct FullscreenRectStyle final
 	{
-		Math::Rect<std::int32_t> clientRect = Math::Rect<std::int32_t>(Math::Vector2<std::int32_t>(320, 240)); ///< Client rectangle.
-		Math::Vector2<std::int32_t> minimalClientSize = Math::Vector2<std::int32_t>(320, 240); ///< Minimal client rectangle size.
-		bool fullscreen = true; ///< Is the client rectangle fullscreen?
-		bool movable = false; ///< Is the client rectangle movable?
-		bool resizable = false; ///< Is the client rectangle resizable?
-		bool closable = false; ///< Is the client rectangle closable?
-		bool maximizable = false; ///< Is the client rectangle maximizable?
-		bool minimizable = false;  ///< Is the client rectangle minimizable?
 		bool alwaysOnTop = false;  ///< Is the client rectangle always on top?
-		bool popup = true;  ///< Is the client rectangle popup - pure client rectangle without any other elements?
 	};
+
+	/// @brief Window rectangle style.
+	/// @remark It may be unsupported on some platforms.
+	struct WindowRectStyle final
+	{
+		bool hasFrame = true; ///< Does the client rectangle have a frame?
+		bool movable = true; ///< Is the client rectangle movable?
+		bool resizable = false; ///< Is the client rectangle resizable?
+		bool closable = true; ///< Is the client rectangle closable?
+		bool maximizable = true; ///< Is the client rectangle maximizable?
+		bool minimizable = true;  ///< Is the client rectangle minimizable?
+		bool alwaysOnTop = false;  ///< Is the client rectangle always on top?
+	};
+
+	using RectStyle = std::variant<FullscreenRectStyle, WindowRectStyle>; ///< Rectangle style.
 }
