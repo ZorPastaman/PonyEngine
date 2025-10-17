@@ -374,10 +374,7 @@ namespace PonyEngine::Surface::Windows
 		const auto [clampedWindowPosition, clampedWindowSize] = ClampInScreen(windowPosition, windowSize, resolution);
 		const auto [minWindowPosition, minWindowSize] = AdjustRect(Math::Vector2<int>::Zero(), this->minimalClientSize, style, styleEx);
 		minimalWindowSize = minWindowSize;
-		if (clampedWindowSize.X() < minimalWindowSize.X() || clampedWindowSize.Y() < minimalWindowSize.Y()) [[unlikely]]
-		{
-			throw std::runtime_error(Text::FormatSafe("Failed to create window with appropriate size. Window size: '{}'; Minimal window size: '{}'.", clampedWindowSize, minWindowSize));
-		}
+		const auto correctWindowSize = fullscreen ? clampedWindowSize : Math::Max(clampedWindowSize, minimalWindowSize);
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window... Window class: '0x{:X}'; Title: '{}'; Position: '{}'; Size: '{}'; Style: '{}'.", 
 			windowClass->ClassHandle(), title, windowPosition, windowSize, style);
@@ -388,8 +385,8 @@ namespace PonyEngine::Surface::Windows
 			style,
 			clampedWindowPosition.X(),
 			clampedWindowPosition.Y(),
-			clampedWindowSize.X(),
-			clampedWindowSize.Y(),
+			correctWindowSize.X(),
+			correctWindowSize.Y(),
 			nullptr,
 			nullptr,
 			windowClass->ModuleHandle(),

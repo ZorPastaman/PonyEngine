@@ -93,7 +93,16 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		context.ServiceModuleContext().RemoveService(surfaceServiceHandle);
+		try
+		{
+			context.ServiceModuleContext().RemoveService(surfaceServiceHandle);
+		}
+		catch (...)
+		{
+			MessageHandlerApp = nullptr;
+			throw;
+		}
+
 		MessageHandlerApp = nullptr;
 	}
 }
