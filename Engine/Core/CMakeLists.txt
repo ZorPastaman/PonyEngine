@@ -44,6 +44,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Type/Type.cppm"
 	"Source/Public/Type/Type-Common.cppm"
 	"Source/Public/Type/Type-Limits.cppm"
+	"Source/Public/Type/Type-Variant.cppm"
 )
 
 if(PONY_WINCORE)

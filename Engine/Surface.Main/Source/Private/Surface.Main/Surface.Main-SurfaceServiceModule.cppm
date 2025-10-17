@@ -62,8 +62,11 @@ namespace PonyEngine::Surface::Windows
 				// TODO: Load some data via config service.
 				const std::string_view title = application.ProjectTitle();
 				constexpr auto backgroundColor = Math::ColorRGB<std::uint8_t>::Black();
-				constexpr auto rectStyle = RectStyle();
-				constexpr auto cursorStyle = CursorStyle();
+				constexpr auto rectStyle = FullscreenRectStyle{};
+				constexpr auto cursorClippingRect = Math::Rect<float>(Math::Vector2<float>::One());
+				constexpr bool cursorVisible = true;
+				constexpr auto clientRect = Math::Rect(Math::Vector2<std::int32_t>(320, 240));
+				constexpr auto minimalClientSize = Math::Vector2<std::int32_t>(320, 240);
 				const HICON mainIcon = application.Native().AppIcon();
 				const HCURSOR mainCursor = application.Native().AppCursor() ? application.Native().AppCursor() : GetDefaultCursor();
 
@@ -71,7 +74,7 @@ namespace PonyEngine::Surface::Windows
 				const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor, backgroundColor);
 				PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
 
-				const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title, rectStyle, cursorStyle);
+				const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title, rectStyle, cursorClippingRect, cursorVisible, clientRect, minimalClientSize);
 				Application::ServiceData data;
 				data.SetService(surfaceService);
 				data.AddInterface(&surfaceService->PublicSurfaceService());

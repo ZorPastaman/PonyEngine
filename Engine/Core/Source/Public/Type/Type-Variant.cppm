@@ -7,18 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface:CursorStyle;
+export module PonyEngine.Type:Variant;
 
 import std;
 
-import PonyEngine.Math;
-
-export namespace PonyEngine::Surface
+export namespace PonyEngine::Type
 {
-	/// @brief Cursor style.
-	struct CursorStyle final
+	/// @brief Overload helper.
+	/// @tparam Ts Types.
+	template<typename... Ts>
+	struct Overload : Ts...
 	{
-		std::optional<Math::Rect<float>> clippingRect = Math::Rect<float>(Math::Vector2<float>::One()); ///< Cursor clipping rectangle. It's in normalized client rectangle coordinates.
-		bool visible = true; ///< Is the cursor visible?
+		using Ts::operator()...;
 	};
+	/// @brief Overload helper.
+	/// @tparam Ts Types.
+	/// @return Return value.
+	template<typename... Ts>
+	Overload(Ts...) -> Overload<Ts...>;
 }

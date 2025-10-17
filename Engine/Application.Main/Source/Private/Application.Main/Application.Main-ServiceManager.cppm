@@ -311,7 +311,7 @@ namespace PonyEngine::Application
 				orderedTickableServices.push_back(std::pair(data.tickableService, data.tickOrder));
 			}
 		}
-		std::ranges::sort(orderedTickableServices, [](const std::pair<ITickableService*, std::int32_t>& lhs, const std::pair<ITickableService*, std::int32_t>& rhs)
+		std::ranges::sort(orderedTickableServices, [](const std::pair<ITickableService*, std::int32_t>& lhs, const std::pair<ITickableService*, std::int32_t>& rhs) noexcept
 		{
 			return lhs.second < rhs.second;
 		});
