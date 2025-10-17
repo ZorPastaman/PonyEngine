@@ -109,12 +109,6 @@ export namespace PonyEngine::Application::Windows
 		[[nodiscard("Pure function")]]
 		virtual HCURSOR AppCursor() const noexcept override;
 
-		virtual void AddMessageObserver(IMessageObserver& observer, UINT messageType) override;
-		virtual void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept override;
-		virtual void RemoveMessageObserver(IMessageObserver& observer) noexcept override;
-
 		/// @brief Runs the application.
 		/// @return Exit code.
 		[[nodiscard("Must be returned from main")]]
@@ -312,31 +306,6 @@ namespace PonyEngine::Application::Windows
 	HCURSOR App::AppCursor() const noexcept
 	{
 		return appDataManager->AppCursor();
-	}
-
-	void App::AddMessageObserver(IMessageObserver& observer, const UINT messageType)
-	{
-		messageLoopManager->AddMessageObserver(observer, messageType);
-	}
-
-	void App::AddMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes)
-	{
-		messageLoopManager->AddMessageObserver(observer, messageTypes);
-	}
-
-	void App::RemoveMessageObserver(IMessageObserver& observer, const UINT messageType) noexcept
-	{
-		messageLoopManager->RemoveMessageObserver(observer, messageType);
-	}
-
-	void App::RemoveMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes) noexcept
-	{
-		messageLoopManager->RemoveMessageObserver(observer, messageTypes);
-	}
-
-	void App::RemoveMessageObserver(IMessageObserver& observer) noexcept
-	{
-		messageLoopManager->RemoveMessageObserver(observer);
 	}
 
 	int App::Run()

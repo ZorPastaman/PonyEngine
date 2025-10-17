@@ -22,7 +22,6 @@ import std;
 import PonyEngine.Math;
 
 import :CursorStyle;
-import :IMessageObserver;
 import :IRawInputObserver;
 import :RectStyle;
 
@@ -148,26 +147,6 @@ export namespace PonyEngine::Surface::Windows
 		/// @return Native handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept = 0;
-
-		/// @brief Adds the message observer.
-		/// @param observer Observer to add.
-		/// @param messageType Message type to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void AddMessageObserver(IMessageObserver& observer, UINT messageType) = 0;
-		/// @brief Adds the message observer.
-		/// @param observer Observer to add.
-		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
-		/// @brief Removes the message observer from the specified message type.
-		/// @param observer Observer to remove.
-		/// @param messageType Message type to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept = 0;
-		/// @brief Removes the message observer from the specified message types.
-		/// @param observer Observer to remove.
-		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept = 0;
-		/// @brief Removes the message observer from all the message types.
-		/// @param observer Observer to remove.
-		virtual void RemoveMessageObserver(IMessageObserver& observer) noexcept = 0;
 
 		/// @brief Adds the raw input observer.
 		/// @param observer Observer to add.
