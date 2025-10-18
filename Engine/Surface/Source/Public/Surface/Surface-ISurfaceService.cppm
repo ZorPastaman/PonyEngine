@@ -22,7 +22,6 @@ import std;
 import PonyEngine.Math;
 
 import :IRawInputObserver;
-import :Rect;
 import :RectStyle;
 
 export namespace PonyEngine::Surface
@@ -60,11 +59,11 @@ export namespace PonyEngine::Surface
 		/// @brief Gets a client rectangle.
 		/// @return Client rectangle.
 		[[nodiscard("Pure function")]]
-		virtual Rect<std::int32_t> ClientRect() const = 0;
+		virtual Math::CornerRect<std::int32_t> ClientRect() const = 0;
 		/// @brief Sets a client rectangle.
 		/// @param clientRect Client rectangle.
 		/// @remark If the platform doesn't support client rectangles, the function does nothing.
-		virtual void ClientRect(const Rect<std::int32_t>& clientRect) = 0;
+		virtual void ClientRect(const Math::CornerRect<std::int32_t>& clientRect) = 0;
 		/// @brief Gets a client rectangle minimal size.
 		/// @return Client rectangle minimal size.
 		[[nodiscard("Pure funtion")]]
@@ -107,20 +106,15 @@ export namespace PonyEngine::Surface
 		/// @brief Gets a cursor clipping rectangle.
 		/// @return Cursor clipping rectangle.
 		[[nodiscard("Pure function")]]
-		virtual std::optional<Rect<float>> CursorClippingRect() const = 0;
+		virtual std::optional<Math::CornerRect<float>> CursorClippingRect() const = 0;
 		/// @brief Sets a cursor clipping rectangle.
 		/// @param clippingRect Cursor clipping rectangle.
 		/// @remark If the platform doesn't support cursors, the function does nothing.
-		virtual void CursorClippingRect(const std::optional<Rect<float>>& clippingRect) = 0;
+		virtual void CursorClippingRect(const std::optional<Math::CornerRect<float>>& clippingRect) = 0;
 		/// @brief Gets a cursor position.
 		/// @return Cursor position in screen coordinates.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> CursorPosition() const = 0;
-		/// @brief Sets a cursor position.
-		/// @param position Cursor position in screen coordinates.
-		/// @remark If the platform doesn't support cursors, the function does nothing.
-		/// @note If the window isn't active, the function does nothing.
-		virtual void CursorPosition(const Math::Vector2<std::int32_t>& position) = 0;
 		/// @brief Gets if a cursor is visible.
 		/// @return @a True if a cursor is visible; @a false otherwise.
 		[[nodiscard("Pure function")]]
