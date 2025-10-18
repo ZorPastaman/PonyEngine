@@ -41,15 +41,8 @@ export namespace PonyEngine::Surface::Windows
 		/// @param application Application context.
 		/// @param windowClass Window class.
 		/// @param title Window title.
-		/// @param rectStyle Rectangle style.
-		/// @param cursorClippingRect Cursor clipping rectangle.
-		/// @param cursorVisible Is cursor visible?
-		/// @param clientRect Client rectangle. Ignored in fullscreen.
-		/// @param minimalClientSize Minimal client size.
 		[[nodiscard("Pure constructor")]]
-		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title, 
-			const Surface::RectStyle& rectStyle, const std::optional<Math::Rect<float>>& cursorClippingRect, bool cursorVisible,
-			const Math::Rect<std::int32_t>& clientRect, const Math::Vector2<std::int32_t>& minimalClientSize);
+		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title);
 		SurfaceService(const SurfaceService&) = delete;
 		SurfaceService(SurfaceService&&) = delete;
 
@@ -65,8 +58,8 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure funtion")]]
 		virtual Math::Vector2<std::int32_t> ScreenResolution() const override;
 		[[nodiscard("Pure function")]]
-		virtual Math::Rect<std::int32_t> ClientRect() const override;
-		virtual void ClientRect(const Math::Rect<std::int32_t>& clientRect) override;
+		virtual Rect<std::int32_t> ClientRect() const override;
+		virtual void ClientRect(const Rect<std::int32_t>& clientRect) override;
 		[[nodiscard("Pure funtion")]]
 		virtual Math::Vector2<std::int32_t> MinimalSize() const override;
 		virtual void MinimalSize(const Math::Vector2<std::int32_t>& minimalSize) override;
@@ -86,8 +79,8 @@ export namespace PonyEngine::Surface::Windows
 		virtual bool CursorVisibility() const override;
 		virtual void CursorVisibility(bool visible) override;
 		[[nodiscard("Pure function")]]
-		virtual std::optional<Math::Rect<float>> CursorClippingRect() const override;
-		virtual void CursorClippingRect(const std::optional<Math::Rect<float>>& clippingRect) override;
+		virtual std::optional<Rect<float>> CursorClippingRect() const override;
+		virtual void CursorClippingRect(const std::optional<Rect<float>>& clippingRect) override;
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> CursorPosition() const override;
 		virtual void CursorPosition(const Math::Vector2<std::int32_t>& position) override;
@@ -123,50 +116,23 @@ export namespace PonyEngine::Surface::Windows
 		SurfaceService& operator =(SurfaceService&&) = delete;
 
 	private:
-		/// @brief Calculates an engine point.
-		/// @param windowsPoint Windows point.
-		/// @param resolution Resolution.
-		/// @return Engine point.
-		[[nodiscard("Pure function")]]
-		static Math::Vector2<std::int32_t> CalculateEnginePoint(const Math::Vector2<int>& windowsPoint, const Math::Vector2<int>& resolution) noexcept;
-		/// @brief Calculates a Windows point.
-		/// @param enginePoint Engine point.
-		/// @param resolution Resolution.
-		/// @return Windows point.
-		[[nodiscard("Pure function")]]
-		static Math::Vector2<int> CalculateWindowsPoint(const Math::Vector2<std::int32_t>& enginePoint, const Math::Vector2<int>& resolution) noexcept;
-		/// @brief Calculates an engine rectangle.
-		/// @param position Window client position.
-		/// @param size Window client size.
-		/// @param resolution Resolution.
-		/// @return Engine rectangle.
-		[[nodiscard("Pure function")]]
-		static Math::Rect<std::int32_t> CalculateEngineRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const Math::Vector2<int>& resolution) noexcept;
-		/// @brief Calculates a Windows rectangle.
-		/// @param rect Rectangle.
-		/// @param resolution Resolution.
-		/// @return Windows position and size.
-		[[nodiscard("Pure function")]]
-		static std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateWindowsRect(const Math::Rect<std::int32_t>& rect, const Math::Vector2<int>& resolution) noexcept;
+		/// @brief Style wrapper.
+		struct Style final
+		{
+			DWORD style; ///< Style.
+			DWORD styleEx; ///< Extended style.
+		};
+
 		/// @brief Adjust the rectangle by the style.
-		/// @param position Position.
-		/// @param size Size.
+		/// @param rect Rectangle.
 		/// @param style Style.
-		/// @param styleEx Extended style.
-		/// @return Adjusted position and size.
+		/// @return Adjusted rectangle.
 		[[nodiscard("Pure function")]]
-		static std::pair<Math::Vector2<int>, Math::Vector2<int>> AdjustRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, DWORD style, DWORD styleEx);
-		/// @brief Clamps the rect inside the screen.
-		/// @param position Position.
-		/// @param size Size.
-		/// @param resolution Resolution.
-		/// @return Clamped position and size.
+		static Rect<int> AdjustRect(const Rect<int>& rect, Style style);
+		/// @brief Calculates the client rectangle.
+		/// @return Client rectangle.
 		[[nodiscard("Pure function")]]
-		static std::pair<Math::Vector2<int>, Math::Vector2<int>> ClampInScreen(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const Math::Vector2<int>& resolution) noexcept;
-		/// @brief Calculates the client rect.
-		/// @return Client position and size.
-		[[nodiscard("Pure function")]]
-		std::pair<Math::Vector2<int>, Math::Vector2<int>> CalculateClientRect() const;
+		Rect<int> CalculateClientRect() const;
 		/// @brief Gets a screen resolution.
 		/// @return Screen resolution.
 		[[nodiscard("Pure function")]]
@@ -175,25 +141,19 @@ export namespace PonyEngine::Surface::Windows
 		/// @brief Gets a window style.
 		/// @return Window style and extended style.
 		[[nodiscard("Pure function")]]
-		std::pair<DWORD, DWORD> GetStyle() const;
+		Style GetStyle() const;
 		/// @brief Sets a window style.
 		/// @param style Style.
-		/// @param styleEx Extended style.
-		void SetStyle(DWORD style, DWORD styleEx);
+		void SetStyle(Style style);
 		/// @brief Converts a rectangle style to a Windows style.
 		/// @param style Rectangle style.
 		/// @return Windows style.
 		[[nodiscard("Pure function")]]
-		static constexpr DWORD ConvertToWindowsStyle(const Surface::RectStyle& style) noexcept;
-		/// @brief Converts a rectangle style to a Windows style ex.
-		/// @param style Rectangle style.
-		/// @return Windows style ex.
-		[[nodiscard("Pure function")]]
-		static constexpr DWORD ConvertToWindowsStyleEx(const Surface::RectStyle& style) noexcept;
+		static constexpr Style ConvertToWindowsStyle(const Surface::RectStyle& style) noexcept;
 
 		/// @brief Clips the cursor to the specified rectangle.
 		/// @param clippingRect Clipping rectangle. If std::nullopt, the cursor will be free to move.
-		void ClipCursor(const std::optional<Math::Rect<float>>& clippingRect);
+		void ClipCursor(const std::optional<Rect<float>>& clippingRect);
 
 		/// @brief Registers a raw input type.
 		/// @param usagePage Usage page.
@@ -315,9 +275,8 @@ export namespace PonyEngine::Surface::Windows
 
 		Surface::RectStyle rectStyle; ///< Client rectangle style.
 		Math::Vector2<int> minimalClientSize; ///< Minimal client size.
-		Math::Vector2<int> minimalWindowSize; ///< Minimal window size.
 
-		std::optional<Math::Rect<float>> cursorClippingRect; ///< Cursor clipping rectangle.
+		std::optional<Rect<float>> cursorClippingRect; ///< Cursor clipping rectangle.
 		bool cursorVisible; ///< Is cursor visible?
 
 		bool styleUnlocked; ///< Is the style changing unlocked?
@@ -342,14 +301,12 @@ export namespace PonyEngine::Surface::Windows
 #if PONY_WINDOWS
 namespace PonyEngine::Surface::Windows
 {
-	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title, 
-		const Surface::RectStyle& rectStyle, const std::optional<Math::Rect<float>>& cursorClippingRect, bool cursorVisible, 
-		const Math::Rect<std::int32_t>& clientRect, const Math::Vector2<std::int32_t>& minimalClientSize) :
+	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
 		application{&application},
-		rectStyle(rectStyle),
-		minimalClientSize(static_cast<Math::Vector2<int>>(minimalClientSize)),
-		cursorClippingRect(cursorClippingRect),
-		cursorVisible{cursorVisible},
+		rectStyle(FullscreenRectStyle{.alwaysOnTop = false}),
+		minimalClientSize(Math::Vector2<int>::One()),
+		cursorClippingRect(Rect<float>{.position = Math::Vector2<float>::Zero(), .size = Math::Vector2<float>::One()}),
+		cursorVisible{true},
 		styleUnlocked{false},
 		windowActive{false},
 		windowInFocus{false},
@@ -358,35 +315,24 @@ namespace PonyEngine::Surface::Windows
 		painted{false},
 		windowClass(windowClass)
 	{
-		const bool fullscreen = std::holds_alternative<FullscreenRectStyle>(this->rectStyle);
-
 		assert(this->windowClass && "The window class is nullptr.");
-		assert((fullscreen || (clientRect.Extent(0) > 0 && clientRect.Extent(1) > 0)) && "The client rect is invalid.");
-		assert(this->minimalClientSize.X() > 0 && this->minimalClientSize.Y() > 0 && "The minimal client size is invalid.");
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Debug, "Calculating window rect.");
 		const Math::Vector2<int> resolution = GetResolution();
-		const DWORD style = ConvertToWindowsStyle(this->rectStyle);
-		const DWORD styleEx = ConvertToWindowsStyleEx(this->rectStyle);
-		const Math::Rect<std::int32_t> actualRect = fullscreen ? Math::Rect<std::int32_t>(static_cast<Math::Vector2<std::int32_t>>(resolution / 2)) : clientRect;
-		const auto [clientPosition, clientSize] = CalculateWindowsRect(actualRect, resolution);
-		const auto [windowPosition, windowSize] = AdjustRect(clientPosition, clientSize, style, styleEx);
-		const auto [clampedWindowPosition, clampedWindowSize] = ClampInScreen(windowPosition, windowSize, resolution);
-		const auto [minWindowPosition, minWindowSize] = AdjustRect(Math::Vector2<int>::Zero(), this->minimalClientSize, style, styleEx);
-		minimalWindowSize = minWindowSize;
-		const auto correctWindowSize = fullscreen ? clampedWindowSize : Math::Max(clampedWindowSize, minimalWindowSize);
+		const Style style = ConvertToWindowsStyle(rectStyle);
+		const auto [windowPosition, windowSize] = AdjustRect(Rect<int>{.position = Math::Vector2<int>::Zero(), .size = resolution}, style);
 
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window... Window class: '0x{:X}'; Title: '{}'; Position: '{}'; Size: '{}'; Style: '{}'.", 
-			windowClass->ClassHandle(), title, windowPosition, windowSize, style);
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window... Window class: '0x{:X}'; Title: '{}'; Position: '{}'; Size: '{}'; Style: '{}'; StyleEx: '{}'.", 
+			windowClass->ClassHandle(), title, windowPosition, windowSize, style.style, style.styleEx);
 		windowHandle = CreateWindowExA(
-			styleEx,
+			style.styleEx,
 			reinterpret_cast<LPCSTR>(this->windowClass->ClassHandle()),
 			title.data(),
-			style,
-			clampedWindowPosition.X(),
-			clampedWindowPosition.Y(),
-			correctWindowSize.X(),
-			correctWindowSize.Y(),
+			style.style,
+			windowPosition.X(),
+			windowPosition.Y(),
+			windowSize.X(),
+			windowSize.Y(),
 			nullptr,
 			nullptr,
 			windowClass->ModuleHandle(),
@@ -463,40 +409,25 @@ namespace PonyEngine::Surface::Windows
 			throw std::logic_error("Window is dead.");
 		}
 
-		const auto [position, size] = std::visit<std::pair<Math::Vector2<int>, Math::Vector2<int>>>(Type::Overload
-		{
-			[](const FullscreenRectStyle&) noexcept
-			{
-				return std::pair(Math::Vector2<int>::Zero(), GetResolution());
-			},
-			[&](const WindowRectStyle&)
-			{
-				return CalculateClientRect();
-			}
-		}, rectStyle);
+		const Style originalStyle = GetStyle();
+		const Style style = ConvertToWindowsStyle(rectStyle);
+		const auto rect = AdjustRect(CalculateClientRect(), style);
 
-		const DWORD style = ConvertToWindowsStyle(rectStyle);
-		const DWORD styleEx = ConvertToWindowsStyleEx(rectStyle);
-		const auto [windowPosition, windowSize] = AdjustRect(position, size, style, styleEx);
-		const auto [minimalWindowPos, minimalWindowSiz] = AdjustRect(Math::Vector2<int>::Zero(), minimalClientSize, style, styleEx);
-
-		const auto [originalStyle, originalStyleEx] = GetStyle();
 		try
 		{
-			SetStyle(style, styleEx);
-			if (!SetWindowPos(windowHandle, nullptr, windowPosition.X(), windowPosition.Y(), windowSize.X(), windowSize.Y(), SWP_NOZORDER)) [[unlikely]]
+			SetStyle(style);
+			if (!SetWindowPos(windowHandle, nullptr, rect.position.X(), rect.position.Y(), rect.size.X(), rect.size.Y(), SWP_NOZORDER)) [[unlikely]]
 			{
 				throw std::runtime_error(Text::FormatSafe("Failed to set window rect. Error code: '0x{:X}'.", GetLastError()));
 			}
 		}
 		catch (...)
 		{
-			SetStyle(originalStyle, originalStyleEx);
+			SetStyle(originalStyle);
 			throw;
 		}
 
 		this->rectStyle = rectStyle;
-		minimalWindowSize = minimalWindowSiz;
 	}
 
 	Math::Vector2<std::int32_t> SurfaceService::ScreenResolution() const
@@ -504,20 +435,17 @@ namespace PonyEngine::Surface::Windows
 		return static_cast<Math::Vector2<std::int32_t>>(GetResolution());
 	}
 
-	Math::Rect<std::int32_t> SurfaceService::ClientRect() const
+	Rect<std::int32_t> SurfaceService::ClientRect() const
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead.");
 		}
 
-		const auto [position, size] = CalculateClientRect();
-		const Math::Vector2<int> resolution = GetResolution();
-
-		return CalculateEngineRect(position, size, resolution);
+		return static_cast<Rect<std::int32_t>>(CalculateClientRect());
 	}
 
-	void SurfaceService::ClientRect(const Math::Rect<std::int32_t>& clientRect)
+	void SurfaceService::ClientRect(const Rect<std::int32_t>& clientRect)
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
@@ -532,32 +460,23 @@ namespace PonyEngine::Surface::Windows
 			},
 			[&](const WindowRectStyle& s)
 			{
-				if (clientRect.Extent(0) <= 0 || clientRect.Extent(1) <= 0) [[unlikely]]
-				{
-					throw std::invalid_argument("Client rect size on both axes must be greater than zero.");
-				}
-
-				const Math::Vector2<int> resolution = GetResolution();
-				const auto [position, size] = CalculateWindowsRect(clientRect, resolution);
-				if (size.X() < minimalClientSize.X() || size.Y() < minimalClientSize.Y()) [[unlikely]]
+				if (clientRect.size.X() < minimalClientSize.X() || clientRect.size.Y() < minimalClientSize.Y()) [[unlikely]]
 				{
 					throw std::invalid_argument("Size is less than minimal size.");
 				}
 
-				const auto [clientPosition, clientSize] = CalculateClientRect();
-				if (!s.movable && clientPosition != position) [[unlikely]]
+				const Rect<int> currentRect = CalculateClientRect();
+				if (!s.movable && currentRect.position != clientRect.position) [[unlikely]]
 				{
 					throw std::invalid_argument("Can't move unmovable window.");
 				}
-				if (!s.resizable && clientSize != size) [[unlikely]]
+				if (!s.resizable && currentRect.size != clientRect.size) [[unlikely]]
 				{
 					throw std::invalid_argument("Can't resize non-resizable window.");
 				}
 
-				const auto [style, styleEx] = GetStyle();
-				const auto [adjustedPosition, adjustedSize] = AdjustRect(position, size, style, styleEx);
-
-				if (!SetWindowPos(windowHandle, nullptr, adjustedPosition.X(), adjustedPosition.Y(), adjustedSize.X(), adjustedSize.Y(), SWP_NOZORDER)) [[unlikely]]
+				const Rect<int> adjustedRect = AdjustRect(static_cast<Rect<int>>(clientRect), GetStyle());
+				if (!SetWindowPos(windowHandle, nullptr, adjustedRect.position.X(), adjustedRect.position.Y(), adjustedRect.size.X(), adjustedRect.size.Y(), SWP_NOZORDER)) [[unlikely]]
 				{
 					throw std::runtime_error(Text::FormatSafe("Failed to set window rect. Error code: '0x{:X}'.", GetLastError()));
 				}
@@ -588,11 +507,7 @@ namespace PonyEngine::Surface::Windows
 			throw std::invalid_argument("Minimal size is bigger than current client rect.");
 		}
 
-		const auto [style, styleEx] = GetStyle();
-		const auto [minWindowPosition, minWindowSize] = AdjustRect(Math::Vector2<int>::Zero(), minSize, style, styleEx);
-
 		minimalClientSize = minSize;
-		minimalWindowSize = minWindowSize;
 	}
 
 	bool SurfaceService::IsAlive() const
@@ -669,12 +584,12 @@ namespace PonyEngine::Surface::Windows
 		cursorVisible = visible;
 	}
 
-	std::optional<Math::Rect<float>> SurfaceService::CursorClippingRect() const
+	std::optional<Rect<float>> SurfaceService::CursorClippingRect() const
 	{
 		return cursorClippingRect;
 	}
 
-	void SurfaceService::CursorClippingRect(const std::optional<Math::Rect<float>>& clippingRect)
+	void SurfaceService::CursorClippingRect(const std::optional<Rect<float>>& clippingRect)
 	{
 		if (windowInFocus && !windowRepositioning)
 		{
@@ -691,9 +606,8 @@ namespace PonyEngine::Surface::Windows
 		{
 			throw std::runtime_error(Text::FormatSafe("Failed to get cursor position. Error code: '0x{:X}'.", GetLastError()));
 		}
-		const Math::Vector2<int> resolution = GetResolution();
 
-		return CalculateEnginePoint(Math::Vector2<int>(static_cast<int>(position.x), static_cast<int>(position.y)), resolution);
+		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(position.x), static_cast<std::int32_t>(position.y));
 	}
 
 	void SurfaceService::CursorPosition(const Math::Vector2<std::int32_t>& position)
@@ -703,9 +617,7 @@ namespace PonyEngine::Surface::Windows
 			throw std::logic_error("Can't change cursor position when window isn't in focus.");
 		}
 
-		const Math::Vector2<int> resolution = GetResolution();
-		const Math::Vector2<int> pos = CalculateWindowsPoint(position, resolution);
-		if (!SetCursorPos(pos.X(), pos.Y())) [[unlikely]]
+		if (!SetCursorPos(static_cast<int>(position.X()), static_cast<int>(position.Y()))) [[unlikely]]
 		{
 			throw std::runtime_error(Text::FormatSafe("Failed to set cursor position. Error code: '0x{:X}'.", GetLastError()));
 		}
@@ -730,15 +642,13 @@ namespace PonyEngine::Surface::Windows
 			throw std::logic_error("Window is dead.");
 		}
 
-		const Math::Vector2<int> resolution = GetResolution();
-		const Math::Vector2<int> windowsClient = CalculateWindowsPoint(clientPoint, resolution);
-		auto screenPoint = POINT{.x = static_cast<LONG>(windowsClient.X()), .y = static_cast<LONG>(windowsClient.Y())};
+		auto screenPoint = POINT{.x = static_cast<LONG>(clientPoint.X()), .y = static_cast<LONG>(clientPoint.Y())};
 		if (!::ClientToScreen(windowHandle, &screenPoint)) [[unlikely]]
 		{
 			throw std::runtime_error(Text::FormatSafe("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		return CalculateEnginePoint(Math::Vector2<int>(static_cast<int>(screenPoint.x), static_cast<int>(screenPoint.y)), resolution);
+		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(screenPoint.x), static_cast<std::int32_t>(screenPoint.y));
 	}
 
 	Math::Vector2<std::int32_t> SurfaceService::ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const
@@ -748,15 +658,13 @@ namespace PonyEngine::Surface::Windows
 			throw std::logic_error("Window is dead.");
 		}
 
-		const Math::Vector2<int> resolution = GetResolution();
-		const Math::Vector2<int> windowsScreen = CalculateWindowsPoint(screenPoint, resolution);
-		auto clientPoint = POINT{.x = static_cast<LONG>(windowsScreen.X()), .y = static_cast<LONG>(windowsScreen.Y())};
+		auto clientPoint = POINT{.x = static_cast<LONG>(screenPoint.X()), .y = static_cast<LONG>(screenPoint.Y())};
 		if (!::ScreenToClient(windowHandle, &clientPoint)) [[unlikely]]
 		{
 			throw std::runtime_error(Text::FormatSafe("Failed to get client point. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		return CalculateEnginePoint(Math::Vector2<int>(static_cast<int>(clientPoint.x), static_cast<int>(clientPoint.y)), resolution);
+		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(clientPoint.x), static_cast<std::int32_t>(clientPoint.y));
 	}
 
 	HWND SurfaceService::Handle() noexcept
@@ -936,72 +844,27 @@ namespace PonyEngine::Surface::Windows
 		return *this;
 	}
 
-	Math::Vector2<std::int32_t> SurfaceService::CalculateEnginePoint(const Math::Vector2<int>& windowsPoint, const Math::Vector2<int>& resolution) noexcept
-	{
-		const auto screenCenter = static_cast<Math::Vector2<std::int32_t>>(resolution / 2);
-		const auto point = static_cast<Math::Vector2<std::int32_t>>(windowsPoint);
-
-		return Math::Vector2<std::int32_t>(point.X() - screenCenter.X(), screenCenter.Y() - point.Y());
-	}
-
-	Math::Vector2<int> SurfaceService::CalculateWindowsPoint(const Math::Vector2<std::int32_t>& enginePoint, const Math::Vector2<int>& resolution) noexcept
-	{
-		const Math::Vector2<int> screenCenter = resolution / 2;
-		const auto point = static_cast<Math::Vector2<int>>(enginePoint);
-
-		return Math::Vector2<int>(point.X() + screenCenter.X(), screenCenter.Y() - point.Y());
-	}
-
-	Math::Rect<std::int32_t> SurfaceService::CalculateEngineRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, const Math::Vector2<int>& resolution) noexcept
-	{
-		const auto extents = static_cast<Math::Vector2<std::int32_t>>(size) / 2;
-		const Math::Vector2<std::int32_t> pos = CalculateEnginePoint(position, resolution);
-		const auto center = Math::Vector2<std::int32_t>(pos.X() + extents.X(), pos.Y() - extents.Y());
-
-		return Math::Rect<std::int32_t>(center, extents);
-	}
-
-	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::CalculateWindowsRect(const Math::Rect<std::int32_t>& rect, const Math::Vector2<int>& resolution) noexcept
-	{
-		const auto extents = static_cast<Math::Vector2<int>>(rect.Extents());
-		const Math::Vector2<int> size = extents * 2;
-		const Math::Vector2<int> center = CalculateWindowsPoint(rect.Center(), resolution);
-		const Math::Vector2<int> position = center - extents;
-
-		return std::pair(position, size);
-	}
-
-	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::AdjustRect(const Math::Vector2<int>& position, const Math::Vector2<int>& size, 
-		const DWORD style, const DWORD styleEx)
+	Rect<int> SurfaceService::AdjustRect(const Rect<int>& rect, const Style style)
 	{
 		auto windowRect = RECT
 		{
-			.left = static_cast<LONG>(position.X()),
-			.top = static_cast<LONG>(position.Y()),
-			.right = static_cast<LONG>(position.X() + size.X()),
-			.bottom = static_cast<LONG>(position.Y() + size.Y())
+			.left = static_cast<LONG>(rect.position.X()),
+			.top = static_cast<LONG>(rect.position.Y()),
+			.right = static_cast<LONG>(rect.position.X() + rect.size.X()),
+			.bottom = static_cast<LONG>(rect.position.Y() + rect.size.Y())
 		};
-		if (!AdjustWindowRectEx(&windowRect, style, false, styleEx)) [[unlikely]]
+		if (!AdjustWindowRectEx(&windowRect, style.style, false, style.styleEx)) [[unlikely]]
 		{
 			throw std::runtime_error(Text::FormatSafe("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		const auto adjustedPosition = Math::Vector2<int>(static_cast<int>(windowRect.left), static_cast<int>(windowRect.top));
-		const auto adjustedSize = Math::Vector2<int>(static_cast<int>(windowRect.right - windowRect.left), static_cast<int>(windowRect.bottom - windowRect.top));
+		const auto position = Math::Vector2<int>(static_cast<int>(windowRect.left), static_cast<int>(windowRect.top));
+		const auto size = Math::Vector2<int>(static_cast<int>(windowRect.right - windowRect.left), static_cast<int>(windowRect.bottom - windowRect.top));
 
-		return std::pair(adjustedPosition, adjustedSize);
+		return Rect<int>{.position = position, .size = size};
 	}
 
-	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::ClampInScreen(const Math::Vector2<int>& position, const Math::Vector2<int>& size, 
-		const Math::Vector2<int>& resolution) noexcept
-	{
-		const Math::Vector2<int> clampedSize = Math::Clamp(size, Math::Vector2<int>::Zero(), resolution);
-		const Math::Vector2<int> clampedPosition = Math::Clamp(position, Math::Vector2<int>::Zero(), resolution - clampedSize);
-
-		return std::pair(clampedPosition, clampedSize);
-	}
-
-	std::pair<Math::Vector2<int>, Math::Vector2<int>> SurfaceService::CalculateClientRect() const
+	Rect<int> SurfaceService::CalculateClientRect() const
 	{
 		RECT rect;
 		if (!GetClientRect(windowHandle, &rect)) [[unlikely]]
@@ -1016,7 +879,7 @@ namespace PonyEngine::Surface::Windows
 		const auto position = Math::Vector2<int>(static_cast<int>(screenPosition.x), static_cast<int>(screenPosition.y));
 		const auto size = Math::Vector2<int>(static_cast<int>(rect.right - rect.left), static_cast<int>(rect.bottom - rect.top));
 
-		return std::pair(position, size);
+		return Rect<int>{.position = position, .size = size};
 	}
 
 	Math::Vector2<int> SurfaceService::GetResolution()
@@ -1032,12 +895,13 @@ namespace PonyEngine::Surface::Windows
 		return resolution;
 	}
 
-	std::pair<DWORD, DWORD> SurfaceService::GetStyle() const
+	SurfaceService::Style SurfaceService::GetStyle() const
 	{
 		SetLastError(DWORD{0});
 
-		const auto style = static_cast<DWORD>(GetWindowLongPtrA(windowHandle, GWL_STYLE));
-		if (!style) [[unlikely]]
+		Style style;
+		style.style = static_cast<DWORD>(GetWindowLongPtrA(windowHandle, GWL_STYLE));
+		if (!style.style) [[unlikely]]
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
@@ -1045,8 +909,8 @@ namespace PonyEngine::Surface::Windows
 			}
 		}
 
-		const auto styleEx = static_cast<DWORD>(GetWindowLongPtrA(windowHandle, GWL_EXSTYLE));
-		if (!styleEx) [[unlikely]]
+		style.styleEx = static_cast<DWORD>(GetWindowLongPtrA(windowHandle, GWL_EXSTYLE));
+		if (!style.styleEx) [[unlikely]]
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
@@ -1054,15 +918,15 @@ namespace PonyEngine::Surface::Windows
 			}
 		}
 
-		return std::pair(style, styleEx);
+		return style;
 	}
 
-	void SurfaceService::SetStyle(const DWORD style, const DWORD styleEx)
+	void SurfaceService::SetStyle(const Style style)
 	{
 		SetLastError(DWORD{0});
 
 		styleUnlocked = true;
-		if (!SetWindowLongPtrA(windowHandle, GWL_STYLE, static_cast<LONG_PTR>(style))) [[unlikely]]
+		if (!SetWindowLongPtrA(windowHandle, GWL_STYLE, static_cast<LONG_PTR>(style.style))) [[unlikely]]
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
@@ -1071,7 +935,7 @@ namespace PonyEngine::Surface::Windows
 			}
 		}
 
-		if (!SetWindowLongPtrA(windowHandle, GWL_EXSTYLE, static_cast<LONG_PTR>(styleEx))) [[unlikely]]
+		if (!SetWindowLongPtrA(windowHandle, GWL_EXSTYLE, static_cast<LONG_PTR>(style.styleEx))) [[unlikely]]
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
@@ -1082,58 +946,56 @@ namespace PonyEngine::Surface::Windows
 		styleUnlocked = false;
 	}
 
-	constexpr DWORD SurfaceService::ConvertToWindowsStyle(const Surface::RectStyle& style) noexcept
+	constexpr SurfaceService::Style SurfaceService::ConvertToWindowsStyle(const Surface::RectStyle& style) noexcept
 	{
-		return std::visit<DWORD>(Type::Overload
+		return Style
 		{
-			[](const FullscreenRectStyle&) noexcept
+			.style = std::visit<DWORD>(Type::Overload
 			{
-				return WS_POPUP;
-			},
-			[](const WindowRectStyle& s) noexcept
-			{
-				DWORD windowsStyle = 0;
-				windowsStyle |= WS_CAPTION & (0 - (s.hasFrame | s.movable));
-				windowsStyle |= (WS_CAPTION | WS_THICKFRAME) & (0 - s.resizable);
-				windowsStyle |= (WS_CAPTION | WS_SYSMENU) & (0 - s.closable);
-				windowsStyle |= (WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX) & (0 - s.maximizable);
-				windowsStyle |= (WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX) & (0 - s.minimizable);
+				[](const FullscreenRectStyle&) noexcept
+				{
+					return WS_POPUP;
+				},
+				[](const WindowRectStyle& s) noexcept
+				{
+					DWORD windowsStyle = 0;
+					windowsStyle |= WS_CAPTION & (0 - (s.hasFrame | s.movable));
+					windowsStyle |= (WS_CAPTION | WS_THICKFRAME) & (0 - s.resizable);
+					windowsStyle |= (WS_CAPTION | WS_SYSMENU) & (0 - s.closable);
+					windowsStyle |= (WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX) & (0 - s.maximizable);
+					windowsStyle |= (WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX) & (0 - s.minimizable);
 
-				return windowsStyle == 0 ? WS_POPUP : windowsStyle;
-			}
-		}, style);
+					return windowsStyle == 0 ? WS_POPUP : windowsStyle;
+				}
+			}, style),
+			.styleEx = std::visit<DWORD>(Type::Overload
+			{
+				[](const FullscreenRectStyle& s) noexcept
+				{
+					return WS_EX_TOPMOST & (0 - s.alwaysOnTop);
+				},
+				[](const WindowRectStyle& s) noexcept
+				{
+					return WS_EX_TOPMOST & (0 - s.alwaysOnTop);
+				}
+			}, style)
+		};
 	}
 
-	constexpr DWORD SurfaceService::ConvertToWindowsStyleEx(const Surface::RectStyle& style) noexcept
-	{
-		return std::visit<DWORD>(Type::Overload
-		{
-			[](const FullscreenRectStyle& s) noexcept
-			{
-				return WS_EX_TOPMOST & (0 - s.alwaysOnTop);
-			},
-			[](const WindowRectStyle& s) noexcept
-			{
-				return WS_EX_TOPMOST & (0 - s.alwaysOnTop);
-			}
-		}, style);
-	}
-
-	void SurfaceService::ClipCursor(const std::optional<Math::Rect<float>>& clippingRect)
+	void SurfaceService::ClipCursor(const std::optional<Rect<float>>& clippingRect)
 	{
 		if (clippingRect)
 		{
-			const Math::Rect<std::int32_t> clientRect = ClientRect();
-			const Math::Vector2<int> resolution = GetResolution();
-			const Math::Vector2<int> clippingPosition = CalculateWindowsPoint(RelativeToAbsolute(clippingRect->Center(), clientRect.Extents()) + clientRect.Center(), resolution);
-			const Math::Vector2<std::int32_t> clippingExtents = RelativeToAbsolute(clippingRect->Extents(), clientRect.Extents());
-
+			const Rect<int> clientRect = CalculateClientRect();
+			const Math::Vector2<int> clippingPosition = clientRect.position + 
+				static_cast<Math::Vector2<int>>(Math::Multiply(clippingRect->position, static_cast<Math::Vector2<float>>(clientRect.size)));
+			const Math::Vector2<int> clippingSize = static_cast<Math::Vector2<int>>(Math::Multiply(clippingRect->size, static_cast<Math::Vector2<float>>(clientRect.size)));
 			const auto rect = RECT
 			{
-				.left = static_cast<LONG>(clippingPosition.X()) - static_cast<LONG>(clippingExtents.X()),
-				.top = static_cast<LONG>(clippingPosition.Y()) - static_cast<LONG>(clippingExtents.Y()),
-				.right = static_cast<LONG>(clippingPosition.X()) + static_cast<LONG>(clippingExtents.X()),
-				.bottom = static_cast<LONG>(clippingPosition.Y()) + static_cast<LONG>(clippingExtents.Y())
+				.left = static_cast<LONG>(clippingPosition.X()),
+				.top = static_cast<LONG>(clippingPosition.Y()),
+				.right = static_cast<LONG>(clippingPosition.X() + clippingSize.X()),
+				.bottom = static_cast<LONG>(clippingPosition.Y() + clippingSize.Y())
 			};
 			if (!::ClipCursor(&rect)) [[unlikely]]
 			{
@@ -1276,10 +1138,11 @@ namespace PonyEngine::Surface::Windows
 		{
 			const auto minMax = reinterpret_cast<MINMAXINFO*>(lParam);
 			const Math::Vector2<int> resolution = GetResolution();
+			const Rect<int> rect = AdjustRect(Rect<int>{.position = Math::Vector2<int>::Zero(), .size = minimalClientSize}, GetStyle());
 
 			minMax->ptMaxSize = POINT{.x = resolution.X(), .y = resolution.Y()};
 			minMax->ptMaxPosition = POINT{.x = 0l, .y = 0l};
-			minMax->ptMinTrackSize = POINT{.x = minimalWindowSize.X(), .y = minimalWindowSize.Y()};
+			minMax->ptMinTrackSize = POINT{.x = rect.size.X(), .y = rect.size.Y()};
 			minMax->ptMaxTrackSize = POINT{.x = resolution.X(), .y = resolution.Y()};
 		}
 		catch (const std::exception& e)
@@ -1331,21 +1194,29 @@ namespace PonyEngine::Surface::Windows
 
 	LRESULT SurfaceService::ObserveWindowPosChanging(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		const auto windowPos = reinterpret_cast<WINDOWPOS*>(lParam);
-		std::visit(Type::Overload
+		try
 		{
-			[&](const FullscreenRectStyle&) noexcept
+			const auto windowPos = reinterpret_cast<WINDOWPOS*>(lParam);
+			std::visit(Type::Overload
 			{
-				windowPos->flags |= SWP_NOMOVE | SWP_NOSIZE;
-			},
-			[&](const WindowRectStyle& s) noexcept
-			{
-				windowPos->cx = std::max(windowPos->cx, minimalWindowSize.X());
-				windowPos->cy = std::max(windowPos->cy, minimalWindowSize.Y());
-				windowPos->flags |= SWP_NOMOVE & (0 - !s.movable);
-				windowPos->flags |= SWP_NOSIZE & (0 - !s.resizable);
-			}
-		}, rectStyle);
+				[&](const FullscreenRectStyle&) noexcept
+				{
+					windowPos->flags |= SWP_NOMOVE | SWP_NOSIZE;
+				},
+				[&](const WindowRectStyle& s)
+				{
+					const Rect<int> rect = AdjustRect(Rect<int>{.position = Math::Vector2<int>::Zero(), .size = minimalClientSize}, GetStyle());
+					windowPos->cx = std::max(windowPos->cx, rect.size.X());
+					windowPos->cy = std::max(windowPos->cy, rect.size.Y());
+					windowPos->flags |= SWP_NOMOVE & (0 - !s.movable);
+					windowPos->flags |= SWP_NOSIZE & (0 - !s.resizable);
+				}
+			}, rectStyle);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(application->Logger(), e, "On window position changing.");
+		}
 
 		return 0;
 	}

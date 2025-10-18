@@ -48,10 +48,9 @@ if(PONY_WINDOWS)
 
 	message(VERBOSE "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
-	configure_file("Data/Windows/Resource.rc.in" Resource.rc)
 	target_sources(PonyEngine.Application.Main PRIVATE 
 		Application.manifest
-		Resource.rc
+		"Data/Windows/Resource.rc"
 	)
 endif()
 
@@ -67,9 +66,17 @@ target_compile_definitions(PonyEngine.Application.Main PRIVATE
 	$<$<BOOL:${PONY_ENGINE_DEFAULT_LOGGER}>:PONY_ENGINE_DEFAULT_LOGGER>
 	$<$<BOOL:${PONY_ENGINE_CONSOLE_LOG}>:PONY_ENGINE_CONSOLE_LOG>
 	$<$<BOOL:${PONY_ENGINE_PLATFORM_CONSOLE_LOG}>:PONY_ENGINE_PLATFORM_CONSOLE_LOG>
-	$<$<BOOL:${PONY_APP_ICON}>:PONY_APP_ICON>
-	$<$<BOOL:${PONY_APP_CURSOR}>:PONY_APP_CURSOR>
 )
+if(PONY_APP_ICON)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE
+		PONY_APP_ICON=${PONY_APP_ICON}
+	)
+endif()
+if(PONY_APP_CURSOR)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE
+		PONY_APP_CURSOR=${PONY_APP_CURSOR}
+	)
+endif()
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Application.Main PROPERTIES 
