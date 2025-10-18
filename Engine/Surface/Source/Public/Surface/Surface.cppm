@@ -11,6 +11,5 @@ export module PonyEngine.Surface;
 
 export import :IRawInputObserver;
 export import :ISurfaceService;
-export import :Rect;
 export import :RectStyle;
 export import :Utility;

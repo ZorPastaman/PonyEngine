@@ -52,8 +52,6 @@ namespace PonyEngine::Surface::Windows
 {
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		ISurfaceService* surface;
-
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(SurfaceService).name());
 		try
 		{
@@ -77,7 +75,6 @@ namespace PonyEngine::Surface::Windows
 				data.SetService(surfaceService);
 				data.AddInterface(&surfaceService->PublicSurfaceService());
 				data.AddInterface(static_cast<Surface::ISurfaceService*>(&surfaceService->PublicSurfaceService()));
-				surface = &surfaceService->PublicSurfaceService();
 
 				return data;
 			});
@@ -88,9 +85,6 @@ namespace PonyEngine::Surface::Windows
 			throw;
 		}
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(SurfaceService).name());
-
-		//surface->RectStyle(WindowRectStyle{.hasFrame = true, .movable = true, .resizable = true, .closable = true, .maximizable = true, .minimizable = true, .alwaysOnTop = true});
-		//surface->ClientRect(Rect<std::int32_t>{.position = Math::Vector2<std::int32_t>(100, 100), .size = Math::Vector2<std::int32_t>(640, 480)});
 	}
 
 	void SurfaceServiceModule::ShutDown(Application::IModuleContext& context)
