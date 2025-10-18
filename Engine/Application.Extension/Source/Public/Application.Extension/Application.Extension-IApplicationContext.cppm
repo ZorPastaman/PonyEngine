@@ -22,7 +22,6 @@ import std;
 import PonyEngine.Log;
 
 import :FlowState;
-import :IMessageObserver;
 
 export namespace PonyEngine::Application
 {

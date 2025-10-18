@@ -18,6 +18,7 @@ import PonyEngine.Log;
 import PonyEngine.Surface;
 
 import :MessageHandler;
+import :ParamProvider;
 import :SurfaceService;
 
 #if PONY_WINDOWS
@@ -51,6 +52,8 @@ namespace PonyEngine::Surface::Windows
 {
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		ISurfaceService* surface;
+
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(SurfaceService).name());
 		try
 		{
@@ -61,12 +64,7 @@ namespace PonyEngine::Surface::Windows
 				PONY_LOG(context.Logger(), Log::LogType::Debug, "Getting surface parameters.");
 				// TODO: Load some data via config service.
 				const std::string_view title = application.ProjectTitle();
-				constexpr auto backgroundColor = Math::ColorRGB<std::uint8_t>::Black();
-				constexpr auto rectStyle = FullscreenRectStyle{};
-				constexpr auto cursorClippingRect = Math::Rect<float>(Math::Vector2<float>::One());
-				constexpr bool cursorVisible = true;
-				constexpr auto clientRect = Math::Rect(Math::Vector2<std::int32_t>(320, 240));
-				constexpr auto minimalClientSize = Math::Vector2<std::int32_t>(320, 240);
+				constexpr Math::ColorRGB<std::uint8_t> backgroundColor = GetBackgroundColor();
 				const HICON mainIcon = application.Native().AppIcon();
 				const HCURSOR mainCursor = application.Native().AppCursor() ? application.Native().AppCursor() : GetDefaultCursor();
 
@@ -74,11 +72,12 @@ namespace PonyEngine::Surface::Windows
 				const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor, backgroundColor);
 				PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
 
-				const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title, rectStyle, cursorClippingRect, cursorVisible, clientRect, minimalClientSize);
+				const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title);
 				Application::ServiceData data;
 				data.SetService(surfaceService);
 				data.AddInterface(&surfaceService->PublicSurfaceService());
 				data.AddInterface(static_cast<Surface::ISurfaceService*>(&surfaceService->PublicSurfaceService()));
+				surface = &surfaceService->PublicSurfaceService();
 
 				return data;
 			});
@@ -89,6 +88,9 @@ namespace PonyEngine::Surface::Windows
 			throw;
 		}
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(SurfaceService).name());
+
+		//surface->RectStyle(WindowRectStyle{.hasFrame = true, .movable = true, .resizable = true, .closable = true, .maximizable = true, .minimizable = true, .alwaysOnTop = true});
+		//surface->ClientRect(Rect<std::int32_t>{.position = Math::Vector2<std::int32_t>(100, 100), .size = Math::Vector2<std::int32_t>(640, 480)});
 	}
 
 	void SurfaceServiceModule::ShutDown(Application::IModuleContext& context)

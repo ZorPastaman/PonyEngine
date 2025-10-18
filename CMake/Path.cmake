@@ -1,5 +1,7 @@
 # Validates the path.
 # path - Path to validate.
+# can_be_absolute - Can the path be absolute?
+# can_be_relative - Can the path be relative?
 function(pony_validate_path path can_be_absolute can_be_relative)
 	if(NOT ${path})
 		message(FATAL_ERROR "${path} isn't set")

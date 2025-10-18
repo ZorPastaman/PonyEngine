@@ -22,6 +22,7 @@ import std;
 import PonyEngine.Math;
 
 import :IRawInputObserver;
+import :Rect;
 import :RectStyle;
 
 export namespace PonyEngine::Surface
@@ -58,18 +59,19 @@ export namespace PonyEngine::Surface
 		virtual Math::Vector2<std::int32_t> ScreenResolution() const = 0;
 		/// @brief Gets a client rectangle.
 		/// @return Client rectangle.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
-		virtual Math::Rect<std::int32_t> ClientRect() const = 0;
+		virtual Rect<std::int32_t> ClientRect() const = 0;
 		/// @brief Sets a client rectangle.
 		/// @param clientRect Client rectangle.
-		virtual void ClientRect(const Math::Rect<std::int32_t>& clientRect) = 0;
+		/// @remark If the platform doesn't support client rectangles, the function does nothing.
+		virtual void ClientRect(const Rect<std::int32_t>& clientRect) = 0;
 		/// @brief Gets a client rectangle minimal size.
 		/// @return Client rectangle minimal size.
 		[[nodiscard("Pure funtion")]]
 		virtual Math::Vector2<std::int32_t> MinimalSize() const = 0;
 		/// @brief Sets a client rectangle minimal size.
 		/// @param minimalSize Client rectangle minimal size.
+		/// @remark If the platform doesn't support client rectangles, the function does nothing.
 		virtual void MinimalSize(const Math::Vector2<std::int32_t>& minimalSize) = 0;
 
 		/// @brief Checks if the surface is alive.
@@ -100,22 +102,23 @@ export namespace PonyEngine::Surface
 		virtual bool CursorVisibility() const = 0;
 		/// @brief Sets if a cursor is controlled as visible.
 		/// @param visible Should cursor be visible?
+		/// @remark If the platform doesn't support cursors, the function does nothing.
 		virtual void CursorVisibility(bool visible) = 0;
 		/// @brief Gets a cursor clipping rectangle.
 		/// @return Cursor clipping rectangle.
 		[[nodiscard("Pure function")]]
-		virtual std::optional<Math::Rect<float>> CursorClippingRect() const = 0;
+		virtual std::optional<Rect<float>> CursorClippingRect() const = 0;
 		/// @brief Sets a cursor clipping rectangle.
 		/// @param clippingRect Cursor clipping rectangle.
-		virtual void CursorClippingRect(const std::optional<Math::Rect<float>>& clippingRect) = 0;
+		/// @remark If the platform doesn't support cursors, the function does nothing.
+		virtual void CursorClippingRect(const std::optional<Rect<float>>& clippingRect) = 0;
 		/// @brief Gets a cursor position.
 		/// @return Cursor position in screen coordinates.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> CursorPosition() const = 0;
 		/// @brief Sets a cursor position.
 		/// @param position Cursor position in screen coordinates.
-		/// @remark The reference point is a screen center.
+		/// @remark If the platform doesn't support cursors, the function does nothing.
 		/// @note If the window isn't active, the function does nothing.
 		virtual void CursorPosition(const Math::Vector2<std::int32_t>& position) = 0;
 		/// @brief Gets if a cursor is visible.
@@ -126,13 +129,11 @@ export namespace PonyEngine::Surface
 		/// @brief Converts the client point to a screen point.
 		/// @param clientPoint Client point.
 		/// @return Screen point.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ClientToScreen(const Math::Vector2<std::int32_t>& clientPoint) const = 0;
 		/// @brief Converts the screen point to a client point.
 		/// @param screenPoint Screen point.
 		/// @return Client point.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const = 0;
 

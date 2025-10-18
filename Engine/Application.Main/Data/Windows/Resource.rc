@@ -7,11 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include "PonyEngine/Macro/Text.h"
 #include "PonyEngine/Platform/Windows/Resource.h"
 
-#if PONY_APP_ICON
-IDI_APP_ICON ICON "${PONY_APP_ICON}"
+#ifdef PONY_APP_ICON
+IDI_APP_ICON ICON PONY_STRINGIFY_VALUE(PONY_APP_ICON)
 #endif
-#if PONY_APP_CURSOR
-IDC_APP_CURSOR CURSOR "${PONY_APP_CURSOR}"
+#ifdef PONY_APP_CURSOR
+IDC_APP_CURSOR CURSOR PONY_STRINGIFY_VALUE(PONY_APP_CURSOR)
 #endif
