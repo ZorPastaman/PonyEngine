@@ -58,7 +58,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 				PONY_APP_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception on application tick.");
 				if (!exceptionInfo)
 				{
-					exceptionInfo = "Unknown exception on application tick.";
+					exceptionInfo = PonyEngine::Text::FormatSafe("Unknown exception on application tick.");
 				}
 				exitCode = PonyEngine::Application::ExitCodes::TickException;
 			}
@@ -81,7 +81,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 			PONY_APP_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception on application.");
 			if (!exceptionInfo)
 			{
-				exceptionInfo = "Unknown exception on application.";
+				exceptionInfo = PonyEngine::Text::FormatSafe("Unknown exception on application.");
 			}
 			exitCode = PonyEngine::Application::ExitCodes::ApplicationException;
 		}
@@ -104,7 +104,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 		PONY_APP_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception on main.");
 		if (!exceptionInfo)
 		{
-			exceptionInfo = "Unknown exception on main.";
+			exceptionInfo = PonyEngine::Text::FormatSafe("Unknown exception on main.");
 		}
 		exitCode = PonyEngine::Application::ExitCodes::MainException;
 	}
