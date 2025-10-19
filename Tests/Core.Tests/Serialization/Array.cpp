@@ -74,6 +74,7 @@ TEST_CASE("Serialize array text", "[Serialization][Array]")
 	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const std::span<const T, Size> values)
 	{
 		std::array<char, PonyEngine::Serialization::GetSerializedArrayTextLength<T>(Size)> data;
+		data.fill(' ');
 		char* serializedPoint = PonyEngine::Serialization::SerializeArrayText<false, T>(values, data);
 		std::array<T, Size> deserialized;
 		const char* deserializedPoint = PonyEngine::Serialization::DeserializeArrayText<false, T>(data, deserialized);

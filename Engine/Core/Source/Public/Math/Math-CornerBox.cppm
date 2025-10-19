@@ -14,6 +14,7 @@ import std;
 import PonyEngine.Type;
 
 import :Box;
+import :Common;
 import :Vector;
 
 export namespace PonyEngine::Math
@@ -109,6 +110,9 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr CornersType Corners() const noexcept requires (Dim <= std::numeric_limits<std::size_t>::digits);
 
+		/// @brief Changes the box so that its size becomes positive and its space stays the same.
+		constexpr void ResolveNegativeSize() noexcept;
+
 		/// @brief Checks if all the data is finite.
 		/// @return @a True if they are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -178,6 +182,32 @@ export namespace PonyEngine::Math
 	std::ostream& operator <<(std::ostream& stream, const CornerBox<T, Size>& box);
 }
 
+/// @brief Box formatter.
+/// @tparam T Component type.
+/// @tparam Size Dimension.
+export template<PonyEngine::Type::Arithmetic T, std::size_t Size>
+struct std::formatter<PonyEngine::Math::CornerBox<T, Size>, char>
+{
+	static constexpr auto parse(std::format_parse_context& context)
+	{
+		if (context.begin() == context.end()) [[unlikely]]
+		{
+			throw std::format_error("Unexpected context end.");
+		}
+		if (*context.begin() != '}') [[unlikely]]
+		{
+			throw std::format_error("Unexpected format specifier.");
+		}
+
+		return context.begin();
+	}
+
+	static auto format(const PonyEngine::Math::CornerBox<T, Size>& box, std::format_context& context)
+	{
+		return std::ranges::copy(box.ToString(), context.out()).out;
+	}
+};
+
 namespace PonyEngine::Math
 {
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
@@ -228,13 +258,13 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr T CornerBox<T, Dim>::Surface() const noexcept
 	{
-		return Box<T, Dim>(size / 2).Surface();
+		return Box<T, Dim>(Abs(size / T{2})).Surface();
 	}
 
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr T CornerBox<T, Dim>::Volume() const noexcept
 	{
-		return Box<T, Dim>(size / T{2}).Volume();
+		return Box<T, Dim>(Abs(size / T{2})).Volume();
 	}
 
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
@@ -293,6 +323,16 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	constexpr void CornerBox<T, Dim>::ResolveNegativeSize() noexcept
+	{
+		for (std::size_t i = 0; i < Dim; ++i)
+		{
+			position[i] = std::min(position[i], position[i] + size[i]);
+			size[i] = Abs(size[i]);
+		}
+	}
+
+	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr bool CornerBox<T, Dim>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return position.IsFinite() && size.IsFinite();
@@ -315,7 +355,10 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr Vector<T, Dim> CornerBox<T, Dim>::ClosestPoint(const Vector<T, Dim>& point) const noexcept
 	{
-		return Clamp(point, Min(), Max());
+		const Vector<T, Dim> min = Min();
+		const Vector<T, Dim> max = Max();
+
+		return Clamp(point, Math::Min(min, max), Math::Max(min, max));
 	}
 
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
@@ -328,20 +371,20 @@ namespace PonyEngine::Math
 	template<Type::Arithmetic U>
 	constexpr CornerBox<T, Dim>::operator CornerBox<U, Dim>() const noexcept
 	{
-		return CornerBox<U, Dim>(static_cast<Vector2<U>>(position), static_cast<Vector2<U>>(size));
+		return CornerBox<U, Dim>(static_cast<Vector<U, Dim>>(position), static_cast<Vector<U, Dim>>(size));
 	}
 
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::operator Box<T, Dim>() const noexcept
 	{
-		const Vector2<T> extents = size / T{2};
+		const Vector<T, Dim> extents = size / T{2};
 		return Box<T, Dim>(position + extents, extents);
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	constexpr bool AreAlmostEqual(const CornerBox<T, Size>& lhs, const CornerBox<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
-		return AreAlmostEqual(lhs.Position(), rhs.Position(), tolerance) && AreAlmostEqual(lhs.Extents(), rhs.Extents(), tolerance);
+		return AreAlmostEqual(lhs.Position(), rhs.Position(), tolerance) && AreAlmostEqual(lhs.Size(), rhs.Size(), tolerance);
 	}
 
 	template<Type::Arithmetic T, std::size_t Size>

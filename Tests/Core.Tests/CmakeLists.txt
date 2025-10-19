@@ -15,6 +15,7 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/BoxIntersections.cpp"
 	"Math/Color.cpp"
 	"Math/Common.cpp"
+	"Math/CornerBox.cpp"
 	"Math/Flat.cpp"
 	"Math/FlatIntersections.cpp"
 	"Math/Matrix.cpp"

@@ -121,6 +121,7 @@ TEST_CASE("Serialize text", "[Serialization][Basic]")
 	auto test = []<PonyEngine::Type::Arithmetic T>(const T value)
 	{
 		std::array<char, PonyEngine::Serialization::SerializedTextLength<T>> data;
+		data.fill(' ');
 		char* const serializedPoint = PonyEngine::Serialization::SerializeText(value, data);
 		T deserialized;
 		const char* const deserializedPoint = PonyEngine::Serialization::DeserializeText<T>(data, deserialized);

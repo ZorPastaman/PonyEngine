@@ -91,6 +91,9 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const override;
 
+		virtual void AddObserver(ISurfaceObserver& observer) override;
+		virtual void RemoveObserver(ISurfaceObserver& observer) noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept override;
 
@@ -246,6 +249,18 @@ export namespace PonyEngine::Surface::Windows
 		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveWindowPosChanged(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_MOVE message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
+		[[nodiscard("The value must be returned to the system")]]
+		LRESULT ObserveMove(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_SIZE message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
+		[[nodiscard("The value must be returned to the system")]]
+		LRESULT ObserveSize(WPARAM wParam, LPARAM lParam) noexcept;
 		/// @brief Observes the WM_WM_DISPLAYCHANGE message.
 		/// @param wParam WParam.
 		/// @param lParam LParam.
@@ -306,6 +321,7 @@ export namespace PonyEngine::Surface::Windows
 
 		HWND windowHandle; ///< Window handle.
 
+		std::vector<ISurfaceObserver*> observers; ///< Surface observer.
 		std::unordered_map<DWORD, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 
 		mutable std::string titleCache; ///< Title cache.
@@ -678,6 +694,24 @@ namespace PonyEngine::Surface::Windows
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(clientPoint.x), static_cast<std::int32_t>(clientPoint.y));
 	}
 
+	void SurfaceService::AddObserver(ISurfaceObserver& observer)
+	{
+		assert(std::ranges::find(observers, &observer) == observers.cend() && "The observer has already been added.");
+		observers.push_back(&observer);
+	}
+
+	void SurfaceService::RemoveObserver(ISurfaceObserver& observer) noexcept
+	{
+		if (const auto position = std::ranges::find(observers, &observer); position != observers.cend()) [[likely]]
+		{
+			observers.erase(position);
+		}
+		else
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove surface observer that hadn't been added.");
+		}
+	}
+
 	HWND SurfaceService::Handle() noexcept
 	{
 		return windowHandle;
@@ -762,7 +796,7 @@ namespace PonyEngine::Surface::Windows
 			}
 		}
 
-		PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove observer of raw input type but it hadn't been added. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+		PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove raw input observer that hadn't been added. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 	}
 
 	void SurfaceService::RemoveRawInputObserver(IRawInputObserver& observer, const std::span<const std::pair<USHORT, USHORT>> rawInputUsages) noexcept
@@ -803,7 +837,7 @@ namespace PonyEngine::Surface::Windows
 			}
 		}
 
-		PONY_LOG_IF(erased == 0uz, application->Logger(), Log::LogType::Warning, "Tried to remove raw input observer but it hadn't been added.");
+		PONY_LOG_IF(erased == 0uz, application->Logger(), Log::LogType::Warning, "Tried to remove raw input observer that hadn't been added.");
 	}
 
 	LRESULT SurfaceService::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
@@ -832,6 +866,10 @@ namespace PonyEngine::Surface::Windows
 			return ObserveWindowPosChanging(wParam, lParam);
 		case WM_WINDOWPOSCHANGED:
 			return ObserveWindowPosChanged(wParam, lParam);
+		case WM_MOVE:
+			return ObserveMove(wParam, lParam);
+		case WM_SIZE:
+			return ObserveSize(wParam, lParam);
 		case WM_DISPLAYCHANGE:
 			return ObserveDisplayChange(wParam, lParam);
 		case WM_STYLECHANGING:
@@ -1154,6 +1192,22 @@ namespace PonyEngine::Surface::Windows
 		windowActive = wParam != WA_INACTIVE;
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Window activate changed to '{}'.", windowActive);
 
+		for (ISurfaceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnActiveChanged(windowActive);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On observing active change.");
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing active change.");
+			}
+		}
+
 		return 0;
 	}
 
@@ -1163,6 +1217,22 @@ namespace PonyEngine::Surface::Windows
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Window focus changed to '{}'.", windowInFocus);
 
 		UpdateCursorClipping();
+
+		for (ISurfaceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnFocusChanged(windowInFocus);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On observing focus change.");
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing focus change.");
+			}
+		}
 
 		return 0;
 	}
@@ -1255,6 +1325,56 @@ namespace PonyEngine::Surface::Windows
 		return DefWindowProcA(windowHandle, WM_WINDOWPOSCHANGED, wParam, lParam);
 	}
 
+	LRESULT SurfaceService::ObserveMove(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		const std::int32_t x = static_cast<std::int32_t>(LOWORD(lParam));
+		const std::int32_t y = static_cast<std::int32_t>(HIWORD(lParam));
+		const auto position = Math::Vector2<std::int32_t>(x, y);
+
+		for (ISurfaceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnMoved(position);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On observing move.");
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing move.");
+			}
+		}
+
+		return 0;
+	}
+
+	LRESULT SurfaceService::ObserveSize(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		const std::int32_t newWidth = static_cast<std::int32_t>(LOWORD(lParam));
+		const std::int32_t newHeight = static_cast<std::int32_t>(HIWORD(lParam));
+		const auto size = Math::Vector2<std::int32_t>(newWidth, newHeight);
+
+		for (ISurfaceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnResized(size);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On observing resize.");
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing resize.");
+			}
+		}
+
+		return 0;
+	}
+
 	LRESULT SurfaceService::ObserveDisplayChange(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		std::visit(Type::Overload
@@ -1263,8 +1383,8 @@ namespace PonyEngine::Surface::Windows
 			{
 				try
 				{
-					const UINT newWidth = LOWORD(lParam);
-					const UINT newHeight = HIWORD(lParam);
+					const int newWidth = LOWORD(lParam);
+					const int newHeight = HIWORD(lParam);
 					const Math::CornerRect<int> rect = AdjustRect(Math::CornerRect<int>(Math::Vector2<int>(newWidth, newHeight)), GetStyle());
 					SetWindowRect(rect);
 
