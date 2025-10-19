@@ -37,9 +37,8 @@ export namespace PonyEngine::Surface::Windows
 		/// @param mainIcon Main application icon.
 		/// @param smallIcon Small application icon.
 		/// @param cursor Cursor.
-		/// @param backgroundColor Background color.
 		[[nodiscard("Pure constructor")]]
-		WindowClass(Application::IApplicationContext& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor, const Math::ColorRGB<std::uint8_t>& backgroundColor);
+		WindowClass(Application::IApplicationContext& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor);
 		WindowClass(const WindowClass&) = delete;
 		WindowClass(WindowClass&&) = delete;
 
@@ -69,18 +68,10 @@ export namespace PonyEngine::Surface::Windows
 #if PONY_WINDOWS
 namespace PonyEngine::Surface::Windows
 {
-	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor, const Math::ColorRGB<std::uint8_t>& backgroundColor) :
+	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
 		application{&application},
 		moduleHandle(File::Windows::GetModule())
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating background brush... Color: '{}'.", backgroundColor);
-		const HBRUSH backgroundBrush = CreateSolidBrush(RGB(backgroundColor.R(), backgroundColor.G(), backgroundColor.B()));
-		if (!backgroundBrush) [[unlikely]]
-		{
-			throw std::runtime_error(Text::FormatSafe("Failed to create background brush. Error code: '0x{:X}'.", GetLastError()));
-		}
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating background brush done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush));
-
 		const auto wc = WNDCLASSEXA
 		{
 			.cbSize = sizeof(WNDCLASSEXA),
@@ -91,7 +82,7 @@ namespace PonyEngine::Surface::Windows
 			.hInstance = moduleHandle,
 			.hIcon = mainIcon,
 			.hCursor = cursor,
-			.hbrBackground = backgroundBrush,
+			.hbrBackground = nullptr,
 			.lpszMenuName = nullptr,
 			.lpszClassName = "Pony Engine Class",
 			.hIconSm = smallIcon
@@ -102,11 +93,6 @@ namespace PonyEngine::Surface::Windows
 		classHandle = RegisterClassExA(&wc);
 		if (!classHandle) [[unlikely]]
 		{
-			if (!DeleteObject(backgroundBrush)) [[unlikely]]
-			{
-				PONY_LOG(this->application->Logger(), Log::LogType::Error, "Failed to delete background brush. Handle: '0x{:X}', Error code: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backgroundBrush), GetLastError());
-			}
-
 			throw std::runtime_error(Text::FormatSafe("Failed to register class. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class done. Handle: '0x{:X}'.", classHandle);

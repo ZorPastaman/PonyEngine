@@ -170,9 +170,9 @@ namespace PonyEngine::Application
 
 	void ModuleManager::RemoveData(const ModuleDataHandle handle)
 	{
-		if (application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
+		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Data can be removed only on shut-down.");
+			throw std::logic_error("Data can be removed only on start-up or shut-down.");
 		}
 
 		if (!handle.IsValid()) [[unlikely]]

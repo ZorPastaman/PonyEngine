@@ -104,11 +104,11 @@ export namespace PonyEngine::Surface
 		/// @remark If the platform doesn't support cursors, the function does nothing.
 		virtual void CursorVisibility(bool visible) = 0;
 		/// @brief Gets a cursor clipping rectangle.
-		/// @return Cursor clipping rectangle.
+		/// @return Cursor clipping rectangle in client rectangle normalized coordinates.
 		[[nodiscard("Pure function")]]
 		virtual std::optional<Math::CornerRect<float>> CursorClippingRect() const = 0;
 		/// @brief Sets a cursor clipping rectangle.
-		/// @param clippingRect Cursor clipping rectangle.
+		/// @param clippingRect Cursor clipping rectangle in client rectangle normalized coordinates.
 		/// @remark If the platform doesn't support cursors, the function does nothing.
 		virtual void CursorClippingRect(const std::optional<Math::CornerRect<float>>& clippingRect) = 0;
 		/// @brief Gets a cursor position.

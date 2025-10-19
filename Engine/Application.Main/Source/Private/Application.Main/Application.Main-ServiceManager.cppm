@@ -197,9 +197,9 @@ namespace PonyEngine::Application
 
 	void ServiceManager::RemoveService(const ServiceHandle handle)
 	{
-		if (application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
+		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Service can be removed only on shut-down.");
+			throw std::logic_error("Service can be removed only on start-up or shut-down.");
 		}
 
 		if (!handle.IsValid()) [[unlikely]]
