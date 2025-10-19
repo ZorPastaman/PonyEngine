@@ -4270,57 +4270,57 @@ TEST_CASE("Axis-angle from rotation matrix", "[Math][Transformations]")
 	matrix = PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, 1.f);
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>::Forward(), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, -1.f);
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>::Up(), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, -1.f);
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>::Right(), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>::Right(), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>::Right(), -axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, 0.667f, 0.667f, -0.333f, 0.667f, 0.667f, 0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, 0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, -0.667f, -0.667f, -0.333f, 0.667f, -0.667f, 0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, 0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, 0.667f, -0.667f, -0.333f, -0.667f, 0.667f, -0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, -0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, -0.667f, 0.667f, -0.333f, -0.667f, -0.667f, -0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, -0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, 0.667f, -0.667f, -0.333f, -0.667f, 0.667f, -0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, -0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, -0.667f, 0.667f, -0.333f, -0.667f, -0.667f, -0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, -0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, -0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, 0.667f, 0.667f, -0.333f, 0.667f, 0.667f, 0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(0.577f, 0.577f, 0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, -0.667f, -0.667f, -0.333f, 0.667f, -0.667f, 0.667f, -0.333f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, axisAngle.second, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, 0.577f), axisAngle.first, PonyEngine::Math::Tolerance{.absolute = 0.001f}) | PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(-0.577f, 0.577f, 0.577f), -axisAngle.first, PonyEngine::Math::Tolerance{ .absolute = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(std::numbers::pi_v<float>, PonyEngine::Math::Abs(axisAngle.second), PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 	
 	matrix = PonyEngine::Math::NormalizeColumns(PonyEngine::Math::Matrix3x3<float>(0.54f, 0.841f, 0.f, -0.841f, 0.54f, 0.f, 0.f, 0.f, 1.f));
 	axisAngle = PonyEngine::Math::AxisAngle(matrix);

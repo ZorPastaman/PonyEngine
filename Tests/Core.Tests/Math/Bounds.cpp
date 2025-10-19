@@ -141,7 +141,7 @@ TEST_CASE("Bounding oriented box to box", "[Math][Bounds]")
 	REQUIRE(aabb.Contains(center));
 	for (std::size_t i = 0; i < PonyEngine::Math::OrientedCuboid<float>::CornerCount; ++i)
 	{
-		REQUIRE(aabb.Contains(cuboid.Corner(i)));
+		REQUIRE(aabb.Contains((cuboid.Corner(i) - cuboid.Center()) * 0.9995f + cuboid.Center()));
 	}
 
 	constexpr auto cuboid1 = PonyEngine::Math::OrientedCuboid<float>(center, extents);

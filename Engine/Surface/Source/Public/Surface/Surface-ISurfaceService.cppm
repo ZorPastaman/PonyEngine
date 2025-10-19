@@ -21,6 +21,7 @@ import std;
 
 import PonyEngine.Math;
 
+import :ISurfaceObserver;
 import :IRawInputObserver;
 import :RectStyle;
 
@@ -130,6 +131,13 @@ export namespace PonyEngine::Surface
 		/// @return Client point.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const = 0;
+
+		/// @brief Adds the observer.
+		/// @param observer Observer.
+		virtual void AddObserver(ISurfaceObserver& observer) = 0;
+		/// @brief Removes the observer.
+		/// @param observer Observer.
+		virtual void RemoveObserver(ISurfaceObserver& observer) noexcept = 0;
 
 		/// @brief Gets the native service surface.
 		/// @return Native service surface.
