@@ -2,9 +2,7 @@
 # target_name - Target name.
 # log_level - Log level. Allowed values: Verbose, Debug, Info, Warning, Error, Exception. "" means no logs.
 # stacktrace_level - Log stacktrace level. Allowed values: Verbose, Debug, Info, Warning, Error, Exception. "" means no log stracktraces.
-# console - If it's true, logs to a standard console are allowed.
-# platform_console - If it's true, logs to a platform console are allowed. The platform must support a platform console.
-function(pony_set_log_defines target_name log_level stacktrace_level console platform_console)
+function(pony_set_log_defines target_name log_level stacktrace_level)
 	function(get_sublist log_level sublist)
 		set(LOG_LEVELS Verbose Debug Info Warning Error Exception)
 		set(LOG_INDEX -1)

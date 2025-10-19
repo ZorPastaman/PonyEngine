@@ -151,9 +151,9 @@ namespace PonyEngine::Log
 
 	void Logger::RemoveSubLogger(const SubLoggerHandle handle)
 	{
-		if (loggerContext->Application().FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
+		if (loggerContext->Application().FlowState() != Application::FlowState::StartingUp && loggerContext->Application().FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Sub-logger can be removed only on shut-down.");
+			throw std::logic_error("Sub-logger can be removed only on start-up or shut-down.");
 		}
 
 		if (!handle.IsValid()) [[unlikely]]

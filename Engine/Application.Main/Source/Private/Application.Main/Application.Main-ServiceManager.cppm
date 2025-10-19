@@ -197,9 +197,9 @@ namespace PonyEngine::Application
 
 	void ServiceManager::RemoveService(const ServiceHandle handle)
 	{
-		if (application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
+		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Service can be removed only on shut-down.");
+			throw std::logic_error("Service can be removed only on start-up or shut-down.");
 		}
 
 		if (!handle.IsValid()) [[unlikely]]
@@ -311,7 +311,7 @@ namespace PonyEngine::Application
 				orderedTickableServices.push_back(std::pair(data.tickableService, data.tickOrder));
 			}
 		}
-		std::ranges::sort(orderedTickableServices, [](const std::pair<ITickableService*, std::int32_t>& lhs, const std::pair<ITickableService*, std::int32_t>& rhs)
+		std::ranges::sort(orderedTickableServices, [](const std::pair<ITickableService*, std::int32_t>& lhs, const std::pair<ITickableService*, std::int32_t>& rhs) noexcept
 		{
 			return lhs.second < rhs.second;
 		});

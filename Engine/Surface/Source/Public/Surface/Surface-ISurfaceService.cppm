@@ -21,9 +21,9 @@ import std;
 
 import PonyEngine.Math;
 
-import :IMessageObserver;
+import :ISurfaceObserver;
 import :IRawInputObserver;
-import :SurfaceStyle;
+import :RectStyle;
 
 export namespace PonyEngine::Surface
 {
@@ -45,29 +45,39 @@ export namespace PonyEngine::Surface
 	{
 		INTERFACE_BODY(ISurfaceService)
 
+		/// @brief Gets the rectangle style.
+		/// @return Rectangle style.
+		[[nodiscard("Pure function")]]
+		virtual Surface::RectStyle RectStyle() const noexcept = 0;
+		/// @brief Sets the rectangle style.
+		/// @param rectStyle Rectangle style.
+		virtual void RectStyle(const Surface::RectStyle& rectStyle) = 0;
+
 		/// @brief Gets a screen resolution.
 		/// @return Screen resolution.
 		[[nodiscard("Pure funtion")]]
 		virtual Math::Vector2<std::int32_t> ScreenResolution() const = 0;
 		/// @brief Gets a client rectangle.
 		/// @return Client rectangle.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
-		virtual Math::Rect<std::int32_t> ClientRect() const = 0;
+		virtual Math::CornerRect<std::int32_t> ClientRect() const = 0;
 		/// @brief Sets a client rectangle.
-		/// @param rect Client rectangle.
-		/// @remark The reference point is a screen center.
+		/// @param clientRect Client rectangle.
 		/// @remark If the platform doesn't support client rectangles, the function does nothing.
-		virtual void ClientRect(const Math::Rect<std::int32_t>& rect) = 0;
-		/// @brief Gets the minimal client size.
-		/// @return Minimal client size.
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> MinimalClientSize() const = 0;
-		/// @brief Sets the minimal client size.
-		/// @param size Minimal client size.
-		/// @remark If the platform doesn't support surface rectangles, the function does nothing.
-		virtual void MinimalClientSize(const Math::Vector2<std::int32_t>& size) = 0;
+		virtual void ClientRect(const Math::CornerRect<std::int32_t>& clientRect) = 0;
+		/// @brief Gets a client rectangle minimal size.
+		/// @return Client rectangle minimal size.
+		[[nodiscard("Pure funtion")]]
+		virtual Math::Vector2<std::int32_t> MinimalSize() const = 0;
+		/// @brief Sets a client rectangle minimal size.
+		/// @param minimalSize Client rectangle minimal size.
+		/// @remark If the platform doesn't support client rectangles, the function does nothing.
+		virtual void MinimalSize(const Math::Vector2<std::int32_t>& minimalSize) = 0;
 
+		/// @brief Checks if the surface is alive.
+		/// @return @a True if the surface is alive; @a false otherwise.
+		[[nodiscard("Pure funtion")]]
+		virtual bool IsAlive() const = 0;
 		/// @brief Checks if the surface is active.
 		/// @return @a True if the surface is active; @a false otherwise.
 		[[nodiscard("Pure funtion")]]
@@ -86,62 +96,48 @@ export namespace PonyEngine::Surface
 		/// @remark If the platform doesn't support client titles, the function does nothing.
 		virtual void Title(std::string_view title) = 0;
 
-		/// @brief Gets a surface style.
-		/// @return Surface style.
+		/// @brief Gets if a cursor is controlled as visible.
+		/// @return @a True if a cursor is controlled visible; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		virtual SurfaceStyle Style() const = 0;
-		/// @brief Sets a surface style.
-		/// @param style Surface style.
-		/// @rematk If the platform doesn't support a style flag, it'll be ignored.
-		virtual void Style(SurfaceStyle style) = 0;
-
+		virtual bool CursorVisibility() const = 0;
+		/// @brief Sets if a cursor is controlled as visible.
+		/// @param visible Should cursor be visible?
+		/// @remark If the platform doesn't support cursors, the function does nothing.
+		virtual void CursorVisibility(bool visible) = 0;
+		/// @brief Gets a cursor clipping rectangle.
+		/// @return Cursor clipping rectangle in client rectangle normalized coordinates.
+		[[nodiscard("Pure function")]]
+		virtual std::optional<Math::CornerRect<float>> CursorClippingRect() const = 0;
+		/// @brief Sets a cursor clipping rectangle.
+		/// @param clippingRect Cursor clipping rectangle in client rectangle normalized coordinates.
+		/// @remark If the platform doesn't support cursors, the function does nothing.
+		virtual void CursorClippingRect(const std::optional<Math::CornerRect<float>>& clippingRect) = 0;
 		/// @brief Gets a cursor position.
 		/// @return Cursor position in screen coordinates.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> CursorPosition() const = 0;
-		/// @brief Sets a cursor position.
-		/// @param position Cursor position in screen coordinates.
-		/// @remark The reference point is a screen center.
-		/// @note If the window isn't active, the function does nothing.
-		virtual void CursorPosition(const Math::Vector2<std::int32_t>& position) = 0;
 		/// @brief Gets if a cursor is visible.
 		/// @return @a True if a cursor is visible; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsCursorVisible() const = 0;
-		/// @brief Gets if a cursor is really visible.
-		/// @details Some platforms control the cursor visibility by a value counter. The surface service by itself adds either -1 or 0.
-		///          This function checks the real visibility state.
-		/// @return @a True if a cursor is visible; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsCursorReallyVisible() const = 0;
-		/// @brief Shows or hides a cursor.
-		/// @param visible If it's @a true, shows a cursor; otherwise, hides it.
-		/// @remark if the platform doesn't support cursors, the function does nothing.
-		virtual void ShowCursor(bool visible) = 0;
-		/// @brief Gets a cursor clipping rectangle.
-		/// @return Cursor clipping rectangle in client coordinates. If it's @a std::nullopt, the cursor isn't clipped. The range is [-1, 1].
-		/// @remark The reference point is a screen center.
-		[[nodiscard("Pure function")]]
-		virtual std::optional<Math::Rect<float>> CursorClippingRect() const = 0;
-		/// @brief Sets a cursor clipping rectangle.
-		/// @param rect Cursor clipping rectangle in client coordinates. If it's @a std::nullopt, the cursor isn't clipped. The range is [-1, 1].
-		/// @remark The reference point is a screen center.
-		/// @remark if the platform doesn't support cursors, the function does nothing.
-		virtual void CursorClippingRect(const std::optional<Math::Rect<float>>& rect) = 0;
 
 		/// @brief Converts the client point to a screen point.
 		/// @param clientPoint Client point.
 		/// @return Screen point.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ClientToScreen(const Math::Vector2<std::int32_t>& clientPoint) const = 0;
 		/// @brief Converts the screen point to a client point.
 		/// @param screenPoint Screen point.
 		/// @return Client point.
-		/// @remark The reference point is a screen center.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const = 0;
+
+		/// @brief Adds the observer.
+		/// @param observer Observer.
+		virtual void AddObserver(ISurfaceObserver& observer) = 0;
+		/// @brief Removes the observer.
+		/// @param observer Observer.
+		virtual void RemoveObserver(ISurfaceObserver& observer) noexcept = 0;
 
 		/// @brief Gets the native service surface.
 		/// @return Native service surface.
@@ -174,26 +170,6 @@ export namespace PonyEngine::Surface::Windows
 		/// @return Native handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept = 0;
-
-		/// @brief Adds the message observer.
-		/// @param observer Observer to add.
-		/// @param messageType Message type to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void AddMessageObserver(IMessageObserver& observer, UINT messageType) = 0;
-		/// @brief Adds the message observer.
-		/// @param observer Observer to add.
-		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
-		/// @brief Removes the message observer from the specified message type.
-		/// @param observer Observer to remove.
-		/// @param messageType Message type to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept = 0;
-		/// @brief Removes the message observer from the specified message types.
-		/// @param observer Observer to remove.
-		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept = 0;
-		/// @brief Removes the message observer from all the message types.
-		/// @param observer Observer to remove.
-		virtual void RemoveMessageObserver(IMessageObserver& observer) noexcept = 0;
 
 		/// @brief Adds the raw input observer.
 		/// @param observer Observer to add.

@@ -15,6 +15,7 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/BoxIntersections.cpp"
 	"Math/Color.cpp"
 	"Math/Common.cpp"
+	"Math/CornerBox.cpp"
 	"Math/Flat.cpp"
 	"Math/FlatIntersections.cpp"
 	"Math/Matrix.cpp"
@@ -28,14 +29,17 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"
 	"Math/Vector.cpp"
+	"Serialization/Array.cpp"
+	"Serialization/Basic.cpp"
 	"Text/Format.cpp"
 	"Text/Convert.cpp"
 	"Type/Common.cpp"
 	"Type/Enum.cpp"
+	"Type/Limits.cpp"
 )
 
 message(VERBOSE "Configuring defines")
-pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
 	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
 )

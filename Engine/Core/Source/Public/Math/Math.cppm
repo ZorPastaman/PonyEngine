@@ -14,6 +14,7 @@ export import :Bounds;
 export import :Box;
 export import :Color;
 export import :Common;
+export import :CornerBox;
 export import :Flat;
 export import :Insides;
 export import :Intersections;

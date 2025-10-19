@@ -8,7 +8,7 @@ target_sources(PonyEngine.Log.Tests PRIVATE
 )
 
 message(VERBOSE "Configuring defines")
-pony_set_log_defines(PonyEngine.Log.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_log_defines(PonyEngine.Log.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 if(PONY_ENGINE_TESTING_BENCHMARK)
 	target_compile_definitions(PonyEngine.Log.Tests PRIVATE PONY_ENGINE_TESTING_BENCHMARK)
 endif()

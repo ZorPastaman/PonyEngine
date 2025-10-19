@@ -48,10 +48,9 @@ if(PONY_WINDOWS)
 
 	message(VERBOSE "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
-	configure_file("Data/Windows/Resource.rc.in" Resource.rc)
 	target_sources(PonyEngine.Application.Main PRIVATE 
 		Application.manifest
-		Resource.rc
+		"Data/Windows/Resource.rc"
 	)
 endif()
 
@@ -65,11 +64,19 @@ target_compile_definitions(PonyEngine.Application.Main PRIVATE
 	PONY_ENGINE_ROOT_PATH=${PONY_ENGINE_ROOT_PATH}
 	$<$<BOOL:${PONY_ENGINE_CREATE_CONSOLE}>:PONY_ENGINE_CREATE_CONSOLE>
 	$<$<BOOL:${PONY_ENGINE_DEFAULT_LOGGER}>:PONY_ENGINE_DEFAULT_LOGGER>
-	$<$<BOOL:${PONY_CONSOLE_LOG}>:PONY_CONSOLE_LOG>
-	$<$<BOOL:${PONY_PLATFORM_CONSOLE_LOG}>:PONY_PLATFORM_CONSOLE_LOG>
-	$<$<BOOL:${PONY_APP_ICON}>:PONY_APP_ICON>
-	$<$<BOOL:${PONY_APP_CURSOR}>:PONY_APP_CURSOR>
+	$<$<BOOL:${PONY_ENGINE_CONSOLE_LOG}>:PONY_ENGINE_CONSOLE_LOG>
+	$<$<BOOL:${PONY_ENGINE_PLATFORM_CONSOLE_LOG}>:PONY_ENGINE_PLATFORM_CONSOLE_LOG>
 )
+if(PONY_APP_ICON)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE
+		PONY_APP_ICON=${PONY_APP_ICON}
+	)
+endif()
+if(PONY_APP_CURSOR)
+	target_compile_definitions(PonyEngine.Application.Main PRIVATE
+		PONY_APP_CURSOR=${PONY_APP_CURSOR}
+	)
+endif()
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Application.Main PROPERTIES 
@@ -79,7 +86,7 @@ set_target_properties(PonyEngine.Application.Main PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Application.Main PUBLIC
+target_link_libraries(PonyEngine.Application.Main PRIVATE
 	PonyEngine.Application.Extension
 	PonyEngine.Core
 	PonyEngine.Log

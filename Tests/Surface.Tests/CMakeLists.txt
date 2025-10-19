@@ -7,7 +7,7 @@ target_sources(PonyEngine.Surface.Tests PRIVATE
 )
 
 message(VERBOSE "Configuring defines")
-pony_set_log_defines(PonyEngine.Surface.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+pony_set_log_defines(PonyEngine.Surface.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface.Tests PROPERTIES 
