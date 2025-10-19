@@ -7,10 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface;
+export module PonyEngine.Type:Variant;
 
-export import :IRawInputObserver;
-export import :ISurfaceObserver;
-export import :ISurfaceService;
-export import :RectStyle;
-export import :Utility;
+import std;
+
+export namespace PonyEngine::Type
+{
+	/// @brief Overload helper.
+	/// @tparam Ts Types.
+	template<typename... Ts>
+	struct Overload : Ts...
+	{
+		using Ts::operator()...;
+	};
+	/// @brief Overload helper.
+	/// @tparam Ts Types.
+	/// @return Return value.
+	template<typename... Ts>
+	Overload(Ts...) -> Overload<Ts...>;
+}

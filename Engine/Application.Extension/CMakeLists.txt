@@ -1,5 +1,8 @@
 message(STATUS "Configuring PonyEngine.Application.Extension")
 
+message(VERBOSE "Configuring environment")
+include("CMake/Module.cmake")
+
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Application.Extension STATIC)
 
@@ -15,7 +18,6 @@ target_sources(PonyEngine.Application.Extension PUBLIC FILE_SET CXX_MODULES FILE
 	"Source/Public/Application.Extension/Application.Extension-IApplicationContext.cppm"
 	"Source/Public/Application.Extension/Application.Extension-ILoggerContext.cppm"
 	"Source/Public/Application.Extension/Application.Extension-ILoggerModuleContext.cppm"
-	"Source/Public/Application.Extension/Application.Extension-IMessageObserver.cppm"
 	"Source/Public/Application.Extension/Application.Extension-IModule.cppm"
 	"Source/Public/Application.Extension/Application.Extension-IModuleContext.cppm"
 	"Source/Public/Application.Extension/Application.Extension-IService.cppm"
@@ -34,7 +36,7 @@ set_target_properties(PonyEngine.Application.Extension PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Application.Extension PUBLIC
+target_link_libraries(PonyEngine.Application.Extension PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
 )

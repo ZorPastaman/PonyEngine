@@ -61,20 +61,14 @@ namespace PonyEngine::Surface::Windows
 				PONY_LOG(context.Logger(), Log::LogType::Debug, "Getting surface parameters.");
 				// TODO: Load some data via config service.
 				const std::string_view title = application.ProjectTitle();
-				constexpr auto clientRect = Math::Rect<std::int32_t>(Math::Vector2<std::int32_t>(320, 240));
-				constexpr auto minimalClientSize = Math::Vector2<std::int32_t>(320, 240);
-				constexpr auto backgroundColor = Math::ColorRGB<std::uint8_t>::Black();
-				constexpr auto style = SurfaceStyle::All;
-				constexpr bool showCursor = true;
-				constexpr std::optional<Math::Rect<float>> cursorClippingRect = Math::Rect<float>(Math::Vector2<float>::One());
 				const HICON mainIcon = application.Native().AppIcon();
 				const HCURSOR mainCursor = application.Native().AppCursor() ? application.Native().AppCursor() : GetDefaultCursor();
 
 				PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class...");
-				const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor, backgroundColor);
+				const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor);
 				PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
 
-				const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title, clientRect, minimalClientSize, style, showCursor, cursorClippingRect);
+				const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title);
 				Application::ServiceData data;
 				data.SetService(surfaceService);
 				data.AddInterface(&surfaceService->PublicSurfaceService());
@@ -93,7 +87,16 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		context.ServiceModuleContext().RemoveService(surfaceServiceHandle);
+		try
+		{
+			context.ServiceModuleContext().RemoveService(surfaceServiceHandle);
+		}
+		catch (...)
+		{
+			MessageHandlerApp = nullptr;
+			throw;
+		}
+
 		MessageHandlerApp = nullptr;
 	}
 }

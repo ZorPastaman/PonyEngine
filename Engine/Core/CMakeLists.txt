@@ -1,7 +1,6 @@
 message(STATUS "Configuring PonyEngine.Core")
 
 message(VERBOSE "Configuring environment")
-include("CMake/Log.cmake")
 include("CMake/Target.cmake")
 
 message(VERBOSE "Configuring target")
@@ -25,6 +24,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Box.cppm"
 	"Source/Public/Math/Math-Color.cppm"
 	"Source/Public/Math/Math-Common.cppm"
+	"Source/Public/Math/Math-CornerBox.cppm"
 	"Source/Public/Math/Math-Flat.cppm"
 	"Source/Public/Math/Math-Insides.cppm"
 	"Source/Public/Math/Math-InternalUtility.cppm"
@@ -36,12 +36,17 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math/Math-Transformations.cppm"
 	"Source/Public/Math/Math-Transform.cppm"
 	"Source/Public/Math/Math-Vector.cppm"
+	"Source/Public/Serialization/Serialization.cppm"
+	"Source/Public/Serialization/Serialization-Array.cppm"
+	"Source/Public/Serialization/Serialization-Basic.cppm"
 	"Source/Public/Text/Text.cppm"
 	"Source/Public/Text/Text-Convert.cppm"
 	"Source/Public/Text/Text-Format.cppm"
 	"Source/Public/Type/Type.cppm"
 	"Source/Public/Type/Type-Common.cppm"
- )
+	"Source/Public/Type/Type-Limits.cppm"
+	"Source/Public/Type/Type-Variant.cppm"
+)
 
 if(PONY_WINCORE)
 	message(VERBOSE "Configuring headers for WinCore")
@@ -57,14 +62,14 @@ if(PONY_WINDOWS)
 	)
 endif()
 
-message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Core PUBLIC
-	$<$<BOOL:${PONY_WINCORE}>:PONY_WINCORE>
-	$<$<BOOL:${PONY_WINDOWS}>:PONY_WINDOWS>
-)
-
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES 
 	CXX_STANDARD 23
 	POSITION_INDEPENDENT_CODE TRUE
+)
+
+message(VERBOSE "Configuring defines")
+target_compile_definitions(PonyEngine.Core PUBLIC
+	$<$<BOOL:${PONY_WINCORE}>:PONY_WINCORE>
+	$<$<BOOL:${PONY_WINDOWS}>:PONY_WINDOWS>
 )

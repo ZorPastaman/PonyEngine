@@ -42,25 +42,11 @@ export namespace PonyEngine::Application::Windows
 
 		void Tick() noexcept;
 
-		void AddMessageObserver(IMessageObserver& observer, UINT messageType);
-		void AddMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes);
-		void RemoveMessageObserver(IMessageObserver& observer, UINT messageType) noexcept;
-		void RemoveMessageObserver(IMessageObserver& observer, std::span<const UINT> messageTypes) noexcept;
-		void RemoveMessageObserver(IMessageObserver& observer) noexcept;
-
 		MessageLoopManager& operator =(const MessageLoopManager&) = delete;
 		MessageLoopManager& operator =(MessageLoopManager&&) = delete;
 
 	private:
-		/// @brief Calls message observers of the specified message type.
-		/// @param uMsg Message type.
-		/// @param wParam WParam.
-		/// @param lParam LParam.
-		void ObserveMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
-
 		IApplicationContext* application; ///< Application context.
-
-		std::unordered_map<UINT, std::vector<IMessageObserver*>> messageObservers; ///< Message observers.
 	};
 }
 #endif
@@ -81,11 +67,6 @@ namespace PonyEngine::Application::Windows
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' message for hwnd '0x{:X}'.", message.message, reinterpret_cast<std::uintptr_t>(message.hwnd));
 
-			if (!message.hwnd) [[unlikely]]
-			{
-				ObserveMessage(message.message, message.wParam, message.lParam);
-			}
-
 			if (message.message == WM_QUIT) [[unlikely]]
 			{
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Quit message received. Stopping application with code '{}'.", static_cast<int>(message.wParam));
@@ -94,89 +75,6 @@ namespace PonyEngine::Application::Windows
 
 			TranslateMessage(&message);
 			DispatchMessageA(&message);
-		}
-	}
-
-	void MessageLoopManager::AddMessageObserver(IMessageObserver& observer, const UINT messageType)
-	{
-		std::vector<IMessageObserver*>& observers = messageObservers[messageType];
-		assert(std::ranges::find(observers, &observer) == observers.cend() && "The observer has already been added.");
-		observers.push_back(&observer);
-	}
-
-	void MessageLoopManager::AddMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes)
-	{
-		for (std::size_t i = 0uz; i < messageTypes.size(); ++i)
-		{
-			try
-			{
-				AddMessageObserver(observer, messageTypes[i]);
-			}
-			catch (...)
-			{
-				while (i-- > 0uz)
-				{
-					RemoveMessageObserver(observer, messageTypes[i]);
-				}
-
-				throw;
-			}
-		}
-	}
-
-	void MessageLoopManager::RemoveMessageObserver(IMessageObserver& observer, const UINT messageType) noexcept
-	{
-		if (const auto position = messageObservers.find(messageType); position != messageObservers.cend()) [[likely]]
-		{
-			if (const auto pos = std::ranges::find(position->second, &observer); pos != position->second.cend()) [[likely]]
-			{
-				position->second.erase(pos);
-				return;
-			}
-		}
-
-		PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove observer of '{}' message type but it hadn't been added.", messageType);
-	}
-
-	void MessageLoopManager::RemoveMessageObserver(IMessageObserver& observer, const std::span<const UINT> messageTypes) noexcept
-	{
-		for (const UINT messageType : messageTypes)
-		{
-			RemoveMessageObserver(observer, messageType);
-		}
-	}
-
-	void MessageLoopManager::RemoveMessageObserver(IMessageObserver& observer) noexcept
-	{
-		std::size_t erased = 0uz;
-
-		for (std::vector<IMessageObserver*>& observers : std::views::values(messageObservers))
-		{
-			if (const auto position = std::ranges::find(observers, &observer); position != observers.cend())
-			{
-				observers.erase(position);
-				++erased;
-			}
-		}
-
-		PONY_LOG_IF(erased == 0uz, application->Logger(), Log::LogType::Warning, "Tried to remove message observer but it hadn't been added.");
-	}
-
-	void MessageLoopManager::ObserveMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
-	{
-		if (const auto position = messageObservers.find(uMsg); position != messageObservers.cend())
-		{
-			for (IMessageObserver* const observer : position->second)
-			{
-				try
-				{
-					observer->Observe(uMsg, wParam, lParam);
-				}
-				catch (const std::exception& e)
-				{
-					PONY_LOG_E(application->Logger(), e, "On calling '{}' Windows message observer.", typeid(*observer).name());
-				}
-			}
 		}
 	}
 }
