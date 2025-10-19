@@ -18,7 +18,6 @@ import PonyEngine.Log;
 import PonyEngine.Surface;
 
 import :MessageHandler;
-import :ParamProvider;
 import :SurfaceService;
 
 #if PONY_WINDOWS
@@ -62,12 +61,11 @@ namespace PonyEngine::Surface::Windows
 				PONY_LOG(context.Logger(), Log::LogType::Debug, "Getting surface parameters.");
 				// TODO: Load some data via config service.
 				const std::string_view title = application.ProjectTitle();
-				constexpr Math::ColorRGB<std::uint8_t> backgroundColor = GetBackgroundColor();
 				const HICON mainIcon = application.Native().AppIcon();
 				const HCURSOR mainCursor = application.Native().AppCursor() ? application.Native().AppCursor() : GetDefaultCursor();
 
 				PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class...");
-				const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor, backgroundColor);
+				const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor);
 				PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
 
 				const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title);

@@ -24,7 +24,6 @@
 				"PONY_ENGINE_PLATFORM_CONSOLE_LOG": true,
 				"PONY_ENGINE_DEFAULT_LOGGER": true,
 				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
-				"PONY_ENGINE_SURFACE_BACKGROUND_COLOR": "0, 0, 0",
 				"PONY_ENGINE_ADD_GAME": true,
 				"PONY_ENGINE_GAME_NAME": "ApplicationServiceSample",
 				"PONY_ENGINE_TESTING": true,
@@ -41,8 +40,8 @@
 				"PONY_ENGINE_OPTIMIZATION": "Debug",
 				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Debug",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Error",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_MAKE_GROUPS": true
 			}
 		},
@@ -56,7 +55,7 @@
 				"PONY_ENGINE_OPTIMIZATION": "Release",
 				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Info",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_MAKE_GROUPS": true
 			}
