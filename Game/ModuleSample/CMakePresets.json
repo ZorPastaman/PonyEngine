@@ -12,18 +12,18 @@
 				"PONY_PROJECT_VERSION": "0.0.0.0",
 				"PONY_COMPANY_TITLE": "Pony Engine",
 				"PONY_PROJECT_TITLE": "Pony Engine Game",
-				"PONY_CONSOLE_LOG": "TRUE",
-				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
-				"PONY_ENGINE_LOG_EXTENSION": "TRUE",
-				"PONY_ENGINE_LOG_MAIN": "TRUE",
-				"PONY_ENGINE_LOG_FILE": "TRUE",
-				"PONY_ENGINE_SURFACE": "TRUE",
-				"PONY_ENGINE_SURFACE_MAIN": "TRUE",
-				"PONY_ENGINE_DEFAULT_LOGGER": "TRUE",
-				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
+				"PONY_ENGINE_LOG_EXTENSION": true,
+				"PONY_ENGINE_LOG_MAIN": true,
+				"PONY_ENGINE_LOG_FILE": true,
+				"PONY_ENGINE_SURFACE": true,
+				"PONY_ENGINE_SURFACE_MAIN": true,
 				"PONY_ENGINE_LOG_MAIN_ORDER": "ba",
 				"PONY_ENGINE_LOG_FILE_ORDER": "bb",
-				"PONY_ENGINE_SURFACE_MAIN_ORDER": "ha"
+				"PONY_ENGINE_SURFACE_MAIN_ORDER": "ha",
+				"PONY_ENGINE_CONSOLE_LOG": true,
+				"PONY_ENGINE_PLATFORM_CONSOLE_LOG": true,
+				"PONY_ENGINE_DEFAULT_LOGGER": true,
+				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log"
 			}
 		},
 		{
@@ -36,9 +36,9 @@
 				"PONY_ENGINE_OPTIMIZATION": "Debug",
 				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Debug",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_MAKE_GROUPS": "TRUE"
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_MAKE_GROUPS": true
 			}
 		},
 		{
@@ -51,9 +51,9 @@
 				"PONY_ENGINE_OPTIMIZATION": "Release",
 				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Info",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_MAKE_GROUPS": "TRUE"
+				"PONY_MAKE_GROUPS": true
 			}
 		},
 		{
@@ -68,7 +68,7 @@
 				"PONY_ENGINE_LOG_LEVEL": "Warning",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_MAKE_GROUPS": "FALSE"
+				"PONY_MAKE_GROUPS": false
 			}
 		},
 		{
@@ -83,7 +83,7 @@
 				"PONY_ENGINE_LOG_LEVEL": "Error",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_MAKE_GROUPS": "FALSE"
+				"PONY_MAKE_GROUPS": false
 			}
 		},
 		{
@@ -113,14 +113,14 @@
 			"name": "Windows-Debug",
 			"inherits": [ "Debug", "Windows" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": "TRUE"
+				"PONY_ENGINE_CREATE_CONSOLE": true
 			}
 		},
 		{
 			"name": "Windows-Development",
 			"inherits": [ "Development", "Windows" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": "TRUE"
+				"PONY_ENGINE_CREATE_CONSOLE": true
 			}
 		},
 		{
