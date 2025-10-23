@@ -38,6 +38,7 @@
 				"PONY_ENGINE_LOG_LEVEL": "Debug",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_CREATE_CONSOLE": true,
 				"PONY_MAKE_GROUPS": true
 			}
 		},
@@ -53,6 +54,7 @@
 				"PONY_ENGINE_LOG_LEVEL": "Info",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_CREATE_CONSOLE": true,
 				"PONY_MAKE_GROUPS": true
 			}
 		},
@@ -87,22 +89,28 @@
 			}
 		},
 		{
-			"name": "WinCore",
-			"hidden": true
-		},
-		{
 			"name": "Windows",
-			"inherits": "WinCore",
 			"hidden": true,
-			"toolchainFile": "CMake/Toolchains/Windows.cmake",
-			"architecture": {
-				"value": "x64",
-				"strategy": "external"
-			},
 			"toolset": {
 				"value": "v143",
 				"strategy": "external"
-			},
+			}
+		},
+		{
+			"name": "Windows-x64",
+			"inherits": "Windows",
+			"hidden": true,
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			}
+		},
+		{
+			"name": "Windows-x64-msvc",
+			"inherits": "Windows-x64",
+			"hidden": true,
+			"generator": "Ninja",
+			"toolchainFile": "CMake/Toolchains/Windows-x64-msvc.cmake",
 			"condition": {
 				"type": "equals",
 				"lhs": "${hostSystemName}",
@@ -110,62 +118,46 @@
 			}
 		},
 		{
-			"name": "Windows-Debug",
-			"inherits": [ "Debug", "Windows" ],
-			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": true
-			}
+			"name": "Windows-x64-msvc-Debug",
+			"displayName": "Windows x64 MSVC - Debug",
+			"inherits": [ "Debug", "Windows-x64-msvc" ]
 		},
 		{
-			"name": "Windows-Development",
-			"inherits": [ "Development", "Windows" ],
-			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": true
-			}
+			"name": "Windows-x64-msvc-Development",
+			"displayName": "Windows x64 MSVC - Development",
+			"inherits": [ "Development", "Windows-x64-msvc" ]
 		},
 		{
-			"name": "Windows-Release",
-			"inherits": [ "Release", "Windows" ]
+			"name": "Windows-x64-msvc-Release",
+			"displayName": "Windows x64 MSVC - Release",
+			"inherits": [ "Release", "Windows-x64-msvc" ]
 		},
 		{
-			"name": "Windows-Shipping",
-			"inherits": [ "Shipping", "Windows" ]
+			"name": "Windows-x64-msvc-Shipping",
+			"displayName": "Windows x64 MSVC - Shipping",
+			"inherits": [ "Shipping", "Windows-x64-msvc" ]
 		}
 	],
 	"buildPresets": [
 		{
-			"name": "Windows-Debug",
-			"configurePreset": "Windows-Debug"
+			"name": "Windows-x64-msvc-Debug",
+			"displayName": "Windows x64 MSVC - Debug",
+			"configurePreset": "Windows-x64-msvc-Debug"
 		},
 		{
-			"name": "Windows-Development",
-			"configurePreset": "Windows-Development"
+			"name": "Windows-x64-msvc-Development",
+			"displayName": "Windows x64 MSVC - Development",
+			"configurePreset": "Windows-x64-msvc-Development"
 		},
 		{
-			"name": "Windows-Release",
-			"configurePreset": "Windows-Release"
+			"name": "Windows-x64-msvc-Release",
+			"displayName": "Windows x64 MSVC - Release",
+			"configurePreset": "Windows-x64-msvc-Release"
 		},
 		{
-			"name": "Windows-Shipping",
-			"configurePreset": "Windows-Shipping"
-		}
-	],
-	"testPresets": [
-		{
-			"name": "Windows-Debug",
-			"configurePreset": "Windows-Debug"
-		},
-		{
-			"name": "Windows-Development",
-			"configurePreset": "Windows-Development"
-		},
-		{
-			"name": "Windows-Release",
-			"configurePreset": "Windows-Release"
-		},
-		{
-			"name": "Windows-Shipping",
-			"configurePreset": "Windows-Shipping"
+			"name": "Windows-x64-msvc-Shipping",
+			"displayName": "Windows x64 MSVC - Shipping",
+			"configurePreset": "Windows-x64-msvc-Shipping"
 		}
 	]
 }

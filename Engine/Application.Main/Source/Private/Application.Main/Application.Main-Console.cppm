@@ -63,7 +63,7 @@ namespace PonyEngine::Application
 #endif
 
 #if PONY_ENGINE_PLATFORM_CONSOLE_LOG
-#if PONY_WINCORE
+#if PONY_WINDOWS
 		OutputDebugStringA(message.data());
 #endif
 #endif

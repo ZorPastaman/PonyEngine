@@ -48,13 +48,6 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Type/Type-Variant.cppm"
 )
 
-if(PONY_WINCORE)
-	message(VERBOSE "Configuring headers for WinCore")
-	target_include_directories(PonyEngine.Core PUBLIC 
-		"Include/Public/WinCore"
-	)
-endif()
-
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring headers for Windows")
 	target_include_directories(PonyEngine.Core PUBLIC 
@@ -65,11 +58,11 @@ endif()
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES 
 	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring defines")
 target_compile_definitions(PonyEngine.Core PUBLIC
-	$<$<BOOL:${PONY_WINCORE}>:PONY_WINCORE>
 	$<$<BOOL:${PONY_WINDOWS}>:PONY_WINDOWS>
 )

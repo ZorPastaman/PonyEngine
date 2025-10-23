@@ -12,9 +12,13 @@
 #include <winsdkver.h>
 #define _WIN32_WINNT 0x0A00
 #define WINVER _WIN32_WINNT
-#define NTDDI_VERSION 0x0A000010
+#define NTDDI_VERSION 0x0A00000D
 #include <sdkddkver.h>
-#include "PonyEngine/Platform/WinCore/Framework.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <wrl/client.h>
 
 #include <windowsx.h>
 #include <hidusage.h>

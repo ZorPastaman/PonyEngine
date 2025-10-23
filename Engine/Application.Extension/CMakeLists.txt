@@ -32,6 +32,7 @@ target_sources(PonyEngine.Application.Extension PUBLIC FILE_SET CXX_MODULES FILE
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Application.Extension PROPERTIES 
 	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

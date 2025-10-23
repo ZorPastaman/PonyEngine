@@ -1,4 +1,2 @@
-include("${CMAKE_CURRENT_LIST_DIR}/MSVC.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/WinCore.cmake")
-
-message(STATUS "Configuring Windows toolchain")
+set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_VERSION 10.0.26100.0)

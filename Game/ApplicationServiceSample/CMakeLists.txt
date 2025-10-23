@@ -3,6 +3,7 @@
 # Set environment
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "0e5b6991-d74f-4b3d-a41c-cf096e0b2508")
 set(CMAKE_CXX_MODULE_STD ON)
 include(FetchContent)
@@ -10,8 +11,6 @@ include(FetchContent)
 # Set game project.
 project(${PONY_PROJECT_NAME} VERSION ${PONY_PROJECT_VERSION} LANGUAGES CXX)
 pony_clean_build_options()
-
-set(PONY_ENGINE_APPLICATION_MAIN TRUE)
 
 # Add PonyEngine project.
 message(STATUS "Fetching PonyEngine")
@@ -36,15 +35,7 @@ pony_set_log_defines(PonyEngine.Application.Extension ${PONY_ENGINE_LOG_LEVEL} $
 pony_set_build_options(PonyEngine.Application.Extension ${PONY_ENGINE_OPTIMIZATION})
 pony_set_log_defines(PonyEngine.Application.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 pony_set_build_options(PonyEngine.Application.Main ${PONY_ENGINE_OPTIMIZATION})
-if(TARGET PonyEngine.Surface)
-	pony_set_log_defines(PonyEngine.Surface ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
-	pony_set_build_options(PonyEngine.Surface ${PONY_ENGINE_OPTIMIZATION})
-endif()
-if(TARGET PonyEngine.Surface.Main)
-	pony_set_log_defines(PonyEngine.Surface.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
-	pony_set_build_options(PonyEngine.Surface.Main ${PONY_ENGINE_OPTIMIZATION})
-	list(APPEND PONY_BASE_MODULES PonyEngine.Surface.Main)
-endif()
+
 if(TARGET PonyEngine.Log.Extension)
 	pony_set_log_defines(PonyEngine.Log.Extension ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 	pony_set_build_options(PonyEngine.Log.Extension ${PONY_ENGINE_OPTIMIZATION})
@@ -58,6 +49,16 @@ if(TARGET PonyEngine.Log.File)
 	pony_set_log_defines(PonyEngine.Log.File ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 	pony_set_build_options(PonyEngine.Log.File ${PONY_ENGINE_OPTIMIZATION})
 	list(APPEND PONY_DEBUG_MODULES PonyEngine.Log.File)
+endif()
+
+if(TARGET PonyEngine.Surface)
+	pony_set_log_defines(PonyEngine.Surface ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+	pony_set_build_options(PonyEngine.Surface ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.Surface.Main)
+	pony_set_log_defines(PonyEngine.Surface.Main ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+	pony_set_build_options(PonyEngine.Surface.Main ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_BASE_MODULES PonyEngine.Surface.Main)
 endif()
 
 # Add game modules.

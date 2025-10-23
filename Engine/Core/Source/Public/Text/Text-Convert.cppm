@@ -9,8 +9,8 @@
 
 module;
 
-#if PONY_WINCORE
-#include "PonyEngine/Platform/WinCore/Framework.h"
+#if PONY_WINDOWS
+#include "PonyEngine/Platform/Windows/Framework.h"
 #endif
 
 export module PonyEngine.Text:Convert;
@@ -19,8 +19,8 @@ import std;
 
 import :Format;
 
-#if PONY_WINCORE
-export namespace PonyEngine::Text::WinCore
+#if PONY_WINDOWS
+export namespace PonyEngine::Text::Windows
 {
 	/// @brief Converts std::wstring_view to std::string with UTF-8 encoding.
 	/// @param source Source.
@@ -36,8 +36,8 @@ export namespace PonyEngine::Text::WinCore
 }
 #endif
 
-#if PONY_WINCORE
-namespace PonyEngine::Text::WinCore
+#if PONY_WINDOWS
+namespace PonyEngine::Text::Windows
 {
 	std::string ConvertToString(const std::wstring_view source)
 	{
