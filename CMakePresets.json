@@ -100,7 +100,7 @@
 				"strategy": "external"
 			},
 			"cacheVariables": {
-				"PONY_APP_ICON": "${sourceDir}/Logo/Windows/Logo.ico"
+				"PONY_APP_ICON": "<Default>"
 			}
 		},
 		{

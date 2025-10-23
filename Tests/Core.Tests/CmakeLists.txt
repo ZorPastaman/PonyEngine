@@ -47,6 +47,7 @@ target_compile_definitions(PonyEngine.Core.Tests PRIVATE
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core.Tests PROPERTIES 
 	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

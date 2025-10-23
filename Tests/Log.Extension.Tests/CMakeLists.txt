@@ -12,6 +12,7 @@ pony_set_log_defines(PonyEngine.Log.Extension.Tests ${PONY_ENGINE_LOG_LEVEL} ${P
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Extension.Tests PROPERTIES 
 	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

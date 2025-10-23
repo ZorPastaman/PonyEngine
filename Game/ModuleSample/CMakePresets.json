@@ -94,6 +94,9 @@
 			"toolset": {
 				"value": "v143",
 				"strategy": "external"
+			},
+			"cacheVariables": {
+				"PONY_APP_ICON": "<Default>"
 			}
 		},
 		{
