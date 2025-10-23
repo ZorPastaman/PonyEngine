@@ -17,6 +17,7 @@ function(pony_make_module_group modules group_target group_name cpp_standard)
 	message(VERBOSE "Setting properties")
 	set_target_properties(${group_target} PROPERTIES 
 		CXX_STANDARD ${cpp_standard}
+		CXX_STANDARD_REQUIRED ON
 		POSITION_INDEPENDENT_CODE TRUE
 		OUTPUT_NAME ${group_name}
 	)

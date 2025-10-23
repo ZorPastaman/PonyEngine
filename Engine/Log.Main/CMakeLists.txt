@@ -1,11 +1,7 @@
 message(STATUS "Configuring PonyEngine.Log.Main")
 
-message(VERBOSE "Validating settings")
-if(NOT TARGET PonyEngine.Log.Extension)
-	message(FATAL_ERROR "PonyEngine.Log.Extension wasn't configured")
-endif()
-
-pony_validate_module_order(PONY_ENGINE_LOG_MAIN_ORDER)
+message(VERBOSE "Configuring parameters")
+set(PONY_ENGINE_LOG_MAIN_ORDER "p" CACHE STRING "PonyEngine.Log.Main module initialization order. Its first character must be in range [b-y].")
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Log.Main STATIC)
@@ -29,6 +25,7 @@ target_sources(PonyEngine.Log.Main PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Configuring defines")
+pony_validate_module_order(PONY_ENGINE_LOG_MAIN_ORDER)
 target_compile_definitions(PonyEngine.Log.Main PUBLIC 
 	PONY_ENGINE_LOG_MAIN_ORDER=${PONY_ENGINE_LOG_MAIN_ORDER}
 )
@@ -36,6 +33,7 @@ target_compile_definitions(PonyEngine.Log.Main PUBLIC
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Main PROPERTIES 
 	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
@@ -44,6 +42,9 @@ target_link_libraries(PonyEngine.Log.Main PUBLIC
 	PonyEngine.Core
 	PonyEngine.Application.Extension
 )
+if(NOT TARGET PonyEngine.Log.Extension)
+	message(FATAL_ERROR "PonyEngine.Log.Extension wasn't configured")
+endif()
 target_link_libraries(PonyEngine.Log.Main PRIVATE
 	PonyEngine.Log
 	PonyEngine.Log.Extension

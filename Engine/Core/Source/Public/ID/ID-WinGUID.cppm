@@ -9,8 +9,8 @@
 
 module;
 
-#if PONY_WINCORE
-#include "PonyEngine/Platform/WinCore/Framework.h"
+#if PONY_WINDOWS
+#include "PonyEngine/Platform/Windows/Framework.h"
 #endif
 
 export module PonyEngine.ID:WinGUID;
@@ -19,8 +19,8 @@ import std;
 
 import PonyEngine.Text;
 
-#if PONY_WINCORE
-export namespace PonyEngine::ID::WinCore
+#if PONY_WINDOWS
+export namespace PonyEngine::ID::Windows
 {
 	/// @brief Acquires GUID.
 	/// @return GUID.
@@ -40,10 +40,10 @@ export namespace PonyEngine::ID::WinCore
 /// @return Reference to the output stream.
 export std::ostream& operator <<(std::ostream& stream, const GUID& guid)
 {
-	return stream << PonyEngine::ID::WinCore::ToString(guid);
+	return stream << PonyEngine::ID::Windows::ToString(guid);
 }
 
-/// @brief WinCore GUID formatter.
+/// @brief Windows GUID formatter.
 export template<>
 struct std::formatter<GUID, char>
 {
@@ -63,13 +63,13 @@ struct std::formatter<GUID, char>
 
 	static auto format(const GUID& guid, std::format_context& context)
 	{
-		return std::ranges::copy(PonyEngine::ID::WinCore::ToString(guid), context.out()).out;
+		return std::ranges::copy(PonyEngine::ID::Windows::ToString(guid), context.out()).out;
 	}
 };
 #endif
 
-#if PONY_WINCORE
-namespace PonyEngine::ID::WinCore
+#if PONY_WINDOWS
+namespace PonyEngine::ID::Windows
 {
 	GUID AcquireGuid()
 	{
@@ -87,7 +87,7 @@ namespace PonyEngine::ID::WinCore
 		auto buffer = std::wstring(39, L'\0');
 		StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
 
-		return Text::WinCore::ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
+		return Text::Windows::ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
 	}
 }
 #endif

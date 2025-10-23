@@ -125,6 +125,9 @@ export namespace PonyEngine::Surface::Windows
 			DWORD styleEx; ///< Extended style.
 		};
 
+		/// @brief Updates a focus change.
+		void UpdateFocus() noexcept;
+
 		/// @brief Adjust the rectangle by the style.
 		/// @param rect Rectangle.
 		/// @param style Style.
@@ -895,6 +898,27 @@ namespace PonyEngine::Surface::Windows
 		return *this;
 	}
 
+	void SurfaceService::UpdateFocus() noexcept
+	{
+		UpdateCursorClipping();
+
+		for (ISurfaceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnFocusChanged(windowInFocus);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On observing focus change.");
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing focus change.");
+			}
+		}
+	}
+
 	Math::CornerRect<int> SurfaceService::AdjustRect(const Math::CornerRect<int>& rect, const Style style)
 	{
 		auto windowRect = RECT
@@ -1216,23 +1240,7 @@ namespace PonyEngine::Surface::Windows
 		windowInFocus = true;
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Window focus changed to '{}'.", windowInFocus);
 
-		UpdateCursorClipping();
-
-		for (ISurfaceObserver* const observer : observers)
-		{
-			try
-			{
-				observer->OnFocusChanged(windowInFocus);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing focus change.");
-			}
-			catch (...)
-			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing focus change.");
-			}
-		}
+		UpdateFocus();
 
 		return 0;
 	}
@@ -1242,7 +1250,7 @@ namespace PonyEngine::Surface::Windows
 		windowInFocus = false;
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Window focus changed to '{}'.", windowInFocus);
 
-		UpdateCursorClipping();
+		UpdateFocus();
 
 		return 0;
 	}
@@ -1377,15 +1385,33 @@ namespace PonyEngine::Surface::Windows
 
 	LRESULT SurfaceService::ObserveDisplayChange(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
+		const int newWidth = LOWORD(lParam);
+		const int newHeight = HIWORD(lParam);
+		const auto resolution = Math::Vector2<std::int32_t>(static_cast<std::int32_t>(newWidth), static_cast<std::int32_t>(newHeight));
+
+		for (ISurfaceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnResolutionChanged(resolution);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(application->Logger(), e, "On observing display change.");
+			}
+			catch (...)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing display change.");
+			}
+		}
+
 		std::visit(Type::Overload
 		{
 			[&](const FullscreenRectStyle& s)
 			{
 				try
 				{
-					const int newWidth = LOWORD(lParam);
-					const int newHeight = HIWORD(lParam);
-					const Math::CornerRect<int> rect = AdjustRect(Math::CornerRect<int>(Math::Vector2<int>(newWidth, newHeight)), GetStyle());
+					const Math::CornerRect<int> rect = AdjustRect(Math::CornerRect<int>(static_cast<Math::Vector2<int>>(resolution)), GetStyle());
 					SetWindowRect(rect);
 
 					UpdateCursorClipping();

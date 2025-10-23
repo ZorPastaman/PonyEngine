@@ -1,11 +1,7 @@
 message(STATUS "Configuring PonyEngine.Surface.Main")
 
-message(VERBOSE "Validating settings")
-if(NOT TARGET PonyEngine.Surface)
-	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
-endif()
-
-pony_validate_module_order(PONY_ENGINE_SURFACE_MAIN_ORDER)
+message(VERBOSE "Configuring parameters")
+set(PONY_ENGINE_SURFACE_MAIN_ORDER "p" CACHE STRING "PonyEngine.Surface.Main module initialization order. Its first character must be in range [b-y].")
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface.Main STATIC)
@@ -31,6 +27,7 @@ target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Configuring defines")
+pony_validate_module_order(PONY_ENGINE_SURFACE_MAIN_ORDER)
 target_compile_definitions(PonyEngine.Surface.Main PUBLIC
 	PONY_ENGINE_SURFACE_MAIN_ORDER=${PONY_ENGINE_SURFACE_MAIN_ORDER}
 )
@@ -38,6 +35,7 @@ target_compile_definitions(PonyEngine.Surface.Main PUBLIC
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface.Main PROPERTIES 
 	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
@@ -46,6 +44,9 @@ target_link_libraries(PonyEngine.Surface.Main PUBLIC
 	PonyEngine.Core
 	PonyEngine.Application.Extension
 )
+if(NOT TARGET PonyEngine.Surface)
+	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
+endif()
 target_link_libraries(PonyEngine.Surface.Main PRIVATE
 	PonyEngine.Surface
 	PonyEngine.Log
