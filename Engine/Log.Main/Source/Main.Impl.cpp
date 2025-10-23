@@ -14,10 +14,9 @@ import PonyEngine.Log.Main;
 
 namespace PonyEngine::Log
 {
-	LoggerModule LoggerModule; ///< Logger module.
-
 	Application::IModule* GetLoggerModule()
 	{
-		return &LoggerModule;
+		static LoggerModule loggerModule;
+		return &loggerModule;
 	}
 }

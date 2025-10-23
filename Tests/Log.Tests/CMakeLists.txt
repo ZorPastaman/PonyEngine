@@ -16,6 +16,7 @@ endif()
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Tests PROPERTIES 
 	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

@@ -18,5 +18,5 @@ namespace PonyEngine::Log
 	/// @brief Gets the file sub-logger module.
 	/// @return File sub-logger module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetFileModule();
+	PONY_DLL_EXPORT Application::IModule* GetFileSubLoggerModule();
 }

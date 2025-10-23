@@ -7,21 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Surface/SurfaceModule.h"
+#include "PonyEngine/Surface/SurfaceServiceModule.h"
 
 import PonyEngine.Application.Extension;
 import PonyEngine.Surface.Main;
 
 namespace PonyEngine::Surface
 {
+	Application::IModule* GetSurfaceServiceModule()
+	{
 #if PONY_WINDOWS
-	Windows::SurfaceServiceModule SurfaceModule; ///< Windows surface module.
+		static Windows::SurfaceServiceModule surfaceModule;
 #else
 #error "Unsupported platform!"
 #endif
 
-	Application::IModule* GetSurfaceModule()
-	{
-		return &SurfaceModule;
+		return &surfaceModule;
 	}
 }

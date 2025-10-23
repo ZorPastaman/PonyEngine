@@ -18,6 +18,7 @@ if(NOT PONY_IS_SUBPROJECT)
 	set(CMAKE_CXX_MODULE_STD ON)
 endif()
 include(FetchContent)
+set(PONY_ROOT ${CMAKE_CURRENT_LIST_DIR})
 include("CMake/Path.cmake")
 include("CMake/Project.cmake")
 

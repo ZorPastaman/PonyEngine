@@ -15,8 +15,8 @@ import PonyEngine.Application.Extension;
 
 namespace PonyEngine::Surface
 {
-	/// @brief Gets the surface module.
-	/// @return Surface module.
+	/// @brief Gets the surface service module.
+	/// @return Surface service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetSurfaceModule();
+	PONY_DLL_EXPORT Application::IModule* GetSurfaceServiceModule();
 }

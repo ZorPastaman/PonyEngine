@@ -87,9 +87,8 @@ namespace PonyEngine::Surface::Windows
 			.lpszClassName = "Pony Engine Class",
 			.hIconSm = smallIcon
 		};
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class... Class name: '{}'; Module: '0x{:X}'; Main icon: '0x{:X}'; Small icon: '0x{:X}'; Cursor: '0x{:X}'; Background brush: '0x{:X}'.",
-			wc.lpszClassName, reinterpret_cast<std::uintptr_t>(wc.hInstance), reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hIconSm),
-			reinterpret_cast<std::uintptr_t>(wc.hCursor), reinterpret_cast<std::uintptr_t>(wc.hbrBackground));
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class... Class name: '{}'; Module: '0x{:X}'; Main icon: '0x{:X}'; Small icon: '0x{:X}'; Cursor: '0x{:X}'.",
+			wc.lpszClassName, reinterpret_cast<std::uintptr_t>(wc.hInstance), reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hIconSm), reinterpret_cast<std::uintptr_t>(wc.hCursor));
 		classHandle = RegisterClassExA(&wc);
 		if (!classHandle) [[unlikely]]
 		{

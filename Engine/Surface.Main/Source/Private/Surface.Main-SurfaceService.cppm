@@ -1199,13 +1199,13 @@ namespace PonyEngine::Surface::Windows
 
 	LRESULT SurfaceService::ObserveCreate(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Window created. Window hangle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Window created.");
 		return 0;
 	}
 
 	LRESULT SurfaceService::ObserveDestroy(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Window destroyed. Stopping engine. Window hangle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Window destroyed. Stopping engine.");
 		application->Stop();
 
 		return 0;

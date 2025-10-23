@@ -19,11 +19,11 @@ target_sources(PonyEngine.Surface.Main PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.Surface.Main PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Surface.Main/Surface.Main.cppm"
-	"Source/Private/Surface.Main/Surface.Main-MessageHandler.cppm"
-	"Source/Private/Surface.Main/Surface.Main-SurfaceService.cppm"
-	"Source/Private/Surface.Main/Surface.Main-SurfaceServiceModule.cppm"
-	"Source/Private/Surface.Main/Surface.Main-WindowClass.cppm"
+	"Source/Private/Surface.Main.cppm"
+	"Source/Private/Surface.Main-MessageHandler.cppm"
+	"Source/Private/Surface.Main-SurfaceService.cppm"
+	"Source/Private/Surface.Main-SurfaceServiceModule.cppm"
+	"Source/Private/Surface.Main-WindowClass.cppm"
 )
 
 message(VERBOSE "Configuring defines")
