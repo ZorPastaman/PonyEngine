@@ -24,6 +24,7 @@ import PonyEngine.Math;
 import :ISurfaceObserver;
 import :IRawInputObserver;
 import :RectStyle;
+import :SurfaceFeature;
 
 export namespace PonyEngine::Surface
 {
@@ -45,12 +46,18 @@ export namespace PonyEngine::Surface
 	{
 		INTERFACE_BODY(ISurfaceService)
 
+		/// @brief Gets the supported features.
+		/// @return Supported features.
+		[[nodiscard("Pure function")]]
+		virtual SurfaceFeature SupportedFeatures() const noexcept = 0;
+
 		/// @brief Gets the rectangle style.
 		/// @return Rectangle style.
 		[[nodiscard("Pure function")]]
 		virtual Surface::RectStyle RectStyle() const noexcept = 0;
 		/// @brief Sets the rectangle style.
 		/// @param rectStyle Rectangle style.
+		/// @remark The final style may be different from the requested one, depending on the platform capabilities.
 		virtual void RectStyle(const Surface::RectStyle& rectStyle) = 0;
 
 		/// @brief Gets a screen resolution.
@@ -63,7 +70,7 @@ export namespace PonyEngine::Surface
 		virtual Math::CornerRect<std::int32_t> ClientRect() const = 0;
 		/// @brief Sets a client rectangle.
 		/// @param clientRect Client rectangle.
-		/// @remark If the platform doesn't support client rectangles, the function does nothing.
+		/// @remark If the platform doesn't support client rectangles, the function throws.
 		virtual void ClientRect(const Math::CornerRect<std::int32_t>& clientRect) = 0;
 		/// @brief Gets a client rectangle minimal size.
 		/// @return Client rectangle minimal size.
@@ -71,7 +78,7 @@ export namespace PonyEngine::Surface
 		virtual Math::Vector2<std::int32_t> MinimalSize() const = 0;
 		/// @brief Sets a client rectangle minimal size.
 		/// @param minimalSize Client rectangle minimal size.
-		/// @remark If the platform doesn't support client rectangles, the function does nothing.
+		/// @remark If the platform doesn't support client rectangles, the function throws.
 		virtual void MinimalSize(const Math::Vector2<std::int32_t>& minimalSize) = 0;
 
 		/// @brief Checks if the surface is alive.
@@ -93,7 +100,7 @@ export namespace PonyEngine::Surface
 		virtual std::string_view Title() const = 0;
 		/// @brief Sets a client title.
 		/// @param title Client title.
-		/// @remark If the platform doesn't support client titles, the function does nothing.
+		/// @remark If the platform doesn't support client titles, the function throws.
 		virtual void Title(std::string_view title) = 0;
 
 		/// @brief Gets if a cursor is controlled as visible.
@@ -102,7 +109,6 @@ export namespace PonyEngine::Surface
 		virtual bool CursorVisibility() const = 0;
 		/// @brief Sets if a cursor is controlled as visible.
 		/// @param visible Should cursor be visible?
-		/// @remark If the platform doesn't support cursors, the function does nothing.
 		virtual void CursorVisibility(bool visible) = 0;
 		/// @brief Gets a cursor clipping rectangle.
 		/// @return Cursor clipping rectangle in client rectangle normalized coordinates.
@@ -110,7 +116,6 @@ export namespace PonyEngine::Surface
 		virtual std::optional<Math::CornerRect<float>> CursorClippingRect() const = 0;
 		/// @brief Sets a cursor clipping rectangle.
 		/// @param clippingRect Cursor clipping rectangle in client rectangle normalized coordinates.
-		/// @remark If the platform doesn't support cursors, the function does nothing.
 		virtual void CursorClippingRect(const std::optional<Math::CornerRect<float>>& clippingRect) = 0;
 		/// @brief Gets a cursor position.
 		/// @return Cursor position in screen coordinates.

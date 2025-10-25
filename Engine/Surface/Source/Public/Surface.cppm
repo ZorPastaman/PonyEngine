@@ -13,4 +13,5 @@ export import :IRawInputObserver;
 export import :ISurfaceObserver;
 export import :ISurfaceService;
 export import :RectStyle;
+export import :SurfaceFeature;
 export import :Utility;

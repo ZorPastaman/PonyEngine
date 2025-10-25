@@ -52,6 +52,9 @@ export namespace PonyEngine::Surface::Windows
 		virtual void End() override;
 
 		[[nodiscard("Pure function")]]
+		virtual SurfaceFeature SupportedFeatures() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual Surface::RectStyle RectStyle() const noexcept override;
 		virtual void RectStyle(const Surface::RectStyle& rectStyle) override;
 
@@ -429,6 +432,11 @@ namespace PonyEngine::Surface::Windows
 		ShowWindow(windowHandle, SW_HIDE);
 	}
 
+	SurfaceFeature SurfaceService::SupportedFeatures() const noexcept
+	{
+		return SurfaceFeature::FullscreenStyle | SurfaceFeature::WindowStyle | SurfaceFeature::ClientRect | SurfaceFeature::Title | SurfaceFeature::HardwareCursor;
+	}
+
 	Surface::RectStyle SurfaceService::RectStyle() const noexcept
 	{
 		return rectStyle;
@@ -452,6 +460,7 @@ namespace PonyEngine::Surface::Windows
 		try
 		{
 			SetStyle(style);
+			SetWindowRect(adjustedRect);
 		}
 		catch (...)
 		{
@@ -460,16 +469,6 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		this->rectStyle = rectStyle;
-
-		try
-		{
-			SetWindowRect(adjustedRect);
-		}
-		catch (...)
-		{
-			SetStyle(originalStyle);
-			throw;
-		}
 	}
 
 	Math::Vector2<std::int32_t> SurfaceService::ScreenResolution() const
