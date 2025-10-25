@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Surface/SurfaceServiceModule.h"
 
-PONY_MODULE(PonyEngine::Surface::GetSurfaceServiceModule, PonyEngineWindowsSurfaceService, PONY_ENGINE_SURFACE_MAIN_ORDER);
+PONY_MODULE(PonyEngine::Surface::GetSurfaceServiceModule, PonyEngineSurfaceService, PONY_ENGINE_SURFACE_MAIN_ORDER);
