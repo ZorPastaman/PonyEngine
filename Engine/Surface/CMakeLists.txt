@@ -10,6 +10,7 @@ target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Surface-ISurfaceObserver.cppm"
 	"Source/Public/Surface-ISurfaceService.cppm"
 	"Source/Public/Surface-RectStyle.cppm"
+	"Source/Public/Surface-SurfaceFeature.cppm"
 	"Source/Public/Surface-Utility.cppm"
 )
 
