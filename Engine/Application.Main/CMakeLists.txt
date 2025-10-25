@@ -8,6 +8,7 @@ option(PONY_ENGINE_CONSOLE_LOG "Enable standard c++ console." ON)
 option(PONY_ENGINE_PLATFORM_CONSOLE_LOG "Enable platform console." ON)
 set(PONY_APP_ICON "" CACHE FILEPATH "Application icon path. Its format depends on a platform. If it's '<Default>', the engine icon is used.")
 set(PONY_APP_CURSOR "" CACHE FILEPATH "Application cursor path. Its format depends on a platform.")
+set(PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER "0" CACHE STRING "PonyEngine application platform message service tick order. It must be an int32 number.")
 
 message(VERBOSE "Configuring target")
 if(PONY_WINDOWS)
@@ -34,10 +35,10 @@ target_sources(PonyEngine.Application.Main PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application.Main-DefaultLogger.cppm"
 	"Source/Private/Application.Main-ExitCodes.cppm"
 	"Source/Private/Application.Main-LoggerManager.cppm"
-	"Source/Private/Application.Main-MessageLoopManager.cppm"
 	"Source/Private/Application.Main-ModuleManager.cppm"
 	"Source/Private/Application.Main-Path.cppm"
 	"Source/Private/Application.Main-PathManager.cppm"
+	"Source/Private/Application.Main-PlatformMessageService.cppm"
 	"Source/Private/Application.Main-Process.cppm"
 	"Source/Private/Application.Main-ServiceManager.cppm"
 )
@@ -67,6 +68,7 @@ if(PONY_APP_ICON STREQUAL "<Default>")
 		set(PONY_APP_ICON "${PONY_ROOT}/Logo/Windows/Logo.ico")
 	endif()
 endif()
+pony_validate_tick_order(PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER)
 target_compile_definitions(PonyEngine.Application.Main PRIVATE
 	PONY_COMPANY_NAME=${PONY_COMPANY_NAME} 
 	PONY_PROJECT_NAME=${PONY_PROJECT_NAME} 
@@ -80,6 +82,7 @@ target_compile_definitions(PonyEngine.Application.Main PRIVATE
 	$<$<BOOL:${PONY_ENGINE_PLATFORM_CONSOLE_LOG}>:PONY_ENGINE_PLATFORM_CONSOLE_LOG>
 	$<$<BOOL:${PONY_APP_ICON}>:PONY_APP_ICON=${PONY_APP_ICON}>
 	$<$<BOOL:${PONY_APP_CURSOR}>:PONY_APP_CURSOR=${PONY_APP_CURSOR}>
+	PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER=${PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER}
 )
 
 message(VERBOSE "Setting properties")
