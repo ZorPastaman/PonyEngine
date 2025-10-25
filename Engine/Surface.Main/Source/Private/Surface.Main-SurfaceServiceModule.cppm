@@ -89,7 +89,9 @@ namespace PonyEngine::Surface::Windows
 	{
 		try
 		{
+			PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(SurfaceService).name());
 			context.ServiceModuleContext().RemoveService(surfaceServiceHandle);
+			PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(SurfaceService).name());
 		}
 		catch (...)
 		{

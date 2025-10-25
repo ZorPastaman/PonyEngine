@@ -7,12 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time:TimeSystemFactoryParams;
+#include "PonyEngine/Time/TimeServiceModule.h"
 
-export namespace PonyEngine::Time
+import PonyEngine.Application.Extension;
+import PonyEngine.Time.Main;
+
+namespace PonyEngine::Time
 {
-	/// @brief Time system factory parameters.
-	struct TimeSystemFactoryParams final
+	Application::IModule* GetTimeServiceModule()
 	{
-	};
+		static TimeServiceModule timeModule;
+		return &timeModule;
+	}
 }

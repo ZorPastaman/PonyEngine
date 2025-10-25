@@ -27,9 +27,9 @@ import PonyEngine.Log;
 import :AppDataManager;
 import :ExitCodes;
 import :LoggerManager;
-import :MessageLoopManager;
 import :ModuleManager;
 import :PathManager;
+import :PlatformMessageService;
 import :ServiceManager;
 
 #if PONY_WINDOWS
@@ -139,9 +139,11 @@ export namespace PonyEngine::Application::Windows
 		std::unique_ptr<LoggerManager> loggerManager; ///< Logger manager.
 		std::unique_ptr<AppDataManager> appDataManager; ///< Application data manager.
 		std::unique_ptr<PathManager> pathManager; ///< Path manager.
-		std::unique_ptr<MessageLoopManager> messageLoopManager; ///< Message loop manager.
+		std::shared_ptr<PlatformMessageService> platformMessageService; ///< Platform message service.
 		std::unique_ptr<ServiceManager> serviceManager; ///< Service manager.
 		std::unique_ptr<ModuleManager> moduleManager; ///< Module manager.
+
+		ServiceHandle platformMessageServiceHandle; ///< Platform message service handle.
 	};
 }
 #endif
@@ -156,15 +158,22 @@ namespace PonyEngine::Application::Windows
 		loggerManager(std::make_unique<LoggerManager>(*static_cast<IApplicationContext*>(this))),
 		appDataManager(std::make_unique<AppDataManager>(*static_cast<IApplicationContext*>(this), instance, prevInstance, commandLine, showCommand)),
 		pathManager(std::make_unique<PathManager>(*static_cast<IApplicationContext*>(this))),
-		messageLoopManager(std::make_unique<MessageLoopManager>(*static_cast<IApplicationContext*>(this))),
+		platformMessageService(std::make_shared<PlatformMessageService>(*static_cast<IApplicationContext*>(this))),
 		serviceManager(std::make_unique<ServiceManager>(*static_cast<IApplicationContext*>(this))),
 		moduleManager(std::make_unique<ModuleManager>(*static_cast<IApplicationContext*>(this), loggerManager->PublicLoggerModuleContext(), serviceManager->PublicServiceModuleContext()))
 	{
+		platformMessageServiceHandle = serviceManager->AddService([&](Application::IApplicationContext&)
+		{
+			ServiceData data;
+			data.SetService(platformMessageService, PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER);
+			return data;
+		});
 	}
 
 	App::~App() noexcept
 	{
 		flowState = FlowState::ShuttingDown;
+		serviceManager->RemoveService(platformMessageServiceHandle);
 	}
 
 	std::string_view App::CompanyName() const noexcept
@@ -320,7 +329,6 @@ namespace PonyEngine::Application::Windows
 			for (StartRun(); IsRunning(); NextFrame())
 			{
 				PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Starting application frame: '{}'.", frameCount);
-				messageLoopManager->Tick();
 				serviceManager->Tick();
 				PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Finishing application frame: '{}'.", frameCount);
 			}
