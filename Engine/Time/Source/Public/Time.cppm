@@ -7,19 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Time;
 
-#include "PonyBase/Utility/ObjectBody.h"
-
-export module PonyEngine.Time:TimeSystemFactory;
-
-import PonyEngine.Core;
-
-export namespace PonyEngine::Time
-{
-	/// @brief Time system factory.
-	class TimeSystemFactory : public Core::ISystemFactory
-	{
-		SIMPLE_BASE_BODY(TimeSystemFactory)
-	};
-}
+export import :ITimeService;

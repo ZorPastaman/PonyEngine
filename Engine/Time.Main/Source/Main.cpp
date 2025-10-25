@@ -7,12 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time:FrameRateSystemFactoryParams;
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/Time/TimeServiceModule.h"
 
-export namespace PonyEngine::Time
-{
-	/// @brief Frame rate system factory parameters.
-	struct FrameRateSystemFactoryParams final
-	{
-	};
-}
+PONY_MODULE(PonyEngine::Time::GetTimeServiceModule, PonyEngineTimeService, PONY_ENGINE_TIME_MAIN_ORDER);

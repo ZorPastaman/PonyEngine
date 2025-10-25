@@ -7,7 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time.Detail;
+#pragma once
 
-export import :FrameRateSystemFactory;
-export import :TimeSystemFactoryImpl;
+#include "PonyEngine/Macro/Compiler.h"
+
+import PonyEngine.Application.Extension;
+
+namespace PonyEngine::Time
+{
+	/// @brief Gets the time service module.
+	/// @return Time service module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT Application::IModule* GetTimeServiceModule();
+}
