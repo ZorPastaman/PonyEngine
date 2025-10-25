@@ -9,15 +9,13 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 
 #if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
 #endif
 
-export module PonyEngine.Application.Main:MessageLoopManager;
+export module PonyEngine.Application.Main:PlatformMessageService;
 
 import std;
 
@@ -27,23 +25,25 @@ import PonyEngine.Log;
 #if PONY_WINDOWS
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Message loop manager.
-	class MessageLoopManager final
+	/// @brief Platform message service.
+	class PlatformMessageService final : public ITickableService
 	{
 	public:
-		/// @brief Creates a message loop manager.
+		/// @brief Creates a platform message service.
 		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
-		explicit MessageLoopManager(IApplicationContext& application) noexcept;
-		MessageLoopManager(const MessageLoopManager&) = delete;
-		MessageLoopManager(MessageLoopManager&&) = delete;
+		explicit PlatformMessageService(IApplicationContext& application) noexcept;
+		PlatformMessageService(const PlatformMessageService&) = delete;
+		PlatformMessageService(PlatformMessageService&&) = delete;
 
-		~MessageLoopManager() noexcept = default;
+		~PlatformMessageService() noexcept = default;
 
-		void Tick() noexcept;
+		virtual void Begin() noexcept override;
+		virtual void End() noexcept override;
+		virtual void Tick() noexcept override;
 
-		MessageLoopManager& operator =(const MessageLoopManager&) = delete;
-		MessageLoopManager& operator =(MessageLoopManager&&) = delete;
+		PlatformMessageService& operator =(const PlatformMessageService&) = delete;
+		PlatformMessageService& operator =(PlatformMessageService&&) = delete;
 
 	private:
 		IApplicationContext* application; ///< Application context.
@@ -54,12 +54,20 @@ export namespace PonyEngine::Application::Windows
 #if PONY_WINDOWS
 namespace PonyEngine::Application::Windows
 {
-	MessageLoopManager::MessageLoopManager(IApplicationContext& application) noexcept :
+	PlatformMessageService::PlatformMessageService(IApplicationContext& application) noexcept :
 		application{&application}
 	{
 	}
 
-	void MessageLoopManager::Tick() noexcept
+	void PlatformMessageService::Begin() noexcept
+	{
+	}
+
+	void PlatformMessageService::End() noexcept
+	{
+	}
+
+	void PlatformMessageService::Tick() noexcept
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Peeking messages.");
 		MSG message;
