@@ -2,7 +2,7 @@ export module Game:GameServiceModule;
 
 import std;
 
-import PonyEngine.Application.Extension;
+import PonyEngine.Application.Ext;
 
 import :GameService;
 
