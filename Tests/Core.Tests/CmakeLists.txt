@@ -5,6 +5,7 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
 	"File/Module.cpp"
 	"File/Path.cpp"
+	"Hash/FNV1a.cpp"
 	"ID/WinGUID.cpp"
 	"Math/Ball.cpp"
 	"Math/BallInsides.cpp"

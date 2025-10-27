@@ -16,6 +16,8 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/File.cppm"
 	"Source/Public/File-Module.cppm"
 	"Source/Public/File-Path.cppm"
+	"Source/Public/Hash.cppm"
+	"Source/Public/Hash-FNV1a.cppm"
 	"Source/Public/ID.cppm"
 	"Source/Public/ID-WinGUID.cppm"
 	"Source/Public/Math.cppm"
