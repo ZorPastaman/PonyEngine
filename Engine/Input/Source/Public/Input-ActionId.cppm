@@ -7,22 +7,28 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputSystemParams;
+export module PonyEngine.Input:ActionId;
 
-import <memory>;
-import <string>;
-import <unordered_map>;
-import <vector>;
-
-import :IDeviceFactory;
-import :InputBindingValue;
+import std;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input system parameters.
-	struct InputSystemParams final
+	/// @brief Action ID.
+	struct ActionId final
 	{
-		std::vector<std::shared_ptr<IDeviceFactory>> inputDeviceFactories; ///< Input device factories.
-		std::unordered_map<std::string, std::vector<InputBindingValue>> inputBindings; ///< Input bindings.
+		std::uint64_t hash = 0ull; ///< Action hash.
+	};
+}
+
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Input::ActionId> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator()(const PonyEngine::Input::ActionId actionId) const noexcept
+		{
+			return std::hash<std::uint64_t>()(actionId.hash);
+		}
 	};
 }

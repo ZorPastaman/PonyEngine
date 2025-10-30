@@ -1,7 +1,7 @@
 message(STATUS "Configuring PonyEngine.Time.Impl")
 
 message(VERBOSE "Configuring parameters")
-set(PONY_ENGINE_TIME_IMPL_ORDER "p" CACHE STRING "PonyEngine.Time.Impl module initialization order. Its first character must be in range [b-y].")
+set(PONY_ENGINE_TIME_ORDER "p" CACHE STRING "PonyEngine.Time.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_TIME_TICK_ORDER "0" CACHE STRING "PonyEngine.Time.Impl service tick order. It must be an int32 number.")
 
 message(VERBOSE "Configuring target")
@@ -26,10 +26,10 @@ target_sources(PonyEngine.Time.Impl PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Configuring defines")
-pony_validate_module_order(PONY_ENGINE_TIME_IMPL_ORDER)
+pony_validate_module_order(PONY_ENGINE_TIME_ORDER)
 pony_validate_tick_order(PONY_ENGINE_TIME_TICK_ORDER)
 target_compile_definitions(PonyEngine.Time.Impl PUBLIC
-	PONY_ENGINE_TIME_IMPL_ORDER=${PONY_ENGINE_TIME_IMPL_ORDER}
+	PONY_ENGINE_TIME_ORDER=${PONY_ENGINE_TIME_ORDER}
 	PONY_ENGINE_TIME_TICK_ORDER=${PONY_ENGINE_TIME_TICK_ORDER}
 )
 

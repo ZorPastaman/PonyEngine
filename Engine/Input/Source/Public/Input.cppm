@@ -7,7 +7,4 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Windows.Detail;
-
-export import :KeyboardDeviceFactory;
-export import :MouseDeviceFactory;
+export module PonyEngine.Input;

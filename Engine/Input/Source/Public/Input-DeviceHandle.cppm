@@ -7,17 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Windows:KeyboardDeviceFactoryData;
+export module PonyEngine.Input:DeviceHandle;
 
-import <memory>;
-
-import PonyEngine.Input;
-
-export namespace PonyEngine::Input::Windows
+export namespace PonyEngine::Input
 {
-	/// @brief Windows keyboard device factory data.
-	struct KeyboardDeviceFactoryData final
+	/// @brief Device handle.
+	struct DeviceHandle final
 	{
-		std::shared_ptr<DeviceFactory> inputDeviceFactory; ///< Windows keyboard device factory.
+		const void* id = nullptr; ///< ID. It's used only by the owner. 
 	};
 }

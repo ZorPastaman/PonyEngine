@@ -33,6 +33,9 @@ export namespace PonyEngine::Time
 		virtual void Tick() noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual double NowTime() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual double RealTime() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual double VirtualTime() const noexcept override;
@@ -173,6 +176,11 @@ namespace PonyEngine::Time
 	{
 		const std::chrono::time_point<std::chrono::steady_clock> now = WaitForNextFrame();
 		UpdateTimes(now);
+	}
+
+	double TimeService::NowTime() const noexcept
+	{
+		return std::chrono::duration<double>(std::chrono::steady_clock::now() - startTimePoint).count();
 	}
 
 	double TimeService::RealTime() const noexcept
