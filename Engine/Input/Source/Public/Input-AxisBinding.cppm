@@ -7,19 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Input:AxisBinding;
 
-#include "PonyBase/Utility/ObjectBody.h"
+import std;
 
-export module PonyEngine.Input:DeviceFactory;
-
-import :IDeviceFactory;
+import :Axis;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input device factory.
-	class DeviceFactory : public IDeviceFactory
+	/// @brief Axis binding.
+	struct AxisBinding final
 	{
-		SIMPLE_BASE_BODY(DeviceFactory)
+		Axis axis; ///< Axis.
+		float scale = 1.f; ///< Scale.
+		std::uint8_t actionAxisIndex = 0u; ///< Action axis index.
 	};
 }

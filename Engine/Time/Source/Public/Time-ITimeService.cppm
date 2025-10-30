@@ -22,6 +22,11 @@ export namespace PonyEngine::Time
 	{
 		INTERFACE_BODY(ITimeService)
 
+		/// @brief Gets a real time elapsed since the start. It computes a time at the call moment.
+		/// @return Real time in seconds.
+		[[nodiscard("Pure function")]]
+		virtual double NowTime() const noexcept = 0;
+
 		/// @brief Gets a real time elapsed since the start.
 		/// @return Real time in seconds.
 		[[nodiscard("Pure function")]]

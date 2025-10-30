@@ -1,0 +1,27 @@
+message(STATUS "Configuring PonyEngine.Input")
+
+message(VERBOSE "Configuring target")
+add_library(PonyEngine.Input STATIC)
+
+message(VERBOSE "Configuring sources")
+target_sources(PonyEngine.Input PUBLIC FILE_SET CXX_MODULES FILES
+	"Source/Public/Input.cppm"
+	"Source/Public/Input-ActionBindingHandle.cppm"
+	"Source/Public/Input-ActionId.cppm"
+	"Source/Public/Input-Axis.cppm"
+	"Source/Public/Input-AxisBinding.cppm"
+	"Source/Public/Input-DeviceHandle.cppm"
+	"Source/Public/Input-IInputService.cppm"
+)
+
+message(VERBOSE "Setting properties")
+set_target_properties(PonyEngine.Input PROPERTIES 
+	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
+	POSITION_INDEPENDENT_CODE TRUE
+)
+
+message(VERBOSE "Configuring dependencies")
+target_link_libraries(PonyEngine.Input PRIVATE
+	PonyEngine.Core
+)

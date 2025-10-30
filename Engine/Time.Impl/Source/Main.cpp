@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Time/TimeServiceModule.h"
 
-PONY_MODULE(PonyEngine::Time::GetTimeServiceModule, PonyEngineTimeService, PONY_ENGINE_TIME_IMPL_ORDER);
+PONY_MODULE(PonyEngine::Time::GetTimeServiceModule, PonyEngineTimeService, PONY_ENGINE_TIME_ORDER);

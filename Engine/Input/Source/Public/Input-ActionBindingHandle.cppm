@@ -7,13 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Windows:MouseDeviceParams;
+export module PonyEngine.Input:ActionBindingHandle;
 
-export namespace PonyEngine::Input::Windows
+export namespace PonyEngine::Input
 {
-	/// @brief Windows mouse device parameters.
-	struct MouseDeviceParams final
+	/// @brief Action binding handle.
+	struct ActionBindingHandle final
 	{
-		float sensitivity = 1.f; ///< Mouse sensitivity.
+		const void* id = nullptr; ///< ID. It's used only by the owner. 
 	};
 }
