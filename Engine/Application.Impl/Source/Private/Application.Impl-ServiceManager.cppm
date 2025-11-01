@@ -81,17 +81,22 @@ export namespace PonyEngine::Application
 
 		IApplicationContext* application; ///< Application context.
 
+		std::vector<ServiceHandle> serviceHandles; ///< Service handles.
 		std::vector<std::shared_ptr<IService>> services; ///< Services.
+		std::vector<ServiceData> serviceData; ///< Initial service data.
+
 		std::vector<ITickableService*> tickableServices; ///< Tickable services.
 		std::unordered_map<std::type_index, void*> serviceInterfaces; ///< Service interfaces.
-		std::vector<ServiceData> serviceData; ///< Initial service data.
+
+		ServiceHandle nextServiceHandle; ///< Next service handle.
 	};
 }
 
 namespace PonyEngine::Application
 {
 	ServiceManager::ServiceManager(IApplicationContext& application) noexcept :
-		application{&application}
+		application{&application},
+		nextServiceHandle{.id = 1u}
 	{
 	}
 
@@ -129,6 +134,11 @@ namespace PonyEngine::Application
 
 	ServiceHandle ServiceManager::AddService(const std::function<ServiceData(IApplicationContext&)>& factory)
 	{
+		if (!nextServiceHandle.IsValid()) [[unlikely]]
+		{
+			throw std::overflow_error("No more service handles available.");
+		}
+
 		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
 		{
 			throw std::logic_error("Service can be added only on start-up.");
@@ -146,53 +156,62 @@ namespace PonyEngine::Application
 			throw std::invalid_argument("Incorrect tickable service.");
 		}
 
-		services.push_back(data.service);
-
+		const ServiceHandle currentHandle = nextServiceHandle;
+		serviceHandles.push_back(currentHandle);
 		try
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces...");
-			for (const auto& [interfaceType, interface] : data.publicInterfaces)
-			{
-				if (!interfaceType) [[unlikely]]
-				{
-					throw std::invalid_argument("Interface is nullptr.");
-				}
-
-				PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interfaceType->name());
-				if (serviceInterfaces.contains(*interfaceType)) [[unlikely]]
-				{
-					throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' has already been added.", interfaceType->name()));
-				}
-				if (!interface) [[unlikely]]
-				{
-					throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' is nullptr.", interfaceType->name()));
-				}
-				serviceInterfaces[*interfaceType] = interface;
-			}
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces done.");
-
+			services.push_back(data.service);
 			try
 			{
 				serviceData.push_back(data);
+				try
+				{
+					PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces...");
+					for (const auto& [interfaceType, interface] : data.publicInterfaces)
+					{
+						if (!interfaceType) [[unlikely]]
+						{
+							throw std::invalid_argument("Interface is nullptr.");
+						}
+
+						PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interfaceType->name());
+						if (serviceInterfaces.contains(*interfaceType)) [[unlikely]]
+						{
+							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' has already been added.", interfaceType->name()));
+						}
+						if (!interface) [[unlikely]]
+						{
+							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' is nullptr.", interfaceType->name()));
+						}
+						serviceInterfaces[*interfaceType] = interface;
+					}
+					PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces done.");
+				}
+				catch (...)
+				{
+					for (const std::type_info* interface : std::views::keys(data.publicInterfaces))
+					{
+						serviceInterfaces.erase(*interface);
+					}
+					serviceData.pop_back();
+					throw;
+				}
 			}
 			catch (...)
 			{
-				for (const std::type_info* interface : std::views::keys(data.publicInterfaces))
-				{
-					serviceInterfaces.erase(*interface);
-				}
-
+				services.pop_back();
 				throw;
 			}
 		}
 		catch (...)
 		{
-			services.pop_back();
+			serviceHandles.pop_back();
 			throw;
 		}
+		++nextServiceHandle.id;
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service done.", typeid(*data.service).name());
 
-		return ServiceHandle{.id = data.service.get()};
+		return currentHandle;
 	}
 
 	void ServiceManager::RemoveService(const ServiceHandle handle)
@@ -202,47 +221,36 @@ namespace PonyEngine::Application
 			throw std::logic_error("Service can be removed only on start-up or shut-down.");
 		}
 
-		if (!handle.IsValid()) [[unlikely]]
+		if (const auto position = std::find(serviceHandles.crbegin(), serviceHandles.crend(), handle); position != serviceHandles.crend()) [[likely]]
 		{
-			throw std::invalid_argument("Invalid handle.");
-		}
-
-		std::optional<std::size_t> indexOpt = std::nullopt;
-		for (std::size_t i = services.size(); i-- > 0uz; )
-		{
-			if (services[i].get() == handle.id)
+			const std::size_t index = std::distance(serviceHandles.cbegin(), position.base()) - 1uz;
+			const char* const serviceName = typeid(*services[index]).name();
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service...", serviceName);
+			if (serviceData[index].tickableService)
 			{
-				indexOpt = i;
-				break;
+				if (const auto pos = std::ranges::find(tickableServices, serviceData[index].tickableService); pos != tickableServices.cend())
+				{
+					tickableServices.erase(pos);
+				}
 			}
+
+			PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces...");
+			for (const std::type_info* interface : std::views::keys(serviceData[index].publicInterfaces))
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interface->name());
+				serviceInterfaces.erase(*interface);
+			}
+			PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces done.");
+
+			serviceData.erase(serviceData.cbegin() + index);
+			services.erase(services.cbegin() + index);
+			serviceHandles.erase(serviceHandles.cbegin() + index);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service done.", serviceName);
 		}
-		if (!indexOpt) [[unlikely]]
+		else [[unlikely]]
 		{
 			throw std::invalid_argument("Service not found.");
 		}
-		const std::size_t index = *indexOpt;
-
-		const char* const serviceName = typeid(*services[index]).name();
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service...", serviceName);
-		PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces...");
-		for (const std::type_info* interface : std::views::keys(serviceData[index].publicInterfaces))
-		{
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interface->name());
-			serviceInterfaces.erase(*interface);
-		}
-		PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces done.");
-
-		if (serviceData[index].tickableService)
-		{
-			if (const auto position = std::ranges::find(tickableServices, serviceData[index].tickableService); position != tickableServices.cend())
-			{
-				tickableServices.erase(position);
-			}
-		}
-
-		serviceData.erase(serviceData.cbegin() + index);
-		services.erase(services.cbegin() + index);
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service done.", serviceName);
 	}
 
 	void ServiceManager::Begin()

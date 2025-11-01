@@ -22,6 +22,9 @@ import :ActionId;
 import :Axis;
 import :AxisBinding;
 import :DeviceHandle;
+import :IDeviceObserver;
+import :IInputObserver;
+import :IRawInputObserver;
 
 export namespace PonyEngine::Input
 {
@@ -40,36 +43,17 @@ export namespace PonyEngine::Input
 		/// @param values Values. It sets all values according to the action axes.
 		[[nodiscard("Pure function")]]
 		virtual void Value(ActionId actionId, std::span<float> values) const noexcept = 0;
-		/// @brief Gets boolean values for the action.
-		/// @param actionId Action ID.
-		/// @param values Values. It sets all values according to the action axes.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		[[nodiscard("Pure function")]]
-		virtual void Value(ActionId actionId, std::span<bool> values, float threshold = 0.4f) const noexcept = 0;
 		/// @brief Gets a float value for the action first axis.
 		/// @param actionId Action ID.
 		/// @return Input float value.
 		[[nodiscard("Pure function")]]
-		float ValueFloat(ActionId actionId) const noexcept;
-		/// @brief Gets a boolean value for the action first axis.
-		/// @param actionId Action ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input boolean value.
-		[[nodiscard("Pure function")]]
-		bool ValueBool(ActionId actionId, float threshold = 0.4f) const noexcept;
+		float Value(ActionId actionId) const noexcept;
 		/// @brief Gets a vector of float values for the action.
 		/// @tparam Size Vector size.
 		/// @param actionId Action ID.
 		/// @return Input vector of float values. It sets all values according to the action axes.
 		template<std::size_t Size> [[nodiscard("Pure function")]]
-		Math::Vector<float, Size> ValueFloatVector(ActionId actionId) const noexcept;
-		/// @brief Gets a vector of boolean values for the action.
-		/// @tparam Size Vector size.
-		/// @param actionId Action ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input vector of boolean values. It sets all values according to the action axes.
-		template<std::size_t Size> [[nodiscard("Pure function")]]
-		Math::Vector<bool, Size> ValueBoolVector(ActionId actionId, float threshold = 0.4f) const noexcept;
+		Math::Vector<float, Size> ValueVector(ActionId actionId) const noexcept;
 		/// @brief Gets values for the action from specific devices.
 		/// @param deviceHandles Device handles.
 		/// @param actionId Action ID.
@@ -88,29 +72,14 @@ export namespace PonyEngine::Input
 		/// @param actionId Action ID.
 		/// @return Input float value.
 		[[nodiscard("Pure function")]]
-		float ValueFloat(std::span<const DeviceHandle> deviceHandles, ActionId actionId) const noexcept;
-		/// @brief Gets a boolean value for the action first axis from specific devices.
-		/// @param deviceHandles Device handles.
-		/// @param actionId Action ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input boolean value.
-		[[nodiscard("Pure function")]]
-		bool ValueBool(std::span<const DeviceHandle> deviceHandles, ActionId actionId, float threshold = 0.4f) const noexcept;
+		float Value(std::span<const DeviceHandle> deviceHandles, ActionId actionId) const noexcept;
 		/// @brief Gets a vector of float values for the action from specific devices.
 		/// @tparam Size Vector size.
 		/// @param deviceHandles Device handles.
 		/// @param actionId Action ID.
 		/// @return Input vector of float values. It sets all values according to the action axes.
 		template<std::size_t Size> [[nodiscard("Pure function")]]
-		Math::Vector<float, Size> ValueFloatVector(std::span<const DeviceHandle> deviceHandles, ActionId actionId) const noexcept;
-		/// @brief Gets a vector of boolean values for the action from specific devices.
-		/// @tparam Size Vector size.
-		/// @param deviceHandles Device handles.
-		/// @param actionId Action ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input vector of boolean values. It sets all values according to the action axes.
-		template<std::size_t Size> [[nodiscard("Pure function")]]
-		Math::Vector<bool, Size> ValueBoolVector(std::span<const DeviceHandle> deviceHandles, ActionId actionId, float threshold = 0.4f) const noexcept;
+		Math::Vector<float, Size> ValueVector(std::span<const DeviceHandle> deviceHandles, ActionId actionId) const noexcept;
 
 		/// @brief Gets an axis value.
 		/// @param layoutType Layout type.
@@ -124,20 +93,6 @@ export namespace PonyEngine::Input
 		/// @return Input float value.
 		template<Layout T> [[nodiscard("Pure function")]]
 		float Value(T axisId) const noexcept;
-		/// @brief Gets an axis boolean value.
-		/// @param layoutType Layout type.
-		/// @param axisId Axis ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input boolean value.
-		[[nodiscard("Pure function")]]
-		virtual bool Value(const std::type_info& layoutType, AxisIdType axisId, float threshold = 0.4f) const noexcept = 0;
-		/// @brief Gets an axis boolean value.
-		/// @tparam T Layout type.
-		/// @param axisId Axis ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input boolean value.
-		template<Layout T> [[nodiscard("Pure function")]]
-		bool Value(T axisId, float threshold = 0.4f) const noexcept;
 		/// @brief Gets an axis value from specific devices.
 		/// @param deviceHandles Device handles.
 		/// @param layoutType Layout type.
@@ -152,28 +107,11 @@ export namespace PonyEngine::Input
 		/// @return Input float value.
 		template<Layout T> [[nodiscard("Pure function")]]
 		float Value(std::span<const DeviceHandle> deviceHandles, T axisId) const noexcept;
-		/// @brief Gets an axis boolean value from specific devices.
-		/// @param deviceHandles Device handles.
-		/// @param layoutType Layout type.
-		/// @param axisId Axis ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input boolean value.
-		[[nodiscard("Pure function")]]
-		virtual bool Value(std::span<const DeviceHandle> deviceHandles, const std::type_info& layoutType, AxisIdType axisId, float threshold = 0.4f) const noexcept = 0;
-		/// @brief Gets an axis boolean value from specific devices.
-		/// @tparam T Layout type.
-		/// @param deviceHandles Device handles.
-		/// @param axisId Axis ID.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		/// @return Input boolean value.
-		template<Layout T> [[nodiscard("Pure function")]]
-		bool Value(std::span<const DeviceHandle> deviceHandles, T axisId, float threshold = 0.4f) const noexcept;
 
 		/// @brief Binds an action to axis bindings.
 		/// @param actionId Action ID.
 		/// @param axisBindings Axis bindings.
 		/// @return Action binding handle to unbind later.
-		[[nodiscard("Must be used to unbind")]]
 		virtual ActionBindingHandle Bind(ActionId actionId, std::span<const AxisBinding> axisBindings) = 0;
 		/// @brief Unbinds an action binding.
 		/// @param handle Action binding handle.
@@ -183,11 +121,6 @@ export namespace PonyEngine::Input
 		/// @return Device handles.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const DeviceHandle> Devices() const noexcept = 0;
-		/// @brief Is the device handle valid?
-		/// @param deviceHandle Device handle.
-		/// @return @a True if it's valid; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsValid(DeviceHandle deviceHandle) const noexcept = 0;
 		/// @brief Gets all layout types supported by the device.
 		/// @param deviceHandle Device handle.
 		/// @return Layout types.
@@ -262,41 +195,62 @@ export namespace PonyEngine::Input
 		/// @return Original action ID; empty string if it's not found.
 		[[nodiscard("Pure function")]]
 		virtual std::string_view UnhashActionId(ActionId actionId) const noexcept = 0;
+
+		/// @brief Adds the device observer.
+		/// @param observer Device observer.
+		virtual void AddObserver(IDeviceObserver& observer) = 0;
+		/// @brief Removes the device observer.
+		/// @param observer Device observer.
+		virtual void RemoveObserver(IDeviceObserver& observer) noexcept = 0;
+		/// @brief Adds the global input observer.
+		/// @param observer Input observer.
+		virtual void AddObserver(IInputObserver& observer) = 0;
+		/// @brief Removes the global input observer.
+		/// @param observer Input observer.
+		virtual void RemoveObserver(IInputObserver& observer) noexcept = 0;
+		/// @brief Adds the input observer.
+		/// @param deviceHandle Device handle.
+		/// @param observer Input observer.
+		virtual void AddObserver(DeviceHandle deviceHandle, IInputObserver& observer) = 0;
+		/// @brief Removes the input observer.
+		/// @param deviceHandle Device handle.
+		/// @param observer Input observer.
+		virtual void RemoveObserver(DeviceHandle deviceHandle, IInputObserver& observer) noexcept = 0;
+		/// @brief Adds the global raw input observer.
+		/// @param observer Raw input observer.
+		virtual void AddObserver(IRawInputObserver& observer) = 0;
+		/// @brief Removes the global raw input observer.
+		/// @param observer Raw input observer.
+		virtual void RemoveObserver(IRawInputObserver& observer) noexcept = 0;
+		/// @brief Adds the device raw input observer.
+		/// @param deviceHandle Device handle.
+		/// @param observer Raw input observer.
+		virtual void AddObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) = 0;
+		/// @brief Removes the device raw input observer.
+		/// @param deviceHandle Device handle.
+		/// @param observer Raw input observer.
+		virtual void RemoveObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) noexcept = 0;
 	};
 }
 
 namespace PonyEngine::Input
 {
-	float IInputService::ValueFloat(const ActionId actionId) const noexcept
+	float IInputService::Value(const ActionId actionId) const noexcept
 	{
 		float value;
 		Value(actionId, std::span(&value, 1uz));
 		return value;
 	}
 
-	bool IInputService::ValueBool(const ActionId actionId, const float threshold) const noexcept
-	{
-		bool value;
-		Value(actionId, std::span(&value, 1uz), threshold);
-		return value;
-	}
-
-	float IInputService::ValueFloat(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId) const noexcept
+	float IInputService::Value(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId) const noexcept
 	{
 		float value;
 		Value(deviceHandles, actionId, std::span(&value, 1uz));
 		return value;
 	}
 
-	bool IInputService::ValueBool(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId, const float threshold) const noexcept
-	{
-		bool value;
-		Value(deviceHandles, actionId, std::span(&value, 1uz), threshold);
-		return value;
-	}
-
 	template<std::size_t Size>
-	Math::Vector<float, Size> IInputService::ValueFloatVector(const ActionId actionId) const noexcept
+	Math::Vector<float, Size> IInputService::ValueVector(const ActionId actionId) const noexcept
 	{
 		Math::Vector<float, Size> vector;
 		Value(actionId, vector.Span());
@@ -304,26 +258,10 @@ namespace PonyEngine::Input
 	}
 
 	template<std::size_t Size>
-	Math::Vector<bool, Size> IInputService::ValueBoolVector(const ActionId actionId, const float threshold) const noexcept
-	{
-		Math::Vector<bool, Size> vector;
-		Value(actionId, vector.Span(), threshold);
-		return vector;
-	}
-
-	template<std::size_t Size>
-	Math::Vector<float, Size> IInputService::ValueFloatVector(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId) const noexcept
+	Math::Vector<float, Size> IInputService::ValueVector(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId) const noexcept
 	{
 		Math::Vector<float, Size> vector;
 		Value(deviceHandles, actionId, vector.Span());
-		return vector;
-	}
-
-	template<std::size_t Size>
-	Math::Vector<bool, Size> IInputService::ValueBoolVector(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId, const float threshold) const noexcept
-	{
-		Math::Vector<bool, Size> vector;
-		Value(deviceHandles, actionId, vector.Span(), threshold);
 		return vector;
 	}
 
@@ -334,21 +272,9 @@ namespace PonyEngine::Input
 	}
 
 	template<Layout T>
-	bool IInputService::Value(const T axisId, const float threshold) const noexcept
-	{
-		return Value(typeid(T), static_cast<AxisIdType>(axisId), threshold);
-	}
-
-	template<Layout T>
 	float IInputService::Value(const std::span<const DeviceHandle> deviceHandles, const T axisId) const noexcept
 	{
 		return Value(deviceHandles, typeid(T), static_cast<AxisIdType>(axisId));
-	}
-
-	template<Layout T>
-	bool IInputService::Value(const std::span<const DeviceHandle> deviceHandles, const T axisId, const float threshold) const noexcept
-	{
-		return Value(deviceHandles, typeid(T), static_cast<AxisIdType>(axisId), threshold);
 	}
 
 	bool IInputService::HasLayout(const DeviceHandle deviceHandle, const std::type_info& layoutType) const
@@ -370,7 +296,7 @@ namespace PonyEngine::Input
 		return HasLayout(deviceHandle, typeid(T));
 	}
 
-	bool IInputService::HasFeature(const DeviceHandle deviceHandle, const std::type_info& featureType) const noexcept
+	bool IInputService::HasFeature(const DeviceHandle deviceHandle, const std::type_info& featureType) const
 	{
 		for (const std::reference_wrapper<const std::type_info> feature : Features(deviceHandle))
 		{
@@ -384,19 +310,19 @@ namespace PonyEngine::Input
 	}
 
 	template<typename T>
-	bool IInputService::HasFeature(const DeviceHandle deviceHandle) const noexcept
+	bool IInputService::HasFeature(const DeviceHandle deviceHandle) const
 	{
 		return HasFeature(deviceHandle, typeid(T));
 	}
 
 	template<typename T>
-	T* IInputService::Feature(const DeviceHandle deviceHandle) noexcept
+	T* IInputService::Feature(const DeviceHandle deviceHandle)
 	{
 		return static_cast<T*>(Feature(deviceHandle, typeid(T)));
 	}
 
 	template<typename T>
-	const T* IInputService::Feature(const DeviceHandle deviceHandle) const noexcept
+	const T* IInputService::Feature(const DeviceHandle deviceHandle) const
 	{
 		return static_cast<const T*>(Feature(deviceHandle, typeid(T)));
 	}

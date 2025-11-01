@@ -1,0 +1,35 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+export module PonyEngine.Input:RawInputEvent;
+
+import std;
+
+import PonyEngine.Math;
+
+import :Axis;
+import :DeviceHandle;
+import :InputEventType;
+
+export namespace PonyEngine::Input
+{
+	/// @brief Raw input event. It's sent directly from an input device.
+	struct RawInputEvent final
+	{
+		std::span<const Axis> axis; ///< Axis.
+		std::span<const float> values; ///< Values.
+		DeviceHandle deviceHandle; ///< Device handle.
+		InputEventType eventType; ///< Event type.
+
+		/// @brief Time point when the event was created.
+		/// @remark Input devices may use different clocks. So, don't rely on this time point for time measurements between different devices or the engine time.
+		std::chrono::time_point<std::chrono::steady_clock> timePoint;
+		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position in client coordinates; std::nullopt if not applicable.
+	};
+}

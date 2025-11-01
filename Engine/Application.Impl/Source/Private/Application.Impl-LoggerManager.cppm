@@ -73,6 +73,9 @@ export namespace PonyEngine::Application
 		std::unique_ptr<DefaultLogger> defaultLogger; ///< Default logger.
 		std::shared_ptr<Log::ILogger> externalLogger; ///< External logger.
 		Log::ILogger* logger; ///< Current logger.
+
+		LoggerHandle nextHandle; ///< Next logger handle.
+		LoggerHandle currentHandle; ///< Current logger handle.
 	};
 }
 
@@ -81,7 +84,9 @@ namespace PonyEngine::Application
 	LoggerManager::LoggerManager(IApplicationContext& application) :
 		application{&application},
 		defaultLogger(std::make_unique<DefaultLogger>(*this->application)),
-		logger{defaultLogger.get()}
+		logger{defaultLogger.get()},
+		nextHandle{.id = 1u},
+		currentHandle{.id = 0u}
 	{
 	}
 
@@ -110,6 +115,11 @@ namespace PonyEngine::Application
 
 	LoggerHandle LoggerManager::SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory)
 	{
+		if (!nextHandle.IsValid()) [[unlikely]]
+		{
+			throw std::overflow_error("No more logger handles available.");
+		}
+
 		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
 		{
 			throw std::logic_error("Logger can be added only on start-up.");
@@ -129,7 +139,10 @@ namespace PonyEngine::Application
 		logger = externalLogger.get();
 		PONY_LOG(*logger, Log::LogType::Info, "External logger set. Logger: '{}'.", typeid(*externalLogger).name());
 
-		return LoggerHandle{.id = externalLogger.get()};
+		currentHandle = nextHandle;
+		++nextHandle.id;
+
+		return currentHandle;
 	}
 
 	void LoggerManager::UnsetLogger(const LoggerHandle handle)
@@ -138,21 +151,18 @@ namespace PonyEngine::Application
 		{
 			throw std::logic_error("Logger can be removed only on start-up or shut-down.");
 		}
-		if (!handle.IsValid()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid handle.");
-		}
 		if (!externalLogger) [[unlikely]]
 		{
 			throw std::logic_error("No external logger was set.");
 		}
-		if (externalLogger.get() != handle.id) [[unlikely]]
+		if (currentHandle != handle) [[unlikely]]
 		{
 			throw std::logic_error("Incorrect handle.");
 		}
 
 		PONY_LOG(*logger, Log::LogType::Info, "External logger unset.");
 		logger = defaultLogger.get();
+		currentHandle.id = 0u;
 		externalLogger = nullptr;
 	}
 
