@@ -17,6 +17,10 @@ module;
 
 export module PonyEngine.Surface:IRawInputObserver;
 
+import std;
+
+import PonyEngine.Math;
+
 #if PONY_WINDOWS
 export namespace PonyEngine::Surface::Windows
 {
@@ -27,7 +31,9 @@ export namespace PonyEngine::Surface::Windows
 
 		/// @brief Observes raw input.
 		/// @param input Raw input to observe.
-		virtual void Observe(const RAWINPUT& input) = 0;
+		/// @param eventTime Event time. It's a low resolution time point.
+		/// @param cursorPosition Event cursor position in screen coordinates.
+		virtual void Observe(const RAWINPUT& input, std::chrono::time_point<std::chrono::steady_clock> eventTime, const Math::Vector2<std::int32_t>& cursorPosition) = 0;
 	};
 }
 #endif

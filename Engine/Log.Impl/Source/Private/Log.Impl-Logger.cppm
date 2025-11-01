@@ -77,14 +77,18 @@ export namespace PonyEngine::Log
 
 		Application::ILoggerContext* loggerContext; ///< Logger context.
 
+		std::vector<SubLoggerHandle> subLoggerHandles; ///< Sub-logger handles.
 		std::vector<std::shared_ptr<ISubLogger>> subLoggers; ///< Sub-loggers.
+
+		SubLoggerHandle nextSubLoggerHandle; ///< Next sub-logger handle.
 	};
 }
 
 namespace PonyEngine::Log
 {
 	Logger::Logger(Application::ILoggerContext& loggerContext) noexcept :
-		loggerContext{&loggerContext}
+		loggerContext{&loggerContext},
+		nextSubLoggerHandle{.id = 1u}
 	{
 	}
 
@@ -132,6 +136,10 @@ namespace PonyEngine::Log
 
 	SubLoggerHandle Logger::AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory)
 	{
+		if (!nextSubLoggerHandle.IsValid()) [[unlikely]]
+		{
+			throw std::overflow_error("No more sub-logger handles available.");
+		}
 		if (loggerContext->Application().FlowState() != Application::FlowState::StartingUp) [[unlikely]]
 		{
 			throw std::logic_error("Sub-logger can be added only on start-up.");
@@ -143,10 +151,22 @@ namespace PonyEngine::Log
 			throw std::invalid_argument("Sub-logger is nullptr.");
 		}
 
-		subLoggers.push_back(subLogger);
+		const SubLoggerHandle currentHandle = nextSubLoggerHandle;
+		subLoggerHandles.push_back(currentHandle);
+		try
+		{
+			subLoggers.push_back(subLogger);
+		}
+		catch (...)
+		{
+			subLoggerHandles.pop_back();
+			throw;
+		}
+		++nextSubLoggerHandle.id;
+
 		PONY_LOG(*this, LogType::Info, "'{}' sub-logger added.", typeid(*subLogger).name());
 
-		return SubLoggerHandle{.id = subLogger.get()};
+		return currentHandle;
 	}
 
 	void Logger::RemoveSubLogger(const SubLoggerHandle handle)
@@ -156,28 +176,18 @@ namespace PonyEngine::Log
 			throw std::logic_error("Sub-logger can be removed only on start-up or shut-down.");
 		}
 
-		if (!handle.IsValid()) [[unlikely]]
+		if (const auto position = std::find(subLoggerHandles.crbegin(), subLoggerHandles.crend(), handle); position != subLoggerHandles.crend()) [[likely]]
 		{
-			throw std::invalid_argument("Invalid handle.");
+			const std::size_t index = std::distance(subLoggerHandles.cbegin(), position.base()) - 1uz;
+			const char* const subLoggerName = typeid(*subLoggers[index]).name();
+			subLoggers.erase(subLoggers.cbegin() + index);
+			subLoggerHandles.erase(subLoggerHandles.cbegin() + index);
+			PONY_LOG(*this, LogType::Info, "'{}' sub-logger removed.", subLoggerName);
 		}
-
-		std::optional<std::size_t> indexOpt = std::nullopt;
-		for (std::size_t i = subLoggers.size(); i-- > 0uz; )
-		{
-			if (subLoggers[i].get() == handle.id)
-			{
-				indexOpt = i;
-				break;
-			}
-		}
-		if (!indexOpt) [[unlikely]]
+		else [[unlikely]]
 		{
 			throw std::invalid_argument("Sub-logger not found.");
 		}
-		const std::size_t index = *indexOpt;
-
-		PONY_LOG(*this, LogType::Info, "'{}' sub-logger removed.", typeid(*subLoggers[index]).name());
-		subLoggers.erase(subLoggers.cbegin() + index);
 	}
 
 	ILogger& Logger::PublicLogger() noexcept

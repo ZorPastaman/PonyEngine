@@ -9,24 +9,39 @@
 
 export module PonyEngine.Application.Ext:ServiceHandle;
 
+import std;
+
 export namespace PonyEngine::Application
 {
 	/// @brief Service handle.
 	struct ServiceHandle final
 	{
-		/// @brief Is the handle valid?
+		std::uint32_t id = 0u; ///< ID. It's used only by the owner.
+
+		/// @brief Checks if the handle is valid.
 		/// @return @a True if it's valid; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsValid() const noexcept;
+		constexpr bool IsValid() const noexcept;
 
-		const void* id = nullptr; ///< ID. It's used only by the owner.
+		/// @brief Checks if the handle is valid.
+		/// @return @a True if it's valid; @a false otherwise.
+		[[nodiscard("Pure operator")]]
+		explicit constexpr operator bool() const noexcept;
+
+		[[nodiscard("Pure operator")]]
+		constexpr auto operator <=>(const ServiceHandle& other) const noexcept = default;
 	};
 }
 
 namespace PonyEngine::Application
 {
-	bool ServiceHandle::IsValid() const noexcept
+	constexpr bool ServiceHandle::IsValid() const noexcept
 	{
 		return id;
+	}
+
+	constexpr ServiceHandle::operator bool() const noexcept
+	{
+		return IsValid();
 	}
 }

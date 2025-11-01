@@ -70,7 +70,12 @@ export namespace PonyEngine::Application
 
 		ILoggerModuleContext* loggerModuleContext; ///< Logger module context.
 		IServiceModuleContext* serviceModuleContext; ///< Service module context.
-		std::unordered_map<const std::type_info*, std::shared_ptr<void>> data; ///< Data.
+
+		std::vector<ModuleDataHandle> dataHandles; ///< Data handles.
+		std::vector<const std::type_info*> dataTypes; ///< Data types.
+		std::vector<std::shared_ptr<void>> data; ///< Data.
+
+		ModuleDataHandle nextDataHandle; ///< Next data handle.
 	};
 }
 
@@ -82,7 +87,8 @@ namespace PonyEngine::Application
 	ModuleManager::ModuleManager(IApplicationContext& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext) :
 		application{&application},
 		loggerModuleContext{&loggerModuleContext},
-		serviceModuleContext{&serviceModuleContext}
+		serviceModuleContext{&serviceModuleContext},
+		nextDataHandle{.id = 1u}
 	{
 		std::uintptr_t lastModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
 		try
@@ -103,7 +109,7 @@ namespace PonyEngine::Application
 		if (data.size() > 0uz) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Data wasn't removed:");
-			for (const std::type_info* type : std::views::keys(data))
+			for (const std::type_info* type : dataTypes)
 			{
 				PONY_LOG(application->Logger(), Log::LogType::Error, "Data of type: '{}'.", type->name());
 			}
@@ -142,9 +148,9 @@ namespace PonyEngine::Application
 
 	void* ModuleManager::GetData(const std::type_info& type) const
 	{
-		if (const auto position = data.find(&type); position != data.cend())
+		if (const auto position = std::ranges::find(dataTypes, &type); position != dataTypes.cend())
 		{
-			return position->second.get();
+			return data[position - dataTypes.cbegin()].get();
 		}
 
 		return nullptr;
@@ -152,20 +158,46 @@ namespace PonyEngine::Application
 
 	ModuleDataHandle ModuleManager::AddData(const std::type_info& type, const std::shared_ptr<void>& data)
 	{
+		if (!nextDataHandle.IsValid()) [[unlikely]]
+		{
+			throw std::overflow_error("No more data handles available.");
+		}
+
 		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
 		{
 			throw std::logic_error("Data can be added only on start-up.");
 		}
 
-		if (this->data.contains(&type)) [[unlikely]]
+		if (std::ranges::find(dataTypes, &type) != dataTypes.cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Type has already been added.");
 		}
 
-		this->data[&type] = data;
+		const ModuleDataHandle currentHandle = nextDataHandle;
+		dataHandles.push_back(currentHandle);
+		try
+		{
+			dataTypes.push_back(&type);
+			try
+			{
+				this->data.push_back(data);
+			}
+			catch (...)
+			{
+				dataTypes.pop_back();
+				throw;
+			}
+		}
+		catch (...)
+		{
+			dataHandles.pop_back();
+			throw;
+		}
+		++nextDataHandle.id;
+
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' added to module context.", type.name());
 
-		return ModuleDataHandle{.id = &type};
+		return currentHandle;
 	}
 
 	void ModuleManager::RemoveData(const ModuleDataHandle handle)
@@ -175,21 +207,19 @@ namespace PonyEngine::Application
 			throw std::logic_error("Data can be removed only on start-up or shut-down.");
 		}
 
-		if (!handle.IsValid()) [[unlikely]]
+		if (const auto position = std::find(dataHandles.crbegin(), dataHandles.crend(), handle); position != dataHandles.crend()) [[likely]]
 		{
-			throw std::invalid_argument("Invalid handle.");
-		}
-
-		if (const auto position = data.find(static_cast<const std::type_info*>(handle.id)); position != data.cend()) [[likely]]
-		{
-			const char* const typeName = position->first->name();
-			this->data.erase(position);
+			const std::size_t index = std::distance(dataHandles.cbegin(), position.base()) - 1uz;
+			const char* const typeName = dataTypes[index]->name();
+			data.erase(data.cbegin() + index);
+			dataTypes.erase(dataTypes.cbegin() + index);
+			dataHandles.erase(dataHandles.cbegin() + index);
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' removed from module context.", typeName);
-
-			return;
 		}
-
-		throw std::invalid_argument("Data not found.");
+		else [[unlikely]]
+		{
+			throw std::invalid_argument("Data not found.");
+		}
 	}
 
 	void ModuleManager::Initialize(std::uintptr_t& lastModule)

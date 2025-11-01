@@ -315,7 +315,7 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		static constexpr std::pair<USHORT, USHORT> Unpack(DWORD value) noexcept;
 
-		Application::IApplicationContext* application; ///< Application context.
+		Application::Windows::IApplicationContext* application; ///< Application context.
 
 		Surface::RectStyle rectStyle; ///< Client rectangle style.
 		Math::Vector2<int> minimalClientSize; ///< Minimal client size.
@@ -345,7 +345,7 @@ export namespace PonyEngine::Surface::Windows
 namespace PonyEngine::Surface::Windows
 {
 	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
-		application{&application},
+		application{application.NativePtr()},
 		rectStyle(FullscreenRectStyle{.alwaysOnTop = false}),
 		minimalClientSize(Math::Vector2<int>::One()),
 		cursorClippingRect(Math::CornerRect<float>(Math::Vector2<float>::One())),
@@ -1529,11 +1529,14 @@ namespace PonyEngine::Surface::Windows
 
 		if (const auto observerPosition = rawInputObservers.find(usageType); observerPosition != rawInputObservers.cend())
 		{
+			const std::chrono::time_point<std::chrono::steady_clock> time = application->LastMessageTime();
+			const Math::Vector2<std::int32_t> cursorPosition = application->LastMessageCursorPosition();
+
 			for (IRawInputObserver* const observer : observerPosition->second)
 			{
 				try
 				{
-					observer->Observe(*input);
+					observer->Observe(*input, time, cursorPosition);
 				}
 				catch (const std::exception& e)
 				{

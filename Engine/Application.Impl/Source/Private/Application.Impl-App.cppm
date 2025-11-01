@@ -109,6 +109,11 @@ export namespace PonyEngine::Application::Windows
 		[[nodiscard("Pure function")]]
 		virtual HCURSOR AppCursor() const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual Math::Vector2<std::int32_t> LastMessageCursorPosition() const noexcept override;
+
 		/// @brief Runs the application.
 		/// @return Exit code.
 		[[nodiscard("Must be returned from main")]]
@@ -315,6 +320,16 @@ namespace PonyEngine::Application::Windows
 	HCURSOR App::AppCursor() const noexcept
 	{
 		return appDataManager->AppCursor();
+	}
+
+	std::chrono::time_point<std::chrono::steady_clock> App::LastMessageTime() const noexcept
+	{
+		return platformMessageService->LastMessageTime();
+	}
+
+	Math::Vector2<std::int32_t> App::LastMessageCursorPosition() const noexcept
+	{
+		return platformMessageService->LastMessageCursorPosition();
 	}
 
 	int App::Run()

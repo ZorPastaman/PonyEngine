@@ -80,10 +80,12 @@ namespace PonyEngine::Input
 	template<Input::Layout T>
 	T Axis::AxisId() const
 	{
+#if !NDEBUG
 		if (*layout != typeid(T)) [[unlikely]]
 		{
 			throw std::bad_cast();
 		}
+#endif
 
 		return static_cast<T>(axisId);
 	}
