@@ -11,19 +11,13 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Input:IInputObserver;
-
-import :InputEvent;
+export module PonyEngine.Input.Ext:IDevice;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input observer.
-	class IInputObserver
+	/// @brief Device.
+	class IDevice
 	{
-		INTERFACE_BODY(IInputObserver)
-
-		/// @brief Invoked on each input event.
-		/// @param inputEvent Input event.
-		virtual void OnInput(const InputEvent& inputEvent) = 0;
+		INTERFACE_BODY(IDevice)
 	};
 }
