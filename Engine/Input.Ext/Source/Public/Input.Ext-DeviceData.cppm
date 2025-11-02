@@ -7,23 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Input.Ext:DeviceData;
 
-#include "PonyEngine/Object/Body.h"
+import std;
 
-export module PonyEngine.Input:IInputObserver;
+import PonyEngine.Input;
 
-import :InputEvent;
+import :IDevice;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input observer.
-	class IInputObserver
+	/// @brief Device data.
+	struct DeviceData final
 	{
-		INTERFACE_BODY(IInputObserver)
-
-		/// @brief Invoked on each input event.
-		/// @param inputEvent Input event.
-		virtual void OnInput(const InputEvent& inputEvent) = 0;
+		std::shared_ptr<IDevice> device; ///< Device.
+		std::vector<std::reference_wrapper<const std::type_info>> layouts; ///< Device layouts.
+		std::unordered_map<std::reference_wrapper<const std::type_info>, void*> features; ///< Device features.
 	};
 }

@@ -11,19 +11,20 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Input:IInputObserver;
-
-import :InputEvent;
+export module PonyEngine.Input.Ext:IInputProvider;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input observer.
-	class IInputObserver
+	/// @brief Input provider.
+	class IInputProvider
 	{
-		INTERFACE_BODY(IInputObserver)
+		INTERFACE_BODY(IInputProvider)
 
-		/// @brief Invoked on each input event.
-		/// @param inputEvent Input event.
-		virtual void OnInput(const InputEvent& inputEvent) = 0;
+		/// @brief Invoked before a first tick.
+		virtual void Begin() = 0;
+		/// @brief Invoked after a last tick.
+		virtual void End() = 0;
+		/// @brief Ticks the provider.
+		virtual void Tick() = 0;
 	};
 }

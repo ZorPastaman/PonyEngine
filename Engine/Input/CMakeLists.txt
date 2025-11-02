@@ -11,12 +11,14 @@ target_sources(PonyEngine.Input PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Input-Axis.cppm"
 	"Source/Public/Input-AxisBinding.cppm"
 	"Source/Public/Input-DeviceHandle.cppm"
+	"Source/Public/Input-IDeviceObserver.cppm"
+	"Source/Public/Input-IInputObserver.cppm"
 	"Source/Public/Input-IInputService.cppm"
 	"Source/Public/Input-InputEvent.cppm"
 	"Source/Public/Input-InputEventType.cppm"
 	"Source/Public/Input-IRawInputObserver.cppm"
 	"Source/Public/Input-RawInputEvent.cppm"
- "Source/Public/Input-IInputObserver.cppm" "Source/Public/Input-IDeviceObserver.cppm")
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Input PROPERTIES 

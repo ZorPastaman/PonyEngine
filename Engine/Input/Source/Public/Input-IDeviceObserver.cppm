@@ -25,6 +25,9 @@ export namespace PonyEngine::Input
 		/// @brief Invoked when a new device is added.
 		/// @param deviceHandle New device handle.
 		virtual void OnDeviceAdded(DeviceHandle deviceHandle) {};
+		/// @brief Invoked when a device is removed.
+		/// @param deviceHandle New device handle.
+		virtual void OnDeviceRemoved(DeviceHandle deviceHandle) {};
 		/// @brief Invoked when a device connection change.
 		/// @param deviceHandle Device handle.
 		/// @param isConnected @a True if it's connected; @a false otherwise.

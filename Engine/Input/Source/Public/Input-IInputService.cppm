@@ -121,6 +121,11 @@ export namespace PonyEngine::Input
 		/// @return Device handles.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const DeviceHandle> Devices() const noexcept = 0;
+		/// @brief Is the device handle valid?
+		/// @param deviceHandle Device handle.
+		/// @return @a True if it's valid; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsValid(DeviceHandle deviceHandle) const noexcept = 0;
 		/// @brief Gets all layout types supported by the device.
 		/// @param deviceHandle Device handle.
 		/// @return Layout types.
