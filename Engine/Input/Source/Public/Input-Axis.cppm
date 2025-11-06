@@ -52,9 +52,28 @@ export namespace PonyEngine::Input
 		Axis& operator =(const Axis& other) noexcept = default;
 		Axis& operator =(Axis&& other) noexcept = default;
 
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const Axis& other) const noexcept = default;
+
 	private:
 		const std::type_info* layout = nullptr; ///< Layout.
 		AxisIdType axisId = 0u; ///< Axis ID.
+	};
+}
+
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Input::Axis> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator ()(const PonyEngine::Input::Axis axis) const noexcept
+		{
+			const std::size_t layoutHash = std::hash<const std::type_info*>()(&axis.Layout());
+			const std::size_t axisIdHash = std::hash<PonyEngine::Input::AxisIdType>()(axis.AxisId());
+
+			return (23uz * 31uz + layoutHash) * 31uz + axisIdHash;
+		}
 	};
 }
 

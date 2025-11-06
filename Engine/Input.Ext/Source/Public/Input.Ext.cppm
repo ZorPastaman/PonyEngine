@@ -8,3 +8,12 @@
  ***************************************************/
 
 export module PonyEngine.Input.Ext;
+
+export import PonyEngine.Input;
+
+export import :DeviceData;
+export import :IDevice;
+export import :IInputContext;
+export import :IInputModuleContext;
+export import :IInputProvider;
+export import :InputProviderHandle;

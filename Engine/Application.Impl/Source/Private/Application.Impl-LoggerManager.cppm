@@ -137,7 +137,7 @@ namespace PonyEngine::Application
 
 		externalLogger = newLogger;
 		logger = externalLogger.get();
-		PONY_LOG(*logger, Log::LogType::Info, "External logger set. Logger: '{}'.", typeid(*externalLogger).name());
+		PONY_LOG(*logger, Log::LogType::Info, "External logger set. Logger: '{}'; Handle: '0x{:X}'.", typeid(*externalLogger).name(), currentHandle.id);
 
 		currentHandle = nextHandle;
 		++nextHandle.id;
@@ -160,7 +160,7 @@ namespace PonyEngine::Application
 			throw std::logic_error("Incorrect handle.");
 		}
 
-		PONY_LOG(*logger, Log::LogType::Info, "External logger unset.");
+		PONY_LOG(*logger, Log::LogType::Info, "External logger unset. Logger: '{}'; Handle: '0x{:X}'.", typeid(*externalLogger).name(), handle.id);
 		logger = defaultLogger.get();
 		currentHandle.id = 0u;
 		externalLogger = nullptr;

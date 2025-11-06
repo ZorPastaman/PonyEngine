@@ -22,10 +22,10 @@ export namespace PonyEngine::Input
 	/// @brief Raw input event. It's sent directly from an input device.
 	struct RawInputEvent final
 	{
-		std::span<const Axis> axis; ///< Axis.
+		std::span<const Axis> axes; ///< Axes.
 		std::span<const float> values; ///< Values.
 		DeviceHandle deviceHandle; ///< Device handle.
-		InputEventType eventType; ///< Event type.
+		InputEventType eventType = InputEventType::State; ///< Event type.
 
 		/// @brief Time point when the event was created.
 		/// @remark Input devices may use different clocks. So, don't rely on this time point for time measurements between different devices or the engine time.

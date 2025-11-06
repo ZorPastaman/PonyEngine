@@ -41,11 +41,15 @@ export namespace PonyEngine::Input
 		virtual DeviceHandle RegisterDevice(const DeviceData& data) = 0;
 		/// @brief Unregisters a device.
 		/// @param deviceHandle Device handle.
-		virtual void UnregisterDevice(DeviceHandle deviceHandle) noexcept = 0;
+		virtual void UnregisterDevice(DeviceHandle deviceHandle) = 0;
 
 		/// @brief Adds an input.
 		/// @param deviceHandle Device handle.
 		/// @param input Raw input.
 		virtual void AddInput(DeviceHandle deviceHandle, const RawInputEvent& input) = 0;
+		/// @brief Changes a connection status of a device.
+		/// @param deviceHandle Device handle.
+		/// @param isConnected Is the device connected?
+		virtual void Connect(DeviceHandle deviceHandle, bool isConnected) = 0;
 	};
 }

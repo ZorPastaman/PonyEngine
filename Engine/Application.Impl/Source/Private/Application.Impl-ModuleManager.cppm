@@ -195,7 +195,7 @@ namespace PonyEngine::Application
 		}
 		++nextDataHandle.id;
 
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' added to module context.", type.name());
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' added to module context. Handle: '0x{:X}'.", type.name(), currentHandle.id);
 
 		return currentHandle;
 	}
@@ -214,7 +214,7 @@ namespace PonyEngine::Application
 			data.erase(data.cbegin() + index);
 			dataTypes.erase(dataTypes.cbegin() + index);
 			dataHandles.erase(dataHandles.cbegin() + index);
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' removed from module context.", typeName);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' removed from module context. Handle: '0x{:X}'.", typeName, handle.id);
 		}
 		else [[unlikely]]
 		{

@@ -150,6 +150,10 @@ namespace PonyEngine::Log
 		{
 			throw std::invalid_argument("Sub-logger is nullptr.");
 		}
+		if (const auto position = std::ranges::find(subLoggers, subLogger); position != subLoggers.cend()) [[unlikely]]
+		{
+			throw std::invalid_argument("Sub-logger has already been added.");
+		}
 
 		const SubLoggerHandle currentHandle = nextSubLoggerHandle;
 		subLoggerHandles.push_back(currentHandle);
@@ -164,7 +168,7 @@ namespace PonyEngine::Log
 		}
 		++nextSubLoggerHandle.id;
 
-		PONY_LOG(*this, LogType::Info, "'{}' sub-logger added.", typeid(*subLogger).name());
+		PONY_LOG(*this, LogType::Info, "'{}' sub-logger added. Handle: '0x{:X}'.", typeid(*subLogger).name(), currentHandle.id);
 
 		return currentHandle;
 	}
@@ -182,7 +186,7 @@ namespace PonyEngine::Log
 			const char* const subLoggerName = typeid(*subLoggers[index]).name();
 			subLoggers.erase(subLoggers.cbegin() + index);
 			subLoggerHandles.erase(subLoggerHandles.cbegin() + index);
-			PONY_LOG(*this, LogType::Info, "'{}' sub-logger removed.", subLoggerName);
+			PONY_LOG(*this, LogType::Info, "'{}' sub-logger removed. Handle: '0x{:X}'.", subLoggerName, handle.id);
 		}
 		else [[unlikely]]
 		{

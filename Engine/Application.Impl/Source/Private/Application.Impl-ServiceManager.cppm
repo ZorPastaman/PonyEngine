@@ -150,7 +150,10 @@ namespace PonyEngine::Application
 		}
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service...", typeid(*data.service).name());
-
+		if (const auto position = std::ranges::find(services, data.service); position != services.cend()) [[unlikely]]
+		{
+			throw std::invalid_argument("Service has already been added.");
+		}
 		if (data.tickableService && static_cast<IService*>(data.tickableService) != data.service.get()) [[unlikely]]
 		{
 			throw std::invalid_argument("Incorrect tickable service.");
@@ -209,7 +212,7 @@ namespace PonyEngine::Application
 			throw;
 		}
 		++nextServiceHandle.id;
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service done.", typeid(*data.service).name());
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service done. Handle: '0x{:X}'.", typeid(*data.service).name(), currentHandle.id);
 
 		return currentHandle;
 	}
@@ -245,7 +248,7 @@ namespace PonyEngine::Application
 			serviceData.erase(serviceData.cbegin() + index);
 			services.erase(services.cbegin() + index);
 			serviceHandles.erase(serviceHandles.cbegin() + index);
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service done.", serviceName);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service done. Handle: '0x{:X}'.", serviceName, handle.id);
 		}
 		else [[unlikely]]
 		{
