@@ -54,59 +54,50 @@ export namespace PonyEngine::Input
 		/// @return Input vector of float values. It sets all values according to the action axes.
 		template<std::size_t Size> [[nodiscard("Pure function")]]
 		Math::Vector<float, Size> ValueVector(ActionId actionId) const noexcept;
-		/// @brief Gets values for the action from specific devices.
-		/// @param deviceHandles Device handles.
+		/// @brief Gets values for the action from a specific device.
+		/// @param deviceHandle Device handle.
 		/// @param actionId Action ID.
 		/// @param values Values. It sets all values according to the action axes.
 		[[nodiscard("Pure function")]]
-		virtual void Value(std::span<const DeviceHandle> deviceHandles, ActionId actionId, std::span<float> values) const noexcept = 0;
-		/// @brief Gets boolean values for the action from specific devices.
-		/// @param deviceHandles Device handles.
-		/// @param actionId Action ID.
-		/// @param values Values. It sets all values according to the action axes.
-		/// @param threshold Threshold for boolean conversion. If the absolute value is greater than the threshold, the boolean value is @a true; otherwise, it's @a false.
-		[[nodiscard("Pure function")]]
-		virtual void Value(std::span<const DeviceHandle> deviceHandles, ActionId actionId, std::span<bool> values, float threshold = 0.4f) const noexcept = 0;
-		/// @brief Gets a float value for the action first axis from specific devices.
-		/// @param deviceHandles Device handles.
+		virtual void Value(DeviceHandle deviceHandle, ActionId actionId, std::span<float> values) const noexcept = 0;
+		/// @brief Gets a float value for the action first axis from a specific device.
+		/// @param deviceHandle Device handle.
 		/// @param actionId Action ID.
 		/// @return Input float value.
 		[[nodiscard("Pure function")]]
-		float Value(std::span<const DeviceHandle> deviceHandles, ActionId actionId) const noexcept;
-		/// @brief Gets a vector of float values for the action from specific devices.
+		float Value(DeviceHandle deviceHandle, ActionId actionId) const noexcept;
+		/// @brief Gets a vector of float values for the action from a specific device.
 		/// @tparam Size Vector size.
-		/// @param deviceHandles Device handles.
+		/// @param deviceHandle Device handle.
 		/// @param actionId Action ID.
 		/// @return Input vector of float values. It sets all values according to the action axes.
 		template<std::size_t Size> [[nodiscard("Pure function")]]
-		Math::Vector<float, Size> ValueVector(std::span<const DeviceHandle> deviceHandles, ActionId actionId) const noexcept;
+		Math::Vector<float, Size> ValueVector(DeviceHandle deviceHandle, ActionId actionId) const noexcept;
 
 		/// @brief Gets an axis value.
-		/// @param layoutType Layout type.
-		/// @param axisId Axis ID.
+		/// @param axis Axis.
 		/// @return Input float value.
 		[[nodiscard("Pure function")]]
-		virtual float Value(const std::type_info& layoutType, AxisIdType axisId) const noexcept = 0;
+		virtual float Value(const Axis& axis) const noexcept = 0;
 		/// @brief Gets an axis value.
 		/// @tparam T Layout type.
 		/// @param axisId Axis ID.
 		/// @return Input float value.
 		template<Layout T> [[nodiscard("Pure function")]]
 		float Value(T axisId) const noexcept;
-		/// @brief Gets an axis value from specific devices.
-		/// @param deviceHandles Device handles.
-		/// @param layoutType Layout type.
-		/// @param axisId Axis ID.
+		/// @brief Gets an axis value from a specific device.
+		/// @param deviceHandle Device handle.
+		/// @param axis Axis
 		/// @return Input float value.
 		[[nodiscard("Pure function")]]
-		virtual float Value(std::span<const DeviceHandle> deviceHandles, const std::type_info& layoutType, AxisIdType axisId) const noexcept = 0;
-		/// @brief Gets an axis value from specific devices.
+		virtual float Value(DeviceHandle deviceHandle, const Axis& axis) const noexcept = 0;
+		/// @brief Gets an axis value from a specific device.
 		/// @tparam T Layout type.
-		/// @param deviceHandles Device handles.
+		/// @param deviceHandle Device handle.
 		/// @param axisId Axis ID.
 		/// @return Input float value.
 		template<Layout T> [[nodiscard("Pure function")]]
-		float Value(std::span<const DeviceHandle> deviceHandles, T axisId) const noexcept;
+		float Value(DeviceHandle deviceHandle, T axisId) const noexcept;
 
 		/// @brief Binds an action to axis bindings.
 		/// @param actionId Action ID.
@@ -201,12 +192,20 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual std::string_view UnhashActionId(ActionId actionId) const noexcept = 0;
 
-		/// @brief Adds the device observer.
+		/// @brief Adds the global device observer.
 		/// @param observer Device observer.
 		virtual void AddObserver(IDeviceObserver& observer) = 0;
-		/// @brief Removes the device observer.
+		/// @brief Removes the global device observer.
 		/// @param observer Device observer.
 		virtual void RemoveObserver(IDeviceObserver& observer) noexcept = 0;
+		/// @brief Adds the device observer.
+		/// @param deviceHandle Device handle.
+		/// @param observer Device observer.
+		virtual void AddObserver(DeviceHandle deviceHandle, IDeviceObserver& observer) = 0;
+		/// @brief Removes the device observer.
+		/// @param deviceHandle Device handle.
+		/// @param observer Device observer.
+		virtual void RemoveObserver(DeviceHandle deviceHandle, IDeviceObserver& observer) noexcept = 0;
 		/// @brief Adds the global input observer.
 		/// @param observer Input observer.
 		virtual void AddObserver(IInputObserver& observer) = 0;
@@ -247,10 +246,10 @@ namespace PonyEngine::Input
 		return value;
 	}
 
-	float IInputService::Value(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId) const noexcept
+	float IInputService::Value(const DeviceHandle deviceHandle, const ActionId actionId) const noexcept
 	{
 		float value;
-		Value(deviceHandles, actionId, std::span(&value, 1uz));
+		Value(deviceHandle, actionId, std::span(&value, 1uz));
 		return value;
 	}
 
@@ -263,23 +262,23 @@ namespace PonyEngine::Input
 	}
 
 	template<std::size_t Size>
-	Math::Vector<float, Size> IInputService::ValueVector(const std::span<const DeviceHandle> deviceHandles, const ActionId actionId) const noexcept
+	Math::Vector<float, Size> IInputService::ValueVector(const DeviceHandle deviceHandle, const ActionId actionId) const noexcept
 	{
 		Math::Vector<float, Size> vector;
-		Value(deviceHandles, actionId, vector.Span());
+		Value(deviceHandle, actionId, vector.Span());
 		return vector;
 	}
 
 	template<Layout T>
 	float IInputService::Value(const T axisId) const noexcept
 	{
-		return Value(typeid(T), static_cast<AxisIdType>(axisId));
+		return Value(Axis(axisId));
 	}
 
 	template<Layout T>
-	float IInputService::Value(const std::span<const DeviceHandle> deviceHandles, const T axisId) const noexcept
+	float IInputService::Value(const DeviceHandle deviceHandle, const T axisId) const noexcept
 	{
-		return Value(deviceHandles, typeid(T), static_cast<AxisIdType>(axisId));
+		return Value(deviceHandle, Axis(axisId));
 	}
 
 	bool IInputService::HasLayout(const DeviceHandle deviceHandle, const std::type_info& layoutType) const

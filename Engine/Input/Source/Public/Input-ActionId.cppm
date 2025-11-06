@@ -17,6 +17,9 @@ export namespace PonyEngine::Input
 	struct ActionId final
 	{
 		std::uint64_t hash = 0ull; ///< Action hash.
+
+		[[nodiscard("Pure operator")]]
+		constexpr bool operator ==(const ActionId& other) const noexcept = default;
 	};
 }
 
@@ -26,7 +29,7 @@ export
 	struct std::hash<PonyEngine::Input::ActionId> final
 	{
 		[[nodiscard("Pure function")]]
-		size_t operator()(const PonyEngine::Input::ActionId actionId) const noexcept
+		size_t operator ()(const PonyEngine::Input::ActionId actionId) const noexcept
 		{
 			return std::hash<std::uint64_t>()(actionId.hash);
 		}

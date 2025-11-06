@@ -335,8 +335,8 @@ export namespace PonyEngine::Surface::Windows
 		std::vector<ISurfaceObserver*> observers; ///< Surface observer.
 		std::unordered_map<DWORD, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 
-		mutable std::string titleCache; ///< Title cache.
-		std::vector<BYTE> rawInputCache; ///< Raw input cache.
+		mutable std::string titleTemp; ///< Title temp data.
+		std::vector<BYTE> rawInputTemp; ///< Raw input temp data.
 	};
 }
 #endif
@@ -591,16 +591,16 @@ namespace PonyEngine::Surface::Windows
 			return std::string_view();
 		}
 
-		titleCache.clear();
-		titleCache.reserve(length + 1);
-		const int copied = GetWindowTextA(windowHandle, titleCache.data(), length + 1);
+		titleTemp.clear();
+		titleTemp.reserve(length + 1);
+		const int copied = GetWindowTextA(windowHandle, titleTemp.data(), length + 1);
 		if (!copied) [[unlikely]]
 		{
 			throw std::runtime_error(Text::FormatSafe("Failed to get window title. Error code: '0x{:X}'.", GetLastError()));
 		}
-		titleCache.resize(copied);
+		titleTemp.resize(copied);
 
-		return titleCache;
+		return titleTemp;
 	}
 
 	void SurfaceService::Title(const std::string_view title)
@@ -1501,20 +1501,20 @@ namespace PonyEngine::Surface::Windows
 		}
 		try
 		{
-			rawInputCache.resize(size);
+			rawInputTemp.resize(size);
 		}
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(application->Logger(), e, "On resizing raw input cache.");
 			return 0;
 		}
-		if (GetRawInputData(rawInputInfo, RID_INPUT, rawInputCache.data(), &size, sizeof(RAWINPUTHEADER)) != rawInputCache.size()) [[unlikely]]
+		if (GetRawInputData(rawInputInfo, RID_INPUT, rawInputTemp.data(), &size, sizeof(RAWINPUTHEADER)) != rawInputTemp.size()) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
 			return 0;
 		}
 
-		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(rawInputCache.data());
+		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(rawInputTemp.data());
 		DWORD usageType;
 		switch (input->header.dwType)
 		{

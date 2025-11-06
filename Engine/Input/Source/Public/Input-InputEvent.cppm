@@ -10,6 +10,8 @@
 export module PonyEngine.Input:InputEvent;
 
 import :ActionId;
+import :DeviceHandle;
+import :InputEventType;
 
 export namespace PonyEngine::Input
 {
@@ -18,5 +20,7 @@ export namespace PonyEngine::Input
 	{
 		ActionId actionId; ///< Action ID.
 		std::span<const float> values; ///< Values.
+		DeviceHandle deviceHandle; ///< Device handle.
+		InputEventType eventType = InputEventType::State; ///< Event type.
 	};
 }
