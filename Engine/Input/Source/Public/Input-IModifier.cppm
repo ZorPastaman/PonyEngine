@@ -7,20 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:AxisBinding;
+module;
 
-import std;
+#include "PonyEngine/Object/Body.h"
 
-import :Axis;
-import :IModifier;
+export module PonyEngine.Input:IModifier;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Axis binding.
-	struct AxisBinding final
+	/// @brief Input value modifier.
+	class IModifier
 	{
-		std::span<std::shared_ptr<IModifier>> modifiers; ///< Input value modifiers.
-		Axis axis; ///< Axis.
-		std::uint8_t actionAxisIndex = 0u; ///< Action axis index.
+		INTERFACE_BODY(IModifier)
+
+		/// @brief Modifies the value.
+		/// @param initial Initial not-modified value.
+		/// @param current Current modified value.
+		/// @return New modified value.
+		[[nodiscard("Must be used")]]
+		virtual float Modify(float initial, float current) noexcept = 0;
 	};
 }

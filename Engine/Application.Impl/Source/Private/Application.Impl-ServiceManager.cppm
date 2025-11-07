@@ -81,6 +81,7 @@ export namespace PonyEngine::Application
 
 		IApplicationContext* application; ///< Application context.
 
+		// These vectors are synced by index.
 		std::vector<ServiceHandle> serviceHandles; ///< Service handles.
 		std::vector<std::shared_ptr<IService>> services; ///< Services.
 		std::vector<ServiceData> serviceData; ///< Initial service data.

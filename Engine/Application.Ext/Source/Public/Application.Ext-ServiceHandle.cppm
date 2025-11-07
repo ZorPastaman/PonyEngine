@@ -33,6 +33,19 @@ export namespace PonyEngine::Application
 	};
 }
 
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Application::ServiceHandle> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator ()(const PonyEngine::Application::ServiceHandle handle) const noexcept
+		{
+			return std::hash<std::uint32_t>()(handle.id);
+		}
+	};
+}
+
 namespace PonyEngine::Application
 {
 	constexpr bool ServiceHandle::IsValid() const noexcept

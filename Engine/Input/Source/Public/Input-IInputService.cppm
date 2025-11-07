@@ -99,6 +99,12 @@ export namespace PonyEngine::Input
 		template<Layout T> [[nodiscard("Pure function")]]
 		float Value(DeviceHandle deviceHandle, T axisId) const noexcept;
 
+		/// @brief Gets a last device reported its input.
+		/// @return Last input device.
+		/// @remark The value is updated each frame. If no device reported an input this frame, the return value is invalid.
+		[[nodiscard("Pure function")]]
+		virtual DeviceHandle LastInputDevice() const noexcept = 0;
+
 		/// @brief Binds an action to axis bindings.
 		/// @param actionId Action ID.
 		/// @param axisBindings Axis bindings.

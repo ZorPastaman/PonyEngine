@@ -33,6 +33,19 @@ export namespace PonyEngine::Input
 	};
 }
 
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Input::DeviceHandle> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator ()(const PonyEngine::Input::DeviceHandle handle) const noexcept
+		{
+			return std::hash<std::uint32_t>()(handle.id);
+		}
+	};
+}
+
 namespace PonyEngine::Input
 {
 	constexpr bool DeviceHandle::IsValid() const noexcept

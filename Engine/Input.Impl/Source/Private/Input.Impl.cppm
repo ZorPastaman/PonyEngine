@@ -8,3 +8,7 @@
  ***************************************************/
 
 export module PonyEngine.Input.Impl;
+
+export import PonyEngine.Input.Ext;
+
+export import :InputServiceModule;

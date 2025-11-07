@@ -33,6 +33,19 @@ export namespace PonyEngine::Input
 	};
 }
 
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Input::InputProviderHandle> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator ()(const PonyEngine::Input::InputProviderHandle handle) const noexcept
+		{
+			return std::hash<std::uint32_t>()(handle.id);
+		}
+	};
+}
+
 namespace PonyEngine::Input
 {
 	constexpr bool InputProviderHandle::IsValid() const noexcept

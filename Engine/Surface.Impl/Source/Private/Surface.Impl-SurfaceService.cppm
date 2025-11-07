@@ -703,13 +703,6 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::AddObserver(ISurfaceObserver& observer)
 	{
-#if !NDEBUG
-		if (std::ranges::find(observers, &observer) != observers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("The observer has already been added.");
-		}
-#endif
-
 		observers.push_back(&observer);
 	}
 
@@ -735,14 +728,6 @@ namespace PonyEngine::Surface::Windows
 		const DWORD usageType = Pack(usagePage, usage);
 		const auto typePosition = rawInputObservers.find(usageType);
 		std::vector<IRawInputObserver*>& observers = typePosition != rawInputObservers.cend() ? typePosition->second : rawInputObservers[usageType];
-
-#if !NDEBUG
-		if (std::ranges::find(observers, &observer) != observers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("The raw input observer has already been added.");
-		}
-#endif
-
 		observers.push_back(&observer);
 
 		if (observers.size() == 1uz)

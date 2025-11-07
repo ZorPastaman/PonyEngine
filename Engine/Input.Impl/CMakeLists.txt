@@ -22,6 +22,7 @@ target_sources(PonyEngine.Input.Impl PRIVATE
 target_sources(PonyEngine.Input.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Input.Impl.cppm"
 	"Source/Private/Input.Impl-InputService.cppm"
+	"Source/Private/Input.Impl-InputServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

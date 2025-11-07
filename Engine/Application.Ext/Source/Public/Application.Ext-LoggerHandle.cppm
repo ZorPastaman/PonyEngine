@@ -33,6 +33,19 @@ export namespace PonyEngine::Application
 	};
 }
 
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Application::LoggerHandle> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator ()(const PonyEngine::Application::LoggerHandle handle) const noexcept
+		{
+			return std::hash<std::uint32_t>()(handle.id);
+		}
+	};
+}
+
 namespace PonyEngine::Application
 {
 	constexpr bool LoggerHandle::IsValid() const noexcept

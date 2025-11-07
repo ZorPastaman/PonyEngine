@@ -71,6 +71,7 @@ export namespace PonyEngine::Application
 		ILoggerModuleContext* loggerModuleContext; ///< Logger module context.
 		IServiceModuleContext* serviceModuleContext; ///< Service module context.
 
+		// These vectors are synced by index.
 		std::vector<ModuleDataHandle> dataHandles; ///< Data handles.
 		std::vector<const std::type_info*> dataTypes; ///< Data types.
 		std::vector<std::shared_ptr<void>> data; ///< Data.

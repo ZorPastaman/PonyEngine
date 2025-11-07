@@ -33,6 +33,19 @@ export namespace PonyEngine::Input
 	};
 }
 
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Input::ActionBindingHandle> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator ()(const PonyEngine::Input::ActionBindingHandle handle) const noexcept
+		{
+			return std::hash<std::uint32_t>()(handle.id);
+		}
+	};
+}
+
 namespace PonyEngine::Input
 {
 	constexpr bool ActionBindingHandle::IsValid() const noexcept
