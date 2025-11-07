@@ -33,6 +33,19 @@ export namespace PonyEngine::Log
 	};
 }
 
+export
+{
+	template<>
+	struct std::hash<PonyEngine::Log::SubLoggerHandle> final
+	{
+		[[nodiscard("Pure function")]]
+		size_t operator ()(const PonyEngine::Log::SubLoggerHandle handle) const noexcept
+		{
+			return std::hash<std::uint32_t>()(handle.id);
+		}
+	};
+}
+
 namespace PonyEngine::Log
 {
 	constexpr bool SubLoggerHandle::IsValid() const noexcept

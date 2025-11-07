@@ -77,6 +77,7 @@ export namespace PonyEngine::Log
 
 		Application::ILoggerContext* loggerContext; ///< Logger context.
 
+		// These vectors are synced by index.
 		std::vector<SubLoggerHandle> subLoggerHandles; ///< Sub-logger handles.
 		std::vector<std::shared_ptr<ISubLogger>> subLoggers; ///< Sub-loggers.
 

@@ -18,7 +18,7 @@ target_sources(PonyEngine.Input PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Input-InputEventType.cppm"
 	"Source/Public/Input-IRawInputObserver.cppm"
 	"Source/Public/Input-RawInputEvent.cppm"
-)
+ "Source/Public/Input-IModifier.cppm" "Source/Public/Input-ScaleModifier.cppm" "Source/Public/Input-DeadZoneModifier.cppm" "Source/Public/Input-ClampModifier.cppm" "Source/Public/Input-BiasModifier.cppm")
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Input PROPERTIES 

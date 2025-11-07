@@ -25,9 +25,12 @@ import PonyEngine.Text;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Input service.
 	class InputService final : public Application::ITickableService, private IInputContext, private IInputModuleContext, private IInputService
 	{
 	public:
+		/// @brief Creates an input service.
+		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
 		explicit InputService(Application::IApplicationContext& application) noexcept;
 		InputService(const InputService&) = delete;
@@ -66,6 +69,9 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual float Value(DeviceHandle deviceHandle, const Axis& axis) const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual DeviceHandle LastInputDevice() const noexcept override;
+
 		virtual ActionBindingHandle Bind(ActionId actionId, std::span<const AxisBinding> axisBindings) override;
 		virtual void Unbind(ActionBindingHandle handle) override;
 
@@ -102,19 +108,38 @@ export namespace PonyEngine::Input
 		virtual void AddObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) override;
 		virtual void RemoveObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) noexcept override;
 
+		/// @brief Gets the public input module context.
+		/// @return Input module context.
+		[[nodiscard("Pure function")]]
+		IInputModuleContext& PublicInputContext() noexcept;
+		/// @brief Gets the public input module context.
+		/// @return Input module context.
+		[[nodiscard("Pure function")]]
+		const IInputModuleContext& PublicInputContext() const noexcept;
+		/// @brief Gets the public input service interface.
+		/// @return Input service interface.
+		[[nodiscard("Pure function")]]
+		IInputService& PublicInputService() noexcept;
+		/// @brief Gets the public input service interface.
+		/// @return Input service interface.
+		[[nodiscard("Pure function")]]
+		const IInputService& PublicInputService() const noexcept;
+
 		InputService& operator =(const InputService&) = delete;
 		InputService& operator =(InputService&&) = delete;
 
 	private:
+		/// @brief Device info.
 		struct DeviceInfo final
 		{
-			std::shared_ptr<IDevice> device;
-			std::vector<std::reference_wrapper<const std::type_info>> deviceLayouts;
-			std::vector<std::reference_wrapper<const std::type_info>> deviceFeatureTypes;
-			std::vector<void*> deviceFeatures;
-			bool deviceConnection;
+			std::shared_ptr<IDevice> device; ///< Device.
+			std::vector<std::reference_wrapper<const std::type_info>> deviceLayouts; ///< Device layouts.
+			std::vector<std::reference_wrapper<const std::type_info>> deviceFeatureTypes; ///< Device feature types.
+			std::vector<void*> deviceFeatures; ///< Device features. They are synced with the @p deviceFeatureTypes by index.
+			bool deviceConnection; ///< Is the device connected?
 		};
 
+		/// @brief Raw input.
 		struct RawInput final
 		{
 			std::size_t valueIndex; ///< Value index.
@@ -126,68 +151,116 @@ export namespace PonyEngine::Input
 			std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position in client coordinates; std::nullopt if not applicable.
 		};
 
+		/// @brief Input value.
 		struct InputValue final
 		{
 			float state = 0.f;
 			float delta = 0.f;
 		};
 
+		/// @brief Action binding.
+		struct ActionBinding final
+		{
+			std::vector<std::shared_ptr<IModifier>> modifiers; ///< Input value modifiers.
+			Axis axis; ///< Axis.
+			std::uint8_t actionAxisIndex = 0u; ///< Action axis index.
+		};
+
+		/// @brief Begins the providers.
+		/// @param count How many providers are begun.
 		void Begin(std::size_t& count);
+		/// @brief Ends the providers.
+		/// @param count How many providers to end.
 		void End(std::size_t count) noexcept;
 
+		/// @brief Clears data from the previous tick.
 		void ClearOldData() noexcept;
+		/// @brief Ticks the providers.
 		void TickProviders();
+		/// @brief Sorts the raw input.
 		void SortInput() noexcept;
+		/// @brief Reads the raw input and updates the data.
 		void UpdateInput();
 
-		[[nodiscard("Pure function")]]
-		static std::size_t AxisCount(std::span<const AxisBinding> bindings) noexcept;
+		/// @brief Adds action values.
+		/// @param actionValues Action values source.
+		/// @param actionId Action ID.
+		/// @param values Target values.
 		static void Value(const std::unordered_map<ActionId, std::vector<InputValue>>& actionValues, ActionId actionId, std::span<float> values) noexcept;
+		/// @brief Gets an axis value.
+		/// @param values Axes source.
+		/// @param axis Axis.
+		/// @return Axis value.
 		[[nodiscard("Pure function")]]
 		static float Value(const std::unordered_map<Axis, InputValue>& values, const Axis& axis) noexcept;
 
+		/// @brief Checks if the @p bindings have at least one axis from the @p axes.
+		/// @param bindings Bindings.
+		/// @param axes Axes.
+		/// @return @a True if they have; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		static bool HasAxis(std::span<const AxisBinding> bindings, std::span<const Axis> axes) noexcept;
+		static bool HasAxis(std::span<const ActionBinding> bindings, std::span<const Axis> axes) noexcept;
 
+		/// @brief Calls on device added observers.
+		/// @param observers Observers to call.
+		/// @param deviceHandle Added device handle.
 		void ObserveDeviceAdded(std::span<IDeviceObserver*> observers, DeviceHandle deviceHandle) noexcept;
+		/// @brief Calls on device removed observers.
+		/// @param observers Observers to call.
+		/// @param deviceHandle Removed device handle.
 		void ObserveDeviceRemoved(std::span<IDeviceObserver*> observers, DeviceHandle deviceHandle) noexcept;
+		/// @brief Calls on connection changed observers.
+		/// @param observers Observers to call.
+		/// @param deviceHandle Device which connection is changed.
+		/// @param isConnected Is it changed to connected?
 		void ObserveDeviceConnectionChanged(std::span<IDeviceObserver*> observers, DeviceHandle deviceHandle, bool isConnected) noexcept;
+		/// @brief Calls action input observers.
+		/// @param observers Observers to call.
+		/// @param inputEvent Action input event.
 		void ObserveInput(std::span<IInputObserver*> observers, const InputEvent& inputEvent) noexcept;
+		/// @brief Calls raw input observers.
+		/// @param observers Observers to call.
+		/// @param inputEvent Raw input event.
 		void ObserveRawInput(std::span<IRawInputObserver*> observers, const RawInputEvent& inputEvent) noexcept;
 
-		Application::IApplicationContext* application;
+		Application::IApplicationContext* application; ///< Application context.
 
-		std::vector<InputProviderHandle> providerHandles;
-		std::vector<std::shared_ptr<IInputProvider>> providers;
+		// These vectors are synced by index.
+		std::vector<InputProviderHandle> providerHandles; ///< Provider handles.
+		std::vector<std::shared_ptr<IInputProvider>> providers; ///< Providers.
 
-		std::vector<DeviceHandle> devices;
-		std::vector<DeviceInfo> deviceInfos;
-		std::vector<std::unordered_map<Axis, InputValue>> deviceAxisValues;
-		std::vector<std::unordered_map<ActionId, std::vector<InputValue>>> deviceActionValues;
+		// These vectors are synced by index.
+		std::vector<DeviceHandle> devices; ///< Device handles.
+		std::vector<DeviceInfo> deviceInfos; ///< Device infos.
+		std::vector<std::unordered_map<Axis, InputValue>> deviceAxisValues; ///< Device axis values.
+		std::vector<std::unordered_map<ActionId, std::vector<InputValue>>> deviceActionValues; ///< Device action values.
 
-		std::vector<ActionBindingHandle> actionBindingHandles;
-		std::vector<ActionId> actionIds;
-		std::vector<std::vector<AxisBinding>> actionBindings;
+		// These vectors are synced by index.
+		std::vector<ActionBindingHandle> actionBindingHandles; ///< Action binding handles.
+		std::vector<ActionId> actionIds; ///< Action IDs.
+		std::vector<std::vector<ActionBinding>> actionBindings; ///< Action bindings.
 
-		std::unordered_map<ActionId, std::string> actionIdHashCache;
+		std::unordered_map<ActionId, std::string> actionIdHashCache; ///< Action ID to its original string cache.
 
-		std::vector<RawInput> rawInputs;
-		std::vector<Axis> rawInputAxes;
-		std::vector<float> rawInputValues;
+		std::vector<RawInput> rawInputs; ///< Raw input events.
+		std::vector<Axis> rawInputAxes; ///< Raw input axes. They are referenced by index from a @p RawInput.
+		std::vector<float> rawInputValues; ///< Raw input values. They are referenced by index from a @p RawInput.
 
-		std::vector<float> actionValuesTemp;
+		std::vector<float> actionValuesTemp; ///< Temp action values.
 
-		std::vector<IDeviceObserver*> globalDeviceObservers;
-		std::vector<IInputObserver*> globalInputObservers;
-		std::vector<IRawInputObserver*> globalRawInputObservers;
+		std::vector<IDeviceObserver*> globalDeviceObservers; ///< Global device observers.
+		std::vector<IInputObserver*> globalInputObservers; ///< Global action input observers.
+		std::vector<IRawInputObserver*> globalRawInputObservers; ///< Global raw input observers.
 
-		std::unordered_map<DeviceHandle, std::vector<IDeviceObserver*>> deviceObservers;
-		std::unordered_map<DeviceHandle, std::vector<IInputObserver*>> inputObservers;
-		std::unordered_map<DeviceHandle, std::vector<IRawInputObserver*>> rawInputObservers;
+		std::unordered_map<DeviceHandle, std::vector<IDeviceObserver*>> deviceObservers; ///< Device observers.
+		std::unordered_map<DeviceHandle, std::vector<IInputObserver*>> inputObservers; ///< Action input observers.
+		std::unordered_map<DeviceHandle, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 
-		InputProviderHandle nextProviderHandle;
-		DeviceHandle nextDeviceHandle;
-		ActionBindingHandle nextActionHandle;
+		DeviceHandle lastInputDevice; ///< Last input device. Can be invalid if there was no input from any device last tick.
+
+		InputProviderHandle nextProviderHandle; ///< Next provider handle.
+		DeviceHandle nextDeviceHandle; ///< Next device handle.
+		ActionBindingHandle nextActionHandle; ///< Next action handle.
 	};
 
 	InputService::InputService(Application::IApplicationContext& application) noexcept :
@@ -196,6 +269,36 @@ export namespace PonyEngine::Input
 		nextDeviceHandle{.id = 1u},
 		nextActionHandle{.id = 1u}
 	{
+	}
+
+	InputService::~InputService() noexcept
+	{
+		if (actionBindingHandles.size() > 0uz) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Actions weren't removed:");
+			for (const ActionBindingHandle action : actionBindingHandles)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Action id: '0x{:X}'.", action.id);
+			}
+		}
+
+		if (deviceInfos.size() > 0uz) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Devices weren't removed:");
+			for (const DeviceInfo& info : deviceInfos)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Device: '{}'.", typeid(*info.device).name());
+			}
+		}
+
+		if (providers.size() > 0uz) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Providers weren't removed:");
+			for (const std::shared_ptr<IInputProvider>& provider : providers)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Provider: '{}'.", typeid(*provider).name());
+			}
+		}
 	}
 
 	void InputService::Begin()
@@ -439,7 +542,7 @@ export namespace PonyEngine::Input
 			const std::size_t index = position - devices.cbegin();
 			if (deviceInfos[index].deviceConnection == isConnected) [[unlikely]]
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Warning, "Device connection was updated to the same value. Handle: '0x{:X}'.", deviceHandle);
+				PONY_LOG(application->Logger(), Log::LogType::Warning, "Device connection was updated to the same value. Handle: '0x{:X}'.", deviceHandle.id);
 				return;
 			}
 			deviceInfos[index].deviceConnection = isConnected;
@@ -520,7 +623,7 @@ export namespace PonyEngine::Input
 	{
 		if (const auto position = std::ranges::find(actionIds, actionId); position != actionIds.cend()) [[likely]]
 		{
-			return AxisCount(actionBindings[position - actionIds.cbegin()]);
+			return actionBindings[position - actionIds.cbegin()].back().actionAxisIndex;
 		}
 
 		return 0uz;
@@ -568,6 +671,11 @@ export namespace PonyEngine::Input
 		return 0.f;
 	}
 
+	DeviceHandle InputService::LastInputDevice() const noexcept
+	{
+		return lastInputDevice;
+	}
+
 	ActionBindingHandle InputService::Bind(const ActionId actionId, const std::span<const AxisBinding> axisBindings)
 	{
 		if (axisBindings.size() == 0uz) [[unlikely]]
@@ -578,6 +686,16 @@ export namespace PonyEngine::Input
 		{
 			throw std::invalid_argument("Action ID is already bound.");
 		}
+		for (const AxisBinding& binding : axisBindings)
+		{
+			for (const std::shared_ptr<IModifier>& modifier : binding.modifiers)
+			{
+				if (!modifier) [[unlikely]]
+				{
+					throw std::invalid_argument("Modifier is nullptr.");
+				}
+			}
+		}
 
 		const ActionBindingHandle currentHandle = nextActionHandle;
 		actionBindingHandles.push_back(currentHandle);
@@ -586,7 +704,19 @@ export namespace PonyEngine::Input
 			actionIds.push_back(actionId);
 			try
 			{
-				actionBindings.push_back(std::vector<AxisBinding>(axisBindings.cbegin(), axisBindings.cend()));
+				std::vector<ActionBinding> bindings;
+				bindings.reserve(axisBindings.size());
+				for (const AxisBinding& binding : axisBindings)
+				{
+					bindings.push_back(ActionBinding
+					{
+						.modifiers = std::vector<std::shared_ptr<IModifier>>(binding.modifiers.cbegin(), binding.modifiers.cend()),
+						.axis = binding.axis,
+						.actionAxisIndex = binding.actionAxisIndex
+					});
+				}
+				std::ranges::sort(bindings, [](const ActionBinding& lhs, const ActionBinding& rhs) { return lhs.actionAxisIndex < rhs.actionAxisIndex; });
+				actionBindings.push_back(std::move(bindings));
 			}
 			catch (...)
 			{
@@ -723,13 +853,6 @@ export namespace PonyEngine::Input
 
 	void InputService::AddObserver(IDeviceObserver& observer)
 	{
-#if !NDEBUG // TODO: Remove. Double subscription is ok
-		if (std::ranges::find(globalDeviceObservers, &observer) != globalDeviceObservers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Observer has already been added.");
-		}
-#endif
-
 		globalDeviceObservers.push_back(&observer);
 	}
 
@@ -749,14 +872,6 @@ export namespace PonyEngine::Input
 		}
 
 		std::vector<IDeviceObserver*>& observers = deviceObservers[deviceHandle];
-
-#if !NDEBUG
-		if (std::ranges::find(observers, &observer) != observers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Observer has already been added.");
-		}
-#endif
-
 		observers.push_back(&observer);
 	}
 
@@ -773,13 +888,6 @@ export namespace PonyEngine::Input
 
 	void InputService::AddObserver(IInputObserver& observer)
 	{
-#if !NDEBUG
-		if (std::ranges::find(globalInputObservers, &observer) != globalInputObservers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Observer has already been added.");
-		}
-#endif
-
 		globalInputObservers.push_back(&observer);
 	}
 
@@ -799,14 +907,6 @@ export namespace PonyEngine::Input
 		}
 
 		std::vector<IInputObserver*>& observers = inputObservers[deviceHandle];
-
-#if !NDEBUG
-		if (std::ranges::find(observers, &observer) != observers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Observer has already been added.");
-		}
-#endif
-
 		observers.push_back(&observer);
 	}
 
@@ -823,13 +923,6 @@ export namespace PonyEngine::Input
 
 	void InputService::AddObserver(IRawInputObserver& observer)
 	{
-#if !NDEBUG
-		if (std::ranges::find(globalRawInputObservers, &observer) != globalRawInputObservers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Observer has already been added.");
-		}
-#endif
-
 		globalRawInputObservers.push_back(&observer);
 	}
 
@@ -849,14 +942,6 @@ export namespace PonyEngine::Input
 		}
 
 		std::vector<IRawInputObserver*>& observers = rawInputObservers[deviceHandle];
-
-#if !NDEBUG
-		if (std::ranges::find(observers, &observer) != observers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Observer has already been added.");
-		}
-#endif
-
 		observers.push_back(&observer);
 	}
 
@@ -869,6 +954,26 @@ export namespace PonyEngine::Input
 				mapPosition->second.erase(position);
 			}
 		}
+	}
+
+	IInputModuleContext& InputService::PublicInputContext() noexcept
+	{
+		return *this;
+	}
+
+	const IInputModuleContext& InputService::PublicInputContext() const noexcept
+	{
+		return *this;
+	}
+
+	IInputService& InputService::PublicInputService() noexcept
+	{
+		return *this;
+	}
+
+	const IInputService& InputService::PublicInputService() const noexcept
+	{
+		return *this;
 	}
 
 	void InputService::Begin(std::size_t& count)
@@ -944,6 +1049,8 @@ export namespace PonyEngine::Input
 		rawInputs.clear();
 		rawInputAxes.clear();
 		rawInputValues.clear();
+
+		lastInputDevice = DeviceHandle();
 	}
 
 	void InputService::TickProviders()
@@ -983,7 +1090,6 @@ export namespace PonyEngine::Input
 			const auto devicePosition = std::ranges::find(devices, rawInput.deviceHandle);
 			assert(devicePosition != devices.cend() && "Device not found.");
 			const std::size_t deviceIndex = devicePosition - devices.cbegin();
-
 			const auto eventAxes = std::span<const Axis>(&rawInputAxes[rawInput.valueIndex], rawInput.valueCount);
 			const auto eventValues = std::span<const float>(&rawInputValues[rawInput.valueIndex], rawInput.valueCount);
 
@@ -1022,24 +1128,31 @@ export namespace PonyEngine::Input
 				}
 			}
 
+			lastInputDevice = *devicePosition;
+
 			for (std::size_t i = 0uz; i < actionBindings.size(); ++i)
 			{
-				const std::span<const AxisBinding> binding = actionBindings[i];
-
+				const std::span<const ActionBinding> binding = actionBindings[i];
 				if (!HasAxis(binding, eventAxes))
 				{
 					continue;
 				}
 
-				const std::size_t bindingSize = AxisCount(binding);
+				const std::size_t bindingSize = binding.back().actionAxisIndex;
 				actionValuesTemp.resize(bindingSize);
 				std::ranges::fill(actionValuesTemp, 0.f);
 				for (std::size_t axisIndex = 0uz; axisIndex < bindingSize; ++axisIndex)
 				{
-					const AxisBinding& axisBinding = binding[axisIndex];
-					if (const auto position = std::ranges::find(eventAxes, axisBinding.axis); position != eventAxes.cend())
+					const ActionBinding& actionBinding = binding[axisIndex];
+					if (const auto position = std::ranges::find(eventAxes, actionBinding.axis); position != eventAxes.cend())
 					{
-						actionValuesTemp[axisBinding.actionAxisIndex] = eventValues[position - eventAxes.cbegin()] * axisBinding.scale;
+						const float initialValue = eventValues[position - eventAxes.cbegin()];
+						float currentValue = initialValue;
+						for (const std::shared_ptr<IModifier>& modifier : actionBinding.modifiers)
+						{
+							currentValue = modifier->Modify(initialValue, currentValue);
+						}
+						actionValuesTemp[actionBinding.actionAxisIndex] = currentValue;
 					}
 				}
 
@@ -1048,7 +1161,9 @@ export namespace PonyEngine::Input
 					.actionId = actionIds[i],
 					.values = actionValuesTemp,
 					.deviceHandle = rawInput.deviceHandle,
-					.eventType = rawInput.eventType
+					.eventType = rawInput.eventType,
+					.timePoint = rawInput.timePoint,
+					.cursorPosition = rawInput.cursorPosition
 				};
 				if (const auto position = inputObservers.find(rawInput.deviceHandle); position != inputObservers.cend())
 				{
@@ -1080,17 +1195,6 @@ export namespace PonyEngine::Input
 		}
 	}
 
-	std::size_t InputService::AxisCount(const std::span<const AxisBinding> bindings) noexcept
-	{
-		std::size_t count = 0uz;
-		for (const AxisBinding& binding : bindings)
-		{
-			count = count < binding.actionAxisIndex ? binding.actionAxisIndex : count;
-		}
-
-		return count;
-	}
-
 	void InputService::Value(const std::unordered_map<ActionId, std::vector<InputValue>>& actionValues, const ActionId actionId, const std::span<float> values) noexcept
 	{
 		if (const auto position = actionValues.find(actionId); position != actionValues.cend())
@@ -1114,9 +1218,9 @@ export namespace PonyEngine::Input
 		return 0.f;
 	}
 
-	bool InputService::HasAxis(const std::span<const AxisBinding> bindings, const std::span<const Axis> axes) noexcept
+	bool InputService::HasAxis(const std::span<const ActionBinding> bindings, const std::span<const Axis> axes) noexcept
 	{
-		for (const AxisBinding& binding : bindings)
+		for (const ActionBinding& binding : bindings)
 		{
 			for (const Axis& axis : axes)
 			{

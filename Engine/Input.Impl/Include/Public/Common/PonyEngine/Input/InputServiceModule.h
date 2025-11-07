@@ -7,20 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:AxisBinding;
+#pragma once
 
-import std;
+#include "PonyEngine/Macro/Compiler.h"
 
-import :Axis;
-import :IModifier;
+import PonyEngine.Application.Ext;
 
-export namespace PonyEngine::Input
+namespace PonyEngine::Input
 {
-	/// @brief Axis binding.
-	struct AxisBinding final
-	{
-		std::span<std::shared_ptr<IModifier>> modifiers; ///< Input value modifiers.
-		Axis axis; ///< Axis.
-		std::uint8_t actionAxisIndex = 0u; ///< Action axis index.
-	};
+	/// @brief Gets the input service module.
+	/// @return Input service module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT Application::IModule* GetInputServiceModule();
 }
