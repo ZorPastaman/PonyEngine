@@ -51,8 +51,8 @@ export namespace PonyEngine::Application
 		virtual const IServiceModuleContext& ServiceModuleContext() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual void* GetData(const std::type_info& type) const override;
-		virtual ModuleDataHandle AddData(const std::type_info& type, const std::shared_ptr<void>& data) override;
+		virtual void* GetData(std::type_index type) const override;
+		virtual ModuleDataHandle AddData(std::type_index type, const std::shared_ptr<void>& data) override;
 		virtual void RemoveData(ModuleDataHandle handle) override;
 
 		ModuleManager& operator =(const ModuleManager&) = delete;
@@ -73,7 +73,7 @@ export namespace PonyEngine::Application
 
 		// These vectors are synced by index.
 		std::vector<ModuleDataHandle> dataHandles; ///< Data handles.
-		std::vector<const std::type_info*> dataTypes; ///< Data types.
+		std::vector<std::type_index> dataTypes; ///< Data types.
 		std::vector<std::shared_ptr<void>> data; ///< Data.
 
 		ModuleDataHandle nextDataHandle; ///< Next data handle.
@@ -110,9 +110,9 @@ namespace PonyEngine::Application
 		if (data.size() > 0uz) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Data wasn't removed:");
-			for (const std::type_info* type : dataTypes)
+			for (const std::type_index type : dataTypes)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Error, "Data of type: '{}'.", type->name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Data of type: '{}'.", type.name());
 			}
 		}
 	}
@@ -147,9 +147,9 @@ namespace PonyEngine::Application
 		return *serviceModuleContext;
 	}
 
-	void* ModuleManager::GetData(const std::type_info& type) const
+	void* ModuleManager::GetData(const std::type_index type) const
 	{
-		if (const auto position = std::ranges::find(dataTypes, &type); position != dataTypes.cend())
+		if (const auto position = std::ranges::find(dataTypes, type); position != dataTypes.cend())
 		{
 			return data[position - dataTypes.cbegin()].get();
 		}
@@ -157,7 +157,7 @@ namespace PonyEngine::Application
 		return nullptr;
 	}
 
-	ModuleDataHandle ModuleManager::AddData(const std::type_info& type, const std::shared_ptr<void>& data)
+	ModuleDataHandle ModuleManager::AddData(const std::type_index type, const std::shared_ptr<void>& data)
 	{
 		if (!nextDataHandle.IsValid()) [[unlikely]]
 		{
@@ -169,7 +169,7 @@ namespace PonyEngine::Application
 			throw std::logic_error("Data can be added only on start-up.");
 		}
 
-		if (std::ranges::find(dataTypes, &type) != dataTypes.cend()) [[unlikely]]
+		if (std::ranges::find(dataTypes, type) != dataTypes.cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Type has already been added.");
 		}
@@ -178,7 +178,7 @@ namespace PonyEngine::Application
 		dataHandles.push_back(currentHandle);
 		try
 		{
-			dataTypes.push_back(&type);
+			dataTypes.push_back(type);
 			try
 			{
 				this->data.push_back(data);
@@ -211,7 +211,7 @@ namespace PonyEngine::Application
 		if (const auto position = std::find(dataHandles.crbegin(), dataHandles.crend(), handle); position != dataHandles.crend()) [[likely]]
 		{
 			const std::size_t index = std::distance(dataHandles.cbegin(), position.base()) - 1uz;
-			const char* const typeName = dataTypes[index]->name();
+			const char* const typeName = dataTypes[index].name();
 			data.erase(data.cbegin() + index);
 			dataTypes.erase(dataTypes.cbegin() + index);
 			dataHandles.erase(dataHandles.cbegin() + index);

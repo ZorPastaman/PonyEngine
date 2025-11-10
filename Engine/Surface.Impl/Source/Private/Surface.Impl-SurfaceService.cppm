@@ -194,11 +194,11 @@ export namespace PonyEngine::Surface::Windows
 		/// @param usage Usage.
 		/// @param flags Registration flags.
 		void RegisterRawInputType(USHORT usagePage, USHORT usage, DWORD flags);
-		/// @brief Gets a hid type from the raw input.
-		/// @param input Raw input.
-		/// @return Hid type.
+		/// @brief Gets a type from the device handle.
+		/// @param handle Device handle.
+		/// @return Usage type.
 		[[nodiscard("Pure function")]]
-		static DWORD GetHidType(const RAWINPUT& input);
+		static DWORD GetUsageType(HANDLE handle);
 
 		/// @brief Observes the WM_CREATE message.
 		/// @param wParam WParam.
@@ -302,6 +302,12 @@ export namespace PonyEngine::Surface::Windows
 		/// @return Result.
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObserveRawInput(WPARAM wParam, LPARAM lParam) noexcept;
+		/// @brief Observes the WM_INPUT_DEVICE_CHANGE message.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		/// @return Result.
+		[[nodiscard("The value must be returned to the system")]]
+		LRESULT ObserveInputDeviceChange(WPARAM wParam, LPARAM lParam) noexcept;
 
 		/// @brief Packs the two USHORT values into a DWORD.
 		/// @param first High bit value.
@@ -895,6 +901,8 @@ namespace PonyEngine::Surface::Windows
 			return ObservePaint(wParam, lParam);
 		case WM_INPUT:
 			return ObserveRawInput(wParam, lParam);
+		case WM_INPUT_DEVICE_CHANGE:
+			return ObserveInputDeviceChange(wParam, lParam);
 		default:
 			return DefWindowProcA(windowHandle, uMsg, wParam, lParam);
 		}
@@ -1165,7 +1173,7 @@ namespace PonyEngine::Surface::Windows
 	void SurfaceService::RegisterRawInputType(const USHORT usagePage, const USHORT usage)
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Registering raw input type... Usage page: '{}'; Usage: '{}'.", usagePage, usage);
-		RegisterRawInputType(usagePage, usage, DWORD{0});
+		RegisterRawInputType(usagePage, usage, RIDEV_DEVNOTIFY);
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Registering raw input type done. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 	}
 
@@ -1183,7 +1191,7 @@ namespace PonyEngine::Surface::Windows
 			.usUsagePage = usagePage,
 			.usUsage = usage,
 			.dwFlags = flags,
-			.hwndTarget = windowHandle
+			.hwndTarget = flags & RIDEV_REMOVE ? nullptr : windowHandle
 		};
 
 		if (!RegisterRawInputDevices(&rid, 1u, sizeof(rid))) [[unlikely]]
@@ -1192,18 +1200,13 @@ namespace PonyEngine::Surface::Windows
 		}
 	}
 
-	DWORD SurfaceService::GetHidType(const RAWINPUT& input)
+	DWORD SurfaceService::GetUsageType(const HANDLE handle)
 	{
 		auto info = RID_DEVICE_INFO{.cbSize = sizeof(RID_DEVICE_INFO)};
 		UINT size = sizeof(info);
-		if (!GetRawInputDeviceInfoA(input.header.hDevice, RIDI_DEVICEINFO, &info, &size)) [[unlikely]]
+		if (!GetRawInputDeviceInfoA(handle, RIDI_DEVICEINFO, &info, &size)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get hid device info. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		if (info.dwType != RIM_TYPEHID) [[unlikely]]
-		{
-			throw std::runtime_error("Wrong hid device.");
+			throw std::runtime_error(Text::FormatSafe("Failed to get device info. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return Pack(info.hid.usUsagePage, info.hid.usUsage);
@@ -1512,11 +1515,11 @@ namespace PonyEngine::Surface::Windows
 		case RIM_TYPEHID:
 			try
 			{
-				usageType = GetHidType(*input);
+				usageType = GetUsageType(input->header.hDevice);
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(application->Logger(), e, "On getting hid type.");
+				PONY_LOG_E(application->Logger(), e, "On getting hid usage type.");
 				return 0;
 			}
 			break;
@@ -1543,6 +1546,46 @@ namespace PonyEngine::Surface::Windows
 				catch (...)
 				{
 					PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer.", typeid(*observer).name());
+				}
+			}
+		}
+
+		return 0;
+	}
+
+	LRESULT SurfaceService::ObserveInputDeviceChange(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		bool isConnected;
+		switch (wParam)
+		{
+		case GIDC_ARRIVAL:
+			isConnected = true;
+			break;
+		case GIDC_REMOVAL:
+			isConnected = false;
+			break;
+		default:
+			return 0;
+		}
+
+		const auto deviceHandle = reinterpret_cast<HANDLE>(lParam);
+		const DWORD usageType = GetUsageType(deviceHandle);
+
+		if (const auto observerPosition = rawInputObservers.find(usageType); observerPosition != rawInputObservers.cend())
+		{
+			for (IRawInputObserver* const observer : observerPosition->second)
+			{
+				try
+				{
+					observer->OnDeviceConnectionChanged(deviceHandle, isConnected);
+				}
+				catch (const std::exception& e)
+				{
+					PONY_LOG_E(application->Logger(), e, "On calling '{}' raw input observer on input device change.", typeid(*observer).name());
+				}
+				catch (...)
+				{
+					PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer on input device change.", typeid(*observer).name());
 				}
 			}
 		}

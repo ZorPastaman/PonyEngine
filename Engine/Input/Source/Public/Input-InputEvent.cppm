@@ -24,7 +24,6 @@ export namespace PonyEngine::Input
 	{
 		ActionId actionId; ///< Action ID.
 		std::span<const float> values; ///< Values.
-		DeviceHandle deviceHandle; ///< Device handle.
 		InputEventType eventType = InputEventType::State; ///< Event type.
 
 		/// @brief Time point when the event was created.

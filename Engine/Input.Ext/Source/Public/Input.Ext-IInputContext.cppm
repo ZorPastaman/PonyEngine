@@ -15,6 +15,7 @@ export module PonyEngine.Input.Ext:IInputContext;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Input;
+import PonyEngine.Log;
 
 import :DeviceData;
 
@@ -33,6 +34,15 @@ export namespace PonyEngine::Input
 		/// @return Application context.
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		virtual Log::ILogger& Logger() noexcept = 0;
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		virtual const Log::ILogger& Logger() const noexcept = 0;
 
 		/// @brief Registers a new device.
 		/// @param data Device data.

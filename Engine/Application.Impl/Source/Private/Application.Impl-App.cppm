@@ -84,9 +84,9 @@ export namespace PonyEngine::Application::Windows
 		virtual const Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual void* FindService(const std::type_info& type) noexcept override;
+		virtual void* FindService(std::type_index type) noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const void* FindService(const std::type_info& type) const noexcept override;
+		virtual const void* FindService(std::type_index type) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual enum FlowState FlowState() const noexcept override;
@@ -251,12 +251,12 @@ namespace PonyEngine::Application::Windows
 		return loggerManager->Logger();
 	}
 
-	void* App::FindService(const std::type_info& type) noexcept
+	void* App::FindService(const std::type_index type) noexcept
 	{
 		return serviceManager->FindService(type);
 	}
 
-	const void* App::FindService(const std::type_info& type) const noexcept
+	const void* App::FindService(const std::type_index type) const noexcept
 	{
 		return serviceManager->FindService(type);
 	}

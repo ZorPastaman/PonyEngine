@@ -58,7 +58,7 @@ export namespace PonyEngine::Application
 		/// @param type Data type.
 		/// @return Data.
 		[[nodiscard("Pure function")]]
-		virtual void* GetData(const std::type_info& type) const = 0;
+		virtual void* GetData(std::type_index type) const = 0;
 		/// @brief Gets a data.
 		/// @tparam T Data type.
 		/// @return Data.
@@ -68,7 +68,7 @@ export namespace PonyEngine::Application
 		/// @param type Data type.
 		/// @param data Data.
 		/// @return Module data handle.
-		virtual ModuleDataHandle AddData(const std::type_info& type, const std::shared_ptr<void>& data) = 0;
+		virtual ModuleDataHandle AddData(std::type_index type, const std::shared_ptr<void>& data) = 0;
 		/// @brief Adds a data.
 		/// @tparam T Data type.
 		/// @param data Data.

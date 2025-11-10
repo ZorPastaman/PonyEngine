@@ -115,7 +115,7 @@ export namespace PonyEngine::Application
 		/// @param type Service type. Must be a public service interface.
 		/// @return Pointer to the service if it's found; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		virtual void* FindService(const std::type_info& type) noexcept = 0;
+		virtual void* FindService(std::type_index type) noexcept = 0;
 		/// @brief Tries to find a service by its type.
 		/// @tparam T Service type. Must be a public service interface.
 		/// @return Pointer to the service if it's found; nullptr if it's not found.
@@ -125,7 +125,7 @@ export namespace PonyEngine::Application
 		/// @param type Service type. Must be a public service interface.
 		/// @return Pointer to the service if it's found; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		virtual const void* FindService(const std::type_info& type) const noexcept = 0;
+		virtual const void* FindService(std::type_index type) const noexcept = 0;
 		/// @brief Tries to find a service by its type.
 		/// @tparam T Service type. Must be a public service interface.
 		/// @return Pointer to the service if it's found; nullptr if it's not found.

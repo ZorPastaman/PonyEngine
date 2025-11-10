@@ -42,12 +42,12 @@ export namespace PonyEngine::Application
 		/// @param type Service interface type.
 		/// @return Service interface; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		void* FindService(const std::type_info& type) noexcept;
+		void* FindService(std::type_index type) noexcept;
 		/// @brief Finds a service interface.
 		/// @param type Service interface type.
 		/// @return Service interface; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		const void* FindService(const std::type_info& type) const noexcept;
+		const void* FindService(std::type_index type) const noexcept;
 
 		/// @brief Begins the services.
 		void Begin();
@@ -113,7 +113,7 @@ namespace PonyEngine::Application
 		}
 	}
 
-	void* ServiceManager::FindService(const std::type_info& type) noexcept
+	void* ServiceManager::FindService(const std::type_index type) noexcept
 	{
 		if (const auto pair = serviceInterfaces.find(type); pair != serviceInterfaces.cend()) [[likely]]
 		{
@@ -123,7 +123,7 @@ namespace PonyEngine::Application
 		return nullptr;
 	}
 
-	const void* ServiceManager::FindService(const std::type_info& type) const noexcept
+	const void* ServiceManager::FindService(const std::type_index type) const noexcept
 	{
 		if (const auto pair = serviceInterfaces.find(type); pair != serviceInterfaces.cend()) [[likely]]
 		{
@@ -173,29 +173,24 @@ namespace PonyEngine::Application
 					PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces...");
 					for (const auto& [interfaceType, interface] : data.publicInterfaces)
 					{
-						if (!interfaceType) [[unlikely]]
+						PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interfaceType.name());
+						if (serviceInterfaces.contains(interfaceType)) [[unlikely]]
 						{
-							throw std::invalid_argument("Interface is nullptr.");
-						}
-
-						PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interfaceType->name());
-						if (serviceInterfaces.contains(*interfaceType)) [[unlikely]]
-						{
-							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' has already been added.", interfaceType->name()));
+							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' has already been added.", interfaceType.name()));
 						}
 						if (!interface) [[unlikely]]
 						{
-							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' is nullptr.", interfaceType->name()));
+							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' is nullptr.", interfaceType.name()));
 						}
-						serviceInterfaces[*interfaceType] = interface;
+						serviceInterfaces[interfaceType] = interface;
 					}
 					PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces done.");
 				}
 				catch (...)
 				{
-					for (const std::type_info* interface : std::views::keys(data.publicInterfaces))
+					for (const std::type_index interface : std::views::keys(data.publicInterfaces))
 					{
-						serviceInterfaces.erase(*interface);
+						serviceInterfaces.erase(interface);
 					}
 					serviceData.pop_back();
 					throw;
@@ -239,10 +234,10 @@ namespace PonyEngine::Application
 			}
 
 			PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces...");
-			for (const std::type_info* interface : std::views::keys(serviceData[index].publicInterfaces))
+			for (const std::type_index interface : std::views::keys(serviceData[index].publicInterfaces))
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interface->name());
-				serviceInterfaces.erase(*interface);
+				PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interface.name());
+				serviceInterfaces.erase(interface);
 			}
 			PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces done.");
 

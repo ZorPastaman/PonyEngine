@@ -127,13 +127,13 @@ export namespace PonyEngine::Input
 		/// @param deviceHandle Device handle.
 		/// @return Layout types.
 		[[nodiscard("Pure function")]]
-		virtual std::span<const std::reference_wrapper<const std::type_info>> Layouts(DeviceHandle deviceHandle) const = 0;
+		virtual std::span<const std::type_index> Layouts(DeviceHandle deviceHandle) const = 0;
 		/// @brief Checks if the device supports the layout.
 		/// @param deviceHandle Device handle.
 		/// @param layoutType Layout type.
 		/// @return @a True if it supports; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool HasLayout(DeviceHandle deviceHandle, const std::type_info& layoutType) const;
+		bool HasLayout(DeviceHandle deviceHandle, std::type_index layoutType) const;
 		/// @brief Checks if the device supports the layout.
 		/// @tparam T Layout type.
 		/// @param deviceHandle Device handle.
@@ -144,13 +144,13 @@ export namespace PonyEngine::Input
 		/// @param deviceHandle Device handle.
 		/// @return Supported feature types.
 		[[nodiscard("Pure function")]]
-		virtual std::span<const std::reference_wrapper<const std::type_info>> Features(DeviceHandle deviceHandle) const = 0;
+		virtual std::span<const std::type_index> Features(DeviceHandle deviceHandle) const = 0;
 		/// @brief Checks if the device supports the feature.
 		/// @param deviceHandle Device handle.
 		/// @param featureType Feature type.
 		/// @return @a True if it supports; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool HasFeature(DeviceHandle deviceHandle, const std::type_info& featureType) const;
+		bool HasFeature(DeviceHandle deviceHandle, std::type_index featureType) const;
 		/// @brief Checks if the device supports the feature.
 		/// @tparam T Feature type.
 		/// @param deviceHandle Device handle.
@@ -162,13 +162,13 @@ export namespace PonyEngine::Input
 		/// @param featureType Feature type.
 		/// @return Feature; nullptr if it's not supported.
 		[[nodiscard("Pure function")]]
-		virtual void* Feature(DeviceHandle deviceHandle, const std::type_info& featureType) = 0;
+		virtual void* Feature(DeviceHandle deviceHandle, std::type_index featureType) = 0;
 		/// @brief Gets the device feature.
 		/// @param deviceHandle Device handle.
 		/// @param featureType Feature type.
 		/// @return Feature; nullptr if it's not supported.
 		[[nodiscard("Pure function")]]
-		virtual const void* Feature(DeviceHandle deviceHandle, const std::type_info& featureType) const = 0;
+		virtual const void* Feature(DeviceHandle deviceHandle, std::type_index featureType) const = 0;
 		/// @brief Gets the device feature.
 		/// @tparam T Feature type.
 		/// @param deviceHandle Device handle.
@@ -287,11 +287,11 @@ namespace PonyEngine::Input
 		return Value(deviceHandle, Axis(axisId));
 	}
 
-	bool IInputService::HasLayout(const DeviceHandle deviceHandle, const std::type_info& layoutType) const
+	bool IInputService::HasLayout(const DeviceHandle deviceHandle, const std::type_index layoutType) const
 	{
-		for (const std::reference_wrapper<const std::type_info> layout : Layouts(deviceHandle))
+		for (const std::type_index layout : Layouts(deviceHandle))
 		{
-			if (layout.get() == layoutType)
+			if (layout == layoutType)
 			{
 				return true;
 			}
@@ -306,11 +306,11 @@ namespace PonyEngine::Input
 		return HasLayout(deviceHandle, typeid(T));
 	}
 
-	bool IInputService::HasFeature(const DeviceHandle deviceHandle, const std::type_info& featureType) const
+	bool IInputService::HasFeature(const DeviceHandle deviceHandle, const std::type_index featureType) const
 	{
-		for (const std::reference_wrapper<const std::type_info> feature : Features(deviceHandle))
+		for (const std::type_index feature : Features(deviceHandle))
 		{
-			if (feature.get() == featureType)
+			if (feature == featureType)
 			{
 				return true;
 			}

@@ -29,4 +29,5 @@ target_link_libraries(PonyEngine.Input.Ext PRIVATE
 	PonyEngine.Input
 	PonyEngine.Core
 	PonyEngine.Application.Ext
+	PonyEngine.Log
 )

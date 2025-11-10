@@ -7,22 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Ext:DeviceData;
+export module PonyEngine.Input.Keyboard.Impl:KeyboardEvent;
 
 import std;
 
 import PonyEngine.Input;
-
-import :IDevice;
+import PonyEngine.Math;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Device data.
-	struct DeviceData final
+	struct KeyboardInput final
 	{
-		std::shared_ptr<IDevice> device; ///< Device.
-		std::span<const std::type_index> layouts; ///< Device layouts.
-		std::unordered_map<std::type_index, void*> features; ///< Device features.
-		bool isConnected = true; ///< Is the device connected?
+		KeyboardLayout key;
+		bool pressed;
+		std::chrono::time_point<std::chrono::steady_clock> eventTime;
+		Math::Vector2<std::int32_t> cursorPosition;
 	};
+
+	struct KeyboardConnection final
+	{
+		bool isConnected;
+	};
+
+	using KeyboardEvent = std::variant<KeyboardInput, KeyboardConnection>;
 }

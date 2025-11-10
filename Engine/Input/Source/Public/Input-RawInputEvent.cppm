@@ -24,7 +24,6 @@ export namespace PonyEngine::Input
 	{
 		std::span<const Axis> axes; ///< Axes.
 		std::span<const float> values; ///< Values.
-		DeviceHandle deviceHandle; ///< Device handle.
 		InputEventType eventType = InputEventType::State; ///< Event type.
 
 		/// @brief Time point when the event was created.

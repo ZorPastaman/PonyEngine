@@ -16,6 +16,7 @@ export module PonyEngine.Input.Ext:IInputProvider;
 export namespace PonyEngine::Input
 {
 	/// @brief Input provider.
+	/// @note The provider must write to an input service only inside its tick or begin/end.
 	class IInputProvider
 	{
 		INTERFACE_BODY(IInputProvider)
@@ -25,7 +26,6 @@ export namespace PonyEngine::Input
 		/// @brief Invoked after a last tick.
 		virtual void End() = 0;
 		/// @brief Ticks the provider.
-		/// @note The provider must write to an input service only inside its tick.
 		virtual void Tick() = 0;
 	};
 }
