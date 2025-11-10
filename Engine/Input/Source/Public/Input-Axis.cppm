@@ -38,7 +38,7 @@ export namespace PonyEngine::Input
 		/// @brief Gets the layout type.
 		/// @return Layout type.
 		[[nodiscard("Pure function")]]
-		const std::type_info& Layout() const noexcept;
+		std::type_index Layout() const noexcept;
 		/// @brief Gets the axis ID.
 		/// @return Axis ID.
 		[[nodiscard("Pure function")]]
@@ -56,7 +56,7 @@ export namespace PonyEngine::Input
 		bool operator ==(const Axis& other) const noexcept = default;
 
 	private:
-		const std::type_info* layout = nullptr; ///< Layout.
+		std::type_index layout; ///< Layout.
 		AxisIdType axisId = 0u; ///< Axis ID.
 	};
 }
@@ -69,7 +69,7 @@ export
 		[[nodiscard("Pure function")]]
 		size_t operator ()(const PonyEngine::Input::Axis axis) const noexcept
 		{
-			const std::size_t layoutHash = std::hash<const std::type_info*>()(&axis.Layout());
+			const std::size_t layoutHash = axis.Layout().hash_code();
 			const std::size_t axisIdHash = std::hash<PonyEngine::Input::AxisIdType>()(axis.AxisId());
 
 			return (23uz * 31uz + layoutHash) * 31uz + axisIdHash;
@@ -81,14 +81,14 @@ namespace PonyEngine::Input
 {
 	template<Layout T>
 	Axis::Axis(const T axisId) noexcept :
-		layout{&typeid(T)},
-		axisId{axisId}
+		layout{typeid(T)},
+		axisId{static_cast<AxisIdType>(axisId)}
 	{
 	}
 
-	const std::type_info& Axis::Layout() const noexcept
+	std::type_index Axis::Layout() const noexcept
 	{
-		return *layout;
+		return layout;
 	}
 
 	AxisIdType Axis::AxisId() const noexcept
@@ -100,7 +100,7 @@ namespace PonyEngine::Input
 	T Axis::AxisId() const
 	{
 #if !NDEBUG
-		if (*layout != typeid(T)) [[unlikely]]
+		if (layout != typeid(T)) [[unlikely]]
 		{
 			throw std::bad_cast();
 		}

@@ -47,6 +47,11 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const Log::ILogger& Logger() const noexcept override;
+
 		[[nodiscard("Must be used to unregister")]]
 		virtual DeviceHandle RegisterDevice(const DeviceData& data) override;
 		virtual void UnregisterDevice(DeviceHandle deviceHandle) override;
@@ -80,13 +85,13 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual bool IsValid(DeviceHandle deviceHandle) const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::span<const std::reference_wrapper<const std::type_info>> Layouts(DeviceHandle deviceHandle) const override;
+		virtual std::span<const std::type_index> Layouts(DeviceHandle deviceHandle) const override;
 		[[nodiscard("Pure function")]]
-		virtual std::span<const std::reference_wrapper<const std::type_info>> Features(DeviceHandle deviceHandle) const override;
+		virtual std::span<const std::type_index> Features(DeviceHandle deviceHandle) const override;
 		[[nodiscard("Pure function")]]
-		virtual void* Feature(DeviceHandle deviceHandle, const std::type_info& featureType) override;
+		virtual void* Feature(DeviceHandle deviceHandle, std::type_index featureType) override;
 		[[nodiscard("Pure function")]]
-		virtual const void* Feature(DeviceHandle deviceHandle, const std::type_info& featureType) const override;
+		virtual const void* Feature(DeviceHandle deviceHandle, std::type_index featureType) const override;
 		[[nodiscard("Pure function")]]
 		virtual bool IsConnected(DeviceHandle deviceHandle) const override;
 
@@ -133,8 +138,8 @@ export namespace PonyEngine::Input
 		struct DeviceInfo final
 		{
 			std::shared_ptr<IDevice> device; ///< Device.
-			std::vector<std::reference_wrapper<const std::type_info>> deviceLayouts; ///< Device layouts.
-			std::vector<std::reference_wrapper<const std::type_info>> deviceFeatureTypes; ///< Device feature types.
+			std::vector<std::type_index> deviceLayouts; ///< Device layouts.
+			std::vector<std::type_index> deviceFeatureTypes; ///< Device feature types.
 			std::vector<void*> deviceFeatures; ///< Device features. They are synced with the @p deviceFeatureTypes by index.
 			bool deviceConnection; ///< Is the device connected?
 		};
@@ -216,12 +221,14 @@ export namespace PonyEngine::Input
 		void ObserveDeviceConnectionChanged(std::span<IDeviceObserver*> observers, DeviceHandle deviceHandle, bool isConnected) noexcept;
 		/// @brief Calls action input observers.
 		/// @param observers Observers to call.
+		/// @param deviceHandle Device handle.
 		/// @param inputEvent Action input event.
-		void ObserveInput(std::span<IInputObserver*> observers, const InputEvent& inputEvent) noexcept;
+		void ObserveInput(std::span<IInputObserver*> observers, DeviceHandle deviceHandle, const InputEvent& inputEvent) noexcept;
 		/// @brief Calls raw input observers.
 		/// @param observers Observers to call.
+		/// @param deviceHandle Device handle.
 		/// @param inputEvent Raw input event.
-		void ObserveRawInput(std::span<IRawInputObserver*> observers, const RawInputEvent& inputEvent) noexcept;
+		void ObserveRawInput(std::span<IRawInputObserver*> observers, DeviceHandle deviceHandle, const RawInputEvent& inputEvent) noexcept;
 
 		Application::IApplicationContext* application; ///< Application context.
 
@@ -338,6 +345,16 @@ export namespace PonyEngine::Input
 		return *application;
 	}
 
+	Log::ILogger& InputService::Logger() noexcept
+	{
+		return application->Logger();
+	}
+
+	const Log::ILogger& InputService::Logger() const noexcept
+	{
+		return application->Logger();
+	}
+
 	DeviceHandle InputService::RegisterDevice(const DeviceData& data)
 	{
 		if (!nextDeviceHandle.IsValid()) [[unlikely]]
@@ -365,7 +382,7 @@ export namespace PonyEngine::Input
 		{
 			for (std::size_t j = 0uz; j < i; ++j)
 			{
-				if (data.layouts[i].get() == data.layouts[j].get()) [[unlikely]]
+				if (data.layouts[i] == data.layouts[j]) [[unlikely]]
 				{
 					throw std::invalid_argument(Text::FormatSafe("Layouts have duplicates at indices '{}' and '{}'.", i, j));
 				}
@@ -376,12 +393,13 @@ export namespace PonyEngine::Input
 		devices.push_back(currentDeviceHandle);
 		try
 		{
-			auto deviceInfo = DeviceInfo{.device = data.device, .deviceLayouts = data.layouts, .deviceConnection = true};
+			auto deviceInfo = DeviceInfo{.device = data.device, .deviceConnection = data.isConnected};
+			deviceInfo.deviceLayouts.assign(data.layouts.cbegin(), data.layouts.cend());
 			for (const auto [featureType, feature] : data.features)
 			{
 				if (!feature) [[unlikely]]
 				{
-					throw std::invalid_argument(Text::FormatSafe("Feature of type '{}' is nullptr.", featureType.get().name()));
+					throw std::invalid_argument(Text::FormatSafe("Feature of type '{}' is nullptr.", featureType.name()));
 				}
 
 				deviceInfo.deviceFeatureTypes.push_back(featureType);
@@ -464,9 +482,9 @@ export namespace PonyEngine::Input
 	{
 		static constexpr auto validateLayout = [](const Axis& axis, const DeviceInfo& deviceInfo) noexcept
 		{
-			for (const std::reference_wrapper<const std::type_info>& layout : deviceInfo.deviceLayouts)
+			for (const std::type_index layout : deviceInfo.deviceLayouts)
 			{
-				if (axis.Layout() == layout)
+				if (layout == axis.Layout())
 				{
 					return true;
 				}
@@ -769,7 +787,7 @@ export namespace PonyEngine::Input
 		return std::ranges::find(devices, deviceHandle) != devices.cend();
 	}
 
-	std::span<const std::reference_wrapper<const std::type_info>> InputService::Layouts(const DeviceHandle deviceHandle) const
+	std::span<const std::type_index> InputService::Layouts(const DeviceHandle deviceHandle) const
 	{
 		if (const auto position = std::ranges::find(devices, deviceHandle); position != devices.cend()) [[likely]]
 		{
@@ -779,7 +797,7 @@ export namespace PonyEngine::Input
 		throw std::invalid_argument("Device not found.");
 	}
 
-	std::span<const std::reference_wrapper<const std::type_info>> InputService::Features(const DeviceHandle deviceHandle) const
+	std::span<const std::type_index> InputService::Features(const DeviceHandle deviceHandle) const
 	{
 		if (const auto position = std::ranges::find(devices, deviceHandle); position != devices.cend()) [[likely]]
 		{
@@ -789,12 +807,12 @@ export namespace PonyEngine::Input
 		throw std::invalid_argument("Device not found.");
 	}
 
-	void* InputService::Feature(const DeviceHandle deviceHandle, const std::type_info& featureType)
+	void* InputService::Feature(const DeviceHandle deviceHandle, const std::type_index featureType)
 	{
 		return const_cast<void*>(const_cast<const InputService*>(this)->Feature(deviceHandle, featureType));
 	}
 
-	const void* InputService::Feature(const DeviceHandle deviceHandle, const std::type_info& featureType) const
+	const void* InputService::Feature(const DeviceHandle deviceHandle, const std::type_index featureType) const
 	{
 		if (const auto position = std::ranges::find(devices, deviceHandle); position != devices.cend()) [[likely]]
 		{
@@ -802,7 +820,7 @@ export namespace PonyEngine::Input
 
 			for (std::size_t i = 0uz; i < info.deviceFeatureTypes.size(); ++i)
 			{
-				if (info.deviceFeatureTypes[i].get() == featureType)
+				if (info.deviceFeatureTypes[i] == featureType)
 				{
 					return info.deviceFeatures[i];
 				}
@@ -838,6 +856,8 @@ export namespace PonyEngine::Input
 		}
 
 		actionIdHashCache[hash] = actionId;
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "New action ID hashed. Action ID: '{}'; Hash: '0x{:X}'.", actionId, hash.hash);
+
 		return hash;
 	}
 
@@ -1097,16 +1117,15 @@ export namespace PonyEngine::Input
 			{
 				.axes = eventAxes,
 				.values = eventValues,
-				.deviceHandle = rawInput.deviceHandle,
 				.eventType = rawInput.eventType,
 				.timePoint = rawInput.timePoint,
 				.cursorPosition = rawInput.cursorPosition
 			};
 			if (const auto position = rawInputObservers.find(rawInput.deviceHandle); position != rawInputObservers.cend())
 			{
-				ObserveRawInput(position->second, rawInputEvent);
+				ObserveRawInput(position->second, rawInput.deviceHandle, rawInputEvent);
 			}
-			ObserveRawInput(globalRawInputObservers, rawInputEvent);
+			ObserveRawInput(globalRawInputObservers, rawInput.deviceHandle, rawInputEvent);
 
 			std::unordered_map<Axis, InputValue>& deviceValues = deviceAxisValues[deviceIndex];
 			for (std::size_t i = 0uz; i < eventAxes.size(); ++i)
@@ -1160,16 +1179,15 @@ export namespace PonyEngine::Input
 				{
 					.actionId = actionIds[i],
 					.values = actionValuesTemp,
-					.deviceHandle = rawInput.deviceHandle,
 					.eventType = rawInput.eventType,
 					.timePoint = rawInput.timePoint,
 					.cursorPosition = rawInput.cursorPosition
 				};
 				if (const auto position = inputObservers.find(rawInput.deviceHandle); position != inputObservers.cend())
 				{
-					ObserveInput(position->second, inputEvent);
+					ObserveInput(position->second, rawInput.deviceHandle, inputEvent);
 				}
-				ObserveInput(globalInputObservers, inputEvent);
+				ObserveInput(globalInputObservers, rawInput.deviceHandle, inputEvent);
 
 				std::vector<InputValue>& actionValues = deviceActionValues[deviceIndex][actionIds[i]];
 				actionValues.resize(actionValuesTemp.size());
@@ -1291,13 +1309,13 @@ export namespace PonyEngine::Input
 		}
 	}
 
-	void InputService::ObserveInput(const std::span<IInputObserver*> observers, const InputEvent& inputEvent) noexcept
+	void InputService::ObserveInput(const std::span<IInputObserver*> observers, const DeviceHandle deviceHandle, const InputEvent& inputEvent) noexcept
 	{
 		for (IInputObserver* const observer : observers)
 		{
 			try
 			{
-				observer->OnInput(inputEvent);
+				observer->OnInput(deviceHandle, inputEvent);
 			}
 			catch (const std::exception& e)
 			{
@@ -1310,13 +1328,13 @@ export namespace PonyEngine::Input
 		}
 	}
 
-	void InputService::ObserveRawInput(const std::span<IRawInputObserver*> observers, const RawInputEvent& inputEvent) noexcept
+	void InputService::ObserveRawInput(const std::span<IRawInputObserver*> observers, const DeviceHandle deviceHandle, const RawInputEvent& inputEvent) noexcept
 	{
 		for (IRawInputObserver* const observer : observers)
 		{
 			try
 			{
-				observer->OnRawInput(inputEvent);
+				observer->OnRawInput(deviceHandle, inputEvent);
 			}
 			catch (const std::exception& e)
 			{

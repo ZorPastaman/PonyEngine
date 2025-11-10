@@ -13,6 +13,7 @@ module;
 
 export module PonyEngine.Input:IRawInputObserver;
 
+import :DeviceHandle;
 import :RawInputEvent;
 
 export namespace PonyEngine::Input
@@ -23,7 +24,8 @@ export namespace PonyEngine::Input
 		INTERFACE_BODY(IRawInputObserver)
 
 		/// @brief Invoked on raw input event.
+		/// @param deviceHandle Device handle.
 		/// @param inputEvent Raw input event.
-		virtual void OnRawInput(const RawInputEvent& inputEvent) = 0;
+		virtual void OnRawInput(DeviceHandle deviceHandle, const RawInputEvent& inputEvent) = 0;
 	};
 }

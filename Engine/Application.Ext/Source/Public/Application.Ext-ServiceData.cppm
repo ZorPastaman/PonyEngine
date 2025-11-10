@@ -20,7 +20,7 @@ export namespace PonyEngine::Application
 	struct ServiceData final
 	{
 		std::shared_ptr<IService> service; ///< Service.
-		std::unordered_map<const std::type_info*, void*> publicInterfaces; ///< Service public interfaces.
+		std::unordered_map<std::type_index, void*> publicInterfaces; ///< Service public interfaces.
 		ITickableService* tickableService = nullptr; ///< Tickable service. 
 		std::int32_t tickOrder = 0; ///< Service tick order. It's used only when the @p tickableService is not nullptr.
 
@@ -56,6 +56,6 @@ namespace PonyEngine::Application
 	template<typename T>
 	void ServiceData::AddInterface(T* const interface) noexcept
 	{
-		publicInterfaces.emplace(&typeid(T), interface);
+		publicInterfaces.emplace(typeid(T), interface);
 	}
 }

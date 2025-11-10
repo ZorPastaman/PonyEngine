@@ -23,7 +23,8 @@ export namespace PonyEngine::Input
 		INTERFACE_BODY(IInputObserver)
 
 		/// @brief Invoked on each input event.
+		/// @param deviceHandle Device handle.
 		/// @param inputEvent Input event.
-		virtual void OnInput(const InputEvent& inputEvent) = 0;
+		virtual void OnInput(DeviceHandle deviceHandle, const InputEvent& inputEvent) = 0;
 	};
 }
