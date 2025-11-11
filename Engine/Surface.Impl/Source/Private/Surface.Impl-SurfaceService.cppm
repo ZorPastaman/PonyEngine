@@ -338,6 +338,9 @@ export namespace PonyEngine::Surface::Windows
 
 		HWND windowHandle; ///< Window handle.
 
+		std::vector<HANDLE> deviceHandles; ///< Device handles.
+		std::vector<DWORD> deviceTypes; ///< Device types.
+
 		std::vector<ISurfaceObserver*> observers; ///< Surface observer.
 		std::unordered_map<DWORD, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 
@@ -1209,7 +1212,17 @@ namespace PonyEngine::Surface::Windows
 			throw std::runtime_error(Text::FormatSafe("Failed to get device info. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		return Pack(info.hid.usUsagePage, info.hid.usUsage);
+		switch (info.dwType)
+		{
+		case RIM_TYPEMOUSE:
+			return Pack(HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_MOUSE);
+		case RIM_TYPEKEYBOARD:
+			return Pack(HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_KEYBOARD);
+		case RIM_TYPEHID:
+			return Pack(info.hid.usUsagePage, info.hid.usUsage);
+		default: [[unlikely]]
+			throw std::runtime_error("Unexpected device type.");
+		}
 	}
 
 	LRESULT SurfaceService::ObserveCreate(const WPARAM wParam, const LPARAM lParam) noexcept
@@ -1503,51 +1516,36 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(rawInputTemp.data());
-		DWORD usageType;
-		switch (input->header.dwType)
+		if (const auto position = std::ranges::find(deviceHandles, input->header.hDevice); position != deviceHandles.cend()) [[likely]]
 		{
-		case RIM_TYPEMOUSE:
-			usageType = Pack(HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_MOUSE);
-			break;
-		case RIM_TYPEKEYBOARD:
-			usageType = Pack(HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_KEYBOARD);
-			break;
-		case RIM_TYPEHID:
-			try
+			const std::size_t deviceIndex = position - deviceHandles.cbegin();
+			const DWORD deviceType = deviceTypes[deviceIndex];
+
+			if (const auto observerPosition = rawInputObservers.find(deviceType); observerPosition != rawInputObservers.cend())
 			{
-				usageType = GetUsageType(input->header.hDevice);
+				const std::chrono::time_point<std::chrono::steady_clock> time = application->LastMessageTime();
+				const Math::Vector2<std::int32_t> cursorPosition = application->LastMessageCursorPosition();
+
+				for (IRawInputObserver* const observer : observerPosition->second)
+				{
+					try
+					{
+						observer->Observe(*input, time, cursorPosition);
+					}
+					catch (const std::exception& e)
+					{
+						PONY_LOG_E(application->Logger(), e, "On calling '{}' raw input observer.", typeid(*observer).name());
+					}
+					catch (...)
+					{
+						PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer.", typeid(*observer).name());
+					}
+				}
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On getting hid usage type.");
-				return 0;
-			}
-			break;
-		default: [[unlikely]]
-			PONY_LOG(application->Logger(), Log::LogType::Error, "Unexpected raw input type.");
-			return 0;
 		}
-
-		if (const auto observerPosition = rawInputObservers.find(usageType); observerPosition != rawInputObservers.cend())
+		else [[unlikely]]
 		{
-			const std::chrono::time_point<std::chrono::steady_clock> time = application->LastMessageTime();
-			const Math::Vector2<std::int32_t> cursorPosition = application->LastMessageCursorPosition();
-
-			for (IRawInputObserver* const observer : observerPosition->second)
-			{
-				try
-				{
-					observer->Observe(*input, time, cursorPosition);
-				}
-				catch (const std::exception& e)
-				{
-					PONY_LOG_E(application->Logger(), e, "On calling '{}' raw input observer.", typeid(*observer).name());
-				}
-				catch (...)
-				{
-					PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer.", typeid(*observer).name());
-				}
-			}
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Device on found on raw input. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(input->header.hDevice));
 		}
 
 		return 0;
@@ -1569,25 +1567,69 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		const auto deviceHandle = reinterpret_cast<HANDLE>(lParam);
-		const DWORD usageType = GetUsageType(deviceHandle);
 
-		if (const auto observerPosition = rawInputObservers.find(usageType); observerPosition != rawInputObservers.cend())
+		try
 		{
-			for (IRawInputObserver* const observer : observerPosition->second)
+			DWORD usageType;
+			if (isConnected)
 			{
+				usageType = GetUsageType(deviceHandle);
+				std::size_t index = 0uz;
+				for (; index < deviceTypes.size(); ++index)
+				{
+					if (deviceTypes[index] > usageType)
+					{
+						break;
+					}
+				}
+
+				deviceHandles.insert(deviceHandles.cbegin() + index, deviceHandle);
 				try
 				{
-					observer->OnDeviceConnectionChanged(deviceHandle, isConnected);
-				}
-				catch (const std::exception& e)
-				{
-					PONY_LOG_E(application->Logger(), e, "On calling '{}' raw input observer on input device change.", typeid(*observer).name());
+					deviceTypes.insert(deviceTypes.cbegin() + index, usageType);
 				}
 				catch (...)
 				{
-					PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer on input device change.", typeid(*observer).name());
+					deviceHandles.erase(deviceHandles.cbegin() + index);
+					throw;
+				}
+
+			}
+			else if (const auto position = std::ranges::find(deviceHandles, deviceHandle); position != deviceHandles.cend())
+			{
+				const std::size_t index = position - deviceHandles.cbegin();
+				usageType = deviceTypes[index];
+				deviceTypes.erase(deviceTypes.cbegin() + index);
+				deviceHandles.erase(position);
+			}
+			else [[unlikely]]
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown device disconnected. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(deviceHandle));
+				return 0;
+			}
+
+			if (const auto observerPosition = rawInputObservers.find(usageType); observerPosition != rawInputObservers.cend())
+			{
+				for (IRawInputObserver* const observer : observerPosition->second)
+				{
+					try
+					{
+						observer->OnDeviceConnectionChanged(deviceHandle, isConnected);
+					}
+					catch (const std::exception& e)
+					{
+						PONY_LOG_E(application->Logger(), e, "On calling '{}' raw input observer on input device change.", typeid(*observer).name());
+					}
+					catch (...)
+					{
+						PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer on input device change.", typeid(*observer).name());
+					}
 				}
 			}
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(application->Logger(), e, "On updating device connection state. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(deviceHandle));
 		}
 
 		return 0;

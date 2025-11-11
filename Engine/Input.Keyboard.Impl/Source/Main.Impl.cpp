@@ -16,7 +16,11 @@ namespace PonyEngine::Input
 {
 	Application::IModule* GetKeyboardProviderModule()
 	{
-		static KeyboardProviderModule keyboardProviderModule;
+#if PONY_WINDOWS
+		static Windows::KeyboardProviderModule keyboardProviderModule;
+#else
+#error "Unsupported platform!"
+#endif
 		return &keyboardProviderModule;
 	}
 }
