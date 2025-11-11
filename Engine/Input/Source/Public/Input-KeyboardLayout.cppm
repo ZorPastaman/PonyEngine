@@ -111,9 +111,7 @@ namespace PonyEngine::Input
 		"End",
 		"Page Up",
 		"Page Down",
-		"Print",
 		"Scroll Lock",
-		"Pause",
 		// Numpad numbers
 		"Numpad 0",
 		"Numpad 1",
@@ -130,10 +128,9 @@ namespace PonyEngine::Input
 		"Numpad Minus",
 		"Numpad Star",
 		"Numpad Slash",
-		"Numpad Comma",
+		"Numpad Period",
 		// Numpad system keys
-		"Numpad Enter",
-		"Numpad Lock"
+		"Numpad Enter"
 	};
 }
 
@@ -231,9 +228,7 @@ export namespace PonyEngine::Input
 		End,
 		PageUp,
 		PageDown,
-		Print,
 		ScrollLock,
-		Pause,
 		// Numpad numbers
 		Numpad0,
 		Numpad1,
@@ -250,10 +245,9 @@ export namespace PonyEngine::Input
 		NumpadMinus,
 		NumpadStar,
 		NumpadSlash,
-		NumpadComma,
+		NumpadPeriod,
 		// Numpad system keys
-		NumpadEnter,
-		NumpadLock
+		NumpadEnter
 	};
 
 	ENUM_VALUE_FEATURES(KeyboardLayout, KeyboardLayoutNames)

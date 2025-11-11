@@ -16,7 +16,8 @@ import PonyEngine.Input.Ext;
 
 import :KeyboardProvider;
 
-export namespace PonyEngine::Input
+#if PONY_WINDOWS
+export namespace PonyEngine::Input::Windows
 {
 	class KeyboardProviderModule final : public Application::IModule
 	{
@@ -38,8 +39,10 @@ export namespace PonyEngine::Input
 		InputProviderHandle keyboardProviderHandle;
 	};
 }
+#endif
 
-namespace PonyEngine::Input
+#if PONY_WINDOWS
+namespace PonyEngine::Input::Windows
 {
 	void KeyboardProviderModule::StartUp(Application::IModuleContext& context)
 	{
@@ -51,11 +54,7 @@ namespace PonyEngine::Input
 
 		keyboardProviderHandle = inputModuleContext->AddProvider([&](IInputContext& input)
 		{
-#if PONY_WINDOWS
-			return std::make_shared<Windows::KeyboardProvider>(input);
-#else
-#error "Unsupported platform!"
-#endif
+			return std::make_shared<KeyboardProvider>(input);
 		});
 	}
 
@@ -70,3 +69,4 @@ namespace PonyEngine::Input
 		inputModuleContext->RemoveProvider(keyboardProviderHandle);
 	}
 }
+#endif

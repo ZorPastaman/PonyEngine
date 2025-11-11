@@ -55,7 +55,7 @@ export namespace PonyEngine::Input::Windows
 		KeyboardProvider& operator =(KeyboardProvider&&) = delete;
 
 	private:
-		static inline const std::unordered_map<USHORT, KeyboardLayout> LayoutMap
+		static inline const std::unordered_map<WORD, KeyboardLayout> LayoutMap
 		{
 			// Letters
 			{ 0x001E, KeyboardLayout::A },
@@ -145,9 +145,7 @@ export namespace PonyEngine::Input::Windows
 			{ 0xE04F, KeyboardLayout::End },
 			{ 0xE049, KeyboardLayout::PageUp },
 			{ 0xE051, KeyboardLayout::PageDown },
-			{ 0xE037, KeyboardLayout::Print },
 			{ 0x0046, KeyboardLayout::ScrollLock },
-			{ 0xE11D45, KeyboardLayout::Pause },
 			// Numpad numbers
 			{ 0x0052, KeyboardLayout::Numpad0 },
 			{ 0x004F, KeyboardLayout::Numpad1 },
@@ -164,10 +162,9 @@ export namespace PonyEngine::Input::Windows
 			{ 0x004A, KeyboardLayout::NumpadMinus },
 			{ 0x0037, KeyboardLayout::NumpadStar },
 			{ 0xE035, KeyboardLayout::NumpadSlash },
-			{ 0x0053, KeyboardLayout::NumpadComma },
+			{ 0x0053, KeyboardLayout::NumpadPeriod },
 			// Numpad system keys
-			{ 0xE01C, KeyboardLayout::NumpadEnter },
-			{ 0x0045, KeyboardLayout::NumpadLock }
+			{ 0xE01C, KeyboardLayout::NumpadEnter }
 		};
 
 		void Subscribe();
@@ -201,13 +198,9 @@ namespace PonyEngine::Input::Windows
 {
 	KeyboardProvider::KeyboardProvider(IInputContext& input) :
 		input{&input},
-		surface{this->input->Application().FindService<Surface::Windows::ISurfaceService>()},
+		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
 		registeredDevices{0uz}
 	{
-		if (!surface) [[unlikely]]
-		{
-			throw std::logic_error("Surface service not found.");
-		}
 	}
 
 	void KeyboardProvider::Begin()
@@ -237,17 +230,20 @@ namespace PonyEngine::Input::Windows
 		}
 #endif
 
-		if (const auto layoutPosition = LayoutMap.find(rawInput.data.keyboard.MakeCode); layoutPosition != LayoutMap.cend())
+		const USHORT makeCode = rawInput.data.keyboard.MakeCode;
+		const USHORT flags = rawInput.data.keyboard.Flags;
+		const WORD scanCode = MAKEWORD(makeCode & 0x7F, ((flags & RI_KEY_E0) ? 0xE0 : ((flags & RI_KEY_E1) ? 0xE1 : 0x00)));
+
+		if (const auto layoutPosition = LayoutMap.find(scanCode); layoutPosition != LayoutMap.cend())
 		{
 			const std::size_t index = GetIndex(rawInput.header.hDevice);
+			Keyboard& keyboard = *keyboards[index];
 			const KeyboardLayout key = layoutPosition->second;
 			const bool pressed = !(rawInput.data.keyboard.Flags & RI_KEY_BREAK);
 
-			if (keyboards[index]->IsPressed(key) != pressed)
+			if (keyboard.IsPressed(key) != pressed)
 			{
-				PONY_LOG(input->Logger(), Log::LogType::Info, "Key: {}, Down: {}.", key, pressed);
-
-				keyboards[index]->AddEvent(KeyboardInput
+				keyboard.AddEvent(KeyboardInput
 				{
 					.key = key,
 					.pressed = pressed,
@@ -267,8 +263,13 @@ namespace PonyEngine::Input::Windows
 			if (position != keyboards.cend())
 			{
 				const std::size_t index = position - keyboards.cbegin();
+				Keyboard& keyboard = *keyboards[index];
 				keyboardHandles[index] = device;
-				keyboards[index]->AddEvent(KeyboardConnection{.isConnected = true});
+
+				if (!keyboard.IsConnected()) [[unlikely]]
+				{
+					keyboard.AddEvent(KeyboardConnection{.isConnected = true});
+				}
 			}
 		}
 		else
@@ -276,9 +277,14 @@ namespace PonyEngine::Input::Windows
 			if (const auto position = std::ranges::find(keyboardHandles, device); position != keyboardHandles.cend())
 			{
 				const std::size_t index = position - keyboardHandles.cbegin();
+				Keyboard& keyboard = *keyboards[index];
 				keyboardHandles[index] = INVALID_HANDLE_VALUE;
-				keyboards[index]->AddEvent(KeyboardConnection{.isConnected = false});
-				keyboards[index]->ClearKeyStates();
+				keyboard.ClearKeyStates();
+
+				if (keyboard.IsConnected()) [[unlikely]]
+				{
+					keyboard.AddEvent(KeyboardConnection{.isConnected = false});
+				}
 			}
 		}
 	}

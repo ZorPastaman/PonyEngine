@@ -131,6 +131,16 @@ export namespace PonyEngine::Application
 		/// @return Pointer to the service if it's found; nullptr if it's not found.
 		template<typename T> [[nodiscard("Pure function")]]
 		const T* FindService() const noexcept;
+		/// @brief Gets a service by its type or throws an exception.
+		/// @tparam T Service type. Must be a public service interface.
+		/// @return Reference to the service.
+		template<typename T> [[nodiscard("Pure function")]]
+		T& GetService();
+		/// @brief Gets a service by its type or throws an exception.
+		/// @tparam T Service type. Must be a public service interface.
+		/// @return Reference to the service.
+		template<typename T> [[nodiscard("Pure function")]]
+		const T& GetService() const;
 
 		/// @brief Gets the flow state.
 		/// @return Flow state.
@@ -224,6 +234,30 @@ namespace PonyEngine::Application
 	const T* IApplicationContext::FindService() const noexcept
 	{
 		return static_cast<const T*>(FindService(typeid(T)));
+	}
+
+	template<typename T>
+	T& IApplicationContext::GetService()
+	{
+		T* const service = FindService<T>();
+		if (!service) [[unlikely]]
+		{
+			throw std::logic_error("Service not found");
+		}
+
+		return *service;
+	}
+
+	template<typename T>
+	const T& IApplicationContext::GetService() const
+	{
+		const T* const service = FindService<T>();
+		if (!service) [[unlikely]]
+		{
+			throw std::logic_error("Service not found");
+		}
+
+		return *service;
 	}
 
 	INativeApplicationContext& IApplicationContext::Native() noexcept
