@@ -9,5 +9,4 @@
 
 export module PonyEngine.Text;
 
-export import :Convert;
 export import :Format;

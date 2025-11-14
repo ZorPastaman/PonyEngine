@@ -55,7 +55,7 @@ namespace PonyEngine::Log
 			throw std::logic_error("Logger module context not found.");
 		}
 
-		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}'...", typeid(FileSubLogger).name());
+		PONY_LOG(context.Logger(), LogType::Info, "Constructing '{}'...", typeid(FileSubLogger).name());
 		fileSubLoggerHandle = loggerModuleContext->AddSubLogger([&](ILoggerContext& loggerContext)
 		{
 			PONY_LOG(context.Logger(), LogType::Info, "Preparing log files...");
@@ -73,7 +73,7 @@ namespace PonyEngine::Log
 			}
 			return std::make_shared<FileSubLogger>(loggerContext, logPath);
 		});
-		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' done.", typeid(FileSubLogger).name());
+		PONY_LOG(context.Logger(), LogType::Info, "Constructing '{}' done.", typeid(FileSubLogger).name());
 	}
 
 	void FileSubLoggerModule::ShutDown(Application::IModuleContext& context)
@@ -84,8 +84,8 @@ namespace PonyEngine::Log
 			throw std::logic_error("Logger module context not found.");
 		}
 
-		PONY_LOG(context.Logger(), LogType::Debug, "Releasing '{}'...", typeid(FileSubLogger).name());
+		PONY_LOG(context.Logger(), LogType::Info, "Releasing '{}'...", typeid(FileSubLogger).name());
 		loggerModuleContext->RemoveSubLogger(fileSubLoggerHandle);
-		PONY_LOG(context.Logger(), LogType::Debug, "Releasing '{}' done.", typeid(FileSubLogger).name());
+		PONY_LOG(context.Logger(), LogType::Info, "Releasing '{}' done.", typeid(FileSubLogger).name());
 	}
 }

@@ -18,8 +18,3 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
-#include <wrl/client.h>
-
-#include <windowsx.h>
-#include <hidusage.h>
-#include <shlobj.h>

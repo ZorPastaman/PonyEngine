@@ -13,7 +13,7 @@ module;
 #include "PonyEngine/Macro/Text.h"
 
 #if PONY_WINDOWS
-#include "PonyEngine/Platform/Windows/Framework.h"
+#include "PonyEngine/Platform/Windows/Storage.h"
 #endif
 
 export module PonyEngine.Application.Impl:PathManager;
@@ -21,8 +21,8 @@ export module PonyEngine.Application.Impl:PathManager;
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.File;
 import PonyEngine.Log;
+import PonyEngine.Platform;
 
 import :Path;
 
@@ -90,7 +90,7 @@ namespace PonyEngine::Application::Windows
 		application{&application}
 	{
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting executable file...");
-		executableFile = File::Windows::GetModulePath(nullptr).lexically_normal();
+		executableFile = Platform::Windows::GetModulePath(nullptr).lexically_normal();
 		executableDirectory = executableFile.parent_path();
 		rootDirectory = (executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_ROOT_PATH)).lexically_normal();
 		if (!std::filesystem::exists(rootDirectory)) [[unlikely]]
@@ -101,9 +101,9 @@ namespace PonyEngine::Application::Windows
 			executableFile.string(), executableDirectory.string(), rootDirectory.string());
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting data directories...");
-		localDataDirectory = AddTail(File::Windows::GetKnownPath(FOLDERID_LocalAppData));
-		userDataDirectory = AddTail(File::Windows::GetKnownPath(FOLDERID_SavedGames));
-		tempDataDirectory = AddTail(File::Windows::GetTemporaryPath());
+		localDataDirectory = AddTail(Platform::Windows::GetKnownPath(FOLDERID_LocalAppData));
+		userDataDirectory = AddTail(Platform::Windows::GetKnownPath(FOLDERID_SavedGames));
+		tempDataDirectory = AddTail(Platform::Windows::GetTemporaryPath());
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting data directories done. Local data: '{}'; User data: '{}'; Temp data: '{}'.",
 			localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
 	}

@@ -7,6 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.ID;
+#pragma once
 
-export import :WinGUID;
+#include "Framework.h"
+
+#include <shlobj.h>

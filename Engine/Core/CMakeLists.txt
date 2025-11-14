@@ -13,13 +13,10 @@ target_include_directories(PonyEngine.Core PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/File.cppm"
-	"Source/Public/File-Module.cppm"
-	"Source/Public/File-Path.cppm"
 	"Source/Public/Hash.cppm"
 	"Source/Public/Hash-FNV1a.cppm"
-	"Source/Public/ID.cppm"
-	"Source/Public/ID-WinGUID.cppm"
+	
+	
 	"Source/Public/Math.cppm"
 	"Source/Public/Math-Ball.cppm"
 	"Source/Public/Math-Bounds.cppm"
@@ -38,11 +35,12 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math-Transformations.cppm"
 	"Source/Public/Math-Transform.cppm"
 	"Source/Public/Math-Vector.cppm"
+	"Source/Public/Platform.cppm"
 	"Source/Public/Serialization.cppm"
 	"Source/Public/Serialization-Array.cppm"
 	"Source/Public/Serialization-Basic.cppm"
 	"Source/Public/Text.cppm"
-	"Source/Public/Text-Convert.cppm"
+	
 	"Source/Public/Text-Format.cppm"
 	"Source/Public/Type.cppm"
 	"Source/Public/Type-Common.cppm"
@@ -54,6 +52,14 @@ if(PONY_WINDOWS)
 	message(VERBOSE "Configuring headers for Windows")
 	target_include_directories(PonyEngine.Core PUBLIC 
 		"Include/Public/Windows"
+	)
+
+	message(VERBOSE "Configuring sources")
+	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+		"Source/Public/Platform-Windows.Device.cppm"
+		"Source/Public/Platform-Windows.File.cppm"
+		"Source/Public/Platform-Windows.GUID.cppm"
+		"Source/Public/Platform-Windows.Text.cppm"
 	)
 endif()
 

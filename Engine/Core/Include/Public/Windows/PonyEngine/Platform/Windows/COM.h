@@ -7,7 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.File;
+#pragma once
 
-export import :Module;
-export import :Path;
+#include "Framework.h"
+
+#include <wrl/client.h>
