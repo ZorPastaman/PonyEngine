@@ -21,10 +21,17 @@ target_sources(PonyEngine.Input.Keyboard.Impl PRIVATE
 target_sources(PonyEngine.Input.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Input.Keyboard.Impl.cppm"
 	"Source/Private/Input.Keyboard.Impl-Keyboard.cppm"
-	"Source/Private/Input.Keyboard.Impl-KeyboardEvent.cppm"
-	"Source/Private/Input.Keyboard.Impl-KeyboardProvider.cppm"
-	"Source/Private/Input.Keyboard.Impl-KeyboardProviderModule.cppm"
+	"Source/Private/Input.Keyboard.Impl-KeyboardContainer.cppm"
 )
+
+if(PONY_WINDOWS)
+	message(VERBOSE "Configuring sources for Windows")
+	target_sources(PonyEngine.Input.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Private/Input.Keyboard.Impl-Windows.KeyboardLayoutMap.cppm"
+		"Source/Private/Input.Keyboard.Impl-Windows.KeyboardProvider.cppm"
+		"Source/Private/Input.Keyboard.Impl-Windows.KeyboardProviderModule.cppm"
+	)
+endif()
 
 message(VERBOSE "Configuring defines")
 pony_validate_module_order(PONY_ENGINE_INPUT_KEYBOARD_ORDER)

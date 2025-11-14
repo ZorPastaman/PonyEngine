@@ -18,9 +18,9 @@ module;
 export module PonyEngine.Surface.Impl:WindowClass;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.File;
 import PonyEngine.Log;
 import PonyEngine.Math;
+import PonyEngine.Platform;
 import PonyEngine.Text;
 
 import :MessageHandler;
@@ -70,7 +70,7 @@ namespace PonyEngine::Surface::Windows
 {
 	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
 		application{&application},
-		moduleHandle(File::Windows::GetModule())
+		moduleHandle(Platform::Windows::GetModule())
 	{
 		const auto wc = WNDCLASSEXA
 		{

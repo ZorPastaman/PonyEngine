@@ -3,10 +3,7 @@ add_executable(PonyEngine.Core.Tests)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
-	"File/Module.cpp"
-	"File/Path.cpp"
 	"Hash/FNV1a.cpp"
-	"ID/WinGUID.cpp"
 	"Math/Ball.cpp"
 	"Math/BallInsides.cpp"
 	"Math/BallIntersections.cpp"
@@ -33,11 +30,19 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Serialization/Array.cpp"
 	"Serialization/Basic.cpp"
 	"Text/Format.cpp"
-	"Text/Convert.cpp"
 	"Type/Common.cpp"
 	"Type/Enum.cpp"
 	"Type/Limits.cpp"
 )
+
+if(PONY_WINDOWS)
+	message(VERBOSE "Configuring sources")
+	target_sources(PonyEngine.Core.Tests PRIVATE
+		"Platform/Windows.File.cpp"
+		"Platform/Windows.GUID.cpp"
+		"Platform/Windows.Text.cpp"
+	)
+endif()
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})

@@ -21,8 +21,8 @@ export module PonyEngine.Application.Impl:AppDataManager;
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.File;
 import PonyEngine.Log;
+import PonyEngine.Platform;
 import PonyEngine.Text;
 
 #if PONY_WINDOWS
@@ -105,7 +105,7 @@ namespace PonyEngine::Application::Windows
 			reinterpret_cast<std::uintptr_t>(this->instance), reinterpret_cast<std::uintptr_t>(this->prevInstance), this->showCommand, this->commandLine);
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application resources...");
-		const HMODULE appModule = File::Windows::GetModule();
+		const HMODULE appModule = Platform::Windows::GetModule();
 #ifdef PONY_APP_ICON
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application icon...");
 		appIcon = LoadIconA(appModule, MAKEINTRESOURCEA(IDI_APP_ICON));

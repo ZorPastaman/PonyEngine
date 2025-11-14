@@ -21,6 +21,7 @@ namespace PonyEngine::Input
 #else
 #error "Unsupported platform!"
 #endif
+
 		return &keyboardProviderModule;
 	}
 }

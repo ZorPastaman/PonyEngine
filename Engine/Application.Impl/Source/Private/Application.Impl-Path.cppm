@@ -11,15 +11,9 @@ module;
 
 #include "PonyEngine/Macro/Text.h"
 
-#if PONY_WINDOWS
-#include "PonyEngine/Platform/Windows/Framework.h"
-#endif
-
 export module PonyEngine.Application.Impl:Path;
 
 import std;
-
-import PonyEngine.File;
 
 export namespace PonyEngine::Application
 {

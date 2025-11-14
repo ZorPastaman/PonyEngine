@@ -7,10 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Keyboard.Impl;
-
-export import PonyEngine.Input.Ext;
+export module PonyEngine.Platform;
 
 #if PONY_WINDOWS
-export import :Windows.KeyboardProviderModule;
+export import :Windows.Device;
+export import :Windows.File;
+export import :Windows.GUID;
+export import :Windows.Text;
 #endif

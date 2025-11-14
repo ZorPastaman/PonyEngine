@@ -15,6 +15,7 @@ module;
 
 #if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
+#include "PonyEngine/Platform/Windows/Input.h"
 #endif
 
 export module PonyEngine.Surface.Impl:SurfaceService;
@@ -1542,10 +1543,6 @@ namespace PonyEngine::Surface::Windows
 					}
 				}
 			}
-		}
-		else [[unlikely]]
-		{
-			PONY_LOG(application->Logger(), Log::LogType::Error, "Device on found on raw input. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(input->header.hDevice));
 		}
 
 		return 0;

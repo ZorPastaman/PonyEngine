@@ -153,7 +153,7 @@ export namespace PonyEngine::Input
 			InputEventType eventType; ///< Event type.
 
 			std::chrono::time_point<std::chrono::steady_clock> timePoint; ///< Time point when the event was created.
-			std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position in client coordinates; std::nullopt if not applicable.
+			std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position in screen coordinates; std::nullopt if not applicable.
 		};
 
 		/// @brief Input value.
@@ -564,6 +564,7 @@ export namespace PonyEngine::Input
 				return;
 			}
 			deviceInfos[index].deviceConnection = isConnected;
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Device connection changed to '{}'. Handle: '0x{:X}'.", isConnected, deviceHandle.id);
 
 			if (const auto observePosition = deviceObservers.find(deviceHandle); observePosition != deviceObservers.cend())
 			{

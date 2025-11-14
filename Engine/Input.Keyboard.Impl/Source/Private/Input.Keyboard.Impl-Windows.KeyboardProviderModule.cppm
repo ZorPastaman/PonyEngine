@@ -7,16 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Keyboard.Impl:KeyboardProviderModule;
+module;
+
+#include "PonyEngine/Log/Log.h"
+
+export module PonyEngine.Input.Keyboard.Impl:Windows.KeyboardProviderModule;
 
 import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Input.Ext;
 
-import :KeyboardProvider;
+import :Windows.KeyboardProvider;
 
-#if PONY_WINDOWS
 export namespace PonyEngine::Input::Windows
 {
 	class KeyboardProviderModule final : public Application::IModule
@@ -39,9 +42,7 @@ export namespace PonyEngine::Input::Windows
 		InputProviderHandle keyboardProviderHandle;
 	};
 }
-#endif
 
-#if PONY_WINDOWS
 namespace PonyEngine::Input::Windows
 {
 	void KeyboardProviderModule::StartUp(Application::IModuleContext& context)
@@ -52,10 +53,12 @@ namespace PonyEngine::Input::Windows
 			throw std::logic_error("Input module context not found.");
 		}
 
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(KeyboardProvider).name());
 		keyboardProviderHandle = inputModuleContext->AddProvider([&](IInputContext& input)
 		{
 			return std::make_shared<KeyboardProvider>(input);
 		});
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(KeyboardProvider).name());
 	}
 
 	void KeyboardProviderModule::ShutDown(Application::IModuleContext& context)
@@ -66,7 +69,8 @@ namespace PonyEngine::Input::Windows
 			throw std::logic_error("Input module context not found.");
 		}
 
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(KeyboardProvider).name());
 		inputModuleContext->RemoveProvider(keyboardProviderHandle);
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(KeyboardProvider).name());
 	}
 }
-#endif
