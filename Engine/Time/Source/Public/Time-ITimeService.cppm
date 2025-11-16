@@ -125,5 +125,9 @@ export namespace PonyEngine::Time
 		/// @return Time point when this started.
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> FrameTimePoint() const noexcept = 0;
+		/// @brief Gets a current real time point.
+		/// @return Real time point.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> NowTimePoint() const noexcept = 0;
 	};
 }

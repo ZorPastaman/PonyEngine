@@ -83,6 +83,8 @@ export namespace PonyEngine::Time
 		virtual std::chrono::time_point<std::chrono::steady_clock> StartTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> FrameTimePoint() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> NowTimePoint() const noexcept override;
 
 		/// @brief Gets the public time service.
 		/// @return Public time service.
@@ -143,7 +145,7 @@ namespace PonyEngine::Time
 		timeScale{1.f},
 		framePeriod{1.f / 60.f},
 		targetFrameTime(0.f),
-		startTimePoint(std::chrono::steady_clock::now()),
+		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
 		realTime{0.},
@@ -180,7 +182,7 @@ namespace PonyEngine::Time
 
 	double TimeService::NowTime() const noexcept
 	{
-		return std::chrono::duration<double>(std::chrono::steady_clock::now() - startTimePoint).count();
+		return std::chrono::duration<double>(NowTimePoint() - startTimePoint).count();
 	}
 
 	double TimeService::RealTime() const noexcept
@@ -313,6 +315,11 @@ namespace PonyEngine::Time
 		return thisFrameTimePoint;
 	}
 
+	std::chrono::time_point<std::chrono::steady_clock> TimeService::NowTimePoint() const noexcept
+	{
+		return std::chrono::steady_clock::now();
+	}
+
 	ITimeService& TimeService::PublicTimeService() noexcept
 	{
 		return *this;
@@ -328,7 +335,7 @@ namespace PonyEngine::Time
 		std::chrono::time_point<std::chrono::steady_clock> now;
 		do
 		{
-			now = std::chrono::steady_clock::now();
+			now = NowTimePoint();
 		} while (std::chrono::duration<float>(now - thisFrameTimePoint) < targetFrameTime);
 
 		return now;

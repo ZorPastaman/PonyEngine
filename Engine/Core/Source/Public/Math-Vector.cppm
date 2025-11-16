@@ -242,11 +242,6 @@ export namespace PonyEngine::Math
 		/// @param divisor Divisor.
 		constexpr void Divide(const Vector& divisor) noexcept;
 
-		/// @brief Creates a string representing a state of the vector.
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Casts all the components to the @p U and returns a new vector with those components.
 		/// @tparam U Target component type.
 		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
@@ -625,40 +620,55 @@ export namespace PonyEngine::Math
 	/// @return Quotient.
 	template<std::floating_point U = double, std::integral T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator /(U dividend, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
-
-	/// @brief Outputs a string representation of the @p vector.
-	/// @tparam T Component type.
-	/// @tparam Size Component count.
-	/// @param stream Target stream.
-	/// @param vector Input source.
-	/// @return @p stream.
-	template<Type::Arithmetic T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Vector<T, Size>& vector) requires (Size >= 1uz);
 }
 
 /// @brief Vector formatter.
+/// @details The format is ":<range_args>:<component_args>". The default brackets are (). The default separator is ", ".
 /// @tparam T Component type.
 /// @tparam Size Component count.
 export template<PonyEngine::Type::Arithmetic T, std::size_t Size>
 struct std::formatter<PonyEngine::Math::Vector<T, Size>, char>
 {
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
+private:
+	std::range_formatter<T, char> subFormatter;
 
-		return context.begin();
+public:
+	[[nodiscard("Pure constructor")]]
+	constexpr std::formatter<PonyEngine::Math::Vector<T, Size>, char>() noexcept
+	{
+		subFormatter.set_brackets("(", ")");
 	}
 
-	static auto format(const PonyEngine::Math::Vector<T, Size>& vector, std::format_context& context)
+	constexpr void set_separator(const std::string_view separator) noexcept
 	{
-		return std::ranges::copy(vector.ToString(), context.out()).out;
+		subFormatter.set_separator(separator);
+	}
+
+	constexpr void set_brackets(const std::string_view opening, const std::string_view closing) noexcept
+	{
+		subFormatter.set_brackets(opening, closing);
+	}
+
+	[[nodiscard("Pure function")]]
+	constexpr formatter<T, char>& underlying() noexcept
+	{
+		return subFormatter.underlying();
+	}
+
+	[[nodiscard("Pure function")]]
+	constexpr const formatter<T, char>& underlying() const noexcept
+	{
+		return subFormatter.underlying();
+	}
+
+	constexpr std::format_parse_context::iterator parse(std::format_parse_context& context)
+	{
+		return subFormatter.parse(context);
+	}
+
+	std::format_context::iterator format(const PonyEngine::Math::Vector<T, Size>& vector, std::format_context& context) const
+	{
+		return subFormatter.format(vector.Span(), context);
 	}
 };
 
@@ -1038,23 +1048,6 @@ namespace PonyEngine::Math
 		{
 			(*this)[i] /= divisor[i];
 		}
-	}
-
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	std::string Vector<T, Size>::ToString() const
-	{
-		std::string answer = "(";
-		for (std::size_t i = 0uz; i < Size; ++i)
-		{
-			answer += std::format("{}", (*this)[i]);
-			if (i < Size - 1uz)
-			{
-				answer += ", ";
-			}
-		}
-		answer += ')';
-
-		return answer;
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -1517,11 +1510,5 @@ namespace PonyEngine::Math
 		}
 
 		return quotient;
-	}
-
-	template<Type::Arithmetic T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Vector<T, Size>& vector) requires (Size >= 1uz)
-	{
-		return stream << vector.ToString();
 	}
 }

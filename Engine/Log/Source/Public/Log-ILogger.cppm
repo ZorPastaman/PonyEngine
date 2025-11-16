@@ -24,7 +24,17 @@ export namespace PonyEngine::Log
 	class ILogger
 	{
 		INTERFACE_BODY(ILogger)
+		/*
+		virtual void Log(LogType logType, std::string_view message) const noexcept = 0;
+		virtual void Log(LogType logType, std::string_view format, std::format_args formatArgs) const noexcept = 0;
+		virtual void Log(LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void Log(LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept = 0;
 
+		virtual void Log(const std::exception_ptr& exception, std::string_view message) const noexcept = 0;
+		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept = 0;
+		virtual void Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept = 0;
+		*/
 		/// @brief Logs the message.
 		/// @param logType Log type.
 		/// @param message Log message.

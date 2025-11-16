@@ -324,11 +324,6 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Creates a string representing a state of the color.
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Casts the color to another color type.
 		/// @details It uses a black color as a default and then assigns the channels from this color converting them to the target type.
 		/// @tparam U Target channel type.
@@ -691,21 +686,11 @@ export namespace PonyEngine::Math
 	/// @return Quotient.
 	template<std::floating_point T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel> [[nodiscard("Pure operator")]]
 	constexpr Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel> operator /(const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, T divisor) noexcept;
-
-	/// @brief Outputs a string representation of the @p color.
-	/// @tparam T Channel type.
-	/// @tparam FirstChannel First channel.
-	/// @tparam SecondChannel Second channel.
-	/// @tparam ThirdChannel Third channel.
-	/// @tparam FourthChannel Fourth channel.
-	/// @param stream Target stream.
-	/// @param color Input source.
-	/// @return @p stream.
-	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	std::ostream& operator <<(std::ostream& stream, const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color);
 }
 
 /// @brief Color formatter.
+/// @details The format is ":<color_args>:<range_args>:<component_args>". The default brackets are (). The default separator is ", ".
+///          Color args: c - adds a color scheme like "RGB: (<color_values>)".
 /// @tparam T Channel type.
 /// @tparam FirstChannel First channel.
 /// @tparam SecondChannel Second channel.
@@ -714,23 +699,96 @@ export namespace PonyEngine::Math
 export template<PonyEngine::Math::ColorChannelType T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>
 struct std::formatter<PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>, char>
 {
-	static constexpr auto parse(std::format_parse_context& context)
+private:
+	std::range_formatter<T, char> subFormatter;
+	bool colorName = false;
+
+public:
+	[[nodiscard("Pure constructor")]]
+	constexpr std::formatter<PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>, char>() noexcept
 	{
-		if (context.begin() == context.end()) [[unlikely]]
+		subFormatter.set_brackets("(", ")");
+	}
+
+	constexpr void set_separator(const std::string_view separator) noexcept
+	{
+		subFormatter.set_separator(separator);
+	}
+
+	constexpr void set_brackets(const std::string_view opening, const std::string_view closing) noexcept
+	{
+		subFormatter.set_brackets(opening, closing);
+	}
+
+	[[nodiscard("Pure function")]]
+	constexpr formatter<T, char>& underlying() noexcept
+	{
+		return subFormatter.underlying();
+	}
+
+	[[nodiscard("Pure function")]]
+	constexpr const formatter<T, char>& underlying() const noexcept
+	{
+		return subFormatter.underlying();
+	}
+
+	constexpr std::format_parse_context::iterator parse(std::format_parse_context& context)
+	{
+		auto it = context.begin();
+
+		if (it == context.end()) [[unlikely]]
 		{
 			throw std::format_error("Unexpected context end.");
 		}
-		if (*context.begin() != '}') [[unlikely]]
+
+		for (; *it != '}' && *it != ':'; ++it)
 		{
-			throw std::format_error("Unexpected format specifier.");
+			switch (*it)
+			{
+			case 'c':
+				colorName = true;
+				break;
+			default: [[unlikely]]
+				throw std::format_error("Unexpected format specifier.");
+			}
 		}
 
-		return context.begin();
+		it += *it == ':';
+		context.advance_to(it);
+		return subFormatter.parse(context);
 	}
 
-	static auto format(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, std::format_context& context)
+	std::format_context::iterator format(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, std::format_context& context) const
 	{
-		return std::ranges::copy(color.ToString(), context.out()).out;
+		auto it = context.out();
+
+		if (colorName)
+		{
+			for (std::size_t i = 0uz; i < PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::ChannelCount; ++i)
+			{
+				if (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::RedIndex == i)
+				{
+					*it++ = 'R';
+				}
+				else if (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::GreenIndex == i)
+				{
+					*it++ = 'G';
+				}
+				else if (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::BlueIndex == i)
+				{
+					*it++ = 'B';
+				}
+				else if (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::AlphaIndex == i)
+				{
+					*it++ = 'A';
+				}
+			}
+
+			it = std::ranges::copy(std::string_view(": "), it).out;
+		}
+
+		context.advance_to(it);
+		return subFormatter.format(color.Span(), context);
 	}
 };
 
@@ -1136,44 +1194,6 @@ namespace PonyEngine::Math
 	}
 
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	std::string Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::ToString() const
-	{
-		static constexpr auto GetChannelName = [](const std::size_t index) noexcept
-		{
-			if (index == RedIndex)
-			{
-				return 'R';
-			}
-			if (index == GreenIndex)
-			{
-				return 'G';
-			}
-			if (index == BlueIndex)
-			{
-				return 'B';
-			}
-			if (index == AlphaIndex)
-			{
-				return 'A';
-			}
-
-			return 'U'; // Unknown.
-		};
-
-		std::string answer;
-		for (std::size_t i = 0uz; i < ChannelCount; ++i)
-		{
-			if (i > 0uz)
-			{
-				answer += ", ";
-			}
-			answer += std::format("{}: {}", GetChannelName(i), channels[i]);
-		}
-
-		return answer;
-	}
-
-	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
 	template<ColorChannelType U, ColorChannel FirstChannelU, ColorChannel SecondChannelU, ColorChannel ThirdChannelU, ColorChannel FourthChannelU>
 	constexpr Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::operator Color<U, FirstChannelU, SecondChannelU, ThirdChannelU, FourthChannelU>() const noexcept
 	{
@@ -1451,12 +1471,6 @@ namespace PonyEngine::Math
 	constexpr Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel> operator /(const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const T divisor) noexcept
 	{
 		return Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>(color.Vector() / divisor);
-	}
-
-	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel>
-	std::ostream& operator <<(std::ostream& stream, const Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color)
-	{
-		return stream << color.ToString();
 	}
 
 	template<ColorChannelType T, ColorChannel FirstChannel, ColorChannel SecondChannel, ColorChannel ThirdChannel, ColorChannel FourthChannel, bool Opaque>
