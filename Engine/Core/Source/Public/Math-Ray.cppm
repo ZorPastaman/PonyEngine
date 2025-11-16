@@ -117,11 +117,6 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		Vector<T, Size> Unnormalize(T value) const noexcept;
 
-		/// @brief Creates a string representing the ray.
-		/// @return String representing the ray.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Converts the ray to a ray of another type.
 		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
@@ -160,42 +155,7 @@ export namespace PonyEngine::Math
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	bool AreAlmostEqual(const Ray<T, Size>& lhs, const Ray<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size >= 1);
-
-	/// @brief Outputs a string representation of the @p ray.
-	/// @tparam T Component type.
-	/// @tparam Size Dimension.
-	/// @param stream Target stream.
-	/// @param ray Input source.
-	/// @return @p stream.
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Ray<T, Size>& ray) requires (Size >= 1);
 }
-
-/// @brief Ray formatter.
-/// @tparam T Component type.
-/// @tparam Size Dimension.
-export template<std::floating_point T, std::size_t Size>
-struct std::formatter<PonyEngine::Math::Ray<T, Size>, char>
-{
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
-
-		return context.begin();
-	}
-
-	static auto format(const PonyEngine::Math::Ray<T, Size>& ray, std::format_context& context)
-	{
-		return std::ranges::copy(ray.ToString(), context.out()).out;
-	}
-};
 
 namespace PonyEngine::Math
 {
@@ -307,12 +267,6 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	std::string Ray<T, Size>::ToString() const
-	{
-		return std::format("Origin: {}, Direction: {}", origin, direction);
-	}
-
-	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	template<std::floating_point U>
 	Ray<T, Size>::operator Ray<U, Size>() const noexcept
 	{
@@ -323,11 +277,5 @@ namespace PonyEngine::Math
 	bool AreAlmostEqual(const Ray<T, Size>& lhs, const Ray<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept requires (Size >= 1)
 	{
 		return AreAlmostEqual(lhs.Origin(), rhs.Origin(), tolerance) && AreAlmostEqual(std::min(Dot(lhs.Direction(), rhs.Direction()), T{1}), T{1}, tolerance);
-	}
-
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Ray<T, Size>& ray) requires (Size >= 1)
-	{
-		return stream << ray.ToString();
 	}
 }

@@ -492,13 +492,6 @@ TEST_CASE("Color toString", "[Math][Color]")
 	REQUIRE(std::format("{:c:}", brg) == brgExpected);
 	brgExpected = std::format("({:n})", brg.Span());
 	REQUIRE(std::format("{}", brg) == brgExpected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::ColorRGBA<float>(0.1f, 0.2f, 0.3f, 0.4f).ToString();
-	};
-#endif
 }
 
 TEST_CASE("Color cast", "[Math][Color]")

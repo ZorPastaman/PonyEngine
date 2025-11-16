@@ -1516,25 +1516,6 @@ TEST_CASE("Matrix to string", "[Math][Matrix]")
 	REQUIRE(std::format("{:m}", matrix4x4) == expected4x4);
 	expected4x4 = std::format("[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]", matrix4x4[0, 0], matrix4x4[0, 1], matrix4x4[0, 2], matrix4x4[0, 3], matrix4x4[1, 0], matrix4x4[1, 1], matrix4x4[1, 2], matrix4x4[1, 3], matrix4x4[2, 0], matrix4x4[2, 1], matrix4x4[2, 2], matrix4x4[2, 3], matrix4x4[3, 0], matrix4x4[3, 1], matrix4x4[3, 2], matrix4x4[3, 3]);
 	REQUIRE(std::format("{:s}", matrix4x4) == expected4x4);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Int")
-	{
-		return PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString();
-	};
-	BENCHMARK("Int multiline")
-	{
-		return PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString(true);
-	};
-	BENCHMARK("Float")
-	{
-		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString();
-	};
-	BENCHMARK("Float multiline")
-	{
-		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString(true);
-	};
-#endif
 }
 
 TEST_CASE("Matrix cast", "[Math][Matrix]")

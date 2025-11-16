@@ -153,11 +153,6 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Vector<T, Size> ClosestPoint(const Vector<T, Size>& point) const noexcept;
 
-		/// @brief Creates a string representing the box.
-		/// @return String representing the box.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Casts the oriented box to an oriented box of another type.
 		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
@@ -193,42 +188,7 @@ export namespace PonyEngine::Math
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const OrientedBox<T, Size>& lhs, const OrientedBox<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
-
-	/// @brief Outputs a string representation of the @p box.
-	/// @tparam T Component type.
-	/// @tparam Size Dimension.
-	/// @param stream Target stream.
-	/// @param box Input source.
-	/// @return @p stream.
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const OrientedBox<T, Size>& box);
 }
-
-/// @brief Oriented box formatter.
-/// @tparam T Component type.
-/// @tparam Size Dimension.
-export template<std::floating_point T, std::size_t Size>
-struct std::formatter<PonyEngine::Math::OrientedBox<T, Size>, char>
-{
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
-
-		return context.begin();
-	}
-
-	static auto format(const PonyEngine::Math::OrientedBox<T, Size>& box, std::format_context& context)
-	{
-		return std::ranges::copy(box.ToString(), context.out()).out;
-	}
-};
 
 namespace PonyEngine::Math
 {
@@ -463,12 +423,6 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	std::string OrientedBox<T, Size>::ToString() const
-	{
-		return std::format("Center: {}, Extents: {}, Axes: {}", center, extents, axes.Transpose());
-	}
-
-	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	template<std::floating_point U>
 	constexpr OrientedBox<T, Size>::operator OrientedBox<U, Size>() const noexcept
 	{
@@ -487,11 +441,5 @@ namespace PonyEngine::Math
 		}
 
 		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.Extents(), rhs.Extents(), tolerance);
-	}
-
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const OrientedBox<T, Size>& box)
-	{
-		return stream << box.ToString();
 	}
 }
