@@ -26,7 +26,6 @@ namespace Name
 		"Red",
 		"Green",
 		"Blue",
-		"Unknown"
 	};
 	ENUM_VALUE_TO_STRING(Color, ColorNames)
 
@@ -59,12 +58,7 @@ TEST_CASE("ENUM_VALUE_TO_STRING works for valid and invalid values", "[Utility][
 	STATIC_REQUIRE(Name::ToString(Name::Color::Red) == Name::ColorNames[0]);
 	STATIC_REQUIRE(Name::ToString(Name::Color::Green) == Name::ColorNames[1]);
 	STATIC_REQUIRE(Name::ToString(Name::Color::Blue) == Name::ColorNames[2]);
-	STATIC_REQUIRE(Name::ToString(static_cast<Name::Color>(99)) == Name::ColorNames[3]);
-
-	std::ostringstream oss;
-	oss << Name::Color::Red;
-	REQUIRE(oss.str() == Name::ColorNames[0]);
-
+	STATIC_REQUIRE(Name::ToString(static_cast<Name::Color>(99)) == "Unknown");
 	std::string formatted = std::format("{}", Name::Color::Green);
 	REQUIRE(Name::ToString(Name::Color::Green) == formatted);
 }
@@ -79,11 +73,6 @@ TEST_CASE("ENUM_MASK_TO_STRING works for masks", "[Utility][Enum]")
 	REQUIRE(Name::ToString(Name::Permission::Read | Name::Permission::Write) == "Read | Write");
 	REQUIRE(Name::ToString(Name::Permission::Read | Name::Permission::Execute) == "Read | Execute");
 	REQUIRE(Name::ToString(static_cast<Name::Permission>(99)) == "Unknown");
-
-	std::ostringstream oss;
-	oss << Name::Permission::Execute;
-	REQUIRE(oss.str() == "Execute");
-
 	std::string formatted = std::format("{}", Name::Permission::Read | Name::Permission::Write);
 	REQUIRE(Name::ToString(Name::Permission::Read | Name::Permission::Write) == formatted);
 }

@@ -15,52 +15,79 @@ export module PonyEngine.Platform:Windows.GUID;
 
 import std;
 
-import :Windows.Text;
+import PonyEngine.Text;
 
 export namespace PonyEngine::Platform::Windows
 {
+	constexpr std::size_t GuidTextSize = 36uz; ///< GUID text representation length. It doesn't include brackets.
+
 	/// @brief Acquires GUID.
 	/// @return GUID.
 	[[nodiscard("Pure function")]]
 	GUID AcquireGuid();
-
-	/// @brief Creates a string representing the @p guid.
-	/// @param guid GUID.
-	/// @return String representing the @p guid.
-	[[nodiscard("Pure function")]]
-	std::string ToString(const GUID& guid);
-}
-
-/// @brief Stream insertion operator for GUID.
-/// @param stream The output stream to write to.
-/// @param guid The GUID to output.
-/// @return Reference to the output stream.
-export std::ostream& operator <<(std::ostream& stream, const GUID& guid)
-{
-	return stream << PonyEngine::Platform::Windows::ToString(guid);
 }
 
 /// @brief Windows GUID formatter.
+/// @details The format is ":<guid_args>". The default brackets are {}.
+///          Guid args: n - no brackets.
 export template<>
 struct std::formatter<GUID, char>
 {
-	static constexpr auto parse(std::format_parse_context& context)
+private:
+	std::string_view opening = "{";
+	std::string_view closing = "}";
+	bool noBrackets = false;
+
+public:
+	constexpr void set_brackets(const std::string_view opening, const std::string_view closing) noexcept
 	{
-		if (context.begin() == context.end()) [[unlikely]]
+		this->opening = opening;
+		this->closing = closing;
+	}
+
+	constexpr std::format_parse_context::iterator parse(std::format_parse_context& context)
+	{
+		auto it = context.begin();
+
+		if (it == context.end()) [[unlikely]]
 		{
 			throw std::format_error("Unexpected context end.");
 		}
-		if (*context.begin() != '}') [[unlikely]]
+
+		for (; *it != '}'; ++it)
 		{
-			throw std::format_error("Unexpected format specifier.");
+			switch (*it)
+			{
+			case 'n':
+				noBrackets = true;
+				break;
+			default: [[unlikely]]
+				throw std::format_error("Unexpected format specifier.");
+			}
 		}
 
-		return context.begin();
+		return it;
 	}
 
-	static auto format(const GUID& guid, std::format_context& context)
+	std::format_context::iterator format(const GUID& guid, std::format_context& context) const
 	{
-		return std::ranges::copy(PonyEngine::Platform::Windows::ToString(guid), context.out()).out;
+		auto it = context.out();
+
+		if (!noBrackets)
+		{
+			it = std::ranges::copy(opening, it).out;
+		}
+
+		it = std::format_to(it, "{:08X}-{:04X}-{:04X}-{:02X}{:02X}-{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}",
+			guid.Data1, guid.Data2, guid.Data3,
+			guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+
+		if (!noBrackets)
+		{
+			it = std::ranges::copy(closing, it).out;
+		}
+
+		return it;
 	}
 };
 
@@ -75,13 +102,5 @@ namespace PonyEngine::Platform::Windows
 		}
 
 		return acquiredGuid;
-	}
-
-	std::string ToString(const GUID& guid)
-	{
-		auto buffer = std::wstring(39, L'\0');
-		StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
-
-		return ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
 	}
 }

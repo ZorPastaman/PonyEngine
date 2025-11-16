@@ -465,7 +465,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	std::string OrientedBox<T, Size>::ToString() const
 	{
-		return std::format("Center: {}, Extents: {}, Axes: {}", center.ToString(), extents.ToString(), axes.Transpose().ToString());
+		return std::format("Center: {}, Extents: {}, Axes: {}", center, extents, axes.Transpose());
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)

@@ -32,28 +32,13 @@ TEST_CASE("AcquireGuid returns unique GUIDs", "[Platform][Windows][GUID]")
 	REQUIRE_FALSE(areEqual);
 }
 
-TEST_CASE("ToString produces a valid GUID string", "[Platform][Windows][GUID]")
+TEST_CASE("std::format supports GUID", "[Platform][Windows][GUID]")
 {
 	const GUID guid = PonyEngine::Platform::Windows::AcquireGuid();
-	const std::string guidStr = PonyEngine::Platform::Windows::ToString(guid);
-
 	auto buffer = std::wstring(39, L'\0');
 	StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
-	REQUIRE(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1) == std::wstring(guidStr.cbegin(), guidStr.cend()));
-}
+	const std::string expected = PonyEngine::Platform::Windows::ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
 
-TEST_CASE("operator << outputs GUID as string", "[Platform][Windows][GUID]") {
-	const GUID guid = PonyEngine::Platform::Windows::AcquireGuid();
-	std::ostringstream oss;
-	oss << guid;
-	const std::string guidStr = oss.str();
-
-	REQUIRE(guidStr == PonyEngine::Platform::Windows::ToString(guid));
-}
-
-TEST_CASE("std::format supports GUID", "[Platform][Windows][GUID]") {
-	const GUID guid = PonyEngine::Platform::Windows::AcquireGuid();
-	const std::string formatted = std::format("{}", guid);
-
-	REQUIRE(formatted == PonyEngine::Platform::Windows::ToString(guid));
+	REQUIRE(std::format("{}", guid) == std::format("{{{}}}", expected));
+	REQUIRE(std::format("{:n}", guid) == expected);
 }

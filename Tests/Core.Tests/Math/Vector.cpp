@@ -784,20 +784,10 @@ TEST_CASE("Vector ToString", "[Math][Vector]")
 	constexpr std::int16_t w = 13;
 	constexpr auto intVector = PonyEngine::Math::Vector4<std::int32_t>(x, y, z, w);
 	const std::string intExpected = std::format("({}, {}, {}, {})", x, y, z, w);
-
-	REQUIRE(intVector.ToString() == intExpected);
-	std::ostringstream oss;
-	oss << intVector;
-	REQUIRE(oss.str() == intExpected);
 	REQUIRE(std::format("{}", intVector) == intExpected);
 
 	constexpr auto floatVector = PonyEngine::Math::Vector4<float>(x, y, z, w);
 	const std::string floatExpected = std::format("({}, {}, {}, {})", floatVector.X(), floatVector.Y(), floatVector.Z(), floatVector.W());
-
-	REQUIRE(floatVector.ToString() == floatExpected);
-	std::ostringstream ossf;
-	ossf << floatVector;
-	REQUIRE(ossf.str() == floatExpected);
 	REQUIRE(std::format("{}", floatVector) == floatExpected);
 
 #if PONY_ENGINE_TESTING_BENCHMARK

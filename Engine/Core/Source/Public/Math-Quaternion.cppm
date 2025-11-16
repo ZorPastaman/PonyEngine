@@ -207,11 +207,6 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr bool IsFinite() const noexcept;
 
-		/// @brief Creates a string representing a state of the quaternion. The format is '(x, y, z, w)'.
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Casts all the components to the @p U and returns a new quaternion with those components.
 		/// @tparam U Target component type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
@@ -366,38 +361,26 @@ export namespace PonyEngine::Math
 	/// @return Transformed vector.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T>& vector) noexcept;
-
-	/// @brief Outputs a string representation of the @p quaternion.
-	/// @tparam T Component type.
-	/// @param stream Target stream.
-	/// @param quaternion Input source.
-	/// @return @p stream.
-	template<std::floating_point T>
-	std::ostream& operator <<(std::ostream& stream, const Quaternion<T>& quaternion);
 }
 
 /// @brief Quaternion formatter.
+/// @details It's just a wrapper over the vector formatter.
 /// @tparam T Component type.
 export template<std::floating_point T>
 struct std::formatter<PonyEngine::Math::Quaternion<T>, char>
 {
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
+private:
+	std::formatter<PonyEngine::Math::Vector4<T>, char> subFormatter;
 
-		return context.begin();
+public:
+	constexpr std::format_parse_context::iterator parse(std::format_parse_context& context)
+	{
+		return subFormatter.parse(context);
 	}
 
-	static auto format(const PonyEngine::Math::Quaternion<T>& quaternion, std::format_context& context)
+	std::format_context::iterator format(const PonyEngine::Math::Quaternion<T>& quaternion, std::format_context& context) const
 	{
-		return std::ranges::copy(quaternion.ToString(), context.out()).out;
+		return subFormatter.format(quaternion.Vector(), context);
 	}
 };
 
@@ -653,12 +636,6 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	std::string Quaternion<T>::ToString() const
-	{
-		return components.ToString();
-	}
-
-	template<std::floating_point T>
 	template<std::floating_point U>
 	constexpr Quaternion<T>::operator Quaternion<U>() const noexcept
 	{
@@ -827,11 +804,5 @@ namespace PonyEngine::Math
 		product.Z() = vector.Z() + (x2z - y2w) * vector.X() + (y2z + x2w) * vector.Y() - (x2x + y2y) * vector.Z();
 
 		return product;
-	}
-
-	template<std::floating_point T>
-	std::ostream& operator <<(std::ostream& stream, const Quaternion<T>& quaternion)
-	{
-		return stream << quaternion.ToString();
 	}
 }
