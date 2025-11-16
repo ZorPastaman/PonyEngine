@@ -254,26 +254,6 @@ TEST_CASE("Flat side", "[Math][Flat]")
 #endif
 }
 
-TEST_CASE("Flat toString", "[Math][Flat]")
-{
-	constexpr auto normal = PonyEngine::Math::Vector3<float>(2.f, 1.f, -5.f);
-	constexpr float distance = -3.f;
-	const auto plane = PonyEngine::Math::Plane<float>(normal, distance);
-	const std::string expected = std::format("Normal: {}, Distance: {}", plane.Normal(), plane.Distance());
-	REQUIRE(expected == plane.ToString());
-	std::ostringstream oss;
-	oss << plane;
-	REQUIRE(expected == oss.str());
-	REQUIRE(std::format("{}", plane) == expected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::Plane<float>(PonyEngine::Math::Vector3<float>(-4.f, 2.f, -3.f), 3.f).ToString();
-	};
-#endif
-}
-
 TEST_CASE("Flat cast", "[Math][Flat]")
 {
 	constexpr auto normal = PonyEngine::Math::Vector3<float>(2.f, 1.f, -5.f);

@@ -394,13 +394,6 @@ TEST_CASE("Quaternion ToString", "[Math][Quaternion]")
 	constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
 	const auto expected = std::format("({}, {}, {}, {})", x, y, z, w);
 	REQUIRE(std::format("{}", quaternion) == expected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::Quaternion<float>(3.f, 4.f, -1.f, 2.f).ToString();
-	};
-#endif
 }
 
 TEST_CASE("Quaternion cast", "[Math][Quaternion]")

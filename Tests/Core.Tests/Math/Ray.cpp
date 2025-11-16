@@ -263,26 +263,6 @@ TEST_CASE("Ray normalize", "[Math][Ray]")
 #endif
 }
 
-TEST_CASE("Ray toString", "[Math][Ray]")
-{
-	constexpr auto origin = PonyEngine::Math::Vector3<float>(3.f, -2.f, -4.f);
-	constexpr auto direction = PonyEngine::Math::Vector3<float>(-1.f, 0.7f, -0.5f);
-	const auto ray = PonyEngine::Math::Ray3D<float>(origin, direction);
-	const std::string expected = std::format("Origin: {}, Direction: {}", ray.Origin(), ray.Direction());
-	REQUIRE(ray.ToString() == expected);
-	std::ostringstream oss;
-	oss << ray;
-	REQUIRE(oss.str() == expected);
-	REQUIRE(std::format("{}", ray) == expected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::Ray3D<float>(PonyEngine::Math::Vector3<float>(4.f, 2.f, -3.f), PonyEngine::Math::Vector3<float>(-2.f, 3.f, 1.f)).ToString();
-	};
-#endif
-}
-
 TEST_CASE("Ray cast", "[Math][Ray]")
 {
 	constexpr auto origin = PonyEngine::Math::Vector3<float>(3.f, -2.f, -4.f);

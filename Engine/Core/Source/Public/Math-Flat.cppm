@@ -101,11 +101,6 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		std::int8_t Side(const Vector<T, Size>& point) const noexcept;
 
-		/// @brief Creates a string representing the flat.
-		/// @return String representing the flat.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Converts the flat to a flat of another type.
 		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
@@ -144,42 +139,7 @@ export namespace PonyEngine::Math
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	bool AreAlmostEqual(const Flat<T, Size>& lhs, const Flat<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size >= 1);
-
-	/// @brief Outputs a string representation of the @p flat.
-	/// @tparam T Component type.
-	/// @tparam Size Dimension.
-	/// @param stream Target stream.
-	/// @param flat Input source.
-	/// @return @p stream.
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Flat<T, Size>& flat) requires (Size >= 1);
 }
-
-/// @brief Flat formatter.
-/// @tparam T Component type.
-/// @tparam Size Dimension.
-export template<std::floating_point T, std::size_t Size>
-struct std::formatter<PonyEngine::Math::Flat<T, Size>, char>
-{
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
-
-		return context.begin();
-	}
-
-	static auto format(const PonyEngine::Math::Flat<T, Size>& flat, std::format_context& context)
-	{
-		return std::ranges::copy(flat.ToString(), context.out()).out;
-	}
-};
 
 namespace PonyEngine::Math
 {
@@ -301,12 +261,6 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	std::string Flat<T, Size>::ToString() const
-	{
-		return std::format("Normal: {}, Distance: {}", normal, distance);
-	}
-
-	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	template<std::floating_point U>
 	Flat<T, Size>::operator Flat<U, Size>() const noexcept
 	{
@@ -317,11 +271,5 @@ namespace PonyEngine::Math
 	bool AreAlmostEqual(const Flat<T, Size>& lhs, const Flat<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept requires (Size >= 1)
 	{
 		return AreAlmostEqual(std::min(Dot(lhs.Normal(), rhs.Normal()), T{1}), T{1}, tolerance) && AreAlmostEqual(lhs.Distance(), rhs.Distance(), tolerance);
-	}
-
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Flat<T, Size>& flat) requires (Size >= 1)
-	{
-		return stream << flat.ToString();
 	}
 }

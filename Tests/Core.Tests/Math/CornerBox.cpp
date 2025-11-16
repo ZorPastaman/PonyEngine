@@ -323,26 +323,6 @@ TEST_CASE("CornerBox closest point", "[Math][CornerBox]")
 #endif
 }
 
-TEST_CASE("CornerBox toString", "[Math][CornerBox]")
-{
-	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
-	constexpr auto size = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
-	constexpr auto cuboid = PonyEngine::Math::CornerCuboid<float>(position, size);
-	const std::string expected = std::format("Position: {}, Size: {}", position, size);
-	REQUIRE(expected == cuboid.ToString());
-	std::ostringstream oss;
-	oss << cuboid;
-	REQUIRE(expected == oss.str());
-	REQUIRE(expected == std::format("{}", cuboid));
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::CornerCuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f)).ToString();
-	};
-#endif
-}
-
 TEST_CASE("CornerBox cast", "[Math][CornerBox]")
 {
 	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);

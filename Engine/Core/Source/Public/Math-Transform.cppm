@@ -136,11 +136,6 @@ export namespace PonyEngine::Math
 		/// @param up Up vector. Must be unit.
 		void LookAt(const Vector<T, Size>& point, const Vector<T, Size>& up) noexcept requires (Size == 3);
 
-		/// @brief Creates a string representing the current state of the transform.
-		/// @return String representing the current state of the transform.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Converts the transform to another transform type.
 		/// @tparam U Target component type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
@@ -179,42 +174,7 @@ export namespace PonyEngine::Math
 	/// @return @a True if they're almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	bool AreAlmostEqual(const Transform<T, Size>& left, const Transform<T, Size>& right, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size == 2 || Size == 3);
-
-	/// @brief Puts the transform ToString() to the stream.
-	/// @tparam T Component type.
-	/// @tparam Size Dimension.
-	/// @param stream Target.
-	/// @param transform Transform.
-	/// @return @p stream.
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Transform<T, Size>& transform) requires (Size == 2 || Size == 3);
 }
-
-/// @brief Transform3D formatter.
-/// @tparam T Component type.
-/// @tparam Size Dimension.
-export template<std::floating_point T, std::size_t Size>
-struct std::formatter<PonyEngine::Math::Transform<T, Size>, char>
-{
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
-
-		return context.begin();
-	}
-
-	static auto format(const PonyEngine::Math::Transform<T, Size>& transform, std::format_context& context)
-	{
-		return std::ranges::copy(transform.ToString(), context.out()).out;
-	}
-};
 
 namespace PonyEngine::Math
 {
@@ -381,12 +341,6 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	std::string Transform<T, Size>::ToString() const
-	{
-		return std::format("Position: {}, Rotation: {}, Scale: {}", position, rotation, scale);
-	}
-
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
 	template<std::floating_point U>
 	constexpr Transform<T, Size>::operator Transform<U, Size>() const noexcept
 	{
@@ -398,11 +352,5 @@ namespace PonyEngine::Math
 	{
 		return AreAlmostEqual(left.Position(), right.Position(), tolerance) && AreAlmostEqual(left.Rotation(), right.Rotation(), tolerance) && 
 			AreAlmostEqual(left.Scale(), right.Scale(), tolerance);
-	}
-
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Transform<T, Size>& transform) requires (Size == 2 || Size == 3)
-	{
-		return stream << transform.ToString();
 	}
 }

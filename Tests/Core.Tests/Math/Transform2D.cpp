@@ -280,29 +280,6 @@ TEST_CASE("Transform2D look-at", "[Math][Transform2D]")
 #endif
 }
 
-TEST_CASE("Transform2D toString", "[Math][Transform2D]")
-{
-	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
-	constexpr float rotation = 0.4f;
-	constexpr auto scale = PonyEngine::Math::Vector2<float>(-2.f, 3.f);
-	const auto transform = PonyEngine::Math::Transform2D<float>(position, rotation, scale);
-	const std::string expected = std::format("Position: {}, Rotation: {}, Scale: {}", position, rotation, scale);
-	REQUIRE(transform.ToString() == expected);
-
-	std::ostringstream oss;
-	oss << transform;
-	REQUIRE(oss.str() == expected);
-
-	REQUIRE(std::format("{}", transform) == expected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::Transform2D<float>().ToString();
-	};
-#endif
-}
-
 TEST_CASE("Transform2D cast", "[Math][Transform2D]")
 {
 	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
