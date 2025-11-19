@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Log.Ext:ILoggerContext;
 
+import std;
+
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 
@@ -32,9 +34,16 @@ export namespace PonyEngine::Log
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept = 0;
 
-		/// @brief Logs to console.
-		/// @param logType Log type.
-		/// @param message Log message.
 		virtual void LogToConsole(LogType logType, std::string_view message) const noexcept = 0;
+		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs) const noexcept = 0;
+		virtual void LogToConsole(LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept = 0;
+
+		virtual void LogToConsole(const std::exception_ptr& exception) const noexcept = 0;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message) const noexcept = 0;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept = 0;
+		virtual void LogToConsole(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept = 0;
 	};
 }

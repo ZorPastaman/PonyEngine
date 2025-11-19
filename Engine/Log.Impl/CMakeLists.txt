@@ -20,8 +20,10 @@ target_sources(PonyEngine.Log.Impl PRIVATE
 )
 target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Log.Impl.cppm"
+	"Source/Private/Log.Impl-LogFiller.cppm"
 	"Source/Private/Log.Impl-Logger.cppm"
 	"Source/Private/Log.Impl-LoggerModule.cppm"
+	"Source/Private/Log.Impl-LogTypeSymbol.cppm"
 )
 
 message(VERBOSE "Configuring defines")
