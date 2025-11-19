@@ -65,11 +65,20 @@ namespace PonyEngine::Log
 			{
 				logFile.close();
 			}
-			catch (const std::exception& e)
+			catch (...)
 			{
 				if constexpr (IsInMask(LogType::Exception, PONY_LOG_MASK))
 				{
-					logger->LogToConsole(LogType::Exception, LogFormat(LogType::Exception, e.what(), "On closing log file."));
+					constexpr std::string_view message = "On closing log file.";
+
+					if constexpr (IsInMask(LogType::Exception, PONY_LOG_STACKTRACE_MASK))
+					{
+						logger->LogToConsole(std::current_exception(), message, std::stacktrace::current());
+					}
+					else
+					{
+						logger->LogToConsole(std::current_exception(), message);
+					}
 				}
 			}
 		}
@@ -79,13 +88,22 @@ namespace PonyEngine::Log
 	{
 		try
 		{
-			logFile << logEntry;
+			logFile << logEntry.formattedMessage;
 		}
-		catch (const std::exception& e)
+		catch (...)
 		{
 			if constexpr (IsInMask(LogType::Exception, PONY_LOG_MASK))
 			{
-				logger->LogToConsole(LogType::Exception, LogFormat(LogType::Exception, e.what(), "On writing to log file."));
+				constexpr std::string_view message = "On writing to log file.";
+
+				if constexpr (IsInMask(LogType::Exception, PONY_LOG_STACKTRACE_MASK))
+				{
+					logger->LogToConsole(std::current_exception(), message, std::stacktrace::current());
+				}
+				else
+				{
+					logger->LogToConsole(std::current_exception(), message);
+				}
 			}
 		}
 	}
