@@ -18,86 +18,319 @@ import :LogTypeSymbol;
 
 export namespace PonyEngine::Log
 {
+	/// @brief Fills a time data.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param context Logger context.
 	void FillTime(std::chrono::time_point<std::chrono::system_clock>& timePoint, std::uint64_t& frameCount, const Application::ILoggerContext& context) noexcept;
 
+	/// @brief Fills a log header.
+	/// @param target Log target.
+	/// @param logType Log type.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
 	void FillHeader(std::string& target, LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount);
 
+	/// @brief Fills a log message.
+	/// @param target Log target.
+	/// @param message Log message.
+	/// @return Log message start and end indices in the target.
 	std::pair<std::size_t, std::size_t> FillMessage(std::string& target, std::string_view message);
+	/// @brief Fills a log message.
+	/// @param target Log target.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @return Log message start and end indices in the target.
 	std::pair<std::size_t, std::size_t> FillMessage(std::string& target, std::string_view format, std::format_args formatArgs);
 
+	/// @brief Fills a log message.
+	/// @param target Log target.
+	/// @param exception Exception.
+	/// @return Log message start and end indices in the target.
 	std::pair<std::size_t, std::size_t> FillMessage(std::string& target, const std::optional<const std::exception*>& exception);
 
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param message Log message.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount, 
 		std::string_view message);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		std::string_view format, std::format_args formatArgs);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		std::string_view message, const std::stacktrace& stacktrace);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param stacktrace Stacktrace.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace);
 
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param exception Exception.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		const std::optional<const std::exception*>& exception);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param exception Exception.
+	/// @param message Log message.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		const std::optional<const std::exception*>& exception, std::string_view message);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param exception Exception.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		const std::optional<const std::exception*>& exception, std::string_view format, std::format_args formatArgs);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		const std::optional<const std::exception*>& exception, const std::stacktrace& stacktrace);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param exception Exception.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		const std::optional<const std::exception*>& exception, std::string_view message, const std::stacktrace& stacktrace);
+	/// @brief Fills a complete log text.
+	/// @param targetString Log target.
+	/// @param timePoint Time point.
+	/// @param frameCount Frame count.
+	/// @param exception Exception.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param stacktrace Stacktrace.
+	/// @return Message view in the target string.
 	std::string_view FillText(std::string& targetString, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount,
 		const std::optional<const std::exception*>& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace);
 
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param message Log message.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, LogType logType, std::string_view message, 
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, LogType logType, std::string_view format, std::format_args formatArgs, 
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, LogType logType, std::string_view message, const std::stacktrace& stacktrace, 
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace,
 		const Application::ILoggerContext& context) noexcept;
 
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, const std::exception_ptr& exception, const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param message Log message.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, const std::exception_ptr& exception, std::string_view message,
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs,
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, const std::exception_ptr& exception, const std::stacktrace& stacktrace, 
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace,
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetEntry Log entry.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
 	void FillData(LogEntry& targetEntry, std::string& targetString, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs,
 		const std::stacktrace& stacktrace, const Application::ILoggerContext& context) noexcept;
 
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param message Log message.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, LogType logType, std::string_view message, 
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, LogType logType, std::string_view format, std::format_args formatArgs, 
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, LogType logType, std::string_view message, const std::stacktrace& stacktrace,
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param logType Log type.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace,
 		const Application::ILoggerContext& context) noexcept;
 
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, const std::exception_ptr& exception, const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param message Log message.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, const std::exception_ptr& exception, std::string_view message,
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs,
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, const std::exception_ptr& exception, const std::stacktrace& stacktrace, 
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace,
 		const Application::ILoggerContext& context) noexcept;
+	/// @brief Fills log data.
+	/// @param targetString Log target.
+	/// @param exception Exception.
+	/// @param format Log message format.
+	/// @param formatArgs Log message format arguments.
+	/// @param stacktrace Stacktrace.
+	/// @param context Logger context.
+	/// @return String to log.
 	std::string_view FillData(std::string& targetString, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, 
 		const std::stacktrace& stacktrace, const Application::ILoggerContext& context) noexcept;
 }
 
 namespace PonyEngine::Log
 {
-	constexpr std::string_view AllocationError = "Log message allocation failed.";
-	constexpr std::string_view FormatError = "Log message format failed: ";
-	constexpr std::string_view NullptrException = "Nullptr exception.";
-	constexpr std::string_view UnknownException = "Unknown exception";
+	constexpr std::string_view AllocationError = "Log message allocation failed."; ///< Allocation error message.
+	constexpr std::string_view FormatError = "Log message format failed: "; ///< Format error message prefix.
+	constexpr std::string_view NullptrException = "Nullptr exception."; ///< Nullptr exception message.
+	constexpr std::string_view UnknownException = "Unknown exception"; ///< Unknown exception message.
 
 	void FillTime(std::chrono::time_point<std::chrono::system_clock>& timePoint, std::uint64_t& frameCount, const Application::ILoggerContext& context) noexcept
 	{

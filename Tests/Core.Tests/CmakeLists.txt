@@ -29,7 +29,6 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/Vector.cpp"
 	"Serialization/Array.cpp"
 	"Serialization/Basic.cpp"
-	"Text/Format.cpp"
 	"Type/Common.cpp"
 	"Type/Enum.cpp"
 	"Type/Limits.cpp"

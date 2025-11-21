@@ -15,8 +15,6 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Public/Log.cppm"
 	"Source/Public/Log-ILogger.cppm"
-	
-	
 	"Source/Public/Log-LogHelper.cppm"
 	"Source/Public/Log-LogType.cppm"
 )

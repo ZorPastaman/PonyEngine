@@ -15,4 +15,5 @@ export import :ILoggerContext;
 export import :ILoggerModuleContext;
 export import :ISubLogger;
 export import :LogEntry;
+export import :LogHelper;
 export import :SubLoggerHandle;

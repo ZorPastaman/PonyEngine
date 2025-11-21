@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Log/Console.h"
 
 export module PonyEngine.Log.Impl:Logger;
 
@@ -19,9 +19,9 @@ import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log.Ext;
-import PonyEngine.Text;
 
 import :LogFiller;
+import :SubLoggerContainer;
 
 export namespace PonyEngine::Log
 {
@@ -98,9 +98,7 @@ export namespace PonyEngine::Log
 
 		Application::ILoggerContext* loggerContext; ///< Logger context.
 
-		// These vectors are synced by index.
-		std::vector<SubLoggerHandle> subLoggerHandles; ///< Sub-logger handles.
-		std::vector<std::shared_ptr<ISubLogger>> subLoggers; ///< Sub-loggers.
+		SubLoggerContainer subLoggerContainer; ///< Sub-logger container.
 
 		mutable std::string logStringTemp; ///< Temporal log string.
 		mutable std::string consoleStringTemp; ///< Temporal log string that is used in @p LogToString().
@@ -121,12 +119,12 @@ namespace PonyEngine::Log
 	{
 		if constexpr (IsInMask(LogType::Error, PONY_LOG_MASK))
 		{
-			if (subLoggers.size() > 0uz) [[unlikely]]
+			if (subLoggerContainer.Size() > 0uz) [[unlikely]]
 			{
-				loggerContext->LogToConsole(LogType::Error, "Sub-loggers weren't removed:");
-				for (const std::shared_ptr<ISubLogger>& subLogger : subLoggers)
+				PONY_CONSOLE(*this, LogType::Error, "Sub-loggers weren't removed:");
+				for (const std::shared_ptr<ISubLogger>& subLogger : subLoggerContainer.SubLoggers())
 				{
-					loggerContext->LogToConsole(LogType::Error, Text::FormatSafe("Sub-logger: '{}'.", typeid(*subLogger).name()));
+					PONY_CONSOLE(*this, LogType::Error, "Sub-logger: '{}'.", typeid(*subLogger).name());
 				}
 			}
 		}
@@ -308,22 +306,13 @@ namespace PonyEngine::Log
 		{
 			throw std::invalid_argument("Sub-logger is nullptr.");
 		}
-		if (const auto position = std::ranges::find(subLoggers, subLogger); position != subLoggers.cend()) [[unlikely]]
+		if (subLoggerContainer.IndexOf(*subLogger) < subLoggerContainer.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Sub-logger has already been added.");
 		}
 
 		const SubLoggerHandle currentHandle = nextSubLoggerHandle;
-		subLoggerHandles.push_back(currentHandle);
-		try
-		{
-			subLoggers.push_back(subLogger);
-		}
-		catch (...)
-		{
-			subLoggerHandles.pop_back();
-			throw;
-		}
+		subLoggerContainer.Add(currentHandle, subLogger);
 		++nextSubLoggerHandle.id;
 
 		PONY_LOG(*this, LogType::Info, "'{}' sub-logger added. Handle: '0x{:X}'.", typeid(*subLogger).name(), currentHandle.id);
@@ -338,12 +327,10 @@ namespace PonyEngine::Log
 			throw std::logic_error("Sub-logger can be removed only on start-up or shut-down.");
 		}
 
-		if (const auto position = std::find(subLoggerHandles.crbegin(), subLoggerHandles.crend(), handle); position != subLoggerHandles.crend()) [[likely]]
+		if (const std::size_t index = subLoggerContainer.IndexOf(handle); index < subLoggerContainer.Size()) [[likely]]
 		{
-			const std::size_t index = std::distance(subLoggerHandles.cbegin(), position.base()) - 1uz;
-			const char* const subLoggerName = typeid(*subLoggers[index]).name();
-			subLoggers.erase(subLoggers.cbegin() + index);
-			subLoggerHandles.erase(subLoggerHandles.cbegin() + index);
+			const char* const subLoggerName = typeid(subLoggerContainer.SubLogger(index)).name();
+			subLoggerContainer.Remove(index);
 			PONY_LOG(*this, LogType::Info, "'{}' sub-logger removed. Handle: '0x{:X}'.", subLoggerName, handle.id);
 		}
 		else [[unlikely]]
@@ -374,9 +361,9 @@ namespace PonyEngine::Log
 
 	void Logger::Log(const LogEntry& logEntry) const noexcept
 	{
-		LogToConsole(logEntry.logType, logEntry.formattedMessage);
+		loggerContext->LogToConsole(logEntry.logType, logEntry.formattedMessage);
 
-		for (const std::shared_ptr<ISubLogger>& subLogger : subLoggers)
+		for (const std::shared_ptr<ISubLogger>& subLogger : subLoggerContainer.SubLoggers())
 		{
 			subLogger->Log(logEntry);
 		}

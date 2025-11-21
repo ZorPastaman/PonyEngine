@@ -47,7 +47,9 @@ target_link_libraries(PonyEngine.Surface.Impl PUBLIC
 if(NOT TARGET PonyEngine.Surface)
 	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
 endif()
-target_link_libraries(PonyEngine.Surface.Impl PRIVATE
+target_link_libraries(PonyEngine.Surface.Impl PUBLIC
 	PonyEngine.Surface
+)
+target_link_libraries(PonyEngine.Surface.Impl PRIVATE
 	PonyEngine.Log
 )

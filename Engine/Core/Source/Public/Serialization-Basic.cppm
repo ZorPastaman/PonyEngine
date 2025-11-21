@@ -11,7 +11,6 @@ export module PonyEngine.Serialization:Basic;
 
 import std;
 
-import PonyEngine.Text;
 import PonyEngine.Type;
 
 export namespace PonyEngine::Serialization
@@ -140,7 +139,7 @@ namespace PonyEngine::Serialization
 		{
 			if (data.size() < 1uz) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to serialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::value_too_large)));
+				throw std::runtime_error(std::format("Failed to serialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::value_too_large)));
 			}
 
 			data[0] = '0' + value;
@@ -152,7 +151,7 @@ namespace PonyEngine::Serialization
 
 			if (ec != std::errc()) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to serialize data. Error code: '0x{:X}'.", std::to_underlying(ec)));
+				throw std::runtime_error(std::format("Failed to serialize data. Error code: '0x{:X}'.", std::to_underlying(ec)));
 			}
 
 			return pt;
@@ -166,11 +165,11 @@ namespace PonyEngine::Serialization
 		{
 			if (data.size() < 1uz) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to deserialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::invalid_argument)));
+				throw std::runtime_error(std::format("Failed to deserialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::invalid_argument)));
 			}
 			if (data[0] != '0' && data[0] != '1') [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to deserialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::invalid_argument)));
+				throw std::runtime_error(std::format("Failed to deserialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::invalid_argument)));
 			}
 
 			value = data[0] != '0';
@@ -182,7 +181,7 @@ namespace PonyEngine::Serialization
 
 			if (ec != std::errc()) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to deserialize data. Error code: '0x{:X}'.", std::to_underlying(ec)));
+				throw std::runtime_error(std::format("Failed to deserialize data. Error code: '0x{:X}'.", std::to_underlying(ec)));
 			}
 
 			return pt;

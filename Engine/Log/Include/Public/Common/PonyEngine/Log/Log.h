@@ -136,11 +136,11 @@
 	if constexpr (PonyEngine::Log::IsInMask(PonyEngine::Log::LogType::Exception, PONY_LOG_STACKTRACE_MASK)) \
 	{ \
 		const std::stacktrace stacktrace = std::stacktrace::current(); \
-		PonyEngine::Log::LogToLogger(logger, exception, stacktrace, __VA_OPT__(,) __VA_ARGS__); \
+		PonyEngine::Log::LogToLogger(logger, exception, stacktrace __VA_OPT__(,) __VA_ARGS__); \
 	} \
 	else \
 	{ \
-		PonyEngine::Log::LogToLogger(logger, exception, __VA_OPT__(,) __VA_ARGS__); \
+		PonyEngine::Log::LogToLogger(logger, exception __VA_OPT__(,) __VA_ARGS__); \
 	} \
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -177,7 +177,7 @@
 #define PONY_LOG_X(logger, exception, ...) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogTypeMask::None) \
 	{ \
-		PONY_LOG_PUSH_X(logger, exception, __VA_OPT__(,) __VA_ARGS__); \
+		PONY_LOG_PUSH_X(logger, exception __VA_OPT__(,) __VA_ARGS__); \
 	} \
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -191,6 +191,6 @@
 	{ \
 		if (condition) \
 		{ \
-			PONY_LOG_PUSH_X(logger, exception, __VA_OPT__(,) __VA_ARGS__); \
+			PONY_LOG_PUSH_X(logger, exception __VA_OPT__(,) __VA_ARGS__); \
 		} \
 	} \

@@ -17,16 +17,6 @@ else()
 	add_executable(PonyEngine.Application.Impl)
 endif()
 
-message(VERBOSE "Configuring headers")
-target_include_directories(PonyEngine.Application.Impl PRIVATE
-	"Include/Private/Common"
-)
-
-message(VERBOSE "Configuring sources")
-target_sources(PonyEngine.Application.Impl PRIVATE
-	"Source/Main.cpp"
-)
-
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application.Impl.cppm"
 	"Source/Private/Application.Impl-App.cppm"
@@ -48,6 +38,11 @@ if(PONY_WINDOWS)
 	target_include_directories(PonyEngine.Application.Impl PRIVATE
 		"Include/Private/Windows"
 	)
+
+	message(VERBOSE "Configuring sources for Windows")
+	target_sources(PonyEngine.Application.Impl PRIVATE
+		"Source/Main.Windows.cpp"
+)
 
 	message(VERBOSE "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
@@ -94,8 +89,10 @@ set_target_properties(PonyEngine.Application.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Application.Impl PRIVATE
+target_link_libraries(PonyEngine.Application.Impl PUBLIC
 	PonyEngine.Application.Ext
+)
+target_link_libraries(PonyEngine.Application.Impl PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
 )

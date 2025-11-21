@@ -28,9 +28,10 @@ export namespace PonyEngine::Application
 	public:
 		/// @brief Creates a logger manager.
 		/// @param application Application context.
+		/// @param defaultLogger Default logger.
 		/// @remark Sets a default logger as a current logger.
 		[[nodiscard("Pure constructor")]]
-		explicit LoggerManager(IApplicationContext& application);
+		LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
 		LoggerManager(const LoggerManager&) = delete;
 		LoggerManager(LoggerManager&&) = delete;
 
@@ -70,7 +71,7 @@ export namespace PonyEngine::Application
 	private:
 		IApplicationContext* application; ///< Application context.
 
-		std::unique_ptr<DefaultLogger> defaultLogger; ///< Default logger.
+		std::shared_ptr<Log::ILogger> defaultLogger; ///< Default logger.
 		std::shared_ptr<Log::ILogger> externalLogger; ///< External logger.
 		Log::ILogger* logger; ///< Current logger.
 
@@ -81,9 +82,9 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	LoggerManager::LoggerManager(IApplicationContext& application) :
+	LoggerManager::LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
 		application{&application},
-		defaultLogger(std::make_unique<DefaultLogger>(*this->application)),
+		defaultLogger(defaultLogger),
 		logger{defaultLogger.get()},
 		nextHandle{.id = 1u},
 		currentHandle{.id = 0u}

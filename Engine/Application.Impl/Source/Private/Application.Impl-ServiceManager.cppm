@@ -17,7 +17,6 @@ import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
-import PonyEngine.Text;
 
 export namespace PonyEngine::Application
 {
@@ -176,11 +175,11 @@ namespace PonyEngine::Application
 						PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interfaceType.name());
 						if (serviceInterfaces.contains(interfaceType)) [[unlikely]]
 						{
-							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' has already been added.", interfaceType.name()));
+							throw std::invalid_argument(std::format("Interface of type '{}' has already been added.", interfaceType.name()));
 						}
 						if (!interface) [[unlikely]]
 						{
-							throw std::invalid_argument(Text::FormatSafe("Interface of type '{}' is nullptr.", interfaceType.name()));
+							throw std::invalid_argument(std::format("Interface of type '{}' is nullptr.", interfaceType.name()));
 						}
 						serviceInterfaces[interfaceType] = interface;
 					}
@@ -283,14 +282,9 @@ namespace PonyEngine::Application
 				PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking '{}' service.", typeid(*tickableService).name());
 				tickableService->Tick();
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On ticking '{}' service.", typeid(*tickableService).name());
-				throw;
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on ticking '{}' service.", typeid(*tickableService).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On ticking '{}' service.", typeid(*tickableService).name());
 				throw;
 			}
 		}
@@ -347,14 +341,9 @@ namespace PonyEngine::Application
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service done.", typeid(*service).name());
 				++count;
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On beginning '{}' service.", typeid(*service).name());
-				throw;
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on beginning '{}' service.", typeid(*service).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On beginning '{}' service.", typeid(*service).name());
 				throw;
 			}
 		}
@@ -373,13 +362,9 @@ namespace PonyEngine::Application
 				service->End();
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service done.", typeid(*service).name());
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On ending '{}' service.", typeid(*service).name());
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on ending '{}' service.", typeid(*service).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On ending '{}' service.", typeid(*service).name());
 			}
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending application services done.");

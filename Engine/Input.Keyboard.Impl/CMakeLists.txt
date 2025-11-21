@@ -57,9 +57,11 @@ endif()
 if(NOT TARGET PonyEngine.Input.Ext)
 	message(FATAL_ERROR "PonyEngine.Input.Ext wasn't configured")
 endif()
-target_link_libraries(PonyEngine.Input.Keyboard.Impl PRIVATE
+target_link_libraries(PonyEngine.Input.Keyboard.Impl PUBLIC
 	PonyEngine.Input
 	PonyEngine.Input.Ext
+)
+target_link_libraries(PonyEngine.Input.Keyboard.Impl PRIVATE
 	PonyEngine.Log
 )
 if(PONY_WINDOWS)

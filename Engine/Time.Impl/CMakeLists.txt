@@ -48,7 +48,9 @@ target_link_libraries(PonyEngine.Time.Impl PUBLIC
 if(NOT TARGET PonyEngine.Time)
 	message(FATAL_ERROR "PonyEngine.Time wasn't configured")
 endif()
-target_link_libraries(PonyEngine.Time.Impl PRIVATE
+target_link_libraries(PonyEngine.Time.Impl PUBLIC
 	PonyEngine.Time
+)
+target_link_libraries(PonyEngine.Time.Impl PRIVATE
 	PonyEngine.Log
 )

@@ -44,8 +44,9 @@ export namespace PonyEngine::Application::Windows
 		/// @param prevInstance Previous instance.
 		/// @param commandLine Command line.
 		/// @param showCommand Show command.
+		/// @param defaultLogger Default logger.
 		[[nodiscard("Pure constructor")]]
-		App(HINSTANCE instance, HINSTANCE prevInstance, PSTR commandLine, int showCommand);
+		App(HINSTANCE instance, HINSTANCE prevInstance, PSTR commandLine, int showCommand, const std::shared_ptr<Log::ILogger>& defaultLogger);
 		App(const App&) = delete;
 		App(App&&) = delete;
 
@@ -156,11 +157,11 @@ export namespace PonyEngine::Application::Windows
 #if PONY_WINDOWS
 namespace PonyEngine::Application::Windows
 {
-	App::App(const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand) :
+	App::App(const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand, const std::shared_ptr<Log::ILogger>& defaultLogger) :
 		frameCount{0ull},
 		exitCode{ExitCodes::InitialExitCode},
 		flowState{FlowState::StartingUp},
-		loggerManager(std::make_unique<LoggerManager>(*static_cast<IApplicationContext*>(this))),
+		loggerManager(std::make_unique<LoggerManager>(*static_cast<IApplicationContext*>(this), defaultLogger)),
 		appDataManager(std::make_unique<AppDataManager>(*static_cast<IApplicationContext*>(this), instance, prevInstance, commandLine, showCommand)),
 		pathManager(std::make_unique<PathManager>(*static_cast<IApplicationContext*>(this))),
 		platformMessageService(std::make_shared<PlatformMessageService>(*static_cast<IApplicationContext*>(this))),

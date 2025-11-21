@@ -15,8 +15,6 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Hash.cppm"
 	"Source/Public/Hash-FNV1a.cppm"
-	
-	
 	"Source/Public/Math.cppm"
 	"Source/Public/Math-Ball.cppm"
 	"Source/Public/Math-Bounds.cppm"
@@ -39,9 +37,6 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Serialization.cppm"
 	"Source/Public/Serialization-Array.cppm"
 	"Source/Public/Serialization-Basic.cppm"
-	"Source/Public/Text.cppm"
-	
-	"Source/Public/Text-Format.cppm"
 	"Source/Public/Type.cppm"
 	"Source/Public/Type-Common.cppm"
 	"Source/Public/Type-Limits.cppm"
