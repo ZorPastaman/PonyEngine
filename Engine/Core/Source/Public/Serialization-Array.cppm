@@ -233,7 +233,7 @@ namespace PonyEngine::Serialization
 				{
 					if (dataPoint == end) [[unlikely]]
 					{
-						throw std::runtime_error(Text::FormatSafe("Failed to serialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::value_too_large)));
+						throw std::runtime_error(std::format("Failed to serialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::value_too_large)));
 					}
 
 					*dataPoint = separator;

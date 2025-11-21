@@ -24,6 +24,7 @@ target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Log.Impl-Logger.cppm"
 	"Source/Private/Log.Impl-LoggerModule.cppm"
 	"Source/Private/Log.Impl-LogTypeSymbol.cppm"
+	"Source/Private/Log.Impl-SubLoggerContainer.cppm"
 )
 
 message(VERBOSE "Configuring defines")
@@ -47,7 +48,7 @@ target_link_libraries(PonyEngine.Log.Impl PUBLIC
 if(NOT TARGET PonyEngine.Log.Ext)
 	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
 endif()
-target_link_libraries(PonyEngine.Log.Impl PRIVATE
+target_link_libraries(PonyEngine.Log.Impl PUBLIC
 	PonyEngine.Log
 	PonyEngine.Log.Ext
 )

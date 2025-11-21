@@ -3,9 +3,9 @@ add_executable(PonyEngine.Log.Tests)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Tests PRIVATE
-	"Log/LogFormat.cpp"
+	
 	"Log/LogMacro.cpp"
-)
+ "Log/LogMacroStacktrace.cpp")
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Log.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})

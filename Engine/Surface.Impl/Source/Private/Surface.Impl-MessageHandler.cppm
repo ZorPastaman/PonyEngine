@@ -24,7 +24,6 @@ import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
-import PonyEngine.Text;
 
 #if PONY_WINDOWS
 export namespace PonyEngine::Surface::Windows
@@ -114,9 +113,9 @@ namespace PonyEngine::Surface::Windows
 		{
 			WindowHandlers[hWnd] = windowProc;
 		}
-		catch (const std::exception& e)
+		catch (...)
 		{
-			PONY_LOG_E(windowProc->Application().Logger(), e, "On setting message handler.");
+			PONY_LOG_X(windowProc->Application().Logger(), std::current_exception(), "On setting message handler.");
 			return -1;
 		}
 

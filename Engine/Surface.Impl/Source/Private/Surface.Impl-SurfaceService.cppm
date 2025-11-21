@@ -390,7 +390,7 @@ namespace PonyEngine::Surface::Windows
 		);
 		if (!windowHandle) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window done. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 	}
@@ -405,9 +405,9 @@ namespace PonyEngine::Surface::Windows
 				{
 					ClipCursor(std::nullopt);
 				}
-				catch (const std::exception& e)
+				catch (...)
 				{
-					PONY_LOG_E(application->Logger(), e, "On freeing cursor.");
+					PONY_LOG_X(application->Logger(), std::current_exception(), "On freeing cursor.");
 				}
 			}
 			if (!cursorVisible)
@@ -595,7 +595,7 @@ namespace PonyEngine::Surface::Windows
 		{
 			if (const DWORD errorCode = GetLastError()) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to get window title length. Error code: '0x{:X}'.", errorCode));
+				throw std::runtime_error(std::format("Failed to get window title length. Error code: '0x{:X}'.", errorCode));
 			}
 
 			return std::string_view();
@@ -606,7 +606,7 @@ namespace PonyEngine::Surface::Windows
 		const int copied = GetWindowTextA(windowHandle, titleTemp.data(), length + 1);
 		if (!copied) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get window title. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 		titleTemp.resize(copied);
 
@@ -622,7 +622,7 @@ namespace PonyEngine::Surface::Windows
 
 		if (!SetWindowTextA(windowHandle, title.data())) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to set window title. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to set window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 	}
 
@@ -661,7 +661,7 @@ namespace PonyEngine::Surface::Windows
 		POINT position;
 		if (!GetCursorPos(&position)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get cursor position. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get cursor position. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(position.x), static_cast<std::int32_t>(position.y));
@@ -673,7 +673,7 @@ namespace PonyEngine::Surface::Windows
 		cursorInfo.cbSize = sizeof(CURSORINFO);
 		if (!GetCursorInfo(&cursorInfo)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get cursor visibility. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get cursor visibility. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return cursorInfo.flags & CURSOR_SHOWING;
@@ -689,7 +689,7 @@ namespace PonyEngine::Surface::Windows
 		auto screenPoint = POINT{.x = static_cast<LONG>(clientPoint.X()), .y = static_cast<LONG>(clientPoint.Y())};
 		if (!::ClientToScreen(windowHandle, &screenPoint)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(screenPoint.x), static_cast<std::int32_t>(screenPoint.y));
@@ -705,7 +705,7 @@ namespace PonyEngine::Surface::Windows
 		auto clientPoint = POINT{.x = static_cast<LONG>(screenPoint.X()), .y = static_cast<LONG>(screenPoint.Y())};
 		if (!::ScreenToClient(windowHandle, &clientPoint)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get client point. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get client point. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(clientPoint.x), static_cast<std::int32_t>(clientPoint.y));
@@ -746,16 +746,9 @@ namespace PonyEngine::Surface::Windows
 			{
 				RegisterRawInputType(usagePage, usage);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On registering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
-				observers.pop_back();
-
-				throw;
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on registering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On registering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 				observers.pop_back();
 
 				throw;
@@ -797,13 +790,9 @@ namespace PonyEngine::Surface::Windows
 					{
 						UnregisterRawInputType(usagePage, usage);
 					}
-					catch (const std::exception& e)
-					{
-						PONY_LOG_E(application->Logger(), e, "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
-					}
 					catch (...)
 					{
-						PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+						PONY_LOG_X(application->Logger(), std::current_exception(), "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 					}
 				}
 
@@ -840,13 +829,9 @@ namespace PonyEngine::Surface::Windows
 					{
 						UnregisterRawInputType(usagePage, usage);
 					}
-					catch (const std::exception& e)
-					{
-						PONY_LOG_E(application->Logger(), e, "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
-					}
 					catch (...)
 					{
-						PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+						PONY_LOG_X(application->Logger(), std::current_exception(), "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 					}
 				}
 			}
@@ -932,13 +917,9 @@ namespace PonyEngine::Surface::Windows
 			{
 				observer->OnFocusChanged(windowInFocus);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing focus change.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing focus change.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing focus change.");
 			}
 		}
 	}
@@ -954,7 +935,7 @@ namespace PonyEngine::Surface::Windows
 		};
 		if (!AdjustWindowRectEx(&windowRect, style.style, false, style.styleEx)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		const auto position = Math::Vector2<int>(static_cast<int>(windowRect.left), static_cast<int>(windowRect.top));
@@ -968,12 +949,12 @@ namespace PonyEngine::Surface::Windows
 		RECT rect;
 		if (!::GetClientRect(windowHandle, &rect)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get client rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get client rect. Error code: '0x{:X}'.", GetLastError()));
 		}
 		auto screenPosition = POINT{.x = rect.top, .y = rect.top};
 		if (!::ClientToScreen(windowHandle, &screenPosition)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get client position. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get client position. Error code: '0x{:X}'.", GetLastError()));
 		}
 		const auto position = Math::Vector2<int>(static_cast<int>(screenPosition.x), static_cast<int>(screenPosition.y));
 		const auto size = Math::Vector2<int>(static_cast<int>(rect.right - rect.left), static_cast<int>(rect.bottom - rect.top));
@@ -986,7 +967,7 @@ namespace PonyEngine::Surface::Windows
 		RECT rect;
 		if (!::GetWindowRect(windowHandle, &rect)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get window rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		const auto position = Math::Vector2<int>(static_cast<int>(rect.left), static_cast<int>(rect.bottom));
@@ -1013,7 +994,7 @@ namespace PonyEngine::Surface::Windows
 		if (!SetWindowPos(windowHandle, insert, rect.Position().X(), rect.Position().Y(), rect.Size().X(), rect.Size().Y(), SWP_NOACTIVATE | SWP_FRAMECHANGED)) [[unlikely]]
 		{
 			unlocked = false;
-			throw std::runtime_error(Text::FormatSafe("Failed to set window rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to set window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
 		unlocked = false;
 	}
@@ -1041,7 +1022,7 @@ namespace PonyEngine::Surface::Windows
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to get window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to get window style. Error code: '0x{:X}'.", error));
 			}
 		}
 
@@ -1050,7 +1031,7 @@ namespace PonyEngine::Surface::Windows
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to get extended window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to get extended window style. Error code: '0x{:X}'.", error));
 			}
 		}
 
@@ -1067,7 +1048,7 @@ namespace PonyEngine::Surface::Windows
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
 				unlocked = false;
-				throw std::runtime_error(Text::FormatSafe("Failed to set window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to set window style. Error code: '0x{:X}'.", error));
 			}
 		}
 
@@ -1076,7 +1057,7 @@ namespace PonyEngine::Surface::Windows
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
 				unlocked = false;
-				throw std::runtime_error(Text::FormatSafe("Failed to set extended window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to set extended window style. Error code: '0x{:X}'.", error));
 			}
 		}
 		unlocked = false;
@@ -1141,14 +1122,14 @@ namespace PonyEngine::Surface::Windows
 			};
 			if (!::ClipCursor(&rect)) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to clip cursor. Error code: '0x{:X}'.", GetLastError()));
+				throw std::runtime_error(std::format("Failed to clip cursor. Error code: '0x{:X}'.", GetLastError()));
 			}
 		}
 		else
 		{
 			if (!::ClipCursor(nullptr)) [[unlikely]]
 			{
-				throw std::runtime_error(Text::FormatSafe("Failed to free cursor. Error code: '0x{:X}'.", GetLastError()));
+				throw std::runtime_error(std::format("Failed to free cursor. Error code: '0x{:X}'.", GetLastError()));
 			}
 		}
 	}
@@ -1166,9 +1147,9 @@ namespace PonyEngine::Surface::Windows
 			{
 				ClipCursor(cursorClippingRect);
 			}
-			catch (const std::exception& e)
+			catch (...)
 			{
-				PONY_LOG_E(application->Logger(), e, "On updating cursor clipping.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On updating cursor clipping.");
 				cursorClippingRect = std::nullopt;
 			}
 		}
@@ -1200,7 +1181,7 @@ namespace PonyEngine::Surface::Windows
 
 		if (!RegisterRawInputDevices(&rid, 1u, sizeof(rid))) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to register/unregister raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
+			throw std::runtime_error(std::format("Failed to register/unregister raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
 		}
 	}
 
@@ -1210,7 +1191,7 @@ namespace PonyEngine::Surface::Windows
 		UINT size = sizeof(info);
 		if (!GetRawInputDeviceInfoA(handle, RIDI_DEVICEINFO, &info, &size)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get device info. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get device info. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		switch (info.dwType)
@@ -1251,13 +1232,9 @@ namespace PonyEngine::Surface::Windows
 			{
 				observer->OnActiveChanged(windowActive);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing active change.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing active change.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing active change.");
 			}
 		}
 
@@ -1297,9 +1274,9 @@ namespace PonyEngine::Surface::Windows
 			minMax->ptMinTrackSize = POINT{.x = rect.Size().X(), .y = rect.Size().Y()};
 			minMax->ptMaxTrackSize = POINT{.x = resolution.X(), .y = resolution.Y()};
 		}
-		catch (const std::exception& e)
+		catch (...)
 		{
-			PONY_LOG_E(application->Logger(), e, "On getting min max info.");
+			PONY_LOG_X(application->Logger(), std::current_exception(), "On getting min max info.");
 		}
 
 		return 0;
@@ -1347,9 +1324,9 @@ namespace PonyEngine::Surface::Windows
 				}
 			}, rectStyle);
 		}
-		catch (const std::exception& e)
+		catch (...)
 		{
-			PONY_LOG_E(application->Logger(), e, "On window position changing.");
+			PONY_LOG_X(application->Logger(), std::current_exception(), "On window position changing.");
 		}
 
 		return 0;
@@ -1374,13 +1351,9 @@ namespace PonyEngine::Surface::Windows
 			{
 				observer->OnMoved(position);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing move.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing move.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing move.");
 			}
 		}
 
@@ -1399,13 +1372,9 @@ namespace PonyEngine::Surface::Windows
 			{
 				observer->OnResized(size);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing resize.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing resize.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing resize.");
 			}
 		}
 
@@ -1424,13 +1393,9 @@ namespace PonyEngine::Surface::Windows
 			{
 				observer->OnResolutionChanged(resolution);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing display change.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing display change.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing display change.");
 			}
 		}
 
@@ -1445,9 +1410,9 @@ namespace PonyEngine::Surface::Windows
 
 					UpdateCursorClipping();
 				}
-				catch (const std::exception& e)
+				catch (...)
 				{
-					PONY_LOG_E(application->Logger(), e, "On window display change.");
+					PONY_LOG_X(application->Logger(), std::current_exception(), "On window display change.");
 					cursorClippingRect = std::nullopt;
 				}
 			},
@@ -1505,9 +1470,9 @@ namespace PonyEngine::Surface::Windows
 		{
 			rawInputTemp.resize(size);
 		}
-		catch (const std::exception& e)
+		catch (...)
 		{
-			PONY_LOG_E(application->Logger(), e, "On resizing raw input cache.");
+			PONY_LOG_X(application->Logger(), std::current_exception(), "On resizing raw input cache.");
 			return 0;
 		}
 		if (GetRawInputData(rawInputInfo, RID_INPUT, rawInputTemp.data(), &size, sizeof(RAWINPUTHEADER)) != rawInputTemp.size()) [[unlikely]]
@@ -1533,13 +1498,9 @@ namespace PonyEngine::Surface::Windows
 					{
 						observer->Observe(*input, time, cursorPosition);
 					}
-					catch (const std::exception& e)
-					{
-						PONY_LOG_E(application->Logger(), e, "On calling '{}' raw input observer.", typeid(*observer).name());
-					}
 					catch (...)
 					{
-						PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer.", typeid(*observer).name());
+						PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' raw input observer.", typeid(*observer).name());
 					}
 				}
 			}
@@ -1613,20 +1574,16 @@ namespace PonyEngine::Surface::Windows
 					{
 						observer->OnDeviceConnectionChanged(deviceHandle, isConnected);
 					}
-					catch (const std::exception& e)
-					{
-						PONY_LOG_E(application->Logger(), e, "On calling '{}' raw input observer on input device change.", typeid(*observer).name());
-					}
 					catch (...)
 					{
-						PONY_LOG(application->Logger(), Log::LogType::Error, "Unknown exception on calling '{}' raw input observer on input device change.", typeid(*observer).name());
+						PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' raw input observer on input device change.", typeid(*observer).name());
 					}
 				}
 			}
 		}
-		catch (const std::exception& e)
+		catch (...)
 		{
-			PONY_LOG_E(application->Logger(), e, "On updating device connection state. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(deviceHandle));
+			PONY_LOG_X(application->Logger(), std::current_exception(), "On updating device connection state. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(deviceHandle));
 		}
 
 		return 0;

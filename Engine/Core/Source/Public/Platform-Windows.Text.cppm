@@ -15,8 +15,6 @@ export module PonyEngine.Platform:Windows.Text;
 
 import std;
 
-import PonyEngine.Text;
-
 export namespace PonyEngine::Platform::Windows
 {
 	/// @brief Gets a size of a converted string.
@@ -71,7 +69,7 @@ namespace PonyEngine::Platform::Windows
 		const int length = WideCharToMultiByte(CP_UTF8, 0, source.data(), static_cast<int>(source.size()), nullptr, 0, nullptr, nullptr);
 		if (length <= 0) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get utf8 string length. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get utf8 string length. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(length);
@@ -87,7 +85,7 @@ namespace PonyEngine::Platform::Windows
 		const int length = MultiByteToWideChar(CP_UTF8, 0, source.data(), static_cast<int>(source.size()), nullptr, 0);
 		if (length <= 0) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get wide string length. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get wide string length. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(length);
@@ -117,7 +115,7 @@ namespace PonyEngine::Platform::Windows
 		const int length = WideCharToMultiByte(CP_UTF8, 0, source.data(), static_cast<int>(source.size()), target.data(), static_cast<int>(target.size()), nullptr, nullptr);
 		if (length <= 0) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to convert to utf8 string. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to convert to utf8 string. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(length);
@@ -147,7 +145,7 @@ namespace PonyEngine::Platform::Windows
 		const int length = MultiByteToWideChar(CP_UTF8, 0, source.data(), static_cast<int>(source.size()), target.data(), static_cast<int>(target.size()));
 		if (length <= 0) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to convert to wide string. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to convert to wide string. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(length);

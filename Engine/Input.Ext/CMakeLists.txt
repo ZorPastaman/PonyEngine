@@ -25,8 +25,10 @@ message(VERBOSE "Configuring dependencies")
 if(NOT TARGET PonyEngine.Input)
 	message(FATAL_ERROR "PonyEngine.Input wasn't configured")
 endif()
-target_link_libraries(PonyEngine.Input.Ext PRIVATE
+target_link_libraries(PonyEngine.Input.Ext PUBLIC
 	PonyEngine.Input
+)
+target_link_libraries(PonyEngine.Input.Ext PRIVATE
 	PonyEngine.Core
 	PonyEngine.Application.Ext
 	PonyEngine.Log

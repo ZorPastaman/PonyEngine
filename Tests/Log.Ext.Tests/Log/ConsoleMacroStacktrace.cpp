@@ -27,31 +27,31 @@
 #ifndef PONY_LOG_EXCEPTION
 #define PONY_LOG_EXCEPTION
 #endif
-#ifdef PONY_LOG_STACKTRACE_VERBOSE
-#undef PONY_LOG_STACKTRACE_VERBOSE
+#ifndef PONY_LOG_STACKTRACE_VERBOSE
+#define PONY_LOG_STACKTRACE_VERBOSE
 #endif
-#ifdef PONY_LOG_STACKTRACE_DEBUG
-#undef PONY_LOG_STACKTRACE_DEBUG
+#ifndef PONY_LOG_STACKTRACE_DEBUG
+#define PONY_LOG_STACKTRACE_DEBUG
 #endif
-#ifdef PONY_LOG_STACKTRACE_INFO
-#undef PONY_LOG_STACKTRACE_INFO
+#ifndef PONY_LOG_STACKTRACE_INFO
+#define PONY_LOG_STACKTRACE_INFO
 #endif
-#ifdef PONY_LOG_STACKTRACE_WARNING
-#undef PONY_LOG_STACKTRACE_WARNING
+#ifndef PONY_LOG_STACKTRACE_WARNING
+#define PONY_LOG_STACKTRACE_WARNING
 #endif
-#ifdef PONY_LOG_STACKTRACE_ERROR
-#undef PONY_LOG_STACKTRACE_ERROR
+#ifndef PONY_LOG_STACKTRACE_ERROR
+#define PONY_LOG_STACKTRACE_ERROR
 #endif
-#ifdef PONY_LOG_STACKTRACE_EXCEPTION
-#undef PONY_LOG_STACKTRACE_EXCEPTION
+#ifndef PONY_LOG_STACKTRACE_EXCEPTION
+#define PONY_LOG_STACKTRACE_EXCEPTION
 #endif
-#include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Log/Console.h"
 
 import std;
 
-import PonyEngine.Log;
+import PonyEngine.Log.Ext;
 
-class MockLogger final : public PonyEngine::Log::ILogger
+class MockLogger final : public PonyEngine::Log::ILoggerContext
 {
 public:
 	mutable PonyEngine::Log::LogType lastLogType;
@@ -61,64 +61,76 @@ public:
 	mutable bool logCalled = false;
 	mutable bool logExceptionCalled = false;
 
-	virtual void Log(const PonyEngine::Log::LogType logType, const std::string_view message) const noexcept override
+	[[nodiscard("Pure function")]]
+	virtual PonyEngine::Application::IApplicationContext& Application() noexcept override
+	{
+		std::exit(1);
+	}
+
+	[[nodiscard("Pure function")]]
+	virtual const PonyEngine::Application::IApplicationContext& Application() const noexcept override
+	{
+		std::exit(1);
+	}
+
+	virtual void LogToConsole(const PonyEngine::Log::LogType logType, const std::string_view message) const noexcept override
 	{
 		logCalled = true;
 		lastLogType = logType;
 		lastMsg = message;
 	}
 
-	virtual void Log(const PonyEngine::Log::LogType logType, const std::string_view format, const std::format_args formatArgs) const noexcept override
-	{
-		logCalled = true;
-		lastLogType = logType;
-		lastMsg = std::vformat(format, formatArgs);
-	}
-
-	virtual void Log(const PonyEngine::Log::LogType logType, const std::string_view message, const std::stacktrace& stacktrace) const noexcept override
-	{
-		logCalled = true;
-		lastLogType = logType;
-		lastMsg = message;
-		lastStacktrace = stacktrace;
-	}
-
-	virtual void Log(const PonyEngine::Log::LogType logType, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override
+	virtual void LogToConsole(const PonyEngine::Log::LogType logType, const std::string_view format, const std::format_args formatArgs) const noexcept override
 	{
 		logCalled = true;
 		lastLogType = logType;
 		lastMsg = std::vformat(format, formatArgs);
+	}
+
+	virtual void LogToConsole(const PonyEngine::Log::LogType logType, const std::string_view message, const std::stacktrace& stacktrace) const noexcept override
+	{
+		logCalled = true;
+		lastLogType = logType;
+		lastMsg = message;
 		lastStacktrace = stacktrace;
 	}
 
-	virtual void Log(const std::exception_ptr& exception) const noexcept override
+	virtual void LogToConsole(const PonyEngine::Log::LogType logType, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override
+	{
+		logCalled = true;
+		lastLogType = logType;
+		lastMsg = std::vformat(format, formatArgs);
+		lastStacktrace = stacktrace;
+	}
+
+	virtual void LogToConsole(const std::exception_ptr& exception) const noexcept override
 	{
 		logExceptionCalled = true;
 		lastException = exception;
 	}
 
-	virtual void Log(const std::exception_ptr& exception, const std::string_view message) const noexcept override
+	virtual void LogToConsole(const std::exception_ptr& exception, const std::string_view message) const noexcept override
 	{
 		logExceptionCalled = true;
 		lastException = exception;
 		lastMsg = message;
 	}
 
-	virtual void Log(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs) const noexcept override
+	virtual void LogToConsole(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs) const noexcept override
 	{
 		logExceptionCalled = true;
 		lastException = exception;
 		lastMsg = std::vformat(format, formatArgs);
 	}
 
-	virtual void Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override
+	virtual void LogToConsole(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override
 	{
 		logExceptionCalled = true;
 		lastException = exception;
 		lastStacktrace = stacktrace;
 	}
 
-	virtual void Log(const std::exception_ptr& exception, const std::string_view message, const std::stacktrace& stacktrace) const noexcept override
+	virtual void LogToConsole(const std::exception_ptr& exception, const std::string_view message, const std::stacktrace& stacktrace) const noexcept override
 	{
 		logExceptionCalled = true;
 		lastException = exception;
@@ -126,7 +138,7 @@ public:
 		lastStacktrace = stacktrace;
 	}
 
-	virtual void Log(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override
+	virtual void LogToConsole(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override
 	{
 		logExceptionCalled = true;
 		lastException = exception;
@@ -135,52 +147,52 @@ public:
 	}
 };
 
-TEST_CASE("PONY_LOG message", "[Log][LogMacro]")
+TEST_CASE("PONY_CONSOLE message, stacktrace", "[Log][LogMacro]")
 {
 	MockLogger logger;
 	constexpr std::string_view message = "Test message.";
-	PONY_LOG(logger, PonyEngine::Log::LogType::Verbose, message);
+	PONY_CONSOLE(logger, PonyEngine::Log::LogType::Warning, message);
 
 	REQUIRE(logger.logCalled);
 	REQUIRE_FALSE(logger.logExceptionCalled);
-	REQUIRE(logger.lastLogType == PonyEngine::Log::LogType::Verbose);
+	REQUIRE(logger.lastLogType == PonyEngine::Log::LogType::Warning);
 	REQUIRE(logger.lastMsg == message);
 	REQUIRE_FALSE(logger.lastException);
-	REQUIRE(logger.lastStacktrace.empty());
+	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
 
-TEST_CASE("PONY_LOG format", "[Log][LogMacro]")
+TEST_CASE("PONY_CONSOLE format, stacktrace", "[Log][LogMacro]")
 {
 	MockLogger logger;
 	constexpr std::string_view format = "Test format: '{}'.";
 	constexpr std::string_view arg = "argument";
-	PONY_LOG(logger, PonyEngine::Log::LogType::Debug, format, arg);
+	PONY_CONSOLE(logger, PonyEngine::Log::LogType::Error, format, arg);
 
 	REQUIRE(logger.logCalled);
 	REQUIRE_FALSE(logger.logExceptionCalled);
-	REQUIRE(logger.lastLogType == PonyEngine::Log::LogType::Debug);
+	REQUIRE(logger.lastLogType == PonyEngine::Log::LogType::Error);
 	REQUIRE(logger.lastMsg == std::vformat(format, std::make_format_args(arg)));
 	REQUIRE_FALSE(logger.lastException);
-	REQUIRE(logger.lastStacktrace.empty());
+	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
 
-TEST_CASE("PONY_LOG_IF", "[Log][LogMacro]")
+TEST_CASE("PONY_CONSOLE_IF stacktrace", "[Log][LogMacro]")
 {
 	MockLogger logger;
 	constexpr std::string_view message = "Test message.";
-	PONY_LOG_IF(false, logger, PonyEngine::Log::LogType::Info, message);
+	PONY_CONSOLE_IF(false, logger, PonyEngine::Log::LogType::Warning, message);
 	REQUIRE_FALSE(logger.logCalled);
 
-	PONY_LOG_IF(true, logger, PonyEngine::Log::LogType::Info, message);
+	PONY_CONSOLE_IF(true, logger, PonyEngine::Log::LogType::Warning, message);
 	REQUIRE(logger.logCalled);
 	REQUIRE_FALSE(logger.logExceptionCalled);
-	REQUIRE(logger.lastLogType == PonyEngine::Log::LogType::Info);
+	REQUIRE(logger.lastLogType == PonyEngine::Log::LogType::Warning);
 	REQUIRE(logger.lastMsg == message);
 	REQUIRE_FALSE(logger.lastException);
-	REQUIRE(logger.lastStacktrace.empty());
+	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
 
-TEST_CASE("PONY_LOG_X", "[Log][LogMacro]")
+TEST_CASE("PONY_CONSOLE_X stacktrace", "[Log][LogMacro]")
 {
 	MockLogger logger;
 	std::exception_ptr exception;
@@ -193,15 +205,15 @@ TEST_CASE("PONY_LOG_X", "[Log][LogMacro]")
 		exception = std::current_exception();
 	}
 
-	PONY_LOG_X(logger, exception);
+	PONY_CONSOLE_X(logger, exception);
 	REQUIRE_FALSE(logger.logCalled);
 	REQUIRE(logger.logExceptionCalled);
 	REQUIRE(logger.lastMsg.empty());
 	REQUIRE(logger.lastException == exception);
-	REQUIRE(logger.lastStacktrace.empty());
+	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
 
-TEST_CASE("PONY_LOG_X message", "[Log][LogMacro]")
+TEST_CASE("PONY_CONSOLE_X message, stacktrace", "[Log][LogMacro]")
 {
 	MockLogger logger;
 	constexpr std::string_view message = "Test exception message.";
@@ -215,15 +227,15 @@ TEST_CASE("PONY_LOG_X message", "[Log][LogMacro]")
 		exception = std::current_exception();
 	}
 
-	PONY_LOG_X(logger, exception, message);
+	PONY_CONSOLE_X(logger, exception, message);
 	REQUIRE_FALSE(logger.logCalled);
 	REQUIRE(logger.logExceptionCalled);
 	REQUIRE(logger.lastMsg == message);
 	REQUIRE(logger.lastException == exception);
-	REQUIRE(logger.lastStacktrace.empty());
+	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
 
-TEST_CASE("PONY_LOG_X format", "[Log][LogMacro]")
+TEST_CASE("PONY_CONSOLE_X format, stacktrace", "[Log][LogMacro]")
 {
 	MockLogger logger;
 	constexpr std::string_view format = "Test exception message: '{}'.";
@@ -238,15 +250,15 @@ TEST_CASE("PONY_LOG_X format", "[Log][LogMacro]")
 		exception = std::current_exception();
 	}
 
-	PONY_LOG_X(logger, exception, format, arg);
+	PONY_CONSOLE_X(logger, exception, format, arg);
 	REQUIRE_FALSE(logger.logCalled);
 	REQUIRE(logger.logExceptionCalled);
 	REQUIRE(logger.lastMsg == std::vformat(format, std::make_format_args(arg)));
 	REQUIRE(logger.lastException == exception);
-	REQUIRE(logger.lastStacktrace.empty());
+	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
 
-TEST_CASE("PONY_LOG_X_IF", "[Log][LogMacro]")
+TEST_CASE("PONY_CONSOLE_X_IF stacktrace", "[Log][LogMacro]")
 {
 	MockLogger logger;
 	std::exception_ptr exception;
@@ -258,13 +270,14 @@ TEST_CASE("PONY_LOG_X_IF", "[Log][LogMacro]")
 	{
 		exception = std::current_exception();
 	}
-	PONY_LOG_X_IF(false, logger, exception);
+	PONY_CONSOLE_X_IF(false, logger, exception);
 	REQUIRE_FALSE(logger.logExceptionCalled);
 
-	PONY_LOG_X_IF(true, logger, exception);
+	PONY_CONSOLE_X_IF(true, logger, exception);
 	REQUIRE_FALSE(logger.logCalled);
 	REQUIRE(logger.logExceptionCalled);
 	REQUIRE(logger.lastMsg.empty());
 	REQUIRE(logger.lastException == exception);
-	REQUIRE(logger.lastStacktrace.empty());
+	REQUIRE_FALSE(logger.lastStacktrace.empty());
 }
+

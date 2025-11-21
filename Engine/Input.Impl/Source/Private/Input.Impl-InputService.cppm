@@ -21,7 +21,6 @@ import PonyEngine.Application.Ext;
 import PonyEngine.Input.Ext;
 import PonyEngine.Hash;
 import PonyEngine.Log;
-import PonyEngine.Text;
 
 export namespace PonyEngine::Input
 {
@@ -384,7 +383,7 @@ export namespace PonyEngine::Input
 			{
 				if (data.layouts[i] == data.layouts[j]) [[unlikely]]
 				{
-					throw std::invalid_argument(Text::FormatSafe("Layouts have duplicates at indices '{}' and '{}'.", i, j));
+					throw std::invalid_argument(std::format("Layouts have duplicates at indices '{}' and '{}'.", i, j));
 				}
 			}
 		}
@@ -399,7 +398,7 @@ export namespace PonyEngine::Input
 			{
 				if (!feature) [[unlikely]]
 				{
-					throw std::invalid_argument(Text::FormatSafe("Feature of type '{}' is nullptr.", featureType.name()));
+					throw std::invalid_argument(std::format("Feature of type '{}' is nullptr.", featureType.name()));
 				}
 
 				deviceInfo.deviceFeatureTypes.push_back(featureType);
@@ -507,7 +506,7 @@ export namespace PonyEngine::Input
 			{
 				if (input.axes[i] == input.axes[j]) [[unlikely]]
 				{
-					throw std::invalid_argument(Text::FormatSafe("Same axes at indices '{}' and '{}'.", i, j));
+					throw std::invalid_argument(std::format("Same axes at indices '{}' and '{}'.", i, j));
 				}
 			}
 		}
@@ -520,7 +519,7 @@ export namespace PonyEngine::Input
 			{
 				if (!validateLayout(axis, deviceInfo)) [[unlikely]]
 				{
-					throw std::invalid_argument(Text::FormatSafe("Device doesn't support '{}' layout.", axis.Layout().name()));
+					throw std::invalid_argument(std::format("Device doesn't support '{}' layout.", axis.Layout().name()));
 				}
 			}
 			const std::size_t valueIndex = rawInputAxes.size();
@@ -1009,14 +1008,9 @@ export namespace PonyEngine::Input
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' input provider done.", typeid(*provider).name());
 				++count;
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On beginning '{}' input provider.", typeid(*provider).name());
-				throw;
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on beginning '{}' input provider.", typeid(*provider).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On beginning '{}' input provider.", typeid(*provider).name());
 				throw;
 			}
 		}
@@ -1035,13 +1029,9 @@ export namespace PonyEngine::Input
 				provider->End();
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' input provider done.", typeid(*provider).name());
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On ending '{}' input provider.", typeid(*provider).name());
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on ending '{}' input provider.", typeid(*provider).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On ending '{}' input provider.", typeid(*provider).name());
 			}
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending input providers done.");
@@ -1083,14 +1073,9 @@ export namespace PonyEngine::Input
 			{
 				provider->Tick();
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On ticking '{}' input provider.", typeid(*provider).name());
-				throw;
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on ticking '{}' input provider.", typeid(*provider).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On ticking '{}' input provider.", typeid(*provider).name());
 				throw;
 			}
 		}
@@ -1261,13 +1246,9 @@ export namespace PonyEngine::Input
 			{
 				observer->OnDeviceAdded(deviceHandle);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing device added.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing device added.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing device added.");
 			}
 		}
 	}
@@ -1280,13 +1261,9 @@ export namespace PonyEngine::Input
 			{
 				observer->OnDeviceRemoved(deviceHandle);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing device removed.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing device removed.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing device removed.");
 			}
 		}
 	}
@@ -1299,13 +1276,9 @@ export namespace PonyEngine::Input
 			{
 				observer->OnDeviceConnectionChanged(deviceHandle, isConnected);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing device connection changed.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing device connection changed.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing device connection changed.");
 			}
 		}
 	}
@@ -1318,13 +1291,9 @@ export namespace PonyEngine::Input
 			{
 				observer->OnInput(deviceHandle, inputEvent);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing action input.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing action input.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing action input.");
 			}
 		}
 	}
@@ -1337,13 +1306,9 @@ export namespace PonyEngine::Input
 			{
 				observer->OnRawInput(deviceHandle, inputEvent);
 			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(application->Logger(), e, "On observing raw input.");
-			}
 			catch (...)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Exception, "Unknown exception on observing raw input.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing raw input.");
 			}
 		}
 	}

@@ -15,8 +15,6 @@ export module PonyEngine.Platform:Windows.File;
 
 import std;
 
-import PonyEngine.Text;
-
 import :Windows.GUID;
 
 export namespace PonyEngine::Platform::Windows
@@ -50,7 +48,7 @@ namespace PonyEngine::Platform::Windows
 		HMODULE moduleHandle;
 		if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(&GetModule), &moduleHandle) || !moduleHandle)
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to find module. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to find module. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return moduleHandle;
@@ -61,7 +59,7 @@ namespace PonyEngine::Platform::Windows
 		auto path = std::array<wchar_t, MAX_PATH>();
 		if (!GetModuleFileNameW(module, path.data(), static_cast<DWORD>(path.size()))) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get module name. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get module name. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return std::filesystem::path(path.data());
@@ -72,7 +70,7 @@ namespace PonyEngine::Platform::Windows
 		wchar_t* pathRaw = nullptr;
 		if (const HRESULT result = SHGetKnownFolderPath(folderId, 0, nullptr, &pathRaw); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get known path. FolderID: '{}'. Result: '0x{:X}'.", folderId, static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(std::format("Failed to get known path. FolderID: '{}'. Result: '0x{:X}'.", folderId, static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		const auto path = std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)>(pathRaw, &CoTaskMemFree);
 
@@ -84,7 +82,7 @@ namespace PonyEngine::Platform::Windows
 		auto path = std::array<wchar_t, MAX_PATH>();
 		if (!GetTempPath2W(MAX_PATH, path.data()))
 		{
-			throw std::runtime_error(Text::FormatSafe("Failed to get temporary path. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get temporary path. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return std::filesystem::path(path.data());

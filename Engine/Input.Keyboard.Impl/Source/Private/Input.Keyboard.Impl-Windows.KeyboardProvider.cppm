@@ -21,7 +21,6 @@ import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Platform;
 import PonyEngine.Surface;
-import PonyEngine.Text;
 import PonyEngine.Type;
 
 import :Keyboard;

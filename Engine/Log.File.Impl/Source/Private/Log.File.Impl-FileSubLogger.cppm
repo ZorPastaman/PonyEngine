@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Log/Console.h"
 
 export module PonyEngine.Log.File.Impl:FileSubLogger;
 
@@ -67,19 +67,7 @@ namespace PonyEngine::Log
 			}
 			catch (...)
 			{
-				if constexpr (IsInMask(LogType::Exception, PONY_LOG_MASK))
-				{
-					constexpr std::string_view message = "On closing log file.";
-
-					if constexpr (IsInMask(LogType::Exception, PONY_LOG_STACKTRACE_MASK))
-					{
-						logger->LogToConsole(std::current_exception(), message, std::stacktrace::current());
-					}
-					else
-					{
-						logger->LogToConsole(std::current_exception(), message);
-					}
-				}
+				PONY_CONSOLE_X(*logger, std::current_exception(), "On closing log file.");
 			}
 		}
 	}
@@ -92,19 +80,7 @@ namespace PonyEngine::Log
 		}
 		catch (...)
 		{
-			if constexpr (IsInMask(LogType::Exception, PONY_LOG_MASK))
-			{
-				constexpr std::string_view message = "On writing to log file.";
-
-				if constexpr (IsInMask(LogType::Exception, PONY_LOG_STACKTRACE_MASK))
-				{
-					logger->LogToConsole(std::current_exception(), message, std::stacktrace::current());
-				}
-				else
-				{
-					logger->LogToConsole(std::current_exception(), message);
-				}
-			}
+			PONY_CONSOLE_X(*logger, std::current_exception(), "On writing to log file.");
 		}
 	}
 }
