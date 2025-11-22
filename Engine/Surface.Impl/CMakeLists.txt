@@ -40,16 +40,15 @@ set_target_properties(PonyEngine.Surface.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Surface.Impl PUBLIC
-	PonyEngine.Core
-	PonyEngine.Application.Ext
-)
 if(NOT TARGET PonyEngine.Surface)
 	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
 endif()
 target_link_libraries(PonyEngine.Surface.Impl PUBLIC
 	PonyEngine.Surface
+	PonyEngine.Core
+	PonyEngine.Application.Ext
 )
 target_link_libraries(PonyEngine.Surface.Impl PRIVATE
 	PonyEngine.Log
+	PonyEngine.MessagePump
 )
