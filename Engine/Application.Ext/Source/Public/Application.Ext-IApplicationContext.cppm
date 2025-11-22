@@ -209,15 +209,6 @@ export namespace PonyEngine::Application::Windows
 		/// @return Application cursor.
 		[[nodiscard("Pure function")]]
 		virtual HCURSOR AppCursor() const noexcept = 0;
-
-		/// @brief Gets the time of the last message.
-		/// @return Time of the last message. It's a low resolution time point.
-		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept = 0;
-		/// @brief Gets the cursor position of the last message.
-		/// @return Cursor position in the screen coordinates of the last message.
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> LastMessageCursorPosition() const noexcept = 0;
 	};
 }
 #endif

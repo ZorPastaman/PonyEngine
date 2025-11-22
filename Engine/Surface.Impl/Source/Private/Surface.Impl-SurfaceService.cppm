@@ -25,6 +25,7 @@ import std;
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.Math;
+import PonyEngine.MessagePump;
 import PonyEngine.Surface;
 import PonyEngine.Type;
 
@@ -323,6 +324,7 @@ export namespace PonyEngine::Surface::Windows
 		static constexpr std::pair<USHORT, USHORT> Unpack(DWORD value) noexcept;
 
 		Application::Windows::IApplicationContext* application; ///< Application context.
+		MessagePump::IPumpService* pumpService; ///< Message pump service.
 
 		Surface::RectStyle rectStyle; ///< Client rectangle style.
 		Math::Vector2<int> minimalClientSize; ///< Minimal client size.
@@ -356,6 +358,7 @@ namespace PonyEngine::Surface::Windows
 {
 	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
 		application{application.NativePtr()},
+		pumpService{&this->application->GetService<MessagePump::IPumpService>()},
 		rectStyle(FullscreenRectStyle{.alwaysOnTop = false}),
 		minimalClientSize(Math::Vector2<int>::One()),
 		cursorClippingRect(Math::CornerRect<float>(Math::Vector2<float>::One())),
@@ -1489,8 +1492,8 @@ namespace PonyEngine::Surface::Windows
 
 			if (const auto observerPosition = rawInputObservers.find(deviceType); observerPosition != rawInputObservers.cend())
 			{
-				const std::chrono::time_point<std::chrono::steady_clock> time = application->LastMessageTime();
-				const Math::Vector2<std::int32_t> cursorPosition = application->LastMessageCursorPosition();
+				const std::chrono::time_point<std::chrono::steady_clock> time = pumpService->LastMessageTime();
+				const Math::Vector2<std::int32_t> cursorPosition = pumpService->LastMessageCursorPosition();
 
 				for (IRawInputObserver* const observer : observerPosition->second)
 				{

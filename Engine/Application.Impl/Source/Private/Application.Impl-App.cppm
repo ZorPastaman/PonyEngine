@@ -29,7 +29,6 @@ import :ExitCodes;
 import :LoggerManager;
 import :ModuleManager;
 import :PathManager;
-import :PlatformMessageService;
 import :ServiceManager;
 
 #if PONY_WINDOWS
@@ -110,11 +109,6 @@ export namespace PonyEngine::Application::Windows
 		[[nodiscard("Pure function")]]
 		virtual HCURSOR AppCursor() const noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t> LastMessageCursorPosition() const noexcept override;
-
 		/// @brief Runs the application.
 		/// @return Exit code.
 		[[nodiscard("Must be returned from main")]]
@@ -145,11 +139,8 @@ export namespace PonyEngine::Application::Windows
 		std::unique_ptr<LoggerManager> loggerManager; ///< Logger manager.
 		std::unique_ptr<AppDataManager> appDataManager; ///< Application data manager.
 		std::unique_ptr<PathManager> pathManager; ///< Path manager.
-		std::shared_ptr<PlatformMessageService> platformMessageService; ///< Platform message service.
 		std::unique_ptr<ServiceManager> serviceManager; ///< Service manager.
 		std::unique_ptr<ModuleManager> moduleManager; ///< Module manager.
-
-		ServiceHandle platformMessageServiceHandle; ///< Platform message service handle.
 	};
 }
 #endif
@@ -164,22 +155,14 @@ namespace PonyEngine::Application::Windows
 		loggerManager(std::make_unique<LoggerManager>(*static_cast<IApplicationContext*>(this), defaultLogger)),
 		appDataManager(std::make_unique<AppDataManager>(*static_cast<IApplicationContext*>(this), instance, prevInstance, commandLine, showCommand)),
 		pathManager(std::make_unique<PathManager>(*static_cast<IApplicationContext*>(this))),
-		platformMessageService(std::make_shared<PlatformMessageService>(*static_cast<IApplicationContext*>(this))),
 		serviceManager(std::make_unique<ServiceManager>(*static_cast<IApplicationContext*>(this))),
 		moduleManager(std::make_unique<ModuleManager>(*static_cast<IApplicationContext*>(this), loggerManager->PublicLoggerModuleContext(), serviceManager->PublicServiceModuleContext()))
 	{
-		platformMessageServiceHandle = serviceManager->AddService([&](Application::IApplicationContext&)
-		{
-			ServiceData data;
-			data.SetService(platformMessageService, PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER);
-			return data;
-		});
 	}
 
 	App::~App() noexcept
 	{
 		flowState = FlowState::ShuttingDown;
-		serviceManager->RemoveService(platformMessageServiceHandle);
 	}
 
 	std::string_view App::CompanyName() const noexcept
@@ -321,16 +304,6 @@ namespace PonyEngine::Application::Windows
 	HCURSOR App::AppCursor() const noexcept
 	{
 		return appDataManager->AppCursor();
-	}
-
-	std::chrono::time_point<std::chrono::steady_clock> App::LastMessageTime() const noexcept
-	{
-		return platformMessageService->LastMessageTime();
-	}
-
-	Math::Vector2<std::int32_t> App::LastMessageCursorPosition() const noexcept
-	{
-		return platformMessageService->LastMessageCursorPosition();
 	}
 
 	int App::Run()
