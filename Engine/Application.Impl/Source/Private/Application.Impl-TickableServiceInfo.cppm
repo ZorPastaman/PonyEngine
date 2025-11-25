@@ -7,18 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.Impl;
+export module PonyEngine.Application.Impl:TickableServiceInfo;
 
-export import PonyEngine.Application.Ext;
+import std;
 
-export import :App;
-export import :Console;
-export import :DefaultLogger;
-export import :ExitCodes;
-export import :Windows.Process;
+import PonyEngine.Application.Ext;
 
-#if PONY_WINDOWS
-export import :Windows.AppDataManager;
-export import :Windows.Console;
-export import :Windows.DefaultLogger;
-#endif
+export namespace PonyEngine::Application
+{
+	struct TickableServiceInfo final
+	{
+		ITickableService* tickableService;
+		std::int32_t tickOrder;
+	};
+}

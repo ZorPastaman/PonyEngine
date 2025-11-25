@@ -7,18 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.Impl;
+export module PonyEngine.File;
 
-export import PonyEngine.Application.Ext;
-
-export import :App;
-export import :Console;
-export import :DefaultLogger;
-export import :ExitCodes;
-export import :Windows.Process;
-
-#if PONY_WINDOWS
-export import :Windows.AppDataManager;
-export import :Windows.Console;
-export import :Windows.DefaultLogger;
-#endif
+export import :IFileService;
+export import :IReadStream;
+export import :IWriteStream;
+export import :ReadMode;
+export import :WriteMode;

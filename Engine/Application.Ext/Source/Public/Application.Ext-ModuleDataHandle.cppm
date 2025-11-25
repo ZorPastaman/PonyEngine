@@ -33,18 +33,15 @@ export namespace PonyEngine::Application
 	};
 }
 
-export
+export template<>
+struct std::hash<PonyEngine::Application::ModuleDataHandle> final
 {
-	template<>
-	struct std::hash<PonyEngine::Application::ModuleDataHandle> final
+	[[nodiscard("Pure function")]]
+	size_t operator ()(const PonyEngine::Application::ModuleDataHandle handle) const noexcept
 	{
-		[[nodiscard("Pure function")]]
-		size_t operator ()(const PonyEngine::Application::ModuleDataHandle handle) const noexcept
-		{
-			return std::hash<std::uint32_t>()(handle.id);
-		}
-	};
-}
+		return std::hash<std::uint32_t>()(handle.id);
+	}
+};
 
 namespace PonyEngine::Application
 {

@@ -10,11 +10,6 @@
 module;
 
 #include <cassert>
-#include <stdio.h>
-
-#if PONY_WINDOWS
-#include "PonyEngine/Platform/Windows/Framework.h"
-#endif
 
 export module PonyEngine.Application.Impl:Console;
 
@@ -29,16 +24,6 @@ export namespace PonyEngine::Application
 	/// @param message Message.
 	void LogToConsole(Log::LogType logType, std::string_view message) noexcept;
 }
-
-#if PONY_WINDOWS
-export namespace PonyEngine::Application::Windows
-{
-	/// @brief Creates a console.
-	void CreateConsole();
-	/// @brief Destroys a console.
-	void DestroyConsole();
-}
-#endif
 
 namespace PonyEngine::Application
 {
@@ -59,12 +44,6 @@ namespace PonyEngine::Application
 		{
 			// Something totally wrong happened.
 		}
-#endif
-
-#if PONY_ENGINE_PLATFORM_CONSOLE_LOG
-#if PONY_WINDOWS
-		OutputDebugStringA(message.data());
-#endif
 #endif
 	}
 
@@ -87,70 +66,3 @@ namespace PonyEngine::Application
 		}
 	}
 }
-
-#if PONY_WINDOWS
-namespace PonyEngine::Application::Windows
-{
-	/// @brief Sets both the input and output code pages of the console.
-	/// @param codePageID Code page ID.
-	void SetConsoleCodePage(UINT codePageID);
-
-	void CreateConsole()
-	{
-		if (!AllocConsole()) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to allocate console. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		SetConsoleCodePage(CP_UTF8);
-
-		FILE* fp;
-		if (const errno_t error = freopen_s(&fp, "CONOUT$", "w", stdout)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to reassign stdout. Error code: '0x{:X}'.", error));
-		}
-		if (const errno_t error = freopen_s(&fp, "CONOUT$", "w", stderr)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to reassign stderr. Error code: '0x{:X}'.", error));
-		}
-		if (const errno_t error = freopen_s(&fp, "CONIN$", "r", stdin)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to reassign stdin. Error code: '0x{:X}'.", error));
-		}
-	}
-
-	void DestroyConsole()
-	{
-		FILE* fp;
-		if (const errno_t error = freopen_s(&fp, "NUL", "w", stdout)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to reassign stdout. Error code: '0x{:X}'.", error));
-		}
-		if (const errno_t error = freopen_s(&fp, "NUL", "w", stderr)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to reassign stderr. Error code: '0x{:X}'.", error));
-		}
-		if (const errno_t error = freopen_s(&fp, "NUL", "r", stdin)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to reassign stdin. Error code: '0x{:X}'.", error));
-		}
-
-		if (!FreeConsole()) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to free console. Error code: '0x{:X}'.", GetLastError()));
-		}
-	}
-
-	void SetConsoleCodePage(const UINT codePageID)
-	{
-		if (!SetConsoleCP(codePageID)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to set console code page to '{}'. Error code: '0x{:X}'.", codePageID, GetLastError()));
-		}
-		if (!SetConsoleOutputCP(codePageID)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to set console output code page to '{}'. Error code: '0x{:X}'.", codePageID, GetLastError()));
-		}
-	}
-}
-#endif

@@ -8,7 +8,6 @@ option(PONY_ENGINE_CONSOLE_LOG "Enable standard c++ console." ON)
 option(PONY_ENGINE_PLATFORM_CONSOLE_LOG "Enable platform console." ON)
 set(PONY_APP_ICON "" CACHE FILEPATH "Application icon path. Its format depends on a platform. If it's '<Default>', the engine icon is used.")
 set(PONY_APP_CURSOR "" CACHE FILEPATH "Application cursor path. Its format depends on a platform.")
-set(PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER "0" CACHE STRING "PonyEngine application platform message service tick order. It must be an int32 number.")
 
 message(VERBOSE "Configuring target")
 if(PONY_WINDOWS)
@@ -17,19 +16,20 @@ else()
 	add_executable(PonyEngine.Application.Impl)
 endif()
 
+message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application.Impl.cppm"
-	"Source/Private/Application.Impl-App.cppm"
-	"Source/Private/Application.Impl-AppDataManager.cppm"
 	"Source/Private/Application.Impl-Console.cppm"
 	"Source/Private/Application.Impl-DefaultLogger.cppm"
 	"Source/Private/Application.Impl-ExitCodes.cppm"
+	"Source/Private/Application.Impl-InterfaceContainer.cppm"
 	"Source/Private/Application.Impl-LoggerManager.cppm"
 	"Source/Private/Application.Impl-ModuleManager.cppm"
+	"Source/Private/Application.Impl-Name.cppm"
 	"Source/Private/Application.Impl-Path.cppm"
-	"Source/Private/Application.Impl-PathManager.cppm"
-	"Source/Private/Application.Impl-Process.cppm"
+	"Source/Private/Application.Impl-ServiceContainer.cppm"
 	"Source/Private/Application.Impl-ServiceManager.cppm"
+	"Source/Private/Application.Impl-TickableServiceInfo.cppm"
 )
 
 if(PONY_WINDOWS)
@@ -38,10 +38,20 @@ if(PONY_WINDOWS)
 		"Include/Private/Windows"
 	)
 
+	target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
+		"Source/Private/Application.Impl-Windows.App.cppm"
+		"Source/Private/Application.Impl-Windows.AppDataManager.cppm"
+		"Source/Private/Application.Impl-Windows.Console.cppm"
+		"Source/Private/Application.Impl-Windows.DefaultLogger.cppm"
+		"Source/Private/Application.Impl-Windows.LoggerManager.cppm"
+		"Source/Private/Application.Impl-Windows.PathManager.cppm"
+		"Source/Private/Application.Impl-Windows.Process.cppm"
+	)
+
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Application.Impl PRIVATE
 		"Source/Main.Windows.cpp"
-)
+	)
 
 	message(VERBOSE "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
@@ -62,7 +72,6 @@ if(PONY_APP_ICON STREQUAL "<Default>")
 		set(PONY_APP_ICON "${PONY_ROOT}/Logo/Windows/Logo.ico")
 	endif()
 endif()
-pony_validate_tick_order(PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER)
 target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_COMPANY_NAME=${PONY_COMPANY_NAME} 
 	PONY_PROJECT_NAME=${PONY_PROJECT_NAME} 
@@ -76,7 +85,6 @@ target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	$<$<BOOL:${PONY_ENGINE_PLATFORM_CONSOLE_LOG}>:PONY_ENGINE_PLATFORM_CONSOLE_LOG>
 	$<$<BOOL:${PONY_APP_ICON}>:PONY_APP_ICON=${PONY_APP_ICON}>
 	$<$<BOOL:${PONY_APP_CURSOR}>:PONY_APP_CURSOR=${PONY_APP_CURSOR}>
-	PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER=${PONY_ENGINE_PLATFORM_MESSAGE_TICK_ORDER}
 )
 
 message(VERBOSE "Setting properties")

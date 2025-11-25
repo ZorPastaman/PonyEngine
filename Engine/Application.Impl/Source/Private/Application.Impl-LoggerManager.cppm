@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Application.Impl:LoggerManager;
@@ -18,34 +20,25 @@ import std;
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 
-import :DefaultLogger;
-
 export namespace PonyEngine::Application
 {
 	/// @brief Logger manager.
-	class LoggerManager final : private ILoggerContext, private ILoggerModuleContext
+	class LoggerManager : private ILoggerContext, private ILoggerModuleContext
 	{
 	public:
-		/// @brief Creates a logger manager.
-		/// @param application Application context.
-		/// @param defaultLogger Default logger.
-		/// @remark Sets a default logger as a current logger.
-		[[nodiscard("Pure constructor")]]
-		LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
 		LoggerManager(const LoggerManager&) = delete;
 		LoggerManager(LoggerManager&&) = delete;
 
-		~LoggerManager() noexcept;
+		virtual ~LoggerManager() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual IApplicationContext& Application() noexcept override;
+		virtual IApplicationContext& Application() noexcept override final;
 		[[nodiscard("Pure function")]]
-		virtual const IApplicationContext& Application() const noexcept override;
-		virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept override;
+		virtual const IApplicationContext& Application() const noexcept override final;
 
 		[[nodiscard("Must be used to unset")]]
-		virtual LoggerHandle SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory) override;
-		virtual void UnsetLogger(LoggerHandle handle) override;
+		virtual LoggerHandle SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory) override final;
+		virtual void UnsetLogger(LoggerHandle handle) override final;
 
 		/// @brief Gets the logger.
 		/// @return Logger.
@@ -68,6 +61,14 @@ export namespace PonyEngine::Application
 		LoggerManager& operator =(const LoggerManager&) = delete;
 		LoggerManager& operator =(LoggerManager&&) = delete;
 
+	protected:
+		/// @brief Creates a logger manager.
+		/// @param application Application context.
+		/// @param defaultLogger Default logger.
+		/// @remark Sets a default logger as a current logger.
+		[[nodiscard("Pure constructor")]]
+		LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
+
 	private:
 		IApplicationContext* application; ///< Application context.
 
@@ -82,15 +83,6 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	LoggerManager::LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
-		application{&application},
-		defaultLogger(defaultLogger),
-		logger{defaultLogger.get()},
-		nextHandle{.id = 1u},
-		currentHandle{.id = 0u}
-	{
-	}
-
 	LoggerManager::~LoggerManager() noexcept
 	{
 		if (externalLogger) [[unlikely]]
@@ -107,11 +99,6 @@ namespace PonyEngine::Application
 	const IApplicationContext& LoggerManager::Application() const noexcept
 	{
 		return *application;
-	}
-
-	void LoggerManager::LogToConsole(const Log::LogType logType, const std::string_view message) const noexcept
-	{
-		Application::LogToConsole(logType, message);
 	}
 
 	LoggerHandle LoggerManager::SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory)
@@ -185,5 +172,15 @@ namespace PonyEngine::Application
 	const ILoggerModuleContext& LoggerManager::PublicLoggerModuleContext() const noexcept
 	{
 		return *this;
+	}
+
+	LoggerManager::LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
+		application{&application},
+		defaultLogger(defaultLogger),
+		logger{defaultLogger.get()},
+		nextHandle{.id = 1u},
+		currentHandle{.id = 0u}
+	{
+		assert(this->defaultLogger && "The default logger is nullptr.");
 	}
 }
