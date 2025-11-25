@@ -55,16 +55,16 @@ namespace PonyEngine::Surface::Windows
 		surfaceServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
 		{
 			PONY_LOG(context.Logger(), Log::LogType::Debug, "Getting surface parameters.");
-			// TODO: Load some data via config service.
+			auto& nativeApplication = static_cast<Application::Windows::IApplicationContext&>(application);
 			const std::string_view title = application.ProjectTitle();
-			const HICON mainIcon = application.Native().AppIcon();
-			const HCURSOR mainCursor = application.Native().AppCursor() ? application.Native().AppCursor() : GetDefaultCursor();
+			const HICON mainIcon = nativeApplication.AppIcon();
+			const HCURSOR mainCursor = nativeApplication.AppCursor() ? nativeApplication.AppCursor() : GetDefaultCursor();
 
 			PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class...");
 			const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor);
 			PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class done. Class: '0x{:X}'.", windowClass->ClassHandle());
 
-			const auto surfaceService = std::make_shared<SurfaceService>(application, windowClass, title);
+			const auto surfaceService = std::make_shared<SurfaceService>(nativeApplication, windowClass, title);
 			Application::ServiceData data;
 			data.SetService(surfaceService);
 			data.AddInterface(&surfaceService->PublicSurfaceService());

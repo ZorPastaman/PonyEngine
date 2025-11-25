@@ -44,7 +44,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @param windowClass Window class.
 		/// @param title Window title.
 		[[nodiscard("Pure constructor")]]
-		SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title);
+		SurfaceService(Application::Windows::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title);
 		SurfaceService(const SurfaceService&) = delete;
 		SurfaceService(SurfaceService&&) = delete;
 
@@ -356,8 +356,8 @@ export namespace PonyEngine::Surface::Windows
 #if PONY_WINDOWS
 namespace PonyEngine::Surface::Windows
 {
-	SurfaceService::SurfaceService(Application::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
-		application{application.NativePtr()},
+	SurfaceService::SurfaceService(Application::Windows::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
+		application{&application},
 		pumpService{&this->application->GetService<MessagePump::IPumpService>()},
 		rectStyle(FullscreenRectStyle{.alwaysOnTop = false}),
 		minimalClientSize(Math::Vector2<int>::One()),
@@ -440,13 +440,13 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::Begin()
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Debug, "Show window.");
-		ShowWindow(windowHandle, this->application->Native().ShowCommand());
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Show window.");
+		ShowWindow(windowHandle, application->ShowCommand());
 	}
 
 	void SurfaceService::End()
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Debug, "Hide window.");
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Hide window.");
 		ShowWindow(windowHandle, SW_HIDE);
 	}
 

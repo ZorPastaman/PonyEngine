@@ -11,10 +11,6 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-#if PONY_WINDOWS
-#include "PonyEngine/Platform/Windows/Framework.h"
-#endif
-
 export module PonyEngine.Application.Ext:IApplicationContext;
 
 import std;
@@ -26,19 +22,6 @@ import :FlowState;
 
 export namespace PonyEngine::Application
 {
-#if PONY_WINDOWS
-	namespace Windows
-	{
-		/// @brief Windows application context.
-		class IApplicationContext;
-	}
-
-	/// @brief Windows application context.
-	using INativeApplicationContext = Windows::IApplicationContext;
-#else
-#error "Unsupported platform!"
-#endif
-
 	/// @brief Application context.
 	class IApplicationContext
 	{
@@ -160,58 +143,8 @@ export namespace PonyEngine::Application
 		/// @return Current frame count.
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t FrameCount() const noexcept = 0;
-
-		/// @brief Gets the native application context.
-		/// @return Native application context.
-		[[nodiscard("Pure function")]]
-		INativeApplicationContext& Native() noexcept;
-		/// @brief Gets the native application context.
-		/// @return Native application context.
-		[[nodiscard("Pure function")]]
-		const INativeApplicationContext& Native() const noexcept;
-		/// @brief Gets the native application context.
-		/// @return Native application context.
-		[[nodiscard("Pure function")]]
-		INativeApplicationContext* NativePtr() noexcept;
-		/// @brief Gets the native application context.
-		/// @return Native application context.
-		[[nodiscard("Pure function")]]
-		const INativeApplicationContext* NativePtr() const noexcept;
 	};
 }
-
-#if PONY_WINDOWS
-export namespace PonyEngine::Application::Windows
-{
-	/// @brief Windows application context.
-	class IApplicationContext : public Application::IApplicationContext
-	{
-		INTERFACE_BODY(IApplicationContext)
-
-		/// @brief Gets the instance handle of the application.
-		/// @return Instance handle of the application.
-		[[nodiscard("Pure function")]]
-		virtual HINSTANCE Instance() const noexcept = 0;
-		/// @brief Gets the previous instance handle of the application.
-		/// @return Previous instance handle of the application.
-		[[nodiscard("Pure function")]]
-		virtual HINSTANCE PrevInstance() const noexcept = 0;
-		/// @brief Gets the show command for the application.
-		/// @return Show command.
-		[[nodiscard("Pure function")]]
-		virtual int ShowCommand() const noexcept = 0;
-
-		/// @brief Gets the application icon.
-		/// @return Application icon.
-		[[nodiscard("Pure function")]]
-		virtual HICON AppIcon() const noexcept = 0;
-		/// @brief Gets the application cursor.
-		/// @return Application cursor.
-		[[nodiscard("Pure function")]]
-		virtual HCURSOR AppCursor() const noexcept = 0;
-	};
-}
-#endif
 
 namespace PonyEngine::Application
 {
@@ -249,25 +182,5 @@ namespace PonyEngine::Application
 		}
 
 		return *service;
-	}
-
-	INativeApplicationContext& IApplicationContext::Native() noexcept
-	{
-		return static_cast<INativeApplicationContext&>(*this);
-	}
-
-	const INativeApplicationContext& IApplicationContext::Native() const noexcept
-	{
-		return static_cast<const INativeApplicationContext&>(*this);
-	}
-
-	INativeApplicationContext* IApplicationContext::NativePtr() noexcept
-	{
-		return static_cast<INativeApplicationContext*>(this);
-	}
-
-	const INativeApplicationContext* IApplicationContext::NativePtr() const noexcept
-	{
-		return static_cast<const INativeApplicationContext*>(this);
 	}
 }

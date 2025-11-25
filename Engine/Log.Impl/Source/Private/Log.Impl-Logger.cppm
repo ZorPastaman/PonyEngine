@@ -122,9 +122,9 @@ namespace PonyEngine::Log
 			if (subLoggerContainer.Size() > 0uz) [[unlikely]]
 			{
 				PONY_CONSOLE(*this, LogType::Error, "Sub-loggers weren't removed:");
-				for (const std::shared_ptr<ISubLogger>& subLogger : subLoggerContainer.SubLoggers())
+				for (std::size_t i = 0uz; i < subLoggerContainer.Size(); ++i)
 				{
-					PONY_CONSOLE(*this, LogType::Error, "Sub-logger: '{}'.", typeid(*subLogger).name());
+					PONY_CONSOLE(*this, LogType::Error, "Sub-logger: '{}'.", typeid(subLoggerContainer.SubLogger(i)).name());
 				}
 			}
 		}
@@ -363,9 +363,9 @@ namespace PonyEngine::Log
 	{
 		loggerContext->LogToConsole(logEntry.logType, logEntry.formattedMessage);
 
-		for (const std::shared_ptr<ISubLogger>& subLogger : subLoggerContainer.SubLoggers())
+		for (std::size_t i = 0uz; i < subLoggerContainer.Size(); ++i)
 		{
-			subLogger->Log(logEntry);
+			subLoggerContainer.SubLogger(i).Log(logEntry);
 		}
 	}
 }

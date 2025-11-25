@@ -10,13 +10,10 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-
-#if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
 #include "PonyEngine/Platform/Windows/Resource.h"
-#endif
 
-export module PonyEngine.Application.Impl:AppDataManager;
+export module PonyEngine.Application.Impl:Windows.AppDataManager;
 
 import std;
 
@@ -24,7 +21,6 @@ import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.Platform;
 
-#if PONY_WINDOWS
 export namespace PonyEngine::Application::Windows
 {
 	/// @brief Application data manager.
@@ -74,8 +70,6 @@ export namespace PonyEngine::Application::Windows
 		AppDataManager& operator =(AppDataManager&&) = delete;
 
 	private:
-		IApplicationContext* application; ///< Application context.
-
 		HINSTANCE instance; ///< Instance.
 		HINSTANCE prevInstance; ///< Previous instance.
 		std::string_view commandLine; ///< Command line.
@@ -85,14 +79,10 @@ export namespace PonyEngine::Application::Windows
 		HCURSOR appCursor; ///< Application cursor.
 	};
 }
-#endif
 
-#if PONY_WINDOWS
 namespace PonyEngine::Application::Windows
 {
-	AppDataManager::AppDataManager(IApplicationContext& application, const HINSTANCE instance, const HINSTANCE prevInstance,
-		const PSTR commandLine, const int showCommand) :
-		application{&application},
+	AppDataManager::AppDataManager(IApplicationContext& application, const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand) :
 		instance(instance),
 		prevInstance(prevInstance),
 		commandLine(commandLine),
@@ -100,30 +90,30 @@ namespace PonyEngine::Application::Windows
 		appIcon(nullptr),
 		appCursor(nullptr)
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Main data received. Instance: '0x{:X}'; Previous instance: '0x{:X}'; Show command: '{}'; Command line: '{}'.",
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Main data received. Instance: '0x{:X}'; Previous instance: '0x{:X}'; Show command: '{}'; Command line: '{}'.",
 			reinterpret_cast<std::uintptr_t>(this->instance), reinterpret_cast<std::uintptr_t>(this->prevInstance), this->showCommand, this->commandLine);
 
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application resources...");
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application resources...");
 		const HMODULE appModule = Platform::Windows::GetModule();
 #ifdef PONY_APP_ICON
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application icon...");
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application icon...");
 		appIcon = LoadIconA(appModule, MAKEINTRESOURCEA(IDI_APP_ICON));
 		if (!appIcon) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to load application icon. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application icon done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appIcon));
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application icon done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appIcon));
 #endif
 #ifdef PONY_APP_CURSOR
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application cursor...");
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application cursor...");
 		appCursor = LoadCursorA(appModule, MAKEINTRESOURCEA(IDC_APP_CURSOR));
 		if (!appCursor) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to load application cursor. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application cursor done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appCursor));
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application cursor done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appCursor));
 #endif
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Loading application resources done.");
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application resources done.");
 	}
 
 	HINSTANCE AppDataManager::Instance() const noexcept
@@ -156,4 +146,3 @@ namespace PonyEngine::Application::Windows
 		return appCursor;
 	}
 }
-#endif

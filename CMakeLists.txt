@@ -66,6 +66,7 @@ pony_validate_title(PONY_PROJECT_TITLE)
 message(VERBOSE "Configuring modules")
 option(PONY_ENGINE_TIME "Enable PonyEngine.Time module." OFF)
 option(PONY_ENGINE_TIME_IMPL "Enable PonyEngine.Time.Impl module. It requires PonyEngine.Time." OFF)
+option(PONY_ENGINE_FILE "Enable PonyEngine.File module." OFF)
 option(PONY_ENGINE_LOG_EXT "Enable PonyEngine.Log.Ext module." OFF)
 option(PONY_ENGINE_LOG_IMPL "Enable PonyEngine.Log.Impl module. It requires PonyEngine.Log.Ext." OFF)
 option(PONY_ENGINE_LOG_FILE_IMPL "Enable PonyEngine.Log.File.Impl module. It requires PonyEngine.Log.Ext." OFF)
@@ -88,6 +89,10 @@ if(PONY_ENGINE_TIME)
 endif()
 if(PONY_ENGINE_TIME_IMPL)
 	add_subdirectory("Engine/Time.Impl")
+endif()
+
+if(PONY_ENGINE_FILE)
+	add_subdirectory("Engine/File")
 endif()
 
 if(PONY_ENGINE_LOG_EXT)
@@ -130,7 +135,7 @@ endif()
 if(NOT PONY_IS_SUBPROJECT)
 	set(PONY_BASE_MODULES "")
 	set(PONY_LOG_MODULES "")
-	set(PONY_PLATFORM_MODULES "")
+	set(PONY_SURFACE_MODULES "")
 	set(PONY_INPUT_MODULES "")
 
 	message(VERBOSE "Post-configuring")
@@ -150,6 +155,11 @@ if(NOT PONY_IS_SUBPROJECT)
 		pony_set_log_defines(PonyEngine.Time.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 		pony_set_build_options(PonyEngine.Time.Impl ${PONY_ENGINE_OPTIMIZATION})
 		list(APPEND PONY_BASE_MODULES PonyEngine.Time.Impl)
+	endif()
+
+	if(TARGET PonyEngine.File)
+		pony_set_log_defines(PonyEngine.File ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+		pony_set_build_options(PonyEngine.File ${PONY_ENGINE_OPTIMIZATION})
 	endif()
 
 	if(TARGET PonyEngine.Log.Ext)
@@ -174,7 +184,7 @@ if(NOT PONY_IS_SUBPROJECT)
 	if(TARGET PonyEngine.MessagePump.Impl)
 		pony_set_log_defines(PonyEngine.MessagePump.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 		pony_set_build_options(PonyEngine.MessagePump.Impl ${PONY_ENGINE_OPTIMIZATION})
-		list(APPEND PONY_PLATFORM_MODULES PonyEngine.MessagePump.Impl)
+		list(APPEND PONY_SURFACE_MODULES PonyEngine.MessagePump.Impl)
 	endif()
 
 	if(TARGET PonyEngine.Surface)
@@ -184,7 +194,7 @@ if(NOT PONY_IS_SUBPROJECT)
 	if(TARGET PonyEngine.Surface.Impl)
 		pony_set_log_defines(PonyEngine.Surface.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 		pony_set_build_options(PonyEngine.Surface.Impl ${PONY_ENGINE_OPTIMIZATION})
-		list(APPEND PONY_PLATFORM_MODULES PonyEngine.Surface.Impl)
+		list(APPEND PONY_SURFACE_MODULES PonyEngine.Surface.Impl)
 	endif()
 
 	if(TARGET PonyEngine.Input)
@@ -229,8 +239,8 @@ if(NOT PONY_IS_SUBPROJECT)
 			list(APPEND PONY_INSTALL_TARGETS PonyModule.Log)
 		endif()
 
-		if(PONY_PLATFORM_MODULES)
-			pony_make_module_group(PONY_PLATFORM_MODULES PonyModule.Platform "PonyModule.Platform" 23)
+		if(PONY_SURFACE_MODULES)
+			pony_make_module_group(PONY_SURFACE_MODULES PonyModule.Platform "PonyModule.Platform" 23)
 			pony_set_log_defines(PonyModule.Platform ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 			pony_set_build_options(PonyModule.Platform ${PONY_ENGINE_OPTIMIZATION})
 			target_link_libraries(PonyEngine.Application.Impl PRIVATE PonyModule.Platform)
@@ -257,7 +267,7 @@ if(NOT PONY_IS_SUBPROJECT)
 		target_link_libraries(PonyEngine.Application.Impl PRIVATE
 			${PONY_BASE_MODULES}
 			${PONY_LOG_MODULES}
-			${PONY_PLATFORM_MODULES}
+			${PONY_SURFACE_MODULES}
 			${PONY_INPUT_MODULES}
 			${PONY_GAME_MODULES}
 		)

@@ -57,7 +57,7 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	std::shared_ptr<PonyEngine::Application::DefaultLogger> logger;
 	try
 	{
-		logger = std::make_shared<PonyEngine::Application::DefaultLogger>();
+		logger = std::make_shared<PonyEngine::Application::Windows::DefaultLogger>();
 	}
 	catch (const std::exception& e)
 	{

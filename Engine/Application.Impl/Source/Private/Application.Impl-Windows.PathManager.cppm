@@ -11,12 +11,9 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Macro/Text.h"
-
-#if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Storage.h"
-#endif
 
-export module PonyEngine.Application.Impl:PathManager;
+export module PonyEngine.Application.Impl:Windows.PathManager;
 
 import std;
 
@@ -26,7 +23,6 @@ import PonyEngine.Platform;
 
 import :Path;
 
-#if PONY_WINDOWS
 export namespace PonyEngine::Application::Windows
 {
 	/// @brief Path manager.
@@ -71,8 +67,6 @@ export namespace PonyEngine::Application::Windows
 		PathManager& operator =(PathManager&&) = delete;
 
 	private:
-		IApplicationContext* application; ///< Application context.
-
 		std::filesystem::path executableFile; ///< Path to the executable.
 		std::filesystem::path executableDirectory; ///< Executable directory.
 		std::filesystem::path rootDirectory; ///< Root directory.
@@ -81,15 +75,12 @@ export namespace PonyEngine::Application::Windows
 		std::filesystem::path tempDataDirectory; ///< Temporal data directory.
 	};
 }
-#endif
 
-#if PONY_WINDOWS
 namespace PonyEngine::Application::Windows
 {
-	PathManager::PathManager(IApplicationContext& application) :
-		application{&application}
+	PathManager::PathManager(IApplicationContext& application)
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting executable file...");
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Getting executable file...");
 		executableFile = Platform::Windows::GetModulePath(nullptr).lexically_normal();
 		executableDirectory = executableFile.parent_path();
 		rootDirectory = (executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_ROOT_PATH)).lexically_normal();
@@ -97,14 +88,14 @@ namespace PonyEngine::Application::Windows
 		{
 			throw std::logic_error("Root directory doesn't exist.");
 		}
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting executable file done. File: '{}'; Directory: '{}'; Root: '{}'.", 
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Getting executable file done. File: '{}'; Directory: '{}'; Root: '{}'.",
 			executableFile.string(), executableDirectory.string(), rootDirectory.string());
 
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting data directories...");
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Getting data directories...");
 		localDataDirectory = AddTail(Platform::Windows::GetKnownPath(FOLDERID_LocalAppData));
 		userDataDirectory = AddTail(Platform::Windows::GetKnownPath(FOLDERID_SavedGames));
 		tempDataDirectory = AddTail(Platform::Windows::GetTemporaryPath());
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Getting data directories done. Local data: '{}'; User data: '{}'; Temp data: '{}'.",
+		PONY_LOG(application.Logger(), Log::LogType::Info, "Getting data directories done. Local data: '{}'; User data: '{}'; Temp data: '{}'.",
 			localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
 	}
 
@@ -138,4 +129,3 @@ namespace PonyEngine::Application::Windows
 		return tempDataDirectory;
 	}
 }
-#endif

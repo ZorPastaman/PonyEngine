@@ -18,6 +18,10 @@ import std;
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 
+import :InterfaceContainer;
+import :ServiceContainer;
+import :TickableServiceInfo;
+
 export namespace PonyEngine::Application
 {
 	/// @brief Service manager.
@@ -80,10 +84,7 @@ export namespace PonyEngine::Application
 
 		IApplicationContext* application; ///< Application context.
 
-		// These vectors are synced by index.
-		std::vector<ServiceHandle> serviceHandles; ///< Service handles.
-		std::vector<std::shared_ptr<IService>> services; ///< Services.
-		std::vector<ServiceData> serviceData; ///< Initial service data.
+		ServiceContainer serviceContainer; ///< Service container.
 
 		std::vector<ITickableService*> tickableServices; ///< Tickable services.
 		std::unordered_map<std::type_index, void*> serviceInterfaces; ///< Service interfaces.
@@ -102,12 +103,12 @@ namespace PonyEngine::Application
 
 	ServiceManager::~ServiceManager() noexcept
 	{
-		if (services.size() > 0uz) [[unlikely]]
+		if (serviceContainer.Size() > 0uz) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Services weren't removed:");
-			for (const std::shared_ptr<IService>& service : services)
+			for (std::size_t i = 0uz; i < serviceContainer.Size(); ++i)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Error, "Service: '{}'.", typeid(*service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Service: '{}'.", typeid(serviceContainer.Service(i)).name());
 			}
 		}
 	}
@@ -150,7 +151,7 @@ namespace PonyEngine::Application
 		}
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service...", typeid(*data.service).name());
-		if (const auto position = std::ranges::find(services, data.service); position != services.cend()) [[unlikely]]
+		if (serviceContainer.IndexOf(*data.service) < serviceContainer.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Service has already been added.");
 		}
@@ -158,53 +159,31 @@ namespace PonyEngine::Application
 		{
 			throw std::invalid_argument("Incorrect tickable service.");
 		}
+		for (const auto [interfaceType, interface] : data.publicInterfaces)
+		{
+			if (serviceContainer.ContainsInterface(interfaceType)) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Interface of type '{}' has already been added.", interfaceType.name()));
+			}
+			if (!interface) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Interface of type '{}' is nullptr.", interfaceType.name()));
+			}
+		}
 
 		const ServiceHandle currentHandle = nextServiceHandle;
-		serviceHandles.push_back(currentHandle);
+		serviceContainer.Add(currentHandle, data);
 		try
 		{
-			services.push_back(data.service);
-			try
+			const InterfaceContainer& interfaceContainer = serviceContainer.Interfaces(serviceContainer.Size() - 1uz);
+			for (std::size_t i = 0uz; i < interfaceContainer.Size(); ++i)
 			{
-				serviceData.push_back(data);
-				try
-				{
-					PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces...");
-					for (const auto& [interfaceType, interface] : data.publicInterfaces)
-					{
-						PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interfaceType.name());
-						if (serviceInterfaces.contains(interfaceType)) [[unlikely]]
-						{
-							throw std::invalid_argument(std::format("Interface of type '{}' has already been added.", interfaceType.name()));
-						}
-						if (!interface) [[unlikely]]
-						{
-							throw std::invalid_argument(std::format("Interface of type '{}' is nullptr.", interfaceType.name()));
-						}
-						serviceInterfaces[interfaceType] = interface;
-					}
-					PONY_LOG(application->Logger(), Log::LogType::Debug, "Adding service interfaces done.");
-				}
-				catch (...)
-				{
-					for (const std::type_index interface : std::views::keys(data.publicInterfaces))
-					{
-						serviceInterfaces.erase(interface);
-					}
-					serviceData.pop_back();
-					throw;
-				}
-			}
-			catch (...)
-			{
-				services.pop_back();
-				throw;
+				serviceInterfaces[interfaceContainer.Type(i)] = interfaceContainer.Interface(i);
 			}
 		}
 		catch (...)
 		{
-			serviceHandles.pop_back();
-			throw;
+			serviceContainer.Remove(serviceContainer.Size() - 1uz);
 		}
 		++nextServiceHandle.id;
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service done. Handle: '0x{:X}'.", typeid(*data.service).name(), currentHandle.id);
@@ -219,30 +198,11 @@ namespace PonyEngine::Application
 			throw std::logic_error("Service can be removed only on start-up or shut-down.");
 		}
 
-		if (const auto position = std::find(serviceHandles.crbegin(), serviceHandles.crend(), handle); position != serviceHandles.crend()) [[likely]]
+		if (const std::size_t index = serviceContainer.IndexOf(handle); index < serviceContainer.Size()) [[likely]]
 		{
-			const std::size_t index = std::distance(serviceHandles.cbegin(), position.base()) - 1uz;
-			const char* const serviceName = typeid(*services[index]).name();
+			const char* const serviceName = typeid(serviceContainer.Service(index)).name();
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service...", serviceName);
-			if (serviceData[index].tickableService)
-			{
-				if (const auto pos = std::ranges::find(tickableServices, serviceData[index].tickableService); pos != tickableServices.cend())
-				{
-					tickableServices.erase(pos);
-				}
-			}
-
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces...");
-			for (const std::type_index interface : std::views::keys(serviceData[index].publicInterfaces))
-			{
-				PONY_LOG(application->Logger(), Log::LogType::Debug, "Interface: '{}'.", interface.name());
-				serviceInterfaces.erase(interface);
-			}
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Removing service interfaces done.");
-
-			serviceData.erase(serviceData.cbegin() + index);
-			services.erase(services.cbegin() + index);
-			serviceHandles.erase(serviceHandles.cbegin() + index);
+			serviceContainer.Remove(index);
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service done. Handle: '0x{:X}'.", serviceName, handle.id);
 		}
 		else [[unlikely]]
@@ -269,7 +229,7 @@ namespace PonyEngine::Application
 
 	void ServiceManager::End() noexcept
 	{
-		End(services.size());
+		End(serviceContainer.Size());
 	}
 
 	void ServiceManager::Tick()
@@ -303,27 +263,29 @@ namespace PonyEngine::Application
 	void ServiceManager::UpdateTickableServices()
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Getting tickable services...");
-		std::vector<std::pair<ITickableService*, std::int32_t>> orderedTickableServices;
-		orderedTickableServices.reserve(serviceData.size());
-		for (const ServiceData& data : serviceData)
+		std::vector<TickableServiceInfo> orderedTickableServices;
+		orderedTickableServices.reserve(serviceContainer.Size());
+		for (std::size_t i = 0uz; i < serviceContainer.Size(); ++i)
 		{
-			if (data.tickableService)
+			if (const TickableServiceInfo& info = serviceContainer.TickableService(i); info.tickableService)
 			{
-				orderedTickableServices.push_back(std::pair(data.tickableService, data.tickOrder));
+				orderedTickableServices.push_back(info);
 			}
 		}
-		std::ranges::sort(orderedTickableServices, [](const std::pair<ITickableService*, std::int32_t>& lhs, const std::pair<ITickableService*, std::int32_t>& rhs) noexcept
+		std::ranges::sort(orderedTickableServices, [](const TickableServiceInfo& lhs, const TickableServiceInfo& rhs) noexcept
 		{
-			return lhs.second < rhs.second;
+			return lhs.tickOrder < rhs.tickOrder;
 		});
 
+		tickableServices.clear();
 		tickableServices.reserve(orderedTickableServices.size());
 		for (std::size_t i = 0uz; i < orderedTickableServices.size(); ++i)
 		{
-			ITickableService* const tickableService = orderedTickableServices[i].first;
+			ITickableService* const tickableService = orderedTickableServices[i].tickableService;
 			PONY_LOG(application->Logger(), Log::LogType::Debug, "Service: '{}'.", typeid(*tickableService).name());
-			PONY_LOG_IF(i > 0uz && orderedTickableServices[i].second == orderedTickableServices[i - 1].second, application->Logger(), Log::LogType::Warning,
-				"'{}' and '{}' services have the same tick order. It may cause unpredictable results.", typeid(*orderedTickableServices[i - 1uz].first).name(), typeid(*orderedTickableServices[i].first).name());
+			PONY_LOG_IF(i > 0uz && orderedTickableServices[i].tickOrder == orderedTickableServices[i - 1].tickOrder, application->Logger(), Log::LogType::Warning,
+				"'{}' and '{}' services have the same tick order: '{}'. It may cause unpredictable results.", 
+				typeid(*orderedTickableServices[i - 1uz].tickableService).name(), typeid(*orderedTickableServices[i].tickableService).name(), orderedTickableServices[i].tickOrder);
 			tickableServices.push_back(tickableService);
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Getting tickable services done.");
@@ -332,18 +294,20 @@ namespace PonyEngine::Application
 	void ServiceManager::Begin(std::size_t& count)
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning application services...");
-		for (const std::shared_ptr<IService>& service : services)
+		for (std::size_t i = 0uz; i < serviceContainer.Size(); ++i)
 		{
+			IService& service = serviceContainer.Service(i);
+
 			try
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service...", typeid(*service).name());
-				service->Begin();
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service done.", typeid(*service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service...", typeid(service).name());
+				service.Begin();
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' service done.", typeid(service).name());
 				++count;
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On beginning '{}' service.", typeid(*service).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On beginning '{}' service.", typeid(service).name());
 				throw;
 			}
 		}
@@ -355,16 +319,16 @@ namespace PonyEngine::Application
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending application services...");
 		for (std::size_t i = count; i-- > 0uz; )
 		{
-			const std::shared_ptr<IService>& service = services[i];
+			IService& service = serviceContainer.Service(i);
 			try
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service...", typeid(*service).name());
-				service->End();
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service done.", typeid(*service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service...", typeid(service).name());
+				service.End();
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' service done.", typeid(service).name());
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ending '{}' service.", typeid(*service).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On ending '{}' service.", typeid(service).name());
 			}
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending application services done.");

@@ -11,39 +11,39 @@ export module PonyEngine.Application.Impl:DefaultLogger;
 
 import std;
 
-import PonyEngine.Application.Ext;
 import PonyEngine.Log;
-
-import :Console;
 
 export namespace PonyEngine::Application
 {
 	/// @brief Default logger that writes everything to a console if it's enabled.
-	class DefaultLogger final : public Log::ILogger
+	class DefaultLogger : public Log::ILogger
 	{
 	public:
-		/// @brief Creates a default logger.
-		[[nodiscard("Pure constructor")]]
-		DefaultLogger() noexcept = default;
 		DefaultLogger(const DefaultLogger&) = delete;
 		DefaultLogger(DefaultLogger&&) = delete;
 
-		~DefaultLogger() noexcept = default;
+		virtual ~DefaultLogger() noexcept = default;
 
-		virtual void Log(Log::LogType logType, std::string_view message) const noexcept override;
-		virtual void Log(Log::LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void Log(Log::LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override;
-		virtual void Log(Log::LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void Log(Log::LogType logType, std::string_view message) const noexcept override final;
+		virtual void Log(Log::LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept override final;
+		virtual void Log(Log::LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override final;
+		virtual void Log(Log::LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override final;
 
-		virtual void Log(const std::exception_ptr& exception) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view message) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void Log(const std::exception_ptr& exception) const noexcept override final;
+		virtual void Log(const std::exception_ptr& exception, std::string_view message) const noexcept override final;
+		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override final;
+		virtual void Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override final;
+		virtual void Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override final;
+		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override final;
 
 		DefaultLogger& operator =(const DefaultLogger&) = delete;
 		DefaultLogger& operator =(DefaultLogger&&) = delete;
+
+	protected:
+		[[nodiscard("Pure constructor")]]
+		DefaultLogger() noexcept = default;
+
+		virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept = 0;
 
 	private:
 		static constexpr std::string_view OnLogExceptionPrefix = "On making a log message:\n";
