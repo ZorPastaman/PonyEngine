@@ -15,9 +15,10 @@ import PonyEngine.Application.Ext;
 
 export namespace PonyEngine::Application
 {
+	/// @brief Tickable service info.
 	struct TickableServiceInfo final
 	{
-		ITickableService* tickableService;
-		std::int32_t tickOrder;
+		ITickableService* tickableService; ///< Tickable service. May be nullptr.
+		std::int32_t tickOrder; ///< Tick order.
 	};
 }

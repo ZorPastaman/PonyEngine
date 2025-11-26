@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Application.Impl:ServiceManager;
@@ -173,9 +175,9 @@ namespace PonyEngine::Application
 
 		const ServiceHandle currentHandle = nextServiceHandle;
 		serviceContainer.Add(currentHandle, data);
+		const InterfaceContainer& interfaceContainer = serviceContainer.Interfaces(serviceContainer.Size() - 1uz);
 		try
 		{
-			const InterfaceContainer& interfaceContainer = serviceContainer.Interfaces(serviceContainer.Size() - 1uz);
 			for (std::size_t i = 0uz; i < interfaceContainer.Size(); ++i)
 			{
 				serviceInterfaces[interfaceContainer.Type(i)] = interfaceContainer.Interface(i);
@@ -183,6 +185,10 @@ namespace PonyEngine::Application
 		}
 		catch (...)
 		{
+			for (std::size_t i = 0uz; i < interfaceContainer.Size(); ++i)
+			{
+				serviceInterfaces.erase(interfaceContainer.Type(i));
+			}
 			serviceContainer.Remove(serviceContainer.Size() - 1uz);
 		}
 		++nextServiceHandle.id;
@@ -202,6 +208,20 @@ namespace PonyEngine::Application
 		{
 			const char* const serviceName = typeid(serviceContainer.Service(index)).name();
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service...", serviceName);
+			const InterfaceContainer& interfaceContainer = serviceContainer.Interfaces(index);
+			for (std::size_t i = 0uz; i < interfaceContainer.Size(); ++i)
+			{
+				serviceInterfaces.erase(interfaceContainer.Type(i));
+			}
+
+			if (const ITickableService* const tickableService = serviceContainer.TickableService(index).tickableService)
+			{
+				if (const auto position = std::ranges::find(tickableServices, tickableService); position != tickableServices.cend())
+				{
+					tickableServices.erase(position);
+				}
+			}
+
 			serviceContainer.Remove(index);
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service done. Handle: '0x{:X}'.", serviceName, handle.id);
 		}
@@ -213,6 +233,8 @@ namespace PonyEngine::Application
 
 	void ServiceManager::Begin()
 	{
+		assert(application->FlowState() == FlowState::Beginning && "Incorrect flow state.");
+
 		UpdateTickableServices();
 
 		std::size_t begunServicesCount = 0uz;
@@ -229,11 +251,15 @@ namespace PonyEngine::Application
 
 	void ServiceManager::End() noexcept
 	{
+		assert(application->FlowState() == FlowState::Ending && "Incorrect flow state.");
+
 		End(serviceContainer.Size());
 	}
 
 	void ServiceManager::Tick()
 	{
+		assert(application->FlowState() == FlowState::Running && "Incorrect flow state.");
+
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking application services.");
 		for (ITickableService* const tickableService : tickableServices)
 		{

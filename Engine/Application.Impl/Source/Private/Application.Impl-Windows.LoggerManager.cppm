@@ -18,6 +18,7 @@ import :Windows.Console;
 
 export namespace PonyEngine::Application::Windows
 {
+	/// @brief Windows logger manager.
 	class LoggerManager final : public Application::LoggerManager
 	{
 	public:

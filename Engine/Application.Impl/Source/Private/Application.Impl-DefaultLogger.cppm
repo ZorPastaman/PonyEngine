@@ -43,14 +43,17 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure constructor")]]
 		DefaultLogger() noexcept = default;
 
+		/// @brief Logs to a console.
+		/// @param logType Log type.
+		/// @param message Log message.
 		virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept = 0;
 
 	private:
-		static constexpr std::string_view OnLogExceptionPrefix = "On making a log message:\n";
+		static constexpr std::string_view OnLogExceptionPrefix = "On making a log message:\n"; ///< The text that is posted before an exception.
 
-		static constexpr std::string_view UnknownExceptionWithNewLine = "Unknown exception.\n";
-		static constexpr std::string_view UnknownException = "Unknown exception.";
-		static constexpr std::string_view NullptrException = "Nullptr exception.";
+		static constexpr std::string_view UnknownExceptionWithNewLine = "Unknown exception.\n"; ///< Unknown exception with a new line text.
+		static constexpr std::string_view UnknownException = "Unknown exception."; ///< Unknown exception without a new line text.
+		static constexpr std::string_view NullptrException = "Nullptr exception."; ///< Nullptr exception text.
 
 		mutable std::string stringTemp; ///< Temporal string.
 	};

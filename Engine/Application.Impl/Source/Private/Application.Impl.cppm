@@ -11,14 +11,13 @@ export module PonyEngine.Application.Impl;
 
 export import PonyEngine.Application.Ext;
 
-export import :App;
 export import :Console;
 export import :DefaultLogger;
 export import :ExitCodes;
-export import :Windows.Process;
 
 #if PONY_WINDOWS
-export import :Windows.AppDataManager;
+export import :Windows.App;
 export import :Windows.Console;
 export import :Windows.DefaultLogger;
+export import :Windows.Process;
 #endif

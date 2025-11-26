@@ -25,7 +25,7 @@ import :Path;
 
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Path manager.
+	/// @brief Windows path manager.
 	class PathManager final
 	{
 	public:

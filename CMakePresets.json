@@ -14,7 +14,6 @@
 				"PONY_PROJECT_TITLE": "Pony Engine Game",
 				"PONY_ENGINE_TIME": true,
 				"PONY_ENGINE_TIME_IMPL": true,
-				"PONY_ENGINE_FILE": true,
 				"PONY_ENGINE_LOG_EXT": true,
 				"PONY_ENGINE_LOG_IMPL": true,
 				"PONY_ENGINE_LOG_FILE_IMPL": true,

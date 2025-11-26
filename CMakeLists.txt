@@ -91,10 +91,6 @@ if(PONY_ENGINE_TIME_IMPL)
 	add_subdirectory("Engine/Time.Impl")
 endif()
 
-if(PONY_ENGINE_FILE)
-	add_subdirectory("Engine/File")
-endif()
-
 if(PONY_ENGINE_LOG_EXT)
 	add_subdirectory("Engine/Log.Ext")
 endif()

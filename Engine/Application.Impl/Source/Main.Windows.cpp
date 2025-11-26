@@ -16,6 +16,12 @@ import std;
 import PonyEngine.Application.Impl;
 import PonyEngine.Log;
 
+/// @brief Executes the main.
+/// @param hInstance Instance.
+/// @param hPrevInstance Previous instance.
+/// @param lpCmdLine Command line.
+/// @param nShowCmd Show command.
+/// @return Exit code and error message. The latter is empty if the former is Success.
 std::pair<int, std::string> Execute(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nShowCmd) noexcept;
 
 int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd)

@@ -13,6 +13,7 @@ import std;
 
 export namespace PonyEngine::Application
 {
+	/// @brief Interface container.
 	class InterfaceContainer final
 	{
 	public:
@@ -25,27 +26,49 @@ export namespace PonyEngine::Application
 
 		~InterfaceContainer() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Finds the @p type index.
+		/// @param type Type.
+		/// @return Type index or @p Size if it's not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(std::type_index type) const noexcept;
+		/// @brief Finds the @p interface index.
+		/// @param interface Interface.
+		/// @return Interface index or @p Size if it's not found.
+		[[nodiscard("Pure function")]]
+		std::size_t IndexOf(void* interface) const noexcept;
 
+		/// @brief Gets a type at the @p index.
+		/// @param index Type index.
+		/// @return Type.
 		[[nodiscard("Pure function")]]
 		std::type_index Type(std::size_t index) const noexcept;
+		/// @brief Gets an interface at the @p index.
+		/// @param index Interface index.
+		/// @return Interface.
 		[[nodiscard("Pure function")]]
 		void* Interface(std::size_t index) const noexcept;
 
+		/// @brief Adds data.
+		/// @param type Type.
+		/// @param interface Interface.
 		void Add(std::type_index type, void* interface);
+		/// @brief Removes data.
+		/// @param index Data index to remove.
 		void Remove(std::size_t index) noexcept;
+		/// @brief Clears data.
 		void Clear() noexcept;
 
 		InterfaceContainer& operator =(const InterfaceContainer& other) = default;
 		InterfaceContainer& operator =(InterfaceContainer&& other) = default;
 
 	private:
-		std::vector<std::type_index> types;
-		std::vector<void*> interfaces;
+		std::vector<std::type_index> types; ///< Types.
+		std::vector<void*> interfaces; ///< Interfaces.
 	};
 }
 
@@ -65,6 +88,11 @@ namespace PonyEngine::Application
 	std::size_t InterfaceContainer::IndexOf(const std::type_index type) const noexcept
 	{
 		return std::ranges::find(types, type) - types.cbegin();
+	}
+
+	std::size_t InterfaceContainer::IndexOf(void* const interface) const noexcept
+	{
+		return std::ranges::find(interfaces, interface) - interfaces.cbegin();
 	}
 
 	std::type_index InterfaceContainer::Type(const std::size_t index) const noexcept
