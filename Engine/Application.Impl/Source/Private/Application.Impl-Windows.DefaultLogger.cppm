@@ -16,6 +16,7 @@ import :Windows.Console;
 
 export namespace PonyEngine::Application::Windows
 {
+	/// @brief Windows default logger. It logs to a standard console and output debug string.
 	class DefaultLogger final : public Application::DefaultLogger
 	{
 	public:

@@ -9,12 +9,9 @@
 
 module;
 
-#include <cassert>
-
-#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Application.Impl:App;
+export module PonyEngine.Application.Impl:Windows.App;
 
 import std;
 
@@ -22,6 +19,7 @@ import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 
 import :ExitCodes;
+import :FlowManager;
 import :ModuleManager;
 import :ServiceManager;
 
@@ -115,24 +113,7 @@ export namespace PonyEngine::Application::Windows
 		App& operator =(App&) = delete;
 
 	private:
-		/// @brief Begins the application.
-		void Begin();
-		/// @brief Ends the application.
-		void End() noexcept;
-
-		/// @brief Starts a run.
-		void StartRun();
-		/// @brief Checks if the application is running.
-		/// @return @a True if it's running; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		bool IsRunning() const noexcept;
-		/// @brief Increments the frame count.
-		void NextFrame() noexcept;
-
-		std::uint64_t frameCount; ///< Frame count.
-		int exitCode; ///< Exit code. It's defined only if @p flowState is stopped.
-		enum FlowState flowState; ///< @a True if the engine is running; @a false otherwise.
-
+		FlowManager flowManager; ///< Flow manager.
 		LoggerManager loggerManager; ///< Logger manager.
 		AppDataManager appDataManager; ///< Application data manager.
 		PathManager pathManager; ///< Path manager.
@@ -144,20 +125,18 @@ export namespace PonyEngine::Application::Windows
 namespace PonyEngine::Application::Windows
 {
 	App::App(const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand, const std::shared_ptr<Log::ILogger>& defaultLogger) :
-		frameCount{0ull},
-		exitCode{ExitCodes::InitialExitCode},
-		flowState{FlowState::StartingUp},
-		loggerManager(*static_cast<IApplicationContext*>(this), defaultLogger),
-		appDataManager(*static_cast<IApplicationContext*>(this), instance, prevInstance, commandLine, showCommand),
-		pathManager(*static_cast<IApplicationContext*>(this)),
-		serviceManager(*static_cast<IApplicationContext*>(this)),
-		moduleManager(*static_cast<IApplicationContext*>(this), loggerManager.PublicLoggerModuleContext(), serviceManager.PublicServiceModuleContext())
+		flowManager(*this),
+		loggerManager(*this, defaultLogger),
+		appDataManager(*this, instance, prevInstance, commandLine, showCommand),
+		pathManager(*this),
+		serviceManager(*this),
+		moduleManager(*this, loggerManager.PublicLoggerModuleContext(), serviceManager.PublicServiceModuleContext())
 	{
 	}
 
 	App::~App() noexcept
 	{
-		flowState = FlowState::ShuttingDown;
+		flowManager.ShutDown();
 	}
 
 	std::string_view App::CompanyName() const noexcept
@@ -242,38 +221,22 @@ namespace PonyEngine::Application::Windows
 
 	enum FlowState App::FlowState() const noexcept
 	{
-		return flowState;
+		return flowManager.FlowState();
 	}
 
 	int App::ExitCode() const noexcept
 	{
-		return exitCode;
+		return flowManager.ExitCode();
 	}
 
 	void App::Stop(const int exitCode) noexcept
 	{
-		if (flowState == FlowState::Running)
-		{
-			this->exitCode = exitCode;
-			flowState = FlowState::Stopped;
-			PONY_LOG(loggerManager.Logger(), Log::LogType::Info, "Application stopped. Exit code: '{}'.", this->exitCode);
-		}
-		else
-		{
-			if (flowState == FlowState::Stopped) [[likely]]
-			{
-				PONY_LOG(loggerManager.Logger(), Log::LogType::Debug, "Tried to stop already stopped Application. Ignoring.");
-			}
-			else [[unlikely]]
-			{
-				PONY_LOG(loggerManager.Logger(), Log::LogType::Debug, "Tried to stop Application in inappropriate state. Ignoring. Current flow state: '{}'.", flowState);
-			}
-		}
+		flowManager.Stop(exitCode);
 	}
 
 	std::uint64_t App::FrameCount() const noexcept
 	{
-		return frameCount;
+		return flowManager.FrameCount();
 	}
 
 	HINSTANCE App::Instance() const noexcept
@@ -303,60 +266,10 @@ namespace PonyEngine::Application::Windows
 
 	int App::Run()
 	{
-		assert(flowState == FlowState::StartingUp && "The flow state is incorrect for running.");
-
-		Begin();
-
-		try
-		{
-			PONY_LOG(loggerManager.Logger(), Log::LogType::Info, "Starting application main loop.");
-			for (StartRun(); IsRunning(); NextFrame())
-			{
-				PONY_LOG(loggerManager.Logger(), Log::LogType::Verbose, "Starting application frame: '{}'.", frameCount);
-				serviceManager.Tick();
-				PONY_LOG(loggerManager.Logger(), Log::LogType::Verbose, "Finishing application frame: '{}'.", frameCount);
-			}
-			PONY_LOG(loggerManager.Logger(), Log::LogType::Info, "Finishing application main loop. Exit code: '{}'.", exitCode);
-		}
-		catch (...)
-		{
-			End();
-			throw;
-		}
-
-		End();
-
-		return exitCode;
-	}
-
-	void App::Begin()
-	{
-		PONY_LOG(loggerManager.Logger(), Log::LogType::Info, "Beginning application...");
-		flowState = FlowState::Beginning;
-		serviceManager.Begin();
-		PONY_LOG(loggerManager.Logger(), Log::LogType::Info, "Beginning application done.");
-	}
-
-	void App::End() noexcept
-	{
-		PONY_LOG(loggerManager.Logger(), Log::LogType::Info, "Ending application...");
-		flowState = FlowState::Ending;
-		serviceManager.End();
-		PONY_LOG(loggerManager.Logger(), Log::LogType::Info, "Ending application done.");
-	}
-
-	void App::StartRun()
-	{
-		flowState = FlowState::Running;
-	}
-
-	bool App::IsRunning() const noexcept
-	{
-		return flowState == FlowState::Running;
-	}
-
-	void App::NextFrame() noexcept
-	{
-		frameCount += IsRunning();
+		const auto begin = [&] { serviceManager.Begin(); };
+		const auto end = [&] noexcept { serviceManager.End(); };
+		const auto tick = [&] { serviceManager.Tick(); };
+		
+		return flowManager.Run(begin, end, tick);
 	}
 }

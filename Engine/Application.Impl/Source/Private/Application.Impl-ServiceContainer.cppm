@@ -22,6 +22,7 @@ import :TickableServiceInfo;
 
 export namespace PonyEngine::Application
 {
+	/// @brief Service container.
 	class ServiceContainer
 	{
 	public:
@@ -32,28 +33,57 @@ export namespace PonyEngine::Application
 
 		~ServiceContainer() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Finds an index of the @p handle.
+		/// @param handle Service handle.
+		/// @return Service handle index or @p Size if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(ServiceHandle handle) const noexcept;
+		/// @brief Finds an index of the @p service.
+		/// @param service Service.
+		/// @return Service index or @p Size if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(const IService& service) const noexcept;
 
+		/// @brief Gets a service handle at the @p index.
+		/// @param index Handle index.
+		/// @return Service handle.
 		[[nodiscard("Pure function")]]
 		ServiceHandle Handle(std::size_t index) const noexcept;
+		/// @brief Gets a service at the @p index.
+		/// @param index Service index.
+		/// @return Service.
 		[[nodiscard("Pure function")]]
 		IService& Service(std::size_t index) const noexcept;
+		/// @brief Gets a tickable service at the @p index.
+		/// @param index Tickable service index.
+		/// @return Tickable service info.
 		[[nodiscard("Pure function")]]
 		const TickableServiceInfo& TickableService(std::size_t index) const noexcept;
+		/// @brief Gets interfaces at the @p index.
+		/// @param index Interface set index.
+		/// @return Interfaces.
 		[[nodiscard("Pure function")]]
 		const InterfaceContainer& Interfaces(std::size_t index) const noexcept;
 
+		/// @brief Checks if any service contains an interfaces of the @p type.
+		/// @param type Interface type.
+		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool ContainsInterface(std::type_index type) const noexcept;
 
+		/// @brief Adds data.
+		/// @param handle Service handle.
+		/// @param serviceData Service data.
 		void Add(ServiceHandle handle, const ServiceData& serviceData);
+		/// @brief Removes data.
+		/// @param index Data index.
 		void Remove(std::size_t index) noexcept;
+		/// @brief Clears data.
 		void Clear() noexcept;
 
 		ServiceContainer& operator =(const ServiceContainer& other) = default;
