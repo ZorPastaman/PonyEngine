@@ -28,8 +28,10 @@ export namespace PonyEngine::Application
 	public:
 		[[nodiscard("Pure constructor")]]
 		ServiceContainer() noexcept = default;
+		[[nodiscard("Pure constructor")]]
 		ServiceContainer(const ServiceContainer& other) = default;
-		ServiceContainer(ServiceContainer&& other) = default;
+		[[nodiscard("Pure constructor")]]
+		ServiceContainer(ServiceContainer&& other) noexcept = default;
 
 		~ServiceContainer() noexcept = default;
 
@@ -87,7 +89,7 @@ export namespace PonyEngine::Application
 		void Clear() noexcept;
 
 		ServiceContainer& operator =(const ServiceContainer& other) = default;
-		ServiceContainer& operator =(ServiceContainer&& other) = default;
+		ServiceContainer& operator =(ServiceContainer&& other) noexcept = default;
 
 	private:
 		std::vector<ServiceHandle> serviceHandles; ///< Service handles.

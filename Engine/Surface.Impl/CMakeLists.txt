@@ -20,11 +20,19 @@ target_sources(PonyEngine.Surface.Impl PRIVATE
 )
 target_sources(PonyEngine.Surface.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Surface.Impl.cppm"
-	"Source/Private/Surface.Impl-MessageHandler.cppm"
-	"Source/Private/Surface.Impl-SurfaceService.cppm"
-	"Source/Private/Surface.Impl-SurfaceServiceModule.cppm"
-	"Source/Private/Surface.Impl-WindowClass.cppm"
 )
+
+if(PONY_WINDOWS)
+	message(VERBOSE "Configuring sources for Windows")
+	target_sources(PonyEngine.Surface.Impl PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Private/Surface.Impl-Windows.MessageHandler.cppm"
+		"Source/Private/Surface.Impl-Windows.RawInputDeviceContainer.cppm"
+		"Source/Private/Surface.Impl-Windows.RawInputManager.cppm"
+		"Source/Private/Surface.Impl-Windows.SurfaceService.cppm"
+		"Source/Private/Surface.Impl-Windows.SurfaceServiceModule.cppm"
+		"Source/Private/Surface.Impl-Windows.WindowClass.cppm"
+)
+endif()
 
 message(VERBOSE "Configuring defines")
 pony_validate_module_order(PONY_ENGINE_SURFACE_ORDER)

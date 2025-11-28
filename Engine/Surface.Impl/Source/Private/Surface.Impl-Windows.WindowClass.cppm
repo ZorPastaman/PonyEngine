@@ -10,21 +10,17 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-
-#if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
-#endif
 
-export module PonyEngine.Surface.Impl:WindowClass;
+export module PonyEngine.Surface.Impl:Windows.WindowClass;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Platform;
 
-import :MessageHandler;
+import :Windows.MessageHandler;
 
-#if PONY_WINDOWS
 export namespace PonyEngine::Surface::Windows
 {
 	/// @brief Window class.
@@ -62,9 +58,7 @@ export namespace PonyEngine::Surface::Windows
 		ATOM classHandle; /// Registered class handle.
 	};
 }
-#endif
 
-#if PONY_WINDOWS
 namespace PonyEngine::Surface::Windows
 {
 	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
@@ -116,4 +110,3 @@ namespace PonyEngine::Surface::Windows
 		return classHandle;
 	}
 }
-#endif

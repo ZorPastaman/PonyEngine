@@ -13,7 +13,6 @@ import std;
 
 import PonyEngine.Platform;
 
-#if PONY_WINDOWS
 TEST_CASE("ConvertToString - Empty wstring", "[Platform][Windows][Text]")
 {
 	constexpr std::wstring_view input;
@@ -57,4 +56,3 @@ TEST_CASE("ConvertToWideString - Unicode string", "[Platform][Windows][Text]")
 	auto result = PonyEngine::Platform::Windows::ConvertToWideString(utf8);
 	REQUIRE(result == original);
 }
-#endif

@@ -21,8 +21,10 @@ export namespace PonyEngine::Application
 		InterfaceContainer() noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		explicit InterfaceContainer(std::size_t reserve);
+		[[nodiscard("Pure constructor")]]
 		InterfaceContainer(const InterfaceContainer& other) = default;
-		InterfaceContainer(InterfaceContainer&& other) = default;
+		[[nodiscard("Pure constructor")]]
+		InterfaceContainer(InterfaceContainer&& other) noexcept = default;
 
 		~InterfaceContainer() noexcept = default;
 
@@ -64,7 +66,7 @@ export namespace PonyEngine::Application
 		void Clear() noexcept;
 
 		InterfaceContainer& operator =(const InterfaceContainer& other) = default;
-		InterfaceContainer& operator =(InterfaceContainer&& other) = default;
+		InterfaceContainer& operator =(InterfaceContainer&& other) noexcept = default;
 
 	private:
 		std::vector<std::type_index> types; ///< Types.

@@ -7,10 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Surface.Impl;
+#include "PonyEngine/Platform/Windows/Framework.h"
 
-export import PonyEngine.Surface;
+#include <catch2/catch_test_macros.hpp>
 
-#if PONY_WINDOWS
-export import :Windows.SurfaceServiceModule;
-#endif
+import std;
+
+import PonyEngine.Platform;
+
+TEST_CASE("DefaultCursor returns default cursor", "[Platform][Windows][Cursor]")
+{
+	REQUIRE(static_cast<HCURSOR>(LoadImageA(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) == PonyEngine::Platform::Windows::GetDefaultCursor());
+}
