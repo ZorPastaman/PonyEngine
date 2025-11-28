@@ -10,18 +10,14 @@
 module;
 
 #include "PonyEngine/Object/Body.h"
-
-#if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
-#endif
 
-export module PonyEngine.Surface:IRawInputObserver;
+export module PonyEngine.Surface:Windows.IRawInputObserver;
 
 import std;
 
 import PonyEngine.Math;
 
-#if PONY_WINDOWS
 export namespace PonyEngine::Surface::Windows
 {
 	/// @brief Window raw input observer.
@@ -41,4 +37,3 @@ export namespace PonyEngine::Surface::Windows
 		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) = 0;
 	};
 }
-#endif

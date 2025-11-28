@@ -31,11 +31,3 @@ TEST_CASE("Relative to absolute", "[Surface][Utility]")
 	constexpr PonyEngine::Math::Vector2<float> result = PonyEngine::Surface::AbsoluteToRelative(point, resolution);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector2<float>(0.33f, 0.67f), result));
 }
-
-#if PONY_WINDOWS
-TEST_CASE("DefaultCursor returns default cursor", "[Surface][Utility]")
-{
-	REQUIRE(static_cast<HCURSOR>(LoadImageA(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED)) == PonyEngine::Surface::Windows::GetDefaultCursor());
-}
-#endif
-

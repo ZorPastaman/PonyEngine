@@ -11,16 +11,16 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 
-export module PonyEngine.Surface.Impl:SurfaceServiceModule;
+export module PonyEngine.Surface.Impl:Windows.SurfaceServiceModule;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
+import PonyEngine.Platform;
 import PonyEngine.Surface;
 
-import :MessageHandler;
-import :SurfaceService;
+import :Windows.MessageHandler;
+import :Windows.SurfaceService;
 
-#if PONY_WINDOWS
 export namespace PonyEngine::Surface::Windows
 {
 	/// @brief Windows surface service module.
@@ -44,9 +44,7 @@ export namespace PonyEngine::Surface::Windows
 		Application::ServiceHandle surfaceServiceHandle; ///< Surface service handle.
 	};
 }
-#endif
 
-#if PONY_WINDOWS
 namespace PonyEngine::Surface::Windows
 {
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
@@ -58,7 +56,7 @@ namespace PonyEngine::Surface::Windows
 			auto& nativeApplication = static_cast<Application::Windows::IApplicationContext&>(application);
 			const std::string_view title = application.ProjectTitle();
 			const HICON mainIcon = nativeApplication.AppIcon();
-			const HCURSOR mainCursor = nativeApplication.AppCursor() ? nativeApplication.AppCursor() : GetDefaultCursor();
+			const HCURSOR mainCursor = nativeApplication.AppCursor() ? nativeApplication.AppCursor() : Platform::Windows::GetDefaultCursor();
 
 			PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class...");
 			const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor);
@@ -82,4 +80,3 @@ namespace PonyEngine::Surface::Windows
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(SurfaceService).name());
 	}
 }
-#endif

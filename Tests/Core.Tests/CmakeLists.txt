@@ -37,6 +37,7 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring sources")
 	target_sources(PonyEngine.Core.Tests PRIVATE
+		"Platform/Windows.Cursor.cpp"
 		"Platform/Windows.File.cpp"
 		"Platform/Windows.GUID.cpp"
 		"Platform/Windows.Text.cpp"

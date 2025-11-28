@@ -25,8 +25,10 @@ export namespace PonyEngine::Log
 	public:
 		[[nodiscard("Pure constructor")]]
 		SubLoggerContainer() noexcept = default;
+		[[nodiscard("Pure constructor")]]
 		SubLoggerContainer(const SubLoggerContainer& other) = default;
-		SubLoggerContainer(SubLoggerContainer&& other) = default;
+		[[nodiscard("Pure constructor")]]
+		SubLoggerContainer(SubLoggerContainer&& other) noexcept = default;
 
 		~SubLoggerContainer() noexcept = default;
 
@@ -68,7 +70,7 @@ export namespace PonyEngine::Log
 		void Clear() noexcept;
 
 		SubLoggerContainer& operator =(const SubLoggerContainer& other) = default;
-		SubLoggerContainer& operator =(SubLoggerContainer&& other) = default;
+		SubLoggerContainer& operator =(SubLoggerContainer&& other) noexcept = default;
 
 	private:
 		std::vector<SubLoggerHandle> subLoggerHandles; ///< Sub-logger handles.

@@ -10,6 +10,7 @@
 export module PonyEngine.Platform;
 
 #if PONY_WINDOWS
+export import :Windows.Cursor;
 export import :Windows.Device;
 export import :Windows.File;
 export import :Windows.GUID;

@@ -13,19 +13,15 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Object/Body.h"
-
-#if PONY_WINDOWS
 #include "PonyEngine/Platform/Windows/Framework.h"
-#endif
 
-export module PonyEngine.Surface.Impl:MessageHandler;
+export module PonyEngine.Surface.Impl:Windows.MessageHandler;
 
 import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 
-#if PONY_WINDOWS
 export namespace PonyEngine::Surface::Windows
 {
 	/// @brief Windows message handler.
@@ -61,9 +57,7 @@ export namespace PonyEngine::Surface::Windows
 	/// @return Process result.
 	LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 }
-#endif
 
-#if PONY_WINDOWS
 namespace PonyEngine::Surface::Windows
 {
 	std::unordered_map<HWND, IMessageHandler*> WindowHandlers; ///< Window handlers.
@@ -139,4 +133,3 @@ namespace PonyEngine::Surface::Windows
 		return DefWindowProcA(hWnd, uMsg, wParam, lParam);
 	}
 }
-#endif

@@ -9,9 +9,13 @@
 
 export module PonyEngine.Surface;
 
-export import :IRawInputObserver;
 export import :ISurfaceObserver;
 export import :ISurfaceService;
 export import :RectStyle;
 export import :SurfaceFeature;
 export import :Utility;
+
+#if PONY_WINDOWS
+export import :Windows.IRawInputObserver;
+export import :Windows.ISurfaceService;
+#endif
