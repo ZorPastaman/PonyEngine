@@ -20,9 +20,12 @@ target_sources(PonyEngine.RawInput.Impl PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Input.Impl.cppm"
-	"Source/Private/Input.Impl-InputService.cppm"
-	"Source/Private/Input.Impl-InputServiceModule.cppm"
+	"Source/Private/RawInput.Impl.cppm"
+	"Source/Private/RawInput.Impl-InputDeviceContainer.cppm"
+	"Source/Private/RawInput.Impl-InputProviderContainer.cppm"
+	"Source/Private/RawInput.Impl-RawInputQueue.cppm"
+	"Source/Private/RawInput.Impl-RawInputService.cppm"
+	"Source/Private/RawInput.Impl-RawInputServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")
@@ -41,10 +44,6 @@ set_target_properties(PonyEngine.RawInput.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.RawInput.Impl PUBLIC
-	PonyEngine.Core
-	PonyEngine.Application.Ext
-)
 if(NOT TARGET PonyEngine.RawInput)
 	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
 endif()
@@ -54,6 +53,8 @@ endif()
 target_link_libraries(PonyEngine.RawInput.Impl PUBLIC
 	PonyEngine.RawInput
 	PonyEngine.RawInput.Ext
+	PonyEngine.Core
+	PonyEngine.Application.Ext
 )
 target_link_libraries(PonyEngine.RawInput.Impl PRIVATE
 	PonyEngine.Log

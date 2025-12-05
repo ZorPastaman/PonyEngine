@@ -16,8 +16,8 @@ export module PonyEngine.RawInput.Ext:IRawInputModuleContext;
 import std;
 
 import :IRawInputContext;
-import :IRawInputProvider;
-import :RawInputProviderHandle;
+import :IInputProvider;
+import :InputProviderHandle;
 
 export namespace PonyEngine::Input
 {
@@ -30,9 +30,9 @@ export namespace PonyEngine::Input
 		/// @param factory Input provider factory.
 		/// @return Input provider handle.
 		[[nodiscard("Must be used to remove")]]
-		virtual RawInputProviderHandle AddProvider(const std::function<std::shared_ptr<IRawInputProvider>(IRawInputContext&)>& factory) = 0;
+		virtual InputProviderHandle AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory) = 0;
 		/// @brief Removes an input provider.
-		/// @param handle 
-		virtual void RemoveProvider(RawInputProviderHandle handle) = 0;
+		/// @param providerHandle Input provider handle.
+		virtual void RemoveProvider(InputProviderHandle providerHandle) = 0;
 	};
 }

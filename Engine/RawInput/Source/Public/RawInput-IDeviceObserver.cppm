@@ -13,6 +13,7 @@ module;
 
 export module PonyEngine.RawInput:IDeviceObserver;
 
+import :ConnectionEvent;
 import :DeviceHandle;
 
 export namespace PonyEngine::Input
@@ -30,7 +31,7 @@ export namespace PonyEngine::Input
 		virtual void OnDeviceRemoved(DeviceHandle deviceHandle) {};
 		/// @brief Invoked when a device connection change.
 		/// @param deviceHandle Device handle.
-		/// @param isConnected @a True if it's connected; @a false otherwise.
-		virtual void OnDeviceConnectionChanged(DeviceHandle deviceHandle, bool isConnected) {};
+		/// @param connection Connection event.
+		virtual void OnDeviceConnectionChanged(DeviceHandle deviceHandle, const ConnectionEvent& connection) {};
 	};
 }

@@ -13,6 +13,7 @@ target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RawInput.cppm"
 	"Source/Public/RawInput-Axis.cppm"
 	"Source/Public/RawInput-AxisId.cppm"
+	"Source/Public/RawInput-ConnectionEvent.cppm"
 	"Source/Public/RawInput-DeviceHandle.cppm"
 	"Source/Public/RawInput-DeviceType.cppm"
 	"Source/Public/RawInput-DeviceTypeId.cppm"

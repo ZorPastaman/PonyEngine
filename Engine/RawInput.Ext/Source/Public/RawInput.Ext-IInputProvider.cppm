@@ -11,15 +11,15 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.RawInput.Ext:IRawInputProvider;
+export module PonyEngine.RawInput.Ext:IInputProvider;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Raw input provider.
+	/// @brief Input provider.
 	/// @note The provider must write to an input service only inside its tick or begin/end.
-	class IRawInputProvider
+	class IInputProvider
 	{
-		INTERFACE_BODY(IRawInputProvider)
+		INTERFACE_BODY(IInputProvider)
 
 		/// @brief Invoked before a first tick.
 		virtual void Begin() = 0;

@@ -11,6 +11,7 @@ export module PonyEngine.RawInput;
 
 export import :Axis;
 export import :AxisId;
+export import :ConnectionEvent;
 export import :DeviceHandle;
 export import :DeviceType;
 export import :DeviceTypeId;

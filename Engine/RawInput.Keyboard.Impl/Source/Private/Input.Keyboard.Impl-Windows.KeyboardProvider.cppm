@@ -16,7 +16,7 @@ export module PonyEngine.Input.Keyboard.Impl:Windows.KeyboardProvider;
 
 import std;
 
-import PonyEngine.Input.Ext;
+import PonyEngine.RawInput.Ext;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Platform;
@@ -34,7 +34,7 @@ export namespace PonyEngine::Input::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit KeyboardProvider(IInputContext& input);
+		explicit KeyboardProvider(IRawInputContext& input);
 		KeyboardProvider(const KeyboardProvider&) = delete;
 		KeyboardProvider(KeyboardProvider&&) = delete;
 
@@ -67,7 +67,7 @@ export namespace PonyEngine::Input::Windows
 		[[nodiscard("Pure function")]]
 		std::string_view GetKeyboardName(HANDLE keyboardHandle);
 
-		IInputContext* input;
+		IRawInputContext* input;
 		Surface::Windows::ISurfaceService* surface;
 
 		KeyboardContainer<HANDLE> keyboardContainer;
@@ -79,7 +79,7 @@ export namespace PonyEngine::Input::Windows
 
 namespace PonyEngine::Input::Windows
 {
-	KeyboardProvider::KeyboardProvider(IInputContext& input) :
+	KeyboardProvider::KeyboardProvider(IRawInputContext& input) :
 		input{&input},
 		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
 		registeredDevices{0uz}
