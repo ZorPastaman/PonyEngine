@@ -7,8 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Impl;
+#pragma once
 
-export import PonyEngine.Input.Ext;
+#include "PonyEngine/Macro/Compiler.h"
 
-export import :InputServiceModule;
+import PonyEngine.Application.Ext;
+
+namespace PonyEngine::Input
+{
+	/// @brief Gets the raw input service module.
+	/// @return Raw input service module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT Application::IModule* GetRawInputServiceModule();
+}

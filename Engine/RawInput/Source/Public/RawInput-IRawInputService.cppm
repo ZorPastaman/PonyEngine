@@ -39,11 +39,11 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual float Value(AxisId axis) const noexcept = 0;
 		/// @brief Gets an axis value from a specific device.
-		/// @param deviceHandle Device handle.
 		/// @param axis Axis
+		/// @param deviceHandle Device handle.
 		/// @return Input float value.
 		[[nodiscard("Pure function")]]
-		virtual float Value(DeviceHandle deviceHandle, AxisId axis) const noexcept = 0;
+		virtual float Value(AxisId axis, DeviceHandle deviceHandle) const noexcept = 0;
 
 		/// @brief Gets a last device reported its input.
 		/// @return Last input device.
@@ -51,10 +51,15 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual DeviceHandle LastInputDevice() const noexcept = 0;
 
-		/// @brief Gets all device handles.
-		/// @return Device handles.
+		/// @brief Gets the device count.
+		/// @return Device count.
 		[[nodiscard("Pure function")]]
-		virtual std::span<const DeviceHandle> DeviceHandles() const noexcept = 0;
+		virtual std::size_t DeviceCount() const noexcept = 0;
+		/// @brief Gets a device handle.
+		/// @param index Device index.
+		/// @return Device handle.
+		[[nodiscard("Pure function")]]
+		virtual DeviceHandle Device(std::size_t index) const = 0;
 		/// @brief Is the device handle valid?
 		/// @param deviceHandle Device handle.
 		/// @return @a True if it's valid; @a false otherwise.
@@ -100,7 +105,7 @@ export namespace PonyEngine::Input
 		/// @param deviceTypeId Device type hash.
 		/// @return Device type.
 		[[nodiscard("Pure function")]]
-		virtual const DeviceType Unhash(DeviceTypeId deviceTypeId) = 0;
+		virtual const DeviceType& Unhash(DeviceTypeId deviceTypeId) = 0;
 		/// @brief Checks if the @p deviceTypeId is valid.
 		/// @param deviceTypeId Device type id.
 		/// @return @a true if it's valid; @a false otherwise.

@@ -16,7 +16,7 @@ export module PonyEngine.Input.Keyboard.Impl:Windows.KeyboardProviderModule;
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.Input.Ext;
+import PonyEngine.RawInput.Ext;
 
 import :Windows.KeyboardProvider;
 
@@ -39,7 +39,7 @@ export namespace PonyEngine::Input::Windows
 		KeyboardProviderModule& operator =(KeyboardProviderModule&&) = delete;
 
 	private:
-		InputProviderHandle keyboardProviderHandle;
+		RawInputProviderHandle keyboardProviderHandle;
 	};
 }
 
@@ -47,14 +47,14 @@ namespace PonyEngine::Input::Windows
 {
 	void KeyboardProviderModule::StartUp(Application::IModuleContext& context)
 	{
-		IInputModuleContext* inputModuleContext = context.GetData<IInputModuleContext>();
+		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Input module context not found.");
 		}
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(KeyboardProvider).name());
-		keyboardProviderHandle = inputModuleContext->AddProvider([&](IInputContext& input)
+		keyboardProviderHandle = inputModuleContext->AddProvider([&](IRawInputContext& input)
 		{
 			return std::make_shared<KeyboardProvider>(input);
 		});
@@ -63,7 +63,7 @@ namespace PonyEngine::Input::Windows
 
 	void KeyboardProviderModule::ShutDown(Application::IModuleContext& context)
 	{
-		IInputModuleContext* inputModuleContext = context.GetData<IInputModuleContext>();
+		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Input module context not found.");

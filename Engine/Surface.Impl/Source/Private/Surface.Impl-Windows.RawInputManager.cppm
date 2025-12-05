@@ -36,7 +36,7 @@ export namespace PonyEngine::Surface::Windows
 		RawInputManager(const RawInputManager&) = delete;
 		RawInputManager(RawInputManager&&) = delete;
 
-		~RawInputManager() noexcept;
+		~RawInputManager() noexcept = default;
 
 		/// @brief Adds the raw input observer.
 		/// @param observer Raw input observer.
@@ -127,21 +127,6 @@ namespace PonyEngine::Surface::Windows
 		surfaceService{&surfaceService},
 		pumpService{&this->application->GetService<MessagePump::IPumpService>()}
 	{
-	}
-
-	RawInputManager::~RawInputManager() noexcept
-	{
-		if (rawInputObservers.size() > 0uz) [[unlikely]]
-		{
-			PONY_LOG(application->Logger(), Log::LogType::Error, "Raw input observers weren't removed:");
-			for (const std::vector<IRawInputObserver*>& observers : std::views::values(rawInputObservers))
-			{
-				for (const IRawInputObserver* const observer : observers)
-				{
-					PONY_LOG(application->Logger(), Log::LogType::Error, "Observer: '{}'.", typeid(*observer).name());
-				}
-			}
-		}
 	}
 
 	void RawInputManager::AddRawInputObserver(IRawInputObserver& observer, const USHORT usagePage, const USHORT usage)

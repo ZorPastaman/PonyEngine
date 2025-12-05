@@ -11,7 +11,7 @@ export module PonyEngine.Input.Keyboard.Impl:Keyboard;
 
 import std;
 
-import PonyEngine.Input.Ext;
+import PonyEngine.RawInput.Ext;
 import PonyEngine.Math;
 
 export namespace PonyEngine::Input

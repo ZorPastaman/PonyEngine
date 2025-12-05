@@ -7,16 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Input/InputServiceModule.h"
+#include "PonyEngine/Input/RawInputServiceModule.h"
 
 import PonyEngine.Application.Ext;
-import PonyEngine.Input.Impl;
+import PonyEngine.RawInput.Impl;
 
 namespace PonyEngine::Input
 {
-	Application::IModule* GetInputServiceModule()
+	Application::IModule* GetRawInputServiceModule()
 	{
-		static InputServiceModule inputModule;
+		static RawInputServiceModule inputModule;
 		return &inputModule;
 	}
 }

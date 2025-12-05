@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Input/InputServiceModule.h"
+#include "PonyEngine/Input/RawInputServiceModule.h"
 
-PONY_MODULE(PonyEngine::Input::GetInputServiceModule, PonyEngineInputService, PONY_ENGINE_INPUT_ORDER);
+PONY_MODULE(PonyEngine::Input::GetRawInputServiceModule, PonyEngineRawInputService, PONY_ENGINE_RAW_INPUT_ORDER);

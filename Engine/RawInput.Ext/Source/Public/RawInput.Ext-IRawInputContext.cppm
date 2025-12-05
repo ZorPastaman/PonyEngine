@@ -55,11 +55,11 @@ export namespace PonyEngine::Input
 
 		/// @brief Adds an input.
 		/// @param deviceHandle Device handle.
-		/// @param input Raw input.
+		/// @param input Raw input event.
 		virtual void AddInput(DeviceHandle deviceHandle, const RawInputEvent& input) = 0;
 		/// @brief Changes a connection status of a device.
 		/// @param deviceHandle Device handle.
-		/// @param isConnected Is the device connected?
-		virtual void Connect(DeviceHandle deviceHandle, bool isConnected) = 0;
+		/// @param connection Connection event.
+		virtual void Connect(DeviceHandle deviceHandle, const ConnectionEvent& connection) = 0;
 	};
 }

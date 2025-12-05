@@ -9,7 +9,7 @@
 
 export module PonyEngine.Input.Keyboard.Impl;
 
-export import PonyEngine.Input.Ext;
+export import PonyEngine.RawInput.Ext;
 
 #if PONY_WINDOWS
 export import :Windows.KeyboardProviderModule;
