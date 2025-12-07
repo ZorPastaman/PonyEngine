@@ -69,7 +69,7 @@ export namespace PonyEngine::Log
 		/// @brief Clears the container.
 		void Clear() noexcept;
 
-		SubLoggerContainer& operator =(const SubLoggerContainer& other) = default;
+		SubLoggerContainer& operator =(const SubLoggerContainer& other) = delete;
 		SubLoggerContainer& operator =(SubLoggerContainer&& other) noexcept = default;
 
 	private:

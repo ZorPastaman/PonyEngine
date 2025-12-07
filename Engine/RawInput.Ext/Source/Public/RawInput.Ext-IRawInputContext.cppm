@@ -61,5 +61,36 @@ export namespace PonyEngine::Input
 		/// @param deviceHandle Device handle.
 		/// @param connection Connection event.
 		virtual void Connect(DeviceHandle deviceHandle, const ConnectionEvent& connection) = 0;
+
+		/// @brief Calculates a hash for the @p axis.
+		/// @param axis Axis.
+		/// @return Axis hash.
+		[[nodiscard("Pure function")]]
+		virtual AxisId Hash(const Axis& axis) = 0;
+		/// @brief Gets an original axis from the hash value.
+		/// @param axisId Axis hash.
+		/// @return Axis.
+		[[nodiscard("Pure function")]]
+		virtual const Axis& Unhash(AxisId axisId) const = 0;
+		/// @brief Checks if the @p axisId is valid.
+		/// @param axisId Axis id.
+		/// @return @a true if it's valid; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsValid(AxisId axisId) const noexcept = 0;
+		/// @brief Calculates a hash for the @p deviceType.
+		/// @param deviceType Device type.
+		/// @return Device type hash.
+		[[nodiscard("Pure function")]]
+		virtual DeviceTypeId Hash(const DeviceType& deviceType) = 0;
+		/// @brief Gets an original device type from the hash value.
+		/// @param deviceTypeId Device type hash.
+		/// @return Device type.
+		[[nodiscard("Pure function")]]
+		virtual const DeviceType& Unhash(DeviceTypeId deviceTypeId) = 0;
+		/// @brief Checks if the @p deviceTypeId is valid.
+		/// @param deviceTypeId Device type id.
+		/// @return @a true if it's valid; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsValid(DeviceTypeId deviceTypeId) const noexcept = 0;
 	};
 }

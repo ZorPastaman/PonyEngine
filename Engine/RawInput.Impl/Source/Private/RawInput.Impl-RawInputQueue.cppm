@@ -15,10 +15,13 @@ export module PonyEngine.RawInput.Impl:RawInputQueue;
 
 import std;
 
+import PonyEngine.Math;
 import PonyEngine.RawInput;
+import PonyEngine.Type;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Raw input queue.
 	class RawInputQueue final
 	{
 	public:
@@ -31,51 +34,74 @@ export namespace PonyEngine::Input
 
 		~RawInputQueue() noexcept = default;
 
+		/// @brief Gets the event count.
+		/// @return Event count.
+		/// @remark It works correct only after calling @p SortEvents().
 		[[nodiscard("Pure function")]]
-		std::size_t EventSize() const noexcept;
+		std::size_t EventCount() const noexcept;
 
+		/// @brief Gets a device handle.
+		/// @param index Input event index.
+		/// @return Device handle.
+		/// @remark It works correct only after calling @p SortEvents().
 		[[nodiscard("Pure function")]]
 		DeviceHandle Device(std::size_t index) const noexcept;
+		/// @brief Gets an input event.
+		/// @param index Input event index.
+		/// @return Input event.
+		/// @remark It works correct only after calling @p SortEvents().
 		[[nodiscard("Pure function")]]
 		std::variant<RawInputEvent, ConnectionEvent> Event(std::size_t index) const noexcept;
 
+		/// @brief Sorts input events.
 		void SortEvents();
 
+		/// @brief Adds the input event.
+		/// @param device Device.
+		/// @param event Input event.
 		void AddInput(DeviceHandle device, const RawInputEvent& event);
+		/// @brief Adds the connection event.
+		/// @param device Device.
+		/// @param event Connection event.
 		void AddConnection(DeviceHandle device, const ConnectionEvent& event);
+		/// @brief Removes all the event for the device.
+		/// @param device Device.
 		void Remove(DeviceHandle device) noexcept;
+		/// @brief Clears all the data.
 		void Clear() noexcept;
 
-		RawInputQueue& operator =(const RawInputQueue& other) = default;
+		RawInputQueue& operator =(const RawInputQueue& other) = delete;
 		RawInputQueue& operator =(RawInputQueue&& other) noexcept = default;
 
 	private:
+		/// @brief Input data.
 		struct InputData final
 		{
-			std::size_t valueIndex; ///< Index in the axes and values.
-			std::size_t valueCount; ///< Value count.
+			std::size_t valueIndex = 0uz; ///< Index in the axes and values.
+			std::size_t valueCount = 0uz; ///< Value count.
 			InputEventType eventType = InputEventType::State; ///< Event type.
 			std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position in screen coordinates; std::nullopt if not applicable.
 		};
+		/// @brief Connection data.
 		struct ConnectionData final
 		{
-			bool isConnected;
+			bool isConnected = false;
 		};
 
-		std::vector<DeviceHandle> devices;
-		std::vector<std::variant<InputData, ConnectionData>> events;
-		std::vector<std::chrono::time_point<std::chrono::steady_clock>> eventTimes;
+		std::vector<DeviceHandle> devices; ///< Input device handles.
+		std::vector<std::variant<InputData, ConnectionData>> events; ///< Input events.
+		std::vector<std::chrono::time_point<std::chrono::steady_clock>> eventTimes; ///< Input event times.
 
-		std::vector<AxisId> axes;
-		std::vector<float> values;
+		std::vector<AxisId> axes; ///< Input axes.
+		std::vector<float> values; ///< Input values.
 
-		std::vector<std::size_t> eventIndices;
+		std::vector<std::size_t> eventIndices; ///< Sorted event indices.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	std::size_t RawInputQueue::EventSize() const noexcept
+	std::size_t RawInputQueue::EventCount() const noexcept
 	{
 		return eventIndices.size();
 	}
@@ -90,27 +116,28 @@ namespace PonyEngine::Input
 		const std::variant<InputData, ConnectionData>& event = events[index];
 		const std::chrono::time_point<std::chrono::steady_clock> time = eventTimes[index];
 
-		if (event.index() == 0uz) [[likely]]
+		return std::visit<std::variant<RawInputEvent, ConnectionEvent>>(Type::Overload
 		{
-			const InputData& inputData = std::get<0>(event);
-			return RawInputEvent
+			[&](const InputData& inputData) noexcept
 			{
-				.axes = std::span<const AxisId>(&axes[inputData.valueIndex], inputData.valueCount),
-				.values = std::span<const float>(&values[inputData.valueIndex], inputData.valueCount),
-				.eventType = inputData.eventType,
-				.timePoint = time,
-				.cursorPosition = inputData.cursorPosition
-			};
-		}
-		else [[unlikely]]
-		{
-			const ConnectionData& connectionData = std::get<1>(events[index]);
-			return ConnectionEvent
+				return RawInputEvent
+				{
+					.axes = std::span<const AxisId>(&axes[inputData.valueIndex], inputData.valueCount),
+					.values = std::span<const float>(&values[inputData.valueIndex], inputData.valueCount),
+					.eventType = inputData.eventType,
+					.timePoint = time,
+					.cursorPosition = inputData.cursorPosition
+				};
+			},
+			[&](const ConnectionData& connectionData) noexcept
 			{
-				.isConnected = connectionData.isConnected,
-				.timePoint = time
-			};
-		}
+				return ConnectionEvent
+				{
+					.isConnected = connectionData.isConnected,
+					.timePoint = time
+				};
+			}
+		}, event);
 	}
 
 	void RawInputQueue::SortEvents()
@@ -204,6 +231,7 @@ namespace PonyEngine::Input
 	{
 		devices.clear();
 		events.clear();
+		eventTimes.clear();
 		axes.clear();
 		values.clear();
 		eventIndices.clear();

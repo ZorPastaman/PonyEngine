@@ -18,9 +18,10 @@ export module PonyEngine.RawInput.Impl:RawInputService;
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.RawInput.Ext;
 import PonyEngine.Hash;
 import PonyEngine.Log;
+import PonyEngine.RawInput.Ext;
+import PonyEngine.Type;
 
 import :InputDeviceContainer;
 import :InputProviderContainer;
@@ -224,10 +225,13 @@ export namespace PonyEngine::Input
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Clearing input data.");
 		inputQueue.Clear();
 		devices.ClearDeltas();
+
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking input providers.");
 		TickProviders();
+
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Sorting input events.");
 		inputQueue.SortEvents();
+
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Processing input queue.");
 		ProcessInputQueue();
 	}
@@ -682,36 +686,33 @@ export namespace PonyEngine::Input
 
 	void RawInputService::ProcessInputQueue()
 	{
-		for (std::size_t eventIndex = 0uz; eventIndex < inputQueue.EventSize(); ++eventIndex)
+		for (std::size_t eventIndex = 0uz; eventIndex < inputQueue.EventCount(); ++eventIndex)
 		{
 			const DeviceHandle device = inputQueue.Device(eventIndex);
 			const std::variant<RawInputEvent, ConnectionEvent> event = inputQueue.Event(eventIndex);
 			const std::size_t deviceIndex = devices.IndexOf(device);
 
-			if (event.index() == 0uz) [[likely]]
+			std::visit(Type::Overload
 			{
-				const RawInputEvent& inputEvent = std::get<0>(event);
-
-				for (std::size_t axisIndex = 0uz; axisIndex < inputEvent.axes.size(); ++axisIndex)
+				[&](const RawInputEvent& inputEvent)
 				{
-					devices.Value(deviceIndex, inputEvent.axes[axisIndex], inputEvent.values[axisIndex], inputEvent.eventType);
-				}
-				lastInputDevice = device;
+					for (std::size_t axisIndex = 0uz; axisIndex < inputEvent.axes.size(); ++axisIndex)
+					{
+						devices.Value(deviceIndex, inputEvent.axes[axisIndex], inputEvent.values[axisIndex], inputEvent.eventType);
+						PONY_LOG(application->Logger(), Log::LogType::Info, "Key: {}; Value: {}.", Unhash(inputEvent.axes[axisIndex]).Path(), inputEvent.values[axisIndex]);
+					}
+					lastInputDevice = device;
 
-				ObserveInput(device, inputEvent);
-			}
-			else [[unlikely]]
-			{
-				const ConnectionEvent& connectionEvent = std::get<1>(event);
-
-				if (!connectionEvent.isConnected)
+					ObserveInput(device, inputEvent);
+				},
+				[&](const ConnectionEvent& connectionEvent)
 				{
-					devices.Reset(deviceIndex);
-				}
-				devices.IsConnected(devices.IndexOf(device), connectionEvent.isConnected);
+					devices.IsConnected(devices.IndexOf(device), connectionEvent.isConnected);
+					PONY_LOG(application->Logger(), Log::LogType::Info, "Connection: {}.", connectionEvent.isConnected);
 
-				ObserveConnection(device, connectionEvent);
-			}
+					ObserveConnection(device, connectionEvent);
+				}
+			}, event);
 		}
 	}
 

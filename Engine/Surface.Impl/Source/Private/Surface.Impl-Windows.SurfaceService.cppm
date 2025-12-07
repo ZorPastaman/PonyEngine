@@ -21,6 +21,7 @@ import std;
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.Math;
+import PonyEngine.MessagePump;
 import PonyEngine.Surface;
 import PonyEngine.Type;
 
@@ -96,6 +97,11 @@ export namespace PonyEngine::Surface::Windows
 
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual Math::Vector2<std::int32_t> LastMessageCursorPosition() const noexcept override;
 
 		virtual void AddRawInputObserver(IRawInputObserver& observer, USHORT usagePage, USHORT usage) override;
 		virtual void AddRawInputObserver(IRawInputObserver& observer, std::span<const std::pair<USHORT, USHORT>> rawInputUsages) override;
@@ -276,6 +282,7 @@ export namespace PonyEngine::Surface::Windows
 		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
 
 		Application::Windows::IApplicationContext* application; ///< Application context.
+		MessagePump::IPumpService* pumpService; ///< Message pump service.
 
 		Surface::RectStyle rectStyle; ///< Client rectangle style.
 		Math::Vector2<int> minimalClientSize; ///< Minimal client size.
@@ -287,6 +294,9 @@ export namespace PonyEngine::Surface::Windows
 		bool windowActive; ///< Is the window active?
 		bool windowInFocus; ///< Is the window in focus?
 		bool windowRepositioning; ///< Is window being moved?
+
+		std::chrono::time_point<std::chrono::steady_clock> lastMessageTime; ///< Last message time.
+		Math::Vector2<std::int32_t> lastMessageCursorPosition; ///< Last message cursor position.
 
 		std::shared_ptr<WindowClass> windowClass; ///< Window class.
 		RawInputManager rawInputManager; ///< Raw input manager.
@@ -303,6 +313,7 @@ namespace PonyEngine::Surface::Windows
 {
 	SurfaceService::SurfaceService(Application::Windows::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
 		application{&application},
+		pumpService{&this->application->GetService<MessagePump::IPumpService>()},
 		rectStyle(FullscreenRectStyle{.alwaysOnTop = false}),
 		minimalClientSize(Math::Vector2<int>::One()),
 		cursorClippingRect(Math::CornerRect<float>(Math::Vector2<float>::One())),
@@ -681,6 +692,16 @@ namespace PonyEngine::Surface::Windows
 		return windowHandle;
 	}
 
+	std::chrono::time_point<std::chrono::steady_clock> SurfaceService::LastMessageTime() const noexcept
+	{
+		return lastMessageTime;
+	}
+
+	Math::Vector2<std::int32_t> SurfaceService::LastMessageCursorPosition() const noexcept
+	{
+		return lastMessageCursorPosition;
+	}
+
 	void SurfaceService::AddRawInputObserver(IRawInputObserver& observer, const USHORT usagePage, const USHORT usage)
 	{
 		rawInputManager.AddRawInputObserver(observer, usagePage, usage);
@@ -719,6 +740,9 @@ namespace PonyEngine::Surface::Windows
 	LRESULT SurfaceService::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' message.", uMsg);
+
+		lastMessageTime = pumpService->LastMessageTime();
+		lastMessageCursorPosition = pumpService->LastMessageCursorPosition();
 
 		switch (uMsg)
 		{

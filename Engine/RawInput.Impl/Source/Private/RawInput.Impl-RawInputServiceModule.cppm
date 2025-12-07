@@ -16,8 +16,8 @@ export module PonyEngine.RawInput.Impl:RawInputServiceModule;
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.RawInput;
 import PonyEngine.Log;
+import PonyEngine.RawInput;
 
 import :RawInputService;
 

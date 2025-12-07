@@ -86,9 +86,6 @@ export namespace PonyEngine::Input
 		/// @param type Event type.
 		void Value(std::size_t deviceIndex, AxisId axis, float value, InputEventType type);
 
-		/// @brief Resets axes of the given device.
-		/// @param deviceIndex Device index.
-		void Reset(std::size_t deviceIndex) noexcept;
 		/// @brief Clears deltas.
 		void ClearDeltas() noexcept;
 
@@ -103,7 +100,7 @@ export namespace PonyEngine::Input
 		/// @brief Clears all the data.
 		void Clear() noexcept;
 
-		InputDeviceContainer& operator =(const InputDeviceContainer& other) = default;
+		InputDeviceContainer& operator =(const InputDeviceContainer& other) = delete;
 		InputDeviceContainer& operator =(InputDeviceContainer&& other) noexcept = default;
 
 	private:
@@ -227,17 +224,6 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void InputDeviceContainer::Reset(const std::size_t deviceIndex) noexcept
-	{
-		assert(deviceIndex < devices.size() && "Incorrect device.");
-
-		for (const std::size_t axisIndex : axisIndices[deviceIndex])
-		{
-			states[axisIndex] = 0.f;
-			deltas[axisIndex] = 0.f;
-		}
-	}
-
 	void InputDeviceContainer::ClearDeltas() noexcept
 	{
 		std::ranges::fill(deltas, 0.f);
@@ -297,8 +283,10 @@ namespace PonyEngine::Input
 			}
 		}
 
-		for (const std::size_t axisIndex : axisIndices[index])
+		const std::span<const std::size_t> indices = axisIndices[index];
+		for (std::size_t i = indices.size(); i-- > 0uz; )
 		{
+			const std::size_t axisIndex = indices[i];
 			deltas.erase(deltas.cbegin() + axisIndex);
 			states.erase(states.cbegin() + axisIndex);
 			axes.erase(axes.cbegin() + axisIndex);

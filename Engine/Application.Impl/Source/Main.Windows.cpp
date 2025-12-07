@@ -30,7 +30,10 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 
 	if (exitCode != PonyEngine::Application::ExitCodes::Success) [[unlikely]]
 	{
-		MessageBoxA(nullptr, exceptionInfo.c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
+		const std::string text = exceptionInfo.empty()
+			? std::format("Error code: '{}'.", exitCode)
+			: std::format("Error code: '{}'.\nException:\n{}", exitCode, exceptionInfo);
+		MessageBoxA(nullptr, text.c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
 	}
 
 	return exitCode;

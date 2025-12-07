@@ -62,7 +62,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @brief Clears the data.
 		void Clear() noexcept;
 
-		RawInputDeviceContainer& operator =(const RawInputDeviceContainer& other) = default;
+		RawInputDeviceContainer& operator =(const RawInputDeviceContainer& other) = delete;
 		RawInputDeviceContainer& operator =(RawInputDeviceContainer&& other) noexcept = default;
 
 	private:
