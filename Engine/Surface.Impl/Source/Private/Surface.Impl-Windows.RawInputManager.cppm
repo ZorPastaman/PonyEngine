@@ -17,7 +17,6 @@ export module PonyEngine.Surface.Impl:Windows.RawInputManager;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
-import PonyEngine.MessagePump;
 import PonyEngine.Surface;
 
 import: Windows.RawInputDeviceContainer;
@@ -110,7 +109,6 @@ export namespace PonyEngine::Surface::Windows
 
 		Application::Windows::IApplicationContext* application; ///< Application context.
 		ISurfaceService* surfaceService;
-		MessagePump::IPumpService* pumpService; ///< Message pump service.
 
 		RawInputDeviceContainer deviceContainer; ///< Device container.
 
@@ -124,8 +122,7 @@ namespace PonyEngine::Surface::Windows
 {
 	RawInputManager::RawInputManager(Application::Windows::IApplicationContext& application, ISurfaceService& surfaceService) noexcept :
 		application{&application},
-		surfaceService{&surfaceService},
-		pumpService{&this->application->GetService<MessagePump::IPumpService>()}
+		surfaceService{&surfaceService}
 	{
 	}
 
@@ -270,14 +267,11 @@ namespace PonyEngine::Surface::Windows
 
 			if (const auto observerPosition = rawInputObservers.find(deviceType); observerPosition != rawInputObservers.cend())
 			{
-				const std::chrono::time_point<std::chrono::steady_clock> time = pumpService->LastMessageTime();
-				const Math::Vector2<std::int32_t> cursorPosition = pumpService->LastMessageCursorPosition();
-
 				for (IRawInputObserver* const observer : observerPosition->second)
 				{
 					try
 					{
-						observer->Observe(*input, time, cursorPosition);
+						observer->Observe(*input);
 					}
 					catch (...)
 					{

@@ -16,8 +16,8 @@ export namespace PonyEngine::Input
 	/// @brief Axis ID.
 	struct AxisId final
 	{
-		std::uint32_t hash; ///< Axis hash.
-		std::uint32_t index; ///< Axis hash index. It's used when different axes have the same hash.
+		std::uint32_t hash = 0u; ///< Axis hash.
+		std::uint32_t index = 0u; ///< Axis hash index. It's used when different axes have the same hash.
 
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const AxisId& other) const noexcept = default;

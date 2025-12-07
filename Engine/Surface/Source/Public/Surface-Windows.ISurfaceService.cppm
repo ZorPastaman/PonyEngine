@@ -16,6 +16,8 @@ export module PonyEngine.Surface:Windows.ISurfaceService;
 
 import std;
 
+import PonyEngine.Math;
+
 import :ISurfaceService;
 
 import :Windows.IRawInputObserver;
@@ -31,6 +33,15 @@ export namespace PonyEngine::Surface::Windows
 		/// @return Native handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND Handle() noexcept = 0;
+
+		/// @brief Gets a last message time.
+		/// @return Last message time.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept = 0;
+		/// @brief Gets the cursor position of the last message.
+		/// @return Cursor position in the screen coordinates of the last message.
+		[[nodiscard("Pure function")]]
+		virtual Math::Vector2<std::int32_t> LastMessageCursorPosition() const noexcept = 0;
 
 		/// @brief Adds the raw input observer.
 		/// @param observer Observer to add.

@@ -14,10 +14,6 @@ module;
 
 export module PonyEngine.Surface:Windows.IRawInputObserver;
 
-import std;
-
-import PonyEngine.Math;
-
 export namespace PonyEngine::Surface::Windows
 {
 	/// @brief Window raw input observer.
@@ -27,13 +23,11 @@ export namespace PonyEngine::Surface::Windows
 
 		/// @brief Observes raw input.
 		/// @param rawInput Raw input to observe.
-		/// @param eventTime Event time. It's a low resolution time point.
-		/// @param cursorPosition Event cursor position in screen coordinates.
-		virtual void Observe(const RAWINPUT& rawInput, std::chrono::time_point<std::chrono::steady_clock> eventTime, const Math::Vector2<std::int32_t>& cursorPosition) = 0;
+		virtual void Observe(const RAWINPUT& rawInput) {}
 
 		/// @brief Invoked on a device connection change.
 		/// @param device Device handle.
 		/// @param isConnected Is the device connected?
-		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) = 0;
+		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) {}
 	};
 }

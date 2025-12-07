@@ -19,17 +19,19 @@ target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Input.Keyboard.Impl.cppm"
-	"Source/Private/Input.Keyboard.Impl-Keyboard.cppm"
-	"Source/Private/Input.Keyboard.Impl-KeyboardContainer.cppm"
+	"Source/Private/RawInput.Keyboard.Impl.cppm"
+	"Source/Private/RawInput.Keyboard.Impl-Keyboard.cppm"
+	"Source/Private/RawInput.Keyboard.Impl-KeyboardContainer.cppm"
+	"Source/Private/RawInput.Keyboard.Impl-KeyboardEvent.cppm"
+	"Source/Private/RawInput.Keyboard.Impl-KeyboardEventQueue.cppm"
 )
 
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-		"Source/Private/Input.Keyboard.Impl-Windows.KeyboardLayoutMap.cppm"
-		"Source/Private/Input.Keyboard.Impl-Windows.KeyboardProvider.cppm"
-		"Source/Private/Input.Keyboard.Impl-Windows.KeyboardProviderModule.cppm"
+	target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FILES
+		"Source/Private/RawInput.Keyboard.Impl-Windows.KeyboardAxisMap.cppm"
+		"Source/Private/RawInput.Keyboard.Impl-Windows.KeyboardProvider.cppm"
+		"Source/Private/RawInput.Keyboard.Impl-Windows.KeyboardProviderModule.cppm"
 	)
 endif()
 
@@ -47,10 +49,6 @@ set_target_properties(PonyEngine.RawInput.Keyboard.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PUBLIC
-	PonyEngine.Core
-	PonyEngine.Application.Ext
-)
 if(NOT TARGET PonyEngine.RawInput)
 	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
 endif()
@@ -60,6 +58,8 @@ endif()
 target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PUBLIC
 	PonyEngine.RawInput
 	PonyEngine.RawInput.Ext
+	PonyEngine.Core
+	PonyEngine.Application.Ext
 )
 target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PRIVATE
 	PonyEngine.Log

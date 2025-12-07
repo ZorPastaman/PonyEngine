@@ -85,7 +85,6 @@ export namespace PonyEngine::Input
 		static constexpr std::string_view MainLeftBracePath = PONY_INPUT_KEYBOARD_MAIN_LEFT_BRACE_PATH; ///< Button with '{' on US layout.
 		static constexpr std::string_view MainRightBracePath = PONY_INPUT_KEYBOARD_MAIN_RIGHT_BRACE_PATH; ///< Button with '}' on US layout.
 		static constexpr std::string_view MainBackslashPath = PONY_INPUT_KEYBOARD_MAIN_BACKSLASH_PATH; ///< Button with '\' on US layout.
-		static constexpr std::string_view MainHashPath = PONY_INPUT_KEYBOARD_MAIN_HASH_PATH; ///< Button with '#' on non-US layout.
 		static constexpr std::string_view MainColonPath = PONY_INPUT_KEYBOARD_MAIN_COLON_PATH; ///< Button with ':' on US layout.
 		static constexpr std::string_view MainApostrophePath = PONY_INPUT_KEYBOARD_MAIN_APOSTROPHE_PATH; ///< Button with ''' on US layout.
 		static constexpr std::string_view MainTildePath = PONY_INPUT_KEYBOARD_MAIN_TILDE_PATH; ///< Button with '~' on US layout.
@@ -172,5 +171,9 @@ export namespace PonyEngine::Input
 		static constexpr std::string_view SystemMenuPath = PONY_INPUT_KEYBOARD_SYSTEM_MENU_PATH; ///< Menu button.
 		static constexpr std::string_view SystemLeftGuidePath = PONY_INPUT_KEYBOARD_SYSTEM_LEFT_GUIDE_PATH; ///< Left guide button.
 		static constexpr std::string_view SystemRightGuidePath = PONY_INPUT_KEYBOARD_SYSTEM_RIGHT_GUIDE_PATH; ///< Right guide button.
+		static constexpr std::string_view SystemPrintScreenPath = PONY_INPUT_KEYBOARD_SYSTEM_PRINT_SCREEN_PATH; ///< Print screen button.
+		static constexpr std::string_view SystemRequestPath = PONY_INPUT_KEYBOARD_SYSTEM_REQUEST_PATH; ///< Request button.
+		static constexpr std::string_view SystemPausePath = PONY_INPUT_KEYBOARD_SYSTEM_PAUSE_PATH; ///< Pause button.
+		static constexpr std::string_view SystemBreakPath = PONY_INPUT_KEYBOARD_SYSTEM_BREAK_PATH; ///< Break button.
 	};
 }

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Keyboard.Impl;
+export module PonyEngine.RawInput.Keyboard.Impl;
 
 export import PonyEngine.RawInput.Ext;
 

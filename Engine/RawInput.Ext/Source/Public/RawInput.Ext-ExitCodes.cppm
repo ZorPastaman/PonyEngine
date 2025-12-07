@@ -7,7 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Input/KeyboardProviderModule.h"
+module;
 
-PONY_MODULE(PonyEngine::Input::GetKeyboardProviderModule, PonyEngineRawInputKeyboardProvider, PONY_ENGINE_RAW_INPUT_KEYBOARD_ORDER);
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.RawInput.Ext:ExitCodes;
+
+export namespace PonyEngine::Input
+{
+	/// @brief Exit codes of the input sub-systems.
+	struct ExitCodes final
+	{
+		NON_CONSTRUCTIBLE_BODY(ExitCodes)
+
+		static constexpr int InputError = -5000; ///< Main input error.
+	};
+}

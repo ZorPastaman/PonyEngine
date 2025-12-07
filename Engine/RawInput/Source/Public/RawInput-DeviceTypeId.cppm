@@ -16,7 +16,7 @@ export namespace PonyEngine::Input
 	/// @brief Device type ID.
 	struct DeviceTypeId final
 	{
-		std::uint64_t hash; ///< Device type hash.
+		std::uint64_t hash = 0u; ///< Device type hash.
 
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const DeviceTypeId& other) const noexcept = default;

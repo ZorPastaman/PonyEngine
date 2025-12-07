@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 
-export module PonyEngine.Input.Keyboard.Impl:Windows.KeyboardProviderModule;
+export module PonyEngine.RawInput.Keyboard.Impl:Windows.KeyboardProviderModule;
 
 import std;
 
@@ -22,6 +22,7 @@ import :Windows.KeyboardProvider;
 
 export namespace PonyEngine::Input::Windows
 {
+	/// @brief Keyboard provider module.
 	class KeyboardProviderModule final : public Application::IModule
 	{
 	public:
@@ -39,7 +40,7 @@ export namespace PonyEngine::Input::Windows
 		KeyboardProviderModule& operator =(KeyboardProviderModule&&) = delete;
 
 	private:
-		RawInputProviderHandle keyboardProviderHandle;
+		InputProviderHandle keyboardProviderHandle; ///< Keyboard provider handle.
 	};
 }
 
@@ -50,7 +51,7 @@ namespace PonyEngine::Input::Windows
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
 		{
-			throw std::logic_error("Input module context not found.");
+			throw std::logic_error("Raw input module context not found.");
 		}
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(KeyboardProvider).name());
@@ -66,7 +67,7 @@ namespace PonyEngine::Input::Windows
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
 		{
-			throw std::logic_error("Input module context not found.");
+			throw std::logic_error("Raw input module context not found.");
 		}
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(KeyboardProvider).name());

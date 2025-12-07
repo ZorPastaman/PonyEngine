@@ -7,16 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Keyboard.Impl:KeyboardContainer;
+export module PonyEngine.RawInput.Keyboard.Impl:KeyboardContainer;
 
 import std;
 
-import PonyEngine.RawInput.Ext;
+import PonyEngine.RawInput;
 
 import :Keyboard;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Keyboard container.
+	/// @tparam NativeHandleType Native keyboard handle type.
 	template<typename NativeHandleType>
 	class KeyboardContainer final
 	{
@@ -28,46 +30,81 @@ export namespace PonyEngine::Input
 
 		~KeyboardContainer() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Finds a keyboard index by the @p nativeHandle.
+		/// @param nativeHandle Native handle.
+		/// @return Keyboard index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(const NativeHandleType& nativeHandle) const noexcept;
+		/// @brief Finds a keyboard index by the @p deviceHandle.
+		/// @param deviceHandle Device handle.
+		/// @return Keyboard index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(struct DeviceHandle deviceHandle) const noexcept;
+		/// @brief Finds a keyboard index.
+		/// @param keyboard Keyboard.
+		/// @return Keyboard index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(const class Keyboard& keyboard) const noexcept;
+		/// @brief Finds a keyboard index by the @p deviceName.
+		/// @param deviceName Device name.
+		/// @return Keyboard index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(std::string_view deviceName) const noexcept;
 
+		/// @brief Gets a native handle.
+		/// @param index Keyboard index.
+		/// @return Native handle.
 		[[nodiscard("Pure function")]]
 		NativeHandleType& NativeHandle(std::size_t index) noexcept;
+		/// @brief Gets a native handle.
+		/// @param index Keyboard index.
+		/// @return Native handle.
 		[[nodiscard("Pure function")]]
 		const NativeHandleType& NativeHandle(std::size_t index) const noexcept;
+		/// @brief Gets a device handle.
+		/// @param index Keyboard index.
+		/// @return Device handle.
 		[[nodiscard("Pure function")]]
 		struct DeviceHandle& DeviceHandle(std::size_t index) noexcept;
+		/// @brief Gets a device handle.
+		/// @param index Keyboard index.
+		/// @return Device handle.
 		[[nodiscard("Pure function")]]
 		const struct DeviceHandle& DeviceHandle(std::size_t index) const noexcept;
+		/// @brief Gets a keyboard.
+		/// @param index Keyboard index.
+		/// @return Keyboard.
 		[[nodiscard("Pure function")]]
 		class Keyboard& Keyboard(std::size_t index) noexcept;
+		/// @brief Gets a keyboard.
+		/// @param index Keyboard index.
+		/// @return Keyboard.
 		[[nodiscard("Pure function")]]
 		const class Keyboard& Keyboard(std::size_t index) const noexcept;
-		[[nodiscard("Pure function")]]
-		const std::shared_ptr<class Keyboard>& KeyboardShared(std::size_t index) noexcept;
-		[[nodiscard("Pure function")]]
-		const std::shared_ptr<const class Keyboard>& KeyboardShared(std::size_t index) const noexcept;
 
+		/// @brief Adds a keyboard.
+		/// @param nativeHandle Native handle.
+		/// @param deviceHandle Device handle.
+		/// @param keyboard Keyboard.
 		void Add(const NativeHandleType& nativeHandle, struct DeviceHandle deviceHandle, const std::shared_ptr<class Keyboard>& keyboard);
+		/// @brief Removed a keyboard.
+		/// @param index Keyboard index.
 		void Remove(std::size_t index) noexcept;
+		/// @brief Clears all the data.
 		void Clear() noexcept;
 
 		KeyboardContainer& operator =(const KeyboardContainer&) = delete;
 		KeyboardContainer& operator =(KeyboardContainer&&) = delete;
 
 	private:
-		std::vector<NativeHandleType> nativeHandles;
-		std::vector<struct DeviceHandle> deviceHandles;
-		std::vector<std::shared_ptr<class Keyboard>> keyboards;
+		std::vector<NativeHandleType> nativeHandles; ///< Native keyboard handles.
+		std::vector<struct DeviceHandle> deviceHandles; ///< Device handles.
+		std::vector<std::shared_ptr<class Keyboard>> keyboards; ///< Keyboards.
 	};
 }
 
@@ -140,32 +177,25 @@ namespace PonyEngine::Input
 	}
 
 	template<typename NativeHandleType>
-	const std::shared_ptr<class Keyboard>& KeyboardContainer<NativeHandleType>::KeyboardShared(const std::size_t index) noexcept
-	{
-		return keyboards[index];
-	}
-
-	template<typename NativeHandleType>
-	const std::shared_ptr<const class Keyboard>& KeyboardContainer<NativeHandleType>::KeyboardShared(const std::size_t index) const noexcept
-	{
-		return keyboards[index];
-	}
-
-	template<typename NativeHandleType>
 	void KeyboardContainer<NativeHandleType>::Add(const NativeHandleType& nativeHandle, const struct DeviceHandle deviceHandle, const std::shared_ptr<class Keyboard>& keyboard)
 	{
+		nativeHandles.push_back(nativeHandle);
 		try
 		{
-			nativeHandles.push_back(nativeHandle);
 			deviceHandles.push_back(deviceHandle);
-			keyboards.push_back(keyboard);
+			try
+			{
+				keyboards.push_back(keyboard);
+			}
+			catch (...)
+			{
+				deviceHandles.pop_back();
+				throw;
+			}
 		}
 		catch (...)
 		{
-			const std::size_t size = keyboards.size();
-			deviceHandles.resize(size);
-			nativeHandles.resize(size);
-
+			nativeHandles.pop_back();
 			throw;
 		}
 	}

@@ -88,7 +88,7 @@ export namespace PonyEngine::Application
 		/// @brief Clears data.
 		void Clear() noexcept;
 
-		ServiceContainer& operator =(const ServiceContainer& other) = default;
+		ServiceContainer& operator =(const ServiceContainer& other) = delete;
 		ServiceContainer& operator =(ServiceContainer&& other) noexcept = default;
 
 	private:

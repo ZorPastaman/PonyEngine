@@ -65,7 +65,7 @@ export namespace PonyEngine::Application
 		/// @brief Clears data.
 		void Clear() noexcept;
 
-		InterfaceContainer& operator =(const InterfaceContainer& other) = default;
+		InterfaceContainer& operator =(const InterfaceContainer& other) = delete;
 		InterfaceContainer& operator =(InterfaceContainer&& other) noexcept = default;
 
 	private:
