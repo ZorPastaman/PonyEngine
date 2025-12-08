@@ -41,16 +41,14 @@ set_target_properties(PonyEngine.Time.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Time.Impl PUBLIC
-	PonyEngine.Core
-	PonyEngine.Application.Ext
-)
 if(NOT TARGET PonyEngine.Time)
 	message(FATAL_ERROR "PonyEngine.Time wasn't configured")
 endif()
 target_link_libraries(PonyEngine.Time.Impl PUBLIC
-	PonyEngine.Time
+	PonyEngine.Application.Ext
 )
 target_link_libraries(PonyEngine.Time.Impl PRIVATE
+	PonyEngine.Time
+	PonyEngine.Core
 	PonyEngine.Log
 )

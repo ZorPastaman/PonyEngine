@@ -51,11 +51,11 @@ if(NOT TARGET PonyEngine.RawInput.Ext)
 	message(FATAL_ERROR "PonyEngine.RawInput.Ext wasn't configured")
 endif()
 target_link_libraries(PonyEngine.RawInput.Impl PUBLIC
-	PonyEngine.RawInput
-	PonyEngine.RawInput.Ext
-	PonyEngine.Core
 	PonyEngine.Application.Ext
 )
 target_link_libraries(PonyEngine.RawInput.Impl PRIVATE
+	PonyEngine.RawInput
+	PonyEngine.RawInput.Ext
+	PonyEngine.Core
 	PonyEngine.Log
 )

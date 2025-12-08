@@ -16,7 +16,6 @@ export module PonyEngine.Application.Ext:IApplicationContext;
 import std;
 
 import PonyEngine.Log;
-import PonyEngine.Math;
 
 import :FlowState;
 
