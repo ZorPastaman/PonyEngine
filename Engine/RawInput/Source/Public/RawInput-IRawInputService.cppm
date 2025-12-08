@@ -118,27 +118,11 @@ export namespace PonyEngine::Input
 		/// @brief Removes the global device observer.
 		/// @param observer Device observer.
 		virtual void RemoveObserver(IDeviceObserver& observer) noexcept = 0;
-		/// @brief Adds the device observer.
-		/// @param deviceHandle Device handle.
-		/// @param observer Device observer.
-		virtual void AddObserver(DeviceHandle deviceHandle, IDeviceObserver& observer) = 0;
-		/// @brief Removes the device observer.
-		/// @param deviceHandle Device handle.
-		/// @param observer Device observer.
-		virtual void RemoveObserver(DeviceHandle deviceHandle, IDeviceObserver& observer) noexcept = 0;
 		/// @brief Adds the global raw input observer.
 		/// @param observer Raw input observer.
 		virtual void AddObserver(IRawInputObserver& observer) = 0;
 		/// @brief Removes the global raw input observer.
 		/// @param observer Raw input observer.
 		virtual void RemoveObserver(IRawInputObserver& observer) noexcept = 0;
-		/// @brief Adds the device raw input observer.
-		/// @param deviceHandle Device handle.
-		/// @param observer Raw input observer.
-		virtual void AddObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) = 0;
-		/// @brief Removes the device raw input observer.
-		/// @param deviceHandle Device handle.
-		/// @param observer Raw input observer.
-		virtual void RemoveObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) noexcept = 0;
 	};
 }

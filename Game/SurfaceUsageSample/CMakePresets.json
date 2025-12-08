@@ -38,11 +38,7 @@
 				"PONY_ENGINE_CONSOLE_LOG": true,
 				"PONY_ENGINE_PLATFORM_CONSOLE_LOG": true,
 				"PONY_ENGINE_DEFAULT_LOGGER": true,
-				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
-				"PONY_ENGINE_ADD_GAME": true,
-				"PONY_ENGINE_GAME_NAME": "SurfaceUsageSample",
-				"PONY_ENGINE_TESTING": true,
-				"PONY_ENGINE_TESTING_BENCHMARK": false
+				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log"
 			}
 		},
 		{
@@ -161,28 +157,6 @@
 		}
 	],
 	"buildPresets": [
-		{
-			"name": "Windows-x64-msvc-Debug",
-			"displayName": "Windows x64 MSVC - Debug",
-			"configurePreset": "Windows-x64-msvc-Debug"
-		},
-		{
-			"name": "Windows-x64-msvc-Development",
-			"displayName": "Windows x64 MSVC - Development",
-			"configurePreset": "Windows-x64-msvc-Development"
-		},
-		{
-			"name": "Windows-x64-msvc-Release",
-			"displayName": "Windows x64 MSVC - Release",
-			"configurePreset": "Windows-x64-msvc-Release"
-		},
-		{
-			"name": "Windows-x64-msvc-Shipping",
-			"displayName": "Windows x64 MSVC - Shipping",
-			"configurePreset": "Windows-x64-msvc-Shipping"
-		}
-	],
-	"testPresets": [
 		{
 			"name": "Windows-x64-msvc-Debug",
 			"displayName": "Windows x64 MSVC - Debug",

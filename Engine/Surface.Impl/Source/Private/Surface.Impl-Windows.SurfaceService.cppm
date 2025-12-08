@@ -425,7 +425,9 @@ namespace PonyEngine::Surface::Windows
 
 		const Style originalStyle = GetStyle();
 		const Style style = ConvertToWindowsStyle(rectStyle);
-		Math::CornerRect<int> rect = GetClientRect();
+		Math::CornerRect<int> rect = std::holds_alternative<FullscreenRectStyle>(rectStyle)
+			? Math::CornerRect<int>(GetResolution())
+			: GetClientRect();
 		if (std::holds_alternative<WindowRectStyle>(rectStyle))
 		{
 			rect.Size(Math::Max(rect.Size(), minimalClientSize));
@@ -561,7 +563,7 @@ namespace PonyEngine::Surface::Windows
 		}
 
 		titleTemp.clear();
-		titleTemp.reserve(length + 1);
+		titleTemp.resize(length + 1);
 		const int copied = GetWindowTextA(windowHandle, titleTemp.data(), length + 1);
 		if (!copied) [[unlikely]]
 		{
@@ -933,7 +935,8 @@ namespace PonyEngine::Surface::Windows
 		SetLastError(DWORD{0});
 
 		unlocked = true;
-		if (!SetWindowLongPtrA(windowHandle, GWL_STYLE, static_cast<LONG_PTR>(style.style))) [[unlikely]]
+		const DWORD styleValue = style.style | (WS_VISIBLE & (0 - IsWindowVisible(windowHandle)));
+		if (!SetWindowLongPtrA(windowHandle, GWL_STYLE, static_cast<LONG_PTR>(styleValue))) [[unlikely]]
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
