@@ -104,12 +104,8 @@ export namespace PonyEngine::Input
 
 		virtual void AddObserver(IDeviceObserver& observer) override;
 		virtual void RemoveObserver(IDeviceObserver& observer) noexcept override;
-		virtual void AddObserver(DeviceHandle deviceHandle, IDeviceObserver& observer) override;
-		virtual void RemoveObserver(DeviceHandle deviceHandle, IDeviceObserver& observer) noexcept override;
 		virtual void AddObserver(IRawInputObserver& observer) override;
 		virtual void RemoveObserver(IRawInputObserver& observer) noexcept override;
-		virtual void AddObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) override;
-		virtual void RemoveObserver(DeviceHandle deviceHandle, IRawInputObserver& observer) noexcept override;
 
 		/// @brief Gets the public input module context.
 		/// @return Input module context.
@@ -139,37 +135,43 @@ export namespace PonyEngine::Input
 		/// @param count How many providers to end.
 		void End(std::size_t count) noexcept;
 
+		/// @brief Ticks the providers
 		void TickProviders();
+		/// @brief Processes input queue and sends events.
 		void ProcessInputQueue();
 
+		/// @brief Calls connection observers.
+		/// @param device Device.
+		/// @param connection Connection event.
 		void ObserveConnection(DeviceHandle device, const ConnectionEvent& connection) const noexcept;
-		void ObserveConnection(std::span<IDeviceObserver* const> observers, DeviceHandle device, const ConnectionEvent& connection) const noexcept;
+		/// @brief Calls input observers.
+		/// @param device Device.
+		/// @param input Input event.
 		void ObserveInput(DeviceHandle device, const RawInputEvent& input) const noexcept;
-		void ObserveInput(std::span<IRawInputObserver* const> observers, DeviceHandle device, const RawInputEvent& input) const noexcept;
 
+		/// @brief Calls device observers on adding.
+		/// @param device Device.
 		void ObserveDeviceAdded(DeviceHandle device) const noexcept;
-		void ObserveDeviceAdded(std::span<IDeviceObserver* const> observers, DeviceHandle device) const noexcept;
+		/// @brief Calls device observers on removing.
+		/// @param device Device.
 		void ObserveDeviceRemoved(DeviceHandle device) const noexcept;
-		void ObserveDeviceRemoved(std::span<IDeviceObserver* const> observers, DeviceHandle device) const noexcept;
 
 		Application::IApplicationContext* application; ///< Application context.
 
-		InputProviderContainer providers;
-		InputDeviceContainer devices;
+		InputProviderContainer providers; ///< Input providers.
+		InputDeviceContainer devices; ///< Input devices.
 
-		RawInputQueue inputQueue;
-		DeviceHandle lastInputDevice;
+		RawInputQueue inputQueue; ///< Input queue.
+		DeviceHandle lastInputDevice; ///< Last device that sent input.
 
-		std::unordered_map<std::uint32_t, std::vector<Axis>> axisHashMap;
-		std::unordered_map<DeviceTypeId, DeviceType> deviceTypeHashMap;
+		std::unordered_map<std::uint32_t, std::vector<Axis>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
+		std::unordered_map<DeviceTypeId, DeviceType> deviceTypeHashMap; ///< Device type hash map.
 
-		std::vector<IDeviceObserver*> globalDeviceObservers;
-		std::unordered_map<DeviceHandle, std::vector<IDeviceObserver*>> deviceObservers;
-		std::vector<IRawInputObserver*> globalInputObservers;
-		std::unordered_map<DeviceHandle, std::vector<IRawInputObserver*>> inputObservers;
+		std::vector<IDeviceObserver*> deviceObservers; ///< Device observers.
+		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
 
-		InputProviderHandle nextProviderHandle;
-		DeviceHandle nextDeviceHandle;
+		InputProviderHandle nextProviderHandle; ///< Next input provider handle.
+		DeviceHandle nextDeviceHandle; ///< Next device handle.
 	};
 
 	RawInputService::RawInputService(Application::IApplicationContext& application) noexcept :
@@ -535,14 +537,14 @@ export namespace PonyEngine::Input
 
 	void RawInputService::AddObserver(IDeviceObserver& observer)
 	{
-		globalDeviceObservers.push_back(&observer);
+		deviceObservers.push_back(&observer);
 	}
 
 	void RawInputService::RemoveObserver(IDeviceObserver& observer) noexcept
 	{
-		if (const auto position = std::ranges::find(globalDeviceObservers, &observer); position != globalDeviceObservers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(deviceObservers, &observer); position != deviceObservers.cend()) [[likely]]
 		{
-			globalDeviceObservers.erase(position);
+			deviceObservers.erase(position);
 		}
 		else [[unlikely]]
 		{
@@ -550,57 +552,21 @@ export namespace PonyEngine::Input
 		}
 	}
 
-	void RawInputService::AddObserver(const DeviceHandle deviceHandle, IDeviceObserver& observer)
-	{
-		deviceObservers[deviceHandle].push_back(&observer);
-	}
-
-	void RawInputService::RemoveObserver(const DeviceHandle deviceHandle, IDeviceObserver& observer) noexcept
-	{
-		if (const auto devicePosition = deviceObservers.find(deviceHandle); devicePosition != deviceObservers.cend()) [[likely]]
-		{
-			if (const auto observerPosition = std::ranges::find(devicePosition->second, &observer); observerPosition != devicePosition->second.cend()) [[likely]]
-			{
-				devicePosition->second.erase(observerPosition);
-				return;
-			}
-		}
-		PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove input device observer that hadn't been added.");
-	}
-
 	void RawInputService::AddObserver(IRawInputObserver& observer)
 	{
-		globalInputObservers.push_back(&observer);
+		inputObservers.push_back(&observer);
 	}
 
 	void RawInputService::RemoveObserver(IRawInputObserver& observer) noexcept
 	{
-		if (const auto position = std::ranges::find(globalInputObservers, &observer); position != globalInputObservers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(inputObservers, &observer); position != inputObservers.cend()) [[likely]]
 		{
-			globalInputObservers.erase(position);
+			inputObservers.erase(position);
 		}
 		else [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove raw input observer that hadn't been added.");
 		}
-	}
-
-	void RawInputService::AddObserver(const DeviceHandle deviceHandle, IRawInputObserver& observer)
-	{
-		inputObservers[deviceHandle].push_back(&observer);
-	}
-
-	void RawInputService::RemoveObserver(const DeviceHandle deviceHandle, IRawInputObserver& observer) noexcept
-	{
-		if (const auto devicePosition = inputObservers.find(deviceHandle); devicePosition != inputObservers.cend()) [[likely]]
-		{
-			if (const auto observerPosition = std::ranges::find(devicePosition->second, &observer); observerPosition != devicePosition->second.cend()) [[likely]]
-			{
-				devicePosition->second.erase(observerPosition);
-				return;
-			}
-		}
-		PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove raw input observer that hadn't been added.");
 	}
 
 	IRawInputModuleContext& RawInputService::PublicInputContext() noexcept
@@ -718,17 +684,7 @@ export namespace PonyEngine::Input
 
 	void RawInputService::ObserveConnection(const DeviceHandle device, const ConnectionEvent& connection) const noexcept
 	{
-		if (const auto position = deviceObservers.find(device); position != deviceObservers.cend())
-		{
-			ObserveConnection(position->second, device, connection);
-		}
-
-		ObserveConnection(globalDeviceObservers, device, connection);
-	}
-
-	void RawInputService::ObserveConnection(const std::span<IDeviceObserver* const> observers, const DeviceHandle device, const ConnectionEvent& connection) const noexcept
-	{
-		for (IDeviceObserver* const observer : observers)
+		for (IDeviceObserver* const observer : deviceObservers)
 		{
 			try
 			{
@@ -743,17 +699,7 @@ export namespace PonyEngine::Input
 
 	void RawInputService::ObserveInput(const DeviceHandle device, const RawInputEvent& input) const noexcept
 	{
-		if (const auto position = inputObservers.find(device); position != inputObservers.cend())
-		{
-			ObserveInput(position->second, device, input);
-		}
-
-		ObserveInput(globalInputObservers, device, input);
-	}
-
-	void RawInputService::ObserveInput(const std::span<IRawInputObserver* const> observers, const DeviceHandle device, const RawInputEvent& input) const noexcept
-	{
-		for (IRawInputObserver* const observer : observers)
+		for (IRawInputObserver* const observer : inputObservers)
 		{
 			try
 			{
@@ -768,17 +714,7 @@ export namespace PonyEngine::Input
 
 	void RawInputService::ObserveDeviceAdded(const DeviceHandle device) const noexcept
 	{
-		if (const auto position = deviceObservers.find(device); position != deviceObservers.cend())
-		{
-			ObserveDeviceAdded(position->second, device);
-		}
-
-		ObserveDeviceAdded(globalDeviceObservers, device);
-	}
-
-	void RawInputService::ObserveDeviceAdded(const std::span<IDeviceObserver* const> observers, const DeviceHandle device) const noexcept
-	{
-		for (IDeviceObserver* const observer : observers)
+		for (IDeviceObserver* const observer : deviceObservers)
 		{
 			try
 			{
@@ -793,17 +729,7 @@ export namespace PonyEngine::Input
 
 	void RawInputService::ObserveDeviceRemoved(const DeviceHandle device) const noexcept
 	{
-		if (const auto position = deviceObservers.find(device); position != deviceObservers.cend())
-		{
-			ObserveDeviceRemoved(position->second, device);
-		}
-
-		ObserveDeviceRemoved(globalDeviceObservers, device);
-	}
-
-	void RawInputService::ObserveDeviceRemoved(const std::span<IDeviceObserver* const> observers, const DeviceHandle device) const noexcept
-	{
-		for (IDeviceObserver* const observer : observers)
+		for (IDeviceObserver* const observer : deviceObservers)
 		{
 			try
 			{

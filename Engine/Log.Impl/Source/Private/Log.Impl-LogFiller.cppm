@@ -456,7 +456,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.assign_range(" - ");
+		targetString.append_range(std::string_view(" - "));
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, message);
 		targetString.push_back('\n');
 
@@ -469,7 +469,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.assign_range(" - ");
+		targetString.append_range(std::string_view(" - "));
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, format, formatArgs);
 		targetString.push_back('\n');
 
@@ -493,7 +493,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.assign_range(" - ");
+		targetString.append_range(std::string_view(" - "));
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, message);
 		std::format_to(std::back_inserter(targetString), "\n{}\n", stacktrace);
 
@@ -506,7 +506,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.assign_range(" - ");
+		targetString.append_range(std::string_view(" - "));
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, format, formatArgs);
 		std::format_to(std::back_inserter(targetString), "\n{}\n", stacktrace);
 
