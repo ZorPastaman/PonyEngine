@@ -41,14 +41,14 @@ set_target_properties(PonyEngine.Log.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.Impl PUBLIC
-	PonyEngine.Core
-	PonyEngine.Application.Ext
-)
 if(NOT TARGET PonyEngine.Log.Ext)
 	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
 endif()
 target_link_libraries(PonyEngine.Log.Impl PUBLIC
+	PonyEngine.Application.Ext
+)
+target_link_libraries(PonyEngine.Log.Impl PRIVATE
 	PonyEngine.Log
 	PonyEngine.Log.Ext
+	PonyEngine.Core
 )

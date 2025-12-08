@@ -29,6 +29,6 @@ set_target_properties(PonyEngine.Surface PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Surface PRIVATE
+target_link_libraries(PonyEngine.Surface PUBLIC
 	PonyEngine.Core
 )

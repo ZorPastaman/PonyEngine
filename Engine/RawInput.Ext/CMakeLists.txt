@@ -27,8 +27,6 @@ if(NOT TARGET PonyEngine.RawInput)
 endif()
 target_link_libraries(PonyEngine.RawInput.Ext PUBLIC
 	PonyEngine.RawInput
-)
-target_link_libraries(PonyEngine.RawInput.Ext PRIVATE
 	PonyEngine.Core
 	PonyEngine.Application.Ext
 	PonyEngine.Log

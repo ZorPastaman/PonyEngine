@@ -52,11 +52,11 @@ if(NOT TARGET PonyEngine.Surface)
 	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
 endif()
 target_link_libraries(PonyEngine.Surface.Impl PUBLIC
-	PonyEngine.Surface
-	PonyEngine.Core
 	PonyEngine.Application.Ext
 )
 target_link_libraries(PonyEngine.Surface.Impl PRIVATE
+	PonyEngine.Surface
+	PonyEngine.Core
 	PonyEngine.Log
 	PonyEngine.MessagePump
 )

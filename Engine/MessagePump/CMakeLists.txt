@@ -18,6 +18,6 @@ set_target_properties(PonyEngine.MessagePump PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.MessagePump PRIVATE
+target_link_libraries(PonyEngine.MessagePump PUBLIC
 	PonyEngine.Core
 )

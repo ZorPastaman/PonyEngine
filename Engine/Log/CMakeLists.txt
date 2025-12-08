@@ -27,6 +27,6 @@ set_target_properties(PonyEngine.Log PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log PRIVATE
+target_link_libraries(PonyEngine.Log PUBLIC
 	PonyEngine.Core
 )

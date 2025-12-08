@@ -40,7 +40,7 @@
 				"PONY_ENGINE_DEFAULT_LOGGER": true,
 				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
 				"PONY_ENGINE_ADD_GAME": true,
-				"PONY_ENGINE_GAME_NAME": "ApplicationServiceSample",
+				"PONY_ENGINE_GAME_NAME": "SurfaceControlSample",
 				"PONY_ENGINE_TESTING": true,
 				"PONY_ENGINE_TESTING_BENCHMARK": false
 			}

@@ -39,6 +39,6 @@ set_target_properties(PonyEngine.RawInput PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.RawInput PRIVATE
+target_link_libraries(PonyEngine.RawInput PUBLIC
 	PonyEngine.Core
 )

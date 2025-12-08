@@ -97,10 +97,8 @@ set_target_properties(PonyEngine.Application.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Application.Impl PUBLIC
-	PonyEngine.Application.Ext
-)
 target_link_libraries(PonyEngine.Application.Impl PRIVATE
+	PonyEngine.Application.Ext
 	PonyEngine.Core
 	PonyEngine.Log
 )

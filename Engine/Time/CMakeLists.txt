@@ -17,6 +17,6 @@ set_target_properties(PonyEngine.Time PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Time PRIVATE
+target_link_libraries(PonyEngine.Time PUBLIC
 	PonyEngine.Core
 )
