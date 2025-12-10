@@ -21,6 +21,7 @@ export namespace PonyEngine::Application
 		NON_CONSTRUCTIBLE_BODY(ExitCodes)
 
 		static constexpr int InitialExitCode = -1000;
+		static constexpr int UnexpectedException = -5;
 		static constexpr int DeinitializationException = -3;
 		static constexpr int RunningException = -2;
 		static constexpr int InitializationException = -1;

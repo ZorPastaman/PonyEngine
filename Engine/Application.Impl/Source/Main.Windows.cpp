@@ -26,17 +26,25 @@ std::pair<int, std::string> Execute(HINSTANCE hInstance, HINSTANCE hPrevInstance
 
 int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd)
 {
-	const auto [exitCode, exceptionInfo] = Execute(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
-
-	if (exitCode != PonyEngine::Application::ExitCodes::Success) [[unlikely]]
+	try
 	{
-		const std::string text = exceptionInfo.empty()
-			? std::format("Error code: '{}'.", exitCode)
-			: std::format("Error code: '{}'.\nException:\n{}", exitCode, exceptionInfo);
-		MessageBoxA(nullptr, text.c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
-	}
+		const auto [exitCode, exceptionInfo] = Execute(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 
-	return exitCode;
+		if (exitCode != PonyEngine::Application::ExitCodes::Success) [[unlikely]]
+		{
+			const std::string text = exceptionInfo.empty()
+				? std::format("Error code: '{}'.", exitCode)
+				: std::format("Error code: '{}'.\n{}", exitCode, exceptionInfo);
+			MessageBoxA(nullptr, text.c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
+		}
+
+		return exitCode;
+	}
+	catch (...)
+	{
+		MessageBoxA(nullptr, "Unexpected exception", "PonyEngine exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
+		return PonyEngine::Application::ExitCodes::UnexpectedException;
+	}
 }
 
 std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd) noexcept
