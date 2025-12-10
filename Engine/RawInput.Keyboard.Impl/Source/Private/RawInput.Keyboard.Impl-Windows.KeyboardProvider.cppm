@@ -16,6 +16,7 @@ export module PonyEngine.RawInput.Keyboard.Impl:Windows.KeyboardProvider;
 
 import std;
 
+import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Platform;
@@ -94,7 +95,7 @@ export namespace PonyEngine::Input::Windows
 		KeyboardContainer<HANDLE> keyboardContainer; ///< Keyboard container.
 		KeyboardEventQueue eventQueue; ///< Keyboard event queue.
 
-		mutable std::string deviceNameTemp; ///< Temporary device name..
+		mutable std::string deviceNameTemp; ///< Temporary device name.
 	};
 }
 
@@ -205,7 +206,7 @@ namespace PonyEngine::Input::Windows
 
 	void KeyboardProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)
 	{
-		auto addConnectionEvent = [&](const DeviceHandle deviceHandle)
+		const auto addConnectionEvent = [&](const DeviceHandle deviceHandle)
 		{
 			const auto connectionEvent = KeyboardConnectionEvent{.connected = isConnected};
 			const auto event = KeyboardEvent{.event = connectionEvent, .timePoint = surface->LastMessageTime()};
