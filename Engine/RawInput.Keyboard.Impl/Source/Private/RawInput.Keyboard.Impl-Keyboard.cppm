@@ -19,8 +19,12 @@ export namespace PonyEngine::Input
 	class Keyboard final : public IDevice
 	{
 	public:
+		/// @brief Creates a keyboard.
+		/// @param name Keyboard name.
+		/// @param deviceType Device type.
+		/// @param isConnected Is the keyboard connected?
 		[[nodiscard("Pure constuctor")]]
-		Keyboard(std::string_view name, DeviceTypeId deviceType);
+		Keyboard(std::string_view name, DeviceTypeId deviceType, bool isConnected);
 		Keyboard(const Keyboard&) = delete;
 		Keyboard(Keyboard&&) = delete;
 
@@ -55,6 +59,14 @@ export namespace PonyEngine::Input
 		/// @brief Resets all the keys to unpressed.
 		void ResetKeys() noexcept;
 
+		/// @brief Gets the connection status.
+		/// @return Connection status.
+		[[nodiscard("Pure function")]]
+		bool IsConnected() const noexcept;
+		/// @brief Sets the connection status.
+		/// @param isConnected Connection status.
+		void Connect(bool isConnected) noexcept;
+
 		Keyboard& operator =(const Keyboard&) = delete;
 		Keyboard& operator =(Keyboard&&) = delete;
 
@@ -63,14 +75,16 @@ export namespace PonyEngine::Input
 		DeviceTypeId deviceType; ///< Keyboard device type.
 
 		std::vector<AxisId> pressedKeys; ///< Pressed keys.
+		bool isConnected; ///< Is the keyboard connected?
 	};
 }
 
 namespace PonyEngine::Input
 {
-	Keyboard::Keyboard(const std::string_view name, const DeviceTypeId deviceType) :
+	Keyboard::Keyboard(const std::string_view name, const DeviceTypeId deviceType, const bool isConnected) :
 		name(name),
-		deviceType(deviceType)
+		deviceType(deviceType),
+		isConnected{isConnected}
 	{
 	}
 
@@ -132,5 +146,15 @@ namespace PonyEngine::Input
 	void Keyboard::ResetKeys() noexcept
 	{
 		pressedKeys.clear();
+	}
+
+	bool Keyboard::IsConnected() const noexcept
+	{
+		return isConnected;
+	}
+
+	void Keyboard::Connect(const bool isConnected) noexcept
+	{
+		this->isConnected = isConnected;
 	}
 }

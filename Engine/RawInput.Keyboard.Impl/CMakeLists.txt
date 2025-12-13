@@ -55,6 +55,9 @@ endif()
 if(NOT TARGET PonyEngine.RawInput.Ext)
 	message(FATAL_ERROR "PonyEngine.RawInput.Ext wasn't configured")
 endif()
+if(NOT TARGET PonyEngine.Surface)
+	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
+endif()
 target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PUBLIC
 	PonyEngine.Application.Ext
 )
@@ -63,12 +66,5 @@ target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PRIVATE
 	PonyEngine.RawInput.Ext
 	PonyEngine.Core
 	PonyEngine.Log
+	PonyEngine.Surface
 )
-if(PONY_WINDOWS)
-	if(NOT TARGET PonyEngine.Surface)
-		message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
-	endif()
-	target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PRIVATE
-		PonyEngine.Surface
-	)
-endif()

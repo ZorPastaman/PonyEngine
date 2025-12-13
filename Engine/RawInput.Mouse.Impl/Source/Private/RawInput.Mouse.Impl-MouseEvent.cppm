@@ -14,12 +14,14 @@ import std;
 import PonyEngine.Math;
 import PonyEngine.RawInput;
 
+import :MouseAxis;
+
 export namespace PonyEngine::Input
 {
 	/// @brief Mouse button event.
 	struct MouseButtonEvent final
 	{
-		AxisId axis; ///< Button axis.
+		MouseButton button; ///< Button axis.
 		bool state; ///< Is the button pressed?
 		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position.
 	};
@@ -27,7 +29,7 @@ export namespace PonyEngine::Input
 	/// @brief Mouse wheel event.
 	struct MouseWheelEvent final
 	{
-		bool isVertical; ///< If it's @true, it's a vertical wheel; otherwise it's a horizontal wheel.
+		MouseWheel wheel; ///< Wheel axis.
 		float delta; ///< Wheel delta.
 		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position.
 	};
@@ -35,8 +37,6 @@ export namespace PonyEngine::Input
 	/// @brief Mouse pointer event.
 	struct MousePointerEvent final
 	{
-		bool hasX; ///< Has x component?
-		bool hasY; ///< Has y component?
 		Math::Vector2<float> delta; ///< Pointer delta.
 		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position.
 	};

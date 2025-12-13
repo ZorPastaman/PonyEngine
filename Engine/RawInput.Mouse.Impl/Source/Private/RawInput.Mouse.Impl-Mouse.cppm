@@ -24,8 +24,9 @@ export namespace PonyEngine::Input
 		/// @brief Creates a mouse device.
 		/// @param name Device name.
 		/// @param deviceType Device type.
+		/// @param isConnected Is the mouse connected?
 		[[nodiscard("Pure constructor")]]
-		Mouse(std::string_view name, DeviceTypeId deviceType);
+		Mouse(std::string_view name, DeviceTypeId deviceType, bool isConnected);
 		Mouse(const Mouse&) = delete;
 		Mouse(Mouse&&) = delete;
 
@@ -61,6 +62,14 @@ export namespace PonyEngine::Input
 		/// @brief Resets all the buttons to the false state.
 		void ResetButtons() noexcept;
 
+		/// @brief Gets the connection status.
+		/// @return Connection status.
+		[[nodiscard("Pure function")]]
+		bool IsConnected() const noexcept;
+		/// @brief Sets the connection status.
+		/// @param isConnected Connection status.
+		void Connect(bool isConnected) noexcept;
+
 		Mouse& operator =(const Mouse&) = delete;
 		Mouse& operator =(Mouse&&) = delete;
 
@@ -69,14 +78,16 @@ export namespace PonyEngine::Input
 		DeviceTypeId deviceType; ///< Mouse device type.
 
 		std::array<bool, static_cast<std::size_t>(MouseButton::Count)> buttonState; ///< Button states. They are placed in the order they are declared in the enum.
+		bool isConnected;
 	};
 }
 
 namespace PonyEngine::Input
 {
-	Mouse::Mouse(const std::string_view name, const DeviceTypeId deviceType) :
+	Mouse::Mouse(const std::string_view name, const DeviceTypeId deviceType, const bool isConnected) :
 		name(name),
-		deviceType(deviceType)
+		deviceType(deviceType),
+		isConnected{isConnected}
 	{
 		ResetButtons();
 	}
@@ -124,5 +135,15 @@ namespace PonyEngine::Input
 	void Mouse::ResetButtons() noexcept
 	{
 		std::ranges::fill(buttonState, false);
+	}
+
+	bool Mouse::IsConnected() const noexcept
+	{
+		return isConnected;
+	}
+
+	void Mouse::Connect(const bool isConnected) noexcept
+	{
+		this->isConnected = isConnected;
 	}
 }
