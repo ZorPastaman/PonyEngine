@@ -144,7 +144,15 @@ namespace PonyEngine::Input
 	{
 		eventIndices.resize(eventTimes.size());
 		std::ranges::iota(eventIndices, 0uz);
-		std::ranges::sort(eventIndices, [&](const std::size_t lhs, const std::size_t rhs) { return eventTimes[lhs] < eventTimes[rhs]; });
+		std::ranges::sort(eventIndices, [&](const std::size_t lhs, const std::size_t rhs)
+		{
+			const std::chrono::time_point<std::chrono::steady_clock> lhsTime = eventTimes[lhs];
+			const std::chrono::time_point<std::chrono::steady_clock> rhsTime = eventTimes[rhs];
+
+			return lhsTime == rhsTime
+				? events[lhs].index() <= events[rhs].index()
+				: lhsTime < rhsTime;
+		});
 	}
 
 	void RawInputQueue::AddInput(const DeviceHandle device, const RawInputEvent& event)

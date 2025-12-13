@@ -206,10 +206,19 @@ namespace PonyEngine::Input::Windows
 
 	void KeyboardProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)
 	{
-		const auto addConnectionEvent = [&](const DeviceHandle deviceHandle)
+		const auto addConnectionEvent = [&](const std::size_t index)
 		{
+			Keyboard& keyboard = keyboardContainer.Keyboard(index);
+			if (keyboard.IsConnected() == isConnected)
+			{
+				return;
+			}
+
+			keyboard.Connect(isConnected);
+
 			const auto connectionEvent = KeyboardConnectionEvent{.connected = isConnected};
 			const auto event = KeyboardEvent{.event = connectionEvent, .timePoint = surface->LastMessageTime()};
+			const DeviceHandle deviceHandle = keyboardContainer.DeviceHandle(index);
 			eventQueue.Add(deviceHandle, event);
 
 			PONY_LOG(input->Logger(), Log::LogType::Info, "Keyboard device connection changed to '{}'. Handle: '0x{:X}'; Native handle: '0x{:X}'.",
@@ -225,7 +234,7 @@ namespace PonyEngine::Input::Windows
 				if (index < keyboardContainer.Size())
 				{
 					keyboardContainer.NativeHandle(index) = device;
-					addConnectionEvent(keyboardContainer.DeviceHandle(index));
+					addConnectionEvent(index);
 				}
 			}
 			else
@@ -235,7 +244,7 @@ namespace PonyEngine::Input::Windows
 				{
 					ResetInput(index, surface->LastMessageTime(), surface->LastMessageCursorPosition());
 					keyboardContainer.NativeHandle(index) = INVALID_HANDLE_VALUE;
-					addConnectionEvent(keyboardContainer.DeviceHandle(index));
+					addConnectionEvent(index);
 				}
 			}
 		}
@@ -338,7 +347,7 @@ namespace PonyEngine::Input::Windows
 		}
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(keyboardHandle));
-		const auto keyboard = std::make_shared<Keyboard>(GetKeyboardName(keyboardHandle), deviceType);
+		const auto keyboard = std::make_shared<Keyboard>(GetKeyboardName(keyboardHandle), deviceType, true);
 		const DeviceHandle deviceHandle = input->RegisterDevice(DeviceData{.device = keyboard, .isConnected = true});
 		try
 		{

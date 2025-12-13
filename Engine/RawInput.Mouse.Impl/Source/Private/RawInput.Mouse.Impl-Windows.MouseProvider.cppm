@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Input.h"
 
@@ -144,10 +142,11 @@ namespace PonyEngine::Input::Windows
 			{
 				[&](const MouseButtonEvent& button)
 				{
+					const AxisId axis = axisMap.Axis(button.button);
 					const float value = button.state;
 					input->AddInput(device, RawInputEvent
 					{
-						.axes = std::span<const AxisId>(&button.axis, 1uz),
+						.axes = std::span<const AxisId>(&axis, 1uz),
 						.values = std::span<const float>(&value, 1uz),
 						.eventType = InputEventType::State,
 						.timePoint = event.timePoint,
@@ -156,8 +155,7 @@ namespace PonyEngine::Input::Windows
 				},
 				[&](const MouseWheelEvent& wheel)
 				{
-					const auto wheelType = static_cast<MouseWheel>(wheel.isVertical);
-					const AxisId axis = axisMap.Axis(wheelType);
+					const AxisId axis = axisMap.Axis(wheel.wheel);
 					input->AddInput(device, RawInputEvent
 					{
 						.axes = std::span<const AxisId>(&axis, 1uz),
@@ -169,14 +167,10 @@ namespace PonyEngine::Input::Windows
 				},
 				[&](const MousePointerEvent& pointer)
 				{
-					assert((pointer.hasX || pointer.hasY) && "The pointer data is empty.");
-
-					const std::size_t shift = !pointer.hasX;
-					const std::size_t count = pointer.hasX + pointer.hasY;
 					input->AddInput(device, RawInputEvent
 					{
-						.axes = std::span<const AxisId>(&axisMap.Pointers()[shift], count),
-						.values = std::span<const float>(&pointer.delta[shift], count),
+						.axes = axisMap.Pointers(),
+						.values = pointer.delta.Span(),
 						.eventType = InputEventType::Delta,
 						.timePoint = event.timePoint,
 						.cursorPosition = pointer.cursorPosition
@@ -221,10 +215,19 @@ namespace PonyEngine::Input::Windows
 
 	void MouseProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)
 	{
-		const auto addConnectionEvent = [&](const DeviceHandle deviceHandle)
+		const auto addConnectionEvent = [&](const std::size_t index)
 		{
+			Mouse& mouse = mouseContainer.Mouse(index);
+			if (mouse.IsConnected() == isConnected)
+			{
+				return;
+			}
+
+			mouse.Connect(isConnected);
+
 			const auto connectionEvent = MouseConnectionEvent{.isConnected = isConnected};
-			const auto event = MouseEvent{.event = connectionEvent, .timePoint = surface->LastMessageTime()};
+			const auto event = MouseEvent{ .event = connectionEvent, .timePoint = surface->LastMessageTime() };
+			const DeviceHandle deviceHandle = mouseContainer.DeviceHandle(index);
 			eventQueue.Add(deviceHandle, event);
 
 			PONY_LOG(input->Logger(), Log::LogType::Info, "Mouse device connection changed to '{}'. Handle: '0x{:X}'; Native handle: '0x{:X}'.",
@@ -240,7 +243,7 @@ namespace PonyEngine::Input::Windows
 				if (index < mouseContainer.Size())
 				{
 					mouseContainer.NativeHandle(index) = device;
-					addConnectionEvent(mouseContainer.DeviceHandle(index));
+					addConnectionEvent(index);
 				}
 			}
 			else
@@ -250,7 +253,7 @@ namespace PonyEngine::Input::Windows
 				{
 					ResetInput(index, surface->LastMessageTime(), surface->LastMessageCursorPosition());
 					mouseContainer.NativeHandle(index) = INVALID_HANDLE_VALUE;
-					addConnectionEvent(mouseContainer.DeviceHandle(index));
+					addConnectionEvent(index);
 				}
 			}
 		}
@@ -300,7 +303,7 @@ namespace PonyEngine::Input::Windows
 
 			const auto inputEvent = MouseButtonEvent
 			{
-				.axis = axisMap.Axis(static_cast<MouseButton>(i)),
+				.button = static_cast<MouseButton>(i),
 				.state = false,
 				.cursorPosition = cursorPosition
 			};
@@ -359,7 +362,7 @@ namespace PonyEngine::Input::Windows
 		}
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mouseHandle));
-		const auto mouse = std::make_shared<Mouse>(GetMouseName(mouseHandle), deviceType);
+		const auto mouse = std::make_shared<Mouse>(GetMouseName(mouseHandle), deviceType, true);
 		const DeviceHandle deviceHandle = input->RegisterDevice(DeviceData{ .device = mouse, .isConnected = true });
 		try
 		{
@@ -390,10 +393,9 @@ namespace PonyEngine::Input::Windows
 			{
 				mouse.Press(button, pressed);
 
-				const AxisId axis = axisMap.Axis(button);
 				const auto buttonEvent = MouseButtonEvent
 				{
-					.axis = axis,
+					.button = button,
 					.state = pressed,
 					.cursorPosition = surface->LastMessageCursorPosition()
 				};
@@ -441,7 +443,7 @@ namespace PonyEngine::Input::Windows
 		{
 			const auto wheelEvent = MouseWheelEvent
 			{
-				.isVertical = wheel == MouseWheel::Vertical,
+				.wheel = wheel,
 				.delta = static_cast<float>(std::bit_cast<SHORT>(value)) / WHEEL_DELTA,
 				.cursorPosition = surface->LastMessageCursorPosition()
 			};
@@ -469,24 +471,21 @@ namespace PonyEngine::Input::Windows
 		{
 			return;
 		}
+		if (!source.lLastX && !source.lLastY)
+		{
+			return;
+		}
 
 		auto pointerEvent = MousePointerEvent
 		{
-			.hasX = static_cast<bool>(source.lLastX),
-			.hasY = static_cast<bool>(source.lLastY),
-			.delta = Math::Vector2<float>(static_cast<float>(source.lLastX), static_cast<float>(source.lLastY))
+			.delta = Math::Vector2<float>(static_cast<float>(source.lLastX), static_cast<float>(source.lLastY)),
+			.cursorPosition = surface->LastMessageCursorPosition()
 		};
-
-		if (pointerEvent.hasX || pointerEvent.hasY)
+		const auto event = MouseEvent
 		{
-			pointerEvent.cursorPosition = surface->LastMessageCursorPosition();
-
-			const auto event = MouseEvent
-			{
-				.event = pointerEvent,
-				.timePoint = surface->LastMessageTime()
-			};
-			eventQueue.Add(mouseContainer.DeviceHandle(mouseIndex), event);
-		}
+			.event = pointerEvent,
+			.timePoint = surface->LastMessageTime()
+		};
+		eventQueue.Add(mouseContainer.DeviceHandle(mouseIndex), event);
 	}
 }
