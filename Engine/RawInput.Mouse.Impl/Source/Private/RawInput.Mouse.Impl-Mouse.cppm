@@ -18,32 +18,25 @@ import :MouseAxis;
 export namespace PonyEngine::Input
 {
 	/// @brief Mouse device.
-	class Mouse final : public IDevice
+	class Mouse final
 	{
 	public:
 		/// @brief Creates a mouse device.
 		/// @param name Device name.
-		/// @param deviceType Device type.
 		/// @param isConnected Is the mouse connected?
 		[[nodiscard("Pure constructor")]]
-		Mouse(std::string_view name, DeviceTypeId deviceType, bool isConnected);
-		Mouse(const Mouse&) = delete;
-		Mouse(Mouse&&) = delete;
+		Mouse(std::string_view name, bool isConnected);
+		[[nodiscard("Pure constructor")]]
+		Mouse(const Mouse& other) = default;
+		[[nodiscard("Pure constructor")]]
+		Mouse(Mouse&&) noexcept = default;
 
 		~Mouse() noexcept = default;
 
+		/// @brief Gets the mouse name.
+		/// @return Mouse name.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual DeviceTypeId DeviceType() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::type_index> FeatureTypes() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual void* FindFeature(std::type_index type) noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const void* FindFeature(std::type_index type) const noexcept override;
+		std::string_view Name() const noexcept;
 
 		/// @brief Checks if the button pressed.
 		/// @param button Button ID.
@@ -70,12 +63,11 @@ export namespace PonyEngine::Input
 		/// @param isConnected Connection status.
 		void Connect(bool isConnected) noexcept;
 
-		Mouse& operator =(const Mouse&) = delete;
-		Mouse& operator =(Mouse&&) = delete;
+		Mouse& operator =(const Mouse& other) = default;
+		Mouse& operator =(Mouse&& other) noexcept = default;
 
 	private:
 		std::string name; ///< Mouse device name.
-		DeviceTypeId deviceType; ///< Mouse device type.
 
 		std::array<bool, static_cast<std::size_t>(MouseButton::Count)> buttonState; ///< Button states. They are placed in the order they are declared in the enum.
 		bool isConnected;
@@ -84,9 +76,8 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	Mouse::Mouse(const std::string_view name, const DeviceTypeId deviceType, const bool isConnected) :
+	Mouse::Mouse(const std::string_view name, const bool isConnected) :
 		name(name),
-		deviceType(deviceType),
 		isConnected{isConnected}
 	{
 		ResetButtons();
@@ -95,26 +86,6 @@ namespace PonyEngine::Input
 	std::string_view Mouse::Name() const noexcept
 	{
 		return name;
-	}
-
-	DeviceTypeId Mouse::DeviceType() const noexcept
-	{
-		return deviceType;
-	}
-
-	std::span<const std::type_index> Mouse::FeatureTypes() const noexcept
-	{
-		return std::span<const std::type_index>();
-	}
-
-	void* Mouse::FindFeature(const std::type_index type) noexcept
-	{
-		return nullptr;
-	}
-
-	const void* Mouse::FindFeature(const std::type_index type) const noexcept
-	{
-		return nullptr;
 	}
 
 	bool Mouse::IsPressed(const MouseButton button) const noexcept

@@ -15,7 +15,9 @@ export module PonyEngine.RawInput.Impl:InputDeviceContainer;
 
 import std;
 
-import PonyEngine.RawInput;
+import PonyEngine.RawInput.Ext;
+
+import :Device;
 
 export namespace PonyEngine::Input
 {
@@ -42,11 +44,6 @@ export namespace PonyEngine::Input
 		/// @return Handle index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(DeviceHandle handle) const noexcept;
-		/// @brief Finds an index of the @p device.
-		/// @param device Device.
-		/// @return Device index or @p Size() if not found.
-		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(const IDevice& device) const noexcept;
 
 		/// @brief Gets a device handle at the @p index.
 		/// @param index Index.
@@ -57,7 +54,12 @@ export namespace PonyEngine::Input
 		/// @param index Index.
 		/// @return Device.
 		[[nodiscard("Pure function")]]
-		IDevice& Device(std::size_t index) const noexcept;
+		IDevice& Device(std::size_t index) noexcept;
+		/// @brief Gets a device at the @p index.
+		/// @param index Index.
+		/// @return Device.
+		[[nodiscard("Pure function")]]
+		const IDevice& Device(std::size_t index) const noexcept;
 		/// @brief Check if a device at the @p index is connected.
 		/// @param index Device index.
 		/// @return @a True if it's connected; @a false otherwise.
@@ -91,9 +93,9 @@ export namespace PonyEngine::Input
 
 		/// @brief Adds a new device.
 		/// @param handle Device handle.
-		/// @param device Device.
+		/// @param data Device data.
 		/// @param connected Is the device connected?
-		void Add(DeviceHandle handle, const std::shared_ptr<IDevice>& device, bool connected);
+		void Add(DeviceHandle handle, const DeviceData& data, bool connected);
 		/// @brief Removes a device.
 		/// @param index Device index.
 		void Remove(std::size_t index) noexcept;
@@ -130,7 +132,7 @@ export namespace PonyEngine::Input
 		std::size_t AddAxis(std::size_t deviceIndex, AxisId axis);
 
 		std::vector<DeviceHandle> handles; ///< Device handles.
-		std::vector<std::shared_ptr<IDevice>> devices; ///< Devices.
+		std::vector<class Device> devices; ///< Devices.
 		std::vector<bool> connections; ///< Device connection statuses
 		std::vector<std::vector<std::size_t>> axisIndices; ///< Device axes indices. These indices point to the @p axes, @p states and @p deltas.
 
@@ -153,19 +155,19 @@ namespace PonyEngine::Input
 		return std::ranges::find(handles, handle) - handles.cbegin();
 	}
 
-	std::size_t InputDeviceContainer::IndexOf(const IDevice& device) const noexcept
-	{
-		return std::ranges::find_if(devices, [&](const std::shared_ptr<IDevice>& d) { return d.get() == &device; }) - devices.cbegin();
-	}
-
 	DeviceHandle InputDeviceContainer::Handle(const std::size_t index) const noexcept
 	{
 		return handles[index];
 	}
 
-	IDevice& InputDeviceContainer::Device(const std::size_t index) const noexcept
+	IDevice& InputDeviceContainer::Device(const std::size_t index) noexcept
 	{
-		return *devices[index];
+		return devices[index];
+	}
+
+	const IDevice& InputDeviceContainer::Device(const std::size_t index) const noexcept
+	{
+		return devices[index];
 	}
 
 	bool InputDeviceContainer::IsConnected(const std::size_t index) const noexcept
@@ -229,14 +231,12 @@ namespace PonyEngine::Input
 		std::ranges::fill(deltas, 0.f);
 	}
 
-	void InputDeviceContainer::Add(const DeviceHandle handle, const std::shared_ptr<IDevice>& device, const bool connected)
+	void InputDeviceContainer::Add(const DeviceHandle handle, const DeviceData& data, const bool connected)
 	{
-		assert(device && "The device is nullptr");
-
 		handles.push_back(handle);
 		try
 		{
-			devices.push_back(device);
+			devices.emplace_back(data);
 			try
 			{
 				connections.push_back(connected);
