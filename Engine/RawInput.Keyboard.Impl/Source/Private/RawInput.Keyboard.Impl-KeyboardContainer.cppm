@@ -13,13 +13,12 @@ import std;
 
 import PonyEngine.RawInput;
 
-import :Keyboard;
-
 export namespace PonyEngine::Input
 {
 	/// @brief Keyboard container.
 	/// @tparam NativeHandleType Native keyboard handle type.
-	template<typename NativeHandleType>
+	/// @tparam NativeKeyType Native keyboard key type.
+	template<typename NativeHandleType, typename NativeKeyType>
 	class KeyboardContainer final
 	{
 	public:
@@ -45,11 +44,6 @@ export namespace PonyEngine::Input
 		/// @return Keyboard index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(struct DeviceHandle deviceHandle) const noexcept;
-		/// @brief Finds a keyboard index.
-		/// @param keyboard Keyboard.
-		/// @return Keyboard index or @p Size() if not found.
-		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(const class Keyboard& keyboard) const noexcept;
 		/// @brief Finds a keyboard index by the @p deviceName.
 		/// @param deviceName Device name.
 		/// @return Keyboard index or @p Size() if not found.
@@ -76,16 +70,42 @@ export namespace PonyEngine::Input
 		/// @return Device handle.
 		[[nodiscard("Pure function")]]
 		const struct DeviceHandle& DeviceHandle(std::size_t index) const noexcept;
-		/// @brief Gets a keyboard.
+
+		/// @brief Gets a device name.
 		/// @param index Keyboard index.
-		/// @return Keyboard.
+		/// @return Device name.
 		[[nodiscard("Pure function")]]
-		class Keyboard& Keyboard(std::size_t index) noexcept;
-		/// @brief Gets a keyboard.
+		std::string_view DeviceName(std::size_t index) const noexcept;
+
+		/// @brief Gets a device connection status.
 		/// @param index Keyboard index.
-		/// @return Keyboard.
+		/// @return @a True if it's connected; @p false otherwise.
 		[[nodiscard("Pure function")]]
-		const class Keyboard& Keyboard(std::size_t index) const noexcept;
+		bool IsConnected(std::size_t index) const noexcept;
+		/// @brief Sets a device connection status.
+		/// @param index Keyboard index.
+		/// @param isConnected Connection status.
+		void Connect(std::size_t index, bool isConnected) noexcept;
+
+		/// @brief Checks if the key is pressed.
+		/// @param index Keyboard index.
+		/// @param key Key axis.
+		/// @return @a True if it's pressed; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsPressed(std::size_t index, NativeKeyType key) const noexcept;
+		/// @brief Gets pressed keys.
+		/// @param index Keyboard index.
+		/// @return Pressed keys.
+		[[nodiscard("Pure function")]]
+		std::span<const NativeKeyType> PressedKeys(std::size_t index) const noexcept;
+		/// @brief Sets if the key is pressed.
+		/// @param index Keyboard index.
+		/// @param key Key axis.
+		/// @param value Is it pressed?
+		void Press(std::size_t index, NativeKeyType key, bool value);
+		/// @brief Resets all the keys to unpressed.
+		/// @param index Keyboard index.
+		void ResetKeys(std::size_t index) noexcept;
 
 		/// @brief Adds a keyboard.
 		/// @param nativeHandle Native handle.
@@ -105,80 +125,123 @@ export namespace PonyEngine::Input
 	private:
 		std::vector<NativeHandleType> nativeHandles; ///< Native keyboard handles.
 		std::vector<struct DeviceHandle> deviceHandles; ///< Device handles.
-		std::vector<class Keyboard> keyboards; ///< Keyboards.
+		std::vector<std::string> deviceNames; ///< Device names.
+		std::vector<bool> connections; ///< Keyboard connection statuses.
+		std::vector<std::vector<NativeKeyType>> pressedKeys; ///< Keyboard pressed keys.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	template<typename NativeHandleType>
-	std::size_t KeyboardContainer<NativeHandleType>::Size() const noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	std::size_t KeyboardContainer<NativeHandleType, NativeKeyType>::Size() const noexcept
 	{
 		return nativeHandles.size();
 	}
 
-	template<typename NativeHandleType>
-	std::size_t KeyboardContainer<NativeHandleType>::IndexOf(const NativeHandleType& nativeHandle) const noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	std::size_t KeyboardContainer<NativeHandleType, NativeKeyType>::IndexOf(const NativeHandleType& nativeHandle) const noexcept
 	{
 		return std::ranges::find(nativeHandles, nativeHandle) - nativeHandles.cbegin();
 	}
 
-	template<typename NativeHandleType>
-	std::size_t KeyboardContainer<NativeHandleType>::IndexOf(const struct DeviceHandle deviceHandle) const noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	std::size_t KeyboardContainer<NativeHandleType, NativeKeyType>::IndexOf(const struct DeviceHandle deviceHandle) const noexcept
 	{
 		return std::ranges::find(deviceHandles, deviceHandle) - deviceHandles.cbegin();
 	}
 
-	template<typename NativeHandleType>
-	std::size_t KeyboardContainer<NativeHandleType>::IndexOf(const class Keyboard& keyboard) const noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	std::size_t KeyboardContainer<NativeHandleType, NativeKeyType>::IndexOf(const std::string_view deviceName) const noexcept
 	{
-		return std::ranges::find_if(keyboards, [&](const std::shared_ptr<class Keyboard>& k) { return k.get() == &keyboard; }) - keyboards.cbegin();
+		return std::ranges::find(deviceNames, deviceName) - deviceNames.cbegin();
 	}
 
-	template<typename NativeHandleType>
-	std::size_t KeyboardContainer<NativeHandleType>::IndexOf(const std::string_view deviceName) const noexcept
-	{
-		return std::ranges::find_if(keyboards, [&](const class Keyboard& keyboard) { return keyboard.Name() == deviceName; }) - keyboards.cbegin();
-	}
-
-	template<typename NativeHandleTypeType>
-	NativeHandleTypeType& KeyboardContainer<NativeHandleTypeType>::NativeHandle(const std::size_t index) noexcept
+	template<typename NativeHandleTypeType, typename NativeKeyType>
+	NativeHandleTypeType& KeyboardContainer<NativeHandleTypeType, NativeKeyType>::NativeHandle(const std::size_t index) noexcept
 	{
 		return nativeHandles[index];
 	}
 
-	template<typename NativeHandleTypeType>
-	const NativeHandleTypeType& KeyboardContainer<NativeHandleTypeType>::NativeHandle(const std::size_t index) const noexcept
+	template<typename NativeHandleTypeType, typename NativeKeyType>
+	const NativeHandleTypeType& KeyboardContainer<NativeHandleTypeType, NativeKeyType>::NativeHandle(const std::size_t index) const noexcept
 	{
 		return nativeHandles[index];
 	}
 
-	template<typename NativeHandleType>
-	struct DeviceHandle& KeyboardContainer<NativeHandleType>::DeviceHandle(const std::size_t index) noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	struct DeviceHandle& KeyboardContainer<NativeHandleType, NativeKeyType>::DeviceHandle(const std::size_t index) noexcept
 	{
 		return deviceHandles[index];
 	}
 
-	template<typename NativeHandleType>
-	const struct DeviceHandle& KeyboardContainer<NativeHandleType>::DeviceHandle(const std::size_t index) const noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	const struct DeviceHandle& KeyboardContainer<NativeHandleType, NativeKeyType>::DeviceHandle(const std::size_t index) const noexcept
 	{
 		return deviceHandles[index];
 	}
 
-	template<typename NativeHandleType>
-	class Keyboard& KeyboardContainer<NativeHandleType>::Keyboard(const std::size_t index) noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	std::string_view KeyboardContainer<NativeHandleType, NativeKeyType>::DeviceName(const std::size_t index) const noexcept
 	{
-		return keyboards[index];
+		return deviceNames[index];
 	}
 
-	template<typename NativeHandleType>
-	const class Keyboard& KeyboardContainer<NativeHandleType>::Keyboard(const std::size_t index) const noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	bool KeyboardContainer<NativeHandleType, NativeKeyType>::IsConnected(const std::size_t index) const noexcept
 	{
-		return keyboards[index];
+		return connections[index];
 	}
 
-	template<typename NativeHandleType>
-	void KeyboardContainer<NativeHandleType>::Add(const NativeHandleType& nativeHandle, const struct DeviceHandle deviceHandle, 
+	template<typename NativeHandleType, typename NativeKeyType>
+	void KeyboardContainer<NativeHandleType, NativeKeyType>::Connect(const std::size_t index, const bool isConnected) noexcept
+	{
+		connections[index] = isConnected;
+	}
+
+	template<typename NativeHandleType, typename NativeKeyType>
+	bool KeyboardContainer<NativeHandleType, NativeKeyType>::IsPressed(const std::size_t index, const NativeKeyType key) const noexcept
+	{
+		const std::span<const NativeKeyType> pressed = PressedKeys(index);
+		return std::ranges::find(pressed, key) != pressed.cend();
+	}
+
+	template<typename NativeHandleType, typename NativeKeyType>
+	std::span<const NativeKeyType> KeyboardContainer<NativeHandleType, NativeKeyType>::PressedKeys(const std::size_t index) const noexcept
+	{
+		return pressedKeys[index];
+	}
+
+	template<typename NativeHandleType, typename NativeKeyType>
+	void KeyboardContainer<NativeHandleType, NativeKeyType>::Press(const std::size_t index, const NativeKeyType key, const bool value)
+	{
+		std::vector<NativeKeyType>& pressed = pressedKeys[index];
+		const auto position = std::ranges::find(pressed, key);
+
+		if (value)
+		{
+			if (position == pressed.cend()) [[likely]]
+			{
+				pressed.push_back(key);
+			}
+		}
+		else
+		{
+			if (position != pressed.cend()) [[likely]]
+			{
+				pressed.erase(position);
+			}
+		}
+	}
+
+	template<typename NativeHandleType, typename NativeKeyType>
+	void KeyboardContainer<NativeHandleType, NativeKeyType>::ResetKeys(const std::size_t index) noexcept
+	{
+		pressedKeys[index].clear();
+	}
+
+	template<typename NativeHandleType, typename NativeKeyType>
+	void KeyboardContainer<NativeHandleType, NativeKeyType>::Add(const NativeHandleType& nativeHandle, const struct DeviceHandle deviceHandle, 
 		const std::string_view name, const bool isConnected)
 	{
 		nativeHandles.push_back(nativeHandle);
@@ -187,7 +250,25 @@ namespace PonyEngine::Input
 			deviceHandles.push_back(deviceHandle);
 			try
 			{
-				keyboards.emplace_back(name, isConnected);
+				deviceNames.emplace_back(name);
+				try
+				{
+					connections.push_back(isConnected);
+					try
+					{
+						pressedKeys.push_back(std::vector<NativeKeyType>());
+					}
+					catch (...)
+					{
+						connections.pop_back();
+						throw;
+					}
+				}
+				catch (...)
+				{
+					deviceNames.pop_back();
+					throw;
+				}
 			}
 			catch (...)
 			{
@@ -202,19 +283,23 @@ namespace PonyEngine::Input
 		}
 	}
 
-	template<typename NativeHandleType>
-	void KeyboardContainer<NativeHandleType>::Remove(const std::size_t index) noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	void KeyboardContainer<NativeHandleType, NativeKeyType>::Remove(const std::size_t index) noexcept
 	{
-		keyboards.erase(keyboards.cbegin() + index);
+		pressedKeys.erase(pressedKeys.cbegin() + index);
+		connections.erase(connections.cbegin() + index);
+		deviceNames.erase(deviceNames.cbegin() + index);
 		deviceHandles.erase(deviceHandles.cbegin() + index);
 		nativeHandles.erase(nativeHandles.cbegin() + index);
 	}
 
-	template<typename NativeHandleType>
-	void KeyboardContainer<NativeHandleType>::Clear() noexcept
+	template<typename NativeHandleType, typename NativeKeyType>
+	void KeyboardContainer<NativeHandleType, NativeKeyType>::Clear() noexcept
 	{
 		nativeHandles.clear();
 		deviceHandles.clear();
-		keyboards.clear();
+		deviceNames.clear();
+		connections.clear();
+		pressedKeys.clear();
 	}
 }

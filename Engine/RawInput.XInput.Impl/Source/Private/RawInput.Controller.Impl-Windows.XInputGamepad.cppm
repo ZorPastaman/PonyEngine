@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Platform/Windows/GamepadInput.h"
 
-export module PonyEngine.RawInput.Controller.Impl:Windows.XInputGamepad;
+export module PonyEngine.RawInput.XInput.Impl:Windows.XInputGamepad;
 
 import std;
 
@@ -20,7 +20,7 @@ import PonyEngine.RawInput;
 export namespace PonyEngine::Input::Windows
 {
 	/// @brief XInput gamepad.
-	class XInputGamepad final : public IDevice, private IVibrating
+	class Gamepad final : public IDevice, private IVibrating
 	{
 	public:
 		/// @brief Creates an XInput gamepad.
@@ -28,11 +28,11 @@ export namespace PonyEngine::Input::Windows
 		/// @param deviceType Device type.
 		/// @param isConnected Is the gamepad connected?
 		[[nodiscard("Pure constructor")]]
-		XInputGamepad(std::string_view name, DeviceTypeId deviceType, bool isConnected);
-		XInputGamepad(const XInputGamepad&) = delete;
-		XInputGamepad(XInputGamepad&&) = delete;
+		Gamepad(std::string_view name, DeviceTypeId deviceType, bool isConnected);
+		Gamepad(const Gamepad&) = delete;
+		Gamepad(Gamepad&&) = delete;
 
-		~XInputGamepad() noexcept = default;
+		~Gamepad() noexcept = default;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -67,8 +67,8 @@ export namespace PonyEngine::Input::Windows
 		/// @param isConnected Is the gamepad connected?
 		void Connect(bool isConnected) noexcept;
 
-		XInputGamepad& operator =(const XInputGamepad&) = delete;
-		XInputGamepad& operator =(XInputGamepad&&) = delete;
+		Gamepad& operator =(const Gamepad&) = delete;
+		Gamepad& operator =(Gamepad&&) = delete;
 
 	private:
 		static inline const std::array<std::type_index, 1> Features = { typeid(IVibrating) }; ///< Gamepad features.
@@ -84,7 +84,7 @@ export namespace PonyEngine::Input::Windows
 
 namespace PonyEngine::Input::Windows
 {
-	XInputGamepad::XInputGamepad(const std::string_view name, const DeviceTypeId deviceType, const bool isConnected) :
+	Gamepad::Gamepad(const std::string_view name, const DeviceTypeId deviceType, const bool isConnected) :
 		name(name),
 		deviceType(deviceType),
 		gamepadState{},
@@ -93,22 +93,22 @@ namespace PonyEngine::Input::Windows
 	{
 	}
 
-	std::string_view XInputGamepad::Name() const noexcept
+	std::string_view Gamepad::Name() const noexcept
 	{
 		return name;
 	}
 
-	DeviceTypeId XInputGamepad::DeviceType() const noexcept
+	DeviceTypeId Gamepad::DeviceType() const noexcept
 	{
 		return deviceType;
 	}
 
-	std::span<const std::type_index> XInputGamepad::FeatureTypes() const noexcept
+	std::span<const std::type_index> Gamepad::FeatureTypes() const noexcept
 	{
 		return Features;
 	}
 
-	void* XInputGamepad::FindFeature(const std::type_index type) noexcept
+	void* Gamepad::FindFeature(const std::type_index type) noexcept
 	{
 		if (type == typeid(IVibrating))
 		{
@@ -118,7 +118,7 @@ namespace PonyEngine::Input::Windows
 		return nullptr;
 	}
 
-	const void* XInputGamepad::FindFeature(const std::type_index type) const noexcept
+	const void* Gamepad::FindFeature(const std::type_index type) const noexcept
 	{
 		if (type == typeid(IVibrating))
 		{
@@ -128,12 +128,12 @@ namespace PonyEngine::Input::Windows
 		return nullptr;
 	}
 
-	VibrationState XInputGamepad::State() const noexcept
+	VibrationState Gamepad::State() const noexcept
 	{
 		return vibrationState;
 	}
 
-	void XInputGamepad::State(const VibrationState& state) noexcept
+	void Gamepad::State(const VibrationState& state) noexcept
 	{
 		vibrationState = VibrationState
 		{
@@ -142,22 +142,22 @@ namespace PonyEngine::Input::Windows
 		};
 	}
 
-	const XINPUT_GAMEPAD& XInputGamepad::GamepadState() const noexcept
+	const XINPUT_GAMEPAD& Gamepad::GamepadState() const noexcept
 	{
 		return gamepadState;
 	}
 
-	void XInputGamepad::GamepadState(const XINPUT_GAMEPAD& state) noexcept
+	void Gamepad::GamepadState(const XINPUT_GAMEPAD& state) noexcept
 	{
 		gamepadState = state;
 	}
 
-	bool XInputGamepad::IsConnected() const noexcept
+	bool Gamepad::IsConnected() const noexcept
 	{
 		return isConnected;
 	}
 
-	void XInputGamepad::Connect(const bool isConnected) noexcept
+	void Gamepad::Connect(const bool isConnected) noexcept
 	{
 		this->isConnected = isConnected;
 	}

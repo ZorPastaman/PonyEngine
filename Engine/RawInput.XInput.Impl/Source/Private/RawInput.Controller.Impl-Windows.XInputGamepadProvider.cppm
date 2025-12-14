@@ -12,7 +12,7 @@ module;
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/GamepadInput.h"
 
-export module PonyEngine.RawInput.Controller.Impl:Windows.XInputGamepadProvider;
+export module PonyEngine.RawInput.XInput.Impl:Windows.XInputGamepadProvider;
 
 import std;
 

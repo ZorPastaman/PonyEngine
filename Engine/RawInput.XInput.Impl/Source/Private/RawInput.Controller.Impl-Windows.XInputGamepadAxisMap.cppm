@@ -13,7 +13,7 @@ module;
 
 #include "PonyEngine/Platform/Windows/GamepadInput.h"
 
-export module PonyEngine.RawInput.Controller.Impl:Windows.XInputGamepadAxisMap;
+export module PonyEngine.RawInput.XInput.Impl:Windows.XInputGamepadAxisMap;
 
 import std;
 

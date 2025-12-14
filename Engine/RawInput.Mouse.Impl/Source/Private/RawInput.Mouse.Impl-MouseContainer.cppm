@@ -13,7 +13,7 @@ import std;
 
 import PonyEngine.RawInput;
 
-import :Mouse;
+import :MouseAxis;
 
 export namespace PonyEngine::Input
 {
@@ -71,16 +71,41 @@ export namespace PonyEngine::Input
 		/// @return Device handle.
 		[[nodiscard("Pure function")]]
 		const struct DeviceHandle& DeviceHandle(std::size_t index) const noexcept;
-		/// @brief Gets a mouse.
-		/// @param index Mouse index.
-		/// @return Mouse.
+
+		/// @brief Gets the mouse name.
+		/// @return Mouse name.
 		[[nodiscard("Pure function")]]
-		class Mouse& Mouse(std::size_t index) noexcept;
-		/// @brief Gets a mouse.
+		std::string_view Name(std::size_t index) const noexcept;
+
+		/// @brief Gets the connection status.
 		/// @param index Mouse index.
-		/// @return Mouse.
+		/// @return Connection status.
 		[[nodiscard("Pure function")]]
-		const class Mouse& Mouse(std::size_t index) const noexcept;
+		bool IsConnected(std::size_t index) const noexcept;
+		/// @brief Sets the connection status.
+		/// @param index Mouse index.
+		/// @param isConnected Connection status.
+		void Connect(std::size_t index, bool isConnected) noexcept;
+
+		/// @brief Checks if the button pressed.
+		/// @param index Mouse index.
+		/// @param button Button ID.
+		/// @return @a True if it's pressed; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsPressed(std::size_t index, MouseButton button) const noexcept;
+		/// @brief Gets all the button states.
+		/// @param index Mouse index.
+		/// @return Button states.
+		/// @remark They are placed in the order they are declared in the enum.
+		[[nodiscard("Pure function")]]
+		std::span<const bool, static_cast<std::size_t>(MouseButton::Count)> ButtonStates(std::size_t index) const noexcept;
+		/// @brief Sets a button state.
+		/// @param index Mouse index.
+		/// @param button Button ID.
+		/// @param value Button state.
+		void Press(std::size_t index, MouseButton button, bool value) noexcept;
+		/// @brief Resets all the buttons to the false state.
+		void ResetButtons(std::size_t index) noexcept;
 
 		/// @brief Adds a mouse.
 		/// @param nativeHandle Native handle.
@@ -100,7 +125,9 @@ export namespace PonyEngine::Input
 	private:
 		std::vector<NativeHandleType> nativeHandles; ///< Native mouse handles.
 		std::vector<struct DeviceHandle> deviceHandles; ///< Device handles.
-		std::vector<class Mouse> mouses; ///< Mouses.
+		std::vector<std::string> mouseNames;
+		std::vector<bool> connections;
+		std::vector<std::array<bool, static_cast<std::size_t>(MouseButton::Count)>> buttonStates;
 	};
 }
 
@@ -127,7 +154,7 @@ namespace PonyEngine::Input
 	template<typename NativeHandleType>
 	std::size_t MouseContainer<NativeHandleType>::IndexOf(const std::string_view deviceName) const noexcept
 	{
-		return std::ranges::find_if(mouses, [&](const class Mouse& mouse) { return mouse.Name() == deviceName; }) - mouses.cbegin();
+		return std::ranges::find(mouseNames, deviceName) - mouseNames.cbegin();
 	}
 
 	template<typename NativeHandleTypeType>
@@ -155,15 +182,45 @@ namespace PonyEngine::Input
 	}
 
 	template<typename NativeHandleType>
-	class Mouse& MouseContainer<NativeHandleType>::Mouse(const std::size_t index) noexcept
+	std::string_view MouseContainer<NativeHandleType>::Name(const std::size_t index) const noexcept
 	{
-		return mouses[index];
+		return mouseNames[index];
 	}
 
 	template<typename NativeHandleType>
-	const class Mouse& MouseContainer<NativeHandleType>::Mouse(const std::size_t index) const noexcept
+	bool MouseContainer<NativeHandleType>::IsConnected(const std::size_t index) const noexcept
 	{
-		return mouses[index];
+		return connections[index];
+	}
+
+	template<typename NativeHandleType>
+	void MouseContainer<NativeHandleType>::Connect(const std::size_t index, const bool isConnected) noexcept
+	{
+		connections[index] = isConnected;
+	}
+
+	template<typename NativeHandleType>
+	bool MouseContainer<NativeHandleType>::IsPressed(const std::size_t index, const MouseButton button) const noexcept
+	{
+		return buttonStates[index][static_cast<std::size_t>(button)];
+	}
+
+	template<typename NativeHandleType>
+	std::span<const bool, static_cast<std::size_t>(MouseButton::Count)> MouseContainer<NativeHandleType>::ButtonStates(const std::size_t index) const noexcept
+	{
+		return buttonStates[index];
+	}
+
+	template<typename NativeHandleType>
+	void MouseContainer<NativeHandleType>::Press(const std::size_t index, const MouseButton button, const bool value) noexcept
+	{
+		buttonStates[index][static_cast<std::size_t>(button)] = value;
+	}
+
+	template<typename NativeHandleType>
+	void MouseContainer<NativeHandleType>::ResetButtons(const std::size_t index) noexcept
+	{
+		std::ranges::fill(buttonStates[index], false);
 	}
 
 	template<typename NativeHandleType>
@@ -176,7 +233,27 @@ namespace PonyEngine::Input
 			deviceHandles.push_back(deviceHandle);
 			try
 			{
-				mouses.emplace_back(name, isConnected);
+				mouseNames.emplace_back(name);
+				try
+				{
+					connections.push_back(isConnected);
+					try
+					{
+						auto buttons = std::array<bool, static_cast<std::size_t>(MouseButton::Count)>();
+						std::ranges::fill(buttons, false);
+						buttonStates.push_back(buttons);
+					}
+					catch (...)
+					{
+						connections.pop_back();
+						throw;
+					}
+				}
+				catch (...)
+				{
+					mouseNames.pop_back();
+					throw;
+				}
 			}
 			catch (...)
 			{
@@ -194,7 +271,9 @@ namespace PonyEngine::Input
 	template<typename NativeHandleType>
 	void MouseContainer<NativeHandleType>::Remove(const std::size_t index) noexcept
 	{
-		mouses.erase(mouses.cbegin() + index);
+		buttonStates.erase(buttonStates.cbegin() + index);
+		connections.erase(connections.cbegin() + index);
+		mouseNames.erase(mouseNames.cbegin() + index);
 		deviceHandles.erase(deviceHandles.cbegin() + index);
 		nativeHandles.erase(nativeHandles.cbegin() + index);
 	}
@@ -204,6 +283,8 @@ namespace PonyEngine::Input
 	{
 		nativeHandles.clear();
 		deviceHandles.clear();
-		mouses.clear();
+		mouseNames.clear();
+		connections.clear();
+		buttonStates.clear();
 	}
 }

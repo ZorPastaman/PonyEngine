@@ -18,6 +18,8 @@ import :KeyboardEvent;
 export namespace PonyEngine::Input
 {
 	/// @brief Keyboard event queue.
+	/// @tparam NativeKeyType Native key type.
+	template<typename NativeKeyType>
 	class KeyboardEventQueue final
 	{
 	public:
@@ -44,12 +46,12 @@ export namespace PonyEngine::Input
 		/// @param index Event index.
 		/// @return Keyboard event.
 		[[nodiscard("Pure function")]]
-		const KeyboardEvent& Event(std::size_t index) const noexcept;
+		const KeyboardEvent<NativeKeyType>& Event(std::size_t index) const noexcept;
 
 		/// @brief Adds the event.
 		/// @param device Device handle.
 		/// @param event Keyboard event.
-		void Add(DeviceHandle device, const KeyboardEvent& event);
+		void Add(DeviceHandle device, const KeyboardEvent<NativeKeyType>& event);
 		/// @brief Removes all the keyboard devices.
 		/// @param device Device handle.
 		void Remove(DeviceHandle device) noexcept;
@@ -61,28 +63,32 @@ export namespace PonyEngine::Input
 
 	private:
 		std::vector<DeviceHandle> devices; ///< Keyboard device handles.
-		std::vector<KeyboardEvent> events; ///< Keyboard events.
+		std::vector<KeyboardEvent<NativeKeyType>> events; ///< Keyboard events.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	std::size_t KeyboardEventQueue::Size() const noexcept
+	template<typename NativeKeyType>
+	std::size_t KeyboardEventQueue<NativeKeyType>::Size() const noexcept
 	{
 		return devices.size();
 	}
 
-	DeviceHandle KeyboardEventQueue::Device(const std::size_t index) const noexcept
+	template<typename NativeKeyType>
+	DeviceHandle KeyboardEventQueue<NativeKeyType>::Device(const std::size_t index) const noexcept
 	{
 		return devices[index];
 	}
 
-	const KeyboardEvent& KeyboardEventQueue::Event(const std::size_t index) const noexcept
+	template<typename NativeKeyType>
+	const KeyboardEvent<NativeKeyType>& KeyboardEventQueue<NativeKeyType>::Event(const std::size_t index) const noexcept
 	{
 		return events[index];
 	}
 
-	void KeyboardEventQueue::Add(const DeviceHandle device, const KeyboardEvent& event)
+	template<typename NativeKeyType>
+	void KeyboardEventQueue<NativeKeyType>::Add(const DeviceHandle device, const KeyboardEvent<NativeKeyType>& event)
 	{
 		devices.push_back(device);
 		try
@@ -96,7 +102,8 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void KeyboardEventQueue::Remove(const DeviceHandle device) noexcept
+	template<typename NativeKeyType>
+	void KeyboardEventQueue<NativeKeyType>::Remove(const DeviceHandle device) noexcept
 	{
 		for (std::size_t i = devices.size(); i-- > 0uz; )
 		{
@@ -108,7 +115,8 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void KeyboardEventQueue::Clear() noexcept
+	template<typename NativeKeyType>
+	void KeyboardEventQueue<NativeKeyType>::Clear() noexcept
 	{
 		devices.clear();
 		events.clear();
