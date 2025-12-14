@@ -52,7 +52,7 @@ namespace PonyEngine::Input::Windows
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
 		{
-			throw std::logic_error("Raw input module context not found.");
+			throw std::logic_error("Raw input module context not found");
 		}
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(MouseProvider).name());
@@ -68,7 +68,7 @@ namespace PonyEngine::Input::Windows
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
 		{
-			throw std::logic_error("Raw input module context not found.");
+			throw std::logic_error("Raw input module context not found");
 		}
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(MouseProvider).name());

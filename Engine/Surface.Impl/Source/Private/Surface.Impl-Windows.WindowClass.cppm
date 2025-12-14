@@ -85,7 +85,7 @@ namespace PonyEngine::Surface::Windows
 		classHandle = RegisterClassExA(&wc);
 		if (!classHandle) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to register class. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to register class: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Registering window class done. Handle: '0x{:X}'.", classHandle);
 	}

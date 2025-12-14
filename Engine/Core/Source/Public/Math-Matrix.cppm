@@ -609,7 +609,7 @@ public:
 
 		if (it == context.end()) [[unlikely]]
 		{
-			throw std::format_error("Unexpected context end.");
+			throw std::format_error("Unexpected context end");
 		}
 
 		for (; *it != '}' && *it != ':'; ++it)
@@ -623,13 +623,13 @@ public:
 				singleLine = true;
 				break;
 			default: [[unlikely]]
-				throw std::format_error("Unexpected format specifier.");
+				throw std::format_error("Unexpected format specifier");
 			}
 		}
 
 		if (multiline && singleLine) [[unlikely]]
 		{
-			throw std::format_error("Incompatible multiline and single line specifiers.");
+			throw std::format_error("Incompatible multiline and single line specifiers");
 		}
 
 		it += *it == ':';

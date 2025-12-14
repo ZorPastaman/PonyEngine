@@ -49,7 +49,7 @@ public:
 
 		if (it == context.end()) [[unlikely]]
 		{
-			throw std::format_error("Unexpected context end.");
+			throw std::format_error("Unexpected context end");
 		}
 
 		for (; *it != '}'; ++it)
@@ -60,7 +60,7 @@ public:
 				noBrackets = true;
 				break;
 			default: [[unlikely]]
-				throw std::format_error("Unexpected format specifier.");
+				throw std::format_error("Unexpected format specifier");
 			}
 		}
 
@@ -96,7 +96,7 @@ namespace PonyEngine::Platform::Windows
 		GUID acquiredGuid;
 		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get guid. Result: '0x{:X}'.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(std::format("Failed to get guid: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return acquiredGuid;

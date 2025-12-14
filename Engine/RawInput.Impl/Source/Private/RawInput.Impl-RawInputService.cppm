@@ -262,7 +262,7 @@ export namespace PonyEngine::Input
 	{
 		if (!nextDeviceHandle.IsValid()) [[unlikely]]
 		{
-			throw std::overflow_error("No more device handles available.");
+			throw std::overflow_error("No more device handles available");
 		}
 
 		if (!deviceTypeHashMap.contains(data.type))
@@ -299,7 +299,7 @@ export namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Device not found.");
+			throw std::invalid_argument("Device not found");
 		}
 	}
 
@@ -311,7 +311,7 @@ export namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Device not found.");
+			throw std::invalid_argument("Device not found");
 		}
 	}
 
@@ -323,7 +323,7 @@ export namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Device not found.");
+			throw std::invalid_argument("Device not found");
 		}
 	}
 
@@ -331,21 +331,21 @@ export namespace PonyEngine::Input
 	{
 		if (!nextProviderHandle.IsValid()) [[unlikely]]
 		{
-			throw std::overflow_error("No more input provider handles available.");
+			throw std::overflow_error("No more input provider handles available");
 		}
 		if (application->FlowState() != Application::FlowState::StartingUp) [[unlikely]]
 		{
-			throw std::logic_error("Input providers can be added only on start-up.");
+			throw std::logic_error("Input providers can be added only on start-up");
 		}
 
 		const std::shared_ptr<IInputProvider> provider = factory(*this);
 		if (!provider) [[unlikely]]
 		{
-			throw std::invalid_argument("Input provider is nullptr.");
+			throw std::invalid_argument("Input provider is nullptr");
 		}
 		if (providers.IndexOf(*provider) < providers.Size()) [[unlikely]]
 		{
-			throw std::invalid_argument("Input provider has already been added.");
+			throw std::invalid_argument("Input provider has already been added");
 		}
 
 		const InputProviderHandle currentHandle = nextProviderHandle;
@@ -361,7 +361,7 @@ export namespace PonyEngine::Input
 	{
 		if (application->FlowState() != Application::FlowState::StartingUp && application->FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Input provider can be removed only on start-up or shut-down.");
+			throw std::logic_error("Input provider can be removed only on start-up or shut-down");
 		}
 
 		if (const std::size_t index = providers.IndexOf(providerHandle); index < providers.Size()) [[likely]]
@@ -372,7 +372,7 @@ export namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Input provider not found.");
+			throw std::invalid_argument("Input provider not found");
 		}
 	}
 
@@ -400,7 +400,7 @@ export namespace PonyEngine::Input
 	{
 		if (index >= devices.Size()) [[unlikely]]
 		{
-			throw std::out_of_range("Index is out of range.");
+			throw std::out_of_range("Index is out of range");
 		}
 
 		return devices.Handle(index);
@@ -419,7 +419,7 @@ export namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Device not found.");
+			throw std::invalid_argument("Device not found");
 		}
 	}
 
@@ -431,7 +431,7 @@ export namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Device not found.");
+			throw std::invalid_argument("Device not found");
 		}
 	}
 
@@ -443,7 +443,7 @@ export namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Device not found.");
+			throw std::invalid_argument("Device not found");
 		}
 	}
 
@@ -488,7 +488,7 @@ export namespace PonyEngine::Input
 			}
 		}
 
-		throw std::invalid_argument("Invalid axis ID.");
+		throw std::invalid_argument("Invalid axis ID");
 	}
 
 	bool RawInputService::IsValid(const AxisId axisId) const noexcept
@@ -505,7 +505,7 @@ export namespace PonyEngine::Input
 		{
 			if (position->second != deviceType) [[unlikely]]
 			{
-				throw std::overflow_error("Hash collision.");
+				throw std::overflow_error("Hash collision");
 			}
 		}
 		else
@@ -523,7 +523,7 @@ export namespace PonyEngine::Input
 			return position->second;
 		}
 
-		throw std::invalid_argument("Invalid device type ID.");
+		throw std::invalid_argument("Invalid device type ID");
 	}
 
 	bool RawInputService::IsValid(const DeviceTypeId deviceTypeId) const noexcept

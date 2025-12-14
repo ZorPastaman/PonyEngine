@@ -161,17 +161,17 @@ namespace PonyEngine::Application
 	{
 		if (!nextDataHandle.IsValid()) [[unlikely]]
 		{
-			throw std::overflow_error("No more data handles available.");
+			throw std::overflow_error("No more data handles available");
 		}
 
 		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
 		{
-			throw std::logic_error("Data can be added only on start-up.");
+			throw std::logic_error("Data can be added only on start-up");
 		}
 
 		if (std::ranges::find(dataTypes, type) != dataTypes.cend()) [[unlikely]]
 		{
-			throw std::invalid_argument("Type has already been added.");
+			throw std::invalid_argument("Type has already been added");
 		}
 
 		const ModuleDataHandle currentHandle = nextDataHandle;
@@ -205,7 +205,7 @@ namespace PonyEngine::Application
 	{
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Data can be removed only on start-up or shut-down.");
+			throw std::logic_error("Data can be removed only on start-up or shut-down");
 		}
 
 		if (const auto position = std::find(dataHandles.crbegin(), dataHandles.crend(), handle); position != dataHandles.crend()) [[likely]]
@@ -219,7 +219,7 @@ namespace PonyEngine::Application
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Data not found.");
+			throw std::invalid_argument("Data not found");
 		}
 	}
 
@@ -236,7 +236,7 @@ namespace PonyEngine::Application
 				IModule* const module = *modulePtr;
 				if (!module) [[unlikely]]
 				{
-					throw std::logic_error("Module is nullptr.");
+					throw std::logic_error("Module is nullptr");
 				}
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*&*module).name());
 				try

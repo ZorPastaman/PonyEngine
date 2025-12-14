@@ -195,22 +195,14 @@ namespace PonyEngine::Input::Windows
 #if !NDEBUG
 		if (rawInput.header.dwType != RIM_TYPEMOUSE) [[unlikely]]
 		{
-			throw std::logic_error("Not mouse input.");
+			throw std::logic_error("Not mouse input");
 		}
 #endif
 
-		try
-		{
-			const std::size_t index = GetOrCreateMouse(rawInput.header.hDevice);
-			UpdateButtons(rawInput.data.mouse, index);
-			UpdateWheels(rawInput.data.mouse, index);
-			UpdatePointer(rawInput.data.mouse, index);
-		}
-		catch (...)
-		{
-			input->Application().Stop(ExitCodes::InputError);
-			throw;
-		}
+		const std::size_t index = GetOrCreateMouse(rawInput.header.hDevice);
+		UpdateButtons(rawInput.data.mouse, index);
+		UpdateWheels(rawInput.data.mouse, index);
+		UpdatePointer(rawInput.data.mouse, index);
 	}
 
 	void MouseProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)
@@ -234,33 +226,25 @@ namespace PonyEngine::Input::Windows
 				isConnected, deviceHandle.id, reinterpret_cast<std::uintptr_t>(device));
 		};
 
-		try
+		if (isConnected)
 		{
-			if (isConnected)
+			const std::string_view name = GetMouseName(device);
+			const std::size_t index = mouseContainer.IndexOf(name);
+			if (index < mouseContainer.Size())
 			{
-				const std::string_view name = GetMouseName(device);
-				const std::size_t index = mouseContainer.IndexOf(name);
-				if (index < mouseContainer.Size())
-				{
-					mouseContainer.NativeHandle(index) = device;
-					addConnectionEvent(index);
-				}
-			}
-			else
-			{
-				const std::size_t index = mouseContainer.IndexOf(device);
-				if (index < mouseContainer.Size())
-				{
-					ResetInput(index, surface->LastMessageTime(), surface->LastMessageCursorPosition());
-					mouseContainer.NativeHandle(index) = INVALID_HANDLE_VALUE;
-					addConnectionEvent(index);
-				}
+				mouseContainer.NativeHandle(index) = device;
+				addConnectionEvent(index);
 			}
 		}
-		catch (...)
+		else
 		{
-			input->Application().Stop(ExitCodes::InputError);
-			throw;
+			const std::size_t index = mouseContainer.IndexOf(device);
+			if (index < mouseContainer.Size())
+			{
+				ResetInput(index, surface->LastMessageTime(), surface->LastMessageCursorPosition());
+				mouseContainer.NativeHandle(index) = INVALID_HANDLE_VALUE;
+				addConnectionEvent(index);
+			}
 		}
 	}
 
@@ -271,20 +255,12 @@ namespace PonyEngine::Input::Windows
 			return;
 		}
 
-		try
-		{
-			const std::chrono::time_point<std::chrono::steady_clock> time = surface->LastMessageTime();
-			const Math::Vector2<std::int32_t> cursorPosition = surface->LastMessageCursorPosition();
+		const std::chrono::time_point<std::chrono::steady_clock> time = surface->LastMessageTime();
+		const Math::Vector2<std::int32_t> cursorPosition = surface->LastMessageCursorPosition();
 
-			for (std::size_t i = 0uz; i < mouseContainer.Size(); ++i)
-			{
-				ResetInput(i, time, cursorPosition);
-			}
-		}
-		catch (...)
+		for (std::size_t i = 0uz; i < mouseContainer.Size(); ++i)
 		{
-			input->Application().Stop(ExitCodes::InputError);
-			throw;
+			ResetInput(i, time, cursorPosition);
 		}
 	}
 

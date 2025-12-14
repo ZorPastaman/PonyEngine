@@ -48,7 +48,7 @@ namespace PonyEngine::Platform::Windows
 		GetRawInputDeviceInfoA(deviceHandle, RIDI_DEVICENAME, nullptr, &size);
 		if (!size || size == std::numeric_limits<UINT>::max()) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get device name size. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get device name size: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(size);
@@ -75,7 +75,7 @@ namespace PonyEngine::Platform::Windows
 		const std::size_t copied = GetRawInputDeviceInfoA(deviceHandle, RIDI_DEVICENAME, deviceName.data(), &size);
 		if (!copied || copied == std::numeric_limits<UINT>::max()) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get device name. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get device name: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(copied - 1uz); // Minus null-terminator.

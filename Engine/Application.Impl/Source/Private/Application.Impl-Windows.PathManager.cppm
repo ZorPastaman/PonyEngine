@@ -86,7 +86,7 @@ namespace PonyEngine::Application::Windows
 		rootDirectory = (executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_ROOT_PATH)).lexically_normal();
 		if (!std::filesystem::exists(rootDirectory)) [[unlikely]]
 		{
-			throw std::logic_error("Root directory doesn't exist.");
+			throw std::logic_error("Root directory doesn't exist");
 		}
 		PONY_LOG(application.Logger(), Log::LogType::Info, "Getting executable file done. File: '{}'; Directory: '{}'; Root: '{}'.",
 			executableFile.string(), executableDirectory.string(), rootDirectory.string());

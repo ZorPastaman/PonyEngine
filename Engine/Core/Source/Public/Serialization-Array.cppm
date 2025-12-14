@@ -136,7 +136,7 @@ namespace PonyEngine::Serialization
 
 			if (byteCount > data.size()) [[unlikely]]
 			{
-				throw std::invalid_argument("Data is too small.");
+				throw std::invalid_argument("Data is too small");
 			}
 
 			std::memcpy(data.data(), values.data(), byteCount);
@@ -160,7 +160,7 @@ namespace PonyEngine::Serialization
 
 			if (byteCount > data.size()) [[unlikely]]
 			{
-				throw std::invalid_argument("Data is too small.");
+				throw std::invalid_argument("Data is too small");
 			}
 
 			std::memcpy(values.data(), data.data(), byteCount);
@@ -233,7 +233,7 @@ namespace PonyEngine::Serialization
 				{
 					if (dataPoint == end) [[unlikely]]
 					{
-						throw std::runtime_error(std::format("Failed to serialize data. Error code: '0x{:X}'.", std::to_underlying(std::errc::value_too_large)));
+						throw std::runtime_error(std::format("Failed to serialize data: ErrorCode = '0x{:X}'", std::to_underlying(std::errc::value_too_large)));
 					}
 
 					*dataPoint = separator;

@@ -349,7 +349,7 @@ namespace PonyEngine::Surface::Windows
 		);
 		if (!windowHandle) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to create window: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating window done. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 	}
@@ -420,7 +420,7 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 
 		const Style originalStyle = GetStyle();
@@ -456,7 +456,7 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 
 		return static_cast<Math::CornerRect<std::int32_t>>(GetClientRect());
@@ -466,30 +466,30 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 
 		std::visit(Type::Overload
 		{
 			[](const FullscreenRectStyle&)
 			{
-				throw std::logic_error("Rect is fullscreen.");
+				throw std::logic_error("Rect is fullscreen");
 			},
 			[&](const WindowRectStyle& s)
 			{
 				if (clientRect.Size().X() < minimalClientSize.X() || clientRect.Size().Y() < minimalClientSize.Y()) [[unlikely]]
 				{
-					throw std::invalid_argument("Size is less than minimal size.");
+					throw std::invalid_argument("Size is less than minimal size");
 				}
 
 				const Math::CornerRect<int> currentRect = GetClientRect();
 				if (!s.movable && currentRect.Position() != clientRect.Position()) [[unlikely]]
 				{
-					throw std::invalid_argument("Can't move unmovable window.");
+					throw std::invalid_argument("Can't move unmovable window");
 				}
 				if (!s.resizable && currentRect.Size() != clientRect.Size()) [[unlikely]]
 				{
-					throw std::invalid_argument("Can't resize non-resizable window.");
+					throw std::invalid_argument("Can't resize non-resizable window");
 				}
 
 				const Math::CornerRect<int> adjustedRect = AdjustRect(static_cast<Math::CornerRect<int>>(clientRect), GetStyle());
@@ -507,11 +507,11 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 		if (minimalSize.X() <= 0 || minimalSize.Y() <= 0) [[unlikely]]
 		{
-			throw std::invalid_argument("Minimal size must be at least one pixel.");
+			throw std::invalid_argument("Minimal size must be at least one pixel");
 		}
 
 		const auto minSize = static_cast<Math::Vector2<int>>(minimalSize);
@@ -521,7 +521,7 @@ namespace PonyEngine::Surface::Windows
 			const Math::CornerRect<int> clientRect = GetClientRect();
 			if (clientRect.Size().X() < minSize.X() || clientRect.Size().Y() < minSize.Y()) [[unlikely]]
 			{
-				throw std::invalid_argument("Minimal size is bigger than current client rect.");
+				throw std::invalid_argument("Minimal size is bigger than current client rect");
 			}
 		}
 
@@ -547,7 +547,7 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 
 		SetLastError(DWORD{0});
@@ -556,7 +556,7 @@ namespace PonyEngine::Surface::Windows
 		{
 			if (const DWORD errorCode = GetLastError()) [[unlikely]]
 			{
-				throw std::runtime_error(std::format("Failed to get window title length. Error code: '0x{:X}'.", errorCode));
+				throw std::runtime_error(std::format("Failed to get window title length: ErrorCode = '0x{:X}'", errorCode));
 			}
 
 			return std::string_view();
@@ -567,7 +567,7 @@ namespace PonyEngine::Surface::Windows
 		const int copied = GetWindowTextA(windowHandle, titleTemp.data(), length + 1);
 		if (!copied) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get window title. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get window title: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		titleTemp.resize(copied);
 
@@ -578,12 +578,12 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 
 		if (!SetWindowTextA(windowHandle, title.data())) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to set window title. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to set window title: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 	}
 
@@ -622,7 +622,7 @@ namespace PonyEngine::Surface::Windows
 		POINT position;
 		if (!GetCursorPos(&position)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get cursor position. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get cursor position: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(position.x), static_cast<std::int32_t>(position.y));
@@ -634,7 +634,7 @@ namespace PonyEngine::Surface::Windows
 		cursorInfo.cbSize = sizeof(CURSORINFO);
 		if (!GetCursorInfo(&cursorInfo)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get cursor visibility. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get cursor visibility: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return cursorInfo.flags & CURSOR_SHOWING;
@@ -644,13 +644,13 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 
 		auto screenPoint = POINT{.x = static_cast<LONG>(clientPoint.X()), .y = static_cast<LONG>(clientPoint.Y())};
 		if (!::ClientToScreen(windowHandle, &screenPoint)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get screen point: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(screenPoint.x), static_cast<std::int32_t>(screenPoint.y));
@@ -660,13 +660,13 @@ namespace PonyEngine::Surface::Windows
 	{
 		if (!IsAlive()) [[unlikely]]
 		{
-			throw std::logic_error("Window is dead.");
+			throw std::logic_error("Window is dead");
 		}
 
 		auto clientPoint = POINT{.x = static_cast<LONG>(screenPoint.X()), .y = static_cast<LONG>(screenPoint.Y())};
 		if (!::ScreenToClient(windowHandle, &clientPoint)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get client point. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get client point: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return Math::Vector2<std::int32_t>(static_cast<std::int32_t>(clientPoint.x), static_cast<std::int32_t>(clientPoint.y));
@@ -827,7 +827,7 @@ namespace PonyEngine::Surface::Windows
 		};
 		if (!AdjustWindowRectEx(&windowRect, style.style, false, style.styleEx)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to adjust window rect: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		const auto position = Math::Vector2<int>(static_cast<int>(windowRect.left), static_cast<int>(windowRect.top));
@@ -841,12 +841,12 @@ namespace PonyEngine::Surface::Windows
 		RECT rect;
 		if (!::GetClientRect(windowHandle, &rect)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get client rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get client rect: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		auto screenPosition = POINT{.x = rect.top, .y = rect.top};
 		if (!::ClientToScreen(windowHandle, &screenPosition)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get client position. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get client position: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		const auto position = Math::Vector2<int>(static_cast<int>(screenPosition.x), static_cast<int>(screenPosition.y));
 		const auto size = Math::Vector2<int>(static_cast<int>(rect.right - rect.left), static_cast<int>(rect.bottom - rect.top));
@@ -859,7 +859,7 @@ namespace PonyEngine::Surface::Windows
 		RECT rect;
 		if (!::GetWindowRect(windowHandle, &rect)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get window rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get window rect: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		const auto position = Math::Vector2<int>(static_cast<int>(rect.left), static_cast<int>(rect.bottom));
@@ -886,7 +886,7 @@ namespace PonyEngine::Surface::Windows
 		if (!SetWindowPos(windowHandle, insert, rect.Position().X(), rect.Position().Y(), rect.Size().X(), rect.Size().Y(), SWP_NOACTIVATE | SWP_FRAMECHANGED)) [[unlikely]]
 		{
 			unlocked = false;
-			throw std::runtime_error(std::format("Failed to set window rect. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to set window rect: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		unlocked = false;
 	}
@@ -898,7 +898,7 @@ namespace PonyEngine::Surface::Windows
 		resolution.Y() = GetSystemMetrics(SM_CYSCREEN);
 		if (!resolution.X() || !resolution.Y()) [[unlikely]]
 		{
-			throw std::runtime_error("Failed to get screen resolution.");
+			throw std::runtime_error("Failed to get screen resolution");
 		}
 
 		return resolution;
@@ -914,7 +914,7 @@ namespace PonyEngine::Surface::Windows
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
-				throw std::runtime_error(std::format("Failed to get window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to get window style: ErrorCode = '0x{:X}'", error));
 			}
 		}
 
@@ -923,7 +923,7 @@ namespace PonyEngine::Surface::Windows
 		{
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
-				throw std::runtime_error(std::format("Failed to get extended window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to get extended window style: ErrorCode = '0x{:X}'", error));
 			}
 		}
 
@@ -941,7 +941,7 @@ namespace PonyEngine::Surface::Windows
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
 				unlocked = false;
-				throw std::runtime_error(std::format("Failed to set window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to set window style: ErrorCode = '0x{:X}'", error));
 			}
 		}
 
@@ -950,7 +950,7 @@ namespace PonyEngine::Surface::Windows
 			if (const auto error = GetLastError()) [[unlikely]]
 			{
 				unlocked = false;
-				throw std::runtime_error(std::format("Failed to set extended window style. Error code: '0x{:X}'.", error));
+				throw std::runtime_error(std::format("Failed to set extended window style: ErrorCode = '0x{:X}'", error));
 			}
 		}
 		unlocked = false;
@@ -1015,14 +1015,14 @@ namespace PonyEngine::Surface::Windows
 			};
 			if (!::ClipCursor(&rect)) [[unlikely]]
 			{
-				throw std::runtime_error(std::format("Failed to clip cursor. Error code: '0x{:X}'.", GetLastError()));
+				throw std::runtime_error(std::format("Failed to clip cursor: ErrorCode = '0x{:X}'", GetLastError()));
 			}
 		}
 		else
 		{
 			if (!::ClipCursor(nullptr)) [[unlikely]]
 			{
-				throw std::runtime_error(std::format("Failed to free cursor. Error code: '0x{:X}'.", GetLastError()));
+				throw std::runtime_error(std::format("Failed to free cursor: ErrorCode = '0x{:X}'", GetLastError()));
 			}
 		}
 	}

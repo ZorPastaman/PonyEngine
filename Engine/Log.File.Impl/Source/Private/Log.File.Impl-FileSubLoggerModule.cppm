@@ -52,7 +52,7 @@ namespace PonyEngine::Log
 		ILoggerModuleContext* const loggerModuleContext = context.GetData<ILoggerModuleContext>();
 		if (!loggerModuleContext) [[unlikely]]
 		{
-			throw std::logic_error("Logger module context not found.");
+			throw std::logic_error("Logger module context not found");
 		}
 
 		PONY_LOG(context.Logger(), LogType::Info, "Constructing '{}'...", typeid(FileSubLogger).name());
@@ -81,7 +81,7 @@ namespace PonyEngine::Log
 		ILoggerModuleContext* const loggerModuleContext = context.GetData<ILoggerModuleContext>();
 		if (!loggerModuleContext) [[unlikely]]
 		{
-			throw std::logic_error("Logger module context not found.");
+			throw std::logic_error("Logger module context not found");
 		}
 
 		PONY_LOG(context.Logger(), LogType::Info, "Releasing '{}'...", typeid(FileSubLogger).name());
