@@ -53,7 +53,7 @@ namespace PonyEngine::Log
 	{
 		if (!logFile.is_open()) [[unlikely]]
 		{
-			throw std::runtime_error("Failed to open log file.");
+			throw std::runtime_error("Failed to open log file");
 		}
 	}
 

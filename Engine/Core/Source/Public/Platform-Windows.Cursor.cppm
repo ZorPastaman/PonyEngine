@@ -30,7 +30,7 @@ namespace PonyEngine::Platform::Windows
 		const auto cursor = static_cast<HCURSOR>(LoadImageA(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
-			throw std::runtime_error(std::format("Failed to load default cursor. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to load default cursor: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return cursor;

@@ -105,22 +105,22 @@ namespace PonyEngine::Application
 	{
 		if (!nextHandle.IsValid()) [[unlikely]]
 		{
-			throw std::overflow_error("No more logger handles available.");
+			throw std::overflow_error("No more logger handles available");
 		}
 
 		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
 		{
-			throw std::logic_error("Logger can be added only on start-up.");
+			throw std::logic_error("Logger can be added only on start-up");
 		}
 		if (externalLogger) [[unlikely]]
 		{
-			throw std::logic_error("External logger has already been set.");
+			throw std::logic_error("External logger has already been set");
 		}
 
 		const std::shared_ptr<Log::ILogger> newLogger = factory(*this);
 		if (!newLogger) [[unlikely]]
 		{
-			throw std::logic_error("Created logger is nullptr.");
+			throw std::logic_error("Created logger is nullptr");
 		}
 
 		externalLogger = newLogger;
@@ -137,15 +137,15 @@ namespace PonyEngine::Application
 	{
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Logger can be removed only on start-up or shut-down.");
+			throw std::logic_error("Logger can be removed only on start-up or shut-down");
 		}
 		if (!externalLogger) [[unlikely]]
 		{
-			throw std::logic_error("No external logger was set.");
+			throw std::logic_error("No external logger was set");
 		}
 		if (currentHandle != handle) [[unlikely]]
 		{
-			throw std::logic_error("Incorrect handle.");
+			throw std::logic_error("Incorrect handle");
 		}
 
 		PONY_LOG(*logger, Log::LogType::Info, "External logger unset. Logger: '{}'; Handle: '0x{:X}'.", typeid(*externalLogger).name(), handle.id);

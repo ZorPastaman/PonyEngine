@@ -139,37 +139,37 @@ namespace PonyEngine::Application
 	{
 		if (!nextServiceHandle.IsValid()) [[unlikely]]
 		{
-			throw std::overflow_error("No more service handles available.");
+			throw std::overflow_error("No more service handles available");
 		}
 
 		if (application->FlowState() != FlowState::StartingUp) [[unlikely]]
 		{
-			throw std::logic_error("Service can be added only on start-up.");
+			throw std::logic_error("Service can be added only on start-up");
 		}
 		const ServiceData data = factory(*application);
 		if (!data.service) [[unlikely]]
 		{
-			throw std::invalid_argument("Service is nullptr.");
+			throw std::invalid_argument("Service is nullptr");
 		}
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service...", typeid(*data.service).name());
 		if (serviceContainer.IndexOf(*data.service) < serviceContainer.Size()) [[unlikely]]
 		{
-			throw std::invalid_argument("Service has already been added.");
+			throw std::invalid_argument("Service has already been added");
 		}
 		if (data.tickableService && static_cast<IService*>(data.tickableService) != data.service.get()) [[unlikely]]
 		{
-			throw std::invalid_argument("Incorrect tickable service.");
+			throw std::invalid_argument("Incorrect tickable service");
 		}
 		for (const auto [interfaceType, interface] : data.publicInterfaces)
 		{
 			if (serviceContainer.ContainsInterface(interfaceType)) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Interface of type '{}' has already been added.", interfaceType.name()));
+				throw std::invalid_argument(std::format("Interface of type '{}' has already been added", interfaceType.name()));
 			}
 			if (!interface) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Interface of type '{}' is nullptr.", interfaceType.name()));
+				throw std::invalid_argument(std::format("Interface of type '{}' is nullptr", interfaceType.name()));
 			}
 		}
 
@@ -201,7 +201,7 @@ namespace PonyEngine::Application
 	{
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
-			throw std::logic_error("Service can be removed only on start-up or shut-down.");
+			throw std::logic_error("Service can be removed only on start-up or shut-down");
 		}
 
 		if (const std::size_t index = serviceContainer.IndexOf(handle); index < serviceContainer.Size()) [[likely]]
@@ -227,7 +227,7 @@ namespace PonyEngine::Application
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Service not found.");
+			throw std::invalid_argument("Service not found");
 		}
 	}
 

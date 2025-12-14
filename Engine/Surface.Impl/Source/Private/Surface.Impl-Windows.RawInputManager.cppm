@@ -374,7 +374,7 @@ namespace PonyEngine::Surface::Windows
 
 		if (!RegisterRawInputDevices(&rid, 1u, sizeof(rid))) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to register/unregister raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
+			throw std::runtime_error(std::format("Failed to register/unregister raw input device: UsagePage = '0x{:X}'; Usage = '0x{:X}'; Flags = '0x{:X}'; WindowHandle = '0x{:X}'; ErrorCode = '0x{:X}'", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
 		}
 	}
 
@@ -384,7 +384,7 @@ namespace PonyEngine::Surface::Windows
 		UINT size = sizeof(info);
 		if (!GetRawInputDeviceInfoA(handle, RIDI_DEVICEINFO, &info, &size)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get device info. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get device info: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		switch (info.dwType)
@@ -396,7 +396,7 @@ namespace PonyEngine::Surface::Windows
 		case RIM_TYPEHID:
 			return Pack(info.hid.usUsagePage, info.hid.usUsage);
 		default: [[unlikely]]
-			throw std::runtime_error("Unexpected device type.");
+			throw std::runtime_error("Unexpected device type");
 		}
 	}
 

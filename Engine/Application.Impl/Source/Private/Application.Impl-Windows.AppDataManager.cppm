@@ -100,7 +100,7 @@ namespace PonyEngine::Application::Windows
 		appIcon = LoadIconA(appModule, MAKEINTRESOURCEA(IDI_APP_ICON));
 		if (!appIcon) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to load application icon. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to load application icon: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application icon done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appIcon));
 #endif
@@ -109,7 +109,7 @@ namespace PonyEngine::Application::Windows
 		appCursor = LoadCursorA(appModule, MAKEINTRESOURCEA(IDC_APP_CURSOR));
 		if (!appCursor) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to load application cursor. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to load application cursor: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 		PONY_LOG(application.Logger(), Log::LogType::Info, "Loading application cursor done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(appCursor));
 #endif

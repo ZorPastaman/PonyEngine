@@ -254,7 +254,7 @@ namespace PonyEngine::Time
 	{
 		if (cap <= 0.f) [[unlikely]]
 		{
-			throw std::invalid_argument("Delta time cap must be greater than zero.");
+			throw std::invalid_argument("Delta time cap must be greater than zero");
 		}
 
 		deltaTimeCap = cap;
@@ -269,7 +269,7 @@ namespace PonyEngine::Time
 	{
 		if (scale < 0.f) [[unlikely]]
 		{
-			throw std::invalid_argument("Time scale must be greater or equal zero.");
+			throw std::invalid_argument("Time scale must be greater or equal zero");
 		}
 
 		timeScale = scale;
@@ -284,7 +284,7 @@ namespace PonyEngine::Time
 	{
 		if (period <= 0.f) [[unlikely]]
 		{
-			throw std::invalid_argument("Frame period must be greater than zero.");
+			throw std::invalid_argument("Frame period must be greater than zero");
 		}
 
 		framePeriod = period;
@@ -299,7 +299,7 @@ namespace PonyEngine::Time
 	{
 		if (frameTime < 0.f) [[unlikely]]
 		{
-			throw std::invalid_argument("Target frame time must be greater or equal zero.");
+			throw std::invalid_argument("Target frame time must be greater or equal zero");
 		}
 
 		targetFrameTime = std::chrono::duration<float>(frameTime);

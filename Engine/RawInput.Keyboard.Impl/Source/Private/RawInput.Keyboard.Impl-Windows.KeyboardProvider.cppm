@@ -162,7 +162,7 @@ namespace PonyEngine::Input::Windows
 #if !NDEBUG
 		if (rawInput.header.dwType != RIM_TYPEKEYBOARD) [[unlikely]]
 		{
-			throw std::logic_error("Not keyboard input.");
+			throw std::logic_error("Not keyboard input");
 		}
 #endif
 
@@ -172,35 +172,27 @@ namespace PonyEngine::Input::Windows
 			return;
 		}
 
-		try
-		{
-			const std::size_t index = GetOrCreateKeyboard(rawInput.header.hDevice);
-			Keyboard& keyboard = keyboardContainer.Keyboard(index);
-			const AxisId axis = axisMap.Axis(rawInput.data.keyboard);
-			const bool pressed = !(rawInput.data.keyboard.Flags & RI_KEY_BREAK);
+		const std::size_t index = GetOrCreateKeyboard(rawInput.header.hDevice);
+		Keyboard& keyboard = keyboardContainer.Keyboard(index);
+		const AxisId axis = axisMap.Axis(rawInput.data.keyboard);
+		const bool pressed = !(rawInput.data.keyboard.Flags & RI_KEY_BREAK);
 
-			if (keyboard.IsPressed(axis) != pressed)
+		if (keyboard.IsPressed(axis) != pressed)
+		{
+			keyboard.Press(axis, pressed);
+
+			const auto inputEvent = KeyboardInputEvent
 			{
-				keyboard.Press(axis, pressed);
-
-				const auto inputEvent = KeyboardInputEvent
-				{
-					.axis = axis,
-					.state = pressed,
-					.cursorPosition = surface->LastMessageCursorPosition()
-				};
-				const auto event = KeyboardEvent
-				{
-					.event = inputEvent,
-					.timePoint = surface->LastMessageTime()
-				};
-				eventQueue.Add(keyboardContainer.DeviceHandle(index), event);
-			}
-		}
-		catch (...)
-		{
-			input->Application().Stop(ExitCodes::InputError);
-			throw;
+				.axis = axis,
+				.state = pressed,
+				.cursorPosition = surface->LastMessageCursorPosition()
+			};
+			const auto event = KeyboardEvent
+			{
+				.event = inputEvent,
+				.timePoint = surface->LastMessageTime()
+			};
+			eventQueue.Add(keyboardContainer.DeviceHandle(index), event);
 		}
 	}
 
@@ -225,33 +217,25 @@ namespace PonyEngine::Input::Windows
 				isConnected, deviceHandle.id, reinterpret_cast<std::uintptr_t>(device));
 		};
 
-		try
+		if (isConnected)
 		{
-			if (isConnected)
+			const std::string_view name = GetKeyboardName(device);
+			const std::size_t index = keyboardContainer.IndexOf(name);
+			if (index < keyboardContainer.Size())
 			{
-				const std::string_view name = GetKeyboardName(device);
-				const std::size_t index = keyboardContainer.IndexOf(name);
-				if (index < keyboardContainer.Size())
-				{
-					keyboardContainer.NativeHandle(index) = device;
-					addConnectionEvent(index);
-				}
-			}
-			else
-			{
-				const std::size_t index = keyboardContainer.IndexOf(device);
-				if (index < keyboardContainer.Size())
-				{
-					ResetInput(index, surface->LastMessageTime(), surface->LastMessageCursorPosition());
-					keyboardContainer.NativeHandle(index) = INVALID_HANDLE_VALUE;
-					addConnectionEvent(index);
-				}
+				keyboardContainer.NativeHandle(index) = device;
+				addConnectionEvent(index);
 			}
 		}
-		catch (...)
+		else
 		{
-			input->Application().Stop(ExitCodes::InputError);
-			throw;
+			const std::size_t index = keyboardContainer.IndexOf(device);
+			if (index < keyboardContainer.Size())
+			{
+				ResetInput(index, surface->LastMessageTime(), surface->LastMessageCursorPosition());
+				keyboardContainer.NativeHandle(index) = INVALID_HANDLE_VALUE;
+				addConnectionEvent(index);
+			}
 		}
 	}
 
@@ -262,20 +246,12 @@ namespace PonyEngine::Input::Windows
 			return;
 		}
 
-		try
-		{
-			const std::chrono::time_point<std::chrono::steady_clock> time = surface->LastMessageTime();
-			const Math::Vector2<std::int32_t> cursorPosition = surface->LastMessageCursorPosition();
+		const std::chrono::time_point<std::chrono::steady_clock> time = surface->LastMessageTime();
+		const Math::Vector2<std::int32_t> cursorPosition = surface->LastMessageCursorPosition();
 
-			for (std::size_t i = 0uz; i < keyboardContainer.Size(); ++i)
-			{
-				ResetInput(i, time, cursorPosition);
-			}
-		}
-		catch (...)
+		for (std::size_t i = 0uz; i < keyboardContainer.Size(); ++i)
 		{
-			input->Application().Stop(ExitCodes::InputError);
-			throw;
+			ResetInput(i, time, cursorPosition);
 		}
 	}
 
