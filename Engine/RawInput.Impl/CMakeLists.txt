@@ -21,6 +21,7 @@ target_sources(PonyEngine.RawInput.Impl PRIVATE
 )
 target_sources(PonyEngine.RawInput.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/RawInput.Impl.cppm"
+	"Source/Private/RawInput.Impl-Device.cppm"
 	"Source/Private/RawInput.Impl-InputDeviceContainer.cppm"
 	"Source/Private/RawInput.Impl-InputProviderContainer.cppm"
 	"Source/Private/RawInput.Impl-RawInputQueue.cppm"

@@ -265,20 +265,16 @@ export namespace PonyEngine::Input
 			throw std::overflow_error("No more device handles available.");
 		}
 
-		if (!data.device) [[unlikely]]
+		if (!deviceTypeHashMap.contains(data.type))
 		{
-			throw std::invalid_argument("Device is nullptr.");
-		}
-		if (devices.IndexOf(*data.device) < devices.Size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Device has already been added.");
+			throw std::invalid_argument("Device type is invalid");
 		}
 
 		const DeviceHandle currentHandle = nextDeviceHandle;
-		devices.Add(currentHandle, data.device, data.isConnected);
+		devices.Add(currentHandle, data, data.isConnected);
 		++nextDeviceHandle.id;
 
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Name: '{}'.", currentHandle.id, data.device->Name());
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Name: '{}'.", currentHandle.id, data.name);
 
 		ObserveDeviceAdded(currentHandle);
 

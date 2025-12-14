@@ -90,8 +90,9 @@ export namespace PonyEngine::Input
 		/// @brief Adds a keyboard.
 		/// @param nativeHandle Native handle.
 		/// @param deviceHandle Device handle.
-		/// @param keyboard Keyboard.
-		void Add(const NativeHandleType& nativeHandle, struct DeviceHandle deviceHandle, const std::shared_ptr<class Keyboard>& keyboard);
+		/// @param name Keyboard name.
+		/// @param isConnected Is the device connected?
+		void Add(const NativeHandleType& nativeHandle, struct DeviceHandle deviceHandle, std::string_view name, bool isConnected);
 		/// @brief Removed a keyboard.
 		/// @param index Keyboard index.
 		void Remove(std::size_t index) noexcept;
@@ -104,7 +105,7 @@ export namespace PonyEngine::Input
 	private:
 		std::vector<NativeHandleType> nativeHandles; ///< Native keyboard handles.
 		std::vector<struct DeviceHandle> deviceHandles; ///< Device handles.
-		std::vector<std::shared_ptr<class Keyboard>> keyboards; ///< Keyboards.
+		std::vector<class Keyboard> keyboards; ///< Keyboards.
 	};
 }
 
@@ -137,7 +138,7 @@ namespace PonyEngine::Input
 	template<typename NativeHandleType>
 	std::size_t KeyboardContainer<NativeHandleType>::IndexOf(const std::string_view deviceName) const noexcept
 	{
-		return std::ranges::find_if(keyboards, [&](const std::shared_ptr<class Keyboard>& keyboard) { return keyboard->Name() == deviceName; }) - keyboards.cbegin();
+		return std::ranges::find_if(keyboards, [&](const class Keyboard& keyboard) { return keyboard.Name() == deviceName; }) - keyboards.cbegin();
 	}
 
 	template<typename NativeHandleTypeType>
@@ -167,17 +168,18 @@ namespace PonyEngine::Input
 	template<typename NativeHandleType>
 	class Keyboard& KeyboardContainer<NativeHandleType>::Keyboard(const std::size_t index) noexcept
 	{
-		return *keyboards[index];
+		return keyboards[index];
 	}
 
 	template<typename NativeHandleType>
 	const class Keyboard& KeyboardContainer<NativeHandleType>::Keyboard(const std::size_t index) const noexcept
 	{
-		return *keyboards[index];
+		return keyboards[index];
 	}
 
 	template<typename NativeHandleType>
-	void KeyboardContainer<NativeHandleType>::Add(const NativeHandleType& nativeHandle, const struct DeviceHandle deviceHandle, const std::shared_ptr<class Keyboard>& keyboard)
+	void KeyboardContainer<NativeHandleType>::Add(const NativeHandleType& nativeHandle, const struct DeviceHandle deviceHandle, 
+		const std::string_view name, const bool isConnected)
 	{
 		nativeHandles.push_back(nativeHandle);
 		try
@@ -185,7 +187,7 @@ namespace PonyEngine::Input
 			deviceHandles.push_back(deviceHandle);
 			try
 			{
-				keyboards.push_back(keyboard);
+				keyboards.emplace_back(name, isConnected);
 			}
 			catch (...)
 			{

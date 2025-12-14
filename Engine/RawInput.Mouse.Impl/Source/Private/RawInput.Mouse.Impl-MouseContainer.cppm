@@ -45,11 +45,6 @@ export namespace PonyEngine::Input
 		/// @return Mouse index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(struct DeviceHandle deviceHandle) const noexcept;
-		/// @brief Finds a mouse index.
-		/// @param mouse Mouse.
-		/// @return Mouse index or @p Size() if not found.
-		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(const class Mouse& mouse) const noexcept;
 		/// @brief Finds a mouse index by the @p deviceName.
 		/// @param deviceName Device name.
 		/// @return Mouse index or @p Size() if not found.
@@ -90,8 +85,9 @@ export namespace PonyEngine::Input
 		/// @brief Adds a mouse.
 		/// @param nativeHandle Native handle.
 		/// @param deviceHandle Device handle.
-		/// @param mouse Mouse.
-		void Add(const NativeHandleType& nativeHandle, struct DeviceHandle deviceHandle, const std::shared_ptr<class Mouse>& mouse);
+		/// @param name Device name.
+		/// @param isConnected Is the mouse connected?
+		void Add(const NativeHandleType& nativeHandle, struct DeviceHandle deviceHandle, std::string_view name, bool isConnected);
 		/// @brief Removed a mouse.
 		/// @param index Mouse index.
 		void Remove(std::size_t index) noexcept;
@@ -104,7 +100,7 @@ export namespace PonyEngine::Input
 	private:
 		std::vector<NativeHandleType> nativeHandles; ///< Native mouse handles.
 		std::vector<struct DeviceHandle> deviceHandles; ///< Device handles.
-		std::vector<std::shared_ptr<class Mouse>> mouses; ///< Mouses.
+		std::vector<class Mouse> mouses; ///< Mouses.
 	};
 }
 
@@ -129,15 +125,9 @@ namespace PonyEngine::Input
 	}
 
 	template<typename NativeHandleType>
-	std::size_t MouseContainer<NativeHandleType>::IndexOf(const class Mouse& mouse) const noexcept
-	{
-		return std::ranges::find_if(mouses, [&](const std::shared_ptr<class Mouse>& k) { return k.get() == &mouse; }) - mouses.cbegin();
-	}
-
-	template<typename NativeHandleType>
 	std::size_t MouseContainer<NativeHandleType>::IndexOf(const std::string_view deviceName) const noexcept
 	{
-		return std::ranges::find_if(mouses, [&](const std::shared_ptr<class Mouse>& mouse) { return mouse->Name() == deviceName; }) - mouses.cbegin();
+		return std::ranges::find_if(mouses, [&](const class Mouse& mouse) { return mouse.Name() == deviceName; }) - mouses.cbegin();
 	}
 
 	template<typename NativeHandleTypeType>
@@ -167,17 +157,18 @@ namespace PonyEngine::Input
 	template<typename NativeHandleType>
 	class Mouse& MouseContainer<NativeHandleType>::Mouse(const std::size_t index) noexcept
 	{
-		return *mouses[index];
+		return mouses[index];
 	}
 
 	template<typename NativeHandleType>
 	const class Mouse& MouseContainer<NativeHandleType>::Mouse(const std::size_t index) const noexcept
 	{
-		return *mouses[index];
+		return mouses[index];
 	}
 
 	template<typename NativeHandleType>
-	void MouseContainer<NativeHandleType>::Add(const NativeHandleType& nativeHandle, const struct DeviceHandle deviceHandle, const std::shared_ptr<class Mouse>& mouse)
+	void MouseContainer<NativeHandleType>::Add(const NativeHandleType& nativeHandle, const struct DeviceHandle deviceHandle,
+		const std::string_view name, const bool isConnected)
 	{
 		nativeHandles.push_back(nativeHandle);
 		try
@@ -185,7 +176,7 @@ namespace PonyEngine::Input
 			deviceHandles.push_back(deviceHandle);
 			try
 			{
-				mouses.push_back(mouse);
+				mouses.emplace_back(name, isConnected);
 			}
 			catch (...)
 			{
