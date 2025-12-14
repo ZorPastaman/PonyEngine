@@ -20,7 +20,7 @@ target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE
 )
 target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/RawInput.Keyboard.Impl.cppm"
-	"Source/Private/RawInput.Keyboard.Impl-Keyboard.cppm"
+	
 	"Source/Private/RawInput.Keyboard.Impl-KeyboardContainer.cppm"
 	"Source/Private/RawInput.Keyboard.Impl-KeyboardEvent.cppm"
 	"Source/Private/RawInput.Keyboard.Impl-KeyboardEventQueue.cppm"

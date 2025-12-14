@@ -7,10 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput.Controller.Impl;
+#include "PonyEngine/Input/ControllerProviderModule.h"
 
-export import PonyEngine.RawInput.Ext;
+import PonyEngine.Application.Ext;
+import PonyEngine.RawInput.XInput.Impl;
 
+namespace PonyEngine::Input
+{
+	Application::IModule* GetControllerProviderModule()
+	{
 #if PONY_WINDOWS
-export import :Windows.XInputGamepadProviderModule;
+		static Windows::XInputGamepadProviderModule controllerProviderModule;
+#else
+#error "Unsupported platform!"
 #endif
+
+		return &controllerProviderModule;
+	}
+}

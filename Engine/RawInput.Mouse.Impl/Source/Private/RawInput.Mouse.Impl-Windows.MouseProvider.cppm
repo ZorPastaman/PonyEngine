@@ -21,7 +21,6 @@ import PonyEngine.Platform;
 import PonyEngine.Surface;
 import PonyEngine.Type;
 
-import :Mouse;
 import :MouseAxis;
 import :MouseAxisMap;
 import :MouseContainer;
@@ -209,13 +208,12 @@ namespace PonyEngine::Input::Windows
 	{
 		const auto addConnectionEvent = [&](const std::size_t index)
 		{
-			Mouse& mouse = mouseContainer.Mouse(index);
-			if (mouse.IsConnected() == isConnected)
+			if (mouseContainer.IsConnected(index) == isConnected)
 			{
 				return;
 			}
 
-			mouse.Connect(isConnected);
+			mouseContainer.Connect(index, isConnected);
 
 			const auto connectionEvent = MouseConnectionEvent{.isConnected = isConnected};
 			const auto event = MouseEvent{ .event = connectionEvent, .timePoint = surface->LastMessageTime() };
@@ -267,8 +265,7 @@ namespace PonyEngine::Input::Windows
 	void MouseProvider::ResetInput(const std::size_t mouseIndex, const std::chrono::time_point<std::chrono::steady_clock> eventTime,
 		const Math::Vector2<std::int32_t>& cursorPosition)
 	{
-		Mouse& mouse = mouseContainer.Mouse(mouseIndex);
-		const std::span<const bool, static_cast<std::size_t>(MouseButton::Count)> buttonStates = mouse.ButtonStates();
+		const std::span<const bool, static_cast<std::size_t>(MouseButton::Count)> buttonStates = mouseContainer.ButtonStates(mouseIndex);
 
 		for (std::size_t i = 0uz; i < buttonStates.size(); ++i)
 		{
@@ -291,7 +288,7 @@ namespace PonyEngine::Input::Windows
 			eventQueue.Add(mouseContainer.DeviceHandle(mouseIndex), event);
 		}
 
-		mouse.ResetButtons();
+		mouseContainer.ResetButtons(mouseIndex);
 	}
 
 	void MouseProvider::Subscribe()
@@ -367,9 +364,9 @@ namespace PonyEngine::Input::Windows
 	{
 		const auto updateButton = [&](const MouseButton button, const bool pressed)
 		{
-			if (Mouse& mouse = mouseContainer.Mouse(mouseIndex); mouse.IsPressed(button) != pressed) [[likely]]
+			if (mouseContainer.IsPressed(mouseIndex, button) != pressed) [[likely]]
 			{
-				mouse.Press(button, pressed);
+				mouseContainer.Press(mouseIndex, button, pressed);
 
 				const auto buttonEvent = MouseButtonEvent
 				{

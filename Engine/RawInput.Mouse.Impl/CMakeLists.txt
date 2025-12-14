@@ -20,7 +20,7 @@ target_sources(PonyEngine.RawInput.Mouse.Impl PRIVATE
 )
 target_sources(PonyEngine.RawInput.Mouse.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/RawInput.Mouse.Impl.cppm"
-	"Source/Private/RawInput.Mouse.Impl-Mouse.cppm"
+	
 	"Source/Private/RawInput.Mouse.Impl-MouseAxis.cppm"
 	"Source/Private/RawInput.Mouse.Impl-MouseAxisMap.cppm"
 	"Source/Private/RawInput.Mouse.Impl-MouseContainer.cppm"

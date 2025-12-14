@@ -24,7 +24,6 @@ import PonyEngine.RawInput.Ext;
 import PonyEngine.Surface;
 import PonyEngine.Type;
 
-import :Keyboard;
 import :KeyboardContainer;
 import :KeyboardEvent;
 import :KeyboardEventQueue;
@@ -92,8 +91,8 @@ export namespace PonyEngine::Input::Windows
 		DeviceTypeId deviceType; ///< Keyboard device type.
 		KeyboardAxisMap axisMap; ///< Axis map.
 
-		KeyboardContainer<HANDLE> keyboardContainer; ///< Keyboard container.
-		KeyboardEventQueue eventQueue; ///< Keyboard event queue.
+		KeyboardContainer<HANDLE, WORD> keyboardContainer; ///< Keyboard container.
+		KeyboardEventQueue<WORD> eventQueue; ///< Keyboard event queue.
 
 		mutable std::string deviceNameTemp; ///< Temporary device name.
 	};
@@ -126,17 +125,18 @@ namespace PonyEngine::Input::Windows
 		for (std::size_t i = 0uz; i < eventQueue.Size(); ++i)
 		{
 			const DeviceHandle device = eventQueue.Device(i);
-			const KeyboardEvent& event = eventQueue.Event(i);
+			const KeyboardEvent<WORD>& event = eventQueue.Event(i);
 
 			std::visit(Type::Overload
 			{
-				[&](const KeyboardInputEvent& keyboardInput)
+				[&](const KeyboardInputEvent<WORD>& keyboardInput)
 				{
+					const AxisId axis = axisMap.Axis(keyboardInput.key);
 					const float value = keyboardInput.state;
 
 					input->AddInput(device, RawInputEvent
 					{
-						.axes = std::span<const AxisId>(&keyboardInput.axis, 1uz),
+						.axes = std::span<const AxisId>(&axis, 1uz),
 						.values = std::span<const float>(&value, 1uz),
 						.eventType = InputEventType::State,
 						.timePoint = event.timePoint,
@@ -173,21 +173,20 @@ namespace PonyEngine::Input::Windows
 		}
 
 		const std::size_t index = GetOrCreateKeyboard(rawInput.header.hDevice);
-		Keyboard& keyboard = keyboardContainer.Keyboard(index);
-		const AxisId axis = axisMap.Axis(rawInput.data.keyboard);
+		const WORD key = axisMap.ScanCode(rawInput.data.keyboard);
 		const bool pressed = !(rawInput.data.keyboard.Flags & RI_KEY_BREAK);
 
-		if (keyboard.IsPressed(axis) != pressed)
+		if (keyboardContainer.IsPressed(index, key) != pressed)
 		{
-			keyboard.Press(axis, pressed);
+			keyboardContainer.Press(index, key, pressed);
 
-			const auto inputEvent = KeyboardInputEvent
+			const auto inputEvent = KeyboardInputEvent<WORD>
 			{
-				.axis = axis,
+				.key = key,
 				.state = pressed,
 				.cursorPosition = surface->LastMessageCursorPosition()
 			};
-			const auto event = KeyboardEvent
+			const auto event = KeyboardEvent<WORD>
 			{
 				.event = inputEvent,
 				.timePoint = surface->LastMessageTime()
@@ -200,16 +199,15 @@ namespace PonyEngine::Input::Windows
 	{
 		const auto addConnectionEvent = [&](const std::size_t index)
 		{
-			Keyboard& keyboard = keyboardContainer.Keyboard(index);
-			if (keyboard.IsConnected() == isConnected)
+			if (keyboardContainer.IsConnected(index) == isConnected)
 			{
 				return;
 			}
 
-			keyboard.Connect(isConnected);
+			keyboardContainer.Connect(index, isConnected);
 
 			const auto connectionEvent = KeyboardConnectionEvent{.connected = isConnected};
-			const auto event = KeyboardEvent{.event = connectionEvent, .timePoint = surface->LastMessageTime()};
+			const auto event = KeyboardEvent<WORD>{.event = connectionEvent, .timePoint = surface->LastMessageTime()};
 			const DeviceHandle deviceHandle = keyboardContainer.DeviceHandle(index);
 			eventQueue.Add(deviceHandle, event);
 
@@ -258,17 +256,15 @@ namespace PonyEngine::Input::Windows
 	void KeyboardProvider::ResetInput(const std::size_t keyboardIndex, const std::chrono::time_point<std::chrono::steady_clock> eventTime, 
 		const Math::Vector2<std::int32_t>& cursorPosition)
 	{
-		Keyboard& keyboard = keyboardContainer.Keyboard(keyboardIndex);
-
-		for (const AxisId axis : keyboard.PressedKeys())
+		for (const WORD key : keyboardContainer.PressedKeys(keyboardIndex))
 		{
-			const auto inputEvent = KeyboardInputEvent
+			const auto inputEvent = KeyboardInputEvent<WORD>
 			{
-				.axis = axis,
+				.key = key,
 				.state = false,
 				.cursorPosition = cursorPosition
 			};
-			const auto event = KeyboardEvent
+			const auto event = KeyboardEvent<WORD>
 			{
 				.event = inputEvent,
 				.timePoint = eventTime
@@ -276,7 +272,7 @@ namespace PonyEngine::Input::Windows
 			eventQueue.Add(keyboardContainer.DeviceHandle(keyboardIndex), event);
 		}
 
-		keyboard.ResetKeys();
+		keyboardContainer.ResetKeys(keyboardIndex);
 	}
 
 	void KeyboardProvider::Subscribe()

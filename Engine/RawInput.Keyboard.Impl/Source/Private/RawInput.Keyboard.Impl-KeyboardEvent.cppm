@@ -17,11 +17,13 @@ import PonyEngine.RawInput;
 export namespace PonyEngine::Input
 {
 	/// @brief Keyboard input event.
+	/// @tparam NativeKeyType Native key type.
+	template<typename NativeKeyType>
 	struct KeyboardInputEvent final
 	{
-		AxisId axis; ///< Key axis.
+		NativeKeyType key; ///< Key.
 		bool state; ///< Is the key pressed?
-		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position.
+		Math::Vector2<std::int32_t> cursorPosition; ///< Cursor position.
 	};
 
 	/// @brief Keyboard connection event.
@@ -31,9 +33,11 @@ export namespace PonyEngine::Input
 	};
 
 	/// @brief Keyboard event.
+	/// @tparam NativeKeyType Native key type.
+	template<typename NativeKeyType>
 	struct KeyboardEvent final
 	{
-		std::variant<KeyboardInputEvent, KeyboardConnectionEvent> event; ///< Event.
+		std::variant<KeyboardInputEvent<NativeKeyType>, KeyboardConnectionEvent> event; ///< Event.
 		std::chrono::time_point<std::chrono::steady_clock> timePoint; ///< Event time.
 	};
 }

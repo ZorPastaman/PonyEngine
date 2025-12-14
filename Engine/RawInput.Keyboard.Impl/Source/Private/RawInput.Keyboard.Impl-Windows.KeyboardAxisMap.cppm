@@ -32,25 +32,21 @@ export namespace PonyEngine::Input::Windows
 
 		~KeyboardAxisMap() noexcept = default;
 
-		/// @brief Gets a bound axis.
-		/// @param key Key.
-		/// @return Axis.
-		[[nodiscard("Pure function")]]
-		AxisId Axis(const RAWKEYBOARD& key);
-
-		KeyboardAxisMap& operator =(const KeyboardAxisMap&) = delete;
-		KeyboardAxisMap& operator =(KeyboardAxisMap&&) = delete;
-
-	private:
 		/// @brief Gets a scan code from the key input.
 		/// @param key Key input.
 		/// @return Scan code.
 		[[nodiscard("Pure function")]]
 		static WORD ScanCode(const RAWKEYBOARD& key) noexcept;
+
 		/// @brief Gets a bound axis.
 		/// @param scanCode Scan code.
 		/// @return Axis.
 		AxisId Axis(WORD scanCode);
+
+		KeyboardAxisMap& operator =(const KeyboardAxisMap&) = delete;
+		KeyboardAxisMap& operator =(KeyboardAxisMap&&) = delete;
+
+	private:
 		/// @brief Binds an axis.
 		/// @param scanCode Scan code.
 		/// @param axisPath Axis path.
@@ -199,11 +195,6 @@ namespace PonyEngine::Input::Windows
 		Bind(0x0054, KeyboardLayout::SystemRequestPath);
 		Bind(0xE11D, KeyboardLayout::SystemPausePath);
 		Bind(0xE046, KeyboardLayout::SystemBreakPath);
-	}
-
-	AxisId KeyboardAxisMap::Axis(const RAWKEYBOARD& key)
-	{
-		return Axis(ScanCode(key));
 	}
 
 	WORD KeyboardAxisMap::ScanCode(const RAWKEYBOARD& key) noexcept
