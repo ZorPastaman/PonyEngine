@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 
-export module PonyEngine.RawInput.XInput.Impl:Windows.XInputGamepadProviderModule;
+export module PonyEngine.RawInput.XInput.Impl:Windows.GamepadProviderModule;
 
 import std;
 
@@ -19,26 +19,26 @@ import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.RawInput.Ext;
 
-import :Windows.XInputGamepadProvider;
+import :Windows.GamepadProvider;
 
 export namespace PonyEngine::Input::Windows
 {
 	/// @brief XInput gamepad provider module.
-	class XInputGamepadProviderModule final : public Application::IModule
+	class GamepadProviderModule final : public Application::IModule
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		XInputGamepadProviderModule() noexcept = default;
-		XInputGamepadProviderModule(const XInputGamepadProviderModule&) = delete;
-		XInputGamepadProviderModule(XInputGamepadProviderModule&&) = delete;
+		GamepadProviderModule() noexcept = default;
+		GamepadProviderModule(const GamepadProviderModule&) = delete;
+		GamepadProviderModule(GamepadProviderModule&&) = delete;
 
-		~XInputGamepadProviderModule() noexcept = default;
+		~GamepadProviderModule() noexcept = default;
 
 		virtual void StartUp(Application::IModuleContext& context) override;
 		virtual void ShutDown(Application::IModuleContext& context) override;
 
-		XInputGamepadProviderModule& operator =(const XInputGamepadProviderModule&) = delete;
-		XInputGamepadProviderModule& operator =(XInputGamepadProviderModule&&) = delete;
+		GamepadProviderModule& operator =(const GamepadProviderModule&) = delete;
+		GamepadProviderModule& operator =(GamepadProviderModule&&) = delete;
 
 	private:
 		InputProviderHandle controllerProviderHandle; ///< Controller provider handle.
@@ -47,7 +47,7 @@ export namespace PonyEngine::Input::Windows
 
 namespace PonyEngine::Input::Windows
 {
-	void XInputGamepadProviderModule::StartUp(Application::IModuleContext& context)
+	void GamepadProviderModule::StartUp(Application::IModuleContext& context)
 	{
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
@@ -55,15 +55,15 @@ namespace PonyEngine::Input::Windows
 			throw std::logic_error("Raw input module context not found.");
 		}
 
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(XInputGamepadProvider).name());
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(GamepadProvider).name());
 		controllerProviderHandle = inputModuleContext->AddProvider([&](IRawInputContext& input)
-			{
-				return std::make_shared<XInputGamepadProvider>(input);
-			});
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(XInputGamepadProvider).name());
+		{
+			return std::make_shared<GamepadProvider>(input);
+		});
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(GamepadProvider).name());
 	}
 
-	void XInputGamepadProviderModule::ShutDown(Application::IModuleContext& context)
+	void GamepadProviderModule::ShutDown(Application::IModuleContext& context)
 	{
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
 		if (!inputModuleContext) [[unlikely]]
@@ -71,8 +71,8 @@ namespace PonyEngine::Input::Windows
 			throw std::logic_error("Raw input module context not found.");
 		}
 
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(XInputGamepadProvider).name());
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(GamepadProvider).name());
 		inputModuleContext->RemoveProvider(controllerProviderHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(XInputGamepadProvider).name());
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(GamepadProvider).name());
 	}
 }

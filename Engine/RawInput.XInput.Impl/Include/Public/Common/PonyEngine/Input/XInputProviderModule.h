@@ -15,8 +15,8 @@ import PonyEngine.Application.Ext;
 
 namespace PonyEngine::Input
 {
-	/// @brief Gets the controller provider module.
-	/// @return Controller provider module.
+	/// @brief Gets the XInput provider module.
+	/// @return XInput provider module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetControllerProviderModule();
+	PONY_DLL_EXPORT Application::IModule* GetXInputProviderModule();
 }

@@ -12,3 +12,4 @@
 #include "Framework.h"
 
 #include <hidusage.h>
+#include <xinput.h>
