@@ -23,7 +23,7 @@ export namespace PonyEngine::Input
 	{
 		MouseButton button; ///< Button axis.
 		bool state; ///< Is the button pressed?
-		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position.
+		Math::Vector2<std::int32_t> cursorPosition; ///< Cursor position.
 	};
 
 	/// @brief Mouse wheel event.
@@ -31,14 +31,14 @@ export namespace PonyEngine::Input
 	{
 		MouseWheel wheel; ///< Wheel axis.
 		float delta; ///< Wheel delta.
-		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position.
+		Math::Vector2<std::int32_t> cursorPosition; ///< Cursor position.
 	};
 
 	/// @brief Mouse pointer event.
 	struct MousePointerEvent final
 	{
 		Math::Vector2<float> delta; ///< Pointer delta.
-		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position.
+		Math::Vector2<std::int32_t> cursorPosition; ///< Cursor position.
 	};
 
 	/// @brief Mouse connection event.

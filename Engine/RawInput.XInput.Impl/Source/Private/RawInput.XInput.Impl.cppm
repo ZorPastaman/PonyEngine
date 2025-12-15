@@ -12,5 +12,5 @@ export module PonyEngine.RawInput.XInput.Impl;
 export import PonyEngine.RawInput.Ext;
 
 #if PONY_WINDOWS
-export import :Windows.XInputProviderModule;
+export import :Windows.GamepadProviderModule;
 #endif

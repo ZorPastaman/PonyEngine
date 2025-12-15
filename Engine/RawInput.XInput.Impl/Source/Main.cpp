@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Input/ControllerProviderModule.h"
+#include "PonyEngine/Input/XInputProviderModule.h"
 
-PONY_MODULE(PonyEngine::Input::GetControllerProviderModule, PonyEngineRawInputControllerProvider, PONY_ENGINE_RAW_INPUT_CONTROLLER_ORDER);
+PONY_MODULE(PonyEngine::Input::GetXInputProviderModule, PonyEngineRawInputXInputProvider, PONY_ENGINE_RAW_INPUT_XINPUT_ORDER);

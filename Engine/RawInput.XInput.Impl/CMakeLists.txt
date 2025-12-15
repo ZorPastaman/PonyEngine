@@ -25,8 +25,10 @@ target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE FILE_SET CXX_MODULES FILE
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE FILE_SET CXX_MODULES FILES
-		"Source/Private/RawInput.XInput.Impl-Windows.Gamepad.cppm"
-		"Source/Private/RawInput.XInput.Impl-Windows.GamepadVibrator.cppm"
+		"Source/Private/RawInput.XInput.Impl-Windows.GamepadAxisMap.cppm"
+		"Source/Private/RawInput.XInput.Impl-Windows.GamepadContainer.cppm"
+		"Source/Private/RawInput.XInput.Impl-Windows.GamepadProvider.cppm"
+		"Source/Private/RawInput.XInput.Impl-Windows.GamepadProviderModule.cppm"
 	)
 endif()
 

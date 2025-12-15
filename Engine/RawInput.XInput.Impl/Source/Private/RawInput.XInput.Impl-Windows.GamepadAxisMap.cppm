@@ -11,9 +11,9 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Platform/Windows/GamepadInput.h"
+#include "PonyEngine/Platform/Windows/Input.h"
 
-export module PonyEngine.RawInput.XInput.Impl:Windows.XInputGamepadAxisMap;
+export module PonyEngine.RawInput.XInput.Impl:Windows.GamepadAxisMap;
 
 import std;
 
@@ -22,7 +22,7 @@ import PonyEngine.RawInput.Ext;
 export namespace PonyEngine::Input::Windows
 {
 	/// @brief XInput gamepad axis map.
-	class XInputGamepadAxisMap final
+	class GamepadAxisMap final
 	{
 	public:
 		/// @brief Trigger axis.
@@ -47,11 +47,11 @@ export namespace PonyEngine::Input::Windows
 		/// @brief Creates an XInput gamepad axis map.
 		/// @param input Raw input context.
 		[[nodiscard("Pure constructor")]]
-		explicit XInputGamepadAxisMap(IRawInputContext& input);
-		XInputGamepadAxisMap(const XInputGamepadAxisMap&) = delete;
-		XInputGamepadAxisMap(XInputGamepadAxisMap&&) = delete;
+		explicit GamepadAxisMap(IRawInputContext& input);
+		GamepadAxisMap(const GamepadAxisMap&) = delete;
+		GamepadAxisMap(GamepadAxisMap&&) = delete;
 
-		~XInputGamepadAxisMap() noexcept = default;
+		~GamepadAxisMap() noexcept = default;
 
 		/// @brief Gets a buttons axis.
 		/// @param button Native button.
@@ -75,8 +75,8 @@ export namespace PonyEngine::Input::Windows
 		[[nodiscard("Pure function")]]
 		std::span<const AxisId, 2> Stick(StickPlacement placement) const noexcept;
 
-		XInputGamepadAxisMap& operator =(const XInputGamepadAxisMap&) = delete;
-		XInputGamepadAxisMap& operator =(XInputGamepadAxisMap&&) = delete;
+		GamepadAxisMap& operator =(const GamepadAxisMap&) = delete;
+		GamepadAxisMap& operator =(GamepadAxisMap&&) = delete;
 
 	private:
 		static constexpr std::size_t ButtonCount = 14; ///< Button count.
@@ -108,7 +108,7 @@ export namespace PonyEngine::Input::Windows
 
 namespace PonyEngine::Input::Windows
 {
-	XInputGamepadAxisMap::XInputGamepadAxisMap(IRawInputContext& input)
+	GamepadAxisMap::GamepadAxisMap(IRawInputContext& input)
 	{
 		constexpr auto buttonMap = std::array<std::pair<WORD, std::string_view>, ButtonCount>
 		{
@@ -141,7 +141,7 @@ namespace PonyEngine::Input::Windows
 		Bind(StickPlacement::Right, StickDirection::Vertical, GamepadLayout::RightStickVerticalPath, input);
 	}
 
-	AxisId XInputGamepadAxisMap::Button(const WORD button) const noexcept
+	AxisId GamepadAxisMap::Button(const WORD button) const noexcept
 	{
 		const std::size_t index = std::ranges::find(nativeAxes, button) - nativeAxes.cbegin();
 		assert(index < ButtonCount && "Invalid native button.");
@@ -149,33 +149,33 @@ namespace PonyEngine::Input::Windows
 		return buttonAxes[index];
 	}
 
-	AxisId XInputGamepadAxisMap::Trigger(const TriggerAxis trigger) const noexcept
+	AxisId GamepadAxisMap::Trigger(const TriggerAxis trigger) const noexcept
 	{
 		return triggerAxes[static_cast<std::size_t>(trigger)];
 	}
 
-	AxisId XInputGamepadAxisMap::Stick(const StickPlacement placement, const StickDirection direction) const noexcept
+	AxisId GamepadAxisMap::Stick(const StickPlacement placement, const StickDirection direction) const noexcept
 	{
 		return stickAxes[static_cast<std::size_t>(placement)][static_cast<std::size_t>(direction)];
 	}
 
-	std::span<const AxisId, 2> XInputGamepadAxisMap::Stick(const StickPlacement placement) const noexcept
+	std::span<const AxisId, 2> GamepadAxisMap::Stick(const StickPlacement placement) const noexcept
 	{
 		return stickAxes[static_cast<std::size_t>(placement)];
 	}
 
-	void XInputGamepadAxisMap::Bind(const std::size_t index, const WORD nativeAxis, const std::string_view axis, IRawInputContext& input)
+	void GamepadAxisMap::Bind(const std::size_t index, const WORD nativeAxis, const std::string_view axis, IRawInputContext& input)
 	{
 		nativeAxes[index] = nativeAxis;
 		buttonAxes[index] = input.Hash(Axis(axis));
 	}
 
-	void XInputGamepadAxisMap::Bind(const TriggerAxis trigger, const std::string_view axis, IRawInputContext& input)
+	void GamepadAxisMap::Bind(const TriggerAxis trigger, const std::string_view axis, IRawInputContext& input)
 	{
 		triggerAxes[static_cast<std::size_t>(trigger)] = input.Hash(Axis(axis));
 	}
 
-	void XInputGamepadAxisMap::Bind(const StickPlacement placement, const StickDirection direction, const std::string_view axis, IRawInputContext& input)
+	void GamepadAxisMap::Bind(const StickPlacement placement, const StickDirection direction, const std::string_view axis, IRawInputContext& input)
 	{
 		stickAxes[static_cast<std::size_t>(placement)][static_cast<std::size_t>(direction)] = input.Hash(Axis(axis));
 	}
