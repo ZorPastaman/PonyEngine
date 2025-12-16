@@ -18,7 +18,6 @@ target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RawInput-DeviceType.cppm"
 	"Source/Public/RawInput-DeviceTypeId.cppm"
 	"Source/Public/RawInput-Gamepad.cppm"
-	"Source/Public/RawInput-IDevice.cppm"
 	"Source/Public/RawInput-IDeviceObserver.cppm"
 	"Source/Public/RawInput-InputEventType.cppm"
 	"Source/Public/RawInput-IRawInputObserver.cppm"

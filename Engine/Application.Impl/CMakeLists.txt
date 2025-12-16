@@ -25,6 +25,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application.Impl-FlowManager.cppm"
 	"Source/Private/Application.Impl-InterfaceContainer.cppm"
 	"Source/Private/Application.Impl-LoggerManager.cppm"
+	"Source/Private/Application.Impl-ModuleDataContainer.cppm"
 	"Source/Private/Application.Impl-ModuleManager.cppm"
 	"Source/Private/Application.Impl-Name.cppm"
 	"Source/Private/Application.Impl-Path.cppm"

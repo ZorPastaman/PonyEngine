@@ -50,27 +50,6 @@ export namespace PonyEngine::Log
 		virtual void Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
 		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept override;
-
-		virtual void LogToConsole(LogType logType, std::string_view message) const noexcept override;
-		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override;
-		virtual void LogToConsole(LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
-
-		virtual void LogToConsole(const std::exception_ptr& exception) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
-
-		[[nodiscard("Must be used to remove")]]
-		virtual SubLoggerHandle AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory) override;
-		virtual void RemoveSubLogger(SubLoggerHandle handle) override;
-
 		/// @brief Gets the public logger interface.
 		/// @return Logger interface.
 		[[nodiscard("Pure function")]]
@@ -92,6 +71,27 @@ export namespace PonyEngine::Log
 		Logger& operator =(Logger&&) = delete;
 
 	private:
+		[[nodiscard("Pure function")]]
+		virtual Application::IApplicationContext& Application() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const Application::IApplicationContext& Application() const noexcept override;
+
+		virtual void LogToConsole(LogType logType, std::string_view message) const noexcept override;
+		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override;
+		virtual void LogToConsole(LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
+
+		virtual void LogToConsole(const std::exception_ptr& exception) const noexcept override;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message) const noexcept override;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override;
+		virtual void LogToConsole(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
+
+		[[nodiscard("Must be used to remove")]]
+		virtual SubLoggerHandle AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory) override;
+		virtual void RemoveSubLogger(SubLoggerHandle handle) override;
+
 		/// @brief Logs the entry.
 		/// @param logEntry Log entry to log.
 		void Log(const LogEntry& logEntry) const noexcept;
@@ -208,6 +208,26 @@ namespace PonyEngine::Log
 		LogEntry logEntry;
 		FillData(logEntry, logStringTemp, exception, format, formatArgs, stacktrace, *loggerContext);
 		Log(logEntry);
+	}
+
+	ILogger& Logger::PublicLogger() noexcept
+	{
+		return *this;
+	}
+
+	const ILogger& Logger::PublicLogger() const noexcept
+	{
+		return *this;
+	}
+
+	ILoggerModuleContext& Logger::PublicLoggerModule() noexcept
+	{
+		return *this;
+	}
+
+	const ILoggerModuleContext& Logger::PublicLoggerModule() const noexcept
+	{
+		return *this;
 	}
 
 	Application::IApplicationContext& Logger::Application() noexcept
@@ -337,26 +357,6 @@ namespace PonyEngine::Log
 		{
 			throw std::invalid_argument("Sub-logger not found");
 		}
-	}
-
-	ILogger& Logger::PublicLogger() noexcept
-	{
-		return *this;
-	}
-
-	const ILogger& Logger::PublicLogger() const noexcept
-	{
-		return *this;
-	}
-
-	ILoggerModuleContext& Logger::PublicLoggerModule() noexcept
-	{
-		return *this;
-	}
-
-	const ILoggerModuleContext& Logger::PublicLoggerModule() const noexcept
-	{
-		return *this;
 	}
 
 	void Logger::Log(const LogEntry& logEntry) const noexcept

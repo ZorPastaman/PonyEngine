@@ -31,15 +31,6 @@ export namespace PonyEngine::Application
 
 		virtual ~LoggerManager() noexcept;
 
-		[[nodiscard("Pure function")]]
-		virtual IApplicationContext& Application() noexcept override final;
-		[[nodiscard("Pure function")]]
-		virtual const IApplicationContext& Application() const noexcept override final;
-
-		[[nodiscard("Must be used to unset")]]
-		virtual LoggerHandle SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory) override final;
-		virtual void UnsetLogger(LoggerHandle handle) override final;
-
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
@@ -70,6 +61,15 @@ export namespace PonyEngine::Application
 		LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
 
 	private:
+		[[nodiscard("Pure function")]]
+		virtual IApplicationContext& Application() noexcept override final;
+		[[nodiscard("Pure function")]]
+		virtual const IApplicationContext& Application() const noexcept override final;
+
+		[[nodiscard("Must be used to unset")]]
+		virtual LoggerHandle SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory) override final;
+		virtual void UnsetLogger(LoggerHandle handle) override final;
+
 		IApplicationContext* application; ///< Application context.
 
 		std::shared_ptr<Log::ILogger> defaultLogger; ///< Default logger.
@@ -89,6 +89,16 @@ namespace PonyEngine::Application
 		{
 			PONY_LOG(*logger, Log::LogType::Error, "External logger wasn't removed. Logger: '{}'.", typeid(*externalLogger).name())
 		}
+	}
+
+	LoggerManager::LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
+		application{&application},
+		defaultLogger(defaultLogger),
+		logger{defaultLogger.get()},
+		nextHandle{.id = 1u},
+		currentHandle{.id = 0u}
+	{
+		assert(this->defaultLogger && "The default logger is nullptr.");
 	}
 
 	IApplicationContext& LoggerManager::Application() noexcept
@@ -172,15 +182,5 @@ namespace PonyEngine::Application
 	const ILoggerModuleContext& LoggerManager::PublicLoggerModuleContext() const noexcept
 	{
 		return *this;
-	}
-
-	LoggerManager::LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
-		application{&application},
-		defaultLogger(defaultLogger),
-		logger{defaultLogger.get()},
-		nextHandle{.id = 1u},
-		currentHandle{.id = 0u}
-	{
-		assert(this->defaultLogger && "The default logger is nullptr.");
 	}
 }

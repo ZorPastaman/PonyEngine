@@ -49,6 +49,26 @@ export namespace PonyEngine::Surface::Windows
 		virtual void Begin() override;
 		virtual void End() override;
 
+		/// @brief Gets the public surface service.
+		/// @return Public surface service.
+		[[nodiscard("Pure function")]]
+		ISurfaceService& PublicSurfaceService() noexcept;
+		/// @brief Gets the public surface service.
+		/// @return Public surface service.
+		[[nodiscard("Pure function")]]
+		const ISurfaceService& PublicSurfaceService() const noexcept;
+
+		SurfaceService& operator =(const SurfaceService&) = delete;
+		SurfaceService& operator =(SurfaceService&&) = delete;
+
+	private:
+		/// @brief Style wrapper.
+		struct Style final
+		{
+			DWORD style; ///< Style.
+			DWORD styleEx; ///< Extended style.
+		};
+
 		[[nodiscard("Pure function")]]
 		virtual SurfaceFeature SupportedFeatures() const noexcept override;
 
@@ -115,26 +135,6 @@ export namespace PonyEngine::Surface::Windows
 		virtual const Application::IApplicationContext& Application() const noexcept override;
 
 		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-		/// @brief Gets the public surface service.
-		/// @return Public surface service.
-		[[nodiscard("Pure function")]]
-		ISurfaceService& PublicSurfaceService() noexcept;
-		/// @brief Gets the public surface service.
-		/// @return Public surface service.
-		[[nodiscard("Pure function")]]
-		const ISurfaceService& PublicSurfaceService() const noexcept;
-
-		SurfaceService& operator =(const SurfaceService&) = delete;
-		SurfaceService& operator =(SurfaceService&&) = delete;
-
-	private:
-		/// @brief Style wrapper.
-		struct Style final
-		{
-			DWORD style; ///< Style.
-			DWORD styleEx; ///< Extended style.
-		};
 
 		/// @brief Updates a focus change.
 		void UpdateFocus() noexcept;
@@ -404,6 +404,16 @@ namespace PonyEngine::Surface::Windows
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Hide window.");
 		ShowWindow(windowHandle, SW_HIDE);
+	}
+
+	ISurfaceService& SurfaceService::PublicSurfaceService() noexcept
+	{
+		return *this;
+	}
+
+	const ISurfaceService& SurfaceService::PublicSurfaceService() const noexcept
+	{
+		return *this;
 	}
 
 	SurfaceFeature SurfaceService::SupportedFeatures() const noexcept
@@ -787,16 +797,6 @@ namespace PonyEngine::Surface::Windows
 		default:
 			return DefWindowProcA(windowHandle, uMsg, wParam, lParam);
 		}
-	}
-
-	ISurfaceService& SurfaceService::PublicSurfaceService() noexcept
-	{
-		return *this;
-	}
-
-	const ISurfaceService& SurfaceService::PublicSurfaceService() const noexcept
-	{
-		return *this;
 	}
 
 	void SurfaceService::UpdateFocus() noexcept

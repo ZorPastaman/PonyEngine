@@ -16,7 +16,7 @@ export module PonyEngine.Surface:Windows.IRawInputObserver;
 
 export namespace PonyEngine::Surface::Windows
 {
-	/// @brief Window raw input observer.
+	/// @brief Windows raw input observer.
 	class IRawInputObserver
 	{
 		INTERFACE_BODY(IRawInputObserver)

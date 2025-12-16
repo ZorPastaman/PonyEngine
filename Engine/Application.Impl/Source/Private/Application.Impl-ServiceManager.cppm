@@ -39,10 +39,6 @@ export namespace PonyEngine::Application
 
 		~ServiceManager() noexcept;
 
-		[[nodiscard("Must be used to remove")]]
-		virtual ServiceHandle AddService(const std::function<ServiceData(IApplicationContext&)>& factory) override;
-		virtual void RemoveService(ServiceHandle handle) override;
-
 		/// @brief Finds a service interface.
 		/// @param type Service interface type.
 		/// @return Service interface; nullptr if it's not found.
@@ -74,6 +70,10 @@ export namespace PonyEngine::Application
 		ServiceManager& operator =(ServiceManager&&) = delete;
 
 	private:
+		[[nodiscard("Must be used to remove")]]
+		virtual ServiceHandle AddService(const std::function<ServiceData(IApplicationContext&)>& factory) override;
+		virtual void RemoveService(ServiceHandle handle) override;
+
 		/// @brief Updates tickable services vector.
 		void UpdateTickableServices();
 
@@ -133,6 +133,61 @@ namespace PonyEngine::Application
 		}
 
 		return nullptr;
+	}
+
+	void ServiceManager::Begin()
+	{
+		assert(application->FlowState() == FlowState::Beginning && "Incorrect flow state.");
+
+		UpdateTickableServices();
+
+		std::size_t begunServicesCount = 0uz;
+		try
+		{
+			Begin(begunServicesCount);
+		}
+		catch (...)
+		{
+			End(begunServicesCount);
+			throw;
+		}
+	}
+
+	void ServiceManager::End() noexcept
+	{
+		assert(application->FlowState() == FlowState::Ending && "Incorrect flow state.");
+
+		End(serviceContainer.Size());
+	}
+
+	void ServiceManager::Tick()
+	{
+		assert(application->FlowState() == FlowState::Running && "Incorrect flow state.");
+
+		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking application services.");
+		for (ITickableService* const tickableService : tickableServices)
+		{
+			try
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking '{}' service.", typeid(*tickableService).name());
+				tickableService->Tick();
+			}
+			catch (...)
+			{
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On ticking '{}' service.", typeid(*tickableService).name());
+				throw;
+			}
+		}
+	}
+
+	IServiceModuleContext& ServiceManager::PublicServiceModuleContext() noexcept
+	{
+		return *this;
+	}
+
+	const IServiceModuleContext& ServiceManager::PublicServiceModuleContext() const noexcept
+	{
+		return *this;
 	}
 
 	ServiceHandle ServiceManager::AddService(const std::function<ServiceData(IApplicationContext&)>& factory)
@@ -229,61 +284,6 @@ namespace PonyEngine::Application
 		{
 			throw std::invalid_argument("Service not found");
 		}
-	}
-
-	void ServiceManager::Begin()
-	{
-		assert(application->FlowState() == FlowState::Beginning && "Incorrect flow state.");
-
-		UpdateTickableServices();
-
-		std::size_t begunServicesCount = 0uz;
-		try
-		{
-			Begin(begunServicesCount);
-		}
-		catch (...)
-		{
-			End(begunServicesCount);
-			throw;
-		}
-	}
-
-	void ServiceManager::End() noexcept
-	{
-		assert(application->FlowState() == FlowState::Ending && "Incorrect flow state.");
-
-		End(serviceContainer.Size());
-	}
-
-	void ServiceManager::Tick()
-	{
-		assert(application->FlowState() == FlowState::Running && "Incorrect flow state.");
-
-		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking application services.");
-		for (ITickableService* const tickableService : tickableServices)
-		{
-			try
-			{
-				PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking '{}' service.", typeid(*tickableService).name());
-				tickableService->Tick();
-			}
-			catch (...)
-			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ticking '{}' service.", typeid(*tickableService).name());
-				throw;
-			}
-		}
-	}
-
-	IServiceModuleContext& ServiceManager::PublicServiceModuleContext() noexcept
-	{
-		return *this;
-	}
-
-	const IServiceModuleContext& ServiceManager::PublicServiceModuleContext() const noexcept
-	{
-		return *this;
 	}
 
 	void ServiceManager::UpdateTickableServices()

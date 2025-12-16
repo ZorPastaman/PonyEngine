@@ -46,6 +46,15 @@ export namespace PonyEngine::Application::Windows
 
 		~App() noexcept;
 
+		/// @brief Runs the application.
+		/// @return Exit code.
+		[[nodiscard("Must be returned from main")]]
+		int Run();
+
+		App& operator =(const App&) = delete;
+		App& operator =(App&) = delete;
+
+	private:
 		[[nodiscard("Pure function")]]
 		virtual std::string_view CompanyName() const noexcept override;
 		[[nodiscard("Pure function")]]
@@ -104,15 +113,6 @@ export namespace PonyEngine::Application::Windows
 		[[nodiscard("Pure function")]]
 		virtual HCURSOR AppCursor() const noexcept override;
 
-		/// @brief Runs the application.
-		/// @return Exit code.
-		[[nodiscard("Must be returned from main")]]
-		int Run();
-
-		App& operator =(const App&) = delete;
-		App& operator =(App&) = delete;
-
-	private:
 		FlowManager flowManager; ///< Flow manager.
 		LoggerManager loggerManager; ///< Logger manager.
 		AppDataManager appDataManager; ///< Application data manager.
@@ -137,6 +137,15 @@ namespace PonyEngine::Application::Windows
 	App::~App() noexcept
 	{
 		flowManager.ShutDown();
+	}
+
+	int App::Run()
+	{
+		const auto begin = [&] { serviceManager.Begin(); };
+		const auto end = [&] noexcept { serviceManager.End(); };
+		const auto tick = [&] { serviceManager.Tick(); };
+
+		return flowManager.Run(begin, end, tick);
 	}
 
 	std::string_view App::CompanyName() const noexcept
@@ -262,14 +271,5 @@ namespace PonyEngine::Application::Windows
 	HCURSOR App::AppCursor() const noexcept
 	{
 		return appDataManager.AppCursor();
-	}
-
-	int App::Run()
-	{
-		const auto begin = [&] { serviceManager.Begin(); };
-		const auto end = [&] noexcept { serviceManager.End(); };
-		const auto tick = [&] { serviceManager.Tick(); };
-		
-		return flowManager.Run(begin, end, tick);
 	}
 }

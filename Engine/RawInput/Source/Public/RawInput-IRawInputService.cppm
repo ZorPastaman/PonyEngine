@@ -22,7 +22,6 @@ import :AxisId;
 import :DeviceHandle;
 import :DeviceType;
 import :DeviceTypeId;
-import :IDevice;
 import :IDeviceObserver;
 import :IRawInputObserver;
 
@@ -70,16 +69,57 @@ export namespace PonyEngine::Input
 		/// @return @a True if it's connected; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsConnected(DeviceHandle deviceHandle) const = 0;
-		/// @brief Gets a device by its handle.
+		/// @brief Gets a device name.
 		/// @param deviceHandle Device handle.
-		/// @return Device.
+		/// @return Device name.
 		[[nodiscard("Pure function")]]
-		virtual IDevice& Device(DeviceHandle deviceHandle) = 0;
-		/// @brief Gets a device by its handle.
+		virtual std::string_view DeviceName(DeviceHandle deviceHandle) const = 0;
+		/// @brief Gets a device type.
 		/// @param deviceHandle Device handle.
-		/// @return Device.
+		/// @return Device type.
 		[[nodiscard("Pure function")]]
-		virtual const IDevice& Device(DeviceHandle deviceHandle) const = 0;
+		virtual DeviceTypeId DeviceType(DeviceHandle deviceHandle) const = 0;
+		/// @brief Gets device feature types.
+		/// @param deviceHandle Device handle.
+		/// @return Feature types.
+		[[nodiscard("Pure function")]]
+		virtual std::span<const std::type_index> FeatureTypes(DeviceHandle deviceHandle) const = 0;
+		/// @brief Tries to find a device feature.
+		/// @param deviceHandle Device handle.
+		/// @param type Feature type.
+		/// @return Feature or nullptr if not found.
+		[[nodiscard("Pure function")]]
+		virtual void* FindFeature(DeviceHandle deviceHandle, std::type_index type) = 0;
+		/// @brief Tries to find a device feature.
+		/// @param deviceHandle Device handle.
+		/// @param type Feature type.
+		/// @return Feature or nullptr if not found.
+		[[nodiscard("Pure function")]]
+		virtual const void* FindFeature(DeviceHandle deviceHandle, std::type_index type) const = 0;
+		/// @brief Tries to find a device feature.
+		/// @tparam T Feature type.
+		/// @param deviceHandle Device handle.
+		/// @return Feature or nullptr if not found.
+		template<typename T> [[nodiscard("Pure function")]]
+		T* FindFeature(DeviceHandle deviceHandle);
+		/// @brief Tries to find a device feature.
+		/// @tparam T Feature type.
+		/// @param deviceHandle Device handle.
+		/// @return Feature or nullptr if not found.
+		template<typename T> [[nodiscard("Pure function")]]
+		const T* FindFeature(DeviceHandle deviceHandle) const;
+		/// @brief Gets a device feature.
+		/// @tparam T Feature type.
+		/// @param deviceHandle Device handle.
+		/// @return Feature.
+		template<typename T> [[nodiscard("Pure function")]]
+		T& GetFeature(DeviceHandle deviceHandle);
+		/// @brief Gets a device feature.
+		/// @tparam T Feature type.
+		/// @param deviceHandle Device handle.
+		/// @return Feature.
+		template<typename T> [[nodiscard("Pure function")]]
+		const T& GetFeature(DeviceHandle deviceHandle) const;
 
 		/// @brief Calculates a hash for the @p axis.
 		/// @param axis Axis.
@@ -100,12 +140,12 @@ export namespace PonyEngine::Input
 		/// @param deviceType Device type.
 		/// @return Device type hash.
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeId Hash(const DeviceType& deviceType) = 0;
+		virtual DeviceTypeId Hash(const class DeviceType& deviceType) = 0;
 		/// @brief Gets an original device type from the hash value.
 		/// @param deviceTypeId Device type hash.
 		/// @return Device type.
 		[[nodiscard("Pure function")]]
-		virtual const DeviceType& Unhash(DeviceTypeId deviceTypeId) = 0;
+		virtual const class DeviceType& Unhash(DeviceTypeId deviceTypeId) = 0;
 		/// @brief Checks if the @p deviceTypeId is valid.
 		/// @param deviceTypeId Device type id.
 		/// @return @a true if it's valid; @a false otherwise.
@@ -125,4 +165,43 @@ export namespace PonyEngine::Input
 		/// @param observer Raw input observer.
 		virtual void RemoveObserver(IRawInputObserver& observer) noexcept = 0;
 	};
+}
+
+namespace PonyEngine::Input
+{
+	template<typename T>
+	T* IRawInputService::FindFeature(const DeviceHandle deviceHandle)
+	{
+		return static_cast<T*>(FindFeature(deviceHandle, typeid(T)));
+	}
+
+	template<typename T>
+	const T* IRawInputService::FindFeature(const DeviceHandle deviceHandle) const
+	{
+		return static_cast<const T*>(FindFeature(deviceHandle, typeid(T)));
+	}
+
+	template<typename T>
+	T& IRawInputService::GetFeature(const DeviceHandle deviceHandle)
+	{
+		T* const feature = FindFeature<T>(deviceHandle);
+		if (!feature) [[unlikely]]
+		{
+			throw std::logic_error("Feature not found");
+		}
+
+		return *feature;
+	}
+
+	template<typename T>
+	const T& IRawInputService::GetFeature(const DeviceHandle deviceHandle) const
+	{
+		const T* const feature = FindFeature<T>(deviceHandle);
+		if (!feature) [[unlikely]]
+		{
+			throw std::logic_error("Feature not found");
+		}
+
+		return *feature;
+	}
 }
