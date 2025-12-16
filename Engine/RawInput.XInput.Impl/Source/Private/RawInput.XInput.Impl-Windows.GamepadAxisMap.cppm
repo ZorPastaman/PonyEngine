@@ -102,7 +102,7 @@ export namespace PonyEngine::Input::Windows
 		std::array<WORD, ButtonCount> nativeAxes; ///< Native button axes.
 		std::array<AxisId, ButtonCount> buttonAxes; ///< Button axes.
 		std::array<AxisId, 2> triggerAxes; ///< Trigger axes. Order: [left, right]
-		std::array<std::array<AxisId, 2>, 2> stickAxes; ///< Stick axes. Order: [horizontal, vertical][left, right].
+		std::array<std::array<AxisId, 2>, 2> stickAxes; ///< Stick axes. Order: [left, right][horizontal, vertical].
 	};
 }
 

@@ -19,6 +19,8 @@ import std;
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 
+import :ModuleDataContainer;
+
 export namespace PonyEngine::Application
 {
 	/// @brief Module manager.
@@ -29,13 +31,17 @@ export namespace PonyEngine::Application
 		/// @param application Application context.
 		/// @param loggerModuleContext Logger module context.
 		/// @param serviceModuleContext Service module context.
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Pure constructor")]]
 		ModuleManager(IApplicationContext& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext);
 		ModuleManager(const ModuleManager&) = delete;
 		ModuleManager(ModuleManager&&) = delete;
 
 		~ModuleManager() noexcept;
 
+		ModuleManager& operator =(const ModuleManager&) = delete;
+		ModuleManager& operator =(ModuleManager&&) = delete;
+
+	private:
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& Logger() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -55,10 +61,6 @@ export namespace PonyEngine::Application
 		virtual ModuleDataHandle AddData(std::type_index type, const std::shared_ptr<void>& data) override;
 		virtual void RemoveData(ModuleDataHandle handle) override;
 
-		ModuleManager& operator =(const ModuleManager&) = delete;
-		ModuleManager& operator =(ModuleManager&&) = delete;
-
-	private:
 		/// @brief Initializes the modules.
 		/// @param lastModule Last module pointer.
 		void Initialize(std::uintptr_t& lastModule);
@@ -71,10 +73,7 @@ export namespace PonyEngine::Application
 		ILoggerModuleContext* loggerModuleContext; ///< Logger module context.
 		IServiceModuleContext* serviceModuleContext; ///< Service module context.
 
-		// These vectors are synced by index.
-		std::vector<ModuleDataHandle> dataHandles; ///< Data handles.
-		std::vector<std::type_index> dataTypes; ///< Data types.
-		std::vector<std::shared_ptr<void>> data; ///< Data.
+		ModuleDataContainer dataContainer; ///< Data container.
 
 		ModuleDataHandle nextDataHandle; ///< Next data handle.
 	};
@@ -107,10 +106,10 @@ namespace PonyEngine::Application
 	{
 		Finalize(reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(IModule**));
 
-		if (data.size() > 0uz) [[unlikely]]
+		if (dataContainer.Size() > 0uz) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Data wasn't removed:");
-			for (const std::type_index type : dataTypes)
+			for (const std::type_index type : dataContainer.Types())
 			{
 				PONY_LOG(application->Logger(), Log::LogType::Error, "Data of type: '{}'.", type.name());
 			}
@@ -149,9 +148,9 @@ namespace PonyEngine::Application
 
 	void* ModuleManager::GetData(const std::type_index type) const
 	{
-		if (const auto position = std::ranges::find(dataTypes, type); position != dataTypes.cend())
+		if (const std::size_t index = dataContainer.IndexOf(type); index < dataContainer.Size())
 		{
-			return data[position - dataTypes.cbegin()].get();
+			return dataContainer.Data(index);
 		}
 
 		return nullptr;
@@ -169,31 +168,13 @@ namespace PonyEngine::Application
 			throw std::logic_error("Data can be added only on start-up");
 		}
 
-		if (std::ranges::find(dataTypes, type) != dataTypes.cend()) [[unlikely]]
+		if (dataContainer.IndexOf(type) < dataContainer.Size()) [[unlikely]]
 		{
-			throw std::invalid_argument("Type has already been added");
+			throw std::invalid_argument(std::format("Data of type '{}' has already been added", type.name()));
 		}
 
 		const ModuleDataHandle currentHandle = nextDataHandle;
-		dataHandles.push_back(currentHandle);
-		try
-		{
-			dataTypes.push_back(type);
-			try
-			{
-				this->data.push_back(data);
-			}
-			catch (...)
-			{
-				dataTypes.pop_back();
-				throw;
-			}
-		}
-		catch (...)
-		{
-			dataHandles.pop_back();
-			throw;
-		}
+		dataContainer.Add(currentHandle, type, data);
 		++nextDataHandle.id;
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' added to module context. Handle: '0x{:X}'.", type.name(), currentHandle.id);
@@ -208,13 +189,10 @@ namespace PonyEngine::Application
 			throw std::logic_error("Data can be removed only on start-up or shut-down");
 		}
 
-		if (const auto position = std::find(dataHandles.crbegin(), dataHandles.crend(), handle); position != dataHandles.crend()) [[likely]]
+		if (const std::size_t index = dataContainer.IndexOf(handle); index < dataContainer.Size()) [[likely]]
 		{
-			const std::size_t index = std::distance(dataHandles.cbegin(), position.base()) - 1uz;
-			const char* const typeName = dataTypes[index].name();
-			data.erase(data.cbegin() + index);
-			dataTypes.erase(dataTypes.cbegin() + index);
-			dataHandles.erase(dataHandles.cbegin() + index);
+			const char* const typeName = dataContainer.Type(index).name();
+			dataContainer.Remove(index);
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Data of type '{}' removed from module context. Handle: '0x{:X}'.", typeName, handle.id);
 		}
 		else [[unlikely]]

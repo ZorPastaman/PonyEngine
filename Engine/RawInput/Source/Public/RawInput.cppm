@@ -16,7 +16,6 @@ export import :DeviceHandle;
 export import :DeviceType;
 export import :DeviceTypeId;
 export import :Gamepad;
-export import :IDevice;
 export import :IDeviceObserver;
 export import :InputEventType;
 export import :IRawInputObserver;

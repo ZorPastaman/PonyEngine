@@ -46,6 +46,27 @@ export namespace PonyEngine::Input
 		virtual void End() noexcept override;
 		virtual void Tick() override;
 
+		/// @brief Gets the public input module context.
+		/// @return Input module context.
+		[[nodiscard("Pure function")]]
+		IRawInputModuleContext& PublicInputContext() noexcept;
+		/// @brief Gets the public input module context.
+		/// @return Input module context.
+		[[nodiscard("Pure function")]]
+		const IRawInputModuleContext& PublicInputContext() const noexcept;
+		/// @brief Gets the public input service interface.
+		/// @return Input service interface.
+		[[nodiscard("Pure function")]]
+		IRawInputService& PublicInputService() noexcept;
+		/// @brief Gets the public input service interface.
+		/// @return Input service interface.
+		[[nodiscard("Pure function")]]
+		const IRawInputService& PublicInputService() const noexcept;
+
+		RawInputService& operator =(const RawInputService&) = delete;
+		RawInputService& operator =(RawInputService&&) = delete;
+
+	private:
 		[[nodiscard("Pure function")]]
 		virtual Application::IApplicationContext& Application() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -84,9 +105,15 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual bool IsConnected(DeviceHandle deviceHandle) const override;
 		[[nodiscard("Pure function")]]
-		virtual IDevice& Device(DeviceHandle deviceHandle) override;
+		virtual std::string_view DeviceName(DeviceHandle deviceHandle) const override;
 		[[nodiscard("Pure function")]]
-		virtual const IDevice& Device(DeviceHandle deviceHandle) const override;
+		virtual DeviceTypeId DeviceType(DeviceHandle deviceHandle) const override;
+		[[nodiscard("Pure function")]]
+		virtual std::span<const std::type_index> FeatureTypes(DeviceHandle deviceHandle) const override;
+		[[nodiscard("Pure function")]]
+		virtual void* FindFeature(DeviceHandle deviceHandle, std::type_index type)override;
+		[[nodiscard("Pure function")]]
+		virtual const void* FindFeature(DeviceHandle deviceHandle, std::type_index type) const override;
 
 		[[nodiscard("Pure function")]]
 		virtual AxisId Hash(const Axis& axis) override;
@@ -96,9 +123,9 @@ export namespace PonyEngine::Input
 		virtual bool IsValid(AxisId axisId) const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeId Hash(const DeviceType& deviceType) override;
+		virtual DeviceTypeId Hash(const class DeviceType& deviceType) override;
 		[[nodiscard("Pure function")]]
-		virtual const DeviceType& Unhash(DeviceTypeId deviceTypeId) override;
+		virtual const class DeviceType& Unhash(DeviceTypeId deviceTypeId) override;
 		[[nodiscard("Pure function")]]
 		virtual bool IsValid(DeviceTypeId deviceTypeId) const noexcept override;
 
@@ -107,27 +134,6 @@ export namespace PonyEngine::Input
 		virtual void AddObserver(IRawInputObserver& observer) override;
 		virtual void RemoveObserver(IRawInputObserver& observer) noexcept override;
 
-		/// @brief Gets the public input module context.
-		/// @return Input module context.
-		[[nodiscard("Pure function")]]
-		IRawInputModuleContext& PublicInputContext() noexcept;
-		/// @brief Gets the public input module context.
-		/// @return Input module context.
-		[[nodiscard("Pure function")]]
-		const IRawInputModuleContext& PublicInputContext() const noexcept;
-		/// @brief Gets the public input service interface.
-		/// @return Input service interface.
-		[[nodiscard("Pure function")]]
-		IRawInputService& PublicInputService() noexcept;
-		/// @brief Gets the public input service interface.
-		/// @return Input service interface.
-		[[nodiscard("Pure function")]]
-		const IRawInputService& PublicInputService() const noexcept;
-
-		RawInputService& operator =(const RawInputService&) = delete;
-		RawInputService& operator =(RawInputService&&) = delete;
-
-	private:
 		/// @brief Begins the providers.
 		/// @param count How many providers are begun.
 		void Begin(std::size_t& count);
@@ -165,7 +171,7 @@ export namespace PonyEngine::Input
 		DeviceHandle lastInputDevice; ///< Last device that sent input.
 
 		std::unordered_map<std::uint32_t, std::vector<Axis>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
-		std::unordered_map<DeviceTypeId, DeviceType> deviceTypeHashMap; ///< Device type hash map.
+		std::unordered_map<DeviceTypeId, class DeviceType> deviceTypeHashMap; ///< Device type hash map.
 
 		std::vector<IDeviceObserver*> deviceObservers; ///< Device observers.
 		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
@@ -189,7 +195,7 @@ export namespace PonyEngine::Input
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Input devices weren't removed:");
 			for (std::size_t i = 0uz; i < devices.Size(); ++i)
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Error, "Device: '{}'.", typeid(devices.Device(i)).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Device handle: '0x{:X}'.", devices.Handle(i).id);
 			}
 		}
 
@@ -238,6 +244,26 @@ export namespace PonyEngine::Input
 		ProcessInputQueue();
 	}
 
+	IRawInputModuleContext& RawInputService::PublicInputContext() noexcept
+	{
+		return *this;
+	}
+
+	const IRawInputModuleContext& RawInputService::PublicInputContext() const noexcept
+	{
+		return *this;
+	}
+
+	IRawInputService& RawInputService::PublicInputService() noexcept
+	{
+		return *this;
+	}
+
+	const IRawInputService& RawInputService::PublicInputService() const noexcept
+	{
+		return *this;
+	}
+
 	Application::IApplicationContext& RawInputService::Application() noexcept
 	{
 		return *application;
@@ -271,7 +297,7 @@ export namespace PonyEngine::Input
 		}
 
 		const DeviceHandle currentHandle = nextDeviceHandle;
-		devices.Add(currentHandle, data, data.isConnected);
+		devices.Add(currentHandle, data);
 		++nextDeviceHandle.id;
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Name: '{}'.", currentHandle.id, data.name);
@@ -423,11 +449,11 @@ export namespace PonyEngine::Input
 		}
 	}
 
-	IDevice& RawInputService::Device(const DeviceHandle deviceHandle)
+	std::string_view RawInputService::DeviceName(const DeviceHandle deviceHandle) const
 	{
 		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
 		{
-			return devices.Device(index);
+			return devices.DeviceName(index);
 		}
 		else [[unlikely]]
 		{
@@ -435,11 +461,53 @@ export namespace PonyEngine::Input
 		}
 	}
 
-	const IDevice& RawInputService::Device(const DeviceHandle deviceHandle) const
+	DeviceTypeId RawInputService::DeviceType(const DeviceHandle deviceHandle) const
 	{
 		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
 		{
-			return devices.Device(index);
+			return devices.DeviceType(index);
+		}
+		else [[unlikely]]
+		{
+			throw std::invalid_argument("Device not found");
+		}
+	}
+
+	std::span<const std::type_index> RawInputService::FeatureTypes(const DeviceHandle deviceHandle) const
+	{
+		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
+		{
+			return devices.DeviceFeatures(index).FeatureTypes();
+		}
+		else [[unlikely]]
+		{
+			throw std::invalid_argument("Device not found");
+		}
+	}
+
+	void* RawInputService::FindFeature(const DeviceHandle deviceHandle, const std::type_index type)
+	{
+		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
+		{
+			const DeviceFeatureContainer& features = devices.DeviceFeatures(index);
+			const std::size_t featureIndex = features.IndexOf(type);
+
+			return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
+		}
+		else [[unlikely]]
+		{
+			throw std::invalid_argument("Device not found");
+		}
+	}
+
+	const void* RawInputService::FindFeature(const DeviceHandle deviceHandle, const std::type_index type) const
+	{
+		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
+		{
+			const DeviceFeatureContainer& features = devices.DeviceFeatures(index);
+			const std::size_t featureIndex = features.IndexOf(type);
+
+			return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
 		}
 		else [[unlikely]]
 		{
@@ -497,7 +565,7 @@ export namespace PonyEngine::Input
 		return position != axisHashMap.cend() && axisId.index < position->second.size();
 	}
 
-	DeviceTypeId RawInputService::Hash(const DeviceType& deviceType)
+	DeviceTypeId RawInputService::Hash(const class DeviceType& deviceType)
 	{
 		const auto deviceTypeId = DeviceTypeId{.hash = Hash::FNV1a64(deviceType.Type())};
 
@@ -563,26 +631,6 @@ export namespace PonyEngine::Input
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove raw input observer that hadn't been added.");
 		}
-	}
-
-	IRawInputModuleContext& RawInputService::PublicInputContext() noexcept
-	{
-		return *this;
-	}
-
-	const IRawInputModuleContext& RawInputService::PublicInputContext() const noexcept
-	{
-		return *this;
-	}
-
-	IRawInputService& RawInputService::PublicInputService() noexcept
-	{
-		return *this;
-	}
-
-	const IRawInputService& RawInputService::PublicInputService() const noexcept
-	{
-		return *this;
 	}
 
 	void RawInputService::Begin(std::size_t& count)
@@ -661,7 +709,6 @@ export namespace PonyEngine::Input
 					for (std::size_t axisIndex = 0uz; axisIndex < inputEvent.axes.size(); ++axisIndex)
 					{
 						devices.Value(deviceIndex, inputEvent.axes[axisIndex], inputEvent.values[axisIndex], inputEvent.eventType);
-						PONY_LOG(application->Logger(), Log::LogType::Info, "Key: {}; Value: {}.", Unhash(inputEvent.axes[axisIndex]).Path(), inputEvent.values[axisIndex]);
 					}
 					lastInputDevice = device;
 
@@ -670,8 +717,6 @@ export namespace PonyEngine::Input
 				[&](const ConnectionEvent& connectionEvent)
 				{
 					devices.IsConnected(devices.IndexOf(device), connectionEvent.isConnected);
-					PONY_LOG(application->Logger(), Log::LogType::Info, "Connection: {}.", connectionEvent.isConnected);
-
 					ObserveConnection(device, connectionEvent);
 				}
 			}, event);

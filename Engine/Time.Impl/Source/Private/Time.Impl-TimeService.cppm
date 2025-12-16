@@ -32,6 +32,19 @@ export namespace PonyEngine::Time
 		virtual void End() noexcept override;
 		virtual void Tick() noexcept override;
 
+		/// @brief Gets the public time service.
+		/// @return Public time service.
+		[[nodiscard("Pure function")]]
+		ITimeService& PublicTimeService() noexcept;
+		/// @brief Gets the public time service.
+		/// @return Public time service.
+		[[nodiscard("Pure function")]]
+		const ITimeService& PublicTimeService() const noexcept;
+
+		TimeService& operator =(const TimeService&) = delete;
+		TimeService& operator =(TimeService&&) = delete;
+
+	private:
 		[[nodiscard("Pure function")]]
 		virtual double NowTime() const noexcept override;
 
@@ -86,19 +99,6 @@ export namespace PonyEngine::Time
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> NowTimePoint() const noexcept override;
 
-		/// @brief Gets the public time service.
-		/// @return Public time service.
-		[[nodiscard("Pure function")]]
-		ITimeService& PublicTimeService() noexcept;
-		/// @brief Gets the public time service.
-		/// @return Public time service.
-		[[nodiscard("Pure function")]]
-		const ITimeService& PublicTimeService() const noexcept;
-
-		TimeService& operator =(const TimeService&) = delete;
-		TimeService& operator =(TimeService&&) = delete;
-
-	private:
 		/// @brief Waits for the next frame time point according to the @p deltaTimeCap.
 		/// @return Now time point.
 		[[nodiscard("Must used to update times")]]
@@ -178,6 +178,16 @@ namespace PonyEngine::Time
 	{
 		const std::chrono::time_point<std::chrono::steady_clock> now = WaitForNextFrame();
 		UpdateTimes(now);
+	}
+
+	ITimeService& TimeService::PublicTimeService() noexcept
+	{
+		return *this;
+	}
+
+	const ITimeService& TimeService::PublicTimeService() const noexcept
+	{
+		return *this;
 	}
 
 	double TimeService::NowTime() const noexcept
@@ -318,16 +328,6 @@ namespace PonyEngine::Time
 	std::chrono::time_point<std::chrono::steady_clock> TimeService::NowTimePoint() const noexcept
 	{
 		return std::chrono::steady_clock::now();
-	}
-
-	ITimeService& TimeService::PublicTimeService() noexcept
-	{
-		return *this;
-	}
-
-	const ITimeService& TimeService::PublicTimeService() const noexcept
-	{
-		return *this;
 	}
 
 	std::chrono::time_point<std::chrono::steady_clock> TimeService::WaitForNextFrame() noexcept

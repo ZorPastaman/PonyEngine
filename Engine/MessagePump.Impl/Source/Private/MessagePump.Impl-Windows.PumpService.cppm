@@ -39,14 +39,6 @@ export namespace PonyEngine::MessagePump::Windows
 		virtual void End() noexcept override;
 		virtual void Tick() noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual PumpFeature SupportedFeatures() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual Math::Vector2<std::int32_t>LastMessageCursorPosition() const noexcept override;
-
 		/// @brief Gets the public pump service.
 		/// @return Public pump service.
 		[[nodiscard("Pure function")]]
@@ -60,6 +52,14 @@ export namespace PonyEngine::MessagePump::Windows
 		PumpService& operator =(PumpService&&) = delete;
 
 	private:
+		[[nodiscard("Pure function")]]
+		virtual PumpFeature SupportedFeatures() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual Math::Vector2<std::int32_t>LastMessageCursorPosition() const noexcept override;
+
 		/// @brief Updates time based on a new message time.
 		/// @param newMessageTime New message time.
 		void UpdateTime(DWORD newMessageTime) noexcept;
@@ -110,6 +110,16 @@ namespace PonyEngine::MessagePump::Windows
 		}
 	}
 
+	IPumpService& PumpService::PublicPumpService() noexcept
+	{
+		return *this;
+	}
+
+	const IPumpService& PumpService::PublicPumpService() const noexcept
+	{
+		return *this;
+	}
+
 	PumpFeature PumpService::SupportedFeatures() const noexcept
 	{
 		return PumpFeature::MessageTime | PumpFeature::CursorPosition;
@@ -123,16 +133,6 @@ namespace PonyEngine::MessagePump::Windows
 	Math::Vector2<std::int32_t> PumpService::LastMessageCursorPosition() const noexcept
 	{
 		return cursorPosition;
-	}
-
-	IPumpService& PumpService::PublicPumpService() noexcept
-	{
-		return *this;
-	}
-
-	const IPumpService& PumpService::PublicPumpService() const noexcept
-	{
-		return *this;
 	}
 
 	void PumpService::UpdateTime(const DWORD newMessageTime) noexcept
