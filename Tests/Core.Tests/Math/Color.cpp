@@ -482,27 +482,16 @@ TEST_CASE("Color isFinite", "[Math][Color]")
 TEST_CASE("Color toString", "[Math][Color]")
 {
 	constexpr auto rgba = PonyEngine::Math::ColorRGBA<float>(0.1f, 0.2f, 0.3f, 0.4f);
-	const auto rgbaExpected = std::format("R: {}, G: {}, B: {}, A: {}", rgba.R(), rgba.G(), rgba.B(), rgba.A());
-	REQUIRE(rgba.ToString() == rgbaExpected);
-	std::ostringstream rgbaOss;
-	rgbaOss << rgba;
-	REQUIRE(rgbaOss.str() == rgbaExpected);
+	auto rgbaExpected = std::format("RGBA: ({:n})", rgba.Span());
+	REQUIRE(std::format("{:c:}", rgba) == rgbaExpected);
+	rgbaExpected = std::format("({:n})", rgba.Span());
 	REQUIRE(std::format("{}", rgba) == rgbaExpected);
 
 	constexpr auto brg = PonyEngine::Math::Color<std::uint8_t, PonyEngine::Math::ColorChannel::Blue, PonyEngine::Math::ColorChannel::Red, PonyEngine::Math::ColorChannel::Green>(72, 127, 250);
-	const auto brgExpected = std::format("B: {}, R: {}, G: {}", brg.B(), brg.R(), brg.G());
-	REQUIRE(brg.ToString() == brgExpected);
-	std::ostringstream brgOss;
-	brgOss << brg;
-	REQUIRE(brgOss.str() == brgExpected);
+	auto brgExpected = std::format("BRG: ({:n})", brg.Span());
+	REQUIRE(std::format("{:c:}", brg) == brgExpected);
+	brgExpected = std::format("({:n})", brg.Span());
 	REQUIRE(std::format("{}", brg) == brgExpected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::ColorRGBA<float>(0.1f, 0.2f, 0.3f, 0.4f).ToString();
-	};
-#endif
 }
 
 TEST_CASE("Color cast", "[Math][Color]")

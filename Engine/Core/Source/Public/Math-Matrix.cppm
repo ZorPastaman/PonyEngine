@@ -293,12 +293,6 @@ export namespace PonyEngine::Math
 		/// @param divisor Divisor.
 		constexpr void Divide(const Matrix& divisor) noexcept;
 
-		/// @brief Creates a string representing a state of the matrix.
-		/// @param multiline Should it print each line on different lines?
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		std::string ToString(bool multiline = false) const;
-
 		/// @brief Casts all the components to the @p U.
 		/// @tparam U Target component type.
 		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
@@ -569,57 +563,101 @@ export namespace PonyEngine::Math
 	/// @return Quotient.
 	template<std::floating_point U = double, std::integral T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, ColumnSize> operator /(const Matrix<T, RowSize, ColumnSize>& matrix, U divisor) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
-
-	/// @brief Outputs a string representation of the @p matrix.
-	/// @tparam T Component type.
-	/// @tparam RowSize Row count.
-	/// @tparam ColumnSize Column count.
-	/// @param stream Target.
-	/// @param matrix Matrix.
-	/// @return @p stream.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
-	std::ostream& operator <<(std::ostream& stream, const Matrix<T, RowSize, ColumnSize>& matrix);
 }
 
 /// @brief Matrix formatter.
+/// @details The format is ":<matrix_args>:<range_args>:<component_args>". The default brackets are [].
+///          Matrix args: m - each row gets '\n' at the end; s - writes a matrix as one vector, otherwise each row is written with its own brackets.
+///          m and s are incompatible.
 /// @tparam T Component type.
 /// @tparam RowSize Row count.
 /// @tparam ColumnSize Column count.
-/// @note Parameters :m or :M produce a multiline string; without them, the result will be a single line string.
 export template<PonyEngine::Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 struct std::formatter<PonyEngine::Math::Matrix<T, RowSize, ColumnSize>, char>
 {
 private:
+	std::range_formatter<T, char> subFormatter;
 	bool multiline = false;
+	bool singleLine = false;
 
 public:
-	constexpr auto parse(std::format_parse_context& context)
+	constexpr void set_separator(const std::string_view separator) noexcept
+	{
+		subFormatter.set_separator(separator);
+	}
+
+	constexpr void set_brackets(const std::string_view opening, const std::string_view closing) noexcept
+	{
+		subFormatter.set_brackets(opening, closing);
+	}
+
+	[[nodiscard("Pure function")]]
+	constexpr std::range_formatter<T, char>& underlying() noexcept
+	{
+		return subFormatter;
+	}
+
+	[[nodiscard("Pure function")]]
+	constexpr const std::range_formatter<T, char>& underlying() const noexcept
+	{
+		return subFormatter;
+	}
+
+	constexpr std::format_parse_context::iterator parse(std::format_parse_context& context)
 	{
 		auto it = context.begin();
 
-		for (; it != context.end() && *it != '}'; ++it)
+		if (it == context.end()) [[unlikely]]
+		{
+			throw std::format_error("Unexpected context end");
+		}
+
+		for (; *it != '}' && *it != ':'; ++it)
 		{
 			switch (*it)
 			{
 			case 'm':
-			case 'M':
 				multiline = true;
 				break;
+			case 's':
+				singleLine = true;
+				break;
 			default: [[unlikely]]
-				throw std::format_error("Unexpected format specifier.");
+				throw std::format_error("Unexpected format specifier");
 			}
 		}
-		if (it == context.end()) [[unlikely]]
+
+		if (multiline && singleLine) [[unlikely]]
 		{
-			throw std::format_error("Unexpected context end.");
+			throw std::format_error("Incompatible multiline and single line specifiers");
+		}
+
+		it += *it == ':';
+		context.advance_to(it);
+		return subFormatter.parse(context);
+	}
+
+	std::format_context::iterator format(const PonyEngine::Math::Matrix<T, RowSize, ColumnSize>& matrix, std::format_context& context) const
+	{
+		if (singleLine)
+		{
+			return subFormatter.format(matrix.Transpose().Span(), context);
+		}
+
+		auto it = context.out();
+
+		for (std::size_t i = 0uz; i < RowSize; ++i)
+		{
+			context.advance_to(it);
+			it = subFormatter.format(matrix.Row(i).Span(), context);
+
+			if (multiline && i < RowSize - 1uz)
+			{
+				*it++ = '\n';
+			}
 		}
 
 		return it;
-	}
-
-	auto format(const PonyEngine::Math::Matrix<T, RowSize, ColumnSize>& matrix, std::format_context& context) const
-	{
-		return std::ranges::copy(matrix.ToString(multiline), context.out()).out;
 	}
 };
 
@@ -1208,31 +1246,6 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
-	std::string Matrix<T, RowSize, ColumnSize>::ToString(const bool multiline) const
-	{
-		std::string answer;
-		for (std::size_t i = 0uz; i < RowSize; ++i)
-		{
-			answer += '[';
-			for (std::size_t j = 0uz; j < ColumnSize; ++j)
-			{
-				answer += std::format("{}", (*this)[i, j]);
-				if (j < ColumnSize - 1uz)
-				{
-					answer += ", ";
-				}
-			}
-			answer += ']';
-			if (multiline)
-			{
-				answer += '\n';
-			}
-		}
-
-		return answer;
-	}
-
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	template<Type::Arithmetic U>
 	constexpr Matrix<T, RowSize, ColumnSize>::operator Matrix<U, RowSize, ColumnSize>() const noexcept
 	{
@@ -1592,11 +1605,5 @@ namespace PonyEngine::Math
 		}
 
 		return answer;
-	}
-
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
-	std::ostream& operator <<(std::ostream& stream, const Matrix<T, RowSize, ColumnSize>& matrix)
-	{
-		return stream << matrix.ToString();
 	}
 }

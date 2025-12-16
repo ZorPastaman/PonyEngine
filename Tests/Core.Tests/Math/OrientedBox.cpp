@@ -444,24 +444,6 @@ TEST_CASE("OrientedBox closest point", "[Math][OrientedBox]")
 #endif
 }
 
-TEST_CASE("OrientedBox toString", "[Math][OrientedBox]")
-{
-	const auto obb = PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(3.f, 5.f, 7.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, 1.f), PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.1f, 0.7f, -1.2f)));
-	const std::string expected = std::format("Center: {}, Extents: {}, Axes: {}", obb.Center(), obb.Extents(), obb.Axes().Transpose());
-	REQUIRE(obb.ToString() == expected);
-	std::ostringstream oss;
-	oss << obb;
-	REQUIRE(oss.str() == expected);
-	REQUIRE(std::format("{}", obb) == expected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(3.f, 5.f, 7.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, 1.f)).ToString();
-	};
-#endif
-}
-
 TEST_CASE("OrientedBox cast", "[Math][OrientedBox]")
 {
 	const auto obb = PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(3.f, 5.f, 7.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, 1.f), PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.1f, 0.7f, -1.2f)));

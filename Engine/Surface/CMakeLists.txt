@@ -6,13 +6,20 @@ add_library(PonyEngine.Surface STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Surface.cppm"
-	"Source/Public/Surface-IRawInputObserver.cppm"
 	"Source/Public/Surface-ISurfaceObserver.cppm"
 	"Source/Public/Surface-ISurfaceService.cppm"
 	"Source/Public/Surface-RectStyle.cppm"
 	"Source/Public/Surface-SurfaceFeature.cppm"
 	"Source/Public/Surface-Utility.cppm"
 )
+
+if(PONY_WINDOWS)
+	message(VERBOSE "Configuring sources for Windows")
+	target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
+		"Source/Public/Surface-Windows.IRawInputObserver.cppm"
+		"Source/Public/Surface-Windows.ISurfaceService.cppm"
+	)
+endif()
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface PROPERTIES 
@@ -22,6 +29,6 @@ set_target_properties(PonyEngine.Surface PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Surface PRIVATE
+target_link_libraries(PonyEngine.Surface PUBLIC
 	PonyEngine.Core
 )
