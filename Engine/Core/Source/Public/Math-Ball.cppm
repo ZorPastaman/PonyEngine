@@ -93,11 +93,6 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		Vector<T, Size> ClosestPoint(const Vector<T, Size>& point) const noexcept;
 
-		/// @brief Creates a string representing the ball.
-		/// @return String representing the ball.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Casts the ball to a ball of another type.
 		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
@@ -141,42 +136,7 @@ export namespace PonyEngine::Math
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Ball<T, Size>& lhs, const Ball<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size >= 1);
-
-	/// @brief Outputs a string representation of the @p ball.
-	/// @tparam T Component type.
-	/// @tparam Size Dimension.
-	/// @param stream Target stream.
-	/// @param ball Input source.
-	/// @return @p stream.
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Ball<T, Size>& ball) requires (Size >= 1);
 }
-
-/// @brief Ball formatter.
-/// @tparam T Component type.
-/// @tparam Size Dimension.
-export template<std::floating_point T, std::size_t Size>
-struct std::formatter<PonyEngine::Math::Ball<T, Size>, char>
-{
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
-
-		return context.begin();
-	}
-
-	static auto format(const PonyEngine::Math::Ball<T, Size>& ball, std::format_context& context)
-	{
-		return std::ranges::copy(ball.ToString(), context.out()).out;
-	}
-};
 
 namespace PonyEngine::Math
 {
@@ -285,12 +245,6 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	std::string Ball<T, Size>::ToString() const
-	{
-		return std::format("Center: {}, Radius: {}", center, radius);
-	}
-
-	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	template<std::floating_point U>
 	constexpr Ball<T, Size>::operator Ball<U, Size>() const noexcept
 	{
@@ -301,11 +255,5 @@ namespace PonyEngine::Math
 	constexpr bool AreAlmostEqual(const Ball<T, Size>& lhs, const Ball<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept requires (Size >= 1)
 	{
 		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.Radius(), rhs.Radius(), tolerance);
-	}
-
-	template<std::floating_point T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const Ball<T, Size>& ball) requires (Size >= 1)
-	{
-		return stream << ball.ToString();
 	}
 }

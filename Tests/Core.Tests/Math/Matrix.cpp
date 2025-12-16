@@ -1503,46 +1503,19 @@ TEST_CASE("Matrix to string", "[Math][Matrix]")
 	constexpr std::array<std::int16_t, 16uz> components = { -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 };
 	constexpr auto matrix2x3 = PonyEngine::Math::Matrix2x3<std::int32_t>(components[0], components[1], components[2], components[3], components[4], components[5]);
 	std::string expected2x3 = std::format("[{}, {}, {}][{}, {}, {}]", matrix2x3[0, 0], matrix2x3[0, 1], matrix2x3[0, 2], matrix2x3[1, 0], matrix2x3[1, 1], matrix2x3[1, 2]);
-	REQUIRE(matrix2x3.ToString() == expected2x3);
-	std::ostringstream oss;
-	oss << matrix2x3;
-	REQUIRE(oss.str() == expected2x3);
 	REQUIRE(std::format("{}", matrix2x3) == expected2x3);
-	expected2x3 = std::format("[{}, {}, {}]\n[{}, {}, {}]\n", matrix2x3[0, 0], matrix2x3[0, 1], matrix2x3[0, 2], matrix2x3[1, 0], matrix2x3[1, 1], matrix2x3[1, 2]);
-	REQUIRE(matrix2x3.ToString(true) == expected2x3);
+	expected2x3 = std::format("[{}, {}, {}]\n[{}, {}, {}]", matrix2x3[0, 0], matrix2x3[0, 1], matrix2x3[0, 2], matrix2x3[1, 0], matrix2x3[1, 1], matrix2x3[1, 2]);
 	REQUIRE(std::format("{:m}", matrix2x3) == expected2x3);
-	REQUIRE(std::format("{:M}", matrix2x3) == expected2x3);
+	expected2x3 = std::format("[{}, {}, {}, {}, {}, {}]", matrix2x3[0, 0], matrix2x3[0, 1], matrix2x3[0, 2], matrix2x3[1, 0], matrix2x3[1, 1], matrix2x3[1, 2]);
+	REQUIRE(std::format("{:s}", matrix2x3) == expected2x3);
 
 	constexpr auto matrix4x4 = PonyEngine::Math::Matrix4x4<float>(components[0], components[1], components[2], components[3], components[4], components[5], components[6], components[7], components[8], components[9], components[10], components[11], components[12], components[13], components[14], components[15]);
 	std::string expected4x4 = std::format("[{}, {}, {}, {}][{}, {}, {}, {}][{}, {}, {}, {}][{}, {}, {}, {}]", matrix4x4[0, 0], matrix4x4[0, 1], matrix4x4[0, 2], matrix4x4[0, 3], matrix4x4[1, 0], matrix4x4[1, 1], matrix4x4[1, 2], matrix4x4[1, 3], matrix4x4[2, 0], matrix4x4[2, 1], matrix4x4[2, 2], matrix4x4[2, 3], matrix4x4[3, 0], matrix4x4[3, 1], matrix4x4[3, 2], matrix4x4[3, 3]);
-	REQUIRE(matrix4x4.ToString() == expected4x4);
-	oss = std::ostringstream();
-	oss << matrix4x4;
-	REQUIRE(oss.str() == expected4x4);
 	REQUIRE(std::format("{}", matrix4x4) == expected4x4);
-	expected4x4 = std::format("[{}, {}, {}, {}]\n[{}, {}, {}, {}]\n[{}, {}, {}, {}]\n[{}, {}, {}, {}]\n", matrix4x4[0, 0], matrix4x4[0, 1], matrix4x4[0, 2], matrix4x4[0, 3], matrix4x4[1, 0], matrix4x4[1, 1], matrix4x4[1, 2], matrix4x4[1, 3], matrix4x4[2, 0], matrix4x4[2, 1], matrix4x4[2, 2], matrix4x4[2, 3], matrix4x4[3, 0], matrix4x4[3, 1], matrix4x4[3, 2], matrix4x4[3, 3]);
-	REQUIRE(matrix4x4.ToString(true) == expected4x4);
+	expected4x4 = std::format("[{}, {}, {}, {}]\n[{}, {}, {}, {}]\n[{}, {}, {}, {}]\n[{}, {}, {}, {}]", matrix4x4[0, 0], matrix4x4[0, 1], matrix4x4[0, 2], matrix4x4[0, 3], matrix4x4[1, 0], matrix4x4[1, 1], matrix4x4[1, 2], matrix4x4[1, 3], matrix4x4[2, 0], matrix4x4[2, 1], matrix4x4[2, 2], matrix4x4[2, 3], matrix4x4[3, 0], matrix4x4[3, 1], matrix4x4[3, 2], matrix4x4[3, 3]);
 	REQUIRE(std::format("{:m}", matrix4x4) == expected4x4);
-	REQUIRE(std::format("{:M}", matrix4x4) == expected4x4);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Int")
-	{
-		return PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString();
-	};
-	BENCHMARK("Int multiline")
-	{
-		return PonyEngine::Math::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString(true);
-	};
-	BENCHMARK("Float")
-	{
-		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString();
-	};
-	BENCHMARK("Float multiline")
-	{
-		return PonyEngine::Math::Matrix4x4<float>(std::array<float, 16uz>{ -4, 2, 6, 8, -1, 2, 5, -6, 8, 0, -3, 5, -3, 1, 3, -9 }).ToString(true);
-	};
-#endif
+	expected4x4 = std::format("[{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]", matrix4x4[0, 0], matrix4x4[0, 1], matrix4x4[0, 2], matrix4x4[0, 3], matrix4x4[1, 0], matrix4x4[1, 1], matrix4x4[1, 2], matrix4x4[1, 3], matrix4x4[2, 0], matrix4x4[2, 1], matrix4x4[2, 2], matrix4x4[2, 3], matrix4x4[3, 0], matrix4x4[3, 1], matrix4x4[3, 2], matrix4x4[3, 3]);
+	REQUIRE(std::format("{:s}", matrix4x4) == expected4x4);
 }
 
 TEST_CASE("Matrix cast", "[Math][Matrix]")

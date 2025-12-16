@@ -265,29 +265,6 @@ TEST_CASE("Transform3D look-at", "[Math][Transform3D]")
 #endif
 }
 
-TEST_CASE("Transform3D toString", "[Math][Transform3D]")
-{
-	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);
-	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
-	constexpr auto scale = PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f);
-	auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
-	const std::string expected = std::format("Position: {}, Rotation: {}, Scale: {}", position, transform.Rotation(), scale);
-	REQUIRE(transform.ToString() == expected);
-
-	std::ostringstream oss;
-	oss << transform;
-	REQUIRE(oss.str() == expected);
-
-	REQUIRE(std::format("{}", transform) == expected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::Transform3D<float>().ToString();
-	};
-#endif
-}
-
 TEST_CASE("Transform3D cast", "[Math][Transform3D]")
 {
 	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);

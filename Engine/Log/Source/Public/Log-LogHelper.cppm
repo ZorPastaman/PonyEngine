@@ -11,39 +11,134 @@ export module PonyEngine.Log:LogHelper;
 
 import std;
 
-import PonyEngine.Text;
-
-import :LogFormat;
+import :ILogger;
 import :LogType;
 
 export namespace PonyEngine::Log
 {
 	// Functions here are used by PonyEngine/Log/Log.h
 
-	/// @brief Returns the same message.
-	/// @param message Message.
-	/// @return Message.
-	[[nodiscard("Pure function")]]
-	std::string_view LogString(std::string_view message) noexcept;
-	/// @brief Safe formats the string.
-	/// @tparam Args Argument types.
-	/// @param format Format.
-	/// @param args Arguments.
-	/// @return Formatted string.
-	template<typename... Args> [[nodiscard("Pure function")]]
-	std::string LogString(std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Logs to the logger.
+	/// @param logger Logger.
+	/// @param logType Log type.
+	/// @param message Log message.
+	void LogToLogger(const ILogger& logger, LogType logType, std::string_view message) noexcept;
+	/// @brief Logs to the logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param logType Log type.
+	/// @param format Log message format.
+	/// @param args Log message format arguments.
+	template<typename... Args>
+	void LogToLogger(const ILogger& logger, LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Logs to the logger.
+	/// @param logger Logger.
+	/// @param logType Log type.
+	/// @param stacktrace Stacktrace.
+	/// @param message Log message.
+	void LogToLogger(const ILogger& logger, LogType logType, const std::stacktrace& stacktrace, std::string_view message) noexcept;
+	/// @brief Logs to the logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param logType Log type.
+	/// @param stacktrace Stacktrace.
+	/// @param format Log message format.
+	/// @param args Log message format arguments.
+	template<typename... Args>
+	void LogToLogger(const ILogger& logger, LogType logType, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
+
+	/// @brief Logs to the logger.
+	/// @param logger Logger.
+	/// @param exception Exception.
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception) noexcept;
+	/// @brief Logs to the logger.
+	/// @param logger Logger.
+	/// @param exception Exception.
+	/// @param message Log message.
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, std::string_view message) noexcept;
+	/// @brief Logs to the logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param exception Exception.
+	/// @param format Log message format.
+	/// @param args Log message format arguments.
+	template<typename... Args>
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Logs to the logger.
+	/// @param logger Logger.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace) noexcept;
+	/// @brief Logs to the logger.
+	/// @param logger Logger.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @param message Log message.
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, std::string_view message) noexcept;
+	/// @brief Logs to the logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
+	/// @param format Log message format.
+	/// @param args Log message format arguments.
+	template<typename... Args>
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
 }
 
 namespace PonyEngine::Log
 {
-	std::string_view LogString(const std::string_view message) noexcept
+	void LogToLogger(const ILogger& logger, const LogType logType, const std::string_view message) noexcept
 	{
-		return message;
+		logger.Log(logType, message);
 	}
 
 	template<typename... Args>
-	std::string LogString(const std::format_string<Args...> format, Args&&... args) noexcept
+	void LogToLogger(const ILogger& logger, const LogType logType, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return Text::FormatSafe(format, std::forward<Args>(args)...);
+		logger.Log(logType, format.get(), std::make_format_args(args...));
+	}
+
+	void LogToLogger(const ILogger& logger, const LogType logType, const std::stacktrace& stacktrace, const std::string_view message) noexcept
+	{
+		logger.Log(logType, message, stacktrace);
+	}
+
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception) noexcept
+	{
+		logger.Log(exception);
+	}
+
+	template<typename... Args>
+	void LogToLogger(const ILogger& logger, const LogType logType, const std::stacktrace& stacktrace, const std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		logger.Log(logType, format.get(), std::make_format_args(args...), stacktrace);
+	}
+
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::string_view message) noexcept
+	{
+		logger.Log(exception, message);
+	}
+
+	template<typename... Args>
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		logger.Log(exception, format.get(), std::make_format_args(args...));
+	}
+
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace) noexcept
+	{
+		logger.Log(exception, stacktrace);
+	}
+
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, const std::string_view message) noexcept
+	{
+		logger.Log(exception, message, stacktrace);
+	}
+
+	template<typename... Args>
+	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, const std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		logger.Log(exception, format.get(), std::make_format_args(args...), stacktrace);
 	}
 }

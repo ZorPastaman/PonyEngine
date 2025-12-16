@@ -253,26 +253,6 @@ TEST_CASE("Ball closest point", "[Math][Ball]")
 #endif
 }
 
-TEST_CASE("Ball toString", "[Math][Ball]")
-{
-	constexpr auto center = PonyEngine::Math::Vector3<float>(-2.f, -1.f, 2.f);
-	constexpr float radius = 2.f;
-	constexpr auto sphere = PonyEngine::Math::Sphere<float>(center, radius);
-	const std::string expected = std::format("Center: {}, Radius: {}", center, radius);
-	REQUIRE(sphere.ToString() == expected);
-	std::ostringstream oss;
-	oss << sphere;
-	REQUIRE(oss.str() == expected);
-	REQUIRE(std::format("{}", sphere) == expected);
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(-2.f, -1.f, 2.f), 2.f).ToString();
-	};
-#endif
-}
-
 TEST_CASE("Ball cast", "[Math][Ball]")
 {
 	constexpr auto center = PonyEngine::Math::Vector3<float>(-2.f, -1.f, 2.f);

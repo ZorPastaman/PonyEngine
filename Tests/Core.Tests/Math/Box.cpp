@@ -348,26 +348,6 @@ TEST_CASE("Box closest point", "[Math][Box]")
 #endif
 }
 
-TEST_CASE("Box toString", "[Math][Box]")
-{
-	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
-	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
-	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
-	const std::string expected = std::format("Center: {}, Extents: {}", center, PonyEngine::Math::Abs(extents));
-	REQUIRE(expected == cuboid.ToString());
-	std::ostringstream oss;
-	oss << cuboid;
-	REQUIRE(expected == oss.str());
-	REQUIRE(expected == std::format("{}", cuboid));
-
-#if PONY_ENGINE_TESTING_BENCHMARK
-	BENCHMARK("Bench")
-	{
-		return PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f)).ToString();
-	};
-#endif
-}
-
 TEST_CASE("Box cast", "[Math][Box]")
 {
 	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);

@@ -15,8 +15,6 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Public/Log.cppm"
 	"Source/Public/Log-ILogger.cppm"
-	"Source/Public/Log-LogData.cppm"
-	"Source/Public/Log-LogFormat.cppm"
 	"Source/Public/Log-LogHelper.cppm"
 	"Source/Public/Log-LogType.cppm"
 )
@@ -29,6 +27,6 @@ set_target_properties(PonyEngine.Log PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log PRIVATE
+target_link_libraries(PonyEngine.Log PUBLIC
 	PonyEngine.Core
 )

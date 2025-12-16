@@ -3,9 +3,9 @@ add_executable(PonyEngine.Log.Tests)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Tests PRIVATE
-	"Log/LogFormat.cpp"
+	
 	"Log/LogMacro.cpp"
-)
+ "Log/LogMacroStacktrace.cpp")
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Log.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
@@ -31,7 +31,7 @@ target_link_libraries(PonyEngine.Log.Tests PRIVATE
 	Catch2::Catch2WithMain
 	PonyEngine.Log
 	PonyEngine.Core
-	PonyEngine.Application.Extension
+	PonyEngine.Application.Ext
 )
 
 message(VERBOSE "Discovering tests")

@@ -129,11 +129,6 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Vector<T, Dim> ClosestPoint(const Vector<T, Dim>& point) const noexcept;
 
-		/// @brief Creates a string representing the box.
-		/// @return String representing the box.
-		[[nodiscard("Pure function")]]
-		std::string ToString() const;
-
 		/// @brief Casts the box to a box of another type.
 		/// @tparam U Target type.
 		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
@@ -171,42 +166,7 @@ export namespace PonyEngine::Math
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const CornerBox<T, Size>& lhs, const CornerBox<T, Size>& rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
-
-	/// @brief Outputs a string representation of the @p box.
-	/// @tparam T Component type.
-	/// @tparam Size Dimension.
-	/// @param stream Target stream.
-	/// @param box Input source.
-	/// @return @p stream.
-	template<Type::Arithmetic T, std::size_t Size>
-	std::ostream& operator <<(std::ostream& stream, const CornerBox<T, Size>& box);
 }
-
-/// @brief Box formatter.
-/// @tparam T Component type.
-/// @tparam Size Dimension.
-export template<PonyEngine::Type::Arithmetic T, std::size_t Size>
-struct std::formatter<PonyEngine::Math::CornerBox<T, Size>, char>
-{
-	static constexpr auto parse(std::format_parse_context& context)
-	{
-		if (context.begin() == context.end()) [[unlikely]]
-		{
-			throw std::format_error("Unexpected context end.");
-		}
-		if (*context.begin() != '}') [[unlikely]]
-		{
-			throw std::format_error("Unexpected format specifier.");
-		}
-
-		return context.begin();
-	}
-
-	static auto format(const PonyEngine::Math::CornerBox<T, Size>& box, std::format_context& context)
-	{
-		return std::ranges::copy(box.ToString(), context.out()).out;
-	}
-};
 
 namespace PonyEngine::Math
 {
@@ -362,12 +322,6 @@ namespace PonyEngine::Math
 	}
 
 	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
-	std::string CornerBox<T, Dim>::ToString() const
-	{
-		return std::format("Position: {}, Size: {}", position, size);
-	}
-
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	template<Type::Arithmetic U>
 	constexpr CornerBox<T, Dim>::operator CornerBox<U, Dim>() const noexcept
 	{
@@ -385,11 +339,5 @@ namespace PonyEngine::Math
 	constexpr bool AreAlmostEqual(const CornerBox<T, Size>& lhs, const CornerBox<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
 		return AreAlmostEqual(lhs.Position(), rhs.Position(), tolerance) && AreAlmostEqual(lhs.Size(), rhs.Size(), tolerance);
-	}
-
-	template<Type::Arithmetic T, std::size_t Size>
-	std::ostream& operator<<(std::ostream& stream, const CornerBox<T, Size>& box)
-	{
-		return stream << box.ToString();
 	}
 }

@@ -17,11 +17,8 @@
 	[[nodiscard("Pure function")]] \
 	constexpr std::string_view ToString(const Value value) noexcept \
 	{ \
-		return ValueNames[std::min(static_cast<std::size_t>(value), ValueNames.size() - 1uz)]; \
-	} \
-	std::ostream& operator <<(std::ostream& stream, const Value value) \
-	{ \
-		return stream << ToString(value); \
+		const std::size_t index = static_cast<std::size_t>(value); \
+		return index < ValueNames.size() ? ValueNames[index] : "Unknown"; \
 	} \
 
 /// @brief Creates a formatter for an enum value.
@@ -101,10 +98,6 @@
 	{ \
 		return Mask##GeneratedNames[std::min(static_cast<std::size_t>(mask), Mask##GeneratedNames.size() - 1uz)]; \
 	} \
-	std::ostream& operator <<(std::ostream& stream, const Mask mask) \
-	{ \
-		return stream << ToString(mask); \
-	} \
 
 /// @brief Creates a formatter for an enum mask.
 /// @note This define must be used in a global namespace.
@@ -129,7 +122,7 @@
 		} \
 		static auto format(const Namespace::Mask mask, std::format_context& context) \
 		{ \
-			return std::ranges::copy(ToString(mask), context.out()).out; \
+			return std::ranges::copy(Namespace::ToString(mask), context.out()).out; \
 		} \
 	}; \
 
