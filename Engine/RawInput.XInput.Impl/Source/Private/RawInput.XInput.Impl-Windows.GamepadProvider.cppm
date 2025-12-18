@@ -251,7 +251,7 @@ namespace PonyEngine::Input::Windows
 			IVibrating& vibrator = vibrators[i] = Vibrator(*this, i);
 
 			auto data = DeviceData{};
-			data.SetDevice(std::format("XInputGamepad_{}", i), type, false);
+			data.SetDevice(std::format("XInput_{}", i), type, false);
 			data.AddFeature(vibrator);
 			const DeviceHandle handle = input->RegisterDevice(data);
 

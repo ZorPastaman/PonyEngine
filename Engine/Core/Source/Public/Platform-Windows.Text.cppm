@@ -40,6 +40,7 @@ export namespace PonyEngine::Platform::Windows
 	/// @brief Converts std::wstring_view to char array with UTF-8 encoding.
 	/// @param source Source.
 	/// @param target Converted string. Must be enough size.
+	/// @return Actual target string size.
 	std::size_t ConvertToString(std::wstring_view source, std::span<char> target);
 
 	/// @brief Converts std::string_view to std::wstring.
@@ -54,6 +55,7 @@ export namespace PonyEngine::Platform::Windows
 	/// @brief Converts std::string_view to std::wstring.
 	/// @param source Source with UTF-8 encoding.
 	/// @param target Converted string.
+	/// @return Actual target string size.
 	std::size_t ConvertToWideString(std::string_view source, std::span<wchar_t> target);
 }
 
