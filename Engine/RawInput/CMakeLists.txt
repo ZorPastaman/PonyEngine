@@ -27,7 +27,6 @@ target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RawInput-Layout.cppm"
 	"Source/Public/RawInput-Mouse.cppm"
 	"Source/Public/RawInput-RawInputEvent.cppm"
-	"Source/Public/RawInput-VibrationState.cppm"
 )
 
 message(VERBOSE "Setting properties")

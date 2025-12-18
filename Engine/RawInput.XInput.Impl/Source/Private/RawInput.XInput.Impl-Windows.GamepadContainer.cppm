@@ -72,16 +72,6 @@ export namespace PonyEngine::Input::Windows
 		/// @param isConnected Connection status.
 		void Connect(DWORD index, bool isConnected) noexcept;
 
-		/// @brief Gets a vibration state.
-		/// @param index Gamepad index.
-		/// @return Vibration state.
-		[[nodiscard("Pure function")]]
-		const struct VibrationState& VibrationState(DWORD index) const noexcept;
-		/// @brief Sets a vibration state.
-		/// @param index Gamepad index.
-		/// @param state Vibration state.
-		void VibrationState(DWORD index, const struct VibrationState& state) noexcept;
-
 		GamepadContainer& operator =(const GamepadContainer&) = delete;
 		GamepadContainer& operator =(GamepadContainer&&) = delete;
 
@@ -89,7 +79,6 @@ export namespace PonyEngine::Input::Windows
 		std::array<struct DeviceHandle, XUSER_MAX_COUNT> deviceHandles; ///< Device handles.
 		std::array<XINPUT_GAMEPAD, XUSER_MAX_COUNT> gamepadStates; ///< Gamepad states.
 		std::array<bool, XUSER_MAX_COUNT> connections; ///< Gamepad connection statuses.
-		std::array<struct VibrationState, XUSER_MAX_COUNT> vibrationStates; ///< Gamepad vibration states.
 	};
 }
 
@@ -100,7 +89,6 @@ namespace PonyEngine::Input::Windows
 		std::ranges::fill(deviceHandles, Input::DeviceHandle{});
 		std::ranges::fill(gamepadStates, XINPUT_GAMEPAD{});
 		std::ranges::fill(connections, false);
-		std::ranges::fill(vibrationStates, Input::VibrationState{});
 	}
 
 	DWORD GamepadContainer::Size() const noexcept
@@ -141,15 +129,5 @@ namespace PonyEngine::Input::Windows
 	void GamepadContainer::Connect(const DWORD index, const bool isConnected) noexcept
 	{
 		connections[index] = isConnected;
-	}
-
-	const struct VibrationState& GamepadContainer::VibrationState(const DWORD index) const noexcept
-	{
-		return vibrationStates[index];
-	}
-
-	void GamepadContainer::VibrationState(const DWORD index, const struct VibrationState& state) noexcept
-	{
-		vibrationStates[index] = state;
 	}
 }
