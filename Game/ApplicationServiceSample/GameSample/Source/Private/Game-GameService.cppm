@@ -6,7 +6,7 @@ import PonyEngine.Application.Ext;
 
 export namespace Game
 {
-	class GameService final : public PonyEngine::Application::ITickableService
+	class GameService final : public PonyEngine::Application::IService, private PonyEngine::Application::ITickableService
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -19,12 +19,14 @@ export namespace Game
 		virtual void Begin() override;
 		virtual void End() override;
 
-		virtual void Tick() override;
+		virtual void AddTickableServices(PonyEngine::Application::ITickableServiceAdder& adder) override;
 
 		GameService& operator =(const GameService&) = delete;
 		GameService& operator =(GameService&&) = delete;
 
 	private:
+		virtual void Tick() override;
+
 		PonyEngine::Application::IApplicationContext* application;
 	};
 }
@@ -52,6 +54,11 @@ namespace Game
 	void GameService::End()
 	{
 		// Clean up the service after ticking.
+	}
+
+	void GameService::AddTickableServices(PonyEngine::Application::ITickableServiceAdder& adder)
+	{
+		adder.Add(*this, 0);
 	}
 
 	void GameService::Tick()

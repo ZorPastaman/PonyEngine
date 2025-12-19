@@ -66,7 +66,7 @@ export namespace PonyEngine::Input::Windows
 
 			~Vibrator() noexcept = default;
 
-			virtual void Vibrate(float lowFrequency, float highFrequency) override;
+			virtual void Vibrate(float lowFrequency, float highFrequency) noexcept override;
 
 			Vibrator& operator =(const Vibrator& other) noexcept = default;
 			Vibrator& operator =(Vibrator&& other) noexcept = default;
@@ -163,6 +163,8 @@ namespace PonyEngine::Input::Windows
 
 	void GamepadProvider::Tick()
 	{
+		const bool isInFocus = surface->IsInFocus();
+
 		for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			const std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
@@ -176,7 +178,7 @@ namespace PonyEngine::Input::Windows
 					if (const DWORD stateResult = XInputGetState(i, &state); stateResult == ERROR_SUCCESS)
 					{
 						ConnectGamepad(i, now);
-						UpdateInput(i, surface->IsInFocus() ? state.Gamepad : XINPUT_GAMEPAD{}, now);
+						UpdateInput(i, isInFocus ? state.Gamepad : XINPUT_GAMEPAD{}, now);
 
 						continue;
 					}
@@ -203,7 +205,7 @@ namespace PonyEngine::Input::Windows
 	{
 	}
 
-	void GamepadProvider::Vibrator::Vibrate(const float lowFrequency, const float highFrequency)
+	void GamepadProvider::Vibrator::Vibrate(const float lowFrequency, const float highFrequency) noexcept
 	{
 		auto vibration = XINPUT_VIBRATION
 		{
@@ -224,10 +226,8 @@ namespace PonyEngine::Input::Windows
 		{
 			IVibrating& vibrator = vibrators[i] = Vibrator(*this, i);
 
-			auto data = DeviceData{};
-			data.SetDevice(std::format("XInput_{}", i), type, false);
-			data.AddFeature(vibrator);
-			const DeviceHandle handle = input->RegisterDevice(data);
+			const DeviceHandle handle = input->RegisterDevice(type, std::format("XInput_{}", i), false,
+				std::array<FeatureEntry, 1>{ FeatureEntry(vibrator) });
 
 			gamepadContainer.DeviceHandle(i) = handle;
 			gamepadContainer.Connect(i, false);

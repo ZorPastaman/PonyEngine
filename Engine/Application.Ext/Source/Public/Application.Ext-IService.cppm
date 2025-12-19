@@ -13,6 +13,9 @@ module;
 
 export module PonyEngine.Application.Ext:IService;
 
+import :IServiceInterfaceAdder;
+import :ITickableServiceAdder;
+
 export namespace PonyEngine::Application
 {
 	/// @brief Service
@@ -26,5 +29,12 @@ export namespace PonyEngine::Application
 		/// @brief Ends the service.
 		/// @details It's called once after a last application tick.
 		virtual void End() = 0;
+
+		/// @brief Adds tickable services.
+		/// @param adder Tickable service adder.
+		virtual void AddTickableServices(ITickableServiceAdder& adder) {}
+		/// @brief Adds a service interface.
+		/// @param adder Service interface adder.
+		virtual void AddInterfaces(IServiceInterfaceAdder& adder) {}
 	};
 }

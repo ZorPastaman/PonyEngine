@@ -21,11 +21,12 @@ target_sources(PonyEngine.Application.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Application.Ext-IModule.cppm"
 	"Source/Public/Application.Ext-IModuleContext.cppm"
 	"Source/Public/Application.Ext-IService.cppm"
+	"Source/Public/Application.Ext-IServiceInterfaceAdder.cppm"
 	"Source/Public/Application.Ext-IServiceModuleContext.cppm"
 	"Source/Public/Application.Ext-ITickableService.cppm"
+	"Source/Public/Application.Ext-ITickableServiceAdder.cppm"
 	"Source/Public/Application.Ext-LoggerHandle.cppm"
 	"Source/Public/Application.Ext-ModuleDataHandle.cppm"
-	"Source/Public/Application.Ext-ServiceData.cppm"
 	"Source/Public/Application.Ext-ServiceHandle.cppm"
 )
 

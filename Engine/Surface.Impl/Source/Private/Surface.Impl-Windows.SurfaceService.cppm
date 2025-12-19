@@ -49,14 +49,7 @@ export namespace PonyEngine::Surface::Windows
 		virtual void Begin() override;
 		virtual void End() override;
 
-		/// @brief Gets the public surface service.
-		/// @return Public surface service.
-		[[nodiscard("Pure function")]]
-		ISurfaceService& PublicSurfaceService() noexcept;
-		/// @brief Gets the public surface service.
-		/// @return Public surface service.
-		[[nodiscard("Pure function")]]
-		const ISurfaceService& PublicSurfaceService() const noexcept;
+		virtual void AddInterfaces(Application::IServiceInterfaceAdder& adder) override;
 
 		SurfaceService& operator =(const SurfaceService&) = delete;
 		SurfaceService& operator =(SurfaceService&&) = delete;
@@ -406,14 +399,10 @@ namespace PonyEngine::Surface::Windows
 		ShowWindow(windowHandle, SW_HIDE);
 	}
 
-	ISurfaceService& SurfaceService::PublicSurfaceService() noexcept
+	void SurfaceService::AddInterfaces(Application::IServiceInterfaceAdder& adder)
 	{
-		return *this;
-	}
-
-	const ISurfaceService& SurfaceService::PublicSurfaceService() const noexcept
-	{
-		return *this;
+		adder.AddInterface<Surface::ISurfaceService>(*this);
+		adder.AddInterface<ISurfaceService>(*this);
 	}
 
 	SurfaceFeature SurfaceService::SupportedFeatures() const noexcept

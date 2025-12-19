@@ -25,10 +25,7 @@ namespace Game
 	{
 		gameServiceHandle = context.ServiceModuleContext().AddService([&](PonyEngine::Application::IApplicationContext& application)
 		{
-			const auto game = std::make_shared<GameService>(application);
-			PonyEngine::Application::ServiceData data;
-			data.SetService(game, 0);
-			return data;
+			return std::make_shared<GameService>(application);
 		});
 	}
 

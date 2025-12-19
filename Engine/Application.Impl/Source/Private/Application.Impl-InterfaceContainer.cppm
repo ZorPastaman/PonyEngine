@@ -55,6 +55,11 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		void* Interface(std::size_t index) const noexcept;
 
+		/// @brief Gets interface types.
+		/// @return Interface types.
+		[[nodiscard("Pure function")]]
+		std::span<const std::type_index> Types() const noexcept;
+
 		/// @brief Adds data.
 		/// @param type Type.
 		/// @param interface Interface.
@@ -105,6 +110,11 @@ namespace PonyEngine::Application
 	void* InterfaceContainer::Interface(const std::size_t index) const noexcept
 	{
 		return interfaces[index];
+	}
+
+	std::span<const std::type_index> InterfaceContainer::Types() const noexcept
+	{
+		return types;
 	}
 
 	void InterfaceContainer::Add(const std::type_index type, void* const interface)
