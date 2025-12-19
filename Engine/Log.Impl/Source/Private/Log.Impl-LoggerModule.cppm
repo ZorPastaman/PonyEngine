@@ -55,8 +55,9 @@ namespace PonyEngine::Log
 			loggerHandle = context.LoggerModuleContext().SetLogger([&](Application::ILoggerContext& loggerContext)
 			{
 				const auto logger = std::make_shared<Logger>(loggerContext);
-				loggerModuleHandle = context.AddData(std::shared_ptr<ILoggerModuleContext>(logger, &logger->PublicLoggerModule()));
-				return std::shared_ptr<ILogger>(logger, &logger->PublicLogger());
+				loggerModuleHandle = context.AddData(std::shared_ptr<ILoggerModuleContext>(logger, logger.get()));
+
+				return logger;
 			});
 		}
 		catch (...)

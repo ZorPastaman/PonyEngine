@@ -27,7 +27,7 @@ import :TickableServiceInfo;
 export namespace PonyEngine::Application
 {
 	/// @brief Service manager.
-	class ServiceManager final : private IServiceModuleContext
+	class ServiceManager final : public IServiceModuleContext
 	{
 	public:
 		/// @brief Creates a service manager.
@@ -57,22 +57,64 @@ export namespace PonyEngine::Application
 		/// @brief Ticks the services.
 		void Tick();
 
-		/// @brief Gets the public service module context.
-		/// @return Service module context.
-		[[nodiscard("Pure function")]]
-		IServiceModuleContext& PublicServiceModuleContext() noexcept;
-		/// @brief Gets the public service module context.
-		/// @return Service module context.
-		[[nodiscard("Pure function")]]
-		const IServiceModuleContext& PublicServiceModuleContext() const noexcept;
+		[[nodiscard("Must be used to remove")]]
+		virtual ServiceHandle AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory) override;
+		virtual void RemoveService(ServiceHandle handle) override;
 
 		ServiceManager& operator =(const ServiceManager&) = delete;
 		ServiceManager& operator =(ServiceManager&&) = delete;
 
 	private:
-		[[nodiscard("Must be used to remove")]]
-		virtual ServiceHandle AddService(const std::function<ServiceData(IApplicationContext&)>& factory) override;
-		virtual void RemoveService(ServiceHandle handle) override;
+		/// @brief Tickable service adder.
+		class TickableServiceAdder final : public ITickableServiceAdder
+		{
+		public:
+			/// @brief Creates a tickable service adder.
+			/// @param application Application context.
+			/// @param container Tickable service container.
+			[[nodiscard("Pure constructor")]]
+			TickableServiceAdder(IApplicationContext& application, std::vector<TickableServiceInfo>& container) noexcept;
+			TickableServiceAdder(const TickableServiceAdder&) = delete;
+			TickableServiceAdder(TickableServiceAdder&&) = delete;
+
+			~TickableServiceAdder() noexcept = default;
+
+			virtual void Add(ITickableService& tickable, std::int32_t tickOrder) override;
+
+			TickableServiceAdder& operator =(const TickableServiceAdder&) = delete;
+			TickableServiceAdder& operator =(TickableServiceAdder&&) = delete;
+
+		private:
+			IApplicationContext* application; ///< Application context.
+
+			std::vector<TickableServiceInfo>* container; ///< Tickable service container.
+		};
+		/// @brief Service interface adder.
+		class ServiceInterfaceAdder final : public IServiceInterfaceAdder
+		{
+		public:
+			/// @brief Creates a service interface adder.
+			/// @param application Application context.
+			/// @param container Service interface container.
+			/// @param globalContainer Global interface container.
+			[[nodiscard("Pure constructor")]]
+			ServiceInterfaceAdder(IApplicationContext& application, InterfaceContainer& container, std::unordered_map<std::type_index, void*>& globalContainer) noexcept;
+			ServiceInterfaceAdder(const ServiceInterfaceAdder&) = delete;
+			ServiceInterfaceAdder(ServiceInterfaceAdder&&) = delete;
+
+			~ServiceInterfaceAdder() noexcept = default;
+
+			virtual void AddInterface(std::type_index type, void* interface) override;
+
+			ServiceInterfaceAdder& operator =(const ServiceInterfaceAdder&) = delete;
+			ServiceInterfaceAdder& operator =(ServiceInterfaceAdder&&) = delete;
+
+		private:
+			IApplicationContext* application; ///< Application context.
+
+			InterfaceContainer* container; ///< Service interface container.
+			std::unordered_map<std::type_index, void*>* globalContainer; ///< Global interface container.
+		};
 
 		/// @brief Updates tickable services vector.
 		void UpdateTickableServices();
@@ -180,17 +222,7 @@ namespace PonyEngine::Application
 		}
 	}
 
-	IServiceModuleContext& ServiceManager::PublicServiceModuleContext() noexcept
-	{
-		return *this;
-	}
-
-	const IServiceModuleContext& ServiceManager::PublicServiceModuleContext() const noexcept
-	{
-		return *this;
-	}
-
-	ServiceHandle ServiceManager::AddService(const std::function<ServiceData(IApplicationContext&)>& factory)
+	ServiceHandle ServiceManager::AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory)
 	{
 		if (!nextServiceHandle.IsValid()) [[unlikely]]
 		{
@@ -201,53 +233,58 @@ namespace PonyEngine::Application
 		{
 			throw std::logic_error("Service can be added only on start-up");
 		}
-		const ServiceData data = factory(*application);
-		if (!data.service) [[unlikely]]
+
+		const std::shared_ptr<IService> service = factory(*application);
+		if (!service) [[unlikely]]
 		{
 			throw std::invalid_argument("Service is nullptr");
 		}
 
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service...", typeid(*data.service).name());
-		if (serviceContainer.IndexOf(*data.service) < serviceContainer.Size()) [[unlikely]]
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service...", typeid(*service).name());
+		if (serviceContainer.IndexOf(*service) < serviceContainer.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Service has already been added");
 		}
-		if (data.tickableService && static_cast<IService*>(data.tickableService) != data.service.get()) [[unlikely]]
-		{
-			throw std::invalid_argument("Incorrect tickable service");
-		}
-		for (const auto [interfaceType, interface] : data.publicInterfaces)
-		{
-			if (serviceContainer.ContainsInterface(interfaceType)) [[unlikely]]
-			{
-				throw std::invalid_argument(std::format("Interface of type '{}' has already been added", interfaceType.name()));
-			}
-			if (!interface) [[unlikely]]
-			{
-				throw std::invalid_argument(std::format("Interface of type '{}' is nullptr", interfaceType.name()));
-			}
-		}
 
 		const ServiceHandle currentHandle = nextServiceHandle;
-		serviceContainer.Add(currentHandle, data);
-		const InterfaceContainer& interfaceContainer = serviceContainer.Interfaces(serviceContainer.Size() - 1uz);
+		const std::size_t serviceIndex = serviceContainer.Add(currentHandle, service);
+
 		try
 		{
-			for (std::size_t i = 0uz; i < interfaceContainer.Size(); ++i)
-			{
-				serviceInterfaces[interfaceContainer.Type(i)] = interfaceContainer.Interface(i);
-			}
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding tickable service...");
+			auto tickableAdder = TickableServiceAdder(*application, serviceContainer.TickableServices(serviceIndex));
+			service->AddTickableServices(tickableAdder);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding tickable service done.");
 		}
 		catch (...)
 		{
-			for (std::size_t i = 0uz; i < interfaceContainer.Size(); ++i)
-			{
-				serviceInterfaces.erase(interfaceContainer.Type(i));
-			}
-			serviceContainer.Remove(serviceContainer.Size() - 1uz);
+			PONY_LOG_X(application->Logger(), std::current_exception(), "On adding tickable services.");
+			serviceContainer.Remove(serviceIndex);
+
+			throw;
 		}
+
+		try
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding service interfaces...");
+			auto interfaceAdder = ServiceInterfaceAdder(*application, serviceContainer.Interfaces(serviceIndex), serviceInterfaces);
+			service->AddInterfaces(interfaceAdder);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding service interfaces done.");
+		}
+		catch (...)
+		{
+			PONY_LOG_X(application->Logger(), std::current_exception(), "On adding service interfaces.");
+			for (const std::type_index type : serviceContainer.Interfaces(serviceIndex).Types())
+			{
+				serviceInterfaces.erase(type);
+			}
+			serviceContainer.Remove(serviceIndex);
+
+			throw;
+		}
+
 		++nextServiceHandle.id;
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service done. Handle: '0x{:X}'.", typeid(*data.service).name(), currentHandle.id);
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service done. Handle: '0x{:X}'.", typeid(*service).name(), currentHandle.id);
 
 		return currentHandle;
 	}
@@ -263,20 +300,17 @@ namespace PonyEngine::Application
 		{
 			const char* const serviceName = typeid(serviceContainer.Service(index)).name();
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service...", serviceName);
-			const InterfaceContainer& interfaceContainer = serviceContainer.Interfaces(index);
-			for (std::size_t i = 0uz; i < interfaceContainer.Size(); ++i)
+			for (const std::type_index type : serviceContainer.Interfaces(index).Types())
 			{
-				serviceInterfaces.erase(interfaceContainer.Type(i));
+				serviceInterfaces.erase(type);
 			}
-
-			if (const ITickableService* const tickableService = serviceContainer.TickableService(index).tickableService)
+			for (const TickableServiceInfo& tickable : serviceContainer.TickableServices(index))
 			{
-				if (const auto position = std::ranges::find(tickableServices, tickableService); position != tickableServices.cend())
+				if (const auto position = std::ranges::find(tickableServices, tickable.tickableService); position != tickableServices.cend())
 				{
 					tickableServices.erase(position);
 				}
 			}
-
 			serviceContainer.Remove(index);
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Removing '{}' service done. Handle: '0x{:X}'.", serviceName, handle.id);
 		}
@@ -286,17 +320,69 @@ namespace PonyEngine::Application
 		}
 	}
 
+	ServiceManager::TickableServiceAdder::TickableServiceAdder(IApplicationContext& application, std::vector<TickableServiceInfo>& container) noexcept :
+		application{&application},
+		container{&container}
+	{
+	}
+
+	void ServiceManager::TickableServiceAdder::Add(ITickableService& tickable, const std::int32_t tickOrder)
+	{
+		container->push_back(TickableServiceInfo{.tickableService = &tickable, .tickOrder = tickOrder});
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Tickable of type '{}' added.", typeid(tickable).name());
+	}
+
+	ServiceManager::ServiceInterfaceAdder::ServiceInterfaceAdder(IApplicationContext& application, InterfaceContainer& container, 
+		std::unordered_map<std::type_index, void*>& globalContainer) noexcept :
+		application{&application},
+		container{&container},
+		globalContainer{&globalContainer}
+	{
+	}
+
+	void ServiceManager::ServiceInterfaceAdder::AddInterface(const std::type_index type, void* const interface)
+	{
+		if (container->IndexOf(type) < container->Size()) [[unlikely]]
+		{
+			throw std::invalid_argument(std::format("Interface of type '{}' has already been added", type.name()));
+		}
+		if (globalContainer->contains(type)) [[unlikely]]
+		{
+			throw std::invalid_argument(std::format("Interface of type '{}' has already been added by another service", type.name()));
+		}
+
+		if (!interface) [[unlikely]]
+		{
+			throw std::invalid_argument("Interface is nullptr");
+		}
+
+		container->Add(type, interface);
+		try
+		{
+			globalContainer->emplace(type, interface);
+		}
+		catch (...)
+		{
+			container->Remove(container->Size() - 1uz);
+			throw;
+		}
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Interface of type '{}' added.", type.name());
+	}
+
 	void ServiceManager::UpdateTickableServices()
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Getting tickable services...");
-		std::vector<TickableServiceInfo> orderedTickableServices;
-		orderedTickableServices.reserve(serviceContainer.Size());
+		std::size_t tickableCount = 0uz;
 		for (std::size_t i = 0uz; i < serviceContainer.Size(); ++i)
 		{
-			if (const TickableServiceInfo& info = serviceContainer.TickableService(i); info.tickableService)
-			{
-				orderedTickableServices.push_back(info);
-			}
+			tickableCount += serviceContainer.TickableServices(i).size();
+		}
+
+		std::vector<TickableServiceInfo> orderedTickableServices;
+		orderedTickableServices.reserve(tickableCount);
+		for (std::size_t i = 0uz; i < serviceContainer.Size(); ++i)
+		{
+			orderedTickableServices.append_range(serviceContainer.TickableServices(i));
 		}
 		std::ranges::sort(orderedTickableServices, [](const TickableServiceInfo& lhs, const TickableServiceInfo& rhs) noexcept
 		{

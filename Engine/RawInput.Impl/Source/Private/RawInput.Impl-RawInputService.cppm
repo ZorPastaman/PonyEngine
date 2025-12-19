@@ -30,7 +30,7 @@ import :RawInputQueue;
 export namespace PonyEngine::Input
 {
 	/// @brief Raw input service.
-	class RawInputService final : public Application::ITickableService, private IRawInputContext, private IRawInputModuleContext, private IRawInputService
+	class RawInputService final : public Application::IService, public IRawInputModuleContext, private Application::ITickableService, private IRawInputContext, private IRawInputService
 	{
 	public:
 		/// @brief Creates an input service.
@@ -44,29 +44,20 @@ export namespace PonyEngine::Input
 
 		virtual void Begin() override;
 		virtual void End() noexcept override;
-		virtual void Tick() override;
 
-		/// @brief Gets the public input module context.
-		/// @return Input module context.
-		[[nodiscard("Pure function")]]
-		IRawInputModuleContext& PublicInputContext() noexcept;
-		/// @brief Gets the public input module context.
-		/// @return Input module context.
-		[[nodiscard("Pure function")]]
-		const IRawInputModuleContext& PublicInputContext() const noexcept;
-		/// @brief Gets the public input service interface.
-		/// @return Input service interface.
-		[[nodiscard("Pure function")]]
-		IRawInputService& PublicInputService() noexcept;
-		/// @brief Gets the public input service interface.
-		/// @return Input service interface.
-		[[nodiscard("Pure function")]]
-		const IRawInputService& PublicInputService() const noexcept;
+		virtual void AddTickableServices(Application::ITickableServiceAdder& adder) override;
+		virtual void AddInterfaces(Application::IServiceInterfaceAdder& adder) override;
+
+		[[nodiscard("Must be used to remove")]]
+		virtual InputProviderHandle AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory) override;
+		virtual void RemoveProvider(InputProviderHandle providerHandle) override;
 
 		RawInputService& operator =(const RawInputService&) = delete;
 		RawInputService& operator =(RawInputService&&) = delete;
 
 	private:
+		virtual void Tick() override;
+
 		[[nodiscard("Pure function")]]
 		virtual Application::IApplicationContext& Application() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -78,15 +69,12 @@ export namespace PonyEngine::Input
 		virtual const Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Must be used to unregister")]]
-		virtual DeviceHandle RegisterDevice(const DeviceData& data) override;
+		virtual DeviceHandle RegisterDevice(DeviceTypeId deviceType, std::string_view deviceName, bool isConnected,
+			std::span<const FeatureEntry> features = std::span<const FeatureEntry>()) override;
 		virtual void UnregisterDevice(DeviceHandle deviceHandle) override;
 
 		virtual void AddInput(DeviceHandle deviceHandle, const RawInputEvent& input) override;
 		virtual void Connect(DeviceHandle deviceHandle, const ConnectionEvent& connection) override;
-
-		[[nodiscard("Must be used to remove")]]
-		virtual InputProviderHandle AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory) override;
-		virtual void RemoveProvider(InputProviderHandle providerHandle) override;
 
 		[[nodiscard("Pure function")]]
 		virtual float Value(AxisId axis) const noexcept override;
@@ -228,6 +216,65 @@ export namespace PonyEngine::Input
 		End(providers.Size());
 	}
 
+	void RawInputService::AddTickableServices(Application::ITickableServiceAdder& adder)
+	{
+		adder.Add(*this, PONY_ENGINE_RAW_INPUT_TICK_ORDER);
+	}
+
+	void RawInputService::AddInterfaces(Application::IServiceInterfaceAdder& adder)
+	{
+		adder.AddInterface<IRawInputService>(*this);
+	}
+
+	InputProviderHandle RawInputService::AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory)
+	{
+		if (!nextProviderHandle.IsValid()) [[unlikely]]
+		{
+			throw std::overflow_error("No more input provider handles available");
+		}
+		if (application->FlowState() != Application::FlowState::StartingUp) [[unlikely]]
+		{
+			throw std::logic_error("Input providers can be added only on start-up");
+		}
+
+		const std::shared_ptr<IInputProvider> provider = factory(*this);
+		if (!provider) [[unlikely]]
+		{
+			throw std::invalid_argument("Input provider is nullptr");
+		}
+		if (providers.IndexOf(*provider) < providers.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Input provider has already been added");
+		}
+
+		const InputProviderHandle currentHandle = nextProviderHandle;
+		providers.Add(currentHandle, provider);
+		++nextProviderHandle.id;
+
+		PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' provider added. Handle: '0x{:X}'.", typeid(*provider).name(), currentHandle.id);
+
+		return currentHandle;
+	}
+
+	void RawInputService::RemoveProvider(const InputProviderHandle providerHandle)
+	{
+		if (application->FlowState() != Application::FlowState::StartingUp && application->FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
+		{
+			throw std::logic_error("Input provider can be removed only on start-up or shut-down");
+		}
+
+		if (const std::size_t index = providers.IndexOf(providerHandle); index < providers.Size()) [[likely]]
+		{
+			const char* const providerName = typeid(providers.Provider(index)).name();
+			providers.Remove(index);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' provider removed. Handle: '0x{:X}'.", providerName, providerHandle.id);
+		}
+		else [[unlikely]]
+		{
+			throw std::invalid_argument("Input provider not found");
+		}
+	}
+
 	void RawInputService::Tick()
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Clearing input data.");
@@ -242,26 +289,6 @@ export namespace PonyEngine::Input
 
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Processing input queue.");
 		ProcessInputQueue();
-	}
-
-	IRawInputModuleContext& RawInputService::PublicInputContext() noexcept
-	{
-		return *this;
-	}
-
-	const IRawInputModuleContext& RawInputService::PublicInputContext() const noexcept
-	{
-		return *this;
-	}
-
-	IRawInputService& RawInputService::PublicInputService() noexcept
-	{
-		return *this;
-	}
-
-	const IRawInputService& RawInputService::PublicInputService() const noexcept
-	{
-		return *this;
 	}
 
 	Application::IApplicationContext& RawInputService::Application() noexcept
@@ -284,23 +311,24 @@ export namespace PonyEngine::Input
 		return application->Logger();
 	}
 
-	DeviceHandle RawInputService::RegisterDevice(const DeviceData& data)
+	DeviceHandle RawInputService::RegisterDevice(const DeviceTypeId deviceType, const std::string_view deviceName, const bool isConnected,
+		const std::span<const FeatureEntry> features)
 	{
 		if (!nextDeviceHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more device handles available");
 		}
 
-		if (!deviceTypeHashMap.contains(data.type))
+		if (!deviceTypeHashMap.contains(deviceType))
 		{
 			throw std::invalid_argument("Device type is invalid");
 		}
 
 		const DeviceHandle currentHandle = nextDeviceHandle;
-		devices.Add(currentHandle, data);
+		devices.Add(currentHandle, deviceType, deviceName, isConnected, features);
 		++nextDeviceHandle.id;
 
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Name: '{}'.", currentHandle.id, data.name);
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Name: '{}'.", currentHandle.id, deviceName);
 
 		ObserveDeviceAdded(currentHandle);
 
@@ -350,55 +378,6 @@ export namespace PonyEngine::Input
 		else [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
-		}
-	}
-
-	InputProviderHandle RawInputService::AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory)
-	{
-		if (!nextProviderHandle.IsValid()) [[unlikely]]
-		{
-			throw std::overflow_error("No more input provider handles available");
-		}
-		if (application->FlowState() != Application::FlowState::StartingUp) [[unlikely]]
-		{
-			throw std::logic_error("Input providers can be added only on start-up");
-		}
-
-		const std::shared_ptr<IInputProvider> provider = factory(*this);
-		if (!provider) [[unlikely]]
-		{
-			throw std::invalid_argument("Input provider is nullptr");
-		}
-		if (providers.IndexOf(*provider) < providers.Size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Input provider has already been added");
-		}
-
-		const InputProviderHandle currentHandle = nextProviderHandle;
-		providers.Add(currentHandle, provider);
-		++nextProviderHandle.id;
-
-		PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' provider added. Handle: '0x{:X}'.", typeid(*provider).name(), currentHandle.id);
-
-		return currentHandle;
-	}
-
-	void RawInputService::RemoveProvider(const InputProviderHandle providerHandle)
-	{
-		if (application->FlowState() != Application::FlowState::StartingUp && application->FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
-		{
-			throw std::logic_error("Input provider can be removed only on start-up or shut-down");
-		}
-
-		if (const std::size_t index = providers.IndexOf(providerHandle); index < providers.Size()) [[likely]]
-		{
-			const char* const providerName = typeid(providers.Provider(index)).name();
-			providers.Remove(index);
-			PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' provider removed. Handle: '0x{:X}'.", providerName, providerHandle.id);
-		}
-		else [[unlikely]]
-		{
-			throw std::invalid_argument("Input provider not found");
 		}
 	}
 

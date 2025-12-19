@@ -16,7 +16,7 @@ export module PonyEngine.Application.Ext:IServiceModuleContext;
 import std;
 
 import :IApplicationContext;
-import :ServiceData;
+import :IService;
 import :ServiceHandle;
 
 export namespace PonyEngine::Application
@@ -30,7 +30,7 @@ export namespace PonyEngine::Application
 		/// @param factory Service factory.
 		/// @return Service handle.
 		[[nodiscard("Must be used to remove")]]
-		virtual ServiceHandle AddService(const std::function<ServiceData(IApplicationContext&)>& factory) = 0;
+		virtual ServiceHandle AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory) = 0;
 		/// @brief Removes a service.
 		/// @param handle Service handle.
 		virtual void RemoveService(ServiceHandle handle) = 0;

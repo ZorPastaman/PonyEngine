@@ -56,12 +56,9 @@ namespace PonyEngine::Input
 			inputServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
 			{
 				const auto input = std::make_shared<RawInputService>(application);
-				inputServiceModuleHandle = context.AddData(std::shared_ptr<IRawInputModuleContext>(input, &input->PublicInputContext()));
-				Application::ServiceData data;
-				data.SetService(input, PONY_ENGINE_RAW_INPUT_TICK_ORDER);
-				data.AddInterface(&input->PublicInputService());
-
-				return data;
+				inputServiceModuleHandle = context.AddData(std::shared_ptr<IRawInputModuleContext>(input, input.get()));
+				
+				return input;
 			});
 		}
 		catch (...)

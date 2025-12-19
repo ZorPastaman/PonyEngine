@@ -98,8 +98,12 @@ export namespace PonyEngine::Input
 
 		/// @brief Adds a new device.
 		/// @param handle Device handle.
-		/// @param data Device data.
-		void Add(DeviceHandle handle, const DeviceData& data);
+		/// @param deviceType Device type.
+		/// @param deviceName Device name.
+		/// @param isConnected Is the device connected?
+		/// @param features Device features.
+		void Add(DeviceHandle handle, DeviceTypeId deviceType, std::string_view deviceName, bool isConnected,
+			std::span<const FeatureEntry> features);
 		/// @brief Removes a device.
 		/// @param index Device index.
 		void Remove(std::size_t index) noexcept;
@@ -242,30 +246,35 @@ namespace PonyEngine::Input
 		std::ranges::fill(deltas, 0.f);
 	}
 
-	void InputDeviceContainer::Add(const DeviceHandle handle, const DeviceData& data)
+	void InputDeviceContainer::Add(const DeviceHandle handle, const DeviceTypeId deviceType, const std::string_view deviceName, const bool isConnected,
+		const std::span<const FeatureEntry> features)
 	{
 		handles.push_back(handle);
 		try
 		{
-			deviceNames.emplace_back(data.name);
+			deviceNames.emplace_back(deviceName);
 			try
 			{
-				deviceTypes.push_back(data.type);
+				deviceTypes.push_back(deviceType);
 				try
 				{
-					auto features = DeviceFeatureContainer();
-					for (const auto [type, feature] : data.features)
+					auto featureContainer = DeviceFeatureContainer();
+					for (const FeatureEntry& featureEntry : features)
 					{
-						if (!feature) [[unlikely]]
+						if (featureContainer.IndexOf(featureEntry.featureType) < featureContainer.Size())
+						{
+							throw std::invalid_argument(std::format("Feature of type '{}' is added twice", featureEntry.featureType.name()));
+						}
+						if (!featureEntry.feature) [[unlikely]]
 						{
 							throw std::invalid_argument("Feature is nullptr");
 						}
-						features.Add(type, feature);
+						featureContainer.Add(featureEntry.featureType, featureEntry.feature);
 					}
-					deviceFeatures.push_back(std::move(features));
+					deviceFeatures.push_back(std::move(featureContainer));
 					try
 					{
-						connections.push_back(data.isConnected);
+						connections.push_back(isConnected);
 						try
 						{
 							axisIndices.push_back(std::vector<std::size_t>());
