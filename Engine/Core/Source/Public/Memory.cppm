@@ -10,3 +10,4 @@
 export module PonyEngine.Memory;
 
 export import :Arena;
+export import :Pool;

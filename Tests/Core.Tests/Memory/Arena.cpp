@@ -59,6 +59,39 @@ TEST_CASE("Arena: reserve", "[Memory][Arena]")
 	REQUIRE(arena.GetMarker().index == 0uz);
 }
 
+TEST_CASE("Arena: realign", "[Memory][Arena]")
+{
+	constexpr std::size_t alignment = 64uz;
+	constexpr std::size_t reserve = 256uz;
+	auto arena = PonyEngine::Memory::Arena(alignment);
+	REQUIRE(arena.Alignment() == alignment);
+	REQUIRE(arena.Size() == 0uz);
+	REQUIRE(arena.Capacity() == 0uz);
+	REQUIRE(arena.Data());
+	REQUIRE(arena.GetMarker().index == 0uz);
+
+	arena.Realign(alignment);
+	REQUIRE(arena.Alignment() == alignment);
+	REQUIRE(arena.Size() == 0uz);
+	REQUIRE(arena.Capacity() == 0uz);
+	REQUIRE(arena.Data());
+	REQUIRE(arena.GetMarker().index == 0uz);
+
+	arena.Realign(alignment / 2uz);
+	REQUIRE(arena.Alignment() == alignment);
+	REQUIRE(arena.Size() == 0uz);
+	REQUIRE(arena.Capacity() == 0uz);
+	REQUIRE(arena.Data());
+	REQUIRE(arena.GetMarker().index == 0uz);
+
+	arena.Realign(alignment * 2uz);
+	REQUIRE(arena.Alignment() == alignment * 2uz);
+	REQUIRE(arena.Size() == 0uz);
+	REQUIRE(arena.Capacity() == 0uz);
+	REQUIRE(arena.Data());
+	REQUIRE(arena.GetMarker().index == 0uz);
+}
+
 TEST_CASE("Arena: reserve data safety", "[Memory][Arena]")
 {
 	auto arena = PonyEngine::Memory::Arena(32uz);

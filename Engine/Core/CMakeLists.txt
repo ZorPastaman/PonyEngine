@@ -35,6 +35,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Math-Vector.cppm"
 	"Source/Public/Memory.cppm"
 	"Source/Public/Memory-Arena.cppm"
+	"Source/Public/Memory-Pool.cppm"
 	"Source/Public/Platform.cppm"
 	"Source/Public/Serialization.cppm"
 	"Source/Public/Serialization-Array.cppm"
