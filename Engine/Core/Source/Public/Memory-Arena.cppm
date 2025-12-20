@@ -74,6 +74,10 @@ export namespace PonyEngine::Memory
 		/// @brief Reserves memory.
 		/// @param reserve Byte count to reserve.
 		void Reserve(std::size_t reserve);
+		/// @brief Realigns the arena.
+		/// @param alignment New alignment.
+		/// @note It can only increase the alignment.
+		void Realign(std::size_t alignment);
 
 		/// @brief Gets a marker.
 		/// @details This marker can be used later to free the arena to a current point.
@@ -159,12 +163,8 @@ namespace PonyEngine::Memory
 {
 	Arena::Arena(const std::size_t alignment, const std::size_t reserve)
 	{
-		if (alignment < alignof(std::max_align_t)) [[unlikely]]
-		{
-			throw std::invalid_argument("Arena alignment is less than alignment of std::max_align_t");
-		}
-
-		data = CreateData(alignment, reserve);
+		const std::size_t actualAlignment = std::bit_ceil(std::max(alignment, alignof(std::max_align_t)));
+		data = CreateData(actualAlignment, reserve);
 		capacity = reserve;
 		size = 0uz;
 	}
@@ -202,6 +202,18 @@ namespace PonyEngine::Memory
 		std::memcpy(newData.get(), data.get(), size);
 		data = std::move(newData);
 		capacity = reserve;
+	}
+
+	void Arena::Realign(const std::size_t alignment)
+	{
+		if (alignment <= Alignment())
+		{
+			return;
+		}
+
+		std::unique_ptr<std::byte[], DataDeleter> newData = CreateData(alignment, capacity);
+		std::memcpy(newData.get(), data.get(), size);
+		data = std::move(newData);
 	}
 
 	Arena::Marker Arena::GetMarker() const noexcept
