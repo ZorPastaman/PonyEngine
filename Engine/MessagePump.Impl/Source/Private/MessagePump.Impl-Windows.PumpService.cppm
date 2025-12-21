@@ -23,7 +23,7 @@ import PonyEngine.MessagePump;
 export namespace PonyEngine::MessagePump::Windows
 {
 	/// @brief Windows pump service.
-	class PumpService final : public Application::ITickableService, private IPumpService
+	class PumpService final : public Application::IService, private Application::ITickableService, private IPumpService
 	{
 	public:
 		/// @brief Creates a pump service.
@@ -37,21 +37,16 @@ export namespace PonyEngine::MessagePump::Windows
 
 		virtual void Begin() noexcept override;
 		virtual void End() noexcept override;
-		virtual void Tick() noexcept override;
 
-		/// @brief Gets the public pump service.
-		/// @return Public pump service.
-		[[nodiscard("Pure function")]]
-		IPumpService& PublicPumpService() noexcept;
-		/// @brief Gets the public pump service.
-		/// @return Public pump service.
-		[[nodiscard("Pure function")]]
-		const IPumpService& PublicPumpService() const noexcept;
+		virtual void AddTickableServices(Application::ITickableServiceAdder& adder) override;
+		virtual void AddInterfaces(Application::IServiceInterfaceAdder& adder) override;
 
 		PumpService& operator =(const PumpService&) = delete;
 		PumpService& operator =(PumpService&&) = delete;
 
 	private:
+		virtual void Tick() noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual PumpFeature SupportedFeatures() const noexcept override;
 
@@ -89,6 +84,16 @@ namespace PonyEngine::MessagePump::Windows
 	{
 	}
 
+	void PumpService::AddTickableServices(Application::ITickableServiceAdder& adder)
+	{
+		adder.Add(*this, PONY_ENGINE_MESSAGE_PUMP_TICK_ORDER);
+	}
+
+	void PumpService::AddInterfaces(Application::IServiceInterfaceAdder& adder)
+	{
+		adder.AddInterface<IPumpService>(*this);
+	}
+
 	void PumpService::Tick() noexcept
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Peeking WINAPI messages.");
@@ -108,16 +113,6 @@ namespace PonyEngine::MessagePump::Windows
 			TranslateMessage(&message);
 			DispatchMessageA(&message);
 		}
-	}
-
-	IPumpService& PumpService::PublicPumpService() noexcept
-	{
-		return *this;
-	}
-
-	const IPumpService& PumpService::PublicPumpService() const noexcept
-	{
-		return *this;
 	}
 
 	PumpFeature PumpService::SupportedFeatures() const noexcept

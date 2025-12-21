@@ -27,10 +27,12 @@ export namespace PonyEngine::Log
 
 		/// @brief Gets the application context.
 		/// @return Application context.
+		/// @note Don't call the logger of the application context.
 		[[nodiscard("Pure function")]]
 		virtual Application::IApplicationContext& Application() noexcept = 0;
 		/// @brief Gets the application context.
 		/// @return Application context.
+		/// @note Don't call the logger of the application context.
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept = 0;
 

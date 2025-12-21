@@ -17,7 +17,7 @@ import PonyEngine.Application.Ext;
 import PonyEngine.RawInput;
 import PonyEngine.Log;
 
-import :DeviceData;
+import :FeatureEntry;
 
 export namespace PonyEngine::Input
 {
@@ -45,10 +45,14 @@ export namespace PonyEngine::Input
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 
 		/// @brief Registers a new device.
-		/// @param data Device data.
+		/// @param deviceType Device type.
+		/// @param deviceName Device name.
+		/// @param isConnected Is the device connected?
+		/// @param features Device features.
 		/// @return Device handle.
 		[[nodiscard("Must be used to unregister")]]
-		virtual DeviceHandle RegisterDevice(const DeviceData& data) = 0;
+		virtual DeviceHandle RegisterDevice(DeviceTypeId deviceType, std::string_view deviceName, bool isConnected, 
+			std::span<const FeatureEntry> features = std::span<const FeatureEntry>()) = 0;
 		/// @brief Unregisters a device.
 		/// @param deviceHandle Device handle.
 		virtual void UnregisterDevice(DeviceHandle deviceHandle) = 0;

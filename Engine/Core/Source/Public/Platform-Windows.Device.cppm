@@ -37,7 +37,6 @@ export namespace PonyEngine::Platform::Windows
 	/// @param deviceName Device name. Must be enough size.
 	/// @return Copied byte count.
 	std::size_t GetDeviceName(HANDLE deviceHandle, std::span<char> deviceName);
-
 }
 
 namespace PonyEngine::Platform::Windows
@@ -66,7 +65,7 @@ namespace PonyEngine::Platform::Windows
 		const std::size_t size = GetDeviceNameSize(deviceHandle);
 		deviceName.resize(size);
 		const std::size_t copied = GetDeviceName(deviceHandle, std::span<char>(deviceName.data(), deviceName.size()));
-		deviceName.resize(copied); // Minus null-terminator.
+		deviceName.resize(copied);
 	}
 
 	std::size_t GetDeviceName(const HANDLE deviceHandle, const std::span<char> deviceName)

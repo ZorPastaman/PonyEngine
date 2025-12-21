@@ -320,12 +320,10 @@ namespace PonyEngine::Input::Windows
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(keyboardHandle));
 		const std::string_view name = GetKeyboardName(keyboardHandle);
-		auto deviceData = DeviceData();
-		deviceData.SetDevice(name, deviceType, true);
-		const DeviceHandle deviceHandle = input->RegisterDevice(deviceData);
+		const DeviceHandle deviceHandle = input->RegisterDevice(deviceType, name, true);
 		try
 		{
-			keyboardContainer.Add(keyboardHandle, deviceHandle, deviceData.name, deviceData.isConnected);
+			keyboardContainer.Add(keyboardHandle, deviceHandle, name, true);
 		}
 		catch (...)
 		{
@@ -333,7 +331,7 @@ namespace PonyEngine::Input::Windows
 			throw;
 		}
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device done. Native handle: '0x{:X}'; Device handle: '0x{:X}'; Device name: '{}'.", 
-			reinterpret_cast<std::uintptr_t>(keyboardHandle), deviceHandle.id, deviceData.name);
+			reinterpret_cast<std::uintptr_t>(keyboardHandle), deviceHandle.id, name);
 
 		return keyboardContainer.Size() - 1uz;
 	}

@@ -336,12 +336,10 @@ namespace PonyEngine::Input::Windows
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mouseHandle));
 		const std::string_view name = GetMouseName(mouseHandle);
-		auto data = DeviceData();
-		data.SetDevice(name, deviceType, true);
-		const DeviceHandle deviceHandle = input->RegisterDevice(data);
+		const DeviceHandle deviceHandle = input->RegisterDevice(deviceType, name, true);
 		try
 		{
-			mouseContainer.Add(mouseHandle, deviceHandle, data.name, data.isConnected);
+			mouseContainer.Add(mouseHandle, deviceHandle, name, true);
 		}
 		catch (...)
 		{
@@ -349,7 +347,7 @@ namespace PonyEngine::Input::Windows
 			throw;
 		}
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device done. Native handle: '0x{:X}'; Device handle: '0x{:X}'; Device name: '{}'.",
-			reinterpret_cast<std::uintptr_t>(mouseHandle), deviceHandle.id, data.name);
+			reinterpret_cast<std::uintptr_t>(mouseHandle), deviceHandle.id, name);
 
 		return mouseContainer.Size() - 1uz;
 	}

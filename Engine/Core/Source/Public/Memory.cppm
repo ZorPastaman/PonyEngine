@@ -7,14 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput:VibrationState;
+export module PonyEngine.Memory;
 
-export namespace PonyEngine::Input
-{
-	/// @brief Vibration state.
-	struct VibrationState final
-	{
-		float lowFrequency = 0.f; ///< Low frequency motor speed. Must be in range [0, 1].
-		float highFrequency = 0.f; ///< High frequency motor speed. Must be in range [0, 1].
-	};
-}
+export import :Arena;
+export import :Pool;

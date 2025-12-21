@@ -25,4 +25,3 @@ export import :Keyboard;
 export import :Layout;
 export import :Mouse;
 export import :RawInputEvent;
-export import :VibrationState;

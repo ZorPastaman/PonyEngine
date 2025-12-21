@@ -48,13 +48,7 @@ namespace PonyEngine::MessagePump::Windows
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(PumpService).name());
 		pumpServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
 		{
-			const auto pump = std::make_shared<PumpService>(application);
-
-			Application::ServiceData data;
-			data.SetService(pump, PONY_ENGINE_MESSAGE_PUMP_TICK_ORDER);
-			data.AddInterface(&pump->PublicPumpService());
-
-			return data;
+			return std::make_shared<PumpService>(application);
 		});
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(PumpService).name());
 	}

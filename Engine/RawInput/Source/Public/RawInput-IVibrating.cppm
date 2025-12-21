@@ -13,8 +13,6 @@ module;
 
 export module PonyEngine.RawInput:IVibrating;
 
-import :VibrationState;
-
 export namespace PonyEngine::Input
 {
 	/// @brief Vibrating input device feature.
@@ -22,12 +20,9 @@ export namespace PonyEngine::Input
 	{
 		INTERFACE_BODY(IVibrating)
 
-		/// @brief Gets a vibration state.
-		/// @return Vibration state.
-		[[nodiscard("Pure function")]]
-		virtual VibrationState State() const = 0;
 		/// @brief Sets a vibration state.
-		/// @param state Vibration state.
-		virtual void State(const VibrationState& state) = 0;
+		/// @param lowFrequency Low frequency motor speed. Must be in range [0, 1].
+		/// @param highFrequency High frequency motor speed. Must be in range [0, 1].
+		virtual void Vibrate(float lowFrequency, float highFrequency) = 0;
 	};
 }
