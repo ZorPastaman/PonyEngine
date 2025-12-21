@@ -149,9 +149,30 @@ namespace PonyEngine::Input
 			const std::chrono::time_point<std::chrono::steady_clock> lhsTime = eventTimes[lhs];
 			const std::chrono::time_point<std::chrono::steady_clock> rhsTime = eventTimes[rhs];
 
-			return lhsTime == rhsTime
-				? events[lhs].index() <= events[rhs].index()
-				: lhsTime < rhsTime;
+			if (lhsTime != rhsTime) [[likely]]
+			{
+				return lhsTime < rhsTime;
+			}
+
+			const bool lhsConnection = std::holds_alternative<ConnectionData>(events[lhs]);
+			const bool rhsConnection = std::holds_alternative<ConnectionData>(events[rhs]);
+
+			if (lhsConnection && rhsConnection) [[unlikely]]
+			{
+				return std::get<ConnectionData>(events[lhs]).isConnected > std::get<ConnectionData>(events[rhs]).isConnected;
+			}
+
+			if (lhsConnection && !rhsConnection) [[unlikely]]
+			{
+				return std::get<ConnectionData>(events[lhs]).isConnected;
+			}
+
+			if (!lhsConnection && rhsConnection) [[unlikely]]
+			{
+				return !std::get<ConnectionData>(events[rhs]).isConnected;
+			}
+
+			return true;
 		});
 	}
 

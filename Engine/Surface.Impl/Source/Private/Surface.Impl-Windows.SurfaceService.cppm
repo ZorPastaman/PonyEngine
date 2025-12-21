@@ -25,6 +25,8 @@ import PonyEngine.MessagePump;
 import PonyEngine.Surface;
 import PonyEngine.Type;
 
+import :MemoryManager;
+
 import :Windows.MessageHandler;
 import :Windows.RawInputManager;
 import :Windows.WindowClass;
@@ -292,13 +294,12 @@ export namespace PonyEngine::Surface::Windows
 		Math::Vector2<std::int32_t> lastMessageCursorPosition; ///< Last message cursor position.
 
 		std::shared_ptr<WindowClass> windowClass; ///< Window class.
+		MemoryManager memoryManager; ///< Memory manager.
 		RawInputManager rawInputManager; ///< Raw input manager.
 
 		HWND windowHandle; ///< Window handle.
 
 		std::vector<ISurfaceObserver*> observers; ///< Surface observer.
-
-		mutable std::string titleTemp; ///< Title temp data.
 	};
 }
 
@@ -316,7 +317,8 @@ namespace PonyEngine::Surface::Windows
 		windowInFocus{false},
 		windowRepositioning{false},
 		windowClass(windowClass),
-		rawInputManager(*this->application, *this)
+		memoryManager(0uz, 64uz),
+		rawInputManager(*this->application, *this, memoryManager)
 	{
 		assert(this->windowClass && "The window class is nullptr.");
 
@@ -561,16 +563,14 @@ namespace PonyEngine::Surface::Windows
 			return std::string_view();
 		}
 
-		titleTemp.clear();
-		titleTemp.resize(length + 1);
-		const int copied = GetWindowTextA(windowHandle, titleTemp.data(), length + 1);
+		const std::span<char> title = memoryManager.AllocateTemp<char>(length + 1);
+		const int copied = GetWindowTextA(windowHandle, title.data(), length + 1);
 		if (!copied) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to get window title: ErrorCode = '0x{:X}'", GetLastError()));
 		}
-		titleTemp.resize(copied);
 
-		return titleTemp;
+		return std::string_view(title.data(), copied);
 	}
 
 	void SurfaceService::Title(const std::string_view title)
