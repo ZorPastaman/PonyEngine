@@ -16,11 +16,12 @@ export import :ILoggerModuleContext;
 export import :IModule;
 export import :IModuleContext;
 export import :IService;
+export import :IServiceInterfaceAdder;
 export import :IServiceModuleContext;
 export import :ITickableService;
+export import :ITickableServiceAdder;
 export import :LoggerHandle;
 export import :ModuleDataHandle;
-export import :ServiceData;
 export import :ServiceHandle;
 
 #if PONY_WINDOWS

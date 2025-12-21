@@ -66,9 +66,7 @@ export namespace PonyEngine::Input::Windows
 
 			~Vibrator() noexcept = default;
 
-			[[nodiscard("Pure function")]] 
-			virtual VibrationState State() const override;
-			virtual void State(const VibrationState& state) override;
+			virtual void Vibrate(float lowFrequency, float highFrequency) noexcept override;
 
 			Vibrator& operator =(const Vibrator& other) noexcept = default;
 			Vibrator& operator =(Vibrator&& other) noexcept = default;
@@ -120,23 +118,6 @@ export namespace PonyEngine::Input::Windows
 		/// @param now Event time.
 		void UpdateStickInput(DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState,
 			std::chrono::time_point<std::chrono::steady_clock> now);
-		/// @brief Updates a vibration state.
-		/// @param index Gamepad index.
-		void UpdateVibration(DWORD index);
-		/// @brief Updates a vibration state.
-		/// @param index Gamepad index.
-		/// @param state Vibration state.
-		void UpdateVibration(DWORD index, const VibrationState& state);
-
-		/// @brief Gets a gamepad vibration state.
-		/// @param gamepadIndex Gamepad index.
-		/// @return Vibration state.
-		[[nodiscard("Pure function")]]
-		const VibrationState& Vibration(DWORD gamepadIndex) const noexcept;
-		/// @brief Sets a gamepad vibration state.
-		/// @param gamepadIndex Gamepad index.
-		/// @param state Vibration state.
-		void Vibration(DWORD gamepadIndex, const VibrationState& state) noexcept;
 
 		IRawInputContext* input; ///< Raw input context.
 		Surface::ISurfaceService* surface; ///< Surface service.
@@ -182,6 +163,8 @@ namespace PonyEngine::Input::Windows
 
 	void GamepadProvider::Tick()
 	{
+		const bool isInFocus = surface->IsInFocus();
+
 		for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			const std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
@@ -195,17 +178,7 @@ namespace PonyEngine::Input::Windows
 					if (const DWORD stateResult = XInputGetState(i, &state); stateResult == ERROR_SUCCESS)
 					{
 						ConnectGamepad(i, now);
-
-						if (surface->IsInFocus()) [[likely]]
-						{
-							UpdateInput(i, state.Gamepad, now);
-							UpdateVibration(i);
-						}
-						else [[unlikely]]
-						{
-							UpdateInput(i, XINPUT_GAMEPAD{}, now);
-							UpdateVibration(i, VibrationState{});
-						}
+						UpdateInput(i, isInFocus ? state.Gamepad : XINPUT_GAMEPAD{}, now);
 
 						continue;
 					}
@@ -232,14 +205,17 @@ namespace PonyEngine::Input::Windows
 	{
 	}
 
-	VibrationState GamepadProvider::Vibrator::State() const
+	void GamepadProvider::Vibrator::Vibrate(const float lowFrequency, const float highFrequency) noexcept
 	{
-		return provider->Vibration(gamepadIndex);
-	}
+		auto vibration = XINPUT_VIBRATION
+		{
+			.wLeftMotorSpeed = Math::RoundToIntegral<WORD>(std::clamp(lowFrequency, 0.f, 1.f) * std::numeric_limits<WORD>::max()),
+			.wRightMotorSpeed = Math::RoundToIntegral<WORD>(std::clamp(highFrequency, 0.f, 1.f) * std::numeric_limits<WORD>::max())
+		};
 
-	void GamepadProvider::Vibrator::State(const VibrationState& state)
-	{
-		provider->Vibration(gamepadIndex, state);
+		const DWORD result = XInputSetState(gamepadIndex, &vibration);
+		PONY_LOG_IF(result != ERROR_SUCCESS && result != ERROR_DEVICE_NOT_CONNECTED, provider->input->Logger(), Log::LogType::Error,
+			"Failed to set XInput device vibration. Error code: '0x{:X}'.", result);
 	}
 
 	void GamepadProvider::CreateDevices(DWORD& count)
@@ -250,10 +226,8 @@ namespace PonyEngine::Input::Windows
 		{
 			IVibrating& vibrator = vibrators[i] = Vibrator(*this, i);
 
-			auto data = DeviceData{};
-			data.SetDevice(std::format("XInputGamepad_{}", i), type, false);
-			data.AddFeature(vibrator);
-			const DeviceHandle handle = input->RegisterDevice(data);
+			const DeviceHandle handle = input->RegisterDevice(type, std::format("XInput_{}", i), false,
+				std::array<FeatureEntry, 1>{ FeatureEntry(vibrator) });
 
 			gamepadContainer.DeviceHandle(i) = handle;
 			gamepadContainer.Connect(i, false);
@@ -291,7 +265,6 @@ namespace PonyEngine::Input::Windows
 		UpdateInput(index, XINPUT_GAMEPAD{}, now);
 		input->Connect(gamepadContainer.DeviceHandle(index), ConnectionEvent{.isConnected = false, .timePoint = now});
 		gamepadContainer.Connect(index, false);
-		gamepadContainer.VibrationState(index, VibrationState{});
 	}
 
 	void GamepadProvider::UpdateInput(const DWORD index, const XINPUT_GAMEPAD& currentState, const std::chrono::time_point<std::chrono::steady_clock> now)
@@ -426,39 +399,5 @@ namespace PonyEngine::Input::Windows
 			XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, GamepadAxisMap::StickPlacement::Left);
 		updateStickInput(Math::Vector2<SHORT>(prevState.sThumbRX, prevState.sThumbRY), Math::Vector2<SHORT>(currentState.sThumbRX, currentState.sThumbRY),
 			XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, GamepadAxisMap::StickPlacement::Right);
-	}
-
-	void GamepadProvider::UpdateVibration(const DWORD index)
-	{
-		UpdateVibration(index, gamepadContainer.VibrationState(index));
-	}
-
-	void GamepadProvider::UpdateVibration(const DWORD index, const VibrationState& state)
-	{
-		auto vibration = XINPUT_VIBRATION
-		{
-			.wLeftMotorSpeed = Math::RoundToIntegral<WORD>(state.lowFrequency * std::numeric_limits<WORD>::max()),
-			.wRightMotorSpeed = Math::RoundToIntegral<WORD>(state.highFrequency * std::numeric_limits<WORD>::max())
-		};
-
-		const DWORD result = XInputSetState(index, &vibration);
-		PONY_LOG_IF(result != ERROR_SUCCESS && result != ERROR_DEVICE_NOT_CONNECTED, input->Logger(), Log::LogType::Error,
-			"Failed to set XInput device vibration. Error code: '0x{:X}'.", result);
-	}
-
-	const VibrationState& GamepadProvider::Vibration(const DWORD gamepadIndex) const noexcept
-	{
-		return gamepadContainer.VibrationState(gamepadIndex);
-	}
-
-	void GamepadProvider::Vibration(const DWORD gamepadIndex, const VibrationState& state) noexcept
-	{
-		if (!gamepadContainer.IsConnected(gamepadIndex))
-		{
-			return;
-		}
-
-		gamepadContainer.VibrationState(gamepadIndex, state);
-		UpdateVibration(gamepadIndex);
 	}
 }

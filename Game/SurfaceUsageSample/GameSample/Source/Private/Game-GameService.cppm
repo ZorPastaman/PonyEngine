@@ -14,7 +14,7 @@ import PonyEngine.Surface;
 
 export namespace Game
 {
-	class GameService final : public PonyEngine::Application::ITickableService, private PonyEngine::Input::IRawInputObserver
+	class GameService final : public PonyEngine::Application::IService, private PonyEngine::Input::IRawInputObserver
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -26,8 +26,6 @@ export namespace Game
 
 		virtual void Begin() override;
 		virtual void End() override;
-
-		virtual void Tick() override;
 
 		GameService& operator =(const GameService&) = delete;
 		GameService& operator =(GameService&&) = delete;
@@ -102,10 +100,6 @@ namespace Game
 	void GameService::End()
 	{
 		input->RemoveObserver(*this);
-	}
-
-	void GameService::Tick()
-	{
 	}
 
 	void GameService::OnRawInput(PonyEngine::Input::DeviceHandle, const PonyEngine::Input::RawInputEvent& inputEvent)

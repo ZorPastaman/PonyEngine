@@ -61,27 +61,32 @@ export namespace PonyEngine::Application
 		/// @return Service.
 		[[nodiscard("Pure function")]]
 		IService& Service(std::size_t index) const noexcept;
-		/// @brief Gets a tickable service at the @p index.
-		/// @param index Tickable service index.
-		/// @return Tickable service info.
+		/// @brief Gets a tickable service info vector at the @p index.
+		/// @param index Service index.
+		/// @return Tickable service info vector.
 		[[nodiscard("Pure function")]]
-		const TickableServiceInfo& TickableService(std::size_t index) const noexcept;
+		std::vector<TickableServiceInfo>& TickableServices(std::size_t index) noexcept;
+		/// @brief Gets a tickable service info vector at the @p index.
+		/// @param index Service index.
+		/// @return Tickable service info vector.
+		[[nodiscard("Pure function")]]
+		const std::vector<TickableServiceInfo>& TickableServices(std::size_t index) const noexcept;
+		/// @brief Gets interfaces at the @p index.
+		/// @param index Interface set index.
+		/// @return Interfaces.
+		[[nodiscard("Pure function")]]
+		InterfaceContainer& Interfaces(std::size_t index) noexcept;
 		/// @brief Gets interfaces at the @p index.
 		/// @param index Interface set index.
 		/// @return Interfaces.
 		[[nodiscard("Pure function")]]
 		const InterfaceContainer& Interfaces(std::size_t index) const noexcept;
 
-		/// @brief Checks if any service contains an interfaces of the @p type.
-		/// @param type Interface type.
-		/// @return @a True if it contains; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		bool ContainsInterface(std::type_index type) const noexcept;
-
 		/// @brief Adds data.
 		/// @param handle Service handle.
-		/// @param serviceData Service data.
-		void Add(ServiceHandle handle, const ServiceData& serviceData);
+		/// @param service Service.
+		/// @return Service index.
+		std::size_t Add(ServiceHandle handle, const std::shared_ptr<IService>& service);
 		/// @brief Removes data.
 		/// @param index Data index.
 		void Remove(std::size_t index) noexcept;
@@ -94,7 +99,7 @@ export namespace PonyEngine::Application
 	private:
 		std::vector<ServiceHandle> serviceHandles; ///< Service handles.
 		std::vector<std::shared_ptr<IService>> services; ///< Services.
-		std::vector<TickableServiceInfo> tickableServices; ///< Tickable services.
+		std::vector<std::vector<TickableServiceInfo>> tickableServices; ///< Tickable services.
 		std::vector<InterfaceContainer> interfaces; ///< Service interfaces.
 	};
 }
@@ -126,9 +131,19 @@ namespace PonyEngine::Application
 		return *services[index];
 	}
 
-	const TickableServiceInfo& ServiceContainer::TickableService(const std::size_t index) const noexcept
+	std::vector<TickableServiceInfo>& ServiceContainer::TickableServices(const std::size_t index) noexcept
 	{
 		return tickableServices[index];
+	}
+
+	const std::vector<TickableServiceInfo>& ServiceContainer::TickableServices(const std::size_t index) const noexcept
+	{
+		return tickableServices[index];
+	}
+
+	InterfaceContainer& ServiceContainer::Interfaces(const std::size_t index) noexcept
+	{
+		return interfaces[index];
 	}
 
 	const InterfaceContainer& ServiceContainer::Interfaces(const std::size_t index) const noexcept
@@ -136,47 +151,20 @@ namespace PonyEngine::Application
 		return interfaces[index];
 	}
 
-	bool ServiceContainer::ContainsInterface(const std::type_index type) const noexcept
+	std::size_t ServiceContainer::Add(const ServiceHandle handle, const std::shared_ptr<IService>& service)
 	{
-		for (const InterfaceContainer& interfaceContainer : interfaces)
-		{
-			if (interfaceContainer.IndexOf(type) < interfaceContainer.Size())
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	void ServiceContainer::Add(const ServiceHandle handle, const ServiceData& serviceData)
-	{
-		assert(serviceData.service && "The service is nullptr.");
+		assert(service && "The service is nullptr.");
 
 		serviceHandles.push_back(handle);
 		try
 		{
-			services.push_back(serviceData.service);
+			services.push_back(service);
 			try
 			{
-				tickableServices.push_back(TickableServiceInfo{.tickableService = serviceData.tickableService, .tickOrder = serviceData.tickOrder});
+				tickableServices.push_back(std::vector<TickableServiceInfo>());
 				try
 				{
-					interfaces.push_back(InterfaceContainer(serviceData.publicInterfaces.size()));
-
-					try
-					{
-						InterfaceContainer& interfaceContainer = interfaces.back();
-						for (const auto [type, interface] : serviceData.publicInterfaces)
-						{
-							interfaceContainer.Add(type, interface);
-						}
-					}
-					catch (...)
-					{
-						interfaces.pop_back();
-						throw;
-					}
+					interfaces.push_back(InterfaceContainer());
 				}
 				catch (...)
 				{
@@ -195,6 +183,8 @@ namespace PonyEngine::Application
 			serviceHandles.pop_back();
 			throw;
 		}
+
+		return Size() - 1uz;
 	}
 
 	void ServiceContainer::Remove(const std::size_t index) noexcept

@@ -130,7 +130,7 @@ namespace PonyEngine::Application::Windows
 		appDataManager(*this, instance, prevInstance, commandLine, showCommand),
 		pathManager(*this),
 		serviceManager(*this),
-		moduleManager(*this, loggerManager.PublicLoggerModuleContext(), serviceManager.PublicServiceModuleContext())
+		moduleManager(*this, loggerManager, serviceManager)
 	{
 	}
 

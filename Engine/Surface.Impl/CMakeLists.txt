@@ -20,6 +20,7 @@ target_sources(PonyEngine.Surface.Impl PRIVATE
 )
 target_sources(PonyEngine.Surface.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Surface.Impl.cppm"
+	"Source/Private/Surface.Impl-MemoryManager.cppm"
 )
 
 if(PONY_WINDOWS)

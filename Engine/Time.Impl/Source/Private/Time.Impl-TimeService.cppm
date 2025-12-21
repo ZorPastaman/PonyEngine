@@ -17,7 +17,7 @@ import PonyEngine.Time;
 export namespace PonyEngine::Time
 {
 	/// @brief Time service.
-	class TimeService final : public Application::ITickableService, private ITimeService
+	class TimeService final : public Application::IService, private Application::ITickableService, private ITimeService
 	{
 	public:
 		/// @brief Creates a time service.
@@ -30,21 +30,16 @@ export namespace PonyEngine::Time
 
 		virtual void Begin() noexcept override;
 		virtual void End() noexcept override;
-		virtual void Tick() noexcept override;
 
-		/// @brief Gets the public time service.
-		/// @return Public time service.
-		[[nodiscard("Pure function")]]
-		ITimeService& PublicTimeService() noexcept;
-		/// @brief Gets the public time service.
-		/// @return Public time service.
-		[[nodiscard("Pure function")]]
-		const ITimeService& PublicTimeService() const noexcept;
+		virtual void AddTickableServices(Application::ITickableServiceAdder& adder) override;
+		virtual void AddInterfaces(Application::IServiceInterfaceAdder& adder) override;
 
 		TimeService& operator =(const TimeService&) = delete;
 		TimeService& operator =(TimeService&&) = delete;
 
 	private:
+		virtual void Tick() noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual double NowTime() const noexcept override;
 
@@ -174,20 +169,20 @@ namespace PonyEngine::Time
 	{
 	}
 
+	void TimeService::AddTickableServices(Application::ITickableServiceAdder& adder)
+	{
+		adder.Add(*this, PONY_ENGINE_TIME_TICK_ORDER);
+	}
+
+	void TimeService::AddInterfaces(Application::IServiceInterfaceAdder& adder)
+	{
+		adder.AddInterface<ITimeService>(*this);
+	}
+
 	void TimeService::Tick() noexcept
 	{
 		const std::chrono::time_point<std::chrono::steady_clock> now = WaitForNextFrame();
 		UpdateTimes(now);
-	}
-
-	ITimeService& TimeService::PublicTimeService() noexcept
-	{
-		return *this;
-	}
-
-	const ITimeService& TimeService::PublicTimeService() const noexcept
-	{
-		return *this;
 	}
 
 	double TimeService::NowTime() const noexcept
