@@ -80,6 +80,7 @@ option(PONY_ENGINE_RAW_INPUT_IMPL "Enable PonyEngine.RawInput.Impl module." OFF)
 option(PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL "Enable PonyEngine.RawInput.Keyboard.Impl module." OFF)
 option(PONY_ENGINE_RAW_INPUT_MOUSE_IMPL "Enable PonyEngine.RawInput.Mouse.Impl module." OFF)
 option(PONY_ENGINE_RAW_INPUT_XINPUT_IMPL "Enable PonyEngine.RawInput.XINPUT.Impl module." OFF)
+option(PONY_ENGINE_RENDER "Enable PonyEngine.Render module." OFF)
 
 add_subdirectory("Engine/Core")
 add_subdirectory("Engine/Log")
@@ -136,11 +137,16 @@ if(PONY_ENGINE_RAW_INPUT_XINPUT_IMPL)
 	add_subdirectory("Engine/RawInput.XINPUT.Impl")
 endif()
 
+if(PONY_ENGINE_RENDER_DEVICE)
+	add_subdirectory("Engine/RenderDevice")
+endif()
+
 if(NOT PONY_IS_SUBPROJECT)
 	set(PONY_BASE_MODULES "")
 	set(PONY_LOG_MODULES "")
 	set(PONY_SURFACE_MODULES "")
 	set(PONY_INPUT_MODULES "")
+	set(PONY_RENDER_MODULES "")
 
 	message(VERBOSE "Post-configuring")
 	pony_set_build_options(PonyEngine.Core ${PONY_ENGINE_OPTIMIZATION})
@@ -226,6 +232,11 @@ if(NOT PONY_IS_SUBPROJECT)
 		list(APPEND PONY_INPUT_MODULES PonyEngine.RawInput.XInput.Impl)
 	endif()
 
+	if(TARGET PonyEngine.RenderDevice)
+		pony_set_log_defines(PonyEngine.RenderDevice ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+		pony_set_build_options(PonyEngine.RenderDevice ${PONY_ENGINE_OPTIMIZATION})
+	endif()
+
 	if(PONY_ENGINE_ADD_GAME)
 		message(VERBOSE "Adding game")
 		add_subdirectory("Game/${PONY_ENGINE_GAME_NAME}/GameSample")
@@ -269,6 +280,14 @@ if(NOT PONY_IS_SUBPROJECT)
 			list(APPEND PONY_INSTALL_TARGETS PonyModule.Input)
 		endif()
 
+		if(PONY_RENDER_MODULES)
+			pony_make_module_group(PONY_RENDER_MODULES PonyModule.Render "PonyModule.Render" 23)
+			pony_set_log_defines(PonyModule.Render ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+			pony_set_build_options(PonyModule.Render ${PONY_ENGINE_OPTIMIZATION})
+			target_link_libraries(PonyEngine.Application.Impl PRIVATE PonyModule.Render)
+			list(APPEND PONY_INSTALL_TARGETS PonyModule.Render)
+		endif()
+
 		if(PONY_GAME_MODULES)
 			pony_make_module_group(PONY_GAME_MODULES PonyModule.Game "PonyModule.Game" 23)
 			pony_set_log_defines(PonyModule.Game ${PONY_GAME_LOG_LEVEL} ${PONY_GAME_LOG_STACKTRACE_LEVEL})
@@ -284,6 +303,7 @@ if(NOT PONY_IS_SUBPROJECT)
 			${PONY_SURFACE_MODULES}
 			${PONY_INPUT_MODULES}
 			${PONY_GAME_MODULES}
+			${PONY_RENDER_MODULES}
 		)
 	endif()
 

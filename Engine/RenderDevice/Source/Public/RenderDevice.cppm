@@ -7,7 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time;
+export module PonyEngine.RenderDevice;
 
-export import :ITimeService;
-export import :Utility;
+export import :IRenderDeviceService;
