@@ -7,7 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time;
+module;
 
-export import :ITimeService;
-export import :Utility;
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.RenderDevice:IRenderDeviceService;
+
+import std;
+
+export namespace PonyEngine::Render
+{
+	class IRenderDeviceService
+	{
+		INTERFACE_BODY(IRenderDeviceService)
+	};
+}

@@ -7,6 +7,7 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Time PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Time.cppm"
 	"Source/Public/Time-ITimeService.cppm"
+	"Source/Public/Time-Utility.cppm"
 )
 
 message(VERBOSE "Setting properties")

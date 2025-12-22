@@ -12,6 +12,7 @@ export module PonyEngine.Time.Impl:TimeService;
 import std;
 
 import PonyEngine.Application.Ext;
+import PonyEngine.Math;
 import PonyEngine.Time;
 
 export namespace PonyEngine::Time
@@ -41,14 +42,14 @@ export namespace PonyEngine::Time
 		virtual void Tick() noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual double NowTime() const noexcept override;
+		virtual std::chrono::nanoseconds NowTime() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual double RealTime() const noexcept override;
+		virtual std::chrono::nanoseconds RealTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual double VirtualTime() const noexcept override;
+		virtual std::chrono::nanoseconds VirtualTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual double UnscaledVirtualTime() const noexcept override;
+		virtual std::chrono::nanoseconds UnscaledVirtualTime() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t RealFrameCount() const noexcept override;
@@ -58,34 +59,34 @@ export namespace PonyEngine::Time
 		virtual std::uint64_t UnscaledVirtualFrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual float RealDeltaTime() const noexcept override;
+		virtual std::chrono::nanoseconds RealDeltaTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual float VirtualDeltaTime() const noexcept override;
+		virtual std::chrono::nanoseconds VirtualDeltaTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual float UnscaledVirtualDeltaTime() const noexcept override;
+		virtual std::chrono::nanoseconds UnscaledVirtualDeltaTime() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t RealDeltaFrame() const noexcept override;
+		virtual std::uint64_t RealDeltaFrame() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t VirtualDeltaFrame() const noexcept override;
+		virtual std::uint64_t VirtualDeltaFrame() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t UnscaledVirtualDeltaFrame() const noexcept override;
+		virtual std::uint64_t UnscaledVirtualDeltaFrame() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual float DeltaTimeCap() const noexcept override;
-		virtual void DeltaTimeCap(float cap) override;
+		virtual std::chrono::nanoseconds DeltaTimeCap() const noexcept override;
+		virtual void DeltaTimeCap(std::chrono::nanoseconds cap) override;
 
 		[[nodiscard("Pure function")]]
-		virtual float TimeScale() const noexcept override;
-		virtual void TimeScale(float scale) override;
+		virtual double TimeScale() const noexcept override;
+		virtual void TimeScale(double scale) override;
 
 		[[nodiscard("Pure function")]]
-		virtual float FramePeriod() const noexcept override;
-		virtual void FramePeriod(float period) override;
+		virtual std::chrono::nanoseconds FramePeriod() const noexcept override;
+		virtual void FramePeriod(std::chrono::nanoseconds period) override;
 
 		[[nodiscard("Pure function")]]
-		virtual float TargetFrameTime() const noexcept override;
-		virtual void TargetFrameTime(float frameTime) override;
+		virtual std::chrono::nanoseconds TargetFrameTime() const noexcept override;
+		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> StartTimePoint() const noexcept override;
@@ -102,62 +103,62 @@ export namespace PonyEngine::Time
 		/// @param now Now time point.
 		void UpdateTimes(std::chrono::time_point<std::chrono::steady_clock> now) noexcept;
 
-		float deltaTimeCap; ///< Delta time cap.
-		float timeScale; ///< Time scale.
-		float framePeriod; ///< Frame period.
-		std::chrono::duration<float> targetFrameTime; ///< Target frame time.
+		std::chrono::nanoseconds deltaTimeCap; ///< Delta time cap.
+		double timeScale; ///< Time scale.
+		std::chrono::nanoseconds framePeriod; ///< Frame period.
+		std::chrono::nanoseconds targetFrameTime; ///< Target frame time.
 
 		std::chrono::time_point<std::chrono::steady_clock> startTimePoint; ///< Start time point.
 		std::chrono::time_point<std::chrono::steady_clock> prevFrameTimePoint; ///< Previous frame time point.
 		std::chrono::time_point<std::chrono::steady_clock> thisFrameTimePoint; ///< This frame time point.
 
-		double realTime; ///< Real time elapsed since the start in seconds.
-		double unscaledVirtualTime; ///< Unscaled virtual time elapsed since the start in seconds.
-		double virtualTime; ///< Virtual time elapsed since the start in seconds.
+		std::chrono::nanoseconds realTime; ///< Real time elapsed since the start.
+		std::chrono::nanoseconds unscaledVirtualTime; ///< Unscaled virtual time elapsed since the start.
+		std::chrono::nanoseconds virtualTime; ///< Virtual time elapsed since the start.
 
 		std::uint64_t realFrameCount; ///< Real frame count since the start.
 		std::uint64_t unscaledVirtualFrameCount; ///< Unscaled virtual frame count since the start.
 		std::uint64_t virtualFrameCount; ///< Virtual frame count since the start.
 
-		float realDeltaTime; ///< Real delta time.
-		float unscaledVirtualDeltaTime; ///< Unscaled virtual delta time.
-		float virtualDeltaTime; ///< Virtual delta time.
+		std::chrono::nanoseconds realDeltaTime; ///< Real delta time.
+		std::chrono::nanoseconds unscaledVirtualDeltaTime; ///< Unscaled virtual delta time.
+		std::chrono::nanoseconds virtualDeltaTime; ///< Virtual delta time.
 
-		std::uint32_t realDeltaFrame; ///< Real delta frame.
-		std::uint32_t unscaledVirtualDeltaFrame; ///< Unscaled virtual delta frame.
-		std::uint32_t virtualDeltaFrame; ///< Virtual delta frame.
+		std::uint64_t realDeltaFrame; ///< Real delta frame.
+		std::uint64_t unscaledVirtualDeltaFrame; ///< Unscaled virtual delta frame.
+		std::uint64_t virtualDeltaFrame; ///< Virtual delta frame.
 
-		float realTimeAccumulator; ///< Real time accumulator.
-		float unscaledVirtualTimeAccumulator; ///< Unscaled virtual time accumulator.
-		float virtualTimeAccumulator; ///< Virtual time accumulator.
+		std::chrono::nanoseconds realTimeAccumulator; ///< Real time accumulator.
+		std::chrono::nanoseconds unscaledVirtualTimeAccumulator; ///< Unscaled virtual time accumulator.
+		std::chrono::nanoseconds virtualTimeAccumulator; ///< Virtual time accumulator.
 	};
 }
 
 namespace PonyEngine::Time
 {
 	TimeService::TimeService() noexcept :
-		deltaTimeCap{1.f},
-		timeScale{1.f},
-		framePeriod{1.f / 60.f},
-		targetFrameTime(0.f),
+		deltaTimeCap(std::chrono::seconds(1)),
+		timeScale{1.},
+		framePeriod(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(1. / 60.))),
+		targetFrameTime(0ull),
 		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
-		realTime{0.},
-		unscaledVirtualTime{0.},
-		virtualTime{0.},
+		realTime(0),
+		unscaledVirtualTime(0),
+		virtualTime(0),
 		realFrameCount{0ull},
 		unscaledVirtualFrameCount{0ull},
 		virtualFrameCount{0ull},
-		realDeltaTime{0.f},
-		unscaledVirtualDeltaTime{0.f},
-		virtualDeltaTime{0.f},
-		realDeltaFrame{0u},
-		unscaledVirtualDeltaFrame{0u},
-		virtualDeltaFrame{0u},
-		realTimeAccumulator{0.f},
-		unscaledVirtualTimeAccumulator{0.f},
-		virtualTimeAccumulator{0.f}
+		realDeltaTime(0),
+		unscaledVirtualDeltaTime(0),
+		virtualDeltaTime(0),
+		realDeltaFrame{0ull},
+		unscaledVirtualDeltaFrame{0ull},
+		virtualDeltaFrame{0ull},
+		realTimeAccumulator(0),
+		unscaledVirtualTimeAccumulator(0),
+		virtualTimeAccumulator(0)
 	{
 	}
 
@@ -185,22 +186,22 @@ namespace PonyEngine::Time
 		UpdateTimes(now);
 	}
 
-	double TimeService::NowTime() const noexcept
+	std::chrono::nanoseconds TimeService::NowTime() const noexcept
 	{
-		return std::chrono::duration<double>(NowTimePoint() - startTimePoint).count();
+		return std::chrono::nanoseconds(NowTimePoint() - startTimePoint);
 	}
 
-	double TimeService::RealTime() const noexcept
+	std::chrono::nanoseconds TimeService::RealTime() const noexcept
 	{
 		return realTime;
 	}
 
-	double TimeService::VirtualTime() const noexcept
+	std::chrono::nanoseconds TimeService::VirtualTime() const noexcept
 	{
 		return virtualTime;
 	}
 
-	double TimeService::UnscaledVirtualTime() const noexcept
+	std::chrono::nanoseconds TimeService::UnscaledVirtualTime() const noexcept
 	{
 		return unscaledVirtualTime;
 	}
@@ -220,44 +221,44 @@ namespace PonyEngine::Time
 		return unscaledVirtualFrameCount;
 	}
 
-	float TimeService::RealDeltaTime() const noexcept
+	std::chrono::nanoseconds TimeService::RealDeltaTime() const noexcept
 	{
 		return realDeltaTime;
 	}
 
-	float TimeService::VirtualDeltaTime() const noexcept
+	std::chrono::nanoseconds TimeService::VirtualDeltaTime() const noexcept
 	{
 		return virtualDeltaTime;
 	}
 
-	float TimeService::UnscaledVirtualDeltaTime() const noexcept
+	std::chrono::nanoseconds TimeService::UnscaledVirtualDeltaTime() const noexcept
 	{
 		return unscaledVirtualDeltaTime;
 	}
 
-	std::uint32_t TimeService::RealDeltaFrame() const noexcept
+	std::uint64_t TimeService::RealDeltaFrame() const noexcept
 	{
 		return realDeltaFrame;
 	}
 
-	std::uint32_t TimeService::VirtualDeltaFrame() const noexcept
+	std::uint64_t TimeService::VirtualDeltaFrame() const noexcept
 	{
 		return virtualDeltaFrame;
 	}
 
-	std::uint32_t TimeService::UnscaledVirtualDeltaFrame() const noexcept
+	std::uint64_t TimeService::UnscaledVirtualDeltaFrame() const noexcept
 	{
 		return unscaledVirtualDeltaFrame;
 	}
 
-	float TimeService::DeltaTimeCap() const noexcept
+	std::chrono::nanoseconds TimeService::DeltaTimeCap() const noexcept
 	{
 		return deltaTimeCap;
 	}
 
-	void TimeService::DeltaTimeCap(const float cap)
+	void TimeService::DeltaTimeCap(const std::chrono::nanoseconds cap)
 	{
-		if (cap <= 0.f) [[unlikely]]
+		if (cap <= std::chrono::nanoseconds(0)) [[unlikely]]
 		{
 			throw std::invalid_argument("Delta time cap must be greater than zero");
 		}
@@ -265,14 +266,14 @@ namespace PonyEngine::Time
 		deltaTimeCap = cap;
 	}
 
-	float TimeService::TimeScale() const noexcept
+	double TimeService::TimeScale() const noexcept
 	{
 		return timeScale;
 	}
 
-	void TimeService::TimeScale(const float scale)
+	void TimeService::TimeScale(const double scale)
 	{
-		if (scale < 0.f) [[unlikely]]
+		if (scale < 0.) [[unlikely]]
 		{
 			throw std::invalid_argument("Time scale must be greater or equal zero");
 		}
@@ -280,14 +281,14 @@ namespace PonyEngine::Time
 		timeScale = scale;
 	}
 
-	float TimeService::FramePeriod() const noexcept
+	std::chrono::nanoseconds TimeService::FramePeriod() const noexcept
 	{
 		return framePeriod;
 	}
 
-	void TimeService::FramePeriod(const float period)
+	void TimeService::FramePeriod(const std::chrono::nanoseconds period)
 	{
-		if (period <= 0.f) [[unlikely]]
+		if (period <= std::chrono::nanoseconds(0)) [[unlikely]]
 		{
 			throw std::invalid_argument("Frame period must be greater than zero");
 		}
@@ -295,19 +296,14 @@ namespace PonyEngine::Time
 		framePeriod = period;
 	}
 
-	float TimeService::TargetFrameTime() const noexcept
+	std::chrono::nanoseconds TimeService::TargetFrameTime() const noexcept
 	{
-		return targetFrameTime.count();
+		return targetFrameTime;
 	}
 
-	void TimeService::TargetFrameTime(const float frameTime)
+	void TimeService::TargetFrameTime(const std::chrono::nanoseconds frameTime) noexcept
 	{
-		if (frameTime < 0.f) [[unlikely]]
-		{
-			throw std::invalid_argument("Target frame time must be greater or equal zero");
-		}
-
-		targetFrameTime = std::chrono::duration<float>(frameTime);
+		targetFrameTime = frameTime;
 	}
 
 	std::chrono::time_point<std::chrono::steady_clock> TimeService::StartTimePoint() const noexcept
@@ -331,7 +327,7 @@ namespace PonyEngine::Time
 		do
 		{
 			now = NowTimePoint();
-		} while (std::chrono::duration<float>(now - thisFrameTimePoint) < targetFrameTime);
+		} while (now - thisFrameTimePoint < targetFrameTime);
 
 		return now;
 	}
@@ -341,11 +337,11 @@ namespace PonyEngine::Time
 		prevFrameTimePoint = thisFrameTimePoint;
 		thisFrameTimePoint = now;
 
-		realDeltaTime = std::chrono::duration<float>(thisFrameTimePoint - prevFrameTimePoint).count();
+		realDeltaTime = thisFrameTimePoint - prevFrameTimePoint;
 		unscaledVirtualDeltaTime = std::min(realDeltaTime, deltaTimeCap);
-		virtualDeltaTime = unscaledVirtualDeltaTime * timeScale;
+		virtualDeltaTime = std::chrono::nanoseconds(Math::RoundToIntegral<std::chrono::nanoseconds::rep>((unscaledVirtualDeltaTime * timeScale).count()));
 
-		realTime = std::chrono::duration<double>(thisFrameTimePoint - startTimePoint).count();
+		realTime = thisFrameTimePoint - startTimePoint;
 		unscaledVirtualTime += unscaledVirtualDeltaTime;
 		virtualTime += virtualDeltaTime;
 
@@ -353,14 +349,13 @@ namespace PonyEngine::Time
 		unscaledVirtualTimeAccumulator += unscaledVirtualDeltaTime;
 		virtualTimeAccumulator += virtualDeltaTime;
 
-		const float inverseFramePeriod = 1.f / framePeriod;
-		realDeltaFrame = static_cast<std::uint32_t>(realTimeAccumulator * inverseFramePeriod);
-		unscaledVirtualDeltaFrame = static_cast<std::uint32_t>(unscaledVirtualTimeAccumulator * inverseFramePeriod);
-		virtualDeltaFrame = static_cast<std::uint32_t>(virtualTimeAccumulator * inverseFramePeriod);
+		realDeltaFrame = realTimeAccumulator / framePeriod;
+		unscaledVirtualDeltaFrame = unscaledVirtualTimeAccumulator / framePeriod;
+		virtualDeltaFrame = virtualTimeAccumulator / framePeriod;
 
-		realTimeAccumulator -= static_cast<float>(realDeltaFrame) * framePeriod;
-		unscaledVirtualTimeAccumulator -= static_cast<float>(unscaledVirtualDeltaFrame) * framePeriod;
-		virtualTimeAccumulator -= static_cast<float>(virtualDeltaFrame) * framePeriod;
+		realTimeAccumulator %= framePeriod;
+		unscaledVirtualTimeAccumulator %= framePeriod;
+		virtualTimeAccumulator %= framePeriod;
 
 		realFrameCount += realDeltaFrame;
 		unscaledVirtualFrameCount += unscaledVirtualDeltaFrame;
