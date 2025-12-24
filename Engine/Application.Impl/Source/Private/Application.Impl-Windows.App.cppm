@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
+import PonyEngine.Meta;
 
 import :ExitCodes;
 import :FlowManager;
@@ -55,12 +56,19 @@ export namespace PonyEngine::Application::Windows
 		App& operator =(App&) = delete;
 
 	private:
+		[[nodiscard("Pure function")]] 
+		virtual std::string_view EngineName() const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual Meta::Version EngineVersion() const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual std::string_view EngineTitle() const noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual std::string_view CompanyName() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::string_view ProjectName() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::string_view ProjectVersion() const noexcept override;
+		virtual Meta::Version ProjectVersion() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::string_view CompanyTitle() const noexcept override;
 		[[nodiscard("Pure function")]]
@@ -148,6 +156,21 @@ namespace PonyEngine::Application::Windows
 		return flowManager.Run(begin, end, tick);
 	}
 
+	std::string_view App::EngineName() const noexcept
+	{
+		return Application::EngineName();
+	}
+
+	Meta::Version App::EngineVersion() const noexcept
+	{
+		return Application::EngineVersion();
+	}
+
+	std::string_view App::EngineTitle() const noexcept
+	{
+		return Application::EngineTitle();
+	}
+
 	std::string_view App::CompanyName() const noexcept
 	{
 		return Application::CompanyName();
@@ -158,7 +181,7 @@ namespace PonyEngine::Application::Windows
 		return Application::ProjectName();
 	}
 
-	std::string_view App::ProjectVersion() const noexcept
+	Meta::Version App::ProjectVersion() const noexcept
 	{
 		return Application::ProjectVersion();
 	}

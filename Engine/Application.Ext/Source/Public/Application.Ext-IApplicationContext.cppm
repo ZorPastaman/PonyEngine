@@ -16,6 +16,7 @@ export module PonyEngine.Application.Ext:IApplicationContext;
 import std;
 
 import PonyEngine.Log;
+import PonyEngine.Meta;
 
 import :FlowState;
 
@@ -25,6 +26,21 @@ export namespace PonyEngine::Application
 	class IApplicationContext
 	{
 		INTERFACE_BODY(IApplicationContext)
+
+		/// @brief Gets the engine name.
+		/// @return Engine name.
+		/// @remark The name is a string to use in code. To get a fancy name for views, use @p EngineTitle().
+		[[nodiscard("Pure function")]]
+		virtual std::string_view EngineName() const noexcept = 0;
+		/// @brief Gets the engine version.
+		/// @return Engine version.
+		[[nodiscard("Pure function")]]
+		virtual Meta::Version EngineVersion() const noexcept = 0;
+		/// @brief Gets the engine title.
+		/// @return Engine title.
+		/// @remark The title is a string to use in views. To get a name for code, use @p EngineName().
+		[[nodiscard("Pure function")]]
+		virtual std::string_view EngineTitle() const noexcept = 0;
 
 		/// @brief Gets the company name.
 		/// @return Company name.
@@ -39,7 +55,7 @@ export namespace PonyEngine::Application
 		/// @brief Gets the project version.
 		/// @return Project version.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view ProjectVersion() const noexcept = 0;
+		virtual Meta::Version ProjectVersion() const noexcept = 0;
 		/// @brief Gets the company title.
 		/// @return Company title.
 		/// @remark The title is a string to use in views. To get a name for code, use @p CompanyName().
