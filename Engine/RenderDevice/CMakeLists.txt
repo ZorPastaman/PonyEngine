@@ -6,7 +6,6 @@ add_library(PonyEngine.RenderDevice STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RenderDevice.cppm"
-	"Source/Public/RenderDevice-IRenderAPI.cppm"
 	"Source/Public/RenderDevice-IRenderDeviceService.cppm"	
 	"Source/Public/RenderDevice-RenderAPI.cppm" 
 )
