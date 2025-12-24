@@ -15,7 +15,7 @@ export module PonyEngine.RenderDevice:IRenderDeviceService;
 
 import std;
 
-import :IRenderAPI;
+import PonyEngine.Meta;
 
 export namespace PonyEngine::Render
 {
@@ -23,16 +23,18 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IRenderDeviceService)
 
-		static constexpr std::size_t EmptyRenderApiIndex = 0uz;
+		static constexpr std::size_t EmptyBackendIndex = 0uz;
 
 		[[nodiscard("Pure function")]]
-		virtual std::size_t RenderApiCount() const noexcept = 0;
+		virtual std::size_t BackendCount() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual IRenderAPI& RenderApi(std::size_t index) const noexcept = 0;
+		virtual std::string_view BackendName(std::size_t backendIndex) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual IRenderAPI& ActiveRenderApi(std::size_t index) const noexcept = 0;
+		virtual std::string_view RenderApiName(std::size_t backendIndex) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::size_t ActiveRenderApiIndex() const noexcept = 0;
-		virtual void SwitchToRenderApi(std::size_t index) = 0;
+		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t ActiveBackend() const noexcept = 0;
+		virtual void SwitchBackend(std::size_t backendIndex) = 0;
 	};
 }

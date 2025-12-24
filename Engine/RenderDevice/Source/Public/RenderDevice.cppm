@@ -10,7 +10,4 @@
 export module PonyEngine.RenderDevice;
 
 export import :IRenderDeviceService;
-
-export import :IRenderAPI;
-export import :IRenderDeviceService;
 export import :RenderAPI;
