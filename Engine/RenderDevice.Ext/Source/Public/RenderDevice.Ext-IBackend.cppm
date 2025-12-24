@@ -7,10 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice;
+module;
 
-export import :IRenderDeviceService;
+#include "PonyEngine/Object/Body.h"
 
-export import :IRenderAPI;
-export import :IRenderDeviceService;
-export import :RenderAPI;
+export module PonyEngine.RenderDevice.Ext:IBackend;
+
+import PonyEngine.RenderDevice;
+
+export namespace PonyEngine::Render
+{
+	class IBackend
+	{
+		INTERFACE_BODY(IBackend)
+
+		[[nodiscard("Pure function")]]
+		virtual IRenderAPI& RenderApi() const noexcept = 0;
+
+		virtual void Activate() = 0;
+		virtual void Deactivate() = 0;
+	};
+}

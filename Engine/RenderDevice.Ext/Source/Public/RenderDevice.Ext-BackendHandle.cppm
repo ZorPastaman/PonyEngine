@@ -7,14 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput.Ext:InputProviderHandle;
+export module PonyEngine.RenderDevice.Ext:BackendHandle;
 
 import std;
 
-export namespace PonyEngine::Input
+export namespace PonyEngine::Render
 {
-	/// @brief Input provider handle.
-	struct InputProviderHandle final
+	struct BackendHandle final
 	{
 		std::uint32_t id = 0u; ///< ID. It's used only by the owner.
 
@@ -29,28 +28,28 @@ export namespace PonyEngine::Input
 		explicit constexpr operator bool() const noexcept;
 
 		[[nodiscard("Pure operator")]]
-		constexpr auto operator <=>(const InputProviderHandle& other) const noexcept = default;
+		constexpr auto operator <=>(const BackendHandle& other) const noexcept = default;
 	};
 }
 
 export template<>
-struct std::hash<PonyEngine::Input::InputProviderHandle> final
+struct std::hash<PonyEngine::Render::BackendHandle> final
 {
 	[[nodiscard("Pure function")]]
-	size_t operator ()(const PonyEngine::Input::InputProviderHandle handle) const noexcept
+	size_t operator ()(const PonyEngine::Render::BackendHandle handle) const noexcept
 	{
 		return std::hash<std::uint32_t>()(handle.id);
 	}
 };
 
-namespace PonyEngine::Input
+namespace PonyEngine::Render
 {
-	constexpr bool InputProviderHandle::IsValid() const noexcept
+	constexpr bool BackendHandle::IsValid() const noexcept
 	{
 		return id;
 	}
 
-	constexpr InputProviderHandle::operator bool() const noexcept
+	constexpr BackendHandle::operator bool() const noexcept
 	{
 		return IsValid();
 	}

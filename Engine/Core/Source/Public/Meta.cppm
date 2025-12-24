@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice;
+export module PonyEngine.Meta;
 
-export import :IRenderDeviceService;
-
-export import :IRenderAPI;
-export import :IRenderDeviceService;
-export import :RenderAPI;
+export import :Version;
