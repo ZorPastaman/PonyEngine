@@ -28,11 +28,11 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual std::size_t BackendCount() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::string_view BackendName(std::size_t backendIndex) const noexcept = 0;
+		virtual std::string_view BackendName(std::size_t backendIndex) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::string_view RenderApiName(std::size_t backendIndex) const noexcept = 0;
+		virtual std::string_view RenderApiName(std::size_t backendIndex) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const noexcept = 0;
+		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual std::size_t ActiveBackend() const noexcept = 0;
 		virtual void SwitchBackend(std::size_t backendIndex) = 0;
