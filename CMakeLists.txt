@@ -170,6 +170,10 @@ if(PONY_ENGINE_RENDER_DEVICE_IMPL)
 	add_subdirectory("Engine/RenderDevice.Impl")
 endif()
 
+if(PONY_ENGINE_MSVC)
+	add_subdirectory("Compiler/MSVC")
+endif()
+
 if(NOT PONY_IS_SUBPROJECT)
 	set(PONY_BASE_MODULES "")
 	set(PONY_LOG_MODULES "")
