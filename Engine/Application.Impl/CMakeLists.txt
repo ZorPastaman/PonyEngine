@@ -67,7 +67,7 @@ message(VERBOSE "Configuring defines")
 if(PONY_ENGINE_ROOT_PATH)
 	pony_validate_path(PONY_ENGINE_ROOT_PATH false true)
 else()
-	set(PONY_ENGINE_ROOT_PATH "") # Remove all possible OFF FALSE and things like that.
+	set(PONY_ENGINE_ROOT_PATH "")
 endif()
 if(PONY_APP_ICON STREQUAL "<Default>")
 	if(PONY_WINDOWS)
