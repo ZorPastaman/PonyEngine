@@ -105,6 +105,8 @@ option(PONY_ENGINE_RENDER "Enable PonyEngine.Render module." OFF)
 option(PONY_ENGINE_RENDER_EXT "Enable PonyEngine.Render.Ext module." OFF)
 option(PONY_ENGINE_RENDER_IMPL "Enable PonyEngine.Render.Impl module." OFF)
 
+option(PONY_ENGINE_MSVC "Enable MSVC compiler support. The compiler must be set to MSVC. Don't mix with other compilers." OFF)
+
 add_subdirectory("Engine/Core")
 add_subdirectory("Engine/Log")
 add_subdirectory("Engine/Application.Ext")
