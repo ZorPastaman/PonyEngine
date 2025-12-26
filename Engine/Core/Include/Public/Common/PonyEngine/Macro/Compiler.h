@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifdef PONY_COMPILER_DIR
-#include PONY_COMPILER_DIR
+#ifdef PONY_COMPILER_INCLUDE
+#include PONY_COMPILER_INCLUDE
 #else
 #error "No compiler added!"
 #endif
