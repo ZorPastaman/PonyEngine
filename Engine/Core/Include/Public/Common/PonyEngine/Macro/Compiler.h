@@ -9,35 +9,40 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Text.h"
-
-// PONY_DLL_EXPORT sets a correct dll export attribute. If the build target isn't dll, it sets nothing.
-#ifdef PONY_DLL
-#ifdef _MSC_VER
-#define PONY_DLL_EXPORT __declspec(dllexport)
+#ifdef PONY_COMPILER_DIR
+#include PONY_COMPILER_DIR
 #else
-#error "Unsupported compiler!"
+#error "No compiler added!"
 #endif
+
+#ifndef PONY_DLL_EXPORT_IMPL
+#error "PONY_DLL_EXPORT_IMPL macro not found!"
+#endif
+
+#ifndef PONY_PRESERVE_IMPL
+#error "PONY_PRESERVE_IMPL macro not found!"
+#endif
+#ifndef PONY_SECTION_IMPL
+#error "PONY_SECTION_IMPL macro not found!"
+#endif
+#ifndef PONY_ALLOCATE_IMPL
+#error "PONY_ALLOCATE_IMPL macro not found!"
+#endif
+
+#ifdef PONY_DLL
+/// @brief Sets a dll export attribute if the build target is dll; otherwise does nothing.
+#define PONY_DLL_EXPORT PONY_DLL_EXPORT_IMPL
 #else
+/// @brief Sets a dll export attribute if the build target is dll; otherwise does nothing.
 #define PONY_DLL_EXPORT
 #endif
 
-// PONY_PRESERVE prevents a compiler from removing the symbol.
-#ifdef _MSC_VER
-#define PONY_PRESERVE(symbol) __pragma(comment(linker, "/include:" PONY_STRINGIFY(symbol)))
-#else
-#error "Unsupported compiler!"
-#endif
-
-#ifdef _MSC_VER
-#define PONY_SECTION(name) __pragma(section(name, read))
-#else
-#error "Unsupported compiler!"
-#endif
-
-// PONY_ALLOCATE allocates a segment by its name.
-#ifdef _MSC_VER
-#define PONY_ALLOCATE(segment) __declspec(allocate(segment))
-#else
-#error "Unsupported compiler!"
-#endif
+/// @brief Prevents a compiler from removing the symbol.
+/// @param symbol Symbol to preserve.
+#define PONY_PRESERVE(symbol) PONY_PRESERVE_IMPL(symbol)
+/// @brief Declares a section.
+/// @param name Section name.
+#define PONY_SECTION(name) PONY_SECTION_IMPL(name)
+/// @brief Allocates a segment.
+/// @param segment Segment name.
+#define PONY_ALLOCATE(segment) PONY_ALLOCATE_IMPL(segment)
