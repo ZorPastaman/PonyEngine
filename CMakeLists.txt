@@ -105,7 +105,7 @@ option(PONY_ENGINE_RENDER "Enable PonyEngine.Render module." OFF)
 option(PONY_ENGINE_RENDER_EXT "Enable PonyEngine.Render.Ext module." OFF)
 option(PONY_ENGINE_RENDER_IMPL "Enable PonyEngine.Render.Impl module." OFF)
 
-option(PONY_ENGINE_MSVC "Enable MSVC compiler support. The compiler must be set to MSVC. Don't mix with other compilers." OFF)
+option(PONY_ENGINE_CUSTOM_COMPILER "If OFF, the engine automatically detects and configures supported compilers. If ON, the engine skips compiler detection and a custom compiler configuration must be provided." OFF)
 
 add_subdirectory("Engine/Core")
 add_subdirectory("Engine/Log")
@@ -172,8 +172,8 @@ if(PONY_ENGINE_RENDER_DEVICE_IMPL)
 	add_subdirectory("Engine/RenderDevice.Impl")
 endif()
 
-if(PONY_ENGINE_MSVC)
-	add_subdirectory("Compiler/MSVC")
+if(NOT PONY_ENGINE_CUSTOM_COMPILER)
+	add_subdirectory("Compiler")
 endif()
 
 if(NOT PONY_IS_SUBPROJECT)
