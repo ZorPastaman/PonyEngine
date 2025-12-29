@@ -26,8 +26,6 @@ export namespace PonyEngine::Render
 		~EmptyBackend() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
-		virtual std::string_view Name() const noexcept override;
-		[[nodiscard("Pure function")]] 
 		virtual std::string_view RenderApiName() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual Meta::Version RenderApiVersion() const noexcept override;
@@ -42,11 +40,6 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	std::string_view EmptyBackend::Name() const noexcept
-	{
-		return RenderAPI::Empty;
-	}
-
 	std::string_view EmptyBackend::RenderApiName() const noexcept
 	{
 		return RenderAPI::Empty;

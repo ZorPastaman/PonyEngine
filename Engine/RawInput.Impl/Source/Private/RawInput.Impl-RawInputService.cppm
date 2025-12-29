@@ -178,7 +178,7 @@ export namespace PonyEngine::Input
 
 	RawInputService::~RawInputService() noexcept
 	{
-		if (devices.Size() > 0uz)
+		if (devices.Size() > 0uz) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Input devices weren't removed:");
 			for (std::size_t i = 0uz; i < devices.Size(); ++i)
@@ -187,7 +187,7 @@ export namespace PonyEngine::Input
 			}
 		}
 
-		if (providers.Size() > 0uz)
+		if (providers.Size() > 0uz) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Input providers weren't removed:");
 			for (std::size_t i = 0uz; i < providers.Size(); ++i)

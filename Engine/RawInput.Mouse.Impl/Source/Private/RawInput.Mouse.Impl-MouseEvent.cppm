@@ -12,7 +12,6 @@ export module PonyEngine.RawInput.Mouse.Impl:MouseEvent;
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.RawInput;
 
 import :MouseAxis;
 

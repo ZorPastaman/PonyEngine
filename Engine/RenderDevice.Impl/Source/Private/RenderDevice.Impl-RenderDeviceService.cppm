@@ -49,8 +49,6 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t BackendCount() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::string_view BackendName(std::size_t backendIndex) const override;
-		[[nodiscard("Pure function")]] 
 		virtual std::string_view RenderApiName(std::size_t backendIndex) const override;
 		[[nodiscard("Pure function")]] 
 		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const override;
@@ -104,7 +102,14 @@ namespace PonyEngine::Render
 		
 		RemoveBackend(0uz);
 
-		// TODO: Report unremoved
+		if (backends.Size() > 0uz) [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Error, "Render backends weren't removed:");
+			for (std::size_t i = 0uz; i < backends.Size(); ++i)
+			{
+				PONY_LOG(application->Logger(), Log::LogType::Error, "Backend handle: '0x{:X}'.", backends.Handle(i).id);
+			}
+		}
 	}
 
 	void RenderDeviceService::Begin()
@@ -159,16 +164,6 @@ namespace PonyEngine::Render
 	std::size_t RenderDeviceService::BackendCount() const noexcept
 	{
 		return backends.Size();
-	}
-
-	std::string_view RenderDeviceService::BackendName(const std::size_t backendIndex) const
-	{
-		if (backendIndex >= backends.Size()) [[unlikely]]
-		{
-			throw std::out_of_range("Out of range");
-		}
-
-		return backends.Backend(backendIndex).Name();
 	}
 
 	std::string_view RenderDeviceService::RenderApiName(const std::size_t backendIndex) const

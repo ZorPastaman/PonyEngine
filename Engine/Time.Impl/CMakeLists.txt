@@ -9,7 +9,7 @@ add_library(PonyEngine.Time.Impl STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Time.Impl PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")

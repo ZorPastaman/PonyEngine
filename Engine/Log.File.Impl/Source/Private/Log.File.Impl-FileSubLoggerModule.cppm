@@ -17,7 +17,7 @@ export module PonyEngine.Log.File.Impl:FileSubLoggerModule;
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.Log;
+import PonyEngine.Log.Ext;
 
 import :FileSubLogger;
 

@@ -8,7 +8,7 @@ add_library(PonyEngine.Application.Ext STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Application.Ext PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")
@@ -29,13 +29,6 @@ target_sources(PonyEngine.Application.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Application.Ext-ModuleDataHandle.cppm"
 	"Source/Public/Application.Ext-ServiceHandle.cppm"
 )
-
-if(PONY_WINDOWS)
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Application.Ext PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Application.Ext-Windows.IApplicationContext.cppm"
-	)
-endif()
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Application.Ext PROPERTIES 

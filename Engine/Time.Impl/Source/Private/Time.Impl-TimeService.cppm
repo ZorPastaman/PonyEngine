@@ -98,7 +98,7 @@ export namespace PonyEngine::Time
 		/// @brief Waits for the next frame time point according to the @p deltaTimeCap.
 		/// @return Now time point.
 		[[nodiscard("Must used to update times")]]
-		std::chrono::time_point<std::chrono::steady_clock> WaitForNextFrame() noexcept;
+		std::chrono::time_point<std::chrono::steady_clock> WaitForNextFrame() const noexcept;
 		/// @brief Updates times and frame counts.
 		/// @param now Now time point.
 		void UpdateTimes(std::chrono::time_point<std::chrono::steady_clock> now) noexcept;
@@ -321,7 +321,7 @@ namespace PonyEngine::Time
 		return std::chrono::steady_clock::now();
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> TimeService::WaitForNextFrame() noexcept
+	std::chrono::time_point<std::chrono::steady_clock> TimeService::WaitForNextFrame() const noexcept
 	{
 		std::chrono::time_point<std::chrono::steady_clock> now;
 		do

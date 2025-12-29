@@ -15,9 +15,9 @@ export module PonyEngine.RawInput.Ext:IRawInputModuleContext;
 
 import std;
 
-import :IRawInputContext;
 import :IInputProvider;
 import :InputProviderHandle;
+import :IRawInputContext;
 
 export namespace PonyEngine::Input
 {

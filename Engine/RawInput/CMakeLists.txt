@@ -5,7 +5,7 @@ add_library(PonyEngine.RawInput STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.RawInput PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")

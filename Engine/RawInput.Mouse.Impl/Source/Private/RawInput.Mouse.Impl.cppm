@@ -11,6 +11,8 @@ export module PonyEngine.RawInput.Mouse.Impl;
 
 export import PonyEngine.RawInput.Ext;
 
-#if PONY_WINDOWS
-export import :Windows.MouseProviderModule;
-#endif
+export import :MouseAxis;
+export import :MouseAxisMap;
+export import :MouseContainer;
+export import :MouseEvent;
+export import :MouseEventQueue;

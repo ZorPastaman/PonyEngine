@@ -11,6 +11,6 @@ export module PonyEngine.RawInput.Keyboard.Impl;
 
 export import PonyEngine.RawInput.Ext;
 
-#if PONY_WINDOWS
-export import :Windows.KeyboardProviderModule;
-#endif
+export import :KeyboardContainer;
+export import :KeyboardEvent;
+export import :KeyboardEventQueue;

@@ -100,15 +100,12 @@ namespace PonyEngine::Log
 
 	Logger::~Logger() noexcept
 	{
-		if constexpr (IsInMask(LogType::Error, PONY_LOG_MASK))
+		if (subLoggerContainer.Size() > 0uz) [[unlikely]]
 		{
-			if (subLoggerContainer.Size() > 0uz) [[unlikely]]
+			PONY_CONSOLE(*this, LogType::Error, "Sub-loggers weren't removed:");
+			for (std::size_t i = 0uz; i < subLoggerContainer.Size(); ++i)
 			{
-				PONY_CONSOLE(*this, LogType::Error, "Sub-loggers weren't removed:");
-				for (std::size_t i = 0uz; i < subLoggerContainer.Size(); ++i)
-				{
-					PONY_CONSOLE(*this, LogType::Error, "Sub-logger: '{}'.", typeid(subLoggerContainer.SubLogger(i)).name());
-				}
+				PONY_CONSOLE(*this, LogType::Error, "Sub-logger: '{}'.", typeid(subLoggerContainer.SubLogger(i)).name());
 			}
 		}
 	}
