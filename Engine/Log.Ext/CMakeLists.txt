@@ -5,7 +5,7 @@ add_library(PonyEngine.Log.Ext STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Log.Ext PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")

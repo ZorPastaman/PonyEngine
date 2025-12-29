@@ -15,8 +15,6 @@ export module PonyEngine.RawInput:IRawInputService;
 
 import std;
 
-import PonyEngine.Math;
-
 import :Axis;
 import :AxisId;
 import :DeviceHandle;

@@ -9,7 +9,7 @@ set(CMAKE_CXX_MODULE_STD ON)
 include(FetchContent)
 
 # Set game project.
-project(${PONY_PROJECT_NAME} VERSION ${PONY_PROJECT_VERSION} LANGUAGES CXX)
+project(${PONY_PROJECT_NAME} VERSION "${PONY_PROJECT_VERSION_MAJOR}.${PONY_PROJECT_VERSION_MINOR}.${PONY_PROJECT_VERSION_PATCH}.${PONY_PROJECT_VERSION_TWEAK}" LANGUAGES CXX)
 pony_clean_build_options()
 
 # Add PonyEngine project.
@@ -26,6 +26,7 @@ set(PONY_BASE_MODULES "")
 set(PONY_LOG_MODULES "")
 set(PONY_SURFACE_MODULES "")
 set(PONY_INPUT_MODULES "")
+set(PONY_RENDER_MODULES "")
 
 # Set PonyEngine options.
 pony_set_build_options(PonyEngine.Core ${PONY_ENGINE_OPTIMIZATION})
@@ -44,11 +45,6 @@ if(TARGET PonyEngine.Time.Impl)
 	pony_set_log_defines(PonyEngine.Time.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 	pony_set_build_options(PonyEngine.Time.Impl ${PONY_ENGINE_OPTIMIZATION})
 	list(APPEND PONY_BASE_MODULES PonyEngine.Time.Impl)
-endif()
-
-if(TARGET PonyEngine.File)
-	pony_set_log_defines(PonyEngine.File ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
-	pony_set_build_options(PonyEngine.File ${PONY_ENGINE_OPTIMIZATION})
 endif()
 
 if(TARGET PonyEngine.Log.Ext)
@@ -111,6 +107,25 @@ if(TARGET PonyEngine.RawInput.XInput.Impl)
 	list(APPEND PONY_INPUT_MODULES PonyEngine.RawInput.XInput.Impl)
 endif()
 
+if(TARGET PonyEngine.RenderDevice)
+	pony_set_log_defines(PonyEngine.RenderDevice ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+	pony_set_build_options(PonyEngine.RenderDevice ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.RenderDevice.Ext)
+	pony_set_log_defines(PonyEngine.RenderDevice.Ext ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+	pony_set_build_options(PonyEngine.RenderDevice.Ext ${PONY_ENGINE_OPTIMIZATION})
+endif()
+if(TARGET PonyEngine.RenderDevice.Impl)
+	pony_set_log_defines(PonyEngine.RenderDevice.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+	pony_set_build_options(PonyEngine.RenderDevice.Impl ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_RENDER_MODULES PonyEngine.RenderDevice.Impl)
+endif()
+if(TARGET PonyEngine.RenderDevice.D3D12.Impl)
+	pony_set_log_defines(PonyEngine.RenderDevice.D3D12.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+	pony_set_build_options(PonyEngine.RenderDevice.D3D12.Impl ${PONY_ENGINE_OPTIMIZATION})
+	list(APPEND PONY_RENDER_MODULES PonyEngine.RenderDevice.D3D12.Impl)
+endif()
+
 # Add game modules.
 add_subdirectory("GameSample")
 # Set Game options.
@@ -154,6 +169,14 @@ if(PONY_MAKE_GROUPS)
 		list(APPEND PONY_INSTALL_TARGETS PonyModule.Input)
 	endif()
 
+	if(PONY_RENDER_MODULES)
+		pony_make_module_group(PONY_RENDER_MODULES PonyModule.Render "PonyModule.Render" 23)
+		pony_set_log_defines(PonyModule.Render ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+		pony_set_build_options(PonyModule.Render ${PONY_ENGINE_OPTIMIZATION})
+		target_link_libraries(PonyEngine.Application.Impl PRIVATE PonyModule.Render)
+		list(APPEND PONY_INSTALL_TARGETS PonyModule.Render)
+	endif()
+
 	if(PONY_GAME_MODULES)
 		pony_make_module_group(PONY_GAME_MODULES PonyModule.Game "PonyModule.Game" 23)
 		pony_set_log_defines(PonyModule.Game ${PONY_GAME_LOG_LEVEL} ${PONY_GAME_LOG_STACKTRACE_LEVEL})
@@ -168,6 +191,7 @@ else()
 		${PONY_LOG_MODULES}
 		${PONY_SURFACE_MODULES}
 		${PONY_INPUT_MODULES}
+		${PONY_RENDER_MODULES}
 		${PONY_GAME_MODULES}
 	)
 endif()

@@ -17,7 +17,6 @@ import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
-import PonyEngine.RenderDevice.Ext;
 
 import :RenderDeviceService;
 

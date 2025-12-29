@@ -14,10 +14,13 @@ export import PonyEngine.Application.Ext;
 export import :Console;
 export import :DefaultLogger;
 export import :ExitCodes;
-
-#if PONY_WINDOWS
-export import :Windows.App;
-export import :Windows.Console;
-export import :Windows.DefaultLogger;
-export import :Windows.Process;
-#endif
+export import :FlowManager;
+export import :InterfaceContainer;
+export import :LoggerManager;
+export import :ModuleDataContainer;
+export import :ModuleManager;
+export import :Name;
+export import :Path;
+export import :ServiceContainer;
+export import :ServiceManager;
+export import :TickableServiceInfo;

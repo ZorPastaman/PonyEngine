@@ -8,7 +8,7 @@ add_library(PonyEngine.RenderDevice.Impl STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.RenderDevice.Impl PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")

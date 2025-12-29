@@ -15,7 +15,6 @@ export module PonyEngine.Time.Impl:TimeServiceModule;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
-import PonyEngine.Time;
 
 import :TimeService;
 

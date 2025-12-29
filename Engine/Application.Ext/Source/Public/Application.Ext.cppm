@@ -23,7 +23,3 @@ export import :ITickableServiceAdder;
 export import :LoggerHandle;
 export import :ModuleDataHandle;
 export import :ServiceHandle;
-
-#if PONY_WINDOWS
-export import :Windows.IApplicationContext;
-#endif

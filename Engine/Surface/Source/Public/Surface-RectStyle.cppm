@@ -11,8 +11,6 @@ export module PonyEngine.Surface:RectStyle;
 
 import std;
 
-import PonyEngine.Math;
-
 export namespace PonyEngine::Surface
 {
 	/// @brief Fullscreen rectangle style.

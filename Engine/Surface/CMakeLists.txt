@@ -13,14 +13,6 @@ target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Surface-Utility.cppm"
 )
 
-if(PONY_WINDOWS)
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Surface-Windows.IRawInputObserver.cppm"
-		"Source/Public/Surface-Windows.ISurfaceService.cppm"
-	)
-endif()
-
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface PROPERTIES 
 	CXX_STANDARD 23

@@ -14,8 +14,8 @@ module;
 export module PonyEngine.RawInput.Ext:IRawInputContext;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.RawInput;
 import PonyEngine.Log;
+import PonyEngine.RawInput;
 
 import :FeatureEntry;
 
