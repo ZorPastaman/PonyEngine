@@ -109,7 +109,15 @@
 			}
 		},
 		{
+			"name": "WinCore",
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_ENGINE_RENDER_DEVICE_D3D12_IMPL": true
+			}
+		},
+		{
 			"name": "Windows",
+			"inherits": "WinCore",
 			"hidden": true,
 			"toolset": {
 				"value": "v143",
