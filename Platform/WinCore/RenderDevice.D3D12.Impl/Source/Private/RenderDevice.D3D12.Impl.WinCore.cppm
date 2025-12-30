@@ -7,7 +7,4 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Platform.WinCore;
-
-export import :ComPtr;
-export import :GUID;
+export module PonyEngine.RenderDevice.D3D12.Impl.WinCore;
