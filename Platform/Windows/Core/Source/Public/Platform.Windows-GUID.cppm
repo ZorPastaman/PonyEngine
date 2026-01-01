@@ -11,11 +11,11 @@ module;
 
 #include <objbase.h>
 
-export module PonyEngine.Platform.WinCore:GUID;
+export module PonyEngine.Platform.Windows:GUID;
 
 import std;
 
-export namespace PonyEngine::Platform::WinCore
+export namespace PonyEngine::Platform::Windows
 {
 	constexpr std::size_t GuidTextSize = 36uz; ///< GUID text representation length. It doesn't include brackets.
 
@@ -89,7 +89,7 @@ public:
 	}
 };
 
-namespace PonyEngine::Platform::WinCore
+namespace PonyEngine::Platform::Windows
 {
 	GUID AcquireGuid()
 	{

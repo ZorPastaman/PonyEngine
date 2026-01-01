@@ -17,10 +17,10 @@ target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE
 )
 target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/Private/RawInput.XInput.Impl.Windows.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-GamepadAxisMap.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-GamepadContainer.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-GamepadProvider.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-GamepadProviderModule.cppm"
+	"Source/Private/RawInput.XInput.Impl.Windows-XInputAxisMap.cppm"
+	"Source/Private/RawInput.XInput.Impl.Windows-XInputContainer.cppm"
+	"Source/Private/RawInput.XInput.Impl.Windows-XInputProvider.cppm"
+	"Source/Private/RawInput.XInput.Impl.Windows-XInputProviderModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

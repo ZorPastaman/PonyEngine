@@ -7,4 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice.D3D12.Impl.WinCore;
+#pragma once
+
+#include "PonyEngine/Macro/Compiler.h"
+
+import PonyEngine.Application.Ext;
+
+namespace PonyEngine::Render::Windows
+{
+	/// @brief Gets the D3D12 backend module.
+	/// @return D3D12 backend module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT Application::IModule* GetD3D12BackendModule();
+}

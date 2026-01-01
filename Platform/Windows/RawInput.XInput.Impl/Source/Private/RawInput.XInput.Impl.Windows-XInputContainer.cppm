@@ -13,7 +13,7 @@ module;
 
 #include <xinput.h>
 
-export module PonyEngine.RawInput.XInput.Impl.Windows:GamepadContainer;
+export module PonyEngine.RawInput.XInput.Impl.Windows:XInputContainer;
 
 import std;
 
@@ -22,15 +22,15 @@ import PonyEngine.RawInput.Ext;
 export namespace PonyEngine::Input::Windows
 {
 	/// @brief XInput gamepad container.
-	class GamepadContainer final
+	class XInputContainer final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		GamepadContainer() noexcept;
-		GamepadContainer(const GamepadContainer&) = delete;
-		GamepadContainer(GamepadContainer&&) = delete;
+		XInputContainer() noexcept;
+		XInputContainer(const XInputContainer&) = delete;
+		XInputContainer(XInputContainer&&) = delete;
 
-		~GamepadContainer() noexcept = default;
+		~XInputContainer() noexcept = default;
 
 		/// @brief Gets the size.
 		/// @return Size.
@@ -74,8 +74,8 @@ export namespace PonyEngine::Input::Windows
 		/// @param isConnected Connection status.
 		void Connect(DWORD index, bool isConnected) noexcept;
 
-		GamepadContainer& operator =(const GamepadContainer&) = delete;
-		GamepadContainer& operator =(GamepadContainer&&) = delete;
+		XInputContainer& operator =(const XInputContainer&) = delete;
+		XInputContainer& operator =(XInputContainer&&) = delete;
 
 	private:
 		std::array<struct DeviceHandle, XUSER_MAX_COUNT> deviceHandles; ///< Device handles.
@@ -86,49 +86,49 @@ export namespace PonyEngine::Input::Windows
 
 namespace PonyEngine::Input::Windows
 {
-	GamepadContainer::GamepadContainer() noexcept
+	XInputContainer::XInputContainer() noexcept
 	{
 		std::ranges::fill(deviceHandles, Input::DeviceHandle{});
 		std::ranges::fill(gamepadStates, XINPUT_GAMEPAD{});
 		std::ranges::fill(connections, false);
 	}
 
-	DWORD GamepadContainer::Size() const noexcept
+	DWORD XInputContainer::Size() const noexcept
 	{
 		return static_cast<DWORD>(deviceHandles.size());
 	}
 
-	DWORD GamepadContainer::IndexOf(const struct DeviceHandle deviceHandle) const noexcept
+	DWORD XInputContainer::IndexOf(const struct DeviceHandle deviceHandle) const noexcept
 	{
 		return static_cast<DWORD>(std::ranges::find(deviceHandles, deviceHandle) - deviceHandles.cbegin());
 	}
 
-	struct DeviceHandle& GamepadContainer::DeviceHandle(const DWORD index) noexcept
+	struct DeviceHandle& XInputContainer::DeviceHandle(const DWORD index) noexcept
 	{
 		return deviceHandles[index];
 	}
 
-	const struct DeviceHandle& GamepadContainer::DeviceHandle(const DWORD index) const noexcept
+	const struct DeviceHandle& XInputContainer::DeviceHandle(const DWORD index) const noexcept
 	{
 		return deviceHandles[index];
 	}
 
-	const XINPUT_GAMEPAD& GamepadContainer::GamepadState(const DWORD index) const noexcept
+	const XINPUT_GAMEPAD& XInputContainer::GamepadState(const DWORD index) const noexcept
 	{
 		return gamepadStates[index];
 	}
 
-	void GamepadContainer::GamepadState(const DWORD index, const XINPUT_GAMEPAD& state) noexcept
+	void XInputContainer::GamepadState(const DWORD index, const XINPUT_GAMEPAD& state) noexcept
 	{
 		gamepadStates[index] = state;
 	}
 
-	bool GamepadContainer::IsConnected(const DWORD index) const noexcept
+	bool XInputContainer::IsConnected(const DWORD index) const noexcept
 	{
 		return connections[index];
 	}
 
-	void GamepadContainer::Connect(const DWORD index, const bool isConnected) noexcept
+	void XInputContainer::Connect(const DWORD index, const bool isConnected) noexcept
 	{
 		connections[index] = isConnected;
 	}

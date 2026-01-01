@@ -39,7 +39,7 @@ export namespace PonyEngine::Render
 		virtual void End() override;
 
 		[[nodiscard("Must be used to remove")]]
-		virtual BackendHandle AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceModuleContext&)>& factory) override;
+		virtual BackendHandle AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceContext&)>& factory) override;
 		virtual void RemoveBackend(BackendHandle backendHandle) override;
 
 		RenderDeviceService& operator =(const RenderDeviceService&) = delete;
@@ -120,7 +120,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	BackendHandle RenderDeviceService::AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceModuleContext&)>& factory)
+	BackendHandle RenderDeviceService::AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceContext&)>& factory)
 	{
 		if (!nextBackendHandle.IsValid()) [[unlikely]]
 		{

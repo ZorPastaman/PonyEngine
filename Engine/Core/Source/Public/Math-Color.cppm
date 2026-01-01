@@ -1247,14 +1247,7 @@ namespace PonyEngine::Math
 		{
 			for (std::size_t i = 0uz; i < ChannelCount; ++i)
 			{
-				if (channels[i] > std::numeric_limits<T>::max() - other.channels[i])
-				{
-					channels[i] = std::numeric_limits<T>::max();
-				}
-				else
-				{
-					channels[i] += other.channels[i];
-				}
+				channels[i] = SumClamp(channels[i], other.channels[i]);
 			}
 		}
 
@@ -1272,14 +1265,7 @@ namespace PonyEngine::Math
 		{
 			for (std::size_t i = 0; i < ChannelCount; ++i)
 			{
-				if (channels[i] < other.channels[i])
-				{
-					channels[i] = std::numeric_limits<T>::min();
-				}
-				else
-				{
-					channels[i] -= other.channels[i];
-				}
+				channels[i] = DifferenceClamp(channels[i], other.channels[i]);
 			}
 		}
 
@@ -1321,27 +1307,13 @@ namespace PonyEngine::Math
 	template<ColorChannelType To, ColorChannelType From>
 	constexpr To ConvertColorChannel(const From value) noexcept
 	{
-		if constexpr (std::is_floating_point_v<From> && std::is_integral_v<To>)
+		if constexpr (std::is_integral_v<To>)
 		{
-			using FloatingType = std::conditional_t<(sizeof(From) < sizeof(long double) && sizeof(To) > sizeof(std::uint32_t)), long double,
-				std::conditional_t<(sizeof(From) < sizeof(double) && sizeof(To) > sizeof(std::uint16_t)), double, From>>;
-			return RoundToIntegral<To>(static_cast<FloatingType>(std::clamp(value, From{0}, From{1})) * static_cast<FloatingType>(std::numeric_limits<To>::max()));
-		}
-		else if constexpr (std::is_integral_v<From> && std::is_floating_point_v<To>)
-		{
-			using FloatingType = std::conditional_t<(sizeof(To) < sizeof(long double) && sizeof(From) > sizeof(std::uint32_t)), long double,
-				std::conditional_t<(sizeof(To) < sizeof(double) && sizeof(From) > sizeof(std::uint16_t)), double, To>>;
-			return std::clamp(static_cast<To>(static_cast<FloatingType>(value) * (FloatingType{1} / static_cast<FloatingType>(std::numeric_limits<From>::max()))), To{0}, To{1});
-		}
-		else if constexpr (std::is_integral_v<From> && std::is_integral_v<To> && sizeof(From) != sizeof(To))
-		{
-			using FloatingType = std::conditional_t<(sizeof(From) > sizeof(std::uint32_t)), long double,
-				std::conditional_t<(sizeof(From) > sizeof(std::uint16_t)), double, float>>;
-			return ConvertColorChannel<To>(ConvertColorChannel<FloatingType>(value));
+			return ToUnorm<To>(value);
 		}
 		else
 		{
-			return static_cast<To>(value);
+			return ToFloat<To>(value);
 		}
 	}
 
@@ -1411,7 +1383,7 @@ namespace PonyEngine::Math
 			Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel> answer;
 			for (std::size_t i = 0; i < Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::ChannelCount; ++i)
 			{
-				answer[i] = lhs[i] > std::numeric_limits<T>::max() - rhs[i] ? std::numeric_limits<T>::max() : static_cast<T>(lhs[i] + rhs[i]);
+				answer[i] = SumClamp(lhs[i], rhs[i]);
 			}
 
 			return answer;
@@ -1436,7 +1408,7 @@ namespace PonyEngine::Math
 			Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel> answer;
 			for (std::size_t i = 0; i < Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::ChannelCount; ++i)
 			{
-				answer[i] = lhs[i] < std::numeric_limits<T>::min() + rhs[i] ? std::numeric_limits<T>::min() : static_cast<T>(lhs[i] - rhs[i]);
+				answer[i] = DifferenceClamp(lhs[i], rhs[i]);
 			}
 
 			return answer;

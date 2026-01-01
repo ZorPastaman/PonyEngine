@@ -16,7 +16,7 @@ namespace PonyEngine::Input::Windows
 {
 	Application::IModule* GetXInputProviderModule()
 	{
-		static GamepadProviderModule controllerProviderModule;
+		static XInputProviderModule controllerProviderModule;
 		return &controllerProviderModule;
 	}
 }

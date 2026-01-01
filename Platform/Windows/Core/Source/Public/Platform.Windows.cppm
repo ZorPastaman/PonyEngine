@@ -9,9 +9,9 @@
 
 export module PonyEngine.Platform.Windows;
 
-export import PonyEngine.Platform.WinCore;
-
+export import :ComPtr;
 export import :Cursor;
 export import :Device;
 export import :File;
+export import :GUID;
 export import :Text;
