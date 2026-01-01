@@ -9,19 +9,14 @@
 
 module;
 
-#include <objbase.h>
+#include <unknwn.h>
 
-export module PonyEngine.Platform.WinCore:ComPtr;
+export module PonyEngine.Platform.Windows:ComPtr;
 
 import std;
 
-export namespace PonyEngine::Platform::WinCore
+export namespace PonyEngine::Platform::Windows
 {
-	/// @brief Smart pointer to manipulate COM objects.
-	/// @tparam T Object type.
-	//template<std::derived_from<IUnknown> T>
-	//class ComPtr;
-
 	/// @brief Smart pointer to manipulate COM objects.
 	/// @tparam T Object type.
 	template<std::derived_from<IUnknown> T>
@@ -122,7 +117,7 @@ export namespace PonyEngine::Platform::WinCore
 	};
 }
 
-namespace PonyEngine::Platform::WinCore
+namespace PonyEngine::Platform::Windows
 {
 	template<std::derived_from<IUnknown> T>
 	ComPtr<T>::ComPtr() noexcept :

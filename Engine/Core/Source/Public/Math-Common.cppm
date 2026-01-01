@@ -33,6 +33,11 @@ export namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr T RadToDeg = T{180} / std::numbers::pi_v<T>;
 
+	/// @brief Gets a floating point type based on the size of the integral type.
+	/// @tparam T Integral type.
+	template<std::integral T>
+	using FloatingFor = std::conditional_t<(sizeof(T) < 4), float, std::conditional_t<(sizeof(T) > 4), long double, double>>;
+
 	/// @brief Checks if the two floating point values are almost equal with the tolerance value.
 	/// @tparam T Floating point type.
 	/// @param lhs First value.
@@ -89,6 +94,74 @@ export namespace PonyEngine::Math
 	/// @return Rounded integral.
 	template<std::signed_integral To, std::floating_point From> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegral(From from) noexcept;
+
+	/// @brief Converts the floating point value to a unorm value.
+	/// @tparam To Target unorm type.
+	/// @tparam From Source floating point type.
+	/// @param from Floating point value.
+	/// @return Unorm value.
+	template<std::unsigned_integral To, std::floating_point From> [[nodiscard("Pure function")]]
+	constexpr To ToUnorm(From from) noexcept;
+	/// @brief Converts the unorm value to a unorm value of another type.
+	/// @tparam To Target unorm type.
+	/// @tparam From Source unorm type.
+	/// @param from Unorm value.
+	/// @return Unorm value.
+	template<std::unsigned_integral To, std::unsigned_integral From> [[nodiscard("Pure function")]]
+	constexpr To ToUnorm(From from) noexcept;
+	/// @brief Converts the floating point value to a snorm value.
+	/// @tparam To Target snorm type.
+	/// @tparam From Source floating point type.
+	/// @param from Floating point value.
+	/// @return Snorm value.
+	/// @remark Snorm min value and snorm min value + 1 are treated the same.
+	template<std::signed_integral To, std::floating_point From> [[nodiscard("Pure function")]]
+	constexpr To ToSnorm(From from) noexcept;
+	/// @brief Converts the snorm value to a snorm value of another type.
+	/// @tparam To Target snorm type.
+	/// @tparam From Source snorm type.
+	/// @param from Snorm value.
+	/// @return Snorm value.
+	/// @remark Snorm min value and snorm min value + 1 are treated the same.
+	template<std::signed_integral To, std::signed_integral From> [[nodiscard("Pure function")]]
+	constexpr To ToSnorm(From from) noexcept;
+	/// @brief Converts the unorm value to a floating point value.
+	/// @tparam To Target floating point type.
+	/// @tparam From Source unorm type.
+	/// @param from Unorm value.
+	/// @return Floating point value.
+	template<std::floating_point To, std::unsigned_integral From> [[nodiscard("Pure function")]]
+	constexpr To ToFloat(From from) noexcept;
+	/// @brief Converts the snorm value to a floating point value.
+	/// @tparam To Target floating point type.
+	/// @tparam From Source snorm type.
+	/// @param from Snorm value.
+	/// @return Floating point value.
+	/// @remark Snorm min value and snorm min value + 1 are treated the same.
+	template<std::floating_point To, std::signed_integral From> [[nodiscard("Pure function")]]
+	constexpr To ToFloat(From from) noexcept;
+	/// @brief Converts the floating point value to a floating point value of another type.
+	/// @tparam To Target floating point type.
+	/// @tparam From Source floating point type.
+	/// @param from Floating point value.
+	/// @return Floating point value.
+	template<std::floating_point To, std::floating_point From> [[nodiscard("Pure function")]]
+	constexpr To ToFloat(From from) noexcept;
+
+	/// @brief Sums the values and clamps the result to the max value.
+	/// @tparam T Value type.
+	/// @param lhs Left value.
+	/// @param rhs Right value.
+	/// @return Sum.
+	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
+	constexpr T SumClamp(T lhs, T rhs) noexcept;
+	/// @brief Subtracts the @p rhs from the @p lhs and clamps the result to zero.
+	/// @tparam T Value type.
+	/// @param lhs Left value.
+	/// @param rhs Right value.
+	/// @return Difference.
+	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
+	constexpr T DifferenceClamp(T lhs, T rhs) noexcept;
 
 	/// @brief Divides the @p numerator by the @p denominator and ceils the result.
 	/// @tparam T Value type.
@@ -211,6 +284,99 @@ namespace PonyEngine::Math
 	constexpr To RoundToIntegral(const From from) noexcept
 	{
 		return static_cast<To>(from + From{0.5} - (from < From{0}));
+	}
+
+	template<std::unsigned_integral To, std::floating_point From>
+	constexpr To ToUnorm(const From from) noexcept
+	{
+		using FloatingUnorm = FloatingFor<To>;
+		using Floating = std::conditional_t<sizeof(FloatingUnorm) < sizeof(From), From, FloatingUnorm>;
+
+		const Floating fromValue = static_cast<Floating>(std::clamp(from, From{0}, From{1}));
+		return RoundToIntegral<To>(fromValue * std::numeric_limits<To>::max());
+	}
+
+	template<std::unsigned_integral To, std::unsigned_integral From>
+	constexpr To ToUnorm(const From from) noexcept
+	{
+		if constexpr (std::is_same_v<To, From>)
+		{
+			return from;
+		}
+		else
+		{
+			using FromFloating = FloatingFor<From>;
+			using ToFloating = FloatingFor<To>;
+			using Floating = std::conditional_t<sizeof(FromFloating) < sizeof(ToFloating), ToFloating, FromFloating>;
+
+			return ToUnorm<To>(ToFloat<Floating>(from));
+		}
+	}
+
+	template<std::signed_integral To, std::floating_point From>
+	constexpr To ToSnorm(const From from) noexcept
+	{
+		using FloatingSnorm = FloatingFor<To>;
+		using Floating = std::conditional_t<sizeof(FloatingSnorm) < sizeof(From), From, FloatingSnorm>;
+
+		const Floating fromValue = static_cast<Floating>(std::clamp(from, From{-1}, From{1}));
+		return RoundToIntegral<To>(fromValue * std::numeric_limits<To>::max());
+	}
+
+	template<std::signed_integral To, std::signed_integral From>
+	constexpr To ToSnorm(const From from) noexcept
+	{
+		if constexpr (std::is_same_v<To, From>)
+		{
+			return from;
+		}
+		else
+		{
+			using FromFloating = FloatingFor<From>;
+			using ToFloating = FloatingFor<To>;
+			using Floating = std::conditional_t<sizeof(FromFloating) < sizeof(ToFloating), ToFloating, FromFloating>;
+
+			return ToSnorm<To>(ToFloat<Floating>(from));
+		}
+	}
+
+	template<std::floating_point To, std::unsigned_integral From>
+	constexpr To ToFloat(const From from) noexcept
+	{
+		using FloatingUnorm = FloatingFor<From>;
+		using Floating = std::conditional_t<sizeof(FloatingUnorm) < sizeof(To), To, FloatingUnorm>;
+
+		const Floating toValue = static_cast<Floating>(from) / std::numeric_limits<From>::max();
+		return std::clamp(static_cast<To>(toValue), To{0}, To{1});
+	}
+
+	template<std::floating_point To, std::signed_integral From>
+	constexpr To ToFloat(const From from) noexcept
+	{
+		using FloatingSnorm = FloatingFor<From>;
+		using Floating = std::conditional_t<sizeof(FloatingSnorm) < sizeof(To), To, FloatingSnorm>;
+
+		const Floating toValue = static_cast<Floating>(from) / std::numeric_limits<From>::max();
+		return std::clamp(static_cast<To>(toValue), To{-1}, To{1});
+	}
+
+	template<std::floating_point To, std::floating_point From>
+	constexpr To ToFloat(const From from) noexcept
+	{
+		return static_cast<To>(from);
+	}
+
+	template<std::unsigned_integral T>
+	constexpr T SumClamp(const T lhs, const T rhs) noexcept
+	{
+		const T result = lhs + rhs;
+		return result < lhs ? std::numeric_limits<T>::max() : result;
+	}
+
+	template<std::unsigned_integral T>
+	constexpr T DifferenceClamp(const T lhs, const T rhs) noexcept
+	{
+		return lhs < rhs ? T{0} : lhs - rhs;
 	}
 
 	template<std::unsigned_integral T>

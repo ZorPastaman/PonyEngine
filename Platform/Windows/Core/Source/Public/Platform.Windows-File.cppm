@@ -17,7 +17,7 @@ export module PonyEngine.Platform.Windows:File;
 
 import std;
 
-import PonyEngine.Platform.WinCore;
+import :GUID;
 
 export namespace PonyEngine::Platform::Windows
 {

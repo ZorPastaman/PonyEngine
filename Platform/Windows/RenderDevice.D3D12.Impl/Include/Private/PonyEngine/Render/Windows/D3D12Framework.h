@@ -7,7 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Platform.WinCore;
+#pragma once
 
-export import :ComPtr;
-export import :GUID;
+#include "PonyEngine/Platform/Windows/Framework.h"
+
+#include <d3d12.h>
+
+#ifndef NDEBUG
+#include "d3d12sdklayers.h"
+#endif

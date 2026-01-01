@@ -7,8 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput.XInput.Impl.Windows;
+export module PonyEngine.RenderDevice.D3D12.Impl.Windows;
 
-export import PonyEngine.RawInput.Ext;
-
-export import :XInputProviderModule;
+export void MyFunc();

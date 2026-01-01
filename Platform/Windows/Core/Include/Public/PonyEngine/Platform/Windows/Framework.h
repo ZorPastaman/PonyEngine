@@ -9,12 +9,6 @@
 
 #pragma once
 
-#include <winsdkver.h>
-#define _WIN32_WINNT 0x0A00
-#define WINVER _WIN32_WINNT
-#define NTDDI_VERSION 0x0A00000D
-#include <sdkddkver.h>
-
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>

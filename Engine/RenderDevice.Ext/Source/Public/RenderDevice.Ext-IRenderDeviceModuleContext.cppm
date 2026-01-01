@@ -26,7 +26,7 @@ export namespace PonyEngine::Render
 		INTERFACE_BODY(IRenderDeviceModuleContext)
 
 		[[nodiscard("Must be used to remove")]]
-		virtual BackendHandle AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceModuleContext&)>& factory) = 0;
+		virtual BackendHandle AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceContext&)>& factory) = 0;
 		virtual void RemoveBackend(BackendHandle backendHandle) = 0;
 	};
 }

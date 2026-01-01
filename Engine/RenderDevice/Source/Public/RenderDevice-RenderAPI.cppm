@@ -21,7 +21,7 @@ export namespace PonyEngine::Render
 	{
 		NON_CONSTRUCTIBLE_BODY(RenderAPI)
 
-		static constexpr std::string_view Direct3D12 = "D3D12";
+		static constexpr std::string_view Direct3D = "Direct3D";
 		static constexpr std::string_view Vulkan = "Vulkan";
 		static constexpr std::string_view Metal = "Metal";
 

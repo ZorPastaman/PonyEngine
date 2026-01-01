@@ -22,6 +22,18 @@ TEST_CASE("DegToRad and RadToDeg", "[Math][Common]")
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::RadToDeg<double>, 180. / std::numbers::pi_v<double>));
 }
 
+TEST_CASE("FloatingFor", "[Math][Common]")
+{
+	STATIC_REQUIRE(std::is_same_v<float, PonyEngine::Math::FloatingFor<std::uint8_t>>);
+	STATIC_REQUIRE(std::is_same_v<float, PonyEngine::Math::FloatingFor<std::int8_t>>);
+	STATIC_REQUIRE(std::is_same_v<float, PonyEngine::Math::FloatingFor<std::uint16_t>>);
+	STATIC_REQUIRE(std::is_same_v<float, PonyEngine::Math::FloatingFor<std::int16_t>>);
+	STATIC_REQUIRE(std::is_same_v<double, PonyEngine::Math::FloatingFor<std::uint32_t>>);
+	STATIC_REQUIRE(std::is_same_v<double, PonyEngine::Math::FloatingFor<std::int32_t>>);
+	STATIC_REQUIRE(std::is_same_v<long double, PonyEngine::Math::FloatingFor<std::uint64_t>>);
+	STATIC_REQUIRE(std::is_same_v<long double, PonyEngine::Math::FloatingFor<std::int64_t>>);
+}
+
 TEST_CASE("AreAlmostEqual", "[Math][Common]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(1.f, 1.f - 1e-10f));
@@ -123,7 +135,7 @@ TEST_CASE("Signum", "[Math][Common]")
 #endif
 }
 
-TEST_CASE("RoundToIntegral", "[Math][Common]") 
+TEST_CASE("RoundToIntegral", "[Math][Common]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<unsigned int>(2.3f) == 2u);
 	STATIC_REQUIRE(PonyEngine::Math::RoundToIntegral<unsigned int>(2.7f) == 3u);
@@ -140,6 +152,147 @@ TEST_CASE("RoundToIntegral", "[Math][Common]")
 	BENCHMARK("Float to int")
 	{
 		return PonyEngine::Math::RoundToIntegral<int>(2.3f) + PonyEngine::Math::RoundToIntegral<int>(-2.7f);
+	};
+#endif
+}
+
+TEST_CASE("ToUnorm from float", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(0.f) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(1.f) == 255u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(0.5f) == 128u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(-0.5f) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(1.5f) == 255u);
+
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(0.) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(1.) == std::numeric_limits<std::uint32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(0.5) == std::numeric_limits<std::uint32_t>::max() / 2u + 1);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(-0.5) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(1.5) == std::numeric_limits<std::uint32_t>::max());
+
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(0.f) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(1.f) == std::numeric_limits<std::uint32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(0.5f) == std::numeric_limits<std::uint32_t>::max() / 2u + 1);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(-0.5f) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(1.5f) == std::numeric_limits<std::uint32_t>::max());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Double to uint32")
+	{
+		return PonyEngine::Math::ToUnorm<std::uint32_t>(0.5);
+	};
+#endif
+}
+
+TEST_CASE("ToUnorm from unorm", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(0u) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(std::numeric_limits<std::uint32_t>::max()) == 255u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint8_t>(std::numeric_limits<std::uint32_t>::max() / 2) == 127u);
+
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(std::uint8_t{0}) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(std::uint8_t{255}) == std::numeric_limits<std::uint32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToUnorm<std::uint32_t>(std::uint8_t{128}) == 2155905152u);
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Uint32 to uint8")
+	{
+		return PonyEngine::Math::ToUnorm<std::uint8_t>(2155905152u);
+	};
+#endif
+}
+
+TEST_CASE("ToSnorm from float", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(0.f) == 0);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(1.f) == 127);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(-1.f) == -127);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(0.5f) == 64);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(-0.5f) == -64);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(1.5f) == 127);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(-1.5f) == -127);
+
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(0.) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(1.) == std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(-1.) == -std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(0.5) == std::numeric_limits<std::int32_t>::max() / 2 + 1);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(-0.5) == -(std::numeric_limits<std::int32_t>::max() / 2 + 1));
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(1.5) == std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(-1.5) == -std::numeric_limits<std::int32_t>::max());
+
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(0.f) == 0u);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(1.f) == std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(-1.f) == -std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(0.5f) == std::numeric_limits<std::int32_t>::max() / 2 + 1);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(-0.5f) == -(std::numeric_limits<std::int32_t>::max() / 2 + 1));
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(1.5f) == std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(-1.5f) == -std::numeric_limits<std::int32_t>::max());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Double to int32")
+	{
+		return PonyEngine::Math::ToSnorm<std::int32_t>(0.5);
+	};
+#endif
+}
+
+TEST_CASE("ToSnorm from snorm", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(0) == 0);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(std::numeric_limits<std::int32_t>::max()) == 127);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(-std::numeric_limits<std::int32_t>::max()) == -127);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(std::numeric_limits<std::int32_t>::min()) == -127);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(std::numeric_limits<std::int32_t>::max() / 2) == 63);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int8_t>(-(std::numeric_limits<std::int32_t>::max() / 2)) == -63);
+
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(std::int8_t{0}) == 0);
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(std::int8_t{127}) == std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(std::int8_t{-127}) == -std::numeric_limits<std::int32_t>::max());
+	STATIC_REQUIRE(PonyEngine::Math::ToSnorm<std::int32_t>(std::int8_t{-128}) == -std::numeric_limits<std::int32_t>::max());
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("int32 to int8")
+	{
+		return PonyEngine::Math::ToSnorm<std::int8_t>(-std::numeric_limits<std::int32_t>::max() / 2);
+	};
+#endif
+}
+
+TEST_CASE("ToFloat from unorm", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::uint8_t{0}), 0.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::uint8_t{255}), 1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::uint8_t{128}), 0.5f, PonyEngine::Math::Tolerance<float>{.absolute = 0.01f}));
+
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<double>(0u), 0.));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<double>(std::numeric_limits<std::uint32_t>::max()), 1.));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<double>(std::numeric_limits<std::uint32_t>::max() / 2u), 0.5, PonyEngine::Math::Tolerance<double>{.absolute = 0.00001}));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("uint8 to float")
+	{
+		return PonyEngine::Math::ToFloat<float>(std::uint8_t{120});
+	};
+#endif
+}
+
+TEST_CASE("ToFloat from snorm", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::int8_t{0}), 0.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::int8_t{127}), 1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::int8_t{-127}), -1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::int8_t{-128}), -1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<float>(std::int8_t{-64}), -0.5f, PonyEngine::Math::Tolerance<float>{.absolute = 0.01f}));
+
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<double>(0), 0.));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<double>(std::numeric_limits<std::int32_t>::max()), 1.));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<double>(std::numeric_limits<std::int32_t>::max() / 2), 0.5, PonyEngine::Math::Tolerance<double>{.absolute = 0.00001}));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::ToFloat<double>(-std::numeric_limits<std::int32_t>::max() / 2), -0.5, PonyEngine::Math::Tolerance<double>{.absolute = 0.00001}));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("int8 to float")
+	{
+		return PonyEngine::Math::ToFloat<float>(std::int8_t{64});
 	};
 #endif
 }
