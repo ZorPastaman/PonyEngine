@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.RenderDevice.Ext;
 
+import :DXGIFactory;
 import :D3D12Device;
 
 export namespace PonyEngine::Render::Windows
@@ -41,6 +42,7 @@ export namespace PonyEngine::Render::Windows
 	private:
 		IRenderDeviceContext* renderDevice;
 
+		std::unique_ptr<DXGIFactory> factory;
 		std::unique_ptr<D3D12Device> device;
 	};
 }
@@ -64,11 +66,13 @@ namespace PonyEngine::Render::Windows
 
 	void D3D12Backend::Activate()
 	{
+		factory = std::make_unique<DXGIFactory>(*renderDevice);
 		device = std::make_unique<D3D12Device>(*renderDevice);
 	}
 
 	void D3D12Backend::Deactivate()
 	{
 		device.reset();
+		factory.reset();
 	}
 }

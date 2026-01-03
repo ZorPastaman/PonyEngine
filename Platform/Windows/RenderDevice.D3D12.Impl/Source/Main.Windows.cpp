@@ -7,8 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice.D3D12.Impl.Windows;
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/Render/Windows/D3D12BackendModule.h"
 
-export import PonyEngine.RenderDevice.Ext;
-
-export import :D3D12BackendModule;
+PONY_MODULE(PonyEngine::Render::Windows::GetD3D12BackendModule, PonyEngineRenderDeviceD3D12Backend, PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER);

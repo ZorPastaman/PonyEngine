@@ -81,14 +81,14 @@ namespace PonyEngine::Render::Windows
 
 	D3D12Device::~D3D12Device() noexcept
 	{
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 device...");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 device...");
 		device.Reset();
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 device done.");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 device done.");
 
 #ifndef NDEBUG
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface...");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface...");
 		debug.Reset();
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface done.");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface done.");
 #endif
 	}
 
