@@ -38,6 +38,8 @@ export namespace PonyEngine::Render
 		virtual void Begin() override;
 		virtual void End() override;
 
+		virtual void AddInterfaces(Application::IServiceInterfaceAdder& adder) override;
+
 		[[nodiscard("Must be used to remove")]]
 		virtual BackendHandle AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceContext&)>& factory) override;
 		virtual void RemoveBackend(BackendHandle backendHandle) override;
@@ -120,6 +122,11 @@ namespace PonyEngine::Render
 	{
 	}
 
+	void RenderDeviceService::AddInterfaces(Application::IServiceInterfaceAdder& adder)
+	{
+		adder.AddInterface<IRenderDeviceService>(*this);
+	}
+
 	BackendHandle RenderDeviceService::AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceContext&)>& factory)
 	{
 		if (!nextBackendHandle.IsValid()) [[unlikely]]
@@ -153,6 +160,11 @@ namespace PonyEngine::Render
 
 		if (const std::size_t index = backends.IndexOf(backendHandle); index < backends.Size()) [[likely]]
 		{
+			if (index == activeBackendIndex)
+			{
+				SwitchBackend(0uz);
+			}
+
 			RemoveBackend(index);
 		}
 		else [[unlikely]]

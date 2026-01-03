@@ -7,8 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice.D3D12.Impl.Windows;
+#pragma once
 
-export import PonyEngine.RenderDevice.Ext;
+#include "PonyEngine/Platform/Windows/Framework.h"
 
-export import :D3D12BackendModule;
+#include <dxgi1_6.h>
+
+#ifndef NDEBUG
+#include <dxgidebug.h>
+#endif
