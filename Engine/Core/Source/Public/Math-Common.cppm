@@ -22,6 +22,25 @@ export namespace PonyEngine::Math
 	{
 		T relative = T{0.00001}; ///< Relative tolerance. Must be positive.
 		T absolute = T{0.00000001}; ///< Absolute tolerance. Must be positive.
+
+		/// @brief Casts the tolerance to a tolerance of another type.
+		/// @tparam U Target type.
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Tolerance<U>() const noexcept;
+	};
+
+	/// @brief Value range.
+	/// @tparam T Value type.
+	template<Type::Arithmetic T>
+	struct Range final
+	{
+		T min = T{0}; ///< Minimal value.
+		T max = std::numeric_limits<T>::max(); ///< Maximal value.
+
+		/// @brief Casts the range to a range of another type.
+		/// @tparam U Target type.
+		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Range<U>() const noexcept;
 	};
 
 	/// @brief Degrees to radians multiplier.
@@ -45,7 +64,7 @@ export namespace PonyEngine::Math
 	/// @param tolerance Tolerance.
 	/// @return @a True if the values are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(T lhs, T rhs, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept;
+	constexpr bool AreAlmostEqual(T lhs, T rhs, const Tolerance<T>& tolerance = Tolerance<T>{}) noexcept;
 
 	/// @brief Sign function.
 	/// @tparam T Value type.
@@ -95,58 +114,59 @@ export namespace PonyEngine::Math
 	template<std::signed_integral To, std::floating_point From> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegral(From from) noexcept;
 
-	/// @brief Converts the floating point value to a unorm value.
+	/// @brief Converts the normalized floating point value to a unorm value.
 	/// @tparam To Target unorm type.
 	/// @tparam From Source floating point type.
-	/// @param from Floating point value.
+	/// @param from Floating point value. Clamped to [0, 1] automatically.
+	/// @param range Value range.
 	/// @return Unorm value.
 	template<std::unsigned_integral To, std::floating_point From> [[nodiscard("Pure function")]]
-	constexpr To ToUnorm(From from) noexcept;
+	constexpr To NormalizedToUnorm(From from, const Range<To>& range = Range<To>{}) noexcept;
 	/// @brief Converts the unorm value to a unorm value of another type.
 	/// @tparam To Target unorm type.
 	/// @tparam From Source unorm type.
 	/// @param from Unorm value.
+	/// @param fromRange Range of the input value.
+	/// @param toRange Range of the output value.
 	/// @return Unorm value.
 	template<std::unsigned_integral To, std::unsigned_integral From> [[nodiscard("Pure function")]]
-	constexpr To ToUnorm(From from) noexcept;
-	/// @brief Converts the floating point value to a snorm value.
+	constexpr To UnormToUnorm(From from, const Range<From>& fromRange = Range<From>{}, const Range<To>& toRange = Range<To>{}) noexcept;
+	/// @brief Converts the normalized floating point value to a snorm value.
 	/// @tparam To Target snorm type.
 	/// @tparam From Source floating point type.
-	/// @param from Floating point value.
+	/// @param from Floating point value. Clamped to [-1, 1] automatically.
+	/// @param range Value range. Both min and max must be non-negative.
 	/// @return Snorm value.
 	/// @remark Snorm min value and snorm min value + 1 are treated the same.
 	template<std::signed_integral To, std::floating_point From> [[nodiscard("Pure function")]]
-	constexpr To ToSnorm(From from) noexcept;
+	constexpr To NormalizedToSnorm(From from, const Range<To>& range = Range<To>{}) noexcept;
 	/// @brief Converts the snorm value to a snorm value of another type.
 	/// @tparam To Target snorm type.
 	/// @tparam From Source snorm type.
 	/// @param from Snorm value.
+	/// @param fromRange Range of the input value. Both min and max must be non-negative.
+	/// @param toRange Range of the output value. Both min and max must be non-negative.
 	/// @return Snorm value.
 	/// @remark Snorm min value and snorm min value + 1 are treated the same.
 	template<std::signed_integral To, std::signed_integral From> [[nodiscard("Pure function")]]
-	constexpr To ToSnorm(From from) noexcept;
-	/// @brief Converts the unorm value to a floating point value.
+	constexpr To SnormToSnorm(From from, const Range<From>& fromRange = Range<From>{}, const Range<To>& toRange = Range<To>{}) noexcept;
+	/// @brief Converts the unorm value to a normalized floating point value.
 	/// @tparam To Target floating point type.
 	/// @tparam From Source unorm type.
 	/// @param from Unorm value.
+	/// @param range Value range.
 	/// @return Floating point value.
 	template<std::floating_point To, std::unsigned_integral From> [[nodiscard("Pure function")]]
-	constexpr To ToFloat(From from) noexcept;
-	/// @brief Converts the snorm value to a floating point value.
+	constexpr To UnormToNormalized(From from, const Range<From>& range = Range<From>{}) noexcept;
+	/// @brief Converts the snorm value to a normalized floating point value.
 	/// @tparam To Target floating point type.
 	/// @tparam From Source snorm type.
 	/// @param from Snorm value.
+	/// @param range Value range. Both min and max must be non-negative.
 	/// @return Floating point value.
 	/// @remark Snorm min value and snorm min value + 1 are treated the same.
 	template<std::floating_point To, std::signed_integral From> [[nodiscard("Pure function")]]
-	constexpr To ToFloat(From from) noexcept;
-	/// @brief Converts the floating point value to a floating point value of another type.
-	/// @tparam To Target floating point type.
-	/// @tparam From Source floating point type.
-	/// @param from Floating point value.
-	/// @return Floating point value.
-	template<std::floating_point To, std::floating_point From> [[nodiscard("Pure function")]]
-	constexpr To ToFloat(From from) noexcept;
+	constexpr To SnormToNormalized(From from, const Range<From>& range = Range<From>{}) noexcept;
 
 	/// @brief Sums the values and clamps the result to the max value.
 	/// @tparam T Value type.
@@ -239,6 +259,21 @@ export namespace PonyEngine::Math
 namespace PonyEngine::Math
 {
 	template<std::floating_point T>
+	template<std::floating_point U>
+	constexpr Tolerance<T>::operator Tolerance<U>() const noexcept
+	{
+		return Tolerance<U>{.relative = static_cast<U>(relative), .absolute = static_cast<U>(absolute)};
+	}
+
+
+	template<Type::Arithmetic T>
+	template<Type::Arithmetic U>
+	constexpr Range<T>::operator Range<U>() const noexcept
+	{
+		return Range<U>{.min = static_cast<U>(min), .max = static_cast<U>(max)};
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const T lhs, const T rhs, const Tolerance<T>& tolerance) noexcept
 	{
 		return Abs(lhs - rhs) <= std::max(std::max(Abs(lhs), Abs(rhs)) * tolerance.relative, tolerance.absolute);
@@ -287,17 +322,18 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral To, std::floating_point From>
-	constexpr To ToUnorm(const From from) noexcept
+	constexpr To NormalizedToUnorm(const From from, const Range<To>& range) noexcept
 	{
 		using FloatingUnorm = FloatingFor<To>;
 		using Floating = std::conditional_t<sizeof(FloatingUnorm) < sizeof(From), From, FloatingUnorm>;
 
 		const Floating fromValue = static_cast<Floating>(std::clamp(from, From{0}, From{1}));
-		return RoundToIntegral<To>(fromValue * std::numeric_limits<To>::max());
+		const To max = range.max - range.min;
+		return range.min + RoundToIntegral<To>(fromValue * max);
 	}
 
 	template<std::unsigned_integral To, std::unsigned_integral From>
-	constexpr To ToUnorm(const From from) noexcept
+	constexpr To UnormToUnorm(const From from, const Range<From>& fromRange, const Range<To>& toRange) noexcept
 	{
 		if constexpr (std::is_same_v<To, From>)
 		{
@@ -309,22 +345,21 @@ namespace PonyEngine::Math
 			using ToFloating = FloatingFor<To>;
 			using Floating = std::conditional_t<sizeof(FromFloating) < sizeof(ToFloating), ToFloating, FromFloating>;
 
-			return ToUnorm<To>(ToFloat<Floating>(from));
+			return NormalizedToUnorm<To>(UnormToNormalized<Floating>(from, fromRange), toRange);
 		}
 	}
 
 	template<std::signed_integral To, std::floating_point From>
-	constexpr To ToSnorm(const From from) noexcept
+	constexpr To NormalizedToSnorm(const From from, const Range<To>& range) noexcept
 	{
-		using FloatingSnorm = FloatingFor<To>;
-		using Floating = std::conditional_t<sizeof(FloatingSnorm) < sizeof(From), From, FloatingSnorm>;
+		using ToUnorm = std::make_unsigned_t<To>;
 
-		const Floating fromValue = static_cast<Floating>(std::clamp(from, From{-1}, From{1}));
-		return RoundToIntegral<To>(fromValue * std::numeric_limits<To>::max());
+		const To toValue = NormalizedToUnorm<ToUnorm>(Abs(from), static_cast<Range<ToUnorm>>(range));
+		return from < From{0} ? -toValue : toValue;
 	}
 
 	template<std::signed_integral To, std::signed_integral From>
-	constexpr To ToSnorm(const From from) noexcept
+	constexpr To SnormToSnorm(const From from, const Range<From>& fromRange, const Range<To>& toRange) noexcept
 	{
 		if constexpr (std::is_same_v<To, From>)
 		{
@@ -336,34 +371,30 @@ namespace PonyEngine::Math
 			using ToFloating = FloatingFor<To>;
 			using Floating = std::conditional_t<sizeof(FromFloating) < sizeof(ToFloating), ToFloating, FromFloating>;
 
-			return ToSnorm<To>(ToFloat<Floating>(from));
+			return NormalizedToSnorm<To>(SnormToNormalized<Floating>(from, fromRange), toRange);
 		}
 	}
 
 	template<std::floating_point To, std::unsigned_integral From>
-	constexpr To ToFloat(const From from) noexcept
+	constexpr To UnormToNormalized(const From from, const Range<From>& range) noexcept
 	{
 		using FloatingUnorm = FloatingFor<From>;
 		using Floating = std::conditional_t<sizeof(FloatingUnorm) < sizeof(To), To, FloatingUnorm>;
 
-		const Floating toValue = static_cast<Floating>(from) / std::numeric_limits<From>::max();
+		const From numerator = DifferenceClamp(from, range.min);
+		const From denominator = range.max - range.min;
+		const Floating toValue = static_cast<Floating>(numerator) / denominator;
 		return std::clamp(static_cast<To>(toValue), To{0}, To{1});
 	}
 
 	template<std::floating_point To, std::signed_integral From>
-	constexpr To ToFloat(const From from) noexcept
+	constexpr To SnormToNormalized(const From from, const Range<From>& range) noexcept
 	{
-		using FloatingSnorm = FloatingFor<From>;
-		using Floating = std::conditional_t<sizeof(FloatingSnorm) < sizeof(To), To, FloatingSnorm>;
+		using FromUnorm = std::make_unsigned_t<From>;
 
-		const Floating toValue = static_cast<Floating>(from) / std::numeric_limits<From>::max();
-		return std::clamp(static_cast<To>(toValue), To{-1}, To{1});
-	}
-
-	template<std::floating_point To, std::floating_point From>
-	constexpr To ToFloat(const From from) noexcept
-	{
-		return static_cast<To>(from);
+		const From fromAbs = Abs(std::max(from, static_cast<From>(-std::numeric_limits<From>::max())));
+		const To toValue = UnormToNormalized<To>(static_cast<FromUnorm>(fromAbs), static_cast<Range<FromUnorm>>(range));
+		return from < From{0} ? -toValue : toValue;
 	}
 
 	template<std::unsigned_integral T>

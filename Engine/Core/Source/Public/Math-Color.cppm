@@ -1307,13 +1307,21 @@ namespace PonyEngine::Math
 	template<ColorChannelType To, ColorChannelType From>
 	constexpr To ConvertColorChannel(const From value) noexcept
 	{
-		if constexpr (std::is_integral_v<To>)
+		if constexpr (std::is_floating_point_v<From> && std::is_integral_v<To>)
 		{
-			return ToUnorm<To>(value);
+			return NormalizedToUnorm<To>(value);
+		}
+		else if constexpr (std::is_integral_v<From> && std::is_floating_point_v<To>)
+		{
+			return UnormToNormalized<To>(value);
+		}
+		else if constexpr (std::is_integral_v<From> && std::is_integral_v<To>)
+		{
+			return UnormToUnorm<To>(value);
 		}
 		else
 		{
-			return ToFloat<To>(value);
+			return static_cast<To>(value);
 		}
 	}
 
