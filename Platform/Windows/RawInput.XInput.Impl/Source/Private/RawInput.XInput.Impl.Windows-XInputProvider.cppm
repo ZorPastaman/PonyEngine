@@ -338,10 +338,9 @@ namespace PonyEngine::Input::Windows
 				return;
 			}
 
-			const float value = current > XINPUT_GAMEPAD_TRIGGER_THRESHOLD
-				? static_cast<float>(current - XINPUT_GAMEPAD_TRIGGER_THRESHOLD) / (std::numeric_limits<BYTE>::max() - XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
-				: 0.f;
+			const float value = Math::UnormToNormalized<float>(current, Math::Range<BYTE>{.min = XINPUT_GAMEPAD_TRIGGER_THRESHOLD});
 			const AxisId axis = axisMap.Trigger(trigger);
+
 			input->AddInput(handle, RawInputEvent
 			{
 				.axes = std::span<const AxisId>(&axis, 1uz),
@@ -358,15 +357,7 @@ namespace PonyEngine::Input::Windows
 	void XInputProvider::UpdateStickInput(const DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState, 
 		const std::chrono::time_point<std::chrono::steady_clock> now)
 	{
-		const auto calculateValue = [](const Math::Vector2<float> current, const float threshold) noexcept
-		{
-			const auto denominator = Math::Vector2<float>(std::numeric_limits<SHORT>::max()) - Math::Vector2<float>(threshold);
-			const auto numerator = current - Math::ClampMagnitude(current, threshold);
-
-			return Math::ClampMagnitude(Math::Divide(numerator, denominator), 1.f);
-		};
-
-		const auto updateStickInput = [&](const Math::Vector2<SHORT> prev, const Math::Vector2<SHORT> current, const SHORT threshold, 
+		const auto updateStickInput = [&](const Math::Vector2<SHORT>& prev, const Math::Vector2<SHORT>& current, const SHORT threshold, 
 			const XInputAxisMap::StickPlacement placement)
 		{
 			if (prev == current)
@@ -374,24 +365,17 @@ namespace PonyEngine::Input::Windows
 				return;
 			}
 
-			const auto prevFloat = static_cast<Math::Vector2<float>>(prev);
-			const auto currentFloat = static_cast<Math::Vector2<float>>(current);
-			const float thresholdFloat = threshold;
-			const float prevMagnitude = prevFloat.Magnitude();
-			const float currentMagnitude = currentFloat.Magnitude();
-
-			if (prevMagnitude <= threshold && currentMagnitude <= threshold)
+			const auto prevNormalized = static_cast<Math::Vector2<float>>(prev).Normalized(threshold, std::numeric_limits<SHORT>::max());
+			const auto currentNormalized = static_cast<Math::Vector2<float>>(current).Normalized(threshold, std::numeric_limits<SHORT>::max());
+			if (prevNormalized == currentNormalized)
 			{
 				return;
 			}
 
-			const auto value = currentMagnitude > threshold
-				? calculateValue(currentFloat, thresholdFloat)
-				: Math::Vector2<float>::Zero();
 			input->AddInput(handle, RawInputEvent
 			{
 				.axes = axisMap.Stick(placement),
-				.values = value.Span(),
+				.values = currentNormalized.Span(),
 				.eventType = InputEventType::State,
 				.timePoint = now
 			});
