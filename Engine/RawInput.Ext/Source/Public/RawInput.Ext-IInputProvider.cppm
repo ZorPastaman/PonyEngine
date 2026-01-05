@@ -19,7 +19,7 @@ export namespace PonyEngine::Input
 	/// @note The provider must write to an input service only inside its tick or begin/end.
 	class IInputProvider
 	{
-		INTERFACE_BODY(IInputProvider)
+		PONY_INTERFACE_BODY(IInputProvider)
 
 		/// @brief Invoked before a first tick.
 		virtual void Begin() = 0;

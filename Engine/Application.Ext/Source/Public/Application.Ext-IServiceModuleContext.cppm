@@ -24,7 +24,7 @@ export namespace PonyEngine::Application
 	/// @brief Service module context.
 	class IServiceModuleContext
 	{
-		INTERFACE_BODY(IServiceModuleContext)
+		PONY_INTERFACE_BODY(IServiceModuleContext)
 
 		/// @brief Adds a service.
 		/// @param factory Service factory.

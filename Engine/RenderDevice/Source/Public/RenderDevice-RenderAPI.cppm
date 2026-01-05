@@ -19,7 +19,7 @@ export namespace PonyEngine::Render
 {
 	struct RenderAPI final
 	{
-		NON_CONSTRUCTIBLE_BODY(RenderAPI)
+		PONY_NON_CONSTRUCTIBLE_BODY(RenderAPI)
 
 		static constexpr std::string_view Direct3D = "Direct3D";
 		static constexpr std::string_view Vulkan = "Vulkan";

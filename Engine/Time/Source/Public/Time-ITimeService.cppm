@@ -22,7 +22,7 @@ export namespace PonyEngine::Time
 	/// @brief Time service.
 	class ITimeService
 	{
-		INTERFACE_BODY(ITimeService)
+		PONY_INTERFACE_BODY(ITimeService)
 
 		/// @brief Gets a real time elapsed since the start. It computes a time at the call moment.
 		/// @return Real time.

@@ -21,7 +21,7 @@ export namespace PonyEngine::Input
 	/// @brief Raw input observer.
 	class IRawInputObserver
 	{
-		INTERFACE_BODY(IRawInputObserver)
+		PONY_INTERFACE_BODY(IRawInputObserver)
 
 		/// @brief Invoked on raw input event.
 		/// @param deviceHandle Device handle.

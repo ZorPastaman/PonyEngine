@@ -24,7 +24,7 @@ export namespace PonyEngine::Input
 	/// @brief Raw input module context.
 	class IRawInputModuleContext
 	{
-		INTERFACE_BODY(IRawInputModuleContext)
+		PONY_INTERFACE_BODY(IRawInputModuleContext)
 
 		/// @brief Adds an input provider.
 		/// @param factory Input provider factory.

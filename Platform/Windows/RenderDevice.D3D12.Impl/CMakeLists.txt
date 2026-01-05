@@ -23,6 +23,7 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PRIVATE
 target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/Private/RenderDevice.D3D12.Impl.Windows.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-DXGIFactory.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-DXGITextureFormatMap.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Backend.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12BackendModule.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Device.cppm"

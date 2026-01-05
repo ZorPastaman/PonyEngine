@@ -22,7 +22,7 @@ export namespace PonyEngine::MessagePump
 	/// @brief Pump service.
 	class IPumpService
 	{
-		INTERFACE_BODY(IPumpService)
+		PONY_INTERFACE_BODY(IPumpService)
 
 		/// @brief Gets the supported features.
 		/// @return Supported features.

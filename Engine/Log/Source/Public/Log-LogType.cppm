@@ -18,15 +18,14 @@ import std;
 namespace PonyEngine::Log
 {
 	/// @brief Log type names by index.
-	constexpr std::array<std::string_view, 7> LogTypeNames
+	constexpr std::array<std::string_view, 6> LogTypeNames
 	{
 		"Verbose",
 		"Debug",
 		"Info",
 		"Warning",
 		"Error",
-		"Exception",
-		"Unknown"
+		"Exception"
 	};
 }
 
@@ -56,10 +55,11 @@ export namespace PonyEngine::Log
 		All = Verbose | Debug | Info | Warning | Error | Exception
 	};
 
-	ENUM_VALUE_MASK_FEATURES(LogType, LogTypeNames, LogTypeMask, LogTypeNames)
+	PONY_ENUM_VALUE_MASK_FEATURES(LogType, LogTypeMask)
 }
 
 export
 {
-	ENUM_VALUE_MASK_FORMATTER(PonyEngine::Log, LogType, LogTypeMask)
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Log::LogType, PonyEngine::Log::LogTypeNames)
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::Log::LogTypeMask, PonyEngine::Log::LogTypeNames)
 }

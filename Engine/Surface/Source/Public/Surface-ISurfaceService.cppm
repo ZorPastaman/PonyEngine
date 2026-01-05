@@ -26,7 +26,7 @@ export namespace PonyEngine::Surface
 	/// @brief Surface service.
 	class ISurfaceService
 	{
-		INTERFACE_BODY(ISurfaceService)
+		PONY_INTERFACE_BODY(ISurfaceService)
 
 		/// @brief Gets the supported features.
 		/// @return Supported features.

@@ -24,7 +24,7 @@ export namespace PonyEngine::Log
 	/// @brief Logger module context.
 	class ILoggerModuleContext
 	{
-		INTERFACE_BODY(ILoggerModuleContext)
+		PONY_INTERFACE_BODY(ILoggerModuleContext)
 
 		/// @brief Adds a sub-logger.
 		/// @param factory Sub-logger factory.

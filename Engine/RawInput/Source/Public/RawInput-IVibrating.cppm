@@ -18,7 +18,7 @@ export namespace PonyEngine::Input
 	/// @brief Vibrating input device feature.
 	class IVibrating
 	{
-		INTERFACE_BODY(IVibrating)
+		PONY_INTERFACE_BODY(IVibrating)
 
 		/// @brief Sets a vibration state.
 		/// @param lowFrequency Low frequency motor speed. Must be in range [0, 1].

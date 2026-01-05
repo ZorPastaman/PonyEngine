@@ -11,7 +11,7 @@
 
 /// @brief Interface body macro. It must be used inside an interface class.
 /// @param interfaceName Interface name. Must be the same as a class name where the body is declared.
-#define INTERFACE_BODY(interfaceName) \
+#define PONY_INTERFACE_BODY(interfaceName) \
 	protected: \
 		[[nodiscard("Pure constructor")]] \
 		interfaceName() noexcept = default; \
@@ -29,7 +29,7 @@
 
 /// @brief Non-constructible class body macro. It must be used inside a base class.
 /// @param objectName Class name. Must be the same as a class name where the body is declared.
-#define NON_CONSTRUCTIBLE_BODY(objectName) \
+#define PONY_NON_CONSTRUCTIBLE_BODY(objectName) \
 	public: \
 		objectName() = delete; \
 		objectName(const objectName&) = delete; \

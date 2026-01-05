@@ -26,7 +26,7 @@ export namespace PonyEngine::Application
 	/// @brief Module context. It's a context used by modules.
 	class IModuleContext
 	{
-		INTERFACE_BODY(IModuleContext)
+		PONY_INTERFACE_BODY(IModuleContext)
 
 		/// @brief Gets the logger.
 		/// @return Logger.

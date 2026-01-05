@@ -41,11 +41,9 @@ export namespace PonyEngine::Application
 		Ending,
 		ShuttingDown
 	};
-
-	ENUM_VALUE_FEATURES(FlowState, FlowStateNames)
 }
 
 export
 {
-	ENUM_VALUE_FORMATTER(PonyEngine::Application, FlowState)
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Application::FlowState, PonyEngine::Application::FlowStateNames)
 }

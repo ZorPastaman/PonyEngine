@@ -28,7 +28,7 @@ export namespace PonyEngine::Input
 	/// @brief Raw input service.
 	class IRawInputService
 	{
-		INTERFACE_BODY(IRawInputService)
+		PONY_INTERFACE_BODY(IRawInputService)
 
 		/// @brief Gets an axis value.
 		/// @param axis Axis.

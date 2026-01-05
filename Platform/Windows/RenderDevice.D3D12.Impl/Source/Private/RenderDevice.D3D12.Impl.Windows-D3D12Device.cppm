@@ -39,6 +39,9 @@ export namespace PonyEngine::Render::Windows
 
 		~D3D12Device() noexcept;
 
+		[[nodiscard("Pure function")]]
+		D3D12_FEATURE_DATA_FORMAT_SUPPORT GetFormatSupport(DXGI_FORMAT format) const;
+
 		void SetName(std::string_view name);
 
 		D3D12Device& operator =(const D3D12Device&) = delete;
@@ -90,6 +93,17 @@ namespace PonyEngine::Render::Windows
 		debug.Reset();
 		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface done.");
 #endif
+	}
+
+	D3D12_FEATURE_DATA_FORMAT_SUPPORT D3D12Device::GetFormatSupport(const DXGI_FORMAT format) const
+	{
+		auto formatSupport = D3D12_FEATURE_DATA_FORMAT_SUPPORT{.Format = format};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_FORMAT_SUPPORT, &formatSupport, sizeof(formatSupport)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to check texture format support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return formatSupport;
 	}
 
 	void D3D12Device::SetName(const std::string_view name)

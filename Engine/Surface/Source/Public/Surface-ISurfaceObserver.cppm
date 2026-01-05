@@ -22,7 +22,7 @@ export namespace PonyEngine::Surface
 	/// @brief Surface observer.
 	class ISurfaceObserver
 	{
-		INTERFACE_BODY(ISurfaceObserver)
+		PONY_INTERFACE_BODY(ISurfaceObserver)
 
 		/// @brief Invoked when the surface activity is changed.
 		/// @param isActive Is the surface active?

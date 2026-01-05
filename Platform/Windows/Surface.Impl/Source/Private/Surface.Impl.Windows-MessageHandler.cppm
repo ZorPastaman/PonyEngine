@@ -27,7 +27,7 @@ export namespace PonyEngine::Surface::Windows
 	/// @brief Windows message handler.
 	class IMessageHandler
 	{
-		INTERFACE_BODY(IMessageHandler)
+		PONY_INTERFACE_BODY(IMessageHandler)
 
 		/// @brief Gets the application context.
 		/// @return Application context.

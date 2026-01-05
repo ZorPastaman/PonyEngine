@@ -21,7 +21,7 @@ export namespace PonyEngine::Input
 	/// @brief Mouse device.
 	struct MouseDevice final
 	{
-		NON_CONSTRUCTIBLE_BODY(MouseDevice)
+		PONY_NON_CONSTRUCTIBLE_BODY(MouseDevice)
 
 		static constexpr std::string_view GenericType = PONY_INPUT_MOUSE; ///< Generic mouse type. A mouse device supports the @p MouseLayout.
 	};
@@ -29,7 +29,7 @@ export namespace PonyEngine::Input
 	/// @brief Mouse layout.
 	struct MouseLayout final
 	{
-		NON_CONSTRUCTIBLE_BODY(MouseLayout)
+		PONY_NON_CONSTRUCTIBLE_BODY(MouseLayout)
 
 		static constexpr std::string_view Layout = PONY_INPUT_MOUSE; ///< Mouse layout name.
 

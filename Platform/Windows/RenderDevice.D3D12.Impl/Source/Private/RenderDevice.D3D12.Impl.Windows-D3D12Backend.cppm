@@ -14,7 +14,9 @@ import std;
 import PonyEngine.RenderDevice.Ext;
 
 import :DXGIFactory;
+import :DXGITextureFormatMap;
 import :D3D12Device;
+import :Utility;
 
 export namespace PonyEngine::Render::Windows
 {
@@ -22,7 +24,7 @@ export namespace PonyEngine::Render::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit D3D12Backend(IRenderDeviceContext& renderDevice) noexcept;
+		explicit D3D12Backend(IRenderDeviceContext& renderDevice);
 		D3D12Backend(const D3D12Backend&) = delete;
 		D3D12Backend(D3D12Backend&&) = delete;
 
@@ -36,11 +38,16 @@ export namespace PonyEngine::Render::Windows
 		virtual void Activate() override;
 		virtual void Deactivate() override;
 
+		[[nodiscard("Pure function")]] 
+		virtual TextureFormatFeature SupportedFeatures(TextureFormatId textureFormatId) const override;
+
 		D3D12Backend& operator =(const D3D12Backend&) = delete;
 		D3D12Backend& operator =(D3D12Backend&&) = delete;
 
 	private:
 		IRenderDeviceContext* renderDevice;
+
+		DXGITextureFormatMap textureFormatMap;
 
 		std::unique_ptr<DXGIFactory> factory;
 		std::unique_ptr<D3D12Device> device;
@@ -49,8 +56,9 @@ export namespace PonyEngine::Render::Windows
 
 namespace PonyEngine::Render::Windows
 {
-	D3D12Backend::D3D12Backend(IRenderDeviceContext& renderDevice) noexcept :
-		renderDevice{&renderDevice}
+	D3D12Backend::D3D12Backend(IRenderDeviceContext& renderDevice) :
+		renderDevice{&renderDevice},
+		textureFormatMap(*this->renderDevice)
 	{
 	}
 
@@ -74,5 +82,16 @@ namespace PonyEngine::Render::Windows
 	{
 		device.reset();
 		factory.reset();
+	}
+
+	TextureFormatFeature D3D12Backend::SupportedFeatures(const TextureFormatId textureFormatId) const
+	{
+		if (const std::size_t formatIndex = textureFormatMap.IndexOf(textureFormatId); formatIndex < textureFormatMap.Size()) [[likely]]
+		{
+			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device->GetFormatSupport(textureFormatMap.DXGIFormat(formatIndex));
+			return ToEngineTextureFormatFeatures(formatSupport);
+		}
+
+		return TextureFormatFeature::None;
 	}
 }
