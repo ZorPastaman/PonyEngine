@@ -36,10 +36,10 @@ export namespace PonyEngine::MessagePump
 		All = MessageTime | CursorPosition
 	};
 
-	ENUM_MASK_FEATURES(PumpFeature, PumpFeatureNames)
+	PONY_ENUM_MASK_FEATURES(PumpFeature)
 }
 
 export
 {
-	ENUM_MASK_FORMATTER(PonyEngine::MessagePump, PumpFeature)
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::MessagePump::PumpFeature, PonyEngine::MessagePump::PumpFeatureNames)
 }

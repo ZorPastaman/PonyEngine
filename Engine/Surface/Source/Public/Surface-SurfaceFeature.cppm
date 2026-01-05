@@ -41,10 +41,10 @@ export namespace PonyEngine::Surface
 		All = FullscreenStyle | WindowStyle | ClientRect | Title | HardwareCursor
 	};
 
-	ENUM_MASK_FEATURES(SurfaceFeature, SurfaceFeatureNames)
+	PONY_ENUM_MASK_FEATURES(SurfaceFeature)
 }
 
 export
 {
-	ENUM_MASK_FORMATTER(PonyEngine::Surface, SurfaceFeature)
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::Surface::SurfaceFeature, PonyEngine::Surface::SurfaceFeatureNames)
 }

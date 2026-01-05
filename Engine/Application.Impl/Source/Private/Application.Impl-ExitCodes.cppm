@@ -18,7 +18,7 @@ export namespace PonyEngine::Application
 	/// @brief Exit codes that must be used by main. The application uses negative codes.
 	struct ExitCodes final
 	{
-		NON_CONSTRUCTIBLE_BODY(ExitCodes)
+		PONY_NON_CONSTRUCTIBLE_BODY(ExitCodes)
 
 		static constexpr int InitialExitCode = -1000;
 		static constexpr int UnexpectedException = -5;

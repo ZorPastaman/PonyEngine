@@ -8,6 +8,9 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RenderDevice.cppm"
 	"Source/Public/RenderDevice-IRenderDeviceService.cppm"	
 	"Source/Public/RenderDevice-RenderAPI.cppm" 
+	"Source/Public/RenderDevice-TextureFormat.cppm"
+	"Source/Public/RenderDevice-TextureFormatFeature.cppm"
+	"Source/Public/RenderDevice-TextureFormatId.cppm"
 )
 
 message(VERBOSE "Setting properties")

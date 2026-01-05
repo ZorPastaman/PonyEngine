@@ -51,6 +51,7 @@ namespace Game
 
 	void GameService::Begin()
 	{
+		const PonyEngine::Render::TextureFormatFeature feature = renderDevice->SupportedFeatures(renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Unorm));
 	}
 
 	void GameService::End()

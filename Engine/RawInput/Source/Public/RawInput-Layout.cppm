@@ -21,7 +21,7 @@ export namespace PonyEngine::Input
 	/// @brief Layout values.
 	struct Layout final
 	{
-		NON_CONSTRUCTIBLE_BODY(Layout)
+		PONY_NON_CONSTRUCTIBLE_BODY(Layout)
 
 		static constexpr char PathSeparator = PONY_INPUT_PATH_SEPARATOR; ///< Layout path separator.
 

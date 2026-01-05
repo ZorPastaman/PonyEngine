@@ -42,13 +42,11 @@ export namespace PonyEngine::Math
 		Blue,
 		Alpha
 	};
-
-	ENUM_VALUE_FEATURES(ColorChannel, ColorChannelNames)
 }
 
 export
 {
-	ENUM_VALUE_FORMATTER(PonyEngine::Math, ColorChannel)
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Math::ColorChannel, PonyEngine::Math::ColorChannelNames)
 }
 
 export namespace PonyEngine::Math

@@ -24,7 +24,7 @@ export namespace PonyEngine::Input
 	/// @brief Raw input context.
 	class IRawInputContext
 	{
-		INTERFACE_BODY(IRawInputContext)
+		PONY_INTERFACE_BODY(IRawInputContext)
 
 		/// @brief Gets the application context.
 		/// @return Application context.

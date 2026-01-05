@@ -21,7 +21,7 @@ export namespace PonyEngine::Input
 	/// @brief Gamepad device.
 	struct GamepadDevice final
 	{
-		NON_CONSTRUCTIBLE_BODY(GamepadDevice)
+		PONY_NON_CONSTRUCTIBLE_BODY(GamepadDevice)
 
 		static constexpr std::string_view GenericType = PONY_INPUT_GAMEPAD; ///< Generic gamepad type. A gamepad device supports the @p GamepadLayout.
 
@@ -35,7 +35,7 @@ export namespace PonyEngine::Input
 	/// @brief Gamepad layout.
 	struct GamepadLayout final
 	{
-		NON_CONSTRUCTIBLE_BODY(GamepadLayout)
+		PONY_NON_CONSTRUCTIBLE_BODY(GamepadLayout)
 
 		static constexpr std::string_view Layout = PONY_INPUT_GAMEPAD; ///< Gamepad layout name.
 

@@ -21,7 +21,7 @@ export namespace PonyEngine::Application::Windows
 	/// @brief Windows application context.
 	class IApplicationContext : public Application::IApplicationContext
 	{
-		INTERFACE_BODY(IApplicationContext)
+		PONY_INTERFACE_BODY(IApplicationContext)
 
 		/// @brief Gets the instance handle of the application.
 		/// @return Instance handle of the application.

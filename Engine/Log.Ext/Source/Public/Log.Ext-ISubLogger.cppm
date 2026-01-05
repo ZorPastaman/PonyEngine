@@ -22,7 +22,7 @@ export namespace PonyEngine::Log
 	/// @brief Sub-logger.
 	class ISubLogger
 	{
-		INTERFACE_BODY(ISubLogger)
+		PONY_INTERFACE_BODY(ISubLogger)
 
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.

@@ -33,6 +33,9 @@ export namespace PonyEngine::Render
 		virtual void Activate() noexcept override;
 		virtual void Deactivate() noexcept override;
 
+		[[nodiscard("Pure function")]] 
+		virtual TextureFormatFeature SupportedFeatures(TextureFormatId textureFormatId) const override;
+
 		EmptyBackend& operator =(const EmptyBackend&) = delete;
 		EmptyBackend& operator =(EmptyBackend&&) = delete;
 	};
@@ -56,5 +59,10 @@ namespace PonyEngine::Render
 
 	void EmptyBackend::Deactivate() noexcept
 	{
+	}
+
+	TextureFormatFeature EmptyBackend::SupportedFeatures(const TextureFormatId textureFormatId) const
+	{
+		return TextureFormatFeature::None;
 	}
 }

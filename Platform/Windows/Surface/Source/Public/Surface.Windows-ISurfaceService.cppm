@@ -26,7 +26,7 @@ export namespace PonyEngine::Surface::Windows
 	/// @brief Windows surface service.
 	class ISurfaceService : public Surface::ISurfaceService
 	{
-		INTERFACE_BODY(ISurfaceService)
+		PONY_INTERFACE_BODY(ISurfaceService)
 
 		/// @brief Gets the native handle.
 		/// @return Native handle.

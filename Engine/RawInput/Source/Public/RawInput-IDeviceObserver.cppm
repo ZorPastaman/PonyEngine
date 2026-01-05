@@ -21,7 +21,7 @@ export namespace PonyEngine::Input
 	/// @brief Device observer.
 	class IDeviceObserver
 	{
-		INTERFACE_BODY(IDeviceObserver)
+		PONY_INTERFACE_BODY(IDeviceObserver)
 
 		/// @brief Invoked when a new device is added.
 		/// @param deviceHandle New device handle.

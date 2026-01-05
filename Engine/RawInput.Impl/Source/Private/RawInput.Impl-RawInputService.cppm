@@ -503,9 +503,11 @@ export namespace PonyEngine::Input
 		{
 			std::vector<Axis>& axes = position->second;
 			const auto axisPosition = std::ranges::find(axes, axis);
+			axisId.index = static_cast<std::uint32_t>(axisPosition - axes.cbegin());
 
 			if (axisPosition == axes.cend()) [[unlikely]]
 			{
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis.Path(), axisId.hash, axisId.index);
 				if (axes.size() >= std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 				{
 					throw std::bad_alloc();
@@ -513,13 +515,12 @@ export namespace PonyEngine::Input
 
 				axes.push_back(axis);
 			}
-
-			axisId.index = static_cast<std::uint32_t>(axisPosition - axes.cbegin());
 		}
 		else
 		{
-			axisHashMap[hash] = std::vector<Axis>{ axis };
 			axisId.index = 0u;
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis.Path(), axisId.hash, axisId.index);
+			axisHashMap[hash] = std::vector<Axis>{ axis };
 		}
 
 		return axisId;
@@ -557,6 +558,7 @@ export namespace PonyEngine::Input
 		}
 		else
 		{
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '{}'.", deviceType.Type(), deviceTypeId.hash);
 			deviceTypeHashMap[deviceTypeId] = deviceType;
 		}
 

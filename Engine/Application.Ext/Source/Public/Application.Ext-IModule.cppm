@@ -22,7 +22,7 @@ export namespace PonyEngine::Application
 	/// @brief Module.
 	class IModule
 	{
-		INTERFACE_BODY(IModule)
+		PONY_INTERFACE_BODY(IModule)
 
 		/// @brief Invoked on an application start-up.
 		/// @param context Module context.

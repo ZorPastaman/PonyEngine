@@ -21,7 +21,7 @@ export namespace PonyEngine::Application
 	/// @brief Service
 	class IService
 	{
-		INTERFACE_BODY(IService)
+		PONY_INTERFACE_BODY(IService)
 
 		/// @brief Begins the service.
 		/// @details It's called once before a first application tick.

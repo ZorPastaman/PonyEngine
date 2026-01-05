@@ -25,7 +25,7 @@ export namespace PonyEngine::Application
 	/// @brief Logger module context.
 	class ILoggerModuleContext
 	{
-		INTERFACE_BODY(ILoggerModuleContext)
+		PONY_INTERFACE_BODY(ILoggerModuleContext)
 
 		/// @brief Sets the logger.
 		/// @param factory Logger factory.

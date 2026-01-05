@@ -16,6 +16,7 @@ export module PonyEngine.RenderDevice.Impl:RenderDeviceService;
 import std;
 
 import PonyEngine.Application.Ext;
+import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.Meta;
 import PonyEngine.RenderDevice.Ext;
@@ -58,6 +59,15 @@ export namespace PonyEngine::Render
 		virtual std::size_t ActiveBackend() const noexcept override;
 		virtual void SwitchBackend(std::size_t backendIndex) override;
 
+		[[nodiscard("Wierd call")]] 
+		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) override;
+		[[nodiscard("Pure function")]] 
+		virtual std::string_view TextureFormat(struct TextureFormatId textureFormatId) const override;
+		[[nodiscard("Pure function")]] 
+		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual TextureFormatFeature SupportedFeatures(struct TextureFormatId textureFormatId) const override;
+
 		[[nodiscard("Pure function")]] 
 		virtual Application::IApplicationContext& Application() noexcept override;
 		[[nodiscard("Pure function")]] 
@@ -77,6 +87,8 @@ export namespace PonyEngine::Render
 
 		BackendContainer backends;
 		std::size_t activeBackendIndex;
+
+		std::unordered_map<struct TextureFormatId, std::string> textureFormatHashMap;
 
 		BackendHandle nextBackendHandle;
 	};
@@ -234,6 +246,51 @@ namespace PonyEngine::Render
 			PONY_LOG_X(application->Logger(), std::current_exception(), "On activating '{}' backend.", typeid(backends.Backend(backendIndex)).name());
 			throw;
 		}
+	}
+
+	struct TextureFormatId RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
+	{
+		const auto textureFormatId = Render::TextureFormatId{.hash = Hash::FNV1a64(textureFormat)};
+
+		if (const auto position = textureFormatHashMap.find(textureFormatId); position != textureFormatHashMap.cend())
+		{
+			if (position->second != textureFormat)
+			{
+				throw std::overflow_error("Hash collision");
+			}
+		}
+		else
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new texture format. TextureFormat: '{}'; TextureFormatHash: '{}'.", textureFormat, textureFormatId.hash);
+			textureFormatHashMap[textureFormatId] = textureFormat;
+		}
+
+		return textureFormatId;
+	}
+
+	std::string_view RenderDeviceService::TextureFormat(const struct TextureFormatId textureFormatId) const
+	{
+		if (const auto position = textureFormatHashMap.find(textureFormatId); position != textureFormatHashMap.cend()) [[likely]]
+		{
+			return position->second;
+		}
+
+		throw std::invalid_argument("Invalid texture format ID");
+	}
+
+	bool RenderDeviceService::IsValid(const struct TextureFormatId textureFormatId) const noexcept
+	{
+		return textureFormatHashMap.contains(textureFormatId);
+	}
+
+	TextureFormatFeature RenderDeviceService::SupportedFeatures(const struct TextureFormatId textureFormatId) const
+	{
+		if (!IsValid(textureFormatId)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid format");
+		}
+
+		return backends.Backend(activeBackendIndex).SupportedFeatures(textureFormatId);
 	}
 
 	Application::IApplicationContext& RenderDeviceService::Application() noexcept

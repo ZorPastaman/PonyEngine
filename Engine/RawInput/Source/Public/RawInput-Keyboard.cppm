@@ -21,7 +21,7 @@ export namespace PonyEngine::Input
 	/// @brief Keyboard device.
 	struct KeyboardDevice final
 	{
-		NON_CONSTRUCTIBLE_BODY(KeyboardDevice)
+		PONY_NON_CONSTRUCTIBLE_BODY(KeyboardDevice)
 
 		static constexpr std::string_view GenericType = PONY_INPUT_KEYBOARD; ///< Generic keyboard type. A keyboard device supports the @p KeyboardLayout.
 	};
@@ -29,7 +29,7 @@ export namespace PonyEngine::Input
 	/// @brief Keyboard layout.
 	struct KeyboardLayout final
 	{
-		NON_CONSTRUCTIBLE_BODY(KeyboardLayout)
+		PONY_NON_CONSTRUCTIBLE_BODY(KeyboardLayout)
 
 		static constexpr std::string_view Layout = PONY_INPUT_KEYBOARD; ///< Keyboard layout name.
 

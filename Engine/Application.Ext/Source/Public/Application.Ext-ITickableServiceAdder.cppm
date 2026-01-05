@@ -22,7 +22,7 @@ export namespace PonyEngine::Application
 	/// @brief Tickable service adder.
 	class ITickableServiceAdder
 	{
-		INTERFACE_BODY(ITickableServiceAdder)
+		PONY_INTERFACE_BODY(ITickableServiceAdder)
 
 		/// @brief Adds a tickable service.
 		/// @param tickable Tickable service.

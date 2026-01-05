@@ -25,7 +25,7 @@ export namespace PonyEngine::Application
 	/// @brief Application context.
 	class IApplicationContext
 	{
-		INTERFACE_BODY(IApplicationContext)
+		PONY_INTERFACE_BODY(IApplicationContext)
 
 		/// @brief Gets the engine name.
 		/// @return Engine name.

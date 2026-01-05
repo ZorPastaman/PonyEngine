@@ -11,3 +11,6 @@ export module PonyEngine.RenderDevice;
 
 export import :IRenderDeviceService;
 export import :RenderAPI;
+export import :TextureFormat;
+export import :TextureFormatFeature;
+export import :TextureFormatId;

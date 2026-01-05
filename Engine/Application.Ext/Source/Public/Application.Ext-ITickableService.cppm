@@ -18,7 +18,7 @@ export namespace PonyEngine::Application
 	/// @brief Tickable service.
 	class ITickableService
 	{
-		INTERFACE_BODY(ITickableService)
+		PONY_INTERFACE_BODY(ITickableService)
 
 		/// @brief Ticks the service.
 		virtual void Tick() = 0;

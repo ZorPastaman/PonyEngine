@@ -9,26 +9,13 @@
 
 #pragma once
 
-/// @brief Creates a function to convert an enum value to a predefined string value.
-/// @param Value Value enum type.
-/// @param Value param name.
-/// @param ValueNames Array of value enum names.
-#define ENUM_VALUE_TO_STRING(Value, ValueNames) \
-	[[nodiscard("Pure function")]] \
-	constexpr std::string_view ToString(const Value value) noexcept \
-	{ \
-		const std::size_t index = static_cast<std::size_t>(value); \
-		return index < ValueNames.size() ? ValueNames[index] : "Unknown"; \
-	} \
-
 /// @brief Creates a formatter for an enum value.
 /// @note This define must be used in a global namespace.
-/// @remark Before this define, you must use ENUM_VALUE_TO_STRING.
-/// @param Namespace Enum namespace.
 /// @param Value Value enum type.
-#define ENUM_VALUE_FORMATTER(Namespace, Value) \
+/// @param ValueNames Value names. They're synced by index.
+#define PONY_ENUM_VALUE_FORMATTER(Value, ValueNames) \
 	template<> \
-	struct std::formatter<Namespace::Value, char> \
+	struct std::formatter<Value, char> \
 	{ \
 		static constexpr auto parse(std::format_parse_context& context) \
 		{ \
@@ -42,71 +29,21 @@
 			} \
 			return context.begin(); \
 		} \
-		static auto format(const Namespace::Value value, std::format_context& context) \
+		static auto format(const Value value, std::format_context& context) \
 		{ \
-			return std::ranges::copy(Namespace::ToString(value), context.out()).out; \
+			const std::size_t index = static_cast<std::size_t>(value); \
+			return std::ranges::copy(index < ValueNames.size() ? ValueNames[index] : "Unknown"sv, context.out()).out; \
 		} \
 	}; \
 
-/// @brief Creates a function that makes a string representing the enum mask.
-/// @note Enum must have Enum::All value defined.
-/// @param Mask Mask enum type.
-/// @param MaskNames Array of mask enum names.
-#define ENUM_MASK_TO_STRING(Mask, MaskNames) \
-	[[nodiscard("Pure function")]] \
-	constexpr std::string Mask##GenerateToString(const Mask mask) \
-	{ \
-		if (std::to_underlying(mask) == std::underlying_type_t<Mask>{0}) \
-		{ \
-			return "None"; \
-		} \
-		if (mask == Mask::All) \
-		{ \
-			return "All"; \
-		} \
-		if (std::to_underlying(mask) > std::to_underlying(Mask::All)) \
-		{ \
-			return "Unknown"; \
-		} \
-		std::string answer = ""; \
-		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(std::to_underlying(Mask::All)); ++i) \
-		{ \
-			if (((std::underlying_type_t<Mask>{1} << i) & std::to_underlying(mask)) != std::underlying_type_t<Mask>{0}) \
-			{ \
-				if (!answer.empty()) \
-				{ \
-					answer += " | "; \
-				} \
-				answer += MaskNames[i]; \
-			} \
-		} \
-		return answer; \
-	} \
-	[[nodiscard("Pure function")]] \
-	constexpr std::array<std::string, static_cast<std::size_t>(Mask::All) + 2uz> Mask##GenerateToStrings() \
-	{ \
-		std::array<std::string, static_cast<std::size_t>(Mask::All) + 2uz> answer; \
-		for (std::size_t i = 0uz; i < answer.size(); ++i) \
-		{ \
-			answer[i] = Mask##GenerateToString(static_cast<Mask>(i)); \
-		} \
-		return answer; \
-	} \
-	const std::array<std::string, static_cast<std::size_t>(Mask::All) + 2uz> Mask##GeneratedNames = Mask##GenerateToStrings(); \
-	[[nodiscard("Pure function")]] \
-	std::string_view ToString(const Mask mask) noexcept \
-	{ \
-		return Mask##GeneratedNames[std::min(static_cast<std::size_t>(mask), Mask##GeneratedNames.size() - 1uz)]; \
-	} \
-
 /// @brief Creates a formatter for an enum mask.
 /// @note This define must be used in a global namespace.
-/// @remark Before this define, you must use ENUM_MASK_TO_STRING.
-/// @param Namespace Enum namespace.
+/// @note The enum must have All value defined.
 /// @param Mask Mask enum type.
-#define ENUM_MASK_FORMATTER(Namespace, Mask) \
+/// @param MaskNames Mask names. They're synced by index.
+#define PONY_ENUM_MASK_FORMATTER(Mask, MaskNames) \
 	template<> \
-	struct std::formatter<Namespace::Mask, char> \
+	struct std::formatter<Mask, char> \
 	{ \
 		static constexpr auto parse(std::format_parse_context& context) \
 		{ \
@@ -120,16 +57,43 @@
 			} \
 			return context.begin(); \
 		} \
-		static auto format(const Namespace::Mask mask, std::format_context& context) \
+		static auto format(const Mask mask, std::format_context& context) \
 		{ \
-			return std::ranges::copy(Namespace::ToString(mask), context.out()).out; \
+			if (std::to_underlying(mask) == std::underlying_type_t<Mask>{0}) \
+			{ \
+				return std::ranges::copy("None"sv, context.out()).out; \
+			} \
+			if (mask == Mask::All) \
+			{ \
+				return std::ranges::copy("All"sv, context.out()).out; \
+			} \
+			if (std::to_underlying(mask) > std::to_underlying(Mask::All)) \
+			{ \
+				return std::ranges::copy("Unknown"sv, context.out()).out; \
+			} \
+			\
+			bool hasText = false; \
+			auto it = context.out(); \
+			for (std::underlying_type_t<Mask> i = 0; i < static_cast<std::underlying_type_t<Mask>>(std::countr_one(std::to_underlying(Mask::All))); ++i) \
+			{ \
+				if (((std::underlying_type_t<Mask>{1} << i) & std::to_underlying(mask)) != std::underlying_type_t<Mask>{0}) \
+				{ \
+					if (hasText) \
+					{ \
+						it = std::ranges::copy(" | "sv, it).out; \
+					} \
+					it = std::ranges::copy(MaskNames[i], it).out; \
+					hasText = true; \
+				} \
+			} \
+			return it; \
 		} \
 	}; \
 
 /// @brief Creates mask enum operators.
 /// @note Mask must include All value.
 /// @param Mask Mask enum type.
-#define ENUM_MASK_OPERATORS(Mask) \
+#define PONY_ENUM_MASK_OPERATORS(Mask) \
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator &(const Mask left, const Mask right) noexcept \
 	{ \
@@ -167,7 +131,7 @@
 
 /// @brief Creates mask enum check functions.
 /// @param Mask Mask enum type.
-#define ENUM_MASK_CHECKS(Mask) \
+#define PONY_ENUM_MASK_CHECKS(Mask) \
 	[[nodiscard("Pure function")]] \
 	constexpr bool All(const Mask value, const Mask mask) noexcept \
 	{ \
@@ -187,7 +151,7 @@
 /// @brief Creates functions for the value enum and mask enum pair.
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
-#define ENUM_VALUE_MASK(Value, Mask) \
+#define PONY_ENUM_VALUE_MASK(Value, Mask) \
 	/* @brief Converts the value to a mask. */ \
 	/* @param value Value. */ \
 	/* @return Mask. */ \
@@ -249,21 +213,12 @@
 		return valueCount; \
 	} \
 
-/// @brief Creates all the value enum features except a formatter.
-/// @note All the restrictions of the features are applied to this.
-/// @param Value Value enum type.
-#define ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_VALUE_TO_STRING(Value, ValueNames)
 /// @brief Creates all the mask enum features except a formatter.
 /// @note All the restrictions of the features are applied to this.
 /// @param Mask Mask enum type.
-#define ENUM_MASK_FEATURES(Mask, MaskNames) ENUM_MASK_TO_STRING(Mask, MaskNames) ENUM_MASK_OPERATORS(Mask) ENUM_MASK_CHECKS(Mask)
+#define PONY_ENUM_MASK_FEATURES(Mask) PONY_ENUM_MASK_OPERATORS(Mask) PONY_ENUM_MASK_CHECKS(Mask)
 /// @brief Creates all the value enum and mask enum features except formatters.
 /// @note All the restrictions of the features are applied to this.
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
-#define ENUM_VALUE_MASK_FEATURES(Value, ValueNames, Mask, MaskNames) ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_MASK_FEATURES(Mask, MaskNames) ENUM_VALUE_MASK(Value, Mask)
-/// @brief Creates formatter for value and mask enums.
-/// @param Namespace Enum namespace.
-/// @param Value Value enum type.
-/// @param Mask Mask enum type.
-#define ENUM_VALUE_MASK_FORMATTER(Namespace, Value, Mask) ENUM_VALUE_FORMATTER(Namespace, Value) ENUM_MASK_FORMATTER(Namespace, Mask)
+#define PONY_ENUM_VALUE_MASK_FEATURES(Value, Mask) PONY_ENUM_MASK_FEATURES(Mask) PONY_ENUM_VALUE_MASK(Value, Mask)

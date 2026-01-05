@@ -23,7 +23,7 @@ export namespace PonyEngine::Log
 	/// @brief Logger context.
 	class ILoggerContext
 	{
-		INTERFACE_BODY(ILoggerContext)
+		PONY_INTERFACE_BODY(ILoggerContext)
 
 		/// @brief Gets the application context.
 		/// @return Application context.

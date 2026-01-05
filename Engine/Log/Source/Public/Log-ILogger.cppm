@@ -22,7 +22,7 @@ export namespace PonyEngine::Log
 	/// @brief Logger.
 	class ILogger
 	{
-		INTERFACE_BODY(ILogger)
+		PONY_INTERFACE_BODY(ILogger)
 
 		/// @brief Logs a message.
 		/// @param logType Log type.

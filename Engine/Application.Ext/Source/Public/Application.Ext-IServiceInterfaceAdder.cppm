@@ -20,7 +20,7 @@ export namespace PonyEngine::Application
 	/// @brief Service interface adder.
 	class IServiceInterfaceAdder
 	{
-		INTERFACE_BODY(IServiceInterfaceAdder)
+		PONY_INTERFACE_BODY(IServiceInterfaceAdder)
 
 		/// @brief Adds an interface.
 		/// @param type Interface type.

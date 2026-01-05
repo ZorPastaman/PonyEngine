@@ -15,12 +15,13 @@ export module PonyEngine.RenderDevice.Ext:IRenderDeviceContext;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
+import PonyEngine.RenderDevice;
 
 export namespace PonyEngine::Render
 {
 	class IRenderDeviceContext
 	{
-		INTERFACE_BODY(IRenderDeviceContext)
+		PONY_INTERFACE_BODY(IRenderDeviceContext)
 
 		/// @brief Gets the application context.
 		/// @return Application context.
@@ -39,5 +40,12 @@ export namespace PonyEngine::Render
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
+
+		[[nodiscard("Wierd call")]]
+		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::string_view TextureFormat(struct TextureFormatId textureFormatId) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept = 0;
 	};
 }
