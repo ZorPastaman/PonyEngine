@@ -7,16 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice;
+export module PonyEngine.RenderDevice:TextureSupportResponse;
 
-export import :IRenderDeviceService;
-export import :RenderAPI;
-export import :SampleCount;
-export import :TextureCreateInfo;
-export import :TextureDimension;
-export import :TextureFormat;
-export import :TextureFormatFeature;
-export import :TextureFormatId;
-export import :TextureSupportRequest;
-export import :TextureSupportResponse;
-export import :TextureUsage;
+import std;
+
+import PonyEngine.Math;
+
+import :SampleCount;
+
+export namespace PonyEngine::Render
+{
+	struct TextureSupportResponse final
+	{
+		Math::Vector3<std::uint32_t> maxSize = Math::Vector3<std::uint32_t>(0u);
+		std::uint32_t maxArraySize = 0u;
+		SampleCountMask sampleCounts = SampleCountMask::None;
+		bool supported = false;
+	};
+}

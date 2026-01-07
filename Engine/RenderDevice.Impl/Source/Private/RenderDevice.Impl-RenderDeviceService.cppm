@@ -66,7 +66,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]] 
 		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual TextureFormatFeature SupportedFeatures(struct TextureFormatId textureFormatId) const override;
+		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const override;
+		[[nodiscard("Pure function")]]
+		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 
 		[[nodiscard("Pure function")]] 
 		virtual Application::IApplicationContext& Application() noexcept override;
@@ -283,14 +285,24 @@ namespace PonyEngine::Render
 		return textureFormatHashMap.contains(textureFormatId);
 	}
 
-	TextureFormatFeature RenderDeviceService::SupportedFeatures(const struct TextureFormatId textureFormatId) const
+	TextureFormatFeature RenderDeviceService::TextureFormatFeatures(const struct TextureFormatId textureFormatId) const
 	{
 		if (!IsValid(textureFormatId)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid format");
 		}
 
-		return backends.Backend(activeBackendIndex).SupportedFeatures(textureFormatId);
+		return backends.Backend(activeBackendIndex).TextureFormatFeatures(textureFormatId);
+	}
+
+	TextureSupportResponse RenderDeviceService::TextureSupport(const TextureSupportRequest& request) const
+	{
+		if (!IsValid(request.format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid format");
+		}
+
+		return backends.Backend(activeBackendIndex).TextureSupport(request);
 	}
 
 	Application::IApplicationContext& RenderDeviceService::Application() noexcept

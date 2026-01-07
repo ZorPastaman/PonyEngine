@@ -7,16 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice;
+export module PonyEngine.RenderDevice:TextureDimension;
 
-export import :IRenderDeviceService;
-export import :RenderAPI;
-export import :SampleCount;
-export import :TextureCreateInfo;
-export import :TextureDimension;
-export import :TextureFormat;
-export import :TextureFormatFeature;
-export import :TextureFormatId;
-export import :TextureSupportRequest;
-export import :TextureSupportResponse;
-export import :TextureUsage;
+import std;
+
+export namespace PonyEngine::Render
+{
+	enum class TextureDimension : std::uint8_t
+	{
+		Texture1D,
+		Texture2D,
+		Texture3D,
+		TextureCube
+	};
+}

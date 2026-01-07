@@ -27,7 +27,8 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Backend.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12BackendModule.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Device.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-Utility.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Utility.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-EngineUtility.cppm"
 )
 
 message(VERBOSE "Configuring defines")

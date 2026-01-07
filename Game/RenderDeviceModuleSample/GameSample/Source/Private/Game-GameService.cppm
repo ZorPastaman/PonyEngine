@@ -51,7 +51,14 @@ namespace Game
 
 	void GameService::Begin()
 	{
-		const PonyEngine::Render::TextureFormatFeature feature = renderDevice->SupportedFeatures(renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Unorm));
+		const PonyEngine::Render::TextureFormatId format = renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Unorm);
+		const PonyEngine::Render::TextureFormatFeature feature = renderDevice->TextureFormatFeatures(format);
+		const PonyEngine::Render::TextureSupportResponse support = renderDevice->TextureSupport(PonyEngine::Render::TextureSupportRequest
+		{
+			.format = format,
+			.dimension = PonyEngine::Render::TextureDimension::Texture2D,
+			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget
+		});
 	}
 
 	void GameService::End()

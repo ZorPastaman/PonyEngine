@@ -33,6 +33,8 @@ export namespace PonyEngine::Render
 		virtual void Deactivate() = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual TextureFormatFeature SupportedFeatures(TextureFormatId textureFormatId) const = 0;
+		virtual TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 	};
 }
