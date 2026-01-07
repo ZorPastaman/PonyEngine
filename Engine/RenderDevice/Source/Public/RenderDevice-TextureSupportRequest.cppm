@@ -7,16 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice;
+export module PonyEngine.RenderDevice:TextureSupportRequest;
 
-export import :IRenderDeviceService;
-export import :RenderAPI;
-export import :SampleCount;
-export import :TextureCreateInfo;
-export import :TextureDimension;
-export import :TextureFormat;
-export import :TextureFormatFeature;
-export import :TextureFormatId;
-export import :TextureSupportRequest;
-export import :TextureSupportResponse;
-export import :TextureUsage;
+import :TextureFormatId;
+import :TextureDimension;
+import :TextureUsage;
+
+export namespace PonyEngine::Render
+{
+	struct TextureSupportRequest final
+	{
+		TextureFormatId format;
+		TextureDimension dimension = TextureDimension::Texture2D;
+		TextureUsage usage = TextureUsage::None;
+	};
+}

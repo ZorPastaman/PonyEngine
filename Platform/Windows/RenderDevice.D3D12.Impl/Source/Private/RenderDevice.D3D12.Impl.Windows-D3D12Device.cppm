@@ -21,7 +21,7 @@ import PonyEngine.Meta;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice.Ext;
 
-import :Utility;
+import :D3D12Utility;
 
 export namespace PonyEngine::Render::Windows
 {
@@ -41,6 +41,8 @@ export namespace PonyEngine::Render::Windows
 
 		[[nodiscard("Pure function")]]
 		D3D12_FEATURE_DATA_FORMAT_SUPPORT GetFormatSupport(DXGI_FORMAT format) const;
+		[[nodiscard("Pure function")]]
+		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
 
 		void SetName(std::string_view name);
 
@@ -104,6 +106,17 @@ namespace PonyEngine::Render::Windows
 		}
 
 		return formatSupport;
+	}
+
+	UINT D3D12Device::GetSampleQualityCount(const DXGI_FORMAT format, const UINT sampleCount) const
+	{
+		auto levels = D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS{.Format = format, .SampleCount = sampleCount, .Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &levels, sizeof(levels)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to check sampling support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return levels.NumQualityLevels;
 	}
 
 	void D3D12Device::SetName(const std::string_view name)

@@ -17,8 +17,10 @@ import std;
 
 import PonyEngine.Meta;
 
-import :TextureFormatId;
 import :TextureFormatFeature;
+import :TextureFormatId;
+import :TextureSupportRequest;
+import :TextureSupportResponse;
 
 export namespace PonyEngine::Render
 {
@@ -45,6 +47,8 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual TextureFormatFeature SupportedFeatures(struct TextureFormatId textureFormatId) const = 0;
+		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 	};
 }

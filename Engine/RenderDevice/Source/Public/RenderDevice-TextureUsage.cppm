@@ -7,16 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice;
+module;
 
-export import :IRenderDeviceService;
-export import :RenderAPI;
-export import :SampleCount;
-export import :TextureCreateInfo;
-export import :TextureDimension;
-export import :TextureFormat;
-export import :TextureFormatFeature;
-export import :TextureFormatId;
-export import :TextureSupportRequest;
-export import :TextureSupportResponse;
-export import :TextureUsage;
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:TextureUsage;
+
+import std;
+
+export namespace PonyEngine::Render
+{
+	enum class TextureUsage : std::uint8_t
+	{
+		None = 0,
+		ShaderResource = 1 << 0,
+		RenderTarget = 1 << 1,
+		DepthStencil = 1 << 2,
+		UnorderedAccess = 1 << 3,
+		CopySource = 1 << 4,
+		CopyDestination = 1 << 5,
+		All = (1 << 6) - 1
+	};
+
+	PONY_ENUM_MASK_FEATURES(TextureUsage)
+}
