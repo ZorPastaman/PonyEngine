@@ -38,7 +38,9 @@ export namespace PonyEngine::Render
 		UnorderedAccessAtomicUnsignedMinMax = 1 << 15,
 		UnorderedAccessLoad = 1 << 16,
 		UnorderedAccessStore = 1 << 17,
-		All = (1 << 18) - 1
+		SwapChain = 1 << 18,
+		SRGB = 1 << 19,
+		All = (1 << 20) - 1
 	};
 
 	PONY_ENUM_MASK_FEATURES(TextureFormatFeature)

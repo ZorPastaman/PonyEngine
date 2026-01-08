@@ -20,6 +20,8 @@ import PonyEngine.RenderDevice;
 export namespace PonyEngine::Render::Windows
 {
 	[[nodiscard("Pure function")]]
+	DXGI_FORMAT GetSrgbFormat(DXGI_FORMAT format) noexcept;
+	[[nodiscard("Pure function")]]
 	bool IsDepthStencilFormat(DXGI_FORMAT format) noexcept;
 	[[nodiscard("Pure function")]]
 	DXGI_FORMAT GetDepthViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
@@ -34,6 +36,29 @@ export namespace PonyEngine::Render::Windows
 
 namespace PonyEngine::Render::Windows
 {
+	DXGI_FORMAT GetSrgbFormat(const DXGI_FORMAT format) noexcept
+	{
+		switch (format)
+		{
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+			return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		case DXGI_FORMAT_B8G8R8A8_UNORM:
+			return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+		case DXGI_FORMAT_B8G8R8X8_UNORM:
+			return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+		case DXGI_FORMAT_BC1_UNORM:
+			return DXGI_FORMAT_BC1_UNORM_SRGB;
+		case DXGI_FORMAT_BC2_UNORM:
+			return DXGI_FORMAT_BC2_UNORM_SRGB;
+		case DXGI_FORMAT_BC3_UNORM:
+			return DXGI_FORMAT_BC3_UNORM_SRGB;
+		case DXGI_FORMAT_BC7_UNORM:
+			return DXGI_FORMAT_BC7_UNORM_SRGB;
+		default:
+			return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+
 	bool IsDepthStencilFormat(const DXGI_FORMAT format) noexcept
 	{
 		return format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT || format == DXGI_FORMAT_D32_FLOAT ||

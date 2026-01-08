@@ -18,6 +18,8 @@ import std;
 
 import PonyEngine.RenderDevice;
 
+import :D3D12Utility;
+
 export namespace PonyEngine::Render::Windows
 {
 	[[nodiscard("Pure function")]]
@@ -192,6 +194,14 @@ namespace PonyEngine::Render::Windows
 		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE)
 		{
 			features |= TextureFormatFeature::UnorderedAccessStore;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DISPLAY)
+		{
+			features |= TextureFormatFeature::SwapChain;
+		}
+		if (GetSrgbFormat(support.Format) != DXGI_FORMAT_UNKNOWN)
+		{
+			features |= TextureFormatFeature::SRGB;
 		}
 
 		return features;

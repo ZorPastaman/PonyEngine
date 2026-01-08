@@ -40,6 +40,11 @@ export namespace PonyEngine::Render::Windows
 		~D3D12Device() noexcept;
 
 		[[nodiscard("Pure function")]]
+		ID3D12Device14& Device() noexcept;
+		[[nodiscard("Pure function")]]
+		const ID3D12Device14& Device() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		D3D12_FEATURE_DATA_FORMAT_SUPPORT GetFormatSupport(DXGI_FORMAT format) const;
 		[[nodiscard("Pure function")]]
 		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
@@ -95,6 +100,16 @@ namespace PonyEngine::Render::Windows
 		debug.Reset();
 		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface done.");
 #endif
+	}
+
+	ID3D12Device14& D3D12Device::Device() noexcept
+	{
+		return *device;
+	}
+
+	const ID3D12Device14& D3D12Device::Device() const noexcept
+	{
+		return *device;
 	}
 
 	D3D12_FEATURE_DATA_FORMAT_SUPPORT D3D12Device::GetFormatSupport(const DXGI_FORMAT format) const

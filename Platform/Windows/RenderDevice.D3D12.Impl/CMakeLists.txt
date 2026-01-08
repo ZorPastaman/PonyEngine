@@ -26,7 +26,12 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-DXGITextureFormatMap.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Backend.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12BackendModule.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12CommandQueue.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12ComputeCommandQueue.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12CopyCommandQueue.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Device.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Engine.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12GraphicsCommandQueue.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Utility.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-EngineUtility.cppm"
 )
@@ -44,6 +49,9 @@ endif()
 if(NOT TARGET PonyEngine.RenderDevice.Ext)
 	message(FATAL_ERROR "PonyEngine.RenderDevice.Ext wasn't configured")
 endif()
+if(NOT TARGET PonyEngine.Surface)
+	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
+endif()
 target_link_libraries(PonyEngine.RenderDevice.D3D12.Impl PUBLIC
 	PonyEngine.Application.Ext
 )
@@ -52,6 +60,7 @@ target_link_libraries(PonyEngine.RenderDevice.D3D12.Impl PRIVATE
 	PonyEngine.RenderDevice.Ext
 	PonyEngine.Core
 	PonyEngine.Log
+	PonyEngine.Surface
 )
 target_link_libraries(PonyEngine.RenderDevice.D3D12.Impl PRIVATE
 	d3d12.lib
