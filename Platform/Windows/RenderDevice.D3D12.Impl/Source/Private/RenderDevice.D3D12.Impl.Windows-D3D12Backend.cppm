@@ -11,6 +11,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Backend;
 
 import std;
 
+import PonyEngine.Meta;
 import PonyEngine.RenderDevice.Ext;
 
 import :D3D12Engine;
@@ -35,10 +36,22 @@ export namespace PonyEngine::Render::Windows
 		virtual void Activate() override;
 		virtual void Deactivate() override;
 
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo) override;
+
 		[[nodiscard("Pure function")]] 
 		virtual TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]] 
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo) override;
+
+		[[nodiscard("Pure function")]] 
+		virtual IGraphicsCommandQueue& GraphicsCommandQueue() noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual IComputeCommandQueue& ComputeCommandQueue() noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual ICopyCommandQueue& CopyCommandQueue() noexcept override;
 
 		D3D12Backend& operator =(const D3D12Backend&) = delete;
 		D3D12Backend& operator =(D3D12Backend&&) = delete;
@@ -77,6 +90,11 @@ namespace PonyEngine::Render::Windows
 		engine.reset();
 	}
 
+	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const HeapType heapType, const BufferCreateInfo& createInfo)
+	{
+		return engine->CreateBuffer(heapType, createInfo);
+	}
+
 	TextureFormatFeature D3D12Backend::TextureFormatFeatures(const TextureFormatId textureFormatId) const
 	{
 		return engine->TextureFormatFeatures(textureFormatId);
@@ -85,5 +103,25 @@ namespace PonyEngine::Render::Windows
 	TextureSupportResponse D3D12Backend::TextureSupport(const TextureSupportRequest& request) const
 	{
 		return engine->TextureSupport(request);
+	}
+
+	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureCreateInfo& createInfo)
+	{
+		return engine->CreateTexture(heapType, createInfo);
+	}
+
+	IGraphicsCommandQueue& D3D12Backend::GraphicsCommandQueue() noexcept
+	{
+		return engine->GraphicsCommandQueue();
+	}
+
+	IComputeCommandQueue& D3D12Backend::ComputeCommandQueue() noexcept
+	{
+		return engine->ComputeCommandQueue();
+	}
+
+	ICopyCommandQueue& D3D12Backend::CopyCommandQueue() noexcept
+	{
+		return engine->CopyCommandQueue();
 	}
 }

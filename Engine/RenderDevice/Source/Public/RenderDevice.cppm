@@ -9,7 +9,18 @@
 
 export module PonyEngine.RenderDevice;
 
+export import :BufferCreateInfo;
+export import :BufferUsage;
+export import :ClearValue;
+export import :DepthStencil;
+export import :HeapType;
+export import :IBuffer;
+export import :IComputeCommandQueue;
+export import :ICopyCommandQueue;
+export import :IGraphicsCommandQueue;
 export import :IRenderDeviceService;
+export import :ITexture;
+export import :Layout;
 export import :RenderAPI;
 export import :SampleCount;
 export import :TextureCreateInfo;

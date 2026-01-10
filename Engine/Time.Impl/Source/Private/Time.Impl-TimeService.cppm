@@ -7,11 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyEngine/Log/Log.h"
+
 export module PonyEngine.Time.Impl:TimeService;
 
 import std;
 
 import PonyEngine.Application.Ext;
+import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Time;
 
@@ -23,7 +28,7 @@ export namespace PonyEngine::Time
 	public:
 		/// @brief Creates a time service.
 		[[nodiscard("Pure constructor")]]
-		TimeService() noexcept;
+		explicit TimeService(Application::IApplicationContext& application) noexcept;
 		TimeService(const TimeService&) = delete;
 		TimeService(TimeService&&) = delete;
 
@@ -103,6 +108,8 @@ export namespace PonyEngine::Time
 		/// @param now Now time point.
 		void UpdateTimes(std::chrono::time_point<std::chrono::steady_clock> now) noexcept;
 
+		Application::IApplicationContext* application;
+
 		std::chrono::nanoseconds deltaTimeCap; ///< Delta time cap.
 		double timeScale; ///< Time scale.
 		std::chrono::nanoseconds framePeriod; ///< Frame period.
@@ -136,7 +143,8 @@ export namespace PonyEngine::Time
 
 namespace PonyEngine::Time
 {
-	TimeService::TimeService() noexcept :
+	TimeService::TimeService(Application::IApplicationContext& application) noexcept :
+		application{&application},
 		deltaTimeCap(std::chrono::seconds(1)),
 		timeScale{1.},
 		framePeriod(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(1. / 60.))),
@@ -264,6 +272,7 @@ namespace PonyEngine::Time
 		}
 
 		deltaTimeCap = cap;
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Delta time cap changed to '{}'.", deltaTimeCap);
 	}
 
 	double TimeService::TimeScale() const noexcept
@@ -279,6 +288,7 @@ namespace PonyEngine::Time
 		}
 
 		timeScale = scale;
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Time scale changed to '{}'.", timeScale);
 	}
 
 	std::chrono::nanoseconds TimeService::FramePeriod() const noexcept
@@ -294,6 +304,7 @@ namespace PonyEngine::Time
 		}
 
 		framePeriod = period;
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Frame period changed to '{}'.", framePeriod);
 	}
 
 	std::chrono::nanoseconds TimeService::TargetFrameTime() const noexcept
@@ -304,6 +315,7 @@ namespace PonyEngine::Time
 	void TimeService::TargetFrameTime(const std::chrono::nanoseconds frameTime) noexcept
 	{
 		targetFrameTime = frameTime;
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Target frame time changed to '{}'.", targetFrameTime);
 	}
 
 	std::chrono::time_point<std::chrono::steady_clock> TimeService::StartTimePoint() const noexcept

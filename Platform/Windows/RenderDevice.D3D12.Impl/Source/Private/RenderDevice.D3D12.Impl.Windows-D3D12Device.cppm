@@ -49,6 +49,12 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Pure function")]]
 		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
 
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12Resource2> CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, D3D12_HEAP_FLAGS heapFlags, 
+			const D3D12_RESOURCE_DESC1& resourceDesc, D3D12_BARRIER_LAYOUT initialLayout = D3D12_BARRIER_LAYOUT_UNDEFINED,
+			const D3D12_CLEAR_VALUE& clearValue = D3D12_CLEAR_VALUE{.Format = DXGI_FORMAT_UNKNOWN}, 
+			std::span<const DXGI_FORMAT> castableFormats = std::span<const DXGI_FORMAT>());
+
 		void SetName(std::string_view name);
 
 		D3D12Device& operator =(const D3D12Device&) = delete;
@@ -132,6 +138,21 @@ namespace PonyEngine::Render::Windows
 		}
 
 		return levels.NumQualityLevels;
+	}
+
+	Platform::Windows::ComPtr<ID3D12Resource2> D3D12Device::CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, const D3D12_HEAP_FLAGS heapFlags, 
+		const D3D12_RESOURCE_DESC1& resourceDesc, const D3D12_BARRIER_LAYOUT initialLayout, const D3D12_CLEAR_VALUE& clearValue,
+		const std::span<const DXGI_FORMAT> castableFormats)
+	{
+		Platform::Windows::ComPtr<ID3D12Resource2> resource;
+		if (const HRESULT result = device->CreateCommittedResource3(&heapProperties, heapFlags, &resourceDesc, initialLayout, 
+			clearValue.Format != DXGI_FORMAT_UNKNOWN ? &clearValue : nullptr, nullptr, 
+			static_cast<UINT32>(castableFormats.size()), castableFormats.data(), IID_PPV_ARGS(resource.GetAddress())); FAILED(result))
+		{
+			throw std::runtime_error(std::format("Failed to create resource: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return resource;
 	}
 
 	void D3D12Device::SetName(const std::string_view name)

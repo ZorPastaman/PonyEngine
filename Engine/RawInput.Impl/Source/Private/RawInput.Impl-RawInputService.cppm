@@ -697,6 +697,7 @@ export namespace PonyEngine::Input
 				},
 				[&](const ConnectionEvent& connectionEvent)
 				{
+					PONY_LOG(application->Logger(), Log::LogType::Debug, "Connection status of device '0x{:X}' changed to '{}'.", device.id, connectionEvent.isConnected);
 					devices.IsConnected(devices.IndexOf(device), connectionEvent.isConnected);
 					ObserveConnection(device, connectionEvent);
 				}
