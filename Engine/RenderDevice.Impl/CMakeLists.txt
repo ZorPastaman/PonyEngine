@@ -21,7 +21,6 @@ target_sources(PonyEngine.RenderDevice.Impl PRIVATE
 target_sources(PonyEngine.RenderDevice.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/RenderDevice.Impl.cppm"
 	"Source/Private/RenderDevice.Impl-BackendContainer.cppm"
-	"Source/Private/RenderDevice.Impl-EmptyBackend.cppm"
 	"Source/Private/RenderDevice.Impl-RenderDeviceService.cppm"
 	"Source/Private/RenderDevice.Impl-RenderDeviceServiceModule.cppm"
 )

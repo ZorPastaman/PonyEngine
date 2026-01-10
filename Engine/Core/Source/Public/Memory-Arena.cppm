@@ -32,7 +32,7 @@ export namespace PonyEngine::Memory
 		/// @brief Size marker that can be used to free an arena to this point.
 		struct Marker final
 		{
-			std::size_t index; ///< Marker index. Only an arena may use it.
+			std::size_t index = 0uz; ///< Marker index. Only an arena may use it.
 		};
 		/// @brief Data slice.
 		/// @tparam T Data type.
@@ -41,8 +41,8 @@ export namespace PonyEngine::Memory
 		template<ArenaCompatible T>
 		struct Slice final
 		{
-			std::size_t byteOffset; ///< Offset in bytes.
-			std::size_t objectCount; ///< Count of objects of type @p T.
+			std::size_t byteOffset = 0uz; ///< Offset in bytes.
+			std::size_t objectCount = 0uz; ///< Count of objects of type @p T.
 		};
 
 		/// @brief Creates an arena.
@@ -304,10 +304,14 @@ namespace PonyEngine::Memory
 
 	Arena::Slice<std::byte> Arena::AllocateRaw(const std::size_t alignment, const std::size_t size, const std::size_t count)
 	{
-		const std::size_t offset = Math::Align(this->size, alignment);
 		const std::size_t byteCount = size * count;
-		const std::size_t newSize = offset + byteCount;
+		if (byteCount == 0uz)
+		{
+			return Slice<std::byte>{};
+		}
 
+		const std::size_t offset = Math::Align(this->size, alignment);
+		const std::size_t newSize = offset + byteCount;
 		if (newSize > capacity)
 		{
 			Reserve(std::bit_ceil(newSize));

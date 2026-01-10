@@ -9,23 +9,23 @@
 
 module;
 
-#include "PonyEngine/Type/Enum.h"
+#include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.RenderDevice:TextureUsage;
+export module PonyEngine.RenderDevice:IBuffer;
 
 import std;
 
+import :BufferUsage;
+
 export namespace PonyEngine::Render
 {
-	enum class TextureUsage : std::uint8_t
+	class IBuffer
 	{
-		None = 0,
-		ShaderResource = 1 << 0,
-		RenderTarget = 1 << 1,
-		DepthStencil = 1 << 2,
-		UnorderedAccess = 1 << 3,
-		All = (1 << 4) - 1
-	};
+		PONY_INTERFACE_BODY(IBuffer)
 
-	PONY_ENUM_MASK_FEATURES(TextureUsage)
+		[[nodiscard("Pure function")]]
+		virtual std::uint64_t Size() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual BufferUsage Usage() const noexcept = 0;
+	};
 }

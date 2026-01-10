@@ -41,7 +41,11 @@ namespace Game
 	{
 		if (renderDevice->BackendCount() > 0uz)
 		{
-			renderDevice->SwitchBackend(1uz);
+			renderDevice->SwitchBackend(0uz);
+		}
+		else
+		{
+			throw std::logic_error("No backend");
 		}
 	}
 
@@ -58,6 +62,18 @@ namespace Game
 			.format = format,
 			.dimension = PonyEngine::Render::TextureDimension::Texture2D,
 			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget
+		});
+
+		const std::shared_ptr<PonyEngine::Render::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::Render::HeapType::Default, PonyEngine::Render::BufferCreateInfo
+		{
+			.size = 1024ull,
+			.usage = PonyEngine::Render::BufferUsage::ShaderResource
+		});
+
+		const std::shared_ptr<PonyEngine::Render::ITexture> texture = renderDevice->CreateTexture(PonyEngine::Render::HeapType::Default, PonyEngine::Render::TextureCreateInfo
+		{
+			.format = format,
+			.size = PonyEngine::Math::Vector3<std::uint32_t>(1024u, 1024u, 1u),
 		});
 	}
 

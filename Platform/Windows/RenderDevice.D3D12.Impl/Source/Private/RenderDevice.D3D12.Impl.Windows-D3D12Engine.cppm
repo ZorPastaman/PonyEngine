@@ -16,14 +16,18 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Engine;
 
 import std;
 
+import PonyEngine.Memory;
+import PonyEngine.Meta;
 import PonyEngine.RenderDevice.Ext;
 
 import :DXGIFactory;
 import :DXGITextureFormatMap;
+import :D3D12Buffer;
 import :D3D12ComputeCommandQueue;
 import :D3D12CopyCommandQueue;
 import :D3D12Device;
 import :D3D12GraphicsCommandQueue;
+import :D3D12Texture;
 import :D3D12Utility;
 import :EngineUtility;
 
@@ -43,15 +47,29 @@ export namespace PonyEngine::Render::Windows
 		~D3D12Engine() noexcept = default;
 
 		[[nodiscard("Pure function")]]
+		std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo);
+
+		[[nodiscard("Pure function")]]
 		TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const;
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo);
+
+		[[nodiscard("Pure function")]]
+		IGraphicsCommandQueue& GraphicsCommandQueue() noexcept;
+		[[nodiscard("Pure function")]]
+		IComputeCommandQueue& ComputeCommandQueue() noexcept;
+		[[nodiscard("Pure function")]]
+		ICopyCommandQueue& CopyCommandQueue() noexcept;
 
 		D3D12Engine& operator =(const D3D12Engine&) = delete;
 		D3D12Engine& operator =(D3D12Engine&&) = delete;
 
 	private:
 		IRenderDeviceContext* renderDevice;
+
+		Memory::Arena arena;
 
 		DXGITextureFormatMap textureFormatMap;
 
@@ -68,6 +86,7 @@ namespace PonyEngine::Render::Windows
 {
 	D3D12Engine::D3D12Engine(IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice},
+		arena(64uz, 64uz),
 		textureFormatMap(*this->renderDevice),
 		factory(*this->renderDevice),
 		device(*this->renderDevice),
@@ -77,6 +96,16 @@ namespace PonyEngine::Render::Windows
 	{
 	}
 
+	std::shared_ptr<IBuffer> D3D12Engine::CreateBuffer(const HeapType heapType, const BufferCreateInfo& createInfo)
+	{
+		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapType);
+		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(createInfo.usage);
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(createInfo);
+		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
+
+		return std::make_shared<D3D12Buffer>(std::move(resource), createInfo.size, createInfo.usage);
+	}
+
 	TextureFormatFeature D3D12Engine::TextureFormatFeatures(const TextureFormatId textureFormatId) const
 	{
 		if (const std::size_t index = textureFormatMap.IndexOf(textureFormatId); index < textureFormatMap.Size())
@@ -84,7 +113,7 @@ namespace PonyEngine::Render::Windows
 			const DXGI_FORMAT format = textureFormatMap.DXGIFormat(index);
 			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
 
-			return FormatSupportToTextureFormatFeature(formatSupport);
+			return ToTextureFormatFeature(formatSupport);
 		}
 
 		return TextureFormatFeature::None;
@@ -169,5 +198,108 @@ namespace PonyEngine::Render::Windows
 		}
 
 		return TextureSupportResponse{};
+	}
+
+	std::shared_ptr<ITexture> D3D12Engine::CreateTexture(const HeapType heapType, const TextureCreateInfo& createInfo)
+	{
+		switch (createInfo.dimension)
+		{
+		case TextureDimension::Texture1D:
+			if (createInfo.size.Y() != 1u || createInfo.size.Z() != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+			break;
+		case TextureDimension::Texture2D:
+			if (createInfo.size.Z() != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+			break;
+		case TextureDimension::Texture3D:
+			if (createInfo.arraySize != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid array size");
+			}
+			break;
+		case TextureDimension::TextureCube:
+			if (createInfo.size.Z() != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+			if (createInfo.arraySize > D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION / 6) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid array size");
+			}
+			break;
+		}
+
+		const std::size_t formatIndex = textureFormatMap.IndexOf(createInfo.format);
+		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture format");
+		}
+		const DXGI_FORMAT format = textureFormatMap.DXGIFormat(formatIndex);
+
+		arena.Free();
+		auto castableFormats = Memory::Arena::Slice<DXGI_FORMAT>{};
+		if (IsDepthStencilFormat(format))
+		{
+			if (createInfo.castableFormats.size() > 0uz) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid castable texture format");
+			}
+
+			if (Any(TextureUsage::ShaderResource, createInfo.usage))
+			{
+				const DXGI_FORMAT depthFormat = GetDepthViewFormat(format);
+				const DXGI_FORMAT stencilFormat = GetStencilViewFormat(format);
+				castableFormats = arena.Allocate<DXGI_FORMAT>(1uz + (stencilFormat != DXGI_FORMAT_UNKNOWN));
+				const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
+				formats[stencilFormat != DXGI_FORMAT_UNKNOWN] = stencilFormat;
+				formats[0] = depthFormat;
+			}
+		}
+		else
+		{
+			castableFormats = arena.Allocate<DXGI_FORMAT>(createInfo.castableFormats.size());
+			const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
+			for (std::size_t i = 0uz; i < formats.size(); ++i)
+			{
+				const std::size_t castableFormatIndex = textureFormatMap.IndexOf(createInfo.castableFormats[i]);
+				if (castableFormatIndex >= textureFormatMap.Size()) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid texture format");
+				}
+
+				formats[i] = textureFormatMap.DXGIFormat(castableFormatIndex);
+			}
+		}
+
+		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapType);
+		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(createInfo.usage);
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(createInfo, format);
+		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(createInfo.initialLayout);
+		const D3D12_CLEAR_VALUE clearValue = ToClearValue(createInfo.clearValue, format);
+		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
+			resourceDesc, initialLayout, clearValue, arena.Span(castableFormats));
+
+		return std::make_shared<D3D12Texture>(std::move(resource), createInfo.format, createInfo.castableFormats, 
+			createInfo.size, createInfo.mipCount, createInfo.arraySize, createInfo.dimension, createInfo.sampleCount, createInfo.usage);
+	}
+
+	IGraphicsCommandQueue& D3D12Engine::GraphicsCommandQueue() noexcept
+	{
+		return graphicsCommandQueue;
+	}
+
+	IComputeCommandQueue& D3D12Engine::ComputeCommandQueue() noexcept
+	{
+		return computeCommandQueue;
+	}
+
+	ICopyCommandQueue& D3D12Engine::CopyCommandQueue() noexcept
+	{
+		return copyCommandQueue;
 	}
 }

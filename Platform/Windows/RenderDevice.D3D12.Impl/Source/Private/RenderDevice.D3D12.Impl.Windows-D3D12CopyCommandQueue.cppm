@@ -14,11 +14,13 @@ module;
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12CopyCommandQueue;
 
+import PonyEngine.RenderDevice;
+
 import :D3D12CommandQueue;
 
 export namespace PonyEngine::Render::Windows
 {
-	class D3D12CopyCommandQueue final : public D3D12CommandQueue
+	class D3D12CopyCommandQueue final : public D3D12CommandQueue, public ICopyCommandQueue
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

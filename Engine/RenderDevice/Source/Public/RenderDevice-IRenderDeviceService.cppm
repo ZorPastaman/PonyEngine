@@ -17,6 +17,14 @@ import std;
 
 import PonyEngine.Meta;
 
+import :BufferCreateInfo;
+import :IBuffer;
+import :IComputeCommandQueue;
+import :ICopyCommandQueue;
+import :IGraphicsCommandQueue;
+import :ITexture;
+import :HeapType;
+import :TextureCreateInfo;
 import :TextureFormatFeature;
 import :TextureFormatId;
 import :TextureSupportRequest;
@@ -28,8 +36,6 @@ export namespace PonyEngine::Render
 	{
 		PONY_INTERFACE_BODY(IRenderDeviceService)
 
-		static constexpr std::size_t EmptyBackendIndex = 0uz;
-
 		[[nodiscard("Pure function")]]
 		virtual std::size_t BackendCount() const noexcept = 0;
 		[[nodiscard("Pure function")]]
@@ -37,8 +43,11 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::size_t ActiveBackend() const noexcept = 0;
-		virtual void SwitchBackend(std::size_t backendIndex) = 0;
+		virtual std::optional<std::size_t> ActiveBackend() const noexcept = 0;
+		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) = 0;
+
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) = 0;
@@ -50,5 +59,20 @@ export namespace PonyEngine::Render
 		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo) = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual IGraphicsCommandQueue& GraphicsCommandQueue() = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IGraphicsCommandQueue& GraphicsCommandQueue() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual IComputeCommandQueue& ComputeCommandQueue() = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IComputeCommandQueue& ComputeCommandQueue() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual ICopyCommandQueue& CopyCommandQueue() = 0;
+		[[nodiscard("Pure function")]]
+		virtual const ICopyCommandQueue& CopyCommandQueue() const = 0;
 	};
 }

@@ -22,7 +22,6 @@ import PonyEngine.Meta;
 import PonyEngine.RenderDevice.Ext;
 
 import :BackendContainer;
-import :EmptyBackend;
 
 export namespace PonyEngine::Render
 {
@@ -30,7 +29,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit RenderDeviceService(Application::IApplicationContext& application);
+		explicit RenderDeviceService(Application::IApplicationContext& application) noexcept;
 		RenderDeviceService(const RenderDeviceService&) = delete;
 		RenderDeviceService(RenderDeviceService&&) = delete;
 
@@ -56,8 +55,11 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]] 
 		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const override;
 		[[nodiscard("Pure function")]] 
-		virtual std::size_t ActiveBackend() const noexcept override;
-		virtual void SwitchBackend(std::size_t backendIndex) override;
+		virtual std::optional<std::size_t> ActiveBackend() const noexcept override;
+		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) override;
+
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo) override;
 
 		[[nodiscard("Wierd call")]] 
 		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) override;
@@ -69,6 +71,21 @@ export namespace PonyEngine::Render
 		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo) override;
+
+		[[nodiscard("Pure function")]] 
+		virtual IGraphicsCommandQueue& GraphicsCommandQueue() override;
+		[[nodiscard("Pure function")]] 
+		virtual const IGraphicsCommandQueue& GraphicsCommandQueue() const override;
+		[[nodiscard("Pure function")]] 
+		virtual IComputeCommandQueue& ComputeCommandQueue() override;
+		[[nodiscard("Pure function")]] 
+		virtual const IComputeCommandQueue& ComputeCommandQueue() const override;
+		[[nodiscard("Pure function")]] 
+		virtual ICopyCommandQueue& CopyCommandQueue() override;
+		[[nodiscard("Pure function")]] 
+		virtual const ICopyCommandQueue& CopyCommandQueue() const override;
 
 		[[nodiscard("Pure function")]] 
 		virtual Application::IApplicationContext& Application() noexcept override;
@@ -79,16 +96,13 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]] 
 		virtual const Log::ILogger& Logger() const noexcept override;
 
-		BackendHandle AddBackend(const std::shared_ptr<IBackend>& backend);
-		void RemoveBackend(std::size_t index) noexcept;
-
 		void ActivateBackend(std::size_t index);
 		void DeactivateBackend(std::size_t index);
 
 		Application::IApplicationContext* application;
 
 		BackendContainer backends;
-		std::size_t activeBackendIndex;
+		std::optional<std::size_t> activeBackendIndex;
 
 		std::unordered_map<struct TextureFormatId, std::string> textureFormatHashMap;
 
@@ -98,25 +112,18 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	RenderDeviceService::RenderDeviceService(Application::IApplicationContext& application) :
+	RenderDeviceService::RenderDeviceService(Application::IApplicationContext& application) noexcept :
 		application{&application},
-		activeBackendIndex{0uz},
 		nextBackendHandle{.id = 1u}
 	{
-		PONY_LOG(application.Logger(), Log::LogType::Info, "Creating '{}' backend...", typeid(EmptyBackend).name());
-		const auto emptyBackend = std::make_shared<EmptyBackend>();
-		PONY_LOG(application.Logger(), Log::LogType::Info, "Creating '{}' backend done.", typeid(EmptyBackend).name());
-		AddBackend(emptyBackend);
 	}
 
 	RenderDeviceService::~RenderDeviceService() noexcept
 	{
-		if (activeBackendIndex != 0uz)
+		if (activeBackendIndex)
 		{
-			DeactivateBackend(activeBackendIndex);
+			DeactivateBackend(*activeBackendIndex);
 		}
-		
-		RemoveBackend(0uz);
 
 		if (backends.Size() > 0uz) [[unlikely]]
 		{
@@ -162,7 +169,12 @@ namespace PonyEngine::Render
 			throw std::invalid_argument("Backend has already been added");
 		}
 
-		return AddBackend(backend);
+		const BackendHandle currentHandle = nextBackendHandle;
+		backends.Add(currentHandle, backend);
+		++nextBackendHandle.id;
+		PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' backend added. Handle: '0x{:X}'.", typeid(*backend).name(), currentHandle.id);
+
+		return currentHandle;
 	}
 
 	void RenderDeviceService::RemoveBackend(const BackendHandle backendHandle)
@@ -176,10 +188,12 @@ namespace PonyEngine::Render
 		{
 			if (index == activeBackendIndex)
 			{
-				SwitchBackend(0uz);
+				SwitchBackend(std::nullopt);
 			}
 
-			RemoveBackend(index);
+			const char* const backendName = typeid(backends.Backend(index)).name();
+			backends.Remove(index);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' backend removed. Handle: '0x{:X}'.", backendName, backendHandle.id);
 		}
 		else [[unlikely]]
 		{
@@ -212,42 +226,57 @@ namespace PonyEngine::Render
 		return backends.Backend(backendIndex).RenderApiVersion();
 	}
 
-	std::size_t RenderDeviceService::ActiveBackend() const noexcept
+	std::optional<std::size_t> RenderDeviceService::ActiveBackend() const noexcept
 	{
 		return activeBackendIndex;
 	}
 
-	void RenderDeviceService::SwitchBackend(const std::size_t backendIndex)
+	void RenderDeviceService::SwitchBackend(const std::optional<std::size_t> backendIndex)
 	{
-		if (backendIndex >= backends.Size()) [[unlikely]]
+		if (backendIndex && backendIndex >= backends.Size()) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
 		}
 
-		if (activeBackendIndex != 0uz)
+		if (activeBackendIndex)
 		{
 			try
 			{
-				DeactivateBackend(activeBackendIndex);
-				activeBackendIndex = 0uz;
+				DeactivateBackend(*activeBackendIndex);
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On deactivating '{}' backend.", typeid(backends.Backend(activeBackendIndex)).name());
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On deactivating '{}' backend.", typeid(backends.Backend(*activeBackendIndex)).name());
 				throw;
 			}
 		}
+
+		activeBackendIndex = std::nullopt;
 		
-		try
+		if (backendIndex)
 		{
-			ActivateBackend(backendIndex);
-			activeBackendIndex = backendIndex;
+			try
+			{
+				ActivateBackend(*backendIndex);
+			}
+			catch (...)
+			{
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On activating '{}' backend.", typeid(backends.Backend(*backendIndex)).name());
+				throw;
+			}
 		}
-		catch (...)
+
+		activeBackendIndex = backendIndex;
+	}
+
+	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const HeapType heapType, const BufferCreateInfo& createInfo)
+	{
+		if (!activeBackendIndex) [[unlikely]]
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On activating '{}' backend.", typeid(backends.Backend(backendIndex)).name());
-			throw;
+			throw std::logic_error("No active backend");
 		}
+
+		return backends.Backend(*activeBackendIndex).CreateBuffer(heapType, createInfo);
 	}
 
 	struct TextureFormatId RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
@@ -291,8 +320,12 @@ namespace PonyEngine::Render
 		{
 			throw std::invalid_argument("Invalid format");
 		}
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
 
-		return backends.Backend(activeBackendIndex).TextureFormatFeatures(textureFormatId);
+		return backends.Backend(*activeBackendIndex).TextureFormatFeatures(textureFormatId);
 	}
 
 	TextureSupportResponse RenderDeviceService::TextureSupport(const TextureSupportRequest& request) const
@@ -301,8 +334,82 @@ namespace PonyEngine::Render
 		{
 			throw std::invalid_argument("Invalid format");
 		}
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
 
-		return backends.Backend(activeBackendIndex).TextureSupport(request);
+		return backends.Backend(*activeBackendIndex).TextureSupport(request);
+	}
+
+	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureCreateInfo& createInfo)
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex).CreateTexture(heapType, createInfo);
+	}
+
+	IGraphicsCommandQueue& RenderDeviceService::GraphicsCommandQueue()
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex).GraphicsCommandQueue();
+	}
+
+	const IGraphicsCommandQueue& RenderDeviceService::GraphicsCommandQueue() const
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex).GraphicsCommandQueue();
+	}
+
+	IComputeCommandQueue& RenderDeviceService::ComputeCommandQueue()
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex).ComputeCommandQueue();
+	}
+
+	const IComputeCommandQueue& RenderDeviceService::ComputeCommandQueue() const
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex).ComputeCommandQueue();
+	}
+
+	ICopyCommandQueue& RenderDeviceService::CopyCommandQueue()
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex).CopyCommandQueue();
+	}
+
+	const ICopyCommandQueue& RenderDeviceService::CopyCommandQueue() const
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex).CopyCommandQueue();
 	}
 
 	Application::IApplicationContext& RenderDeviceService::Application() noexcept
@@ -323,24 +430,6 @@ namespace PonyEngine::Render
 	const Log::ILogger& RenderDeviceService::Logger() const noexcept
 	{
 		return application->Logger();
-	}
-
-	BackendHandle RenderDeviceService::AddBackend(const std::shared_ptr<IBackend>& backend)
-	{
-		const BackendHandle currentHandle = nextBackendHandle;
-		backends.Add(currentHandle, backend);
-		++nextBackendHandle.id;
-		PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' backend added. Handle: '0x{:X}'.", typeid(*backend).name(), currentHandle.id);
-
-		return currentHandle;
-	}
-
-	void RenderDeviceService::RemoveBackend(const std::size_t index) noexcept
-	{
-		const BackendHandle backendHandle = backends.Handle(index);
-		const char* const backendName = typeid(backends.Backend(index)).name();
-		backends.Remove(index);
-		PONY_LOG(application->Logger(), Log::LogType::Info, "'{}' backend removed. Handle: '0x{:X}'.", backendName, backendHandle.id);
 	}
 
 	void RenderDeviceService::ActivateBackend(const std::size_t index)

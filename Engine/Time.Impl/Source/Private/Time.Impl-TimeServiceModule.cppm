@@ -47,9 +47,9 @@ namespace PonyEngine::Time
 	void TimeServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(TimeService).name());
-		timeServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext&)
+		timeServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
 		{
-			return std::make_shared<TimeService>();
+			return std::make_shared<TimeService>(application);
 		});
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(TimeService).name());
 	}

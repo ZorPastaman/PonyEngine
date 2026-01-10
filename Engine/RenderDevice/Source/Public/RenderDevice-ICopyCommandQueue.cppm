@@ -9,23 +9,14 @@
 
 module;
 
-#include "PonyEngine/Type/Enum.h"
+#include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.RenderDevice:TextureUsage;
-
-import std;
+export module PonyEngine.RenderDevice:ICopyCommandQueue;
 
 export namespace PonyEngine::Render
 {
-	enum class TextureUsage : std::uint8_t
+	class ICopyCommandQueue
 	{
-		None = 0,
-		ShaderResource = 1 << 0,
-		RenderTarget = 1 << 1,
-		DepthStencil = 1 << 2,
-		UnorderedAccess = 1 << 3,
-		All = (1 << 4) - 1
+		PONY_INTERFACE_BODY(ICopyCommandQueue)
 	};
-
-	PONY_ENUM_MASK_FEATURES(TextureUsage)
 }

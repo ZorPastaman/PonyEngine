@@ -14,11 +14,13 @@ module;
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12GraphicsCommandQueue;
 
+import PonyEngine.RenderDevice;
+
 import :D3D12CommandQueue;
 
 export namespace PonyEngine::Render::Windows
 {
-	class D3D12GraphicsCommandQueue final : public D3D12CommandQueue
+	class D3D12GraphicsCommandQueue final : public D3D12CommandQueue, public IGraphicsCommandQueue
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
