@@ -225,14 +225,18 @@ namespace PonyEngine::Memory
 	std::span<T> Arena::Span(const Slice<T>& slice) noexcept
 	{
 		assert((slice.byteOffset + sizeof(T) * slice.objectCount <= size) && "Out of range.");
-		return std::span<T>(reinterpret_cast<T*>(&data[slice.byteOffset]), slice.objectCount);
+		return slice.objectCount > 0uz 
+			? std::span<T>(reinterpret_cast<T*>(&data[slice.byteOffset]), slice.objectCount)
+			: std::span<T>();
 	}
 
 	template<ArenaCompatible T>
 	std::span<const T> Arena::Span(const Slice<T>& slice) const noexcept
 	{
 		assert((slice.byteOffset + sizeof(T) * slice.objectCount <= size) && "Out of range.");
-		return std::span<const T>(reinterpret_cast<const T*>(&data[slice.byteOffset]), slice.objectCount);
+		return slice.objectCount > 0uz
+			? std::span<const T>(reinterpret_cast<const T*>(&data[slice.byteOffset]), slice.objectCount)
+			: std::span<const T>();
 	}
 
 	std::byte* Arena::Data() noexcept

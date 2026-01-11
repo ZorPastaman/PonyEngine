@@ -20,6 +20,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RenderDevice-Layout.cppm"
 	"Source/Public/RenderDevice-RenderAPI.cppm" 
 	"Source/Public/RenderDevice-SampleCount.cppm"
+	"Source/Public/RenderDevice-TextureCreateFlag.cppm"
 	"Source/Public/RenderDevice-TextureCreateInfo.cppm"
 	"Source/Public/RenderDevice-TextureDimension.cppm"
 	"Source/Public/RenderDevice-TextureFormat.cppm"

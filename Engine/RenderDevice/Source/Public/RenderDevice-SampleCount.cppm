@@ -26,7 +26,8 @@ export namespace PonyEngine::Render
 		X16,
 		X32,
 		X64,
-		Max = X64
+		X128,
+		Max = X128
 	};
 
 	enum class SampleCountMask : std::uint8_t
@@ -39,18 +40,19 @@ export namespace PonyEngine::Render
 		X16 = 1 << 4,
 		X32 = 1 << 5,
 		X64 = 1 << 6,
-		All = (1 << 7) - 1
+		X128 = 1 << 7,
+		All = (1 << 8) - 1
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(SampleCount, SampleCountMask)
 
 	[[nodiscard("Pure function")]]
-	std::uint8_t ToNumber(SampleCount count) noexcept;
+	constexpr std::uint8_t ToNumber(SampleCount count) noexcept;
 }
 
 namespace PonyEngine::Render
 {
-	std::uint8_t ToNumber(const SampleCount count) noexcept
+	constexpr std::uint8_t ToNumber(const SampleCount count) noexcept
 	{
 		return static_cast<std::uint8_t>(1u << std::to_underlying(count));
 	}
