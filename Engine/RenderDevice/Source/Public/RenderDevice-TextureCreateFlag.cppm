@@ -7,22 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:TextureSupportResponse;
+module;
+
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:TextureCreateFlag;
 
 import std;
 
-import PonyEngine.Math;
-
-import :SampleCount;
-
 export namespace PonyEngine::Render
 {
-	struct TextureSupportResponse final
+	enum class TextureCreateFlag : std::uint8_t
 	{
-		Math::Vector3<std::uint32_t> maxSize = Math::Vector3<std::uint32_t>(0u);
-		std::uint32_t maxMipCount = 0u;
-		std::uint32_t maxArraySize = 0u;
-		SampleCountMask sampleCounts = SampleCountMask::None;
-		bool supported = false;
+		None = 0,
+		SRGB = 1 << 0,
+		All = (1 << 1) - 1
 	};
+
+	PONY_ENUM_MASK_FEATURES(TextureCreateFlag)
 }

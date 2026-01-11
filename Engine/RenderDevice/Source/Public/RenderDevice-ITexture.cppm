@@ -44,5 +44,7 @@ export namespace PonyEngine::Render
 		virtual SampleCount SampleCount() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureUsage Usage() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual bool SRGBCompatible() const noexcept = 0;
 	};
 }

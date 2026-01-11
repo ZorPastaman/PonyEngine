@@ -16,6 +16,7 @@ import PonyEngine.Math;
 import :ClearValue;
 import :Layout;
 import :SampleCount;
+import :TextureCreateFlag;
 import :TextureFormatId;
 import :TextureDimension;
 import :TextureUsage;
@@ -34,5 +35,6 @@ export namespace PonyEngine::Render
 		SampleCount sampleCount = SampleCount::X1;
 		TextureUsage usage = TextureUsage::ShaderResource;
 		Layout initialLayout = Layout::Common;
+		TextureCreateFlag flags = TextureCreateFlag::None;
 	};
 }

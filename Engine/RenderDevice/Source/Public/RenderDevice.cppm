@@ -23,6 +23,7 @@ export import :ITexture;
 export import :Layout;
 export import :RenderAPI;
 export import :SampleCount;
+export import :TextureCreateFlag;
 export import :TextureCreateInfo;
 export import :TextureDimension;
 export import :TextureFormat;
