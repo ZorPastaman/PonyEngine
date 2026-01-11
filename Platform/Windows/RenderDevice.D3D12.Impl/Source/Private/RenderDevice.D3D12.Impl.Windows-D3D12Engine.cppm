@@ -47,14 +47,14 @@ export namespace PonyEngine::Render::Windows
 		~D3D12Engine() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo);
+		std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params);
 
 		[[nodiscard("Pure function")]]
 		TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const;
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo);
+		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params);
 
 		[[nodiscard("Pure function")]]
 		IGraphicsCommandQueue& GraphicsCommandQueue() noexcept;
@@ -72,10 +72,10 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Pure function")]]
 		SampleCountMask GetSampleCountMask(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
 
-		static void ValidateSize(const BufferCreateInfo& createInfo);
-		static void ValidateDimension(const TextureCreateInfo& createInfo);
-		static void ValidateColorTexture(const TextureCreateInfo& createInfo);
-		static void ValidateDepthTexture(const TextureCreateInfo& createInfo);
+		static void ValidateSize(const BufferParams& params);
+		static void ValidateDimension(const TextureParams& params);
+		static void ValidateColorTexture(const TextureParams& params);
+		static void ValidateDepthTexture(const TextureParams& params);
 
 		IRenderDeviceContext* renderDevice;
 
@@ -106,16 +106,16 @@ namespace PonyEngine::Render::Windows
 	{
 	}
 
-	std::shared_ptr<IBuffer> D3D12Engine::CreateBuffer(const HeapType heapType, const BufferCreateInfo& createInfo)
+	std::shared_ptr<IBuffer> D3D12Engine::CreateBuffer(const HeapType heapType, const BufferParams& params)
 	{
-		ValidateSize(createInfo);
+		ValidateSize(params);
 
 		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapType);
-		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(createInfo.usage);
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(createInfo);
+		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage);
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params);
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
 
-		return std::make_shared<D3D12Buffer>(std::move(resource), createInfo.size, createInfo.usage);
+		return std::make_shared<D3D12Buffer>(std::move(resource), static_cast<std::uint64_t>(resourceDesc.Width), params.usage);
 	}
 
 	TextureFormatFeature D3D12Engine::TextureFormatFeatures(const TextureFormatId textureFormatId) const
@@ -164,15 +164,15 @@ namespace PonyEngine::Render::Windows
 		return TextureSupportResponse{};
 	}
 
-	std::shared_ptr<ITexture> D3D12Engine::CreateTexture(const HeapType heapType, const TextureCreateInfo& createInfo)
+	std::shared_ptr<ITexture> D3D12Engine::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
-		ValidateDimension(createInfo);
-		if (!IsValidUsage(createInfo.usage))
+		ValidateDimension(params);
+		if (!IsValidUsage(params.usage))
 		{
 			throw std::invalid_argument("Invalid usage");
 		}
 
-		const std::size_t formatIndex = textureFormatMap.IndexOf(createInfo.format);
+		const std::size_t formatIndex = textureFormatMap.IndexOf(params.format);
 		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture format");
@@ -180,13 +180,13 @@ namespace PonyEngine::Render::Windows
 		DXGI_FORMAT format = textureFormatMap.DXGIFormat(formatIndex);
 
 		arena.Free();
-		const bool srgb = Any(TextureCreateFlag::SRGB, createInfo.flags);
+		const bool srgb = Any(TextureFlag::SRGB, params.flags);
 		auto castableFormats = Memory::Arena::Slice<DXGI_FORMAT>{};
 		if (IsDepthStencilFormat(format))
 		{
-			ValidateDepthTexture(createInfo);
+			ValidateDepthTexture(params);
 
-			if (Any(TextureUsage::ShaderResource, createInfo.usage))
+			if (Any(TextureUsage::ShaderResource, params.usage))
 			{
 				if (GetStencilViewFormat(format) == DXGI_FORMAT_UNKNOWN)
 				{
@@ -202,13 +202,13 @@ namespace PonyEngine::Render::Windows
 		}
 		else
 		{
-			ValidateColorTexture(createInfo);
+			ValidateColorTexture(params);
 
-			castableFormats = arena.Allocate<DXGI_FORMAT>(createInfo.castableFormats.size() + srgb);
+			castableFormats = arena.Allocate<DXGI_FORMAT>(params.castableFormats.size() + srgb);
 			const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
-			for (std::size_t i = 0uz; i < createInfo.castableFormats.size(); ++i)
+			for (std::size_t i = 0uz; i < params.castableFormats.size(); ++i)
 			{
-				const std::size_t castableFormatIndex = textureFormatMap.IndexOf(createInfo.castableFormats[i]);
+				const std::size_t castableFormatIndex = textureFormatMap.IndexOf(params.castableFormats[i]);
 				if (castableFormatIndex >= textureFormatMap.Size()) [[unlikely]]
 				{
 					throw std::invalid_argument("Invalid castable texture format");
@@ -228,16 +228,16 @@ namespace PonyEngine::Render::Windows
 		}
 
 		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapType);
-		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(createInfo.usage);
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(createInfo, format);
-		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(createInfo.initialLayout);
-		const D3D12_CLEAR_VALUE clearValue = ToClearValue(createInfo.clearValue, format);
+		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage);
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
+		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(params.initialLayout);
+		const D3D12_CLEAR_VALUE clearValue = ToClearValue(params.clearValue, format);
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
 			resourceDesc, initialLayout, clearValue, arena.Span(castableFormats));
 
-		return std::make_shared<D3D12Texture>(std::move(resource), createInfo.format, createInfo.castableFormats, 
+		return std::make_shared<D3D12Texture>(std::move(resource), params.format, params.castableFormats, 
 			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), static_cast<std::uint16_t>(resourceDesc.DepthOrArraySize),
-			static_cast<std::uint16_t>(resourceDesc.MipLevels), createInfo.dimension, createInfo.sampleCount, createInfo.usage, srgb);
+			static_cast<std::uint16_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
 	}
 
 	IGraphicsCommandQueue& D3D12Engine::GraphicsCommandQueue() noexcept
@@ -315,71 +315,71 @@ namespace PonyEngine::Render::Windows
 		return mask;
 	}
 
-	void D3D12Engine::ValidateSize(const BufferCreateInfo& createInfo)
+	void D3D12Engine::ValidateSize(const BufferParams& params)
 	{
-		if (createInfo.size == 0uz) [[unlikely]]
+		if (params.size == 0uz) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid size");
 		}
 	}
 
-	void D3D12Engine::ValidateDimension(const TextureCreateInfo& createInfo)
+	void D3D12Engine::ValidateDimension(const TextureParams& params)
 	{
-		if (createInfo.size.Min() == 0u) [[unlikely]]
+		if (params.size.Min() == 0u) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid size");
 		}
-		if (createInfo.mipCount == 0u || createInfo.mipCount > D3D12_REQ_MIP_LEVELS) [[unlikely]]
+		if (params.mipCount == 0u || params.mipCount > D3D12_REQ_MIP_LEVELS) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid mip count");
 		}
-		if (createInfo.arraySize == 0u) [[unlikely]]
+		if (params.arraySize == 0u) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid array size");
 		}
-		if (ToNumber(createInfo.sampleCount) > D3D12_MAX_MULTISAMPLE_SAMPLE_COUNT) [[unlikely]]
+		if (ToNumber(params.sampleCount) > D3D12_MAX_MULTISAMPLE_SAMPLE_COUNT) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid sample count");
 		}
 
-		switch (createInfo.dimension)
+		switch (params.dimension)
 		{
 		case TextureDimension::Texture1D:
-			if (createInfo.size.X() > D3D12_REQ_TEXTURE1D_U_DIMENSION || createInfo.size.Y() != 1u || createInfo.size.Z() != 1u) [[unlikely]]
+			if (params.size.X() > D3D12_REQ_TEXTURE1D_U_DIMENSION || params.size.Y() != 1u || params.size.Z() != 1u) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid size");
 			}
-			if (createInfo.arraySize > D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION) [[unlikely]]
+			if (params.arraySize > D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid array size");
 			}
 			break;
 		case TextureDimension::Texture2D:
-			if (createInfo.size.X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || createInfo.size.Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || createInfo.size.Z() != 1u) [[unlikely]]
+			if (params.size.X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Z() != 1u) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid size");
 			}
-			if (createInfo.arraySize > D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION) [[unlikely]]
+			if (params.arraySize > D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid array size");
 			}
 			break;
 		case TextureDimension::Texture3D:
-			if (createInfo.size.X() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION || createInfo.size.Y() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION || createInfo.size.Z() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION) [[unlikely]]
+			if (params.size.X() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION || params.size.Y() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION || params.size.Z() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid size");
 			}
-			if (createInfo.arraySize != 1u) [[unlikely]]
+			if (params.arraySize != 1u) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid array size");
 			}
 			break;
 		case TextureDimension::TextureCube:
-			if (createInfo.size.X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || createInfo.size.Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || createInfo.size.Z() != 1u) [[unlikely]]
+			if (params.size.X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Z() != 1u) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid size");
 			}
-			if (createInfo.arraySize > D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION / 6) [[unlikely]]
+			if (params.arraySize > D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION / 6) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid array size");
 			}
@@ -387,25 +387,25 @@ namespace PonyEngine::Render::Windows
 		}
 	}
 
-	void D3D12Engine::ValidateColorTexture(const TextureCreateInfo& createInfo)
+	void D3D12Engine::ValidateColorTexture(const TextureParams& params)
 	{
-		if (Any(TextureUsage::DepthStencil, createInfo.usage)) [[unlikely]]
+		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid usage");
 		}
 	}
 
-	void D3D12Engine::ValidateDepthTexture(const TextureCreateInfo& createInfo)
+	void D3D12Engine::ValidateDepthTexture(const TextureParams& params)
 	{
-		if (createInfo.castableFormats.size() > 0uz) [[unlikely]]
+		if (params.castableFormats.size() > 0uz) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid castable texture format");
 		}
-		if (Any(TextureCreateFlag::SRGB, createInfo.flags)) [[unlikely]]
+		if (Any(TextureFlag::SRGB, params.flags)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid srgb flag");
 		}
-		if (Any(TextureUsage::RenderTarget | TextureUsage::UnorderedAccess, createInfo.usage)) [[unlikely]]
+		if (Any(TextureUsage::RenderTarget | TextureUsage::UnorderedAccess, params.usage)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid usage");
 		}

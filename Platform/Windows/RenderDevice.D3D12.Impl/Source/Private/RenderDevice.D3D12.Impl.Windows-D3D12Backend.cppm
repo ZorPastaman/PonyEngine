@@ -37,14 +37,14 @@ export namespace PonyEngine::Render::Windows
 		virtual void Deactivate() override;
 
 		[[nodiscard("Wierd call")]] 
-		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo) override;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
 		[[nodiscard("Pure function")]] 
 		virtual TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]] 
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Wierd call")]] 
-		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo) override;
+		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
 		[[nodiscard("Pure function")]] 
 		virtual IGraphicsCommandQueue& GraphicsCommandQueue() noexcept override;
@@ -90,9 +90,9 @@ namespace PonyEngine::Render::Windows
 		engine.reset();
 	}
 
-	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const HeapType heapType, const BufferCreateInfo& createInfo)
+	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const HeapType heapType, const BufferParams& params)
 	{
-		return engine->CreateBuffer(heapType, createInfo);
+		return engine->CreateBuffer(heapType, params);
 	}
 
 	TextureFormatFeature D3D12Backend::TextureFormatFeatures(const TextureFormatId textureFormatId) const
@@ -105,9 +105,9 @@ namespace PonyEngine::Render::Windows
 		return engine->TextureSupport(request);
 	}
 
-	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureCreateInfo& createInfo)
+	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
-		return engine->CreateTexture(heapType, createInfo);
+		return engine->CreateTexture(heapType, params);
 	}
 
 	IGraphicsCommandQueue& D3D12Backend::GraphicsCommandQueue() noexcept

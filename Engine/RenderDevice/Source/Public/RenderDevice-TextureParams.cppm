@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:TextureCreateInfo;
+export module PonyEngine.RenderDevice:TextureParams;
 
 import std;
 
@@ -16,14 +16,14 @@ import PonyEngine.Math;
 import :ClearValue;
 import :Layout;
 import :SampleCount;
-import :TextureCreateFlag;
+import :TextureFlag;
 import :TextureFormatId;
 import :TextureDimension;
 import :TextureUsage;
 
 export namespace PonyEngine::Render
 {
-	struct TextureCreateInfo final
+	struct TextureParams final
 	{
 		TextureFormatId format;
 		std::span<const TextureFormatId> castableFormats;
@@ -35,6 +35,6 @@ export namespace PonyEngine::Render
 		SampleCount sampleCount = SampleCount::X1;
 		TextureUsage usage = TextureUsage::ShaderResource;
 		Layout initialLayout = Layout::Common;
-		TextureCreateFlag flags = TextureCreateFlag::None;
+		TextureFlag flags = TextureFlag::None;
 	};
 }

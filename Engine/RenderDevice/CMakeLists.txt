@@ -6,7 +6,7 @@ add_library(PonyEngine.RenderDevice STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RenderDevice.cppm"
-	"Source/Public/RenderDevice-BufferCreateInfo.cppm"
+	"Source/Public/RenderDevice-BufferParams.cppm"
 	"Source/Public/RenderDevice-BufferUsage.cppm"
 	"Source/Public/RenderDevice-ClearValue.cppm"
 	"Source/Public/RenderDevice-DepthStencil.cppm"
@@ -20,12 +20,12 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/RenderDevice-Layout.cppm"
 	"Source/Public/RenderDevice-RenderAPI.cppm" 
 	"Source/Public/RenderDevice-SampleCount.cppm"
-	"Source/Public/RenderDevice-TextureCreateFlag.cppm"
-	"Source/Public/RenderDevice-TextureCreateInfo.cppm"
 	"Source/Public/RenderDevice-TextureDimension.cppm"
+	"Source/Public/RenderDevice-TextureFlag.cppm"
 	"Source/Public/RenderDevice-TextureFormat.cppm"
 	"Source/Public/RenderDevice-TextureFormatFeature.cppm"
 	"Source/Public/RenderDevice-TextureFormatId.cppm"
+	"Source/Public/RenderDevice-TextureParams.cppm"
 	"Source/Public/RenderDevice-TextureSupportRequest.cppm"
 	"Source/Public/RenderDevice-TextureSupportResponse.cppm"
 	"Source/Public/RenderDevice-TextureUsage.cppm"

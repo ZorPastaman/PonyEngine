@@ -28,9 +28,9 @@ export namespace PonyEngine::Render::Windows
 	[[nodiscard("Pure function")]]
 	bool IsValidUsage(TextureUsage usage) noexcept;
 	[[nodiscard("Pure function")]]
-	bool CheckColorSupport(const TextureSupportRequest& supportRequest, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 	[[nodiscard("Pure function")]]
-	bool CheckDepthSupport(const TextureSupportRequest& supportRequest, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 
 	[[nodiscard("Pure function")]]
 	D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureDimension dimension) noexcept;
@@ -40,22 +40,22 @@ export namespace PonyEngine::Render::Windows
 	[[nodiscard("Pure function")]]
 	D3D12_HEAP_PROPERTIES ToHeapProperties(HeapType heapType) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage bufferUsage) noexcept;
+	D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage usage) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_HEAP_FLAGS ToHeapFlags(TextureUsage textureUsage) noexcept;
+	D3D12_HEAP_FLAGS ToHeapFlags(TextureUsage usage) noexcept;
 
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferCreateInfo& createInfo) noexcept;
+	D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureCreateInfo& createInfo, DXGI_FORMAT format) noexcept;
+	D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, DXGI_FORMAT format) noexcept;
 	[[nodiscard("Pure function")]]
 	D3D12_RESOURCE_DIMENSION ToResourceDimension(TextureDimension dimension) noexcept;
 	[[nodiscard("Pure function")]]
-	UINT16 ToDepthArraySize(const TextureCreateInfo& createInfo) noexcept;
+	UINT16 ToDepthArraySize(const TextureParams& params) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_FLAGS ToResourceFlags(BufferUsage bufferUsage) noexcept;
+	D3D12_RESOURCE_FLAGS ToResourceFlags(BufferUsage usage) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_FLAGS ToResourceFlags(TextureUsage textureUsage) noexcept;
+	D3D12_RESOURCE_FLAGS ToResourceFlags(TextureUsage usage) noexcept;
 
 	[[nodiscard("Pure function")]]
 	D3D12_BARRIER_LAYOUT ToLayout(Layout layout) noexcept;
@@ -79,13 +79,13 @@ namespace PonyEngine::Render::Windows
 		return true;
 	}
 
-	bool CheckColorSupport(const TextureSupportRequest& supportRequest, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
-		if (Any(TextureUsage::DepthStencil, supportRequest.usage))
+		if (Any(TextureUsage::DepthStencil, request.usage))
 		{
 			return false;
 		}
-		const D3D12_FORMAT_SUPPORT1 requiredSupport = ToFormatSupport(supportRequest.dimension) | ToFormatSupport(supportRequest.usage);
+		const D3D12_FORMAT_SUPPORT1 requiredSupport = ToFormatSupport(request.dimension) | ToFormatSupport(request.usage);
 		if ((requiredSupport & support.Support1) != requiredSupport)
 		{
 			return false;
@@ -94,17 +94,17 @@ namespace PonyEngine::Render::Windows
 		return true;
 	}
 
-	bool CheckDepthSupport(const TextureSupportRequest& supportRequest, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
-		if (Any(TextureUsage::RenderTarget, supportRequest.usage))
+		if (Any(TextureUsage::RenderTarget, request.usage))
 		{
 			return false;
 		}
-		if (Any(TextureUsage::UnorderedAccess, supportRequest.usage))
+		if (Any(TextureUsage::UnorderedAccess, request.usage))
 		{
 			return false;
 		}
-		const D3D12_FORMAT_SUPPORT1 requiredSupport = ToFormatSupport(supportRequest.dimension) | ToFormatSupport(supportRequest.usage);
+		const D3D12_FORMAT_SUPPORT1 requiredSupport = ToFormatSupport(request.dimension) | ToFormatSupport(request.usage);
 		if ((requiredSupport & support.Support1) != requiredSupport)
 		{
 			return false;
@@ -178,10 +178,10 @@ namespace PonyEngine::Render::Windows
 		return properties;
 	}
 
-	D3D12_HEAP_FLAGS ToHeapFlags(const BufferUsage bufferUsage) noexcept
+	D3D12_HEAP_FLAGS ToHeapFlags(const BufferUsage usage) noexcept
 	{
 		auto flags = D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
-		if (Any(BufferUsage::UnorderedAccess, bufferUsage))
+		if (Any(BufferUsage::UnorderedAccess, usage))
 		{
 			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;
 		}
@@ -189,10 +189,10 @@ namespace PonyEngine::Render::Windows
 		return flags;
 	}
 
-	D3D12_HEAP_FLAGS ToHeapFlags(const TextureUsage textureUsage) noexcept
+	D3D12_HEAP_FLAGS ToHeapFlags(const TextureUsage usage) noexcept
 	{
 		auto flags = D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
-		if (Any(TextureUsage::UnorderedAccess, textureUsage))
+		if (Any(TextureUsage::UnorderedAccess, usage))
 		{
 			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;
 		}
@@ -200,38 +200,38 @@ namespace PonyEngine::Render::Windows
 		return flags;
 	}
 
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferCreateInfo& createInfo) noexcept
+	D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept
 	{
 		return D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
 			.Alignment = 0ull,
-			.Width = static_cast<UINT64>(createInfo.size),
+			.Width = static_cast<UINT64>(params.size),
 			.Height = 1u,
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
 			.Format = DXGI_FORMAT_UNKNOWN,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = ToResourceFlags(createInfo.usage),
+			.Flags = ToResourceFlags(params.usage),
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
 	}
 
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureCreateInfo& createInfo, const DXGI_FORMAT format) noexcept
+	D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, const DXGI_FORMAT format) noexcept
 	{
 		return D3D12_RESOURCE_DESC1
 		{
-			.Dimension = ToResourceDimension(createInfo.dimension),
+			.Dimension = ToResourceDimension(params.dimension),
 			.Alignment = 0ull,
-			.Width = static_cast<UINT64>(createInfo.size.X()),
-			.Height = static_cast<UINT>(createInfo.size.Y()),
-			.DepthOrArraySize = ToDepthArraySize(createInfo),
-			.MipLevels = static_cast<UINT16>(createInfo.mipCount),
+			.Width = static_cast<UINT64>(params.size.X()),
+			.Height = static_cast<UINT>(params.size.Y()),
+			.DepthOrArraySize = ToDepthArraySize(params),
+			.MipLevels = static_cast<UINT16>(params.mipCount),
 			.Format = format,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = static_cast<UINT>(ToNumber(createInfo.sampleCount)), .Quality = 0u},
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = static_cast<UINT>(ToNumber(params.sampleCount)), .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
-			.Flags = ToResourceFlags(createInfo.usage),
+			.Flags = ToResourceFlags(params.usage),
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
 	}
@@ -254,40 +254,40 @@ namespace PonyEngine::Render::Windows
 		}
 	}
 
-	UINT16 ToDepthArraySize(const TextureCreateInfo& createInfo) noexcept
+	UINT16 ToDepthArraySize(const TextureParams& params) noexcept
 	{
-		switch (createInfo.dimension)
+		switch (params.dimension)
 		{
 		case TextureDimension::Texture3D:
-			return static_cast<UINT16>(createInfo.size.Z());
+			return static_cast<UINT16>(params.size.Z());
 		case TextureDimension::TextureCube:
-			return static_cast<UINT16>(createInfo.arraySize * 6);
+			return static_cast<UINT16>(params.arraySize * 6);
 		default:
-			return static_cast<UINT16>(createInfo.arraySize);
+			return static_cast<UINT16>(params.arraySize);
 		}
 	}
 
-	D3D12_RESOURCE_FLAGS ToResourceFlags(const BufferUsage bufferUsage) noexcept
+	D3D12_RESOURCE_FLAGS ToResourceFlags(const BufferUsage usage) noexcept
 	{
-		return Any(BufferUsage::UnorderedAccess, bufferUsage) ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
+		return Any(BufferUsage::UnorderedAccess, usage) ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
 	}
 
-	D3D12_RESOURCE_FLAGS ToResourceFlags(const TextureUsage textureUsage) noexcept
+	D3D12_RESOURCE_FLAGS ToResourceFlags(const TextureUsage usage) noexcept
 	{
 		auto flags = D3D12_RESOURCE_FLAG_NONE;
-		if (Any(TextureUsage::RenderTarget, textureUsage))
+		if (Any(TextureUsage::RenderTarget, usage))
 		{
 			flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 		}
-		if (Any(TextureUsage::DepthStencil, textureUsage))
+		if (Any(TextureUsage::DepthStencil, usage))
 		{
 			flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 		}
-		if (Any(TextureUsage::UnorderedAccess, textureUsage))
+		if (Any(TextureUsage::UnorderedAccess, usage))
 		{
 			flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 		}
-		if (textureUsage == TextureUsage::DepthStencil)
+		if (usage == TextureUsage::DepthStencil)
 		{
 			flags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
 		}
