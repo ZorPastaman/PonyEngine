@@ -18,6 +18,8 @@ import std;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
+import :D3D12Utility;
+
 export namespace PonyEngine::Render::Windows
 {
 	class D3D12Buffer final : public IBuffer
@@ -36,6 +38,8 @@ export namespace PonyEngine::Render::Windows
 		virtual std::uint64_t Size() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual BufferUsage Usage() const noexcept override;
+
+		virtual void SetName(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& Resource() noexcept;
@@ -77,6 +81,11 @@ namespace PonyEngine::Render::Windows
 	BufferUsage D3D12Buffer::Usage() const noexcept
 	{
 		return usage;
+	}
+
+	void D3D12Buffer::SetName(const std::string_view name)
+	{
+		Windows::SetName(*resource, name);
 	}
 
 	ID3D12Resource2& D3D12Buffer::Resource() noexcept

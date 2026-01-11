@@ -18,6 +18,8 @@ import std;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
+import :D3D12Utility;
+
 export namespace PonyEngine::Render::Windows
 {
 	class D3D12Texture final : public ITexture
@@ -54,6 +56,8 @@ export namespace PonyEngine::Render::Windows
 		virtual TextureUsage Usage() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual bool SRGBCompatible() const noexcept override;
+
+		virtual void SetName(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& Resource() noexcept;
@@ -175,6 +179,11 @@ namespace PonyEngine::Render::Windows
 	bool D3D12Texture::SRGBCompatible() const noexcept
 	{
 		return srgbCompatible;
+	}
+
+	void D3D12Texture::SetName(const std::string_view name)
+	{
+		Windows::SetName(*resource, name);
 	}
 
 	ID3D12Resource2& D3D12Texture::Resource() noexcept

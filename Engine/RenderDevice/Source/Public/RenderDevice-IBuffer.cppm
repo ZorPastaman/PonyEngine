@@ -27,5 +27,7 @@ export namespace PonyEngine::Render
 		virtual std::uint64_t Size() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual BufferUsage Usage() const noexcept = 0;
+
+		virtual void SetName(std::string_view name) = 0;
 	};
 }
