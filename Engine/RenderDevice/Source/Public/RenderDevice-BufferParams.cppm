@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:BufferCreateInfo;
+export module PonyEngine.RenderDevice:BufferParams;
 
 import std;
 
@@ -15,7 +15,7 @@ import :BufferUsage;
 
 export namespace PonyEngine::Render
 {
-	struct BufferCreateInfo final
+	struct BufferParams final
 	{
 		std::uint64_t size;
 		BufferUsage usage = BufferUsage::ShaderResource;

@@ -59,7 +59,7 @@ export namespace PonyEngine::Render
 		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) override;
 
 		[[nodiscard("Wierd call")]] 
-		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo) override;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
 		[[nodiscard("Wierd call")]] 
 		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) override;
@@ -72,7 +72,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Wierd call")]] 
-		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo) override;
+		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
 		[[nodiscard("Pure function")]] 
 		virtual IGraphicsCommandQueue& GraphicsCommandQueue() override;
@@ -269,14 +269,14 @@ namespace PonyEngine::Render
 		activeBackendIndex = backendIndex;
 	}
 
-	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const HeapType heapType, const BufferCreateInfo& createInfo)
+	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const HeapType heapType, const BufferParams& params)
 	{
 		if (!activeBackendIndex) [[unlikely]]
 		{
 			throw std::logic_error("No active backend");
 		}
 
-		return backends.Backend(*activeBackendIndex).CreateBuffer(heapType, createInfo);
+		return backends.Backend(*activeBackendIndex).CreateBuffer(heapType, params);
 	}
 
 	struct TextureFormatId RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
@@ -342,14 +342,14 @@ namespace PonyEngine::Render
 		return backends.Backend(*activeBackendIndex).TextureSupport(request);
 	}
 
-	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureCreateInfo& createInfo)
+	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
 		if (!activeBackendIndex) [[unlikely]]
 		{
 			throw std::logic_error("No active backend");
 		}
 
-		return backends.Backend(*activeBackendIndex).CreateTexture(heapType, createInfo);
+		return backends.Backend(*activeBackendIndex).CreateTexture(heapType, params);
 	}
 
 	IGraphicsCommandQueue& RenderDeviceService::GraphicsCommandQueue()

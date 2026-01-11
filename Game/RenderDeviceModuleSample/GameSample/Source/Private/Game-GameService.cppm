@@ -64,7 +64,7 @@ namespace Game
 			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget
 		});
 
-		const std::shared_ptr<PonyEngine::Render::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::Render::HeapType::Default, PonyEngine::Render::BufferCreateInfo
+		const std::shared_ptr<PonyEngine::Render::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::Render::HeapType::Default, PonyEngine::Render::BufferParams
 		{
 			.size = 1024ull,
 			.usage = PonyEngine::Render::BufferUsage::ShaderResource
@@ -72,14 +72,14 @@ namespace Game
 
 		const PonyEngine::Render::TextureFormatId textureFormat = renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Unorm);
 		const PonyEngine::Render::TextureFormatId castableTextureFormat = renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Snorm);
-		const std::shared_ptr<PonyEngine::Render::ITexture> texture = renderDevice->CreateTexture(PonyEngine::Render::HeapType::Default, PonyEngine::Render::TextureCreateInfo
+		const std::shared_ptr<PonyEngine::Render::ITexture> texture = renderDevice->CreateTexture(PonyEngine::Render::HeapType::Default, PonyEngine::Render::TextureParams
 		{
 			.format = textureFormat,
 			.castableFormats = std::span<const PonyEngine::Render::TextureFormatId>(&castableTextureFormat, 1uz),
 			.size = PonyEngine::Math::Vector3<std::uint32_t>(1024u, 1024u, 1u),
 			.dimension = PonyEngine::Render::TextureDimension::Texture2D,
 			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget,
-			.flags = PonyEngine::Render::TextureCreateFlag::SRGB
+			.flags = PonyEngine::Render::TextureFlag::SRGB
 		});
 	}
 

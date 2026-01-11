@@ -17,16 +17,16 @@ import std;
 
 import PonyEngine.Meta;
 
-import :BufferCreateInfo;
+import :BufferParams;
 import :IBuffer;
 import :IComputeCommandQueue;
 import :ICopyCommandQueue;
 import :IGraphicsCommandQueue;
 import :ITexture;
 import :HeapType;
-import :TextureCreateInfo;
 import :TextureFormatFeature;
 import :TextureFormatId;
+import :TextureParams;
 import :TextureSupportRequest;
 import :TextureSupportResponse;
 
@@ -47,7 +47,7 @@ export namespace PonyEngine::Render
 		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) = 0;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) = 0;
@@ -60,7 +60,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual IGraphicsCommandQueue& GraphicsCommandQueue() = 0;

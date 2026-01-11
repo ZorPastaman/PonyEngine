@@ -33,14 +33,14 @@ export namespace PonyEngine::Render
 		virtual void Deactivate() = 0;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureCreateInfo& createInfo) = 0;
+		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual IGraphicsCommandQueue& GraphicsCommandQueue() noexcept = 0;
