@@ -46,5 +46,7 @@ export namespace PonyEngine::Render
 		virtual TextureUsage Usage() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual bool SRGBCompatible() const noexcept = 0;
+
+		virtual void SetName(std::string_view name) = 0;
 	};
 }
