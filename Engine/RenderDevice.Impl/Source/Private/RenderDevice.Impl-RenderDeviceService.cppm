@@ -88,6 +88,18 @@ export namespace PonyEngine::Render
 		virtual const ICopyCommandQueue& CopyCommandQueue() const override;
 
 		[[nodiscard("Pure function")]] 
+		virtual struct SwapChainSupport SwapChainSupport() const override;
+		[[nodiscard("Pure function")]] 
+		virtual void CreateSwapChain(const SwapChainParams& params) override;
+		[[nodiscard("Pure function")]] 
+		virtual std::uint8_t SwapChainBufferCount() const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::uint8_t CurrentSwapChainBufferIndex() const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const override;
+		virtual void PresentNext() override;
+
+		[[nodiscard("Pure function")]] 
 		virtual Application::IApplicationContext& Application() noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual const Application::IApplicationContext& Application() const noexcept override;
@@ -98,6 +110,15 @@ export namespace PonyEngine::Render
 
 		void ActivateBackend(std::size_t index);
 		void DeactivateBackend(std::size_t index);
+
+		[[nodiscard("Pure function")]]
+		IBackend& GetCurrentBackend();
+		[[nodiscard("Pure function")]]
+		const IBackend& GetCurrentBackend() const;
+		[[nodiscard("Pure function")]]
+		IBackend& GetBackend(std::size_t index);
+		[[nodiscard("Pure function")]]
+		const IBackend& GetBackend(std::size_t index) const;
 
 		Application::IApplicationContext* application;
 
@@ -208,22 +229,12 @@ namespace PonyEngine::Render
 
 	std::string_view RenderDeviceService::RenderApiName(const std::size_t backendIndex) const
 	{
-		if (backendIndex >= backends.Size()) [[unlikely]]
-		{
-			throw std::out_of_range("Out of range");
-		}
-
-		return backends.Backend(backendIndex).RenderApiName();
+		return GetBackend(backendIndex).RenderApiName();
 	}
 
 	Meta::Version RenderDeviceService::RenderApiVersion(const std::size_t backendIndex) const
 	{
-		if (backendIndex >= backends.Size()) [[unlikely]]
-		{
-			throw std::out_of_range("Out of range");
-		}
-
-		return backends.Backend(backendIndex).RenderApiVersion();
+		return GetBackend(backendIndex).RenderApiVersion();
 	}
 
 	std::optional<std::size_t> RenderDeviceService::ActiveBackend() const noexcept
@@ -271,12 +282,7 @@ namespace PonyEngine::Render
 
 	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const HeapType heapType, const BufferParams& params)
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
-
-		return backends.Backend(*activeBackendIndex).CreateBuffer(heapType, params);
+		return GetCurrentBackend().CreateBuffer(heapType, params);
 	}
 
 	struct TextureFormatId RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
@@ -320,12 +326,8 @@ namespace PonyEngine::Render
 		{
 			throw std::invalid_argument("Invalid format");
 		}
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
 
-		return backends.Backend(*activeBackendIndex).TextureFormatFeatures(textureFormatId);
+		return GetCurrentBackend().TextureFormatFeatures(textureFormatId);
 	}
 
 	TextureSupportResponse RenderDeviceService::TextureSupport(const TextureSupportRequest& request) const
@@ -334,82 +336,73 @@ namespace PonyEngine::Render
 		{
 			throw std::invalid_argument("Invalid format");
 		}
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
 
-		return backends.Backend(*activeBackendIndex).TextureSupport(request);
+		return GetCurrentBackend().TextureSupport(request);
 	}
 
 	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
-
-		return backends.Backend(*activeBackendIndex).CreateTexture(heapType, params);
+		return GetCurrentBackend().CreateTexture(heapType, params);
 	}
 
 	IGraphicsCommandQueue& RenderDeviceService::GraphicsCommandQueue()
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
-
-		return backends.Backend(*activeBackendIndex).GraphicsCommandQueue();
+		return GetCurrentBackend().GraphicsCommandQueue();
 	}
 
 	const IGraphicsCommandQueue& RenderDeviceService::GraphicsCommandQueue() const
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
-
-		return backends.Backend(*activeBackendIndex).GraphicsCommandQueue();
+		return GetCurrentBackend().GraphicsCommandQueue();
 	}
 
 	IComputeCommandQueue& RenderDeviceService::ComputeCommandQueue()
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
-
-		return backends.Backend(*activeBackendIndex).ComputeCommandQueue();
+		return GetCurrentBackend().ComputeCommandQueue();
 	}
 
 	const IComputeCommandQueue& RenderDeviceService::ComputeCommandQueue() const
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
-
-		return backends.Backend(*activeBackendIndex).ComputeCommandQueue();
+		return GetCurrentBackend().ComputeCommandQueue();
 	}
 
 	ICopyCommandQueue& RenderDeviceService::CopyCommandQueue()
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
-
-		return backends.Backend(*activeBackendIndex).CopyCommandQueue();
+		return GetCurrentBackend().CopyCommandQueue();
 	}
 
 	const ICopyCommandQueue& RenderDeviceService::CopyCommandQueue() const
 	{
-		if (!activeBackendIndex) [[unlikely]]
-		{
-			throw std::logic_error("No active backend");
-		}
+		return GetCurrentBackend().CopyCommandQueue();
+	}
 
-		return backends.Backend(*activeBackendIndex).CopyCommandQueue();
+	struct SwapChainSupport RenderDeviceService::SwapChainSupport() const
+	{
+		return GetCurrentBackend().SwapChainSupport();
+	}
+
+	void RenderDeviceService::CreateSwapChain(const SwapChainParams& params)
+	{
+		return GetCurrentBackend().CreateSwapChain(params);
+	}
+
+	std::uint8_t RenderDeviceService::SwapChainBufferCount() const
+	{
+		return GetCurrentBackend().SwapChainBufferCount();
+	}
+
+	std::uint8_t RenderDeviceService::CurrentSwapChainBufferIndex() const
+	{
+		return GetCurrentBackend().CurrentSwapChainBufferIndex();
+	}
+
+	std::shared_ptr<ITexture> RenderDeviceService::SwapChainBuffer(const std::uint8_t bufferIndex) const
+	{
+		return GetCurrentBackend().SwapChainBuffer(bufferIndex);
+	}
+
+	void RenderDeviceService::PresentNext()
+	{
+		GetCurrentBackend().PresentNext();
 	}
 
 	Application::IApplicationContext& RenderDeviceService::Application() noexcept
@@ -446,5 +439,45 @@ namespace PonyEngine::Render
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Deactivating '{}' backend...", typeid(backend).name());
 		backend.Deactivate();
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Deactivating '{}' backend done.", typeid(backend).name());
+	}
+
+	IBackend& RenderDeviceService::GetCurrentBackend()
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex);
+	}
+
+	const IBackend& RenderDeviceService::GetCurrentBackend() const
+	{
+		if (!activeBackendIndex) [[unlikely]]
+		{
+			throw std::logic_error("No active backend");
+		}
+
+		return backends.Backend(*activeBackendIndex);
+	}
+
+	IBackend& RenderDeviceService::GetBackend(const std::size_t index)
+	{
+		if (index >= backends.Size()) [[unlikely]]
+		{
+			throw std::out_of_range("Out of range");
+		}
+
+		return backends.Backend(index);
+	}
+
+	const IBackend& RenderDeviceService::GetBackend(const std::size_t index) const
+	{
+		if (index >= backends.Size()) [[unlikely]]
+		{
+			throw std::out_of_range("Out of range");
+		}
+
+		return backends.Backend(index);
 	}
 }

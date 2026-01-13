@@ -7,17 +7,29 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:BufferParams;
+module;
+
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:SwapChainEffect;
 
 import std;
 
-import :BufferUsage;
-
 export namespace PonyEngine::Render
 {
-	struct BufferParams final
+	enum class SwapChainEffect : std::uint8_t
 	{
-		std::uint64_t size = 1u;
-		BufferUsage usage = BufferUsage::ShaderResource;
+		FlipDiscard,
+		FlipSequential
 	};
+
+	enum class SwapChainEffectMask : std::uint8_t
+	{
+		None = 0,
+		FlipDiscard = 1 << 0,
+		FlipSequential = 1 << 1,
+		All = (1 << 2) - 1
+	};
+
+	PONY_ENUM_VALUE_MASK_FEATURES(SwapChainEffect, SwapChainEffectMask)
 }

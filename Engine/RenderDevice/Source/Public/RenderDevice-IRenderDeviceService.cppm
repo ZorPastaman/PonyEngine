@@ -18,12 +18,14 @@ import std;
 import PonyEngine.Meta;
 
 import :BufferParams;
+import :HeapType;
 import :IBuffer;
 import :IComputeCommandQueue;
 import :ICopyCommandQueue;
 import :IGraphicsCommandQueue;
 import :ITexture;
-import :HeapType;
+import :SwapChainParams;
+import :SwapChainSupport;
 import :TextureFormatFeature;
 import :TextureFormatId;
 import :TextureParams;
@@ -74,5 +76,17 @@ export namespace PonyEngine::Render
 		virtual ICopyCommandQueue& CopyCommandQueue() = 0;
 		[[nodiscard("Pure function")]]
 		virtual const ICopyCommandQueue& CopyCommandQueue() const = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual struct SwapChainSupport SwapChainSupport() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual void CreateSwapChain(const SwapChainParams& params) = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::uint8_t SwapChainBufferCount() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::uint8_t CurrentSwapChainBufferIndex() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const = 0;
+		virtual void PresentNext() = 0;
 	};
 }

@@ -7,17 +7,31 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:BufferParams;
+module;
+
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:SwapChainScaling;
 
 import std;
 
-import :BufferUsage;
-
 export namespace PonyEngine::Render
 {
-	struct BufferParams final
+	enum class SwapChainScaling : std::uint8_t
 	{
-		std::uint64_t size = 1u;
-		BufferUsage usage = BufferUsage::ShaderResource;
+		NoScaling,
+		Stretch,
+		StretchAspectRatio
 	};
+
+	enum class SwapChainScalingMask : std::uint8_t
+	{
+		None = 0,
+		NoScaling = 1 << 0,
+		Stretch = 1 << 1,
+		StretchAspectRatio = 1 << 2,
+		All = (1 << 3) - 1
+	};
+
+	PONY_ENUM_VALUE_MASK_FEATURES(SwapChainScaling, SwapChainScalingMask)
 }

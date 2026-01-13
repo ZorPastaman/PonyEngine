@@ -63,6 +63,7 @@ namespace Game
 			.dimension = PonyEngine::Render::TextureDimension::Texture2D,
 			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget
 		});
+		const PonyEngine::Render::SwapChainSupport swapChainSupport = renderDevice->SwapChainSupport();
 
 		const std::shared_ptr<PonyEngine::Render::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::Render::HeapType::Default, PonyEngine::Render::BufferParams
 		{
@@ -81,6 +82,19 @@ namespace Game
 			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget,
 			.flags = PonyEngine::Render::TextureFlag::SRGB
 		});
+
+		renderDevice->CreateSwapChain(PonyEngine::Render::SwapChainParams
+		{
+			.format = textureFormat,
+			.size = std::nullopt,
+			.bufferCount = 3u,
+			.alphaMode = PonyEngine::Render::SwapChainAlphaMode::Ignore,
+			.scalingMode = PonyEngine::Render::SwapChainScaling::NoScaling,
+			.swapEffect = PonyEngine::Render::SwapChainEffect::FlipDiscard,
+			.syncMode = PonyEngine::Render::SwapChainSync::FullSync,
+			.flags = PonyEngine::Render::SwapChainFlag::SRGB,
+			.usage = PonyEngine::Render::TextureUsage::RenderTarget
+		});
 	}
 
 	void GameService::End()
@@ -94,5 +108,6 @@ namespace Game
 
 	void GameService::Tick()
 	{
+		renderDevice->PresentNext();
 	}
 }

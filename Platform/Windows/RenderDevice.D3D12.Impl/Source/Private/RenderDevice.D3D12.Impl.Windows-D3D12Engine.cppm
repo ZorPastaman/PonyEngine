@@ -9,6 +9,8 @@
 
 module;
 
+#include "PonyEngine/Log/Log.h"
+
 #include "PonyEngine/Render/Windows/D3D12Framework.h"
 #include "PonyEngine/Render/Windows/DXGIFramework.h"
 
@@ -16,9 +18,11 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Engine;
 
 import std;
 
+import PonyEngine.Log;
 import PonyEngine.Memory;
 import PonyEngine.Meta;
 import PonyEngine.RenderDevice.Ext;
+import PonyEngine.Surface.Windows;
 
 import :DXGIFactory;
 import :DXGITextureFormatMap;
@@ -63,6 +67,18 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Pure function")]]
 		ICopyCommandQueue& CopyCommandQueue() noexcept;
 
+		[[nodiscard("Pure function")]]
+		struct SwapChainSupport SwapChainSupport() const;
+		[[nodiscard("Pure function")]]
+		void CreateSwapChain(const SwapChainParams& params);
+		[[nodiscard("Pure function")]]
+		std::uint8_t SwapChainBufferCount() const;
+		[[nodiscard("Pure function")]]
+		std::uint8_t CurrentSwapChainBufferIndex() const;
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const;
+		void PresentNext();
+
 		D3D12Engine& operator =(const D3D12Engine&) = delete;
 		D3D12Engine& operator =(D3D12Engine&&) = delete;
 
@@ -76,6 +92,7 @@ export namespace PonyEngine::Render::Windows
 		static void ValidateDimension(const TextureParams& params);
 		static void ValidateColorTexture(const TextureParams& params);
 		static void ValidateDepthTexture(const TextureParams& params);
+		static void ValidateSwapChainParams(const SwapChainParams& params);
 
 		IRenderDeviceContext* renderDevice;
 
@@ -89,6 +106,11 @@ export namespace PonyEngine::Render::Windows
 		D3D12GraphicsCommandQueue graphicsCommandQueue;
 		D3D12ComputeCommandQueue computeCommandQueue;
 		D3D12CopyCommandQueue copyCommandQueue;
+
+		std::unique_ptr<DXGISwapChain> swapChain;
+		std::vector<std::shared_ptr<D3D12Texture>> swapChainBuffers;
+		UINT swapChainSyncInterval;
+		UINT swapChainPresentFlags;
 	};
 }
 
@@ -96,13 +118,15 @@ namespace PonyEngine::Render::Windows
 {
 	D3D12Engine::D3D12Engine(IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice},
-		arena(64uz, 64uz),
+		arena(0uz, 64uz),
 		textureFormatMap(*this->renderDevice),
 		factory(*this->renderDevice),
 		device(*this->renderDevice),
 		graphicsCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
 		computeCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
-		copyCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH)
+		copyCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
+		swapChainSyncInterval{0u},
+		swapChainPresentFlags{0u}
 	{
 	}
 
@@ -255,6 +279,107 @@ namespace PonyEngine::Render::Windows
 		return copyCommandQueue;
 	}
 
+	struct SwapChainSupport D3D12Engine::SwapChainSupport() const
+	{
+		const BOOL isTearingSupported = factory.GetTearingSupport();
+
+		return Render::SwapChainSupport
+		{
+			.maxSize = Math::Vector2<std::uint32_t>(D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION, D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION),
+			.minBufferCount = 2u,
+			.maxBufferCount = DXGI_MAX_SWAP_CHAIN_BUFFERS,
+			.alphaModes = SwapChainAlphaModeMask::Ignore | SwapChainAlphaModeMask::Straight | SwapChainAlphaModeMask::Premultiplied,
+			.scalingModes = SwapChainScalingMask::NoScaling | SwapChainScalingMask::Stretch | SwapChainScalingMask::StretchAspectRatio,
+			.swapEffects = SwapChainEffectMask::FlipDiscard | SwapChainEffectMask::FlipSequential,
+			.syncModes = SwapChainSyncMask::FastSync | SwapChainSyncMask::FullSync | (isTearingSupported ? SwapChainSyncMask::NoSync : SwapChainSyncMask::None),
+			.usage = TextureUsage::ShaderResource | TextureUsage::RenderTarget | TextureUsage::UnorderedAccess
+		};
+	}
+
+	void D3D12Engine::CreateSwapChain(const SwapChainParams& params)
+	{
+		ValidateSwapChainParams(params);
+
+		const std::size_t formatIndex = textureFormatMap.IndexOf(params.format);
+		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture format");
+		}
+		const DXGI_FORMAT format = textureFormatMap.DXGIFormat(formatIndex);
+
+		const bool srgb = Any(SwapChainFlag::SRGB, params.flags);
+		if (srgb && GetSrgbFormat(format) == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid srgb flag");
+		}
+
+		const HWND windowHandle = renderDevice->Application().GetService<Surface::Windows::ISurfaceService>().Handle();
+		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = ToSwapChainDesc(params, format);
+		swapChainBuffers.clear();
+		swapChain.reset();
+		swapChainBuffers.resize(params.bufferCount);
+
+		try
+		{
+			swapChain = factory.CreateSwapChain(graphicsCommandQueue.CommandQueue(), windowHandle, swapChainDesc);
+			factory.MakeWindowAssociation(windowHandle);
+			swapChain->SetFullscreenState(FALSE);
+
+			for (UINT i = 0u; i < params.bufferCount; ++i)
+			{
+				Platform::Windows::ComPtr<ID3D12Resource2> resource;
+				swapChain->GetBuffer(i, resource);
+				swapChainBuffers[i] = std::make_shared<D3D12Texture>(std::move(resource), params.format, std::span<const TextureFormatId>(),
+					static_cast<std::uint32_t>(swapChainDesc.Width), static_cast<std::uint32_t>(swapChainDesc.Height), 1u, 1u, 
+					TextureDimension::Texture2D, SampleCount::X1, params.usage, srgb);
+			}
+		}
+		catch (...)
+		{
+			swapChainBuffers.resize(0);
+			swapChain.reset();
+			throw;
+		}
+
+		swapChainSyncInterval = ToSyncInterval(params.syncMode);
+		swapChainPresentFlags = ToPresentFlags(params.syncMode);
+	}
+
+	std::uint8_t D3D12Engine::SwapChainBufferCount() const
+	{
+		return static_cast<std::uint8_t>(swapChainBuffers.size());
+	}
+
+	std::uint8_t D3D12Engine::CurrentSwapChainBufferIndex() const
+	{
+		if (!swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is not created");
+		}
+
+		return static_cast<std::uint8_t>(swapChain->GetCurrentBufferIndex());
+	}
+
+	std::shared_ptr<ITexture> D3D12Engine::SwapChainBuffer(const std::uint8_t bufferIndex) const
+	{
+		if (bufferIndex >= swapChainBuffers.size()) [[unlikely]]
+		{
+			throw std::out_of_range("Buffer index is out of range");
+		}
+
+		return swapChainBuffers[bufferIndex];
+	}
+
+	void D3D12Engine::PresentNext()
+	{
+		if (!swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is not created");
+		}
+
+		swapChain->Present(swapChainSyncInterval, swapChainPresentFlags);
+	}
+
 	TextureSupportResponse D3D12Engine::MakeResponse(const DXGI_FORMAT format, const TextureSupportRequest& request,
 		const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const
 	{
@@ -294,7 +419,7 @@ namespace PonyEngine::Render::Windows
 	}
 
 	SampleCountMask D3D12Engine::GetSampleCountMask(const DXGI_FORMAT format, const TextureSupportRequest& request, 
-	                                                const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const
+		const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const
 	{
 		if ((request.dimension != TextureDimension::Texture2D && request.dimension != TextureDimension::TextureCube) ||
 			Any(TextureUsage::UnorderedAccess, request.usage) || 
@@ -406,6 +531,32 @@ namespace PonyEngine::Render::Windows
 			throw std::invalid_argument("Invalid srgb flag");
 		}
 		if (Any(TextureUsage::RenderTarget | TextureUsage::UnorderedAccess, params.usage)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid usage");
+		}
+	}
+
+	void D3D12Engine::ValidateSwapChainParams(const SwapChainParams& params)
+	{
+		if (params.size)
+		{
+			if (params.size->X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size->Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+		}
+
+		if (params.bufferCount < 2u || params.bufferCount > DXGI_MAX_SWAP_CHAIN_BUFFERS) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer count");
+		}
+
+		if (params.alphaMode != SwapChainAlphaMode::Ignore && params.alphaMode != SwapChainAlphaMode::Straight && params.alphaMode != SwapChainAlphaMode::Premultiplied) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid alpha mode");
+		}
+
+		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid usage");
 		}

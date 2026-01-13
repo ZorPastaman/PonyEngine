@@ -20,6 +20,8 @@ import PonyEngine.Log;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice.Ext;
 
+import :DXGISwapChain;
+
 export namespace PonyEngine::Render::Windows
 {
 	class DXGIFactory final
@@ -31,6 +33,13 @@ export namespace PonyEngine::Render::Windows
 		DXGIFactory(DXGIFactory&&) = delete;
 
 		~DXGIFactory() noexcept;
+
+		[[nodiscard("Pure function")]]
+		BOOL GetTearingSupport() const;
+
+		[[nodiscard("Pure function")]]
+		std::unique_ptr<DXGISwapChain> CreateSwapChain(IUnknown& device, HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc);
+		void MakeWindowAssociation(HWND windowHandle);
 
 		DXGIFactory& operator =(const DXGIFactory&) = delete;
 		DXGIFactory& operator =(DXGIFactory&&) = delete;
@@ -93,5 +102,29 @@ namespace PonyEngine::Render::Windows
 		debug.Reset();
 		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing DXGI debug interface done.");
 #endif
+	}
+
+	BOOL DXGIFactory::GetTearingSupport() const
+	{
+		BOOL tearingSupport;
+		if (const HRESULT result = factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &tearingSupport, sizeof(tearingSupport))) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to check tearing support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return tearingSupport;
+	}
+
+	std::unique_ptr<DXGISwapChain> DXGIFactory::CreateSwapChain(IUnknown& device, const HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc)
+	{
+		return std::make_unique<DXGISwapChain>(*renderDevice, *factory, device, windowHandle, swapChainDesc);
+	}
+
+	void DXGIFactory::MakeWindowAssociation(const HWND windowHandle)
+	{
+		if (const HRESULT result = factory->MakeWindowAssociation(windowHandle, DXGI_MWA_NO_WINDOW_CHANGES); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to make window association: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
 	}
 }

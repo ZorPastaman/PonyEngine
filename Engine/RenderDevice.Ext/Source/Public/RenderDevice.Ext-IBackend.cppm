@@ -45,8 +45,26 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual IGraphicsCommandQueue& GraphicsCommandQueue() noexcept = 0;
 		[[nodiscard("Pure function")]]
+		virtual const IGraphicsCommandQueue& GraphicsCommandQueue() const noexcept = 0;
+		[[nodiscard("Pure function")]]
 		virtual IComputeCommandQueue& ComputeCommandQueue() noexcept = 0;
 		[[nodiscard("Pure function")]]
+		virtual const IComputeCommandQueue& ComputeCommandQueue() const noexcept = 0;
+		[[nodiscard("Pure function")]]
 		virtual ICopyCommandQueue& CopyCommandQueue() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const ICopyCommandQueue& CopyCommandQueue() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual struct SwapChainSupport SwapChainSupport() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual void CreateSwapChain(const SwapChainParams& params) = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::uint8_t SwapChainBufferCount() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::uint8_t CurrentSwapChainBufferIndex() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const = 0;
+		virtual void PresentNext() = 0;
 	};
 }
