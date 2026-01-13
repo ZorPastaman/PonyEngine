@@ -49,9 +49,27 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Pure function")]] 
 		virtual IGraphicsCommandQueue& GraphicsCommandQueue() noexcept override;
 		[[nodiscard("Pure function")]] 
+		virtual const IGraphicsCommandQueue& GraphicsCommandQueue() const noexcept override;
+		[[nodiscard("Pure function")]] 
 		virtual IComputeCommandQueue& ComputeCommandQueue() noexcept override;
 		[[nodiscard("Pure function")]] 
+		virtual const IComputeCommandQueue& ComputeCommandQueue() const noexcept override;
+		[[nodiscard("Pure function")]] 
 		virtual ICopyCommandQueue& CopyCommandQueue() noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual const ICopyCommandQueue& CopyCommandQueue() const noexcept override;
+
+		[[nodiscard("Pure function")]] 
+		virtual struct SwapChainSupport SwapChainSupport() const override;
+		[[nodiscard("Pure function")]] 
+		virtual void CreateSwapChain(const SwapChainParams& params) override;
+		[[nodiscard("Pure function")]] 
+		virtual std::uint8_t SwapChainBufferCount() const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::uint8_t CurrentSwapChainBufferIndex() const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const override;
+		virtual void PresentNext() override;
 
 		D3D12Backend& operator =(const D3D12Backend&) = delete;
 		D3D12Backend& operator =(D3D12Backend&&) = delete;
@@ -115,7 +133,17 @@ namespace PonyEngine::Render::Windows
 		return engine->GraphicsCommandQueue();
 	}
 
+	const IGraphicsCommandQueue& D3D12Backend::GraphicsCommandQueue() const noexcept
+	{
+		return engine->GraphicsCommandQueue();
+	}
+
 	IComputeCommandQueue& D3D12Backend::ComputeCommandQueue() noexcept
+	{
+		return engine->ComputeCommandQueue();
+	}
+
+	const IComputeCommandQueue& D3D12Backend::ComputeCommandQueue() const noexcept
 	{
 		return engine->ComputeCommandQueue();
 	}
@@ -123,5 +151,40 @@ namespace PonyEngine::Render::Windows
 	ICopyCommandQueue& D3D12Backend::CopyCommandQueue() noexcept
 	{
 		return engine->CopyCommandQueue();
+	}
+
+	const ICopyCommandQueue& D3D12Backend::CopyCommandQueue() const noexcept
+	{
+		return engine->CopyCommandQueue();
+	}
+
+	struct SwapChainSupport D3D12Backend::SwapChainSupport() const
+	{
+		return engine->SwapChainSupport();
+	}
+
+	void D3D12Backend::CreateSwapChain(const SwapChainParams& params)
+	{
+		engine->CreateSwapChain(params);
+	}
+
+	std::uint8_t D3D12Backend::SwapChainBufferCount() const
+	{
+		return engine->SwapChainBufferCount();
+	}
+
+	std::uint8_t D3D12Backend::CurrentSwapChainBufferIndex() const
+	{
+		return engine->CurrentSwapChainBufferIndex();
+	}
+
+	std::shared_ptr<ITexture> D3D12Backend::SwapChainBuffer(const std::uint8_t bufferIndex) const
+	{
+		return engine->SwapChainBuffer(bufferIndex);
+	}
+
+	void D3D12Backend::PresentNext()
+	{
+		engine->PresentNext();
 	}
 }

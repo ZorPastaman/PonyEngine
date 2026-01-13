@@ -7,17 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:BufferParams;
+module;
+
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:SwapChainFlag;
 
 import std;
 
-import :BufferUsage;
-
 export namespace PonyEngine::Render
 {
-	struct BufferParams final
+	enum class SwapChainFlag : std::uint8_t
 	{
-		std::uint64_t size = 1u;
-		BufferUsage usage = BufferUsage::ShaderResource;
+		None = 0,
+		SRGB = 1 << 0,
+		All = (1 << 1) - 1
 	};
+
+	PONY_ENUM_MASK_FEATURES(SwapChainFlag)
 }

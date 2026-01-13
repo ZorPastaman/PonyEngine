@@ -32,6 +32,11 @@ export namespace PonyEngine::Render::Windows
 
 		virtual ~D3D12CommandQueue() noexcept;
 
+		[[nodiscard("Pure function")]]
+		ID3D12CommandQueue& CommandQueue() noexcept;
+		[[nodiscard("Pure function")]]
+		const ID3D12CommandQueue& CommandQueue() const noexcept;
+
 		void SetName(std::string_view name);
 
 		D3D12CommandQueue& operator =(const D3D12CommandQueue&) = delete;
@@ -62,6 +67,16 @@ namespace PonyEngine::Render::Windows
 		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 command queue... Type: '{}'.", static_cast<int>(commandQueue->GetDesc().Type));
 		commandQueue.Reset();
 		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 command queue done.");
+	}
+
+	ID3D12CommandQueue& D3D12CommandQueue::CommandQueue() noexcept
+	{
+		return *commandQueue;
+	}
+
+	const ID3D12CommandQueue& D3D12CommandQueue::CommandQueue() const noexcept
+	{
+		return *commandQueue;
 	}
 
 	void D3D12CommandQueue::SetName(const std::string_view name)

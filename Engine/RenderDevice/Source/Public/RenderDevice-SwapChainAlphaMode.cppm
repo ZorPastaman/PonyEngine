@@ -7,17 +7,33 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:BufferParams;
+module;
+
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:SwapChainAlphaMode;
 
 import std;
 
-import :BufferUsage;
-
 export namespace PonyEngine::Render
 {
-	struct BufferParams final
+	enum class SwapChainAlphaMode : std::uint8_t
 	{
-		std::uint64_t size = 1u;
-		BufferUsage usage = BufferUsage::ShaderResource;
+		Ignore,
+		Straight,
+		Premultiplied,
+		Inherit
 	};
+
+	enum class SwapChainAlphaModeMask : std::uint8_t
+	{
+		None = 0,
+		Ignore = 1 << 0,
+		Straight = 1 << 1,
+		Premultiplied = 1 << 2,
+		Inherit = 1 << 3,
+		All = (1 << 4) - 1
+	};
+
+	PONY_ENUM_VALUE_MASK_FEATURES(SwapChainAlphaMode, SwapChainAlphaModeMask)
 }
