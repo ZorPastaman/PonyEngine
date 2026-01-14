@@ -9,16 +9,15 @@
 
 module;
 
-#include "PonyEngine/Log/Log.h"
+#include <cassert>
+
 #include "PonyEngine/Render/Windows/DXGIFramework.h"
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:DXGISwapChain;
 
 import std;
 
-import PonyEngine.Log;
 import PonyEngine.Platform.Windows;
-import PonyEngine.RenderDevice.Ext;
 
 export namespace PonyEngine::Render::Windows
 {
@@ -26,11 +25,13 @@ export namespace PonyEngine::Render::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		DXGISwapChain(IRenderDeviceContext& renderDevice, IDXGIFactory7& factory, IUnknown& device, HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc);
-		DXGISwapChain(const DXGISwapChain&) = delete;
-		DXGISwapChain(DXGISwapChain&&) = delete;
+		explicit DXGISwapChain(IDXGISwapChain4& swapChain) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit DXGISwapChain(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain) noexcept;
+		DXGISwapChain(const DXGISwapChain& other) noexcept = default;
+		DXGISwapChain(DXGISwapChain&& other) noexcept = default;
 
-		~DXGISwapChain() noexcept;
+		~DXGISwapChain() noexcept = default;
 
 		[[nodiscard("Pure function")]]
 		UINT GetCurrentBufferIndex() const noexcept;
@@ -45,38 +46,21 @@ export namespace PonyEngine::Render::Windows
 		DXGISwapChain& operator =(DXGISwapChain&&) = delete;
 
 	private:
-		IRenderDeviceContext* renderDevice;
-
 		Platform::Windows::ComPtr<IDXGISwapChain4> swapChain;
 	};
 }
 
 namespace PonyEngine::Render::Windows
 {
-	DXGISwapChain::DXGISwapChain(IRenderDeviceContext& renderDevice, IDXGIFactory7& factory, IUnknown& device, const HWND windowHandle, 
-		const DXGI_SWAP_CHAIN_DESC1& swapChainDesc) :
-		renderDevice{&renderDevice}
+	DXGISwapChain::DXGISwapChain(IDXGISwapChain4& swapChain) noexcept :
+		swapChain(&swapChain)
 	{
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring dxgi swap chain... Window handle: '0x{:X}'; Width: '{}'; Height: '{}'.", 
-			reinterpret_cast<std::uintptr_t>(windowHandle), swapChainDesc.Width, swapChainDesc.Height);
-		Platform::Windows::ComPtr<IDXGISwapChain1> swapChainTemp;
-		if (const HRESULT result = factory.CreateSwapChainForHwnd(&device, windowHandle, &swapChainDesc, nullptr, nullptr, 
-			swapChainTemp.GetAddress()); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to acquire DXGI swap chain: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = swapChainTemp->QueryInterface(IID_PPV_ARGS(swapChain.GetAddress())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to cast DXGI swap chain interface: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring dxgi swap chain done.");
 	}
 
-	DXGISwapChain::~DXGISwapChain() noexcept
+	DXGISwapChain::DXGISwapChain(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain) noexcept :
+		swapChain(std::move(swapChain))
 	{
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing dxgi swap chain...");
-		swapChain.Reset();
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Releasing dxgi swap chain done.");
+		assert(this->swapChain && "The swap chain is nullptr.");
 	}
 
 	UINT DXGISwapChain::GetCurrentBufferIndex() const noexcept

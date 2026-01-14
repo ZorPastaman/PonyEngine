@@ -90,14 +90,17 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]] 
+		virtual bool IsSwapChainAlive() const override;
+		[[nodiscard("Pure function")]] 
 		virtual void CreateSwapChain(const SwapChainParams& params) override;
+		virtual void DestroySwapChain() override;
 		[[nodiscard("Pure function")]] 
 		virtual std::uint8_t SwapChainBufferCount() const override;
 		[[nodiscard("Pure function")]] 
 		virtual std::uint8_t CurrentSwapChainBufferIndex() const override;
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const override;
-		virtual void PresentNext() override;
+		virtual void PresentNextSwapChainBuffer() override;
 
 		[[nodiscard("Pure function")]] 
 		virtual Application::IApplicationContext& Application() noexcept override;
@@ -380,9 +383,19 @@ namespace PonyEngine::Render
 		return GetCurrentBackend().SwapChainSupport();
 	}
 
+	bool RenderDeviceService::IsSwapChainAlive() const
+	{
+		return GetCurrentBackend().IsSwapChainAlive();
+	}
+
 	void RenderDeviceService::CreateSwapChain(const SwapChainParams& params)
 	{
 		return GetCurrentBackend().CreateSwapChain(params);
+	}
+
+	void RenderDeviceService::DestroySwapChain()
+	{
+		GetCurrentBackend().DestroySwapChain();
 	}
 
 	std::uint8_t RenderDeviceService::SwapChainBufferCount() const
@@ -400,9 +413,9 @@ namespace PonyEngine::Render
 		return GetCurrentBackend().SwapChainBuffer(bufferIndex);
 	}
 
-	void RenderDeviceService::PresentNext()
+	void RenderDeviceService::PresentNextSwapChainBuffer()
 	{
-		GetCurrentBackend().PresentNext();
+		GetCurrentBackend().PresentNextSwapChainBuffer();
 	}
 
 	Application::IApplicationContext& RenderDeviceService::Application() noexcept

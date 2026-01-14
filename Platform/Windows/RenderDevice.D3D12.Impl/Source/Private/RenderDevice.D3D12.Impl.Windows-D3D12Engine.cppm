@@ -25,12 +25,14 @@ import PonyEngine.RenderDevice.Ext;
 import PonyEngine.Surface.Windows;
 
 import :DXGIFactory;
+import :DXGISwapChain;
 import :DXGITextureFormatMap;
 import :D3D12Buffer;
 import :D3D12ComputeCommandQueue;
 import :D3D12CopyCommandQueue;
 import :D3D12Device;
 import :D3D12GraphicsCommandQueue;
+import :D3D12SwapChain;
 import :D3D12Texture;
 import :D3D12Utility;
 import :EngineUtility;
@@ -70,14 +72,17 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Pure function")]]
 		struct SwapChainSupport SwapChainSupport() const;
 		[[nodiscard("Pure function")]]
+		bool IsSwapChainAlive() const;
+		[[nodiscard("Pure function")]]
 		void CreateSwapChain(const SwapChainParams& params);
+		void DestroySwapChain();
 		[[nodiscard("Pure function")]]
 		std::uint8_t SwapChainBufferCount() const;
 		[[nodiscard("Pure function")]]
 		std::uint8_t CurrentSwapChainBufferIndex() const;
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const;
-		void PresentNext();
+		const std::shared_ptr<ITexture>& SwapChainBuffer(std::uint8_t bufferIndex) const;
+		void PresentNextSwapChainBuffer();
 
 		D3D12Engine& operator =(const D3D12Engine&) = delete;
 		D3D12Engine& operator =(D3D12Engine&&) = delete;
@@ -107,10 +112,7 @@ export namespace PonyEngine::Render::Windows
 		D3D12ComputeCommandQueue computeCommandQueue;
 		D3D12CopyCommandQueue copyCommandQueue;
 
-		std::unique_ptr<DXGISwapChain> swapChain;
-		std::vector<std::shared_ptr<D3D12Texture>> swapChainBuffers;
-		UINT swapChainSyncInterval;
-		UINT swapChainPresentFlags;
+		std::unique_ptr<D3D12SwapChain> swapChain;
 	};
 }
 
@@ -124,9 +126,7 @@ namespace PonyEngine::Render::Windows
 		device(*this->renderDevice),
 		graphicsCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
 		computeCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
-		copyCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
-		swapChainSyncInterval{0u},
-		swapChainPresentFlags{0u}
+		copyCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH)
 	{
 	}
 
@@ -296,8 +296,18 @@ namespace PonyEngine::Render::Windows
 		};
 	}
 
+	bool D3D12Engine::IsSwapChainAlive() const
+	{
+		return static_cast<bool>(swapChain);
+	}
+
 	void D3D12Engine::CreateSwapChain(const SwapChainParams& params)
 	{
+		if (swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is alive");
+		}
+
 		ValidateSwapChainParams(params);
 
 		const std::size_t formatIndex = textureFormatMap.IndexOf(params.format);
@@ -315,39 +325,37 @@ namespace PonyEngine::Render::Windows
 
 		const HWND windowHandle = renderDevice->Application().GetService<Surface::Windows::ISurfaceService>().Handle();
 		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = ToSwapChainDesc(params, format);
-		swapChainBuffers.clear();
+
+		auto dxgiSwapChain = DXGISwapChain(factory.CreateSwapChain(graphicsCommandQueue.CommandQueue(), windowHandle, swapChainDesc));
+		factory.MakeWindowAssociation(windowHandle);
+		dxgiSwapChain.SetFullscreenState(FALSE);
+
+		auto buffers = std::vector<std::shared_ptr<D3D12Texture>>(params.bufferCount);
+		for (UINT i = 0u; i < params.bufferCount; ++i)
+		{
+			Platform::Windows::ComPtr<ID3D12Resource2> resource;
+			dxgiSwapChain.GetBuffer(i, resource);
+			buffers[i] = std::make_shared<D3D12Texture>(std::move(resource), params.format, std::span<const TextureFormatId>(),
+				static_cast<std::uint32_t>(swapChainDesc.Width), static_cast<std::uint32_t>(swapChainDesc.Height), 1u, 1u,
+				TextureDimension::Texture2D, SampleCount::X1, params.usage, srgb);
+		}
+
+		swapChain = std::make_unique<D3D12SwapChain>(std::move(dxgiSwapChain), std::move(buffers), ToSyncInterval(params.syncMode), ToPresentFlags(params.syncMode));
+	}
+
+	void D3D12Engine::DestroySwapChain()
+	{
 		swapChain.reset();
-		swapChainBuffers.resize(params.bufferCount);
-
-		try
-		{
-			swapChain = factory.CreateSwapChain(graphicsCommandQueue.CommandQueue(), windowHandle, swapChainDesc);
-			factory.MakeWindowAssociation(windowHandle);
-			swapChain->SetFullscreenState(FALSE);
-
-			for (UINT i = 0u; i < params.bufferCount; ++i)
-			{
-				Platform::Windows::ComPtr<ID3D12Resource2> resource;
-				swapChain->GetBuffer(i, resource);
-				swapChainBuffers[i] = std::make_shared<D3D12Texture>(std::move(resource), params.format, std::span<const TextureFormatId>(),
-					static_cast<std::uint32_t>(swapChainDesc.Width), static_cast<std::uint32_t>(swapChainDesc.Height), 1u, 1u, 
-					TextureDimension::Texture2D, SampleCount::X1, params.usage, srgb);
-			}
-		}
-		catch (...)
-		{
-			swapChainBuffers.resize(0);
-			swapChain.reset();
-			throw;
-		}
-
-		swapChainSyncInterval = ToSyncInterval(params.syncMode);
-		swapChainPresentFlags = ToPresentFlags(params.syncMode);
 	}
 
 	std::uint8_t D3D12Engine::SwapChainBufferCount() const
 	{
-		return static_cast<std::uint8_t>(swapChainBuffers.size());
+		if (!swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is not created");
+		}
+
+		return swapChain->BufferCount();
 	}
 
 	std::uint8_t D3D12Engine::CurrentSwapChainBufferIndex() const
@@ -360,24 +368,28 @@ namespace PonyEngine::Render::Windows
 		return static_cast<std::uint8_t>(swapChain->GetCurrentBufferIndex());
 	}
 
-	std::shared_ptr<ITexture> D3D12Engine::SwapChainBuffer(const std::uint8_t bufferIndex) const
+	const std::shared_ptr<ITexture>& D3D12Engine::SwapChainBuffer(const std::uint8_t bufferIndex) const
 	{
-		if (bufferIndex >= swapChainBuffers.size()) [[unlikely]]
+		if (!swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is not created");
+		}
+		if (bufferIndex >= swapChain->BufferCount()) [[unlikely]]
 		{
 			throw std::out_of_range("Buffer index is out of range");
 		}
 
-		return swapChainBuffers[bufferIndex];
+		return swapChain->GetBuffer(bufferIndex);
 	}
 
-	void D3D12Engine::PresentNext()
+	void D3D12Engine::PresentNextSwapChainBuffer()
 	{
 		if (!swapChain) [[unlikely]]
 		{
 			throw std::logic_error("Swap chain is not created");
 		}
 
-		swapChain->Present(swapChainSyncInterval, swapChainPresentFlags);
+		swapChain->Present();
 	}
 
 	TextureSupportResponse D3D12Engine::MakeResponse(const DXGI_FORMAT format, const TextureSupportRequest& request,
