@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Render/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Buffer;
@@ -71,6 +73,7 @@ namespace PonyEngine::Render::Windows
 		size{size},
 		usage{usage}
 	{
+		assert(this->resource && "The buffer resource is nullptr.");
 	}
 
 	std::uint64_t D3D12Buffer::Size() const noexcept

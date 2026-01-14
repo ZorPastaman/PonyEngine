@@ -38,7 +38,7 @@ export namespace PonyEngine::Render::Windows
 		BOOL GetTearingSupport() const;
 
 		[[nodiscard("Pure function")]]
-		std::unique_ptr<DXGISwapChain> CreateSwapChain(IUnknown& device, HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc);
+		Platform::Windows::ComPtr<IDXGISwapChain4> CreateSwapChain(IUnknown& device, HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc);
 		void MakeWindowAssociation(HWND windowHandle);
 
 		DXGIFactory& operator =(const DXGIFactory&) = delete;
@@ -115,9 +115,21 @@ namespace PonyEngine::Render::Windows
 		return tearingSupport;
 	}
 
-	std::unique_ptr<DXGISwapChain> DXGIFactory::CreateSwapChain(IUnknown& device, const HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc)
+	Platform::Windows::ComPtr<IDXGISwapChain4> DXGIFactory::CreateSwapChain(IUnknown& device, const HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc)
 	{
-		return std::make_unique<DXGISwapChain>(*renderDevice, *factory, device, windowHandle, swapChainDesc);
+		Platform::Windows::ComPtr<IDXGISwapChain1> swapChain;
+		if (const HRESULT result = factory->CreateSwapChainForHwnd(&device, windowHandle, &swapChainDesc, nullptr, nullptr,
+			swapChain.GetAddress()); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to acquire DXGI swap chain: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		Platform::Windows::ComPtr<IDXGISwapChain4> modernSwapChain;
+		if (const HRESULT result = swapChain->QueryInterface(IID_PPV_ARGS(modernSwapChain.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to cast DXGI swap chain interface: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return modernSwapChain;
 	}
 
 	void DXGIFactory::MakeWindowAssociation(const HWND windowHandle)

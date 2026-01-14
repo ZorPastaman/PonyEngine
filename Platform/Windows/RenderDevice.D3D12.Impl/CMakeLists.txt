@@ -34,6 +34,7 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Device.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Engine.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12GraphicsCommandQueue.cppm"
+	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12SwapChain.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Texture.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Utility.cppm"
 	"Source/Private/RenderDevice.D3D12.Impl.Windows-EngineUtility.cppm"

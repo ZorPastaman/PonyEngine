@@ -61,15 +61,18 @@ export namespace PonyEngine::Render::Windows
 
 		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsSwapChainAlive() const override;
 		[[nodiscard("Pure function")]] 
 		virtual void CreateSwapChain(const SwapChainParams& params) override;
+		virtual void DestroySwapChain() override;
 		[[nodiscard("Pure function")]] 
 		virtual std::uint8_t SwapChainBufferCount() const override;
 		[[nodiscard("Pure function")]] 
 		virtual std::uint8_t CurrentSwapChainBufferIndex() const override;
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const override;
-		virtual void PresentNext() override;
+		virtual void PresentNextSwapChainBuffer() override;
 
 		D3D12Backend& operator =(const D3D12Backend&) = delete;
 		D3D12Backend& operator =(D3D12Backend&&) = delete;
@@ -163,9 +166,19 @@ namespace PonyEngine::Render::Windows
 		return engine->SwapChainSupport();
 	}
 
+	bool D3D12Backend::IsSwapChainAlive() const
+	{
+		return engine->IsSwapChainAlive();
+	}
+
 	void D3D12Backend::CreateSwapChain(const SwapChainParams& params)
 	{
 		engine->CreateSwapChain(params);
+	}
+
+	void D3D12Backend::DestroySwapChain()
+	{
+		engine->DestroySwapChain();
 	}
 
 	std::uint8_t D3D12Backend::SwapChainBufferCount() const
@@ -183,8 +196,8 @@ namespace PonyEngine::Render::Windows
 		return engine->SwapChainBuffer(bufferIndex);
 	}
 
-	void D3D12Backend::PresentNext()
+	void D3D12Backend::PresentNextSwapChainBuffer()
 	{
-		engine->PresentNext();
+		engine->PresentNextSwapChainBuffer();
 	}
 }

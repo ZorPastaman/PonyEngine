@@ -108,6 +108,6 @@ namespace Game
 
 	void GameService::Tick()
 	{
-		renderDevice->PresentNext();
+		renderDevice->PresentNextSwapChainBuffer();
 	}
 }
