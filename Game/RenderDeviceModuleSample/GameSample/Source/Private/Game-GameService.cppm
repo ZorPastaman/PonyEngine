@@ -30,6 +30,10 @@ export namespace Game
 
 		PonyEngine::Application::IApplicationContext* application;
 		PonyEngine::Render::IRenderDeviceService* renderDevice;
+
+		std::shared_ptr<PonyEngine::Render::IGraphicsCommandList> graphicsCommandList;
+		std::shared_ptr<PonyEngine::Render::IComputeCommandList> computeCommandList;
+		std::shared_ptr<PonyEngine::Render::ICopyCommandList> copyCommandList;
 	};
 }
 
@@ -96,9 +100,9 @@ namespace Game
 			.usage = PonyEngine::Render::TextureUsage::RenderTarget
 		});
 
-		const std::shared_ptr<PonyEngine::Render::IGraphicsCommandList> graphicsCommandList = renderDevice->CreateGraphicsCommandList();
-		const std::shared_ptr<PonyEngine::Render::IComputeCommandList> computeCommandList = renderDevice->CreateComputeCommandList();
-		const std::shared_ptr<PonyEngine::Render::ICopyCommandList> copyCommandList = renderDevice->CreateCopyCommandList();
+		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
+		computeCommandList = renderDevice->CreateComputeCommandList();
+		copyCommandList = renderDevice->CreateCopyCommandList();
 		graphicsCommandList->Reset();
 		computeCommandList->Reset();
 		copyCommandList->Reset();
