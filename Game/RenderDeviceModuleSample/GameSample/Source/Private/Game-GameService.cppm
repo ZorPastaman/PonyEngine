@@ -95,6 +95,22 @@ namespace Game
 			.flags = PonyEngine::Render::SwapChainFlag::SRGB,
 			.usage = PonyEngine::Render::TextureUsage::RenderTarget
 		});
+
+		const std::shared_ptr<PonyEngine::Render::IGraphicsCommandList> graphicsCommandList = renderDevice->CreateGraphicsCommandList();
+		const std::shared_ptr<PonyEngine::Render::IComputeCommandList> computeCommandList = renderDevice->CreateComputeCommandList();
+		const std::shared_ptr<PonyEngine::Render::ICopyCommandList> copyCommandList = renderDevice->CreateCopyCommandList();
+		graphicsCommandList->Reset();
+		computeCommandList->Reset();
+		copyCommandList->Reset();
+		graphicsCommandList->Close();
+		computeCommandList->Close();
+		copyCommandList->Close();
+		const auto graphics = std::array<const PonyEngine::Render::IGraphicsCommandList*, 1>{ graphicsCommandList.get() };
+		const auto compute = std::array<const PonyEngine::Render::IComputeCommandList*, 1>{ computeCommandList.get() };
+		const auto copy = std::array<const PonyEngine::Render::ICopyCommandList*, 1>{ copyCommandList.get() };
+		renderDevice->Execute(std::span(graphics.data(), 1u));
+		renderDevice->Execute(std::span(compute.data(), 1u));
+		renderDevice->Execute(std::span(copy.data(), 1u));
 	}
 
 	void GameService::End()

@@ -41,6 +41,8 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Pure function")]]
 		const ID3D12CommandQueue& CommandQueue() const noexcept;
 
+		void Execute(std::span<ID3D12CommandList* const> commandLists);
+
 		void SetName(std::string_view name);
 
 		D3D12CommandQueue& operator =(const D3D12CommandQueue&) = delete;
@@ -74,8 +76,18 @@ namespace PonyEngine::Render::Windows
 		return *commandQueue;
 	}
 
+	void D3D12CommandQueue::Execute(const std::span<ID3D12CommandList* const> commandLists)
+	{
+		if (commandLists.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Command lists span is too large");
+		}
+
+		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
+	}
+
 	void D3D12CommandQueue::SetName(const std::string_view name)
 	{
-		Windows::SetName(*commandQueue, name);
+		SetObjectName(*commandQueue, name);
 	}
 }

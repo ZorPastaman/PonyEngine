@@ -29,7 +29,10 @@ import :DXGISwapChain;
 import :DXGITextureFormatMap;
 import :D3D12Buffer;
 import :D3D12CommandQueue;
+import :D3D12ComputeCommandList;
+import :D3D12CopyCommandList;
 import :D3D12Device;
+import :D3D12GraphicsCommandList;
 import :D3D12SwapChain;
 import :D3D12Texture;
 import :D3D12Utility;
@@ -59,6 +62,16 @@ export namespace PonyEngine::Render::Windows
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params);
+
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IComputeCommandList> CreateComputeCommandList();
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ICopyCommandList> CreateCopyCommandList();
+		void Execute(std::span<const IGraphicsCommandList* const> commandLists);
+		void Execute(std::span<const IComputeCommandList* const> commandLists);
+		void Execute(std::span<const ICopyCommandList* const> commandLists);
 
 		[[nodiscard("Pure function")]]
 		struct SwapChainSupport SwapChainSupport() const;
@@ -259,6 +272,90 @@ namespace PonyEngine::Render::Windows
 		return std::make_shared<D3D12Texture>(std::move(resource), params.format, params.castableFormats, 
 			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), static_cast<std::uint16_t>(resourceDesc.DepthOrArraySize),
 			static_cast<std::uint16_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
+	}
+
+	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
+	{
+		constexpr D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+		return std::make_shared<D3D12GraphicsCommandList>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+	}
+
+	std::shared_ptr<IComputeCommandList> D3D12Engine::CreateComputeCommandList()
+	{
+		constexpr D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+		return std::make_shared<D3D12ComputeCommandList>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+	}
+
+	std::shared_ptr<ICopyCommandList> D3D12Engine::CreateCopyCommandList()
+	{
+		constexpr D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_COPY;
+		return std::make_shared<D3D12CopyCommandList>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+	}
+
+	void D3D12Engine::Execute(const std::span<const IGraphicsCommandList* const> commandLists)
+	{
+		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
+		{
+			const IGraphicsCommandList* const commandList = commandLists[i];
+			if (!commandList || typeid(*commandList) != typeid(D3D12GraphicsCommandList)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid command list");
+			}
+		}
+
+		arena.Free();
+		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
+		const std::span<ID3D12CommandList*> listSpan = arena.Span(lists);
+		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
+		{
+			listSpan[i] = &static_cast<const D3D12GraphicsCommandList*>(commandLists[i])->CommandList();
+		}
+
+		graphicsCommandQueue.Execute(listSpan);
+	}
+
+	void D3D12Engine::Execute(const std::span<const IComputeCommandList* const> commandLists)
+	{
+		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
+		{
+			const IComputeCommandList* const commandList = commandLists[i];
+			if (!commandList || typeid(*commandList) != typeid(D3D12ComputeCommandList)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid command list");
+			}
+		}
+
+		arena.Free();
+		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
+		const std::span<ID3D12CommandList*> listSpan = arena.Span(lists);
+		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
+		{
+			listSpan[i] = &static_cast<const D3D12ComputeCommandList*>(commandLists[i])->CommandList();
+		}
+
+		computeCommandQueue.Execute(listSpan);
+	}
+
+	void D3D12Engine::Execute(const std::span<const ICopyCommandList* const> commandLists)
+	{
+		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
+		{
+			const ICopyCommandList* const commandList = commandLists[i];
+			if (!commandList || typeid(*commandList) != typeid(D3D12CopyCommandList)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid command list");
+			}
+		}
+
+		arena.Free();
+		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
+		const std::span<ID3D12CommandList*> listSpan = arena.Span(lists);
+		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
+		{
+			listSpan[i] = &static_cast<const D3D12CopyCommandList*>(commandLists[i])->CommandList();
+		}
+
+		copyCommandQueue.Execute(listSpan);
 	}
 
 	struct SwapChainSupport D3D12Engine::SwapChainSupport() const

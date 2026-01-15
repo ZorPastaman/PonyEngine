@@ -20,6 +20,9 @@ import PonyEngine.Meta;
 import :BufferParams;
 import :HeapType;
 import :IBuffer;
+import :IComputeCommandList;
+import :ICopyCommandList;
+import :IGraphicsCommandList;
 import :ITexture;
 import :SwapChainParams;
 import :SwapChainSupport;
@@ -60,6 +63,16 @@ export namespace PonyEngine::Render
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
+
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() = 0;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() = 0;
+		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists) = 0;
+		virtual void Execute(std::span<const IComputeCommandList* const> commandLists) = 0;
+		virtual void Execute(std::span<const ICopyCommandList* const> commandLists) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual struct SwapChainSupport SwapChainSupport() const = 0;

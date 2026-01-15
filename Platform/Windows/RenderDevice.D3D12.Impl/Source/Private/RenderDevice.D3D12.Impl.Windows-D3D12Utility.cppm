@@ -33,7 +33,7 @@ export namespace PonyEngine::Render::Windows
 	/// @brief Sets the object name.
 	/// @param object Target object.
 	/// @param name Name to set.
-	void SetName(ID3D12Object& object, std::string_view name);
+	void SetObjectName(ID3D12Object& object, std::string_view name);
 }
 
 namespace PonyEngine::Render::Windows
@@ -219,7 +219,7 @@ namespace PonyEngine::Render::Windows
 		}
 	}
 
-	void SetName(ID3D12Object& object, const std::string_view name)
+	void SetObjectName(ID3D12Object& object, const std::string_view name)
 	{
 		if (const HRESULT result = object.SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<UINT>(name.size()), name.data()); FAILED(result)) [[unlikely]]
 		{

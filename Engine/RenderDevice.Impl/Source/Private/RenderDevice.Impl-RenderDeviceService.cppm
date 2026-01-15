@@ -74,6 +74,16 @@ export namespace PonyEngine::Render
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() override;
+		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists) override;
+		virtual void Execute(std::span<const IComputeCommandList* const> commandLists) override;
+		virtual void Execute(std::span<const ICopyCommandList* const> commandLists) override;
+
 		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]] 
@@ -333,6 +343,36 @@ namespace PonyEngine::Render
 	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
 		return GetCurrentBackend().CreateTexture(heapType, params);
+	}
+
+	std::shared_ptr<IGraphicsCommandList> RenderDeviceService::CreateGraphicsCommandList()
+	{
+		return GetCurrentBackend().CreateGraphicsCommandList();
+	}
+
+	std::shared_ptr<IComputeCommandList> RenderDeviceService::CreateComputeCommandList()
+	{
+		return GetCurrentBackend().CreateComputeCommandList();
+	}
+
+	std::shared_ptr<ICopyCommandList> RenderDeviceService::CreateCopyCommandList()
+	{
+		return GetCurrentBackend().CreateCopyCommandList();
+	}
+
+	void RenderDeviceService::Execute(const std::span<const IGraphicsCommandList* const> commandLists)
+	{
+		GetCurrentBackend().Execute(commandLists);
+	}
+
+	void RenderDeviceService::Execute(const std::span<const IComputeCommandList* const> commandLists)
+	{
+		GetCurrentBackend().Execute(commandLists);
+	}
+
+	void RenderDeviceService::Execute(const std::span<const ICopyCommandList* const> commandLists)
+	{
+		GetCurrentBackend().Execute(commandLists);
 	}
 
 	struct SwapChainSupport RenderDeviceService::SwapChainSupport() const

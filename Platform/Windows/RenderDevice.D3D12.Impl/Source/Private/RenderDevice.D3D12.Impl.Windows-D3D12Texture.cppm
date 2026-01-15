@@ -186,7 +186,7 @@ namespace PonyEngine::Render::Windows
 
 	void D3D12Texture::SetName(const std::string_view name)
 	{
-		Windows::SetName(*resource, name);
+		SetObjectName(*resource, name);
 	}
 
 	ID3D12Resource2& D3D12Texture::Resource() noexcept
