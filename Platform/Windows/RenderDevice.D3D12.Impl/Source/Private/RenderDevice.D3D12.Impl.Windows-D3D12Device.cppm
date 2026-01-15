@@ -53,6 +53,11 @@ export namespace PonyEngine::Render::Windows
 			const D3D12_CLEAR_VALUE& clearValue = D3D12_CLEAR_VALUE{.Format = DXGI_FORMAT_UNKNOWN}, 
 			std::span<const DXGI_FORMAT> castableFormats = std::span<const DXGI_FORMAT>());
 
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
+
 		void SetName(std::string_view name);
 
 		D3D12Device& operator =(const D3D12Device&) = delete;
@@ -74,35 +79,35 @@ namespace PonyEngine::Render::Windows
 		renderDevice{&renderDevice}
 	{
 #ifndef NDEBUG
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring debug interface...");
+		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring D3D12 debug interface...");
 		if (const HRESULT result = D3D12GetDebugInterface(IID_PPV_ARGS(debug.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to acquire debug interface: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring debug interface done.");
+		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring D3D12 debug interface done.");
 
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Debug, "Enabling debug layer.");
+		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Debug, "Enabling D3D12 debug layer.");
 		debug->EnableDebugLayer();
 #endif
 
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring d3d12 device...");
+		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring D3D12 device...");
 		if (const HRESULT result = D3D12CreateDevice(nullptr, FeatureLevel, IID_PPV_ARGS(device.GetAddress())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to acquire device: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(std::format("Failed to acquire D3D12 device: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring d3d12 device done.");
+		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring D3D12 device done.");
 	}
 
 	D3D12Device::~D3D12Device() noexcept
 	{
-		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 device...");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing D3D12 device...");
 		device.Reset();
-		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing d3d12 device done.");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing D3D12 device done.");
 
 #ifndef NDEBUG
-		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface...");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing D3D12 debug interface...");
 		debug.Reset();
-		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing debug interface done.");
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing D3D12 debug interface done.");
 #endif
 	}
 
@@ -133,7 +138,7 @@ namespace PonyEngine::Render::Windows
 		Platform::Windows::ComPtr<ID3D12CommandQueue> commandQueue;
 		if (const HRESULT result = this->device->CreateCommandQueue1(&queueDesc, creatorId, IID_PPV_ARGS(commandQueue.GetAddress())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to acquire d3d12 command queue: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(std::format("Failed to acquire D3D12 command queue: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return commandQueue;
@@ -146,16 +151,39 @@ namespace PonyEngine::Render::Windows
 		Platform::Windows::ComPtr<ID3D12Resource2> resource;
 		if (const HRESULT result = device->CreateCommittedResource3(&heapProperties, heapFlags, &resourceDesc, initialLayout, 
 			clearValue.Format != DXGI_FORMAT_UNKNOWN ? &clearValue : nullptr, nullptr, 
-			static_cast<UINT32>(castableFormats.size()), castableFormats.data(), IID_PPV_ARGS(resource.GetAddress())); FAILED(result))
+			static_cast<UINT32>(castableFormats.size()), castableFormats.data(), IID_PPV_ARGS(resource.GetAddress())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to create resource: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(std::format("Failed to create D3D12 resource: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return resource;
 	}
 
+	Platform::Windows::ComPtr<ID3D12CommandAllocator> D3D12Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)
+	{
+		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator;
+		if (const HRESULT result = device->CreateCommandAllocator(commandListType, IID_PPV_ARGS(allocator.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 command allocator: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return allocator;
+	}
+
+	Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> D3D12Device::CreateCommandList(const D3D12_COMMAND_LIST_TYPE commandListType)
+	{
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList;
+		if (const HRESULT result = device->CreateCommandList1(0u, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddress())); 
+			FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 graphics command list: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return commandList;
+	}
+
 	void D3D12Device::SetName(const std::string_view name)
 	{
-		Windows::SetName(*device, name);
+		SetObjectName(*device, name);
 	}
 }

@@ -46,6 +46,16 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() override;
+		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists) override;
+		virtual void Execute(std::span<const IComputeCommandList* const> commandLists) override;
+		virtual void Execute(std::span<const ICopyCommandList* const> commandLists) override;
+
 		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]]
@@ -116,6 +126,36 @@ namespace PonyEngine::Render::Windows
 	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
 		return engine->CreateTexture(heapType, params);
+	}
+
+	std::shared_ptr<IGraphicsCommandList> D3D12Backend::CreateGraphicsCommandList()
+	{
+		return engine->CreateGraphicsCommandList();
+	}
+
+	std::shared_ptr<IComputeCommandList> D3D12Backend::CreateComputeCommandList()
+	{
+		return engine->CreateComputeCommandList();
+	}
+
+	std::shared_ptr<ICopyCommandList> D3D12Backend::CreateCopyCommandList()
+	{
+		return engine->CreateCopyCommandList();
+	}
+
+	void D3D12Backend::Execute(const std::span<const IGraphicsCommandList* const> commandLists)
+	{
+		engine->Execute(commandLists);
+	}
+
+	void D3D12Backend::Execute(const std::span<const IComputeCommandList* const> commandLists)
+	{
+		engine->Execute(commandLists);
+	}
+
+	void D3D12Backend::Execute(const std::span<const ICopyCommandList* const> commandLists)
+	{
+		engine->Execute(commandLists);
 	}
 
 	struct SwapChainSupport D3D12Backend::SwapChainSupport() const

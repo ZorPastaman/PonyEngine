@@ -28,7 +28,9 @@ export namespace PonyEngine::Render::Windows
 		explicit DXGISwapChain(IDXGISwapChain4& swapChain) noexcept;
 		[[nodiscard("Pure constructor")]]
 		explicit DXGISwapChain(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain) noexcept;
+		[[nodiscard("Pure constructor")]]
 		DXGISwapChain(const DXGISwapChain& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
 		DXGISwapChain(DXGISwapChain&& other) noexcept = default;
 
 		~DXGISwapChain() noexcept = default;
