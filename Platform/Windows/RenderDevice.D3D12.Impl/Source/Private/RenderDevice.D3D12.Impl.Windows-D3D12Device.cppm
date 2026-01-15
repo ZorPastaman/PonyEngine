@@ -40,14 +40,12 @@ export namespace PonyEngine::Render::Windows
 		~D3D12Device() noexcept;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Device14& Device() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Device14& Device() const noexcept;
-
-		[[nodiscard("Pure function")]]
 		D3D12_FEATURE_DATA_FORMAT_SUPPORT GetFormatSupport(DXGI_FORMAT format) const;
 		[[nodiscard("Pure function")]]
 		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
+
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12CommandQueue> CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId);
 
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12Resource2> CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, D3D12_HEAP_FLAGS heapFlags, 
@@ -108,16 +106,6 @@ namespace PonyEngine::Render::Windows
 #endif
 	}
 
-	ID3D12Device14& D3D12Device::Device() noexcept
-	{
-		return *device;
-	}
-
-	const ID3D12Device14& D3D12Device::Device() const noexcept
-	{
-		return *device;
-	}
-
 	D3D12_FEATURE_DATA_FORMAT_SUPPORT D3D12Device::GetFormatSupport(const DXGI_FORMAT format) const
 	{
 		auto formatSupport = D3D12_FEATURE_DATA_FORMAT_SUPPORT{.Format = format};
@@ -138,6 +126,17 @@ namespace PonyEngine::Render::Windows
 		}
 
 		return levels.NumQualityLevels;
+	}
+
+	Platform::Windows::ComPtr<ID3D12CommandQueue> D3D12Device::CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId)
+	{
+		Platform::Windows::ComPtr<ID3D12CommandQueue> commandQueue;
+		if (const HRESULT result = this->device->CreateCommandQueue1(&queueDesc, creatorId, IID_PPV_ARGS(commandQueue.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to acquire d3d12 command queue: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return commandQueue;
 	}
 
 	Platform::Windows::ComPtr<ID3D12Resource2> D3D12Device::CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, const D3D12_HEAP_FLAGS heapFlags, 

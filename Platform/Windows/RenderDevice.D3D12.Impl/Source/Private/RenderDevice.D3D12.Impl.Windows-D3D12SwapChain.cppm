@@ -41,11 +41,13 @@ export namespace PonyEngine::Render::Windows
 		~D3D12SwapChain() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::uint8_t BufferCount() const noexcept;
+		UINT BufferCount() const noexcept;
 		[[nodiscard("Pure function")]]
-		std::uint8_t GetCurrentBufferIndex() const noexcept;
+		UINT GetCurrentBufferIndex() const noexcept;
 		[[nodiscard("Pure function")]]
-		const std::shared_ptr<D3D12Texture>& GetBuffer(std::uint8_t index) const;
+		const std::shared_ptr<D3D12Texture>& GetBuffer(UINT index) const;
+
+		void SetFullscreenState(BOOL fullscreen);
 
 		void Present();
 
@@ -69,7 +71,7 @@ namespace PonyEngine::Render::Windows
 		syncInterval{syncInterval},
 		presentFlags{presentFlags}
 	{
-		assert(buffers.size() <= std::numeric_limits<std::uint8_t>::max() && "The buffer count is too great.");
+		assert(buffers.size() <= std::numeric_limits<UINT>::max() && "The buffer count is too great.");
 		assert(std::ranges::find(this->buffers, nullptr) == this->buffers.cend() && "At least one buffer is nullptr.");
 	}
 
@@ -80,7 +82,7 @@ namespace PonyEngine::Render::Windows
 		syncInterval{syncInterval},
 		presentFlags{presentFlags}
 	{
-		assert(buffers.size() <= std::numeric_limits<std::uint8_t>::max() && "The buffer count is too great.");
+		assert(buffers.size() <= std::numeric_limits<UINT>::max() && "The buffer count is too great.");
 		assert(std::ranges::find(this->buffers, nullptr) == this->buffers.cend() && "At least one buffer is nullptr.");
 	}
 
@@ -91,7 +93,7 @@ namespace PonyEngine::Render::Windows
 		syncInterval{syncInterval},
 		presentFlags{presentFlags}
 	{
-		assert(buffers.size() <= std::numeric_limits<std::uint8_t>::max() && "The buffer count is too great.");
+		assert(buffers.size() <= std::numeric_limits<UINT>::max() && "The buffer count is too great.");
 		assert(std::ranges::find(this->buffers, nullptr) == this->buffers.cend() && "At least one buffer is nullptr.");
 	}
 
@@ -102,23 +104,28 @@ namespace PonyEngine::Render::Windows
 		syncInterval{syncInterval},
 		presentFlags{presentFlags}
 	{
-		assert(buffers.size() <= std::numeric_limits<std::uint8_t>::max() && "The buffer count is too great.");
+		assert(buffers.size() <= std::numeric_limits<UINT>::max() && "The buffer count is too great.");
 		assert(std::ranges::find(this->buffers, nullptr) == this->buffers.cend() && "At least one buffer is nullptr.");
 	}
 
-	std::uint8_t D3D12SwapChain::BufferCount() const noexcept
+	UINT D3D12SwapChain::BufferCount() const noexcept
 	{
-		return static_cast<std::uint8_t>(buffers.size());
+		return static_cast<UINT>(buffers.size());
 	}
 
-	std::uint8_t D3D12SwapChain::GetCurrentBufferIndex() const noexcept
+	UINT D3D12SwapChain::GetCurrentBufferIndex() const noexcept
 	{
-		return static_cast<std::uint8_t>(swapChain.GetCurrentBufferIndex());
+		return swapChain.GetCurrentBufferIndex();
 	}
 
-	const std::shared_ptr<D3D12Texture>& D3D12SwapChain::GetBuffer(const std::uint8_t index) const
+	const std::shared_ptr<D3D12Texture>& D3D12SwapChain::GetBuffer(const UINT index) const
 	{
 		return buffers[index];
+	}
+
+	void D3D12SwapChain::SetFullscreenState(const BOOL fullscreen)
+	{
+		swapChain.SetFullscreenState(fullscreen);
 	}
 
 	void D3D12SwapChain::Present()

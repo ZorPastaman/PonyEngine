@@ -75,19 +75,6 @@ export namespace PonyEngine::Render
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
 		[[nodiscard("Pure function")]] 
-		virtual IGraphicsCommandQueue& GraphicsCommandQueue() override;
-		[[nodiscard("Pure function")]] 
-		virtual const IGraphicsCommandQueue& GraphicsCommandQueue() const override;
-		[[nodiscard("Pure function")]] 
-		virtual IComputeCommandQueue& ComputeCommandQueue() override;
-		[[nodiscard("Pure function")]] 
-		virtual const IComputeCommandQueue& ComputeCommandQueue() const override;
-		[[nodiscard("Pure function")]] 
-		virtual ICopyCommandQueue& CopyCommandQueue() override;
-		[[nodiscard("Pure function")]] 
-		virtual const ICopyCommandQueue& CopyCommandQueue() const override;
-
-		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]] 
 		virtual bool IsSwapChainAlive() const override;
@@ -346,36 +333,6 @@ namespace PonyEngine::Render
 	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
 		return GetCurrentBackend().CreateTexture(heapType, params);
-	}
-
-	IGraphicsCommandQueue& RenderDeviceService::GraphicsCommandQueue()
-	{
-		return GetCurrentBackend().GraphicsCommandQueue();
-	}
-
-	const IGraphicsCommandQueue& RenderDeviceService::GraphicsCommandQueue() const
-	{
-		return GetCurrentBackend().GraphicsCommandQueue();
-	}
-
-	IComputeCommandQueue& RenderDeviceService::ComputeCommandQueue()
-	{
-		return GetCurrentBackend().ComputeCommandQueue();
-	}
-
-	const IComputeCommandQueue& RenderDeviceService::ComputeCommandQueue() const
-	{
-		return GetCurrentBackend().ComputeCommandQueue();
-	}
-
-	ICopyCommandQueue& RenderDeviceService::CopyCommandQueue()
-	{
-		return GetCurrentBackend().CopyCommandQueue();
-	}
-
-	const ICopyCommandQueue& RenderDeviceService::CopyCommandQueue() const
-	{
-		return GetCurrentBackend().CopyCommandQueue();
 	}
 
 	struct SwapChainSupport RenderDeviceService::SwapChainSupport() const

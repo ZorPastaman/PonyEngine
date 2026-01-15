@@ -47,19 +47,6 @@ export namespace PonyEngine::Render::Windows
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
 		[[nodiscard("Pure function")]] 
-		virtual IGraphicsCommandQueue& GraphicsCommandQueue() noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual const IGraphicsCommandQueue& GraphicsCommandQueue() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual IComputeCommandQueue& ComputeCommandQueue() noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual const IComputeCommandQueue& ComputeCommandQueue() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual ICopyCommandQueue& CopyCommandQueue() noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual const ICopyCommandQueue& CopyCommandQueue() const noexcept override;
-
-		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]]
 		virtual bool IsSwapChainAlive() const override;
@@ -129,36 +116,6 @@ namespace PonyEngine::Render::Windows
 	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
 		return engine->CreateTexture(heapType, params);
-	}
-
-	IGraphicsCommandQueue& D3D12Backend::GraphicsCommandQueue() noexcept
-	{
-		return engine->GraphicsCommandQueue();
-	}
-
-	const IGraphicsCommandQueue& D3D12Backend::GraphicsCommandQueue() const noexcept
-	{
-		return engine->GraphicsCommandQueue();
-	}
-
-	IComputeCommandQueue& D3D12Backend::ComputeCommandQueue() noexcept
-	{
-		return engine->ComputeCommandQueue();
-	}
-
-	const IComputeCommandQueue& D3D12Backend::ComputeCommandQueue() const noexcept
-	{
-		return engine->ComputeCommandQueue();
-	}
-
-	ICopyCommandQueue& D3D12Backend::CopyCommandQueue() noexcept
-	{
-		return engine->CopyCommandQueue();
-	}
-
-	const ICopyCommandQueue& D3D12Backend::CopyCommandQueue() const noexcept
-	{
-		return engine->CopyCommandQueue();
 	}
 
 	struct SwapChainSupport D3D12Backend::SwapChainSupport() const
