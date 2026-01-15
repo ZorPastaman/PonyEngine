@@ -28,10 +28,8 @@ import :DXGIFactory;
 import :DXGISwapChain;
 import :DXGITextureFormatMap;
 import :D3D12Buffer;
-import :D3D12ComputeCommandQueue;
-import :D3D12CopyCommandQueue;
+import :D3D12CommandQueue;
 import :D3D12Device;
-import :D3D12GraphicsCommandQueue;
 import :D3D12SwapChain;
 import :D3D12Texture;
 import :D3D12Utility;
@@ -63,13 +61,6 @@ export namespace PonyEngine::Render::Windows
 		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params);
 
 		[[nodiscard("Pure function")]]
-		IGraphicsCommandQueue& GraphicsCommandQueue() noexcept;
-		[[nodiscard("Pure function")]]
-		IComputeCommandQueue& ComputeCommandQueue() noexcept;
-		[[nodiscard("Pure function")]]
-		ICopyCommandQueue& CopyCommandQueue() noexcept;
-
-		[[nodiscard("Pure function")]]
 		struct SwapChainSupport SwapChainSupport() const;
 		[[nodiscard("Pure function")]]
 		bool IsSwapChainAlive() const;
@@ -93,11 +84,17 @@ export namespace PonyEngine::Render::Windows
 		[[nodiscard("Pure function")]]
 		SampleCountMask GetSampleCountMask(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
 
+		[[nodiscard("Pure function")]]
+		static D3D12_COMMAND_QUEUE_DESC GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE type) noexcept;
+
 		static void ValidateSize(const BufferParams& params);
 		static void ValidateDimension(const TextureParams& params);
 		static void ValidateColorTexture(const TextureParams& params);
 		static void ValidateDepthTexture(const TextureParams& params);
 		static void ValidateSwapChainParams(const SwapChainParams& params);
+
+		// {132D4628-84F4-40F4-B72F-8A7B08C3C566}
+		static constexpr GUID CreatorId = { 0x132d4628, 0x84f4, 0x40f4, { 0xb7, 0x2f, 0x8a, 0x7b, 0x8, 0xc3, 0xc5, 0x66 } };
 
 		IRenderDeviceContext* renderDevice;
 
@@ -108,9 +105,9 @@ export namespace PonyEngine::Render::Windows
 		DXGIFactory factory;
 		D3D12Device device;
 
-		D3D12GraphicsCommandQueue graphicsCommandQueue;
-		D3D12ComputeCommandQueue computeCommandQueue;
-		D3D12CopyCommandQueue copyCommandQueue;
+		D3D12CommandQueue graphicsCommandQueue;
+		D3D12CommandQueue computeCommandQueue;
+		D3D12CommandQueue copyCommandQueue;
 
 		std::unique_ptr<D3D12SwapChain> swapChain;
 	};
@@ -124,9 +121,9 @@ namespace PonyEngine::Render::Windows
 		textureFormatMap(*this->renderDevice),
 		factory(*this->renderDevice),
 		device(*this->renderDevice),
-		graphicsCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
-		computeCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH),
-		copyCommandQueue(*this->renderDevice, device.Device(), D3D12_COMMAND_QUEUE_PRIORITY_HIGH)
+		graphicsCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_DIRECT), CreatorId)),
+		computeCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COMPUTE), CreatorId)),
+		copyCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COPY), CreatorId))
 	{
 	}
 
@@ -264,24 +261,12 @@ namespace PonyEngine::Render::Windows
 			static_cast<std::uint16_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
 	}
 
-	IGraphicsCommandQueue& D3D12Engine::GraphicsCommandQueue() noexcept
-	{
-		return graphicsCommandQueue;
-	}
-
-	IComputeCommandQueue& D3D12Engine::ComputeCommandQueue() noexcept
-	{
-		return computeCommandQueue;
-	}
-
-	ICopyCommandQueue& D3D12Engine::CopyCommandQueue() noexcept
-	{
-		return copyCommandQueue;
-	}
-
 	struct SwapChainSupport D3D12Engine::SwapChainSupport() const
 	{
 		const BOOL isTearingSupported = factory.GetTearingSupport();
+
+		static_assert(D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION <= std::numeric_limits<std::uint32_t>::max(), "D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION is too great for uint32.");
+		static_assert(DXGI_MAX_SWAP_CHAIN_BUFFERS <= std::numeric_limits<std::uint8_t>::max(), "DXGI_MAX_SWAP_CHAIN_BUFFERS is too great for uint8.");
 
 		return Render::SwapChainSupport
 		{
@@ -397,6 +382,13 @@ namespace PonyEngine::Render::Windows
 	{
 		auto response = TextureSupportResponse{.supported = true};
 
+		static_assert(D3D12_REQ_TEXTURE1D_U_DIMENSION <= std::numeric_limits<std::uint32_t>::max(), "D3D12_REQ_TEXTURE1D_U_DIMENSION is too great for uint32.");
+		static_assert(D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION <= std::numeric_limits<std::uint32_t>::max(), "D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION is too great for uint32.");
+		static_assert(D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION <= std::numeric_limits<std::uint32_t>::max(), "D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION is too great for uint32.");
+		static_assert(D3D12_REQ_MIP_LEVELS <= std::numeric_limits<std::uint32_t>::max(), "D3D12_REQ_MIP_LEVELS is too great for uint32.");
+		static_assert(D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION <= std::numeric_limits<std::uint32_t>::max(), "D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION is too great for uint32.");
+		static_assert(D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION <= std::numeric_limits<std::uint32_t>::max(), "D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION is too great for uint32.");
+
 		switch (request.dimension)
 		{
 		case TextureDimension::Texture1D:
@@ -440,6 +432,8 @@ namespace PonyEngine::Render::Windows
 			return SampleCountMask::X1;
 		}
 
+		static_assert(D3D12_MAX_MULTISAMPLE_SAMPLE_COUNT <= std::numeric_limits<std::uint8_t>::max(), "D3D12_MAX_MULTISAMPLE_SAMPLE_COUNT is too great for uint8.");
+
 		auto mask = SampleCountMask::None;
 		for (UINT i = 1u; i <= std::min(ToNumber(SampleCount::Max), std::uint8_t{D3D12_MAX_MULTISAMPLE_SAMPLE_COUNT}); i <<= 1u)
 		{
@@ -450,6 +444,17 @@ namespace PonyEngine::Render::Windows
 		}
 
 		return mask;
+	}
+
+	D3D12_COMMAND_QUEUE_DESC D3D12Engine::GetCommandQueueDesc(const D3D12_COMMAND_LIST_TYPE type) noexcept
+	{
+		return D3D12_COMMAND_QUEUE_DESC
+		{
+			.Type = type,
+			.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH,
+			.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
+			.NodeMask = 0u
+		};
 	}
 
 	void D3D12Engine::ValidateSize(const BufferParams& params)

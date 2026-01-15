@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Render/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Texture;
@@ -121,6 +123,7 @@ namespace PonyEngine::Render::Windows
 		usage{usage},
 		srgbCompatible{srgbCompatible}
 	{
+		assert(this->resource && "The buffer resource is nullptr.");
 		std::memcpy(this->castableFormats.get(), castableFormats.data(), castableFormats.size_bytes());
 	}
 

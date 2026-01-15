@@ -43,19 +43,6 @@ export namespace PonyEngine::Render
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual IGraphicsCommandQueue& GraphicsCommandQueue() noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual const IGraphicsCommandQueue& GraphicsCommandQueue() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual IComputeCommandQueue& ComputeCommandQueue() noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual const IComputeCommandQueue& ComputeCommandQueue() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual ICopyCommandQueue& CopyCommandQueue() noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual const ICopyCommandQueue& CopyCommandQueue() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
 		virtual struct SwapChainSupport SwapChainSupport() const = 0;
 		[[nodiscard("Pure function")]]
 		virtual bool IsSwapChainAlive() const = 0;
