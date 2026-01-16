@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 #include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
@@ -32,10 +34,12 @@ import :D3D12CommandQueue;
 import :D3D12ComputeCommandList;
 import :D3D12CopyCommandList;
 import :D3D12Device;
+import :D3D12Fence;
 import :D3D12GraphicsCommandList;
 import :D3D12SwapChain;
 import :D3D12Texture;
 import :D3D12Utility;
+import :D3D12Waiter;
 import :EngineUtility;
 
 export namespace PonyEngine::RenderDevice::Windows
@@ -69,9 +73,14 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::shared_ptr<IComputeCommandList> CreateComputeCommandList();
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ICopyCommandList> CreateCopyCommandList();
-		void Execute(std::span<const IGraphicsCommandList* const> commandLists);
-		void Execute(std::span<const IComputeCommandList* const> commandLists);
-		void Execute(std::span<const ICopyCommandList* const> commandLists);
+		void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync);
+		void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync);
+		void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync);
+
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IFence> CreateFence();
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IWaiter> CreateWaiter();
 
 		[[nodiscard("Pure function")]]
 		struct SwapChainSupport SwapChainSupport() const;
@@ -97,6 +106,14 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		SampleCountMask GetSampleCountMask(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
 
+		template<typename T> [[nodiscard("Pure function")]]
+		std::shared_ptr<T> CreateCommandList(D3D12_COMMAND_LIST_TYPE type);
+		template<typename CommandList, typename CommandListInterface>
+		void Execute(std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, D3D12CommandQueue& commandQueue);
+		template<typename CommandList, typename CommandListInterface>
+		static void GetCommandLists(std::span<const CommandListInterface* const> commandLists, std::span<ID3D12CommandList*> lists) noexcept;
+		static void GetFences(std::span<const FenceValue> input, std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept;
+
 		[[nodiscard("Pure function")]]
 		static D3D12_COMMAND_QUEUE_DESC GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE type) noexcept;
 
@@ -105,6 +122,10 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateColorTexture(const TextureParams& params);
 		static void ValidateDepthTexture(const TextureParams& params);
 		static void ValidateSwapChainParams(const SwapChainParams& params);
+
+		template<typename CommandList, typename CommandListInterface>
+		void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
+		void ValidateFences(std::span<const FenceValue> fences);
 
 		// {132D4628-84F4-40F4-B72F-8A7B08C3C566}
 		static constexpr GUID CreatorId = { 0x132d4628, 0x84f4, 0x40f4, { 0xb7, 0x2f, 0x8a, 0x7b, 0x8, 0xc3, 0xc5, 0x66 } };
@@ -130,7 +151,7 @@ namespace PonyEngine::RenderDevice::Windows
 {
 	D3D12Engine::D3D12Engine(IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice},
-		arena(0uz, 64uz),
+		arena(0uz, 256uz),
 		textureFormatMap(*this->renderDevice),
 		factory(*this->renderDevice),
 		device(*this->renderDevice),
@@ -276,86 +297,42 @@ namespace PonyEngine::RenderDevice::Windows
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
 	{
-		constexpr D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-		return std::make_shared<D3D12GraphicsCommandList>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+		return CreateCommandList<D3D12GraphicsCommandList>(D3D12_COMMAND_LIST_TYPE_DIRECT);
 	}
 
 	std::shared_ptr<IComputeCommandList> D3D12Engine::CreateComputeCommandList()
 	{
-		constexpr D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
-		return std::make_shared<D3D12ComputeCommandList>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+		return CreateCommandList<D3D12ComputeCommandList>(D3D12_COMMAND_LIST_TYPE_COMPUTE);
 	}
 
 	std::shared_ptr<ICopyCommandList> D3D12Engine::CreateCopyCommandList()
 	{
-		constexpr D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_COPY;
-		return std::make_shared<D3D12CopyCommandList>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+		return CreateCommandList<D3D12CopyCommandList>(D3D12_COMMAND_LIST_TYPE_COPY);
 	}
 
-	void D3D12Engine::Execute(const std::span<const IGraphicsCommandList* const> commandLists)
+	void D3D12Engine::Execute(const std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync)
 	{
-		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
-		{
-			const IGraphicsCommandList* const commandList = commandLists[i];
-			if (!commandList || typeid(*commandList) != typeid(D3D12GraphicsCommandList)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid command list");
-			}
-		}
-
-		arena.Free();
-		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
-		const std::span<ID3D12CommandList*> listSpan = arena.Span(lists);
-		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
-		{
-			listSpan[i] = &static_cast<const D3D12GraphicsCommandList*>(commandLists[i])->CommandList();
-		}
-
-		graphicsCommandQueue.Execute(listSpan);
+		Execute<D3D12GraphicsCommandList>(commandLists, sync, graphicsCommandQueue);
 	}
 
-	void D3D12Engine::Execute(const std::span<const IComputeCommandList* const> commandLists)
+	void D3D12Engine::Execute(const std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync)
 	{
-		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
-		{
-			const IComputeCommandList* const commandList = commandLists[i];
-			if (!commandList || typeid(*commandList) != typeid(D3D12ComputeCommandList)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid command list");
-			}
-		}
-
-		arena.Free();
-		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
-		const std::span<ID3D12CommandList*> listSpan = arena.Span(lists);
-		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
-		{
-			listSpan[i] = &static_cast<const D3D12ComputeCommandList*>(commandLists[i])->CommandList();
-		}
-
-		computeCommandQueue.Execute(listSpan);
+		Execute<D3D12ComputeCommandList>(commandLists, sync, computeCommandQueue);
 	}
 
-	void D3D12Engine::Execute(const std::span<const ICopyCommandList* const> commandLists)
+	void D3D12Engine::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
-		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
-		{
-			const ICopyCommandList* const commandList = commandLists[i];
-			if (!commandList || typeid(*commandList) != typeid(D3D12CopyCommandList)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid command list");
-			}
-		}
+		Execute<D3D12CopyCommandList>(commandLists, sync, copyCommandQueue);
+	}
 
-		arena.Free();
-		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
-		const std::span<ID3D12CommandList*> listSpan = arena.Span(lists);
-		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
-		{
-			listSpan[i] = &static_cast<const D3D12CopyCommandList*>(commandLists[i])->CommandList();
-		}
+	std::shared_ptr<IFence> D3D12Engine::CreateFence()
+	{
+		return std::make_shared<D3D12Fence>(device.CreateFence());
+	}
 
-		copyCommandQueue.Execute(listSpan);
+	std::shared_ptr<IWaiter> D3D12Engine::CreateWaiter()
+	{
+		return std::make_shared<D3D12Waiter>(*renderDevice);
 	}
 
 	struct SwapChainSupport D3D12Engine::SwapChainSupport() const
@@ -543,6 +520,49 @@ namespace PonyEngine::RenderDevice::Windows
 		return mask;
 	}
 
+	template<typename T>
+	std::shared_ptr<T> D3D12Engine::CreateCommandList(const D3D12_COMMAND_LIST_TYPE type)
+	{
+		return std::make_shared<T>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+	}
+
+	template<typename CommandList, typename CommandListInterface>
+	void D3D12Engine::Execute(const std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, D3D12CommandQueue& commandQueue)
+	{
+		ValidateCommandLists<CommandList, CommandListInterface>(commandLists);
+		ValidateFences(sync.before);
+		ValidateFences(sync.after);
+
+		arena.Free();
+		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
+		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> beforeFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.before.size());
+		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> afterFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.after.size());
+		GetCommandLists<CommandList, CommandListInterface>(commandLists, arena.Span(lists));
+		GetFences(sync.before, arena.Span(beforeFences));
+		GetFences(sync.after, arena.Span(afterFences));
+
+		commandQueue.Execute(arena.Span(lists), arena.Span(beforeFences), arena.Span(afterFences));
+	}
+
+	template<typename CommandList, typename CommandListInterface>
+	void D3D12Engine::GetCommandLists(const std::span<const CommandListInterface* const> commandLists, const std::span<ID3D12CommandList*> lists) noexcept
+	{
+		assert(commandLists.size() == lists.size() && "Input and output sizes are not the same.");
+		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
+		{
+			lists[i] = &static_cast<const CommandList*>(commandLists[i])->CommandList();
+		}
+	}
+
+	void D3D12Engine::GetFences(const std::span<const FenceValue> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept
+	{
+		assert(input.size() == output.size() && "Input and output sizes are not the same.");
+		for (std::size_t i = 0uz; i < input.size(); ++i)
+		{
+			output[i] = std::pair(&static_cast<const D3D12Fence*>(input[i].fence)->Fence(), static_cast<UINT64>(input[i].value));
+		}
+	}
+
 	D3D12_COMMAND_QUEUE_DESC D3D12Engine::GetCommandQueueDesc(const D3D12_COMMAND_LIST_TYPE type) noexcept
 	{
 		return D3D12_COMMAND_QUEUE_DESC
@@ -673,6 +693,29 @@ namespace PonyEngine::RenderDevice::Windows
 		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid usage");
+		}
+	}
+
+	template<typename CommandList, typename CommandListInterface>
+	void D3D12Engine::ValidateCommandLists(const std::span<const CommandListInterface* const> commandLists)
+	{
+		for (const CommandListInterface* const commandList : commandLists)
+		{
+			if (!commandList || typeid(*commandList) != typeid(CommandList)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid command list");
+			}
+		}
+	}
+
+	void D3D12Engine::ValidateFences(const std::span<const FenceValue> fences)
+	{
+		for (const FenceValue& fenceValue : fences)
+		{
+			if (!fenceValue.fence || typeid(*fenceValue.fence) != typeid(D3D12Fence))
+			{
+				throw std::invalid_argument("Invalid fence");
+			}
 		}
 	}
 }

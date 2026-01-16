@@ -48,9 +48,9 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() = 0;
-		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists) = 0;
-		virtual void Execute(std::span<const IComputeCommandList* const> commandLists) = 0;
-		virtual void Execute(std::span<const ICopyCommandList* const> commandLists) = 0;
+		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync) = 0;
+		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) = 0;
+		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual struct SwapChainSupport SwapChainSupport() const = 0;
@@ -66,5 +66,10 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const = 0;
 		virtual void PresentNextSwapChainBuffer() = 0;
+
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IFence> CreateFence() = 0;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IWaiter> CreateWaiter() = 0;
 	};
 }

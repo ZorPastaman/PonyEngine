@@ -58,6 +58,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
 
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12Fence1> CreateFence();
+
 		void SetName(std::string_view name);
 
 		D3D12Device& operator =(const D3D12Device&) = delete;
@@ -180,6 +183,17 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return commandList;
+	}
+
+	Platform::Windows::ComPtr<ID3D12Fence1> D3D12Device::CreateFence()
+	{
+		Platform::Windows::ComPtr<ID3D12Fence1> fence;
+		if (const HRESULT result = device->CreateFence(0ull, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 fence: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return fence;
 	}
 
 	void D3D12Device::SetName(const std::string_view name)
