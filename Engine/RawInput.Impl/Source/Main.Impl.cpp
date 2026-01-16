@@ -7,12 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Input/RawInputServiceModule.h"
+#include "PonyEngine/RawInput/RawInputServiceModule.h"
 
 import PonyEngine.Application.Ext;
 import PonyEngine.RawInput.Impl;
 
-namespace PonyEngine::Input
+namespace PonyEngine::RawInput
 {
 	Application::IModule* GetRawInputServiceModule()
 	{

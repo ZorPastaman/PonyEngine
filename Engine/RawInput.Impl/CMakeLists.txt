@@ -20,13 +20,13 @@ target_sources(PonyEngine.RawInput.Impl PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/RawInput.Impl.cppm"
-	"Source/Private/RawInput.Impl-DeviceFeatureContainer.cppm"
-	"Source/Private/RawInput.Impl-InputDeviceContainer.cppm"
-	"Source/Private/RawInput.Impl-InputProviderContainer.cppm"
-	"Source/Private/RawInput.Impl-RawInputQueue.cppm"
-	"Source/Private/RawInput.Impl-RawInputService.cppm"
-	"Source/Private/RawInput.Impl-RawInputServiceModule.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-DeviceFeatureContainer.cppm"
+	"Source/Private/Main-InputDeviceContainer.cppm"
+	"Source/Private/Main-InputProviderContainer.cppm"
+	"Source/Private/Main-RawInputQueue.cppm"
+	"Source/Private/Main-RawInputService.cppm"
+	"Source/Private/Main-RawInputServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

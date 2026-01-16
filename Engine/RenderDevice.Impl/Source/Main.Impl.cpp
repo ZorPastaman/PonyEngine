@@ -7,12 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Render/RenderDeviceServiceModule.h"
+#include "PonyEngine/RenderDevice/RenderDeviceServiceModule.h"
 
 import PonyEngine.Application.Ext;
 import PonyEngine.RenderDevice.Impl;
 
-namespace PonyEngine::Render
+namespace PonyEngine::RenderDevice
 {
 	Application::IModule* GetRenderDeviceServiceModule()
 	{

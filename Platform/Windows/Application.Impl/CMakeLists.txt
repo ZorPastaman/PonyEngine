@@ -13,17 +13,17 @@ target_include_directories(PonyEngine.Application.Impl PRIVATE
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE
-	"Source/Main.Windows.cpp"
+	"Source/Main.cpp"
 )
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Private/Application.Impl.Windows.cppm"
-	"Source/Private/Application.Impl.Windows-App.cppm"
-	"Source/Private/Application.Impl.Windows-AppDataManager.cppm"
-	"Source/Private/Application.Impl.Windows-Console.cppm"
-	"Source/Private/Application.Impl.Windows-DefaultLogger.cppm"
-	"Source/Private/Application.Impl.Windows-LoggerManager.cppm"
-	"Source/Private/Application.Impl.Windows-PathManager.cppm"
-	"Source/Private/Application.Impl.Windows-Process.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-App.cppm"
+	"Source/Private/Main-AppDataManager.cppm"
+	"Source/Private/Main-Console.cppm"
+	"Source/Private/Main-DefaultLogger.cppm"
+	"Source/Private/Main-LoggerManager.cppm"
+	"Source/Private/Main-PathManager.cppm"
+	"Source/Private/Main-Process.cppm"
 )
 
 message(VERBOSE "Configuring data")

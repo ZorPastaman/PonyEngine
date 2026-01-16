@@ -14,7 +14,7 @@ import PonyEngine.Surface;
 
 export namespace Game
 {
-	class GameService final : public PonyEngine::Application::IService, private PonyEngine::Input::IRawInputObserver
+	class GameService final : public PonyEngine::Application::IService, private PonyEngine::RawInput::IRawInputObserver
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -31,7 +31,7 @@ export namespace Game
 		GameService& operator =(GameService&&) = delete;
 
 	private:
-		virtual void OnRawInput(PonyEngine::Input::DeviceHandle, const PonyEngine::Input::RawInputEvent& inputEvent) override;
+		virtual void OnRawInput(PonyEngine::RawInput::DeviceHandle, const PonyEngine::RawInput::RawInputEvent& inputEvent) override;
 
 		void ChangeStyle();
 		void Move(const PonyEngine::Math::Vector2<std::int32_t>& deltaPos, const PonyEngine::Math::Vector2<std::int32_t>& deltaSize);
@@ -42,22 +42,22 @@ export namespace Game
 		std::int32_t moveSpeed;
 
 		PonyEngine::Application::IApplicationContext* application;
-		PonyEngine::Input::IRawInputService* input;
+		PonyEngine::RawInput::IRawInputService* input;
 		PonyEngine::Surface::ISurfaceService* surface;
 
-		PonyEngine::Input::AxisId fullscreenSwitchAxis;
-		PonyEngine::Input::AxisId moveLeftAxis;
-		PonyEngine::Input::AxisId moveRightAxis;
-		PonyEngine::Input::AxisId moveDownAxis;
-		PonyEngine::Input::AxisId moveUpAxis;
-		PonyEngine::Input::AxisId sizeLeftAxis;
-		PonyEngine::Input::AxisId sizeRightAxis;
-		PonyEngine::Input::AxisId sizeDownAxis;
-		PonyEngine::Input::AxisId sizeUpAxis;
-		PonyEngine::Input::AxisId titleAxis;
-		PonyEngine::Input::AxisId cursorVisibilityAxis;
-		PonyEngine::Input::AxisId cursorClippingAxis;
-		PonyEngine::Input::AxisId reportPositionsAxis;
+		PonyEngine::RawInput::AxisId fullscreenSwitchAxis;
+		PonyEngine::RawInput::AxisId moveLeftAxis;
+		PonyEngine::RawInput::AxisId moveRightAxis;
+		PonyEngine::RawInput::AxisId moveDownAxis;
+		PonyEngine::RawInput::AxisId moveUpAxis;
+		PonyEngine::RawInput::AxisId sizeLeftAxis;
+		PonyEngine::RawInput::AxisId sizeRightAxis;
+		PonyEngine::RawInput::AxisId sizeDownAxis;
+		PonyEngine::RawInput::AxisId sizeUpAxis;
+		PonyEngine::RawInput::AxisId titleAxis;
+		PonyEngine::RawInput::AxisId cursorVisibilityAxis;
+		PonyEngine::RawInput::AxisId cursorClippingAxis;
+		PonyEngine::RawInput::AxisId reportPositionsAxis;
 	};
 }
 
@@ -68,7 +68,7 @@ namespace Game
 		defaultSize(320, 240),
 		moveSpeed{30},
 		application{&application},
-		input{&this->application->GetService<PonyEngine::Input::IRawInputService>()},
+		input{&this->application->GetService<PonyEngine::RawInput::IRawInputService>()},
 		surface{&this->application->GetService<PonyEngine::Surface::ISurfaceService>()}
 	{
 		surface->MinimalSize(defaultSize);
@@ -80,19 +80,19 @@ namespace Game
 
 	void GameService::Begin()
 	{
-		fullscreenSwitchAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::MainSpacePath));
-		moveLeftAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::ArrowLeftPath));
-		moveRightAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::ArrowRightPath));
-		moveDownAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::ArrowDownPath));
-		moveUpAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::ArrowUpPath));
-		sizeLeftAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::Numpad4Path));
-		sizeRightAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::Numpad6Path));
-		sizeDownAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::Numpad2Path));
-		sizeUpAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::Numpad8Path));
-		titleAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::MainTPath));
-		cursorVisibilityAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::MainVPath));
-		cursorClippingAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::MainCPath));
-		reportPositionsAxis = input->Hash(PonyEngine::Input::Axis(PonyEngine::Input::KeyboardLayout::MainRPath));
+		fullscreenSwitchAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainSpacePath));
+		moveLeftAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::ArrowLeftPath));
+		moveRightAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::ArrowRightPath));
+		moveDownAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::ArrowDownPath));
+		moveUpAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::ArrowUpPath));
+		sizeLeftAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::Numpad4Path));
+		sizeRightAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::Numpad6Path));
+		sizeDownAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::Numpad2Path));
+		sizeUpAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::Numpad8Path));
+		titleAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainTPath));
+		cursorVisibilityAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainVPath));
+		cursorClippingAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainCPath));
+		reportPositionsAxis = input->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainRPath));
 
 		input->AddObserver(*this);
 	}
@@ -102,7 +102,7 @@ namespace Game
 		input->RemoveObserver(*this);
 	}
 
-	void GameService::OnRawInput(PonyEngine::Input::DeviceHandle, const PonyEngine::Input::RawInputEvent& inputEvent)
+	void GameService::OnRawInput(PonyEngine::RawInput::DeviceHandle, const PonyEngine::RawInput::RawInputEvent& inputEvent)
 	{
 		auto deltaPos = PonyEngine::Math::Vector2<std::int32_t>::Zero();
 		auto deltaSize = PonyEngine::Math::Vector2<std::int32_t>::Zero();

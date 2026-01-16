@@ -10,16 +10,16 @@ target_include_directories(PonyEngine.RawInput.Keyboard.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Keyboard.Impl PUBLIC
-	"Source/Main.Windows.cpp"
+	"Source/Main.cpp"
 )
 target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE
-	"Source/Main.Impl.Windows.cpp"
+	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Private/RawInput.Keyboard.Impl.Windows.cppm"
-	"Source/Private/RawInput.Keyboard.Impl.Windows-KeyboardAxisMap.cppm"
-	"Source/Private/RawInput.Keyboard.Impl.Windows-KeyboardProvider.cppm"
-	"Source/Private/RawInput.Keyboard.Impl.Windows-KeyboardProviderModule.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-KeyboardAxisMap.cppm"
+	"Source/Private/Main-KeyboardProvider.cppm"
+	"Source/Private/Main-KeyboardProviderModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

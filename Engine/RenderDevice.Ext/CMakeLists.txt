@@ -5,11 +5,11 @@ add_library(PonyEngine.RenderDevice.Ext STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RenderDevice.Ext PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/RenderDevice.Ext.cppm"
-	"Source/Public/RenderDevice.Ext-BackendHandle.cppm"
-	"Source/Public/RenderDevice.Ext-IBackend.cppm"
-	"Source/Public/RenderDevice.Ext-IRenderDeviceContext.cppm"
-	"Source/Public/RenderDevice.Ext-IRenderDeviceModuleContext.cppm"
+	"Source/Public/Main.cppm"
+	"Source/Public/Main-BackendHandle.cppm"
+	"Source/Public/Main-IBackend.cppm"
+	"Source/Public/Main-IRenderDeviceContext.cppm"
+	"Source/Public/Main-IRenderDeviceModuleContext.cppm"
 )
 
 message(VERBOSE "Setting properties")

@@ -20,9 +20,9 @@ target_sources(PonyEngine.Log.File.Impl PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.Log.File.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Log.File.Impl.cppm"
-	"Source/Private/Log.File.Impl-FileSubLogger.cppm"
-	"Source/Private/Log.File.Impl-FileSubLoggerModule.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-FileSubLogger.cppm"
+	"Source/Private/Main-FileSubLoggerModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")
