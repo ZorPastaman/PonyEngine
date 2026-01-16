@@ -5,9 +5,9 @@ add_library(PonyEngine.Time STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Time PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/Time.cppm"
-	"Source/Public/Time-ITimeService.cppm"
-	"Source/Public/Time-Utility.cppm"
+	"Source/Public/Main.cppm"
+	"Source/Public/Main-ITimeService.cppm"
+	"Source/Public/Main-Utility.cppm"
 )
 
 message(VERBOSE "Setting properties")

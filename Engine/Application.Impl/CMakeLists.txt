@@ -9,20 +9,20 @@ add_executable(PonyEngine.Application.Impl)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
-	"Source/Private/Application.Impl.cppm"
-	"Source/Private/Application.Impl-Console.cppm"
-	"Source/Private/Application.Impl-DefaultLogger.cppm"
-	"Source/Private/Application.Impl-ExitCodes.cppm"
-	"Source/Private/Application.Impl-FlowManager.cppm"
-	"Source/Private/Application.Impl-InterfaceContainer.cppm"
-	"Source/Private/Application.Impl-LoggerManager.cppm"
-	"Source/Private/Application.Impl-ModuleDataContainer.cppm"
-	"Source/Private/Application.Impl-ModuleManager.cppm"
-	"Source/Private/Application.Impl-Name.cppm"
-	"Source/Private/Application.Impl-Path.cppm"
-	"Source/Private/Application.Impl-ServiceContainer.cppm"
-	"Source/Private/Application.Impl-ServiceManager.cppm"
-	"Source/Private/Application.Impl-TickableServiceInfo.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-Console.cppm"
+	"Source/Private/Main-DefaultLogger.cppm"
+	"Source/Private/Main-ExitCodes.cppm"
+	"Source/Private/Main-FlowManager.cppm"
+	"Source/Private/Main-InterfaceContainer.cppm"
+	"Source/Private/Main-LoggerManager.cppm"
+	"Source/Private/Main-ModuleDataContainer.cppm"
+	"Source/Private/Main-ModuleManager.cppm"
+	"Source/Private/Main-Name.cppm"
+	"Source/Private/Main-Path.cppm"
+	"Source/Private/Main-ServiceContainer.cppm"
+	"Source/Private/Main-ServiceManager.cppm"
+	"Source/Private/Main-TickableServiceInfo.cppm"
 )
 
 message(VERBOSE "Configuring defines")

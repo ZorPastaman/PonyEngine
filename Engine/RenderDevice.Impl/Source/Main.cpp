@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Render/RenderDeviceServiceModule.h"
+#include "PonyEngine/RenderDevice/RenderDeviceServiceModule.h"
 
-PONY_MODULE(PonyEngine::Render::GetRenderDeviceServiceModule, PonyEngineRenderDeviceService, PONY_ENGINE_RENDER_DEVICE_ORDER);
+PONY_MODULE(PonyEngine::RenderDevice::GetRenderDeviceServiceModule, PonyEngineRenderDeviceService, PONY_ENGINE_RENDER_DEVICE_ORDER);

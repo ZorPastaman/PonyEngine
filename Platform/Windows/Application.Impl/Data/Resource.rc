@@ -7,8 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include "PonyEngine/Application/Windows/Resource.h"
 #include "PonyEngine/Macro/Text.h"
-#include "PonyEngine/Platform/Windows/Resource.h"
 
 #ifdef PONY_APP_ICON
 IDI_APP_ICON ICON PONY_STRINGIFY_VALUE(PONY_APP_ICON)

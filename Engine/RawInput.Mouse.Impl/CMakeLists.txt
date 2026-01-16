@@ -5,12 +5,12 @@ add_library(PonyEngine.RawInput.Mouse.Impl STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Mouse.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/RawInput.Mouse.Impl.cppm"
-	"Source/Private/RawInput.Mouse.Impl-MouseAxis.cppm"
-	"Source/Private/RawInput.Mouse.Impl-MouseAxisMap.cppm"
-	"Source/Private/RawInput.Mouse.Impl-MouseContainer.cppm"
-	"Source/Private/RawInput.Mouse.Impl-MouseEvent.cppm"
-	"Source/Private/RawInput.Mouse.Impl-MouseEventQueue.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-MouseAxis.cppm"
+	"Source/Private/Main-MouseAxisMap.cppm"
+	"Source/Private/Main-MouseContainer.cppm"
+	"Source/Private/Main-MouseEvent.cppm"
+	"Source/Private/Main-MouseEventQueue.cppm"
 )
 
 message(VERBOSE "Setting properties")

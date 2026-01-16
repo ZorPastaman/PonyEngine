@@ -10,17 +10,17 @@ target_include_directories(PonyEngine.RawInput.XInput.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.XInput.Impl PUBLIC
-	"Source/Main.Windows.cpp"
+	"Source/Main.cpp"
 )
 target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE
-	"Source/Main.Impl.Windows.cpp"
+	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Private/RawInput.XInput.Impl.Windows.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-XInputAxisMap.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-XInputContainer.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-XInputProvider.cppm"
-	"Source/Private/RawInput.XInput.Impl.Windows-XInputProviderModule.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-XInputAxisMap.cppm"
+	"Source/Private/Main-XInputContainer.cppm"
+	"Source/Private/Main-XInputProvider.cppm"
+	"Source/Private/Main-XInputProviderModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

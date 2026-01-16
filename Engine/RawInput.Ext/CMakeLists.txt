@@ -5,12 +5,12 @@ add_library(PonyEngine.RawInput.Ext STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Ext PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/RawInput.Ext.cppm"
-	"Source/Public/RawInput.Ext-FeatureEntry.cppm"
-	"Source/Public/RawInput.Ext-IInputProvider.cppm"
-	"Source/Public/RawInput.Ext-InputProviderHandle.cppm"
-	"Source/Public/RawInput.Ext-IRawInputContext.cppm" 
-	"Source/Public/RawInput.Ext-IRawInputModuleContext.cppm"
+	"Source/Public/Main.cppm"
+	"Source/Public/Main-FeatureEntry.cppm"
+	"Source/Public/Main-IInputProvider.cppm"
+	"Source/Public/Main-InputProviderHandle.cppm"
+	"Source/Public/Main-IRawInputContext.cppm" 
+	"Source/Public/Main-IRawInputModuleContext.cppm"
 )
 
 message(VERBOSE "Setting properties")

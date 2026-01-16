@@ -29,11 +29,11 @@ export namespace Game
 		virtual void Tick() override;
 
 		PonyEngine::Application::IApplicationContext* application;
-		PonyEngine::Render::IRenderDeviceService* renderDevice;
+		PonyEngine::RenderDevice::IRenderDeviceService* renderDevice;
 
-		std::shared_ptr<PonyEngine::Render::IGraphicsCommandList> graphicsCommandList;
-		std::shared_ptr<PonyEngine::Render::IComputeCommandList> computeCommandList;
-		std::shared_ptr<PonyEngine::Render::ICopyCommandList> copyCommandList;
+		std::shared_ptr<PonyEngine::RenderDevice::IGraphicsCommandList> graphicsCommandList;
+		std::shared_ptr<PonyEngine::RenderDevice::IComputeCommandList> computeCommandList;
+		std::shared_ptr<PonyEngine::RenderDevice::ICopyCommandList> copyCommandList;
 	};
 }
 
@@ -41,7 +41,7 @@ namespace Game
 {
 	GameService::GameService(PonyEngine::Application::IApplicationContext& application) :
 		application{&application},
-		renderDevice{&this->application->GetService<PonyEngine::Render::IRenderDeviceService>()}
+		renderDevice{&this->application->GetService<PonyEngine::RenderDevice::IRenderDeviceService>()}
 	{
 		if (renderDevice->BackendCount() > 0uz)
 		{
@@ -59,45 +59,45 @@ namespace Game
 
 	void GameService::Begin()
 	{
-		const PonyEngine::Render::TextureFormatId format = renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Unorm);
-		const PonyEngine::Render::TextureFormatFeature feature = renderDevice->TextureFormatFeatures(format);
-		const PonyEngine::Render::TextureSupportResponse support = renderDevice->TextureSupport(PonyEngine::Render::TextureSupportRequest
+		const PonyEngine::RenderDevice::TextureFormatId format = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm);
+		const PonyEngine::RenderDevice::TextureFormatFeature feature = renderDevice->TextureFormatFeatures(format);
+		const PonyEngine::RenderDevice::TextureSupportResponse support = renderDevice->TextureSupport(PonyEngine::RenderDevice::TextureSupportRequest
 		{
 			.format = format,
-			.dimension = PonyEngine::Render::TextureDimension::Texture2D,
-			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget
+			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture2D,
+			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget
 		});
-		const PonyEngine::Render::SwapChainSupport swapChainSupport = renderDevice->SwapChainSupport();
+		const PonyEngine::RenderDevice::SwapChainSupport swapChainSupport = renderDevice->SwapChainSupport();
 
-		const std::shared_ptr<PonyEngine::Render::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::Render::HeapType::Default, PonyEngine::Render::BufferParams
+		const std::shared_ptr<PonyEngine::RenderDevice::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::RenderDevice::HeapType::Default, PonyEngine::RenderDevice::BufferParams
 		{
 			.size = 1024ull,
-			.usage = PonyEngine::Render::BufferUsage::ShaderResource
+			.usage = PonyEngine::RenderDevice::BufferUsage::ShaderResource
 		});
 
-		const PonyEngine::Render::TextureFormatId textureFormat = renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Unorm);
-		const PonyEngine::Render::TextureFormatId castableTextureFormat = renderDevice->TextureFormatId(PonyEngine::Render::TextureFormat::R8G8B8A8_Snorm);
-		const std::shared_ptr<PonyEngine::Render::ITexture> texture = renderDevice->CreateTexture(PonyEngine::Render::HeapType::Default, PonyEngine::Render::TextureParams
+		const PonyEngine::RenderDevice::TextureFormatId textureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm);
+		const PonyEngine::RenderDevice::TextureFormatId castableTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Snorm);
+		const std::shared_ptr<PonyEngine::RenderDevice::ITexture> texture = renderDevice->CreateTexture(PonyEngine::RenderDevice::HeapType::Default, PonyEngine::RenderDevice::TextureParams
 		{
 			.format = textureFormat,
-			.castableFormats = std::span<const PonyEngine::Render::TextureFormatId>(&castableTextureFormat, 1uz),
+			.castableFormats = std::span<const PonyEngine::RenderDevice::TextureFormatId>(&castableTextureFormat, 1uz),
 			.size = PonyEngine::Math::Vector3<std::uint32_t>(1024u, 1024u, 1u),
-			.dimension = PonyEngine::Render::TextureDimension::Texture2D,
-			.usage = PonyEngine::Render::TextureUsage::ShaderResource | PonyEngine::Render::TextureUsage::RenderTarget,
-			.flags = PonyEngine::Render::TextureFlag::SRGB
+			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture2D,
+			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget,
+			.flags = PonyEngine::RenderDevice::TextureFlag::SRGB
 		});
 
-		renderDevice->CreateSwapChain(PonyEngine::Render::SwapChainParams
+		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{
 			.format = textureFormat,
 			.size = std::nullopt,
 			.bufferCount = 3u,
-			.alphaMode = PonyEngine::Render::SwapChainAlphaMode::Ignore,
-			.scalingMode = PonyEngine::Render::SwapChainScaling::NoScaling,
-			.swapEffect = PonyEngine::Render::SwapChainEffect::FlipDiscard,
-			.syncMode = PonyEngine::Render::SwapChainSync::FullSync,
-			.flags = PonyEngine::Render::SwapChainFlag::SRGB,
-			.usage = PonyEngine::Render::TextureUsage::RenderTarget
+			.alphaMode = PonyEngine::RenderDevice::SwapChainAlphaMode::Ignore,
+			.scalingMode = PonyEngine::RenderDevice::SwapChainScaling::NoScaling,
+			.swapEffect = PonyEngine::RenderDevice::SwapChainEffect::FlipDiscard,
+			.syncMode = PonyEngine::RenderDevice::SwapChainSync::FullSync,
+			.flags = PonyEngine::RenderDevice::SwapChainFlag::SRGB,
+			.usage = PonyEngine::RenderDevice::TextureUsage::RenderTarget
 		});
 
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
@@ -109,9 +109,9 @@ namespace Game
 		graphicsCommandList->Close();
 		computeCommandList->Close();
 		copyCommandList->Close();
-		const auto graphics = std::array<const PonyEngine::Render::IGraphicsCommandList*, 1>{ graphicsCommandList.get() };
-		const auto compute = std::array<const PonyEngine::Render::IComputeCommandList*, 1>{ computeCommandList.get() };
-		const auto copy = std::array<const PonyEngine::Render::ICopyCommandList*, 1>{ copyCommandList.get() };
+		const auto graphics = std::array<const PonyEngine::RenderDevice::IGraphicsCommandList*, 1>{ graphicsCommandList.get() };
+		const auto compute = std::array<const PonyEngine::RenderDevice::IComputeCommandList*, 1>{ computeCommandList.get() };
+		const auto copy = std::array<const PonyEngine::RenderDevice::ICopyCommandList*, 1>{ copyCommandList.get() };
 		renderDevice->Execute(std::span(graphics.data(), 1u));
 		renderDevice->Execute(std::span(compute.data(), 1u));
 		renderDevice->Execute(std::span(copy.data(), 1u));

@@ -15,30 +15,30 @@ target_include_directories(PonyEngine.RenderDevice.D3D12.Impl PRIVATE
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC
-	"Source/Main.Windows.cpp"
+	"Source/Main.cpp"
 )
 target_sources(PonyEngine.RenderDevice.D3D12.Impl PRIVATE
-	"Source/Main.Impl.Windows.cpp"
+	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Private/RenderDevice.D3D12.Impl.Windows.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-DXGIFactory.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-DXGISwapChain.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-DXGITextureFormatMap.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Backend.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12BackendModule.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Buffer.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12CommandList.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12CommandQueue.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12ComputeCommandList.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12CopyCommandList.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Device.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Engine.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12GraphicsCommandList.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12SwapChain.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Texture.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-D3D12Utility.cppm"
-	"Source/Private/RenderDevice.D3D12.Impl.Windows-EngineUtility.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-DXGIFactory.cppm"
+	"Source/Private/Main-DXGISwapChain.cppm"
+	"Source/Private/Main-DXGITextureFormatMap.cppm"
+	"Source/Private/Main-D3D12Backend.cppm"
+	"Source/Private/Main-D3D12BackendModule.cppm"
+	"Source/Private/Main-D3D12Buffer.cppm"
+	"Source/Private/Main-D3D12CommandList.cppm"
+	"Source/Private/Main-D3D12CommandQueue.cppm"
+	"Source/Private/Main-D3D12ComputeCommandList.cppm"
+	"Source/Private/Main-D3D12CopyCommandList.cppm"
+	"Source/Private/Main-D3D12Device.cppm"
+	"Source/Private/Main-D3D12Engine.cppm"
+	"Source/Private/Main-D3D12GraphicsCommandList.cppm"
+	"Source/Private/Main-D3D12SwapChain.cppm"
+	"Source/Private/Main-D3D12Texture.cppm"
+	"Source/Private/Main-D3D12Utility.cppm"
+	"Source/Private/Main-EngineUtility.cppm"
 )
 
 message(VERBOSE "Configuring defines")

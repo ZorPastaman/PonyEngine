@@ -20,9 +20,9 @@ target_sources(PonyEngine.Time.Impl PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.Time.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Time.Impl.cppm"
-	"Source/Private/Time.Impl-TimeService.cppm"
-	"Source/Private/Time.Impl-TimeServiceModule.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-TimeService.cppm"
+	"Source/Private/Main-TimeServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")
