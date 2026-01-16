@@ -18,7 +18,6 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12CommandQueue;
 import std;
 
 import PonyEngine.Platform.Windows;
-import PonyEngine.RenderDevice.Ext;
 
 import :D3D12Utility;
 
@@ -41,7 +40,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		const ID3D12CommandQueue& CommandQueue() const noexcept;
 
-		void Execute(std::span<ID3D12CommandList* const> commandLists);
+		void Execute(std::span<ID3D12CommandList* const> commandLists, 
+			std::span<const std::pair<ID3D12Fence*, UINT64>> beforeFences, std::span<const std::pair<ID3D12Fence*, UINT64>> afterFences);
 
 		void SetName(std::string_view name);
 
@@ -76,14 +76,34 @@ namespace PonyEngine::RenderDevice::Windows
 		return *commandQueue;
 	}
 
-	void D3D12CommandQueue::Execute(const std::span<ID3D12CommandList* const> commandLists)
+	void D3D12CommandQueue::Execute(const std::span<ID3D12CommandList* const> commandLists,
+		const std::span<const std::pair<ID3D12Fence*, UINT64>> beforeFences, const std::span<const std::pair<ID3D12Fence*, UINT64>> afterFences)
 	{
 		if (commandLists.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Command lists span is too large");
 		}
 
-		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
+		for (const auto [fence, fenceValue] : beforeFences)
+		{
+			if (const HRESULT result = commandQueue->Wait(fence, fenceValue); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to set wait fence: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+		}
+
+		if (commandLists.size() > 0uz) [[likely]]
+		{
+			commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
+		}
+
+		for (const auto [fence, fenceValue] : afterFences)
+		{
+			if (const HRESULT result = commandQueue->Signal(fence, fenceValue); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to set signal fence: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+		}
 	}
 
 	void D3D12CommandQueue::SetName(const std::string_view name)

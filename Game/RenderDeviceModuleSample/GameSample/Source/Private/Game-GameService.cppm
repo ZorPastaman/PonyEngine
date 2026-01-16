@@ -34,6 +34,14 @@ export namespace Game
 		std::shared_ptr<PonyEngine::RenderDevice::IGraphicsCommandList> graphicsCommandList;
 		std::shared_ptr<PonyEngine::RenderDevice::IComputeCommandList> computeCommandList;
 		std::shared_ptr<PonyEngine::RenderDevice::ICopyCommandList> copyCommandList;
+
+		std::shared_ptr<PonyEngine::RenderDevice::IFence> graphicsFence;
+		std::shared_ptr<PonyEngine::RenderDevice::IFence> computeFence;
+		std::shared_ptr<PonyEngine::RenderDevice::IFence> copyFence;
+		std::uint64_t graphicsFenceValue = 0ull;
+		std::uint64_t computeFenceValue = 0ull;
+		std::uint64_t copyFenceValue = 0ull;
+		std::shared_ptr<PonyEngine::RenderDevice::IWaiter> waiter;
 	};
 }
 
@@ -115,10 +123,35 @@ namespace Game
 		renderDevice->Execute(std::span(graphics.data(), 1u));
 		renderDevice->Execute(std::span(compute.data(), 1u));
 		renderDevice->Execute(std::span(copy.data(), 1u));
+
+		graphicsFence = renderDevice->CreateFence();
+		computeFence = renderDevice->CreateFence();
+		copyFence = renderDevice->CreateFence();
+		graphicsFenceValue = graphicsFence->CompletedValue();
+		computeFenceValue = computeFence->CompletedValue();
+		copyFenceValue = copyFence->CompletedValue();
+		waiter = renderDevice->CreateWaiter();
 	}
 
 	void GameService::End()
 	{
+		const auto graphicsFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = graphicsFence.get(), .value = graphicsFenceValue + 1ull};
+		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::IGraphicsCommandList* const>(), PonyEngine::RenderDevice::QueueSync
+		{
+			.after = std::span<const PonyEngine::RenderDevice::FenceValue>(&graphicsFenceValueSync, 1uz)
+		});
+		const auto computeFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = computeFence.get(), .value = computeFenceValue + 1ull};
+		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::IComputeCommandList* const>(), PonyEngine::RenderDevice::QueueSync
+		{
+			.after = std::span<const PonyEngine::RenderDevice::FenceValue>(&computeFenceValueSync, 1uz)
+		});
+		const auto copyFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = copyFence.get(), .value = copyFenceValue + 1ull};
+		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::ICopyCommandList* const>(), PonyEngine::RenderDevice::QueueSync
+		{
+			.after = std::span<const PonyEngine::RenderDevice::FenceValue>(&copyFenceValueSync, 1uz)
+		});
+		const auto waitedFences = std::array<PonyEngine::RenderDevice::FenceValue, 3>{graphicsFenceValueSync, computeFenceValueSync, copyFenceValueSync };
+		waiter->Wait(waitedFences, std::chrono::seconds(10));
 	}
 
 	void GameService::AddTickableServices(PonyEngine::Application::ITickableServiceAdder& adder)

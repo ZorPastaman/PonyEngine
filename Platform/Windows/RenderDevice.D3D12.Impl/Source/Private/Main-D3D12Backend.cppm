@@ -52,9 +52,14 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() override;
-		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists) override;
-		virtual void Execute(std::span<const IComputeCommandList* const> commandLists) override;
-		virtual void Execute(std::span<const ICopyCommandList* const> commandLists) override;
+		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync) override;
+		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) override;
+		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
+
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IFence> CreateFence() override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IWaiter> CreateWaiter() override;
 
 		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
@@ -143,19 +148,29 @@ namespace PonyEngine::RenderDevice::Windows
 		return engine->CreateCopyCommandList();
 	}
 
-	void D3D12Backend::Execute(const std::span<const IGraphicsCommandList* const> commandLists)
+	void D3D12Backend::Execute(const std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync)
 	{
-		engine->Execute(commandLists);
+		engine->Execute(commandLists, sync);
 	}
 
-	void D3D12Backend::Execute(const std::span<const IComputeCommandList* const> commandLists)
+	void D3D12Backend::Execute(const std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync)
 	{
-		engine->Execute(commandLists);
+		engine->Execute(commandLists, sync);
 	}
 
-	void D3D12Backend::Execute(const std::span<const ICopyCommandList* const> commandLists)
+	void D3D12Backend::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
-		engine->Execute(commandLists);
+		engine->Execute(commandLists, sync);
+	}
+
+	std::shared_ptr<IFence> D3D12Backend::CreateFence()
+	{
+		return engine->CreateFence();
+	}
+
+	std::shared_ptr<IWaiter> D3D12Backend::CreateWaiter()
+	{
+		return engine->CreateWaiter();
 	}
 
 	struct SwapChainSupport D3D12Backend::SwapChainSupport() const

@@ -80,9 +80,9 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() override;
-		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists) override;
-		virtual void Execute(std::span<const IComputeCommandList* const> commandLists) override;
-		virtual void Execute(std::span<const ICopyCommandList* const> commandLists) override;
+		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync) override;
+		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) override;
+		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
 
 		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
@@ -98,6 +98,11 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const override;
 		virtual void PresentNextSwapChainBuffer() override;
+
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IFence> CreateFence() override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IWaiter> CreateWaiter() override;
 
 		[[nodiscard("Pure function")]] 
 		virtual Application::IApplicationContext& Application() noexcept override;
@@ -360,19 +365,19 @@ namespace PonyEngine::RenderDevice
 		return GetCurrentBackend().CreateCopyCommandList();
 	}
 
-	void RenderDeviceService::Execute(const std::span<const IGraphicsCommandList* const> commandLists)
+	void RenderDeviceService::Execute(const std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync)
 	{
-		GetCurrentBackend().Execute(commandLists);
+		GetCurrentBackend().Execute(commandLists, sync);
 	}
 
-	void RenderDeviceService::Execute(const std::span<const IComputeCommandList* const> commandLists)
+	void RenderDeviceService::Execute(const std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync)
 	{
-		GetCurrentBackend().Execute(commandLists);
+		GetCurrentBackend().Execute(commandLists, sync);
 	}
 
-	void RenderDeviceService::Execute(const std::span<const ICopyCommandList* const> commandLists)
+	void RenderDeviceService::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
-		GetCurrentBackend().Execute(commandLists);
+		GetCurrentBackend().Execute(commandLists, sync);
 	}
 
 	struct SwapChainSupport RenderDeviceService::SwapChainSupport() const
@@ -413,6 +418,16 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::PresentNextSwapChainBuffer()
 	{
 		GetCurrentBackend().PresentNextSwapChainBuffer();
+	}
+
+	std::shared_ptr<IFence> RenderDeviceService::CreateFence()
+	{
+		return GetCurrentBackend().CreateFence();
+	}
+
+	std::shared_ptr<IWaiter> RenderDeviceService::CreateWaiter()
+	{
+		return GetCurrentBackend().CreateWaiter();
 	}
 
 	Application::IApplicationContext& RenderDeviceService::Application() noexcept
