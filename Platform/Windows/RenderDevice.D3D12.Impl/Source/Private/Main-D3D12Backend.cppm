@@ -36,6 +36,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void Activate() override;
 		virtual void Deactivate() override;
 
+		[[nodiscard("Pure function")]] 
+		virtual HeapTypeMask BufferHeapTypeSupport() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
@@ -43,6 +45,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]] 
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
+		[[nodiscard("Pure function")]] 
+		virtual HeapTypeMask TextureHeapTypeSupport() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
@@ -113,6 +117,11 @@ namespace PonyEngine::RenderDevice::Windows
 		engine.reset();
 	}
 
+	HeapTypeMask D3D12Backend::BufferHeapTypeSupport() const
+	{
+		return engine->BufferHeapTypeSupport();
+	}
+
 	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const HeapType heapType, const BufferParams& params)
 	{
 		return engine->CreateBuffer(heapType, params);
@@ -126,6 +135,11 @@ namespace PonyEngine::RenderDevice::Windows
 	TextureSupportResponse D3D12Backend::TextureSupport(const TextureSupportRequest& request) const
 	{
 		return engine->TextureSupport(request);
+	}
+
+	HeapTypeMask D3D12Backend::TextureHeapTypeSupport() const
+	{
+		return engine->TextureHeapTypeSupport();
 	}
 
 	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureParams& params)

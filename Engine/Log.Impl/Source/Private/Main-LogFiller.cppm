@@ -16,6 +16,8 @@ import PonyEngine.Log.Ext;
 
 import :LogTypeSymbol;
 
+using namespace std::literals::string_view_literals;
+
 export namespace PonyEngine::Log
 {
 	/// @brief Fills a time data.
@@ -456,7 +458,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.append_range(std::string_view(" - "));
+		targetString.append_range(" - "sv);
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, message);
 		targetString.push_back('\n');
 
@@ -469,7 +471,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.append_range(std::string_view(" - "));
+		targetString.append_range(" - "sv);
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, format, formatArgs);
 		targetString.push_back('\n');
 
@@ -493,7 +495,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.append_range(std::string_view(" - "));
+		targetString.append_range(" - "sv);
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, message);
 		std::format_to(std::back_inserter(targetString), "\n{}\n", stacktrace);
 
@@ -506,7 +508,7 @@ namespace PonyEngine::Log
 		FillHeader(targetString, LogType::Exception, timePoint, frameCount);
 		targetString.push_back(' ');
 		const auto [exceptionStartIndex, exceptionEndIndex] = FillMessage(targetString, exception);
-		targetString.append_range(std::string_view(" - "));
+		targetString.append_range(" - "sv);
 		const auto [messageStartIndex, messageEndIndex] = FillMessage(targetString, format, formatArgs);
 		std::format_to(std::back_inserter(targetString), "\n{}\n", stacktrace);
 

@@ -58,12 +58,16 @@ export namespace PonyEngine::RenderDevice::Windows
 		~D3D12Engine() noexcept = default;
 
 		[[nodiscard("Pure function")]]
+		static HeapTypeMask BufferHeapTypeSupport() noexcept;
+		[[nodiscard("Pure function")]]
 		std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params);
 
 		[[nodiscard("Pure function")]]
 		TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const;
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
+		[[nodiscard("Pure function")]]
+		static HeapTypeMask TextureHeapTypeSupport() noexcept;
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params);
 
@@ -161,6 +165,11 @@ namespace PonyEngine::RenderDevice::Windows
 	{
 	}
 
+	HeapTypeMask D3D12Engine::BufferHeapTypeSupport() noexcept
+	{
+		return HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download;
+	}
+
 	std::shared_ptr<IBuffer> D3D12Engine::CreateBuffer(const HeapType heapType, const BufferParams& params)
 	{
 		ValidateSize(params);
@@ -217,6 +226,11 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return TextureSupportResponse{};
+	}
+
+	HeapTypeMask D3D12Engine::TextureHeapTypeSupport() noexcept
+	{
+		return HeapTypeMask::Default;
 	}
 
 	std::shared_ptr<ITexture> D3D12Engine::CreateTexture(const HeapType heapType, const TextureParams& params)
