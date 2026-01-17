@@ -58,6 +58,8 @@ export namespace PonyEngine::RenderDevice
 		virtual std::optional<std::size_t> ActiveBackend() const noexcept override;
 		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) override;
 
+		[[nodiscard("Pure function")]] 
+		virtual HeapTypeMask BufferHeapTypeSupport() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
@@ -71,6 +73,8 @@ export namespace PonyEngine::RenderDevice
 		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
+		[[nodiscard("Pure function")]] 
+		virtual HeapTypeMask TextureHeapTypeSupport() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
@@ -285,6 +289,11 @@ namespace PonyEngine::RenderDevice
 		activeBackendIndex = backendIndex;
 	}
 
+	HeapTypeMask RenderDeviceService::BufferHeapTypeSupport() const
+	{
+		return GetCurrentBackend().BufferHeapTypeSupport();
+	}
+
 	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const HeapType heapType, const BufferParams& params)
 	{
 		return GetCurrentBackend().CreateBuffer(heapType, params);
@@ -343,6 +352,11 @@ namespace PonyEngine::RenderDevice
 		}
 
 		return GetCurrentBackend().TextureSupport(request);
+	}
+
+	HeapTypeMask RenderDeviceService::TextureHeapTypeSupport() const
+	{
+		return GetCurrentBackend().TextureHeapTypeSupport();
 	}
 
 	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureParams& params)

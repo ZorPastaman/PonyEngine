@@ -51,6 +51,8 @@ export namespace PonyEngine::RenderDevice
 		virtual std::optional<std::size_t> ActiveBackend() const noexcept = 0;
 		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) = 0;
 
+		[[nodiscard("Pure function")]]
+		virtual HeapTypeMask BufferHeapTypeSupport() const = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) = 0;
 
@@ -64,6 +66,8 @@ export namespace PonyEngine::RenderDevice
 		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual HeapTypeMask TextureHeapTypeSupport() const = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
 

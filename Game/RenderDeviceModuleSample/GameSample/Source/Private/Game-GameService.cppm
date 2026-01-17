@@ -76,6 +76,8 @@ namespace Game
 			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget
 		});
 		const PonyEngine::RenderDevice::SwapChainSupport swapChainSupport = renderDevice->SwapChainSupport();
+		const PonyEngine::RenderDevice::HeapTypeMask bufferHeaps = renderDevice->BufferHeapTypeSupport();
+		const PonyEngine::RenderDevice::HeapTypeMask textureHeaps = renderDevice->TextureHeapTypeSupport();
 
 		const std::shared_ptr<PonyEngine::RenderDevice::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::RenderDevice::HeapType::Default, PonyEngine::RenderDevice::BufferParams
 		{
