@@ -42,6 +42,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		D3D12_FEATURE_DATA_FORMAT_SUPPORT GetFormatSupport(DXGI_FORMAT format) const;
 		[[nodiscard("Pure function")]]
+		UINT8 GetPlaneCount(DXGI_FORMAT format) const;
+		[[nodiscard("Pure function")]]
 		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
 
 		[[nodiscard("Pure function")]]
@@ -123,6 +125,17 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return formatSupport;
+	}
+
+	UINT8 D3D12Device::GetPlaneCount(const DXGI_FORMAT format) const
+	{
+		auto formatInfo = D3D12_FEATURE_DATA_FORMAT_INFO{.Format = format};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_FORMAT_INFO, &formatInfo, sizeof(formatInfo)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to check texture format info: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return formatInfo.PlaneCount;
 	}
 
 	UINT D3D12Device::GetSampleQualityCount(const DXGI_FORMAT format, const UINT sampleCount) const

@@ -42,7 +42,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
 		[[nodiscard("Pure function")]] 
-		virtual TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const override;
+		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]] 
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Pure function")]] 
@@ -127,9 +127,9 @@ namespace PonyEngine::RenderDevice::Windows
 		return engine->CreateBuffer(heapType, params);
 	}
 
-	TextureFormatFeature D3D12Backend::TextureFormatFeatures(const TextureFormatId textureFormatId) const
+	struct TextureFormatSupport D3D12Backend::TextureFormatSupport(const TextureFormatId textureFormatId) const
 	{
-		return engine->TextureFormatFeatures(textureFormatId);
+		return engine->TextureFormatSupport(textureFormatId);
 	}
 
 	TextureSupportResponse D3D12Backend::TextureSupport(const TextureSupportRequest& request) const

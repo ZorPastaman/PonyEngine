@@ -26,70 +26,70 @@ import :D3D12Utility;
 export namespace PonyEngine::RenderDevice::Windows
 {
 	[[nodiscard("Pure function")]]
-	bool IsValidUsage(TextureUsage usage) noexcept;
+	constexpr bool IsValidUsage(TextureUsage usage) noexcept;
 	[[nodiscard("Pure function")]]
-	bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 	[[nodiscard("Pure function")]]
-	bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 
 	[[nodiscard("Pure function")]]
-	D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureDimension dimension) noexcept;
+	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureDimension dimension) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureUsage usage) noexcept;
+	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureUsage usage) noexcept;
 
 	[[nodiscard("Pure function")]]
-	D3D12_HEAP_PROPERTIES ToHeapProperties(HeapType heapType) noexcept;
+	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(HeapType heapType) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage usage) noexcept;
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage usage) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_HEAP_FLAGS ToHeapFlags(TextureUsage usage) noexcept;
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(TextureUsage usage) noexcept;
 
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept;
+	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, DXGI_FORMAT format) noexcept;
+	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, DXGI_FORMAT format) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_DIMENSION ToResourceDimension(TextureDimension dimension) noexcept;
+	constexpr D3D12_RESOURCE_DIMENSION ToResourceDimension(TextureDimension dimension) noexcept;
 	[[nodiscard("Pure function")]]
-	UINT16 ToDepthArraySize(const TextureParams& params) noexcept;
+	constexpr UINT16 ToDepthArraySize(const TextureParams& params) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_FLAGS ToResourceFlags(BufferUsage usage) noexcept;
+	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(BufferUsage usage) noexcept;
 	[[nodiscard("Pure function")]]
-	D3D12_RESOURCE_FLAGS ToResourceFlags(TextureUsage usage) noexcept;
+	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(TextureUsage usage) noexcept;
 
 	[[nodiscard("Pure function")]]
-	D3D12_BARRIER_LAYOUT ToLayout(Layout layout) noexcept;
+	constexpr D3D12_BARRIER_LAYOUT ToLayout(Layout layout) noexcept;
 
 	[[nodiscard("Pure function")]]
-	D3D12_CLEAR_VALUE ToClearValue(const ClearValue& clearValue, DXGI_FORMAT format) noexcept;
+	constexpr D3D12_CLEAR_VALUE ToClearValue(const ClearValue& clearValue, DXGI_FORMAT format) noexcept;
 
 	[[nodiscard("Pure function")]]
-	TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 
 	[[nodiscard("Pure function")]]
-	DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, DXGI_FORMAT format) noexcept;
+	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, DXGI_FORMAT format) noexcept;
 	[[nodiscard("Pure function")]]
-	DXGI_USAGE ToUsage(TextureUsage usage) noexcept;
+	constexpr DXGI_USAGE ToUsage(TextureUsage usage) noexcept;
 	[[nodiscard("Pure function")]]
-	DXGI_SCALING ToScaling(SwapChainScaling scaling) noexcept;
+	constexpr DXGI_SCALING ToScaling(SwapChainScaling scaling) noexcept;
 	[[nodiscard("Pure function")]]
-	DXGI_SWAP_EFFECT ToSwapEffect(SwapChainEffect effect) noexcept;
+	constexpr DXGI_SWAP_EFFECT ToSwapEffect(SwapChainEffect effect) noexcept;
 	[[nodiscard("Pure function")]]
-	DXGI_ALPHA_MODE ToAlphaMode(SwapChainAlphaMode alphaMode) noexcept;
+	constexpr DXGI_ALPHA_MODE ToAlphaMode(SwapChainAlphaMode alphaMode) noexcept;
 	[[nodiscard("Pure function")]]
-	UINT ToSwapChainFlags(SwapChainSync syncMode) noexcept;
+	constexpr UINT ToSwapChainFlags(SwapChainSync syncMode) noexcept;
 	[[nodiscard("Pure function")]]
-	UINT ToSyncInterval(SwapChainSync syncMode) noexcept;
+	constexpr UINT ToSyncInterval(SwapChainSync syncMode) noexcept;
 	[[nodiscard("Pure function")]]
-	UINT ToPresentFlags(SwapChainSync syncMode) noexcept;
+	constexpr UINT ToPresentFlags(SwapChainSync syncMode) noexcept;
 
 	[[nodiscard("Pure function")]]
-	SwapChainSyncMask ToSyncMode(BOOL tearingSupported) noexcept;
+	constexpr SwapChainSyncMask ToSyncMode(BOOL tearingSupported) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Windows
 {
-	bool IsValidUsage(const TextureUsage usage) noexcept
+	constexpr bool IsValidUsage(const TextureUsage usage) noexcept
 	{
 		if (Any(TextureUsage::DepthStencil, usage) && Any(TextureUsage::RenderTarget | TextureUsage::UnorderedAccess, usage))
 		{
@@ -99,7 +99,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return true;
 	}
 
-	bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		if (Any(TextureUsage::DepthStencil, request.usage))
 		{
@@ -114,7 +114,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return true;
 	}
 
-	bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		if (Any(TextureUsage::RenderTarget, request.usage))
 		{
@@ -133,7 +133,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return true;
 	}
 
-	D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureDimension dimension) noexcept
+	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureDimension dimension) noexcept
 	{
 		switch (dimension)
 		{
@@ -150,7 +150,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureUsage usage) noexcept
+	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureUsage usage) noexcept
 	{
 		D3D12_FORMAT_SUPPORT1 support = D3D12_FORMAT_SUPPORT1_NONE;
 		if (Any(TextureUsage::RenderTarget, usage))
@@ -169,7 +169,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return support;
 	}
 
-	D3D12_HEAP_PROPERTIES ToHeapProperties(const HeapType heapType) noexcept
+	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(const HeapType heapType) noexcept
 	{
 		auto properties = D3D12_HEAP_PROPERTIES
 		{
@@ -198,7 +198,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return properties;
 	}
 
-	D3D12_HEAP_FLAGS ToHeapFlags(const BufferUsage usage) noexcept
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const BufferUsage usage) noexcept
 	{
 		auto flags = D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
 		if (Any(BufferUsage::UnorderedAccess, usage))
@@ -209,7 +209,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return flags;
 	}
 
-	D3D12_HEAP_FLAGS ToHeapFlags(const TextureUsage usage) noexcept
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const TextureUsage usage) noexcept
 	{
 		auto flags = D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
 		if (Any(TextureUsage::UnorderedAccess, usage))
@@ -220,7 +220,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return flags;
 	}
 
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept
+	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept
 	{
 		return D3D12_RESOURCE_DESC1
 		{
@@ -238,7 +238,7 @@ namespace PonyEngine::RenderDevice::Windows
 		};
 	}
 
-	D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, const DXGI_FORMAT format) noexcept
+	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, const DXGI_FORMAT format) noexcept
 	{
 		return D3D12_RESOURCE_DESC1
 		{
@@ -256,7 +256,7 @@ namespace PonyEngine::RenderDevice::Windows
 		};
 	}
 
-	D3D12_RESOURCE_DIMENSION ToResourceDimension(const TextureDimension dimension) noexcept
+	constexpr D3D12_RESOURCE_DIMENSION ToResourceDimension(const TextureDimension dimension) noexcept
 	{
 		switch (dimension)
 		{
@@ -274,25 +274,25 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	UINT16 ToDepthArraySize(const TextureParams& params) noexcept
+	constexpr UINT16 ToDepthArraySize(const TextureParams& params) noexcept
 	{
 		switch (params.dimension)
 		{
 		case TextureDimension::Texture3D:
 			return static_cast<UINT16>(params.size.Z());
 		case TextureDimension::TextureCube:
-			return static_cast<UINT16>(params.arraySize * 6);
+			return static_cast<UINT16>(params.arraySize * std::to_underlying(Face::Count));
 		default:
 			return static_cast<UINT16>(params.arraySize);
 		}
 	}
 
-	D3D12_RESOURCE_FLAGS ToResourceFlags(const BufferUsage usage) noexcept
+	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(const BufferUsage usage) noexcept
 	{
 		return Any(BufferUsage::UnorderedAccess, usage) ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
 	}
 
-	D3D12_RESOURCE_FLAGS ToResourceFlags(const TextureUsage usage) noexcept
+	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(const TextureUsage usage) noexcept
 	{
 		auto flags = D3D12_RESOURCE_FLAG_NONE;
 		if (Any(TextureUsage::RenderTarget, usage))
@@ -315,7 +315,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return flags;
 	}
 
-	D3D12_BARRIER_LAYOUT ToLayout(const Layout layout) noexcept
+	constexpr D3D12_BARRIER_LAYOUT ToLayout(const Layout layout) noexcept
 	{
 		switch (layout)
 		{
@@ -347,7 +347,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	D3D12_CLEAR_VALUE ToClearValue(const ClearValue& clearValue, const DXGI_FORMAT format) noexcept
+	constexpr D3D12_CLEAR_VALUE ToClearValue(const ClearValue& clearValue, const DXGI_FORMAT format) noexcept
 	{
 		auto clear = D3D12_CLEAR_VALUE
 		{
@@ -361,20 +361,22 @@ namespace PonyEngine::RenderDevice::Windows
 			},
 			[&](const Math::ColorRGBA<float>& color) noexcept
 			{
-				static_assert(sizeof(clear.Color) == sizeof(Math::ColorRGBA<float>), "D3D12 color and engine color are incompatible.");
-				std::memcpy(&clear.Color, &color, sizeof(clear.Color));
+				for (std::size_t i = 0uz; i < color.ChannelCount; ++i)
+				{
+					clear.Color[i] = static_cast<FLOAT>(color[i]);
+				}
 			},
 			[&](const DepthStencil& depthStencil) noexcept
 			{
-				static_assert(sizeof(clear.DepthStencil) == sizeof(DepthStencil), "D3D12 depth stencil and engine depth stencil are incompatible.");
-				std::memcpy(&clear.DepthStencil, &depthStencil, sizeof(clear.DepthStencil));
+				clear.DepthStencil.Depth = static_cast<FLOAT>(depthStencil.depth);
+				clear.DepthStencil.Stencil = static_cast<UINT8>(depthStencil.stencil);
 			}
 		}, clearValue);
 
 		return clear;
 	}
 
-	TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		auto features = TextureFormatFeature::None;
 		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_LOAD)
@@ -461,7 +463,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return features;
 	}
 
-	DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, const DXGI_FORMAT format) noexcept
+	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, const DXGI_FORMAT format) noexcept
 	{
 		return DXGI_SWAP_CHAIN_DESC1
 		{
@@ -479,7 +481,7 @@ namespace PonyEngine::RenderDevice::Windows
 		};
 	}
 
-	DXGI_USAGE ToUsage(const TextureUsage usage) noexcept
+	constexpr DXGI_USAGE ToUsage(const TextureUsage usage) noexcept
 	{
 		DXGI_USAGE answer = 0;
 		if (Any(TextureUsage::ShaderResource, usage))
@@ -498,7 +500,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return answer;
 	}
 
-	DXGI_SCALING ToScaling(const SwapChainScaling scaling) noexcept
+	constexpr DXGI_SCALING ToScaling(const SwapChainScaling scaling) noexcept
 	{
 		switch (scaling)
 		{
@@ -514,7 +516,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	DXGI_SWAP_EFFECT ToSwapEffect(const SwapChainEffect effect) noexcept
+	constexpr DXGI_SWAP_EFFECT ToSwapEffect(const SwapChainEffect effect) noexcept
 	{
 		switch (effect)
 		{
@@ -528,7 +530,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	DXGI_ALPHA_MODE ToAlphaMode(const SwapChainAlphaMode alphaMode) noexcept
+	constexpr DXGI_ALPHA_MODE ToAlphaMode(const SwapChainAlphaMode alphaMode) noexcept
 	{
 		switch (alphaMode)
 		{
@@ -544,14 +546,14 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	UINT ToSwapChainFlags(const SwapChainSync syncMode) noexcept
+	constexpr UINT ToSwapChainFlags(const SwapChainSync syncMode) noexcept
 	{
 		return syncMode == SwapChainSync::NoSync
 			? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
 			: 0u;
 	}
 
-	UINT ToSyncInterval(const SwapChainSync syncMode) noexcept
+	constexpr UINT ToSyncInterval(const SwapChainSync syncMode) noexcept
 	{
 		switch (syncMode)
 		{
@@ -572,14 +574,14 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	UINT ToPresentFlags(const SwapChainSync syncMode) noexcept
+	constexpr UINT ToPresentFlags(const SwapChainSync syncMode) noexcept
 	{
 		return syncMode == SwapChainSync::NoSync
 			? DXGI_PRESENT_ALLOW_TEARING
 			: 0u;
 	}
 
-	SwapChainSyncMask ToSyncMode(const BOOL tearingSupported) noexcept
+	constexpr SwapChainSyncMask ToSyncMode(const BOOL tearingSupported) noexcept
 	{
 		auto syncMode = SwapChainSyncMask::FastSync | SwapChainSyncMask::FullSync | 
 			SwapChainSyncMask::FullSyncHalf | SwapChainSyncMask::FullSyncThird | SwapChainSyncMask::FullSyncFourth;

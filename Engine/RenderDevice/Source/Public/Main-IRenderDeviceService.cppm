@@ -31,6 +31,7 @@ import :SwapChainParams;
 import :SwapChainSupport;
 import :TextureFormatFeature;
 import :TextureFormatId;
+import :TextureFormatSupport;
 import :TextureParams;
 import :TextureSupportRequest;
 import :TextureSupportResponse;
@@ -63,7 +64,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const = 0;
+		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatId textureFormatId) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 		[[nodiscard("Pure function")]]

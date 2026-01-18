@@ -7,20 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.RenderDevice:ICopyCommandList;
+export module PonyEngine.RenderDevice:TextureFormatSupport;
 
 import std;
 
-import :ICommandList;
+import :TextureFormatFeature;
 
 export namespace PonyEngine::RenderDevice
 {
-	class ICopyCommandList : public ICommandList
+	struct TextureFormatSupport final
 	{
-		PONY_INTERFACE_BODY(ICopyCommandList)
+		TextureFormatFeature features = TextureFormatFeature::None;
+		std::uint8_t planeCount = 0u;
+		bool supported = false;
 	};
 }

@@ -36,6 +36,7 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/Main-D3D12Engine.cppm"
 	"Source/Private/Main-D3D12Fence.cppm"
 	"Source/Private/Main-D3D12GraphicsCommandList.cppm"
+	"Source/Private/Main-D3D12Resource.cppm"
 	"Source/Private/Main-D3D12SwapChain.cppm"
 	"Source/Private/Main-D3D12Texture.cppm"
 	"Source/Private/Main-D3D12Utility.cppm"

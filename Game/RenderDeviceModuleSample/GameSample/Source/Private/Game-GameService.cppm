@@ -68,8 +68,8 @@ namespace Game
 	void GameService::Begin()
 	{
 		const PonyEngine::RenderDevice::TextureFormatId format = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm);
-		const PonyEngine::RenderDevice::TextureFormatFeature feature = renderDevice->TextureFormatFeatures(format);
-		const PonyEngine::RenderDevice::TextureSupportResponse support = renderDevice->TextureSupport(PonyEngine::RenderDevice::TextureSupportRequest
+		const PonyEngine::RenderDevice::TextureFormatSupport formatSupport = renderDevice->TextureFormatSupport(format);
+		const PonyEngine::RenderDevice::TextureSupportResponse textureSupport = renderDevice->TextureSupport(PonyEngine::RenderDevice::TextureSupportRequest
 		{
 			.format = format,
 			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture2D,

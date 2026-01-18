@@ -38,7 +38,7 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const = 0;
+		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 		[[nodiscard("Pure function")]]
