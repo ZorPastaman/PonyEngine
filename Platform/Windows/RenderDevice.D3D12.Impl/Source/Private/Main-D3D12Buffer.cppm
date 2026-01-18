@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Buffer;
@@ -20,7 +18,7 @@ import std;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
-import :D3D12Utility;
+import :D3D12Resource;
 
 export namespace PonyEngine::RenderDevice::Windows
 {
@@ -41,6 +39,11 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		virtual BufferUsage Usage() const noexcept override;
 
+		virtual void* Map() override;
+		virtual void* Map(std::uint64_t offset, std::uint64_t length) override;
+		virtual void Unmap() override;
+		virtual void Unmap(std::uint64_t offset, std::uint64_t length) override;
+
 		virtual void SetName(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
@@ -52,7 +55,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		D3D12Buffer& operator =(D3D12Buffer&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12Resource2> resource;
+		D3D12Resource resource;
 
 		std::uint64_t size;
 		BufferUsage usage;
@@ -62,7 +65,7 @@ export namespace PonyEngine::RenderDevice::Windows
 namespace PonyEngine::RenderDevice::Windows
 {
 	D3D12Buffer::D3D12Buffer(ID3D12Resource2& resource, const std::uint64_t size, const BufferUsage usage) noexcept :
-		resource(&resource),
+		resource(resource),
 		size{size},
 		usage{usage}
 	{
@@ -73,7 +76,6 @@ namespace PonyEngine::RenderDevice::Windows
 		size{size},
 		usage{usage}
 	{
-		assert(this->resource && "The buffer resource is nullptr.");
 	}
 
 	std::uint64_t D3D12Buffer::Size() const noexcept
@@ -86,18 +88,38 @@ namespace PonyEngine::RenderDevice::Windows
 		return usage;
 	}
 
+	void* D3D12Buffer::Map()
+	{
+		return resource.Map(0u);
+	}
+
+	void* D3D12Buffer::Map(const std::uint64_t offset, const std::uint64_t length)
+	{
+		return resource.Map(0u, static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+	}
+
+	void D3D12Buffer::Unmap()
+	{
+		resource.Unmap(0u);
+	}
+
+	void D3D12Buffer::Unmap(const std::uint64_t offset, const std::uint64_t length)
+	{
+		resource.Unmap(0u, static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+	}
+
 	void D3D12Buffer::SetName(const std::string_view name)
 	{
-		SetObjectName(*resource, name);
+		resource.SetName(name);
 	}
 
 	ID3D12Resource2& D3D12Buffer::Resource() noexcept
 	{
-		return *resource;
+		return resource.Resource();
 	}
 
 	const ID3D12Resource2& D3D12Buffer::Resource() const noexcept
 	{
-		return *resource;
+		return resource.Resource();
 	}
 }

@@ -15,15 +15,12 @@ export module PonyEngine.RenderDevice:IGraphicsCommandList;
 
 import std;
 
+import :ICommandList;
+
 export namespace PonyEngine::RenderDevice
 {
-	class IGraphicsCommandList
+	class IGraphicsCommandList : public ICommandList
 	{
 		PONY_INTERFACE_BODY(IGraphicsCommandList)
-
-		virtual void Reset() = 0;
-		virtual void Close() = 0;
-
-		virtual void SetName(std::string_view name) = 0;
 	};
 }

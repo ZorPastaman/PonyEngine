@@ -16,10 +16,11 @@ export module PonyEngine.RenderDevice:IBuffer;
 import std;
 
 import :BufferUsage;
+import :IResource;
 
 export namespace PonyEngine::RenderDevice
 {
-	class IBuffer
+	class IBuffer : public IResource
 	{
 		PONY_INTERFACE_BODY(IBuffer)
 
@@ -28,6 +29,9 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual BufferUsage Usage() const noexcept = 0;
 
-		virtual void SetName(std::string_view name) = 0;
+		virtual void* Map() = 0;
+		virtual void* Map(std::uint64_t offset, std::uint64_t length) = 0;
+		virtual void Unmap() = 0;
+		virtual void Unmap(std::uint64_t offset, std::uint64_t length) = 0;
 	};
 }

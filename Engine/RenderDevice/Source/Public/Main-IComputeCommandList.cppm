@@ -15,15 +15,12 @@ export module PonyEngine.RenderDevice:IComputeCommandList;
 
 import std;
 
+import :ICommandList;
+
 export namespace PonyEngine::RenderDevice
 {
-	class IComputeCommandList
+	class IComputeCommandList : public ICommandList
 	{
 		PONY_INTERFACE_BODY(IComputeCommandList)
-
-		virtual void Reset() = 0;
-		virtual void Close() = 0;
-
-		virtual void SetName(std::string_view name) = 0;
 	};
 }

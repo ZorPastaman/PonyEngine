@@ -7,20 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.RenderDevice:ICopyCommandList;
+export module PonyEngine.RenderDevice:Face;
 
 import std;
 
-import :ICommandList;
-
 export namespace PonyEngine::RenderDevice
 {
-	class ICopyCommandList : public ICommandList
+	enum class Face : std::uint8_t
 	{
-		PONY_INTERFACE_BODY(ICopyCommandList)
+		Right,
+		Left,
+		Up,
+		Down,
+		Forward,
+		Back,
+		Count
 	};
 }

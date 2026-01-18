@@ -69,8 +69,8 @@ export namespace PonyEngine::RenderDevice
 		virtual std::string_view TextureFormat(struct TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]] 
 		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual TextureFormatFeature TextureFormatFeatures(struct TextureFormatId textureFormatId) const override;
+		[[nodiscard("Pure function")]]
+		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Pure function")]] 
@@ -334,14 +334,14 @@ namespace PonyEngine::RenderDevice
 		return textureFormatHashMap.contains(textureFormatId);
 	}
 
-	TextureFormatFeature RenderDeviceService::TextureFormatFeatures(const struct TextureFormatId textureFormatId) const
+	struct TextureFormatSupport RenderDeviceService::TextureFormatSupport(const struct TextureFormatId textureFormatId) const
 	{
 		if (!IsValid(textureFormatId)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid format");
 		}
 
-		return GetCurrentBackend().TextureFormatFeatures(textureFormatId);
+		return GetCurrentBackend().TextureFormatSupport(textureFormatId);
 	}
 
 	TextureSupportResponse RenderDeviceService::TextureSupport(const TextureSupportRequest& request) const

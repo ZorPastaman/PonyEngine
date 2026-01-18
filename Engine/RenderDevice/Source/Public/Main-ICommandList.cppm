@@ -11,16 +11,19 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.RenderDevice:ICopyCommandList;
+export module PonyEngine.RenderDevice:ICommandList;
 
 import std;
 
-import :ICommandList;
-
 export namespace PonyEngine::RenderDevice
 {
-	class ICopyCommandList : public ICommandList
+	class ICommandList
 	{
-		PONY_INTERFACE_BODY(ICopyCommandList)
+		PONY_INTERFACE_BODY(ICommandList)
+
+		virtual void Reset() = 0;
+		virtual void Close() = 0;
+
+		virtual void SetName(std::string_view name) = 0;
 	};
 }

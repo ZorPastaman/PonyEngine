@@ -20,15 +20,18 @@ import PonyEngine.RenderDevice;
 export namespace PonyEngine::RenderDevice::Windows
 {
 	[[nodiscard("Pure function")]]
-	DXGI_FORMAT GetSrgbFormat(DXGI_FORMAT format) noexcept;
+	constexpr DXGI_FORMAT GetSrgbFormat(DXGI_FORMAT format) noexcept;
 	[[nodiscard("Pure function")]]
-	DXGI_FORMAT GetTypelessFormat(DXGI_FORMAT format) noexcept;
+	constexpr DXGI_FORMAT GetTypelessFormat(DXGI_FORMAT format) noexcept;
 	[[nodiscard("Pure function")]]
-	bool IsDepthStencilFormat(DXGI_FORMAT format) noexcept;
+	constexpr bool IsDepthStencilFormat(DXGI_FORMAT format) noexcept;
 	[[nodiscard("Pure function")]]
-	DXGI_FORMAT GetDepthViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
+	constexpr DXGI_FORMAT GetDepthViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
 	[[nodiscard("Pure function")]]
-	DXGI_FORMAT GetStencilViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
+	constexpr DXGI_FORMAT GetStencilViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
+
+	[[nodiscard("Pure function")]]
+	constexpr UINT CalculateSubresource(UINT16 mipIndex, UINT16 arrayIndex, UINT8 planeIndex, UINT16 mipCount, UINT16 arraySize) noexcept;
 
 	/// @brief Sets the object name.
 	/// @param object Target object.
@@ -38,7 +41,7 @@ export namespace PonyEngine::RenderDevice::Windows
 
 namespace PonyEngine::RenderDevice::Windows
 {
-	DXGI_FORMAT GetSrgbFormat(const DXGI_FORMAT format) noexcept
+	constexpr DXGI_FORMAT GetSrgbFormat(const DXGI_FORMAT format) noexcept
 	{
 		switch (format)
 		{
@@ -61,7 +64,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	DXGI_FORMAT GetTypelessFormat(const DXGI_FORMAT format) noexcept
+	constexpr DXGI_FORMAT GetTypelessFormat(const DXGI_FORMAT format) noexcept
 	{
 		switch (format)
 		{
@@ -183,13 +186,13 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	bool IsDepthStencilFormat(const DXGI_FORMAT format) noexcept
+	constexpr bool IsDepthStencilFormat(const DXGI_FORMAT format) noexcept
 	{
 		return format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT || format == DXGI_FORMAT_D32_FLOAT ||
 			format == DXGI_FORMAT_D24_UNORM_S8_UINT || format == DXGI_FORMAT_D16_UNORM;
 	}
 
-	DXGI_FORMAT GetDepthViewFormat(const DXGI_FORMAT depthStencilFormat) noexcept
+	constexpr DXGI_FORMAT GetDepthViewFormat(const DXGI_FORMAT depthStencilFormat) noexcept
 	{
 		switch (depthStencilFormat)
 		{
@@ -206,7 +209,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	DXGI_FORMAT GetStencilViewFormat(const DXGI_FORMAT depthStencilFormat) noexcept
+	constexpr DXGI_FORMAT GetStencilViewFormat(const DXGI_FORMAT depthStencilFormat) noexcept
 	{
 		switch (depthStencilFormat)
 		{
@@ -217,6 +220,11 @@ namespace PonyEngine::RenderDevice::Windows
 		default:
 			return DXGI_FORMAT_UNKNOWN;
 		}
+	}
+
+	constexpr UINT CalculateSubresource(const UINT16 mipIndex, const UINT16 arrayIndex, const UINT8 planeIndex, const UINT16 mipCount, const UINT16 arraySize) noexcept
+	{
+		return mipIndex + arrayIndex * mipCount + planeIndex * mipCount * arraySize;
 	}
 
 	void SetObjectName(ID3D12Object& object, const std::string_view name)

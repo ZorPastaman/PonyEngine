@@ -63,7 +63,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params);
 
 		[[nodiscard("Pure function")]]
-		TextureFormatFeature TextureFormatFeatures(TextureFormatId textureFormatId) const;
+		struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const;
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
 		[[nodiscard("Pure function")]]
@@ -98,7 +98,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		std::uint8_t CurrentSwapChainBufferIndex() const;
 		[[nodiscard("Pure function")]]
-		const std::shared_ptr<ITexture>& SwapChainBuffer(std::uint8_t bufferIndex) const;
+		std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const;
 		void PresentNextSwapChainBuffer();
 
 		D3D12Engine& operator =(const D3D12Engine&) = delete;
@@ -182,17 +182,20 @@ namespace PonyEngine::RenderDevice::Windows
 		return std::make_shared<D3D12Buffer>(std::move(resource), static_cast<std::uint64_t>(resourceDesc.Width), params.usage);
 	}
 
-	TextureFormatFeature D3D12Engine::TextureFormatFeatures(const TextureFormatId textureFormatId) const
+	struct TextureFormatSupport D3D12Engine::TextureFormatSupport(const TextureFormatId textureFormatId) const
 	{
 		if (const std::size_t index = textureFormatMap.IndexOf(textureFormatId); index < textureFormatMap.Size())
 		{
 			const DXGI_FORMAT format = textureFormatMap.DXGIFormat(index);
-			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
 
-			return ToTextureFormatFeature(formatSupport);
+			auto support = RenderDevice::TextureFormatSupport{.supported = true};
+			support.features = ToTextureFormatFeature(device.GetFormatSupport(format));
+			support.planeCount = static_cast<std::uint8_t>(device.GetPlaneCount(format));
+
+			return support;
 		}
 
-		return TextureFormatFeature::None;
+		return RenderDevice::TextureFormatSupport{};
 	}
 
 	TextureSupportResponse D3D12Engine::TextureSupport(const TextureSupportRequest& request) const
@@ -441,7 +444,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return static_cast<std::uint8_t>(swapChain->GetCurrentBufferIndex());
 	}
 
-	const std::shared_ptr<ITexture>& D3D12Engine::SwapChainBuffer(const std::uint8_t bufferIndex) const
+	std::shared_ptr<ITexture> D3D12Engine::SwapChainBuffer(const std::uint8_t bufferIndex) const
 	{
 		if (!swapChain) [[unlikely]]
 		{
@@ -500,7 +503,7 @@ namespace PonyEngine::RenderDevice::Windows
 		case TextureDimension::TextureCube:
 			response.maxSize = Math::Vector3<std::uint32_t>(D3D12_REQ_TEXTURECUBE_DIMENSION, D3D12_REQ_TEXTURECUBE_DIMENSION, 1u);
 			response.maxMipCount = D3D12_REQ_MIP_LEVELS;
-			response.maxArraySize = D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION / 6;
+			response.maxArraySize = D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION / std::to_underlying(Face::Count);
 			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
 		default:
@@ -652,7 +655,7 @@ namespace PonyEngine::RenderDevice::Windows
 			{
 				throw std::invalid_argument("Invalid size");
 			}
-			if (params.arraySize > D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION / 6) [[unlikely]]
+			if (params.arraySize > std::uint32_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION} / std::to_underlying(Face::Count)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid array size");
 			}
