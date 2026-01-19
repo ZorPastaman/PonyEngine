@@ -58,14 +58,10 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]] 
 		virtual bool SRGBCompatible() const noexcept override;
 
-		virtual void* Map(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex) override;
-		virtual void* Map(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex, std::uint64_t offset, std::uint64_t length) override;
-		virtual void* Map(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex, Face face) override;
-		virtual void* Map(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex, Face face, std::uint64_t offset, std::uint64_t length) override;
-		virtual void Unmap(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex) override;
-		virtual void Unmap(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex, std::uint64_t offset, std::uint64_t length) override;
-		virtual void Unmap(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex, Face face) override;
-		virtual void Unmap(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex, Face face, std::uint64_t offset, std::uint64_t length) override;
+		virtual void* Map(const SubTextureIndex& index) override;
+		virtual void* Map(const SubTextureIndex& index, std::uint64_t offset, std::uint64_t length) override;
+		virtual void Unmap(const SubTextureIndex& index) override;
+		virtual void Unmap(const SubTextureIndex& index, std::uint64_t offset, std::uint64_t length) override;
 
 		virtual void SetName(std::string_view name) override;
 
@@ -80,8 +76,6 @@ export namespace PonyEngine::RenderDevice::Windows
 	private:
 		[[nodiscard("Pure function")]]
 		UINT CalculateSubresourceIndex(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex) const;
-		[[nodiscard("Pure function")]]
-		UINT CalculateSubresourceIndex(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex, Face face) const;
 
 		D3D12Resource resource;
 
@@ -170,15 +164,9 @@ namespace PonyEngine::RenderDevice::Windows
 
 	std::uint32_t D3D12Texture::ArraySize() const noexcept
 	{
-		switch (dimension)
-		{
-		case TextureDimension::Texture3D:
-			return 1u;
-		case TextureDimension::TextureCube:
-			return depth / std::to_underlying(Face::Count);
-		default:
-			return depth;
-		}
+		return dimension == TextureDimension::Texture3D
+			? 1u
+			: depth;
 	}
 
 	enum SampleCount D3D12Texture::SampleCount() const noexcept
@@ -196,48 +184,24 @@ namespace PonyEngine::RenderDevice::Windows
 		return srgbCompatible;
 	}
 
-	void* D3D12Texture::Map(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex)
+	void* D3D12Texture::Map(const SubTextureIndex& index)
 	{
-		return resource.Map(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex));
+		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex));
 	}
 
-	void* D3D12Texture::Map(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex,
-		const std::uint64_t offset, const std::uint64_t length)
+	void* D3D12Texture::Map(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
 	{
-		return resource.Map(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
-	void* D3D12Texture::Map(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex, const Face face)
+	void D3D12Texture::Unmap(const SubTextureIndex& index)
 	{
-		return resource.Map(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex, face));
+		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex));
 	}
 
-	void* D3D12Texture::Map(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex, const Face face,
-		const std::uint64_t offset, const std::uint64_t length)
+	void D3D12Texture::Unmap(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
 	{
-		return resource.Map(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex, face), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
-	}
-
-	void D3D12Texture::Unmap(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex)
-	{
-		resource.Unmap(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex));
-	}
-
-	void D3D12Texture::Unmap(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex,
-		const std::uint64_t offset, const std::uint64_t length)
-	{
-		resource.Unmap(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
-	}
-
-	void D3D12Texture::Unmap(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex, const Face face)
-	{
-		resource.Unmap(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex, face));
-	}
-
-	void D3D12Texture::Unmap(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex, const Face face,
-		const std::uint64_t offset, const std::uint64_t length)
-	{
-		resource.Unmap(CalculateSubresourceIndex(mipIndex, arrayIndex, planeIndex, face), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
 	void D3D12Texture::SetName(const std::string_view name)
@@ -257,27 +221,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 	UINT D3D12Texture::CalculateSubresourceIndex(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex) const
 	{
-		if (dimension == TextureDimension::TextureCube) [[unlikely]]
-		{
-			throw std::invalid_argument("Texture cube requires face type");
-		}
-
 		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), static_cast<UINT8>(planeIndex),
 			static_cast<UINT16>(mipCount), static_cast<UINT16>(ArraySize()));
-	}
-
-	UINT D3D12Texture::CalculateSubresourceIndex(const std::uint32_t mipIndex, const std::uint32_t arrayIndex,
-		const std::uint8_t planeIndex, const Face face) const
-	{
-		if (dimension != TextureDimension::TextureCube) [[unlikely]]
-		{
-			throw std::invalid_argument("Only texture cube supports faces");
-		}
-
-		const std::uint32_t trueArrayIndex = arrayIndex * std::to_underlying(Face::Count) + std::to_underlying(face);
-		const std::uint32_t trueArraySize = ArraySize() * std::to_underlying(Face::Count);
-
-		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(trueArrayIndex), static_cast<UINT8>(planeIndex),
-			static_cast<UINT16>(mipCount), static_cast<UINT16>(trueArraySize));
 	}
 }

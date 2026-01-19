@@ -143,8 +143,6 @@ namespace PonyEngine::RenderDevice::Windows
 			return D3D12_FORMAT_SUPPORT1_TEXTURE2D;
 		case TextureDimension::Texture3D:
 			return D3D12_FORMAT_SUPPORT1_TEXTURE3D;
-		case TextureDimension::TextureCube:
-			return D3D12_FORMAT_SUPPORT1_TEXTURECUBE;
 		default:
 			return D3D12_FORMAT_SUPPORT1_NONE;
 		}
@@ -266,8 +264,6 @@ namespace PonyEngine::RenderDevice::Windows
 			return D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		case TextureDimension::Texture3D:
 			return D3D12_RESOURCE_DIMENSION_TEXTURE3D;
-		case TextureDimension::TextureCube:
-			return D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		default: [[unlikely]]
 			assert(false && "Invalid dimension.");
 			return D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -276,15 +272,9 @@ namespace PonyEngine::RenderDevice::Windows
 
 	constexpr UINT16 ToDepthArraySize(const TextureParams& params) noexcept
 	{
-		switch (params.dimension)
-		{
-		case TextureDimension::Texture3D:
-			return static_cast<UINT16>(params.size.Z());
-		case TextureDimension::TextureCube:
-			return static_cast<UINT16>(params.arraySize * std::to_underlying(Face::Count));
-		default:
-			return static_cast<UINT16>(params.arraySize);
-		}
+		return params.dimension == TextureDimension::Texture3D
+			? static_cast<UINT16>(params.size.Z())
+			: static_cast<UINT16>(params.arraySize);
 	}
 
 	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(const BufferUsage usage) noexcept
@@ -458,6 +448,10 @@ namespace PonyEngine::RenderDevice::Windows
 		if (GetSrgbFormat(support.Format) != DXGI_FORMAT_UNKNOWN)
 		{
 			features |= TextureFormatFeature::SRGB;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURECUBE)
+		{
+			features |= TextureFormatFeature::Cube;
 		}
 
 		return features;

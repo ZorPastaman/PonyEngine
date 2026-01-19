@@ -40,7 +40,8 @@ export namespace PonyEngine::RenderDevice
 		UnorderedAccessStore = 1 << 17,
 		SwapChain = 1 << 18,
 		SRGB = 1 << 19,
-		All = (1 << 20) - 1
+		Cube = 1 << 20,
+		All = (1 << 21) - 1
 	};
 
 	PONY_ENUM_MASK_FEATURES(TextureFormatFeature)
