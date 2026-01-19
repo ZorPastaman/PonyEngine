@@ -500,12 +500,6 @@ namespace PonyEngine::RenderDevice::Windows
 			response.maxArraySize = 1u;
 			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
-		case TextureDimension::TextureCube:
-			response.maxSize = Math::Vector3<std::uint32_t>(D3D12_REQ_TEXTURECUBE_DIMENSION, D3D12_REQ_TEXTURECUBE_DIMENSION, 1u);
-			response.maxMipCount = D3D12_REQ_MIP_LEVELS;
-			response.maxArraySize = D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION / std::to_underlying(Face::Count);
-			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
-			break;
 		default:
 			break;
 		}
@@ -516,8 +510,7 @@ namespace PonyEngine::RenderDevice::Windows
 	SampleCountMask D3D12Engine::GetSampleCountMask(const DXGI_FORMAT format, const TextureSupportRequest& request, 
 		const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const
 	{
-		if ((request.dimension != TextureDimension::Texture2D && request.dimension != TextureDimension::TextureCube) ||
-			Any(TextureUsage::UnorderedAccess, request.usage) || 
+		if (request.dimension != TextureDimension::Texture2D || Any(TextureUsage::UnorderedAccess, request.usage) || 
 			(formatSupport.Support1 & D3D12_FORMAT_SUPPORT1_MULTISAMPLE_RENDERTARGET) == D3D12_FORMAT_SUPPORT1_NONE)
 		{
 			return SampleCountMask::X1;
@@ -646,16 +639,6 @@ namespace PonyEngine::RenderDevice::Windows
 				throw std::invalid_argument("Invalid size");
 			}
 			if (params.arraySize != 1u) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid array size");
-			}
-			break;
-		case TextureDimension::TextureCube:
-			if (params.size.X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Z() != 1u) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid size");
-			}
-			if (params.arraySize > std::uint32_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION} / std::to_underlying(Face::Count)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid array size");
 			}

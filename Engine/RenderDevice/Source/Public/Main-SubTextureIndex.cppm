@@ -7,20 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:Face;
+export module PonyEngine.RenderDevice:SubTextureIndex;
 
 import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	enum class Face : std::uint8_t
+	struct SubTextureIndex final
 	{
-		Right,
-		Left,
-		Up,
-		Down,
-		Forward,
-		Back,
-		Count
+		std::uint32_t mipIndex = 0u;
+		std::uint32_t arrayIndex = 0u;
+		std::uint8_t planeIndex = 0u;
 	};
 }
