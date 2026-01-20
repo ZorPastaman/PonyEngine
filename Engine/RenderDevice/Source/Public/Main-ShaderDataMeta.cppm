@@ -7,18 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:CopyableFootprint;
+export module PonyEngine.RenderDevice:ShaderDataMeta;
 
 import std;
 
+import :CBVParams;
+import :IBuffer;
+
 export namespace PonyEngine::RenderDevice
 {
-	struct CopyableFootprint final
+	struct EmptyShaderDataMeta final
 	{
-		std::uint64_t offset;
-		std::uint64_t rowSize;
-		std::uint64_t rowPitch;
-		std::uint32_t rowCount;
-		std::uint32_t sliceCount;
 	};
+
+	struct BufferCBVMeta final
+	{
+		const IBuffer* buffer = nullptr;
+		CBVParams params;
+	};
+
+	using ShaderDataMeta = std::variant<EmptyShaderDataMeta, BufferCBVMeta>;
 }

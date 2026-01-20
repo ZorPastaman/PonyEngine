@@ -47,9 +47,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void SetName(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2& Resource() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& Resource() const noexcept;
+		ID3D12Resource2& Resource() const noexcept;
 
 		D3D12Buffer& operator =(const D3D12Buffer&) = delete;
 		D3D12Buffer& operator =(D3D12Buffer&&) = delete;
@@ -113,12 +111,7 @@ namespace PonyEngine::RenderDevice::Windows
 		resource.SetName(name);
 	}
 
-	ID3D12Resource2& D3D12Buffer::Resource() noexcept
-	{
-		return resource.Resource();
-	}
-
-	const ID3D12Resource2& D3D12Buffer::Resource() const noexcept
+	ID3D12Resource2& D3D12Buffer::Resource() const noexcept
 	{
 		return resource.Resource();
 	}

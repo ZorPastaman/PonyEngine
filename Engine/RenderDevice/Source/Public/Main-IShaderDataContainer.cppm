@@ -7,18 +7,28 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:CopyableFootprint;
+module;
+
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.RenderDevice:IShaderDataContainer;
 
 import std;
 
+import :ShaderDataMeta;
+
 export namespace PonyEngine::RenderDevice
 {
-	struct CopyableFootprint final
+	class IShaderDataContainer
 	{
-		std::uint64_t offset;
-		std::uint64_t rowSize;
-		std::uint64_t rowPitch;
-		std::uint32_t rowCount;
-		std::uint32_t sliceCount;
+		PONY_INTERFACE_BODY(IShaderDataContainer)
+
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t Size() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual bool IsShaderVisible() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual const ShaderDataMeta& Meta(std::uint32_t index) const noexcept = 0;
 	};
 }

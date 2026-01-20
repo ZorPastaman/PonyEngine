@@ -101,6 +101,19 @@ namespace Game
 		auto footprints = std::vector<PonyEngine::RenderDevice::CopyableFootprint>(copyableCount);
 		const auto [sourceSize, destinationSize] = renderDevice->GetCopyableFootprints(*texture, 0u, PonyEngine::RenderDevice::TextureAllRange{}, footprints);
 
+		const std::shared_ptr<PonyEngine::RenderDevice::IShaderDataContainer> shaderDataContainer = renderDevice->CreateShaderDataContainer(PonyEngine::RenderDevice::ShaderDataContainerParams
+		{
+			.size = 128u,
+			.shaderVisible = false
+		});
+		const PonyEngine::RenderDevice::CBVRequirement cbvRequirement = renderDevice->CBVRequirement();
+		renderDevice->CreateView(*buffer, *shaderDataContainer, 1u, PonyEngine::RenderDevice::CBVParams
+		{
+			.offset = cbvRequirement.offsetAlignment,
+			.size = cbvRequirement.sizeAlignment
+		});
+		renderDevice->EraseView(*shaderDataContainer, 1u);
+
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{
 			.format = textureFormat,

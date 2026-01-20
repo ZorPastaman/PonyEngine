@@ -50,6 +50,9 @@ export namespace PonyEngine::RenderDevice::Windows
 			UINT64 baseOffset, D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprints, UINT* rowCounts, UINT64* rowSizes) const;
 
 		[[nodiscard("Pure function")]]
+		UINT GetDescriptorHandleIncrement(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) const noexcept;
+
+		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12CommandQueue> CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId);
 
 		[[nodiscard("Pure function")]]
@@ -57,6 +60,10 @@ export namespace PonyEngine::RenderDevice::Windows
 			const D3D12_RESOURCE_DESC1& resourceDesc, D3D12_BARRIER_LAYOUT initialLayout = D3D12_BARRIER_LAYOUT_UNDEFINED,
 			const D3D12_CLEAR_VALUE& clearValue = D3D12_CLEAR_VALUE{.Format = DXGI_FORMAT_UNKNOWN}, 
 			std::span<const DXGI_FORMAT> castableFormats = std::span<const DXGI_FORMAT>());
+
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc);
+		void CreateCBV(const D3D12_CONSTANT_BUFFER_VIEW_DESC& cbvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
 
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
@@ -165,6 +172,11 @@ namespace PonyEngine::RenderDevice::Windows
 		return totalSize;
 	}
 
+	UINT D3D12Device::GetDescriptorHandleIncrement(const D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) const noexcept
+	{
+		return device->GetDescriptorHandleIncrementSize(descriptorHeapType);
+	}
+
 	Platform::Windows::ComPtr<ID3D12CommandQueue> D3D12Device::CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId)
 	{
 		Platform::Windows::ComPtr<ID3D12CommandQueue> commandQueue;
@@ -189,6 +201,22 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return resource;
+	}
+
+	Platform::Windows::ComPtr<ID3D12DescriptorHeap> D3D12Device::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc)
+	{
+		Platform::Windows::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+		if (const HRESULT result = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(descriptorHeap.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 descriptor heap: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return descriptorHeap;
+	}
+
+	void D3D12Device::CreateCBV(const D3D12_CONSTANT_BUFFER_VIEW_DESC& cbvDesc, const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept
+	{
+		device->CreateConstantBufferView(&cbvDesc, handle);
 	}
 
 	Platform::Windows::ComPtr<ID3D12CommandAllocator> D3D12Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)

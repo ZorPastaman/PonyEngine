@@ -241,6 +241,7 @@ namespace PonyEngine::RawInput::Windows
 	{
 		for (DWORD i = count; i-- > 0; )
 		{
+			vibrators[i].Vibrate(0.f, 0.f);
 			input->UnregisterDevice(gamepadContainer.DeviceHandle(i));
 			gamepadContainer.DeviceHandle(i) = DeviceHandle{};
 		}
