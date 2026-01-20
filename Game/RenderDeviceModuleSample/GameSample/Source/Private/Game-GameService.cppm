@@ -91,11 +91,15 @@ namespace Game
 		{
 			.format = textureFormat,
 			.castableFormats = std::span<const PonyEngine::RenderDevice::TextureFormatId>(&castableTextureFormat, 1uz),
-			.size = PonyEngine::Math::Vector3<std::uint32_t>(1024u, 1024u, 1u),
-			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture2D,
+			.size = PonyEngine::Math::Vector3<std::uint32_t>(140u, 230u, 300u),
+			.mipCount = 3u,
+			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture3D,
 			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget,
 			.flags = PonyEngine::RenderDevice::TextureFlag::SRGB
 		});
+		const std::uint32_t copyableCount = renderDevice->GetCopyableFootprintCount(*texture, PonyEngine::RenderDevice::TextureAllRange{});
+		auto footprints = std::vector<PonyEngine::RenderDevice::CopyableFootprint>(copyableCount);
+		const auto [sourceSize, destinationSize] = renderDevice->GetCopyableFootprints(*texture, 0u, PonyEngine::RenderDevice::TextureAllRange{}, footprints);
 
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{

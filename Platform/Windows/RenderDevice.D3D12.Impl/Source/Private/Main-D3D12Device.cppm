@@ -46,6 +46,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
 
+		UINT64 GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, UINT subresourceOffset, UINT subresourceCount,
+			UINT64 baseOffset, D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprints, UINT* rowCounts, UINT64* rowSizes) const;
+
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12CommandQueue> CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId);
 
@@ -147,6 +150,19 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return levels.NumQualityLevels;
+	}
+
+	UINT64 D3D12Device::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const UINT subresourceOffset, const UINT subresourceCount, const UINT64 baseOffset, 
+		D3D12_PLACED_SUBRESOURCE_FOOTPRINT* const footprints, UINT* const rowCounts, UINT64* const rowSizes) const
+	{
+		UINT64 totalSize;
+		device->GetCopyableFootprints1(&resourceDesc, subresourceOffset, subresourceCount, baseOffset, footprints, rowCounts, rowSizes, &totalSize);
+		if (totalSize == std::numeric_limits<UINT64>::max()) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get copyable footprints: invalid resource description"));
+		}
+
+		return totalSize;
 	}
 
 	Platform::Windows::ComPtr<ID3D12CommandQueue> D3D12Device::CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId)

@@ -9,6 +9,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-BufferParams.cppm"
 	"Source/Public/Main-BufferUsage.cppm"
 	"Source/Public/Main-ClearValue.cppm"
+	"Source/Public/Main-CopyableFootprint.cppm"
 	"Source/Public/Main-DepthStencil.cppm"
 	"Source/Public/Main-FenceValue.cppm"
 	"Source/Public/Main-HeapType.cppm"
@@ -44,6 +45,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-TextureSupportRequest.cppm"
 	"Source/Public/Main-TextureSupportResponse.cppm"
 	"Source/Public/Main-TextureUsage.cppm"
+	"Source/Public/Main-Utility.cppm"
 )
 
 message(VERBOSE "Setting properties")

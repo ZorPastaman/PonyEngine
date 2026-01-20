@@ -89,6 +89,15 @@ export namespace PonyEngine::RenderDevice
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
 
 		[[nodiscard("Pure function")]] 
+		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const override;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const override;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const override;
+
+		[[nodiscard("Pure function")]] 
 		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]] 
 		virtual bool IsSwapChainAlive() const override;
@@ -392,6 +401,28 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
 		GetCurrentBackend().Execute(commandLists, sync);
+	}
+
+	std::uint32_t RenderDeviceService::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
+	{
+		return GetCurrentBackend().GetCopyableFootprintCount(params, range);
+	}
+
+	std::uint32_t RenderDeviceService::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
+	{
+		return GetCurrentBackend().GetCopyableFootprintCount(texture, range);
+	}
+
+	std::pair<std::uint64_t, std::uint64_t> RenderDeviceService::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		return GetCurrentBackend().GetCopyableFootprints(params, offset, range, footprints);
+	}
+
+	std::pair<std::uint64_t, std::uint64_t> RenderDeviceService::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		return GetCurrentBackend().GetCopyableFootprints(texture, offset, range, footprints);
 	}
 
 	struct SwapChainSupport RenderDeviceService::SwapChainSupport() const

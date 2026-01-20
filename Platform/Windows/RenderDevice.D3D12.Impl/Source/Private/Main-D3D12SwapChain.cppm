@@ -120,6 +120,11 @@ namespace PonyEngine::RenderDevice::Windows
 
 	const std::shared_ptr<D3D12Texture>& D3D12SwapChain::GetBuffer(const UINT index) const
 	{
+		if (index >= BufferCount()) [[unlikely]]
+		{
+			throw std::out_of_range("Buffer index is out of range");
+		}
+
 		return buffers[index];
 	}
 
