@@ -18,6 +18,7 @@ import std;
 import PonyEngine.Meta;
 
 import :BufferParams;
+import :CopyableFootprint;
 import :HeapType;
 import :IBuffer;
 import :IComputeCommandList;
@@ -27,6 +28,7 @@ import :IGraphicsCommandList;
 import :ITexture;
 import :IWaiter;
 import :QueueSync;
+import :SubTextureIndex;
 import :SwapChainParams;
 import :SwapChainSupport;
 import :TextureFormatFeature;
@@ -71,6 +73,15 @@ export namespace PonyEngine::RenderDevice
 		virtual HeapTypeMask TextureHeapTypeSupport() const = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const = 0;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const = 0;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;

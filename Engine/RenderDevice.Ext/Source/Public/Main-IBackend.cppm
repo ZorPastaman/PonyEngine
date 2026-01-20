@@ -57,6 +57,15 @@ export namespace PonyEngine::RenderDevice
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) = 0;
 
 		[[nodiscard("Pure function")]]
+		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const = 0;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const = 0;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const = 0;
+
+		[[nodiscard("Pure function")]]
 		virtual struct SwapChainSupport SwapChainSupport() const = 0;
 		[[nodiscard("Pure function")]]
 		virtual bool IsSwapChainAlive() const = 0;

@@ -60,6 +60,15 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
 
+		[[nodiscard("Pure function")]] 
+		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const override;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const override;
+		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const override;
+
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IFence> CreateFence() override;
 		[[nodiscard("Wierd call")]] 
@@ -175,6 +184,28 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Backend::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
 		engine->Execute(commandLists, sync);
+	}
+
+	std::uint32_t D3D12Backend::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
+	{
+		return engine->GetCopyableFootprintCount(params, range);
+	}
+
+	std::uint32_t D3D12Backend::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
+	{
+		return engine->GetCopyableFootprintCount(texture, range);
+	}
+
+	std::pair<std::uint64_t, std::uint64_t> D3D12Backend::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		return engine->GetCopyableFootprints(params, offset, range, footprints);
+	}
+
+	std::pair<std::uint64_t, std::uint64_t> D3D12Backend::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		return engine->GetCopyableFootprints(texture, offset, range, footprints);
 	}
 
 	std::shared_ptr<IFence> D3D12Backend::CreateFence()

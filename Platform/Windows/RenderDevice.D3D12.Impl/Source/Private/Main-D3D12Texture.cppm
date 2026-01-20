@@ -66,9 +66,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void SetName(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2& Resource() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& Resource() const noexcept;
+		ID3D12Resource2& Resource() const noexcept;
 
 		D3D12Texture& operator =(const D3D12Texture&) = delete;
 		D3D12Texture& operator =(D3D12Texture&&) = delete;
@@ -101,7 +99,7 @@ namespace PonyEngine::RenderDevice::Windows
 		resource(resource),
 		format(format),
 		castableFormatCount(castableFormats.size()),
-		castableFormats(std::make_unique<TextureFormatId[]>(castableFormatCount)),
+		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(castableFormatCount) : nullptr),
 		width{width},
 		height{height},
 		depth{depth},
@@ -111,7 +109,10 @@ namespace PonyEngine::RenderDevice::Windows
 		usage{usage},
 		srgbCompatible{srgbCompatible}
 	{
-		std::memcpy(this->castableFormats.get(), castableFormats.data(), castableFormats.size_bytes());
+		if (this->castableFormatCount > 0uz)
+		{
+			std::memcpy(this->castableFormats.get(), castableFormats.data(), castableFormats.size_bytes());
+		}
 	}
 
 	D3D12Texture::D3D12Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const TextureFormatId format, const std::span<const TextureFormatId> castableFormats,
@@ -120,7 +121,7 @@ namespace PonyEngine::RenderDevice::Windows
 		resource(std::move(resource)),
 		format(format),
 		castableFormatCount(castableFormats.size()),
-		castableFormats(std::make_unique<TextureFormatId[]>(castableFormatCount)),
+		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(castableFormatCount) : nullptr),
 		width{width},
 		height{height},
 		depth{depth},
@@ -130,7 +131,10 @@ namespace PonyEngine::RenderDevice::Windows
 		usage{usage},
 		srgbCompatible{srgbCompatible}
 	{
-		std::memcpy(this->castableFormats.get(), castableFormats.data(), castableFormats.size_bytes());
+		if (this->castableFormatCount > 0uz)
+		{
+			std::memcpy(this->castableFormats.get(), castableFormats.data(), castableFormats.size_bytes());
+		}
 	}
 
 	TextureDimension D3D12Texture::Dimension() const noexcept
@@ -164,9 +168,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 	std::uint32_t D3D12Texture::ArraySize() const noexcept
 	{
-		return dimension == TextureDimension::Texture3D
-			? 1u
-			: depth;
+		return dimension == TextureDimension::Texture3D ? 1u : depth;
 	}
 
 	enum SampleCount D3D12Texture::SampleCount() const noexcept
@@ -209,12 +211,7 @@ namespace PonyEngine::RenderDevice::Windows
 		resource.SetName(name);
 	}
 
-	ID3D12Resource2& D3D12Texture::Resource() noexcept
-	{
-		return resource.Resource();
-	}
-
-	const ID3D12Resource2& D3D12Texture::Resource() const noexcept
+	ID3D12Resource2& D3D12Texture::Resource() const noexcept
 	{
 		return resource.Resource();
 	}

@@ -25,6 +25,7 @@ import PonyEngine.Memory;
 import PonyEngine.Meta;
 import PonyEngine.RenderDevice.Ext;
 import PonyEngine.Surface.Windows;
+import PonyEngine.Type;
 
 import :DXGIFactory;
 import :DXGISwapChain;
@@ -82,6 +83,15 @@ export namespace PonyEngine::RenderDevice::Windows
 		void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync);
 
 		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const;
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const;
+		std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+		std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+
+		[[nodiscard("Pure function")]]
 		std::shared_ptr<IFence> CreateFence();
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IWaiter> CreateWaiter();
@@ -110,6 +120,21 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		SampleCountMask GetSampleCountMask(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
 
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range, DXGI_FORMAT format) const;
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const D3D12_RESOURCE_DESC1& resourceDesc, const SubTextureRange& range) const;
+		std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, std::uint32_t footprintCount, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+
+		[[nodiscard("Pure function")]]
+		DXGI_FORMAT GetFormat(TextureFormatId format) const;
+
+		[[nodiscard("Pure function")]]
+		D3D12Texture& ToNativeTexture(ITexture& texture) const;
+		[[nodiscard("Pure function")]]
+		const D3D12Texture& ToNativeTexture(const ITexture& texture) const;
+
 		template<typename T> [[nodiscard("Pure function")]]
 		std::shared_ptr<T> CreateCommandList(D3D12_COMMAND_LIST_TYPE type);
 		template<typename CommandList, typename CommandListInterface>
@@ -120,6 +145,9 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		[[nodiscard("Pure function")]]
 		static D3D12_COMMAND_QUEUE_DESC GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE type) noexcept;
+
+		[[nodiscard("Pure function")]]
+		D3D12SwapChain& GetSwapChain() const;
 
 		static void ValidateSize(const BufferParams& params);
 		static void ValidateDimension(const TextureParams& params);
@@ -136,7 +164,7 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		IRenderDeviceContext* renderDevice;
 
-		Memory::Arena arena;
+		mutable Memory::Arena arena;
 
 		DXGITextureFormatMap textureFormatMap;
 
@@ -244,12 +272,7 @@ namespace PonyEngine::RenderDevice::Windows
 			throw std::invalid_argument("Invalid usage");
 		}
 
-		const std::size_t formatIndex = textureFormatMap.IndexOf(params.format);
-		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid texture format");
-		}
-		DXGI_FORMAT format = textureFormatMap.DXGIFormat(formatIndex);
+		DXGI_FORMAT format = GetFormat(params.format);
 
 		arena.Free();
 		const bool srgb = Any(TextureFlag::SRGB, params.flags);
@@ -280,12 +303,7 @@ namespace PonyEngine::RenderDevice::Windows
 			const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
 			for (std::size_t i = 0uz; i < params.castableFormats.size(); ++i)
 			{
-				const std::size_t castableFormatIndex = textureFormatMap.IndexOf(params.castableFormats[i]);
-				if (castableFormatIndex >= textureFormatMap.Size()) [[unlikely]]
-				{
-					throw std::invalid_argument("Invalid castable texture format");
-				}
-				formats[i] = textureFormatMap.DXGIFormat(castableFormatIndex);
+				formats[i] = GetFormat(params.castableFormats[i]);
 			}
 
 			if (srgb)
@@ -342,6 +360,34 @@ namespace PonyEngine::RenderDevice::Windows
 		Execute<D3D12CopyCommandList>(commandLists, sync, copyCommandQueue);
 	}
 
+	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
+	{
+		return GetCopyableFootprintCount(params, range, GetFormat(params.format));
+	}
+
+	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
+	{
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
+		return GetCopyableFootprintCount(resourceDesc, range);
+	}
+
+	std::pair<std::uint64_t, std::uint64_t> D3D12Engine::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		const DXGI_FORMAT format = GetFormat(params.format);
+		const std::uint32_t footprintCount = GetCopyableFootprintCount(params, range, format);
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range, footprints);
+	}
+
+	std::pair<std::uint64_t, std::uint64_t> D3D12Engine::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
+		const std::uint32_t footprintCount = GetCopyableFootprintCount(resourceDesc, range);
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range, footprints);
+	}
+
 	std::shared_ptr<IFence> D3D12Engine::CreateFence()
 	{
 		return std::make_shared<D3D12Fence>(device.CreateFence());
@@ -386,13 +432,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 		ValidateSwapChainParams(params);
 
-		const std::size_t formatIndex = textureFormatMap.IndexOf(params.format);
-		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid texture format");
-		}
-		const DXGI_FORMAT format = textureFormatMap.DXGIFormat(formatIndex);
-
+		const DXGI_FORMAT format = GetFormat(params.format);
 		const bool srgb = Any(SwapChainFlag::SRGB, params.flags);
 		if (srgb && GetSrgbFormat(format) == DXGI_FORMAT_UNKNOWN) [[unlikely]]
 		{
@@ -426,46 +466,22 @@ namespace PonyEngine::RenderDevice::Windows
 
 	std::uint8_t D3D12Engine::SwapChainBufferCount() const
 	{
-		if (!swapChain) [[unlikely]]
-		{
-			throw std::logic_error("Swap chain is not created");
-		}
-
-		return swapChain->BufferCount();
+		return GetSwapChain().BufferCount();
 	}
 
 	std::uint8_t D3D12Engine::CurrentSwapChainBufferIndex() const
 	{
-		if (!swapChain) [[unlikely]]
-		{
-			throw std::logic_error("Swap chain is not created");
-		}
-
-		return static_cast<std::uint8_t>(swapChain->GetCurrentBufferIndex());
+		return static_cast<std::uint8_t>(GetSwapChain().GetCurrentBufferIndex());
 	}
 
 	std::shared_ptr<ITexture> D3D12Engine::SwapChainBuffer(const std::uint8_t bufferIndex) const
 	{
-		if (!swapChain) [[unlikely]]
-		{
-			throw std::logic_error("Swap chain is not created");
-		}
-		if (bufferIndex >= swapChain->BufferCount()) [[unlikely]]
-		{
-			throw std::out_of_range("Buffer index is out of range");
-		}
-
-		return swapChain->GetBuffer(bufferIndex);
+		return GetSwapChain().GetBuffer(bufferIndex);
 	}
 
 	void D3D12Engine::PresentNextSwapChainBuffer()
 	{
-		if (!swapChain) [[unlikely]]
-		{
-			throw std::logic_error("Swap chain is not created");
-		}
-
-		swapChain->Present();
+		GetSwapChain().Present();
 	}
 
 	TextureSupportResponse D3D12Engine::MakeResponse(const DXGI_FORMAT format, const TextureSupportRequest& request,
@@ -530,6 +546,210 @@ namespace PonyEngine::RenderDevice::Windows
 		return mask;
 	}
 
+	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range, const DXGI_FORMAT format) const
+	{
+		ValidateDimension(params);
+
+		const UINT8 planeCount = device.GetPlaneCount(format);
+		const UINT count = std::visit(Type::Overload
+		{
+			[&](const TextureAllRange&) noexcept
+			{
+				return params.mipCount * params.arraySize * planeCount;
+			},
+			[&](const SubTextureIndex& index)
+			{
+				if (index.mipIndex >= params.mipCount || index.arrayIndex >= params.arraySize || index.planeIndex >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return 1u;
+			},
+			[&](const TextureMipRange& mipRange)
+			{
+				if (mipRange.mipOffset + mipRange.mipLength >= params.mipCount || mipRange.arrayIndex >= params.arraySize || mipRange.planeIndex >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return mipRange.mipLength;
+			},
+			[&](const TextureArrayRange& arrayRange)
+			{
+				if (arrayRange.arrayOffset + arrayRange.arrayLength >= params.arraySize || arrayRange.planeIndex >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return params.mipCount * arrayRange.arrayLength;
+			},
+			[&](const TexturePlaneRange& planeRange)
+			{
+				if (planeRange.planeOffset + planeRange.planeLength >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return params.mipCount * params.arraySize * planeRange.planeLength;
+			}
+		}, range);
+
+		return static_cast<std::uint32_t>(count);
+	}
+
+	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const D3D12_RESOURCE_DESC1& resourceDesc, const SubTextureRange& range) const
+	{
+		const UINT16 arraySize = resourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D ? 1u : resourceDesc.DepthOrArraySize;
+		const UINT8 planeCount = device.GetPlaneCount(resourceDesc.Format);
+
+		const UINT count = std::visit(Type::Overload
+		{
+			[&](const TextureAllRange&) noexcept
+			{
+				return static_cast<UINT>(resourceDesc.MipLevels * arraySize * planeCount);
+			},
+			[&](const SubTextureIndex& index)
+			{
+				if (index.mipIndex >= resourceDesc.MipLevels || index.arrayIndex >= arraySize || index.planeIndex >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return UINT{1u};
+			},
+			[&](const TextureMipRange& mipRange)
+			{
+				if (mipRange.mipOffset + mipRange.mipLength >= resourceDesc.MipLevels || mipRange.arrayIndex >= arraySize || mipRange.planeIndex >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return static_cast<UINT>(mipRange.mipLength);
+			},
+			[&](const TextureArrayRange& arrayRange)
+			{
+				if (arrayRange.arrayOffset + arrayRange.arrayLength >= arraySize || arrayRange.planeIndex >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return static_cast<UINT>(resourceDesc.MipLevels * arrayRange.arrayLength);
+			},
+			[&](const TexturePlaneRange& planeRange)
+			{
+				if (planeRange.planeOffset + planeRange.planeLength >= planeCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid range");
+				}
+
+				return static_cast<UINT>(resourceDesc.MipLevels * arraySize * planeRange.planeLength);
+			}
+		}, range);
+
+		return static_cast<std::uint32_t>(count);
+	}
+
+	std::pair<std::uint64_t, std::uint64_t> D3D12Engine::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const std::uint32_t footprintCount, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		if (footprints.size() != 0uz && footprints.size() != footprintCount) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid footprints count");
+		}
+
+		const UINT16 arraySize = resourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D ? 1u : resourceDesc.DepthOrArraySize;
+		const UINT footprintOffset = std::visit(Type::Overload
+		{
+			[&](const TextureAllRange&) noexcept
+			{
+				return 0u;
+			},
+			[&](const SubTextureIndex& index) noexcept
+			{
+				return CalculateSubresource(static_cast<UINT16>(index.mipIndex), static_cast<UINT16>(index.arrayIndex), static_cast<UINT8>(index.planeIndex),
+					static_cast<UINT16>(resourceDesc.MipLevels), static_cast<UINT16>(arraySize));
+			},
+			[&](const TextureMipRange& mipRange) noexcept
+			{
+				return CalculateSubresource(static_cast<UINT16>(mipRange.mipOffset), static_cast<UINT16>(mipRange.arrayIndex), static_cast<UINT8>(mipRange.planeIndex),
+					static_cast<UINT16>(resourceDesc.MipLevels), static_cast<UINT16>(arraySize));
+			},
+			[&](const TextureArrayRange& arrayRange) noexcept
+			{
+				return CalculateSubresource(0u, static_cast<UINT16>(arrayRange.arrayOffset), static_cast<UINT8>(arrayRange.planeIndex),
+					static_cast<UINT16>(resourceDesc.MipLevels), static_cast<UINT16>(arraySize));
+			},
+			[&](const TexturePlaneRange& planeRange) noexcept
+			{
+				return CalculateSubresource(0u, 0u, static_cast<UINT8>(planeRange.planeOffset),
+					static_cast<UINT16>(resourceDesc.MipLevels), static_cast<UINT16>(arraySize));
+			}
+		}, range);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprints = arena.Allocate<D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount);
+		const Memory::Arena::Slice<UINT> rowCounts = arena.Allocate<UINT>(footprintCount);
+		const Memory::Arena::Slice<UINT64> rowSizes = arena.Allocate<UINT64>(footprintCount);
+		const std::span<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprintsSpan = arena.Span(subresourceFootprints);
+		const std::span<UINT> rowCountsSpan = arena.Span(rowCounts);
+		const std::span<UINT64> rowSizesSpan = arena.Span(rowSizes);
+
+		const UINT64 totalSize = device.GetCopyableFootprints(resourceDesc, footprintOffset, static_cast<UINT>(footprintCount), static_cast<UINT64>(offset),
+			subresourceFootprintsSpan.data(), rowCountsSpan.data(), rowSizesSpan.data());
+
+		for (std::size_t i = 0uz; i < footprints.size(); ++i)
+		{
+			footprints[i] = CopyableFootprint
+			{
+				.offset = static_cast<std::uint64_t>(subresourceFootprintsSpan[i].Offset),
+				.rowSize = static_cast<std::uint64_t>(rowSizesSpan[i]),
+				.rowPitch = static_cast<std::uint64_t>(subresourceFootprintsSpan[i].Footprint.RowPitch),
+				.rowCount = static_cast<std::uint32_t>(rowCountsSpan[i]),
+				.sliceCount = static_cast<std::uint32_t>(subresourceFootprintsSpan[i].Footprint.Depth)
+			};
+		}
+
+		UINT64 totalRowSizes = 0ull;
+		for (std::size_t i = 0uz; i < footprintCount; ++i)
+		{
+			totalRowSizes += subresourceFootprintsSpan[i].Footprint.Depth * rowCountsSpan[i] * rowSizesSpan[i];
+		}
+
+		return std::pair(static_cast<std::uint64_t>(totalRowSizes), static_cast<std::uint64_t>(totalSize));
+	}
+
+	DXGI_FORMAT D3D12Engine::GetFormat(const TextureFormatId format) const
+	{
+		const std::size_t formatIndex = textureFormatMap.IndexOf(format);
+		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture format");
+		}
+
+		return textureFormatMap.DXGIFormat(formatIndex);
+	}
+
+	D3D12Texture& D3D12Engine::ToNativeTexture(ITexture& texture) const
+	{
+		if (typeid(texture) != typeid(D3D12Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+
+		return static_cast<D3D12Texture&>(texture);
+	}
+
+	const D3D12Texture& D3D12Engine::ToNativeTexture(const ITexture& texture) const
+	{
+		if (typeid(texture) != typeid(D3D12Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+
+		return static_cast<const D3D12Texture&>(texture);
+	}
+
 	template<typename T>
 	std::shared_ptr<T> D3D12Engine::CreateCommandList(const D3D12_COMMAND_LIST_TYPE type)
 	{
@@ -582,6 +802,16 @@ namespace PonyEngine::RenderDevice::Windows
 			.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
 			.NodeMask = 0u
 		};
+	}
+
+	D3D12SwapChain& D3D12Engine::GetSwapChain() const
+	{
+		if (!swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is not created");
+		}
+
+		return *swapChain;
 	}
 
 	void D3D12Engine::ValidateSize(const BufferParams& params)
