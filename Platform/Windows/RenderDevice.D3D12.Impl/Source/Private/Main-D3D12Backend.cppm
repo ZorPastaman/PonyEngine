@@ -50,6 +50,22 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const override;
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const override;
+		virtual CopyableFootprintSize GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const override;
+		virtual CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const override;
+
+		[[nodiscard("Pure function")]] 
+		virtual struct CBVRequirement CBVRequirement() const noexcept override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
+		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
+		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) override;
+
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
 		[[nodiscard("Wierd call")]] 
@@ -59,15 +75,6 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
-
-		[[nodiscard("Pure function")]] 
-		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const override;
-		[[nodiscard("Pure function")]] 
-		virtual std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const override;
-		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
-			std::span<CopyableFootprint> footprints) const override;
-		virtual std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
-			std::span<CopyableFootprint> footprints) const override;
 
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IFence> CreateFence() override;
@@ -156,6 +163,48 @@ namespace PonyEngine::RenderDevice::Windows
 		return engine->CreateTexture(heapType, params);
 	}
 
+	std::uint32_t D3D12Backend::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
+	{
+		return engine->GetCopyableFootprintCount(params, range);
+	}
+
+	std::uint32_t D3D12Backend::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
+	{
+		return engine->GetCopyableFootprintCount(texture, range);
+	}
+
+	CopyableFootprintSize D3D12Backend::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		return engine->GetCopyableFootprints(params, offset, range, footprints);
+	}
+
+	CopyableFootprintSize D3D12Backend::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		return engine->GetCopyableFootprints(texture, offset, range, footprints);
+	}
+
+	struct CBVRequirement D3D12Backend::CBVRequirement() const noexcept
+	{
+		return RenderDevice::CBVRequirement{.offsetAlignment = D3D12Engine::CBVAlignment, .sizeAlignment = D3D12Engine::CBVAlignment};
+	}
+
+	std::shared_ptr<IShaderDataContainer> D3D12Backend::CreateShaderDataContainer(const ShaderDataContainerParams& params)
+	{
+		return engine->CreateShaderDataContainer(params);
+	}
+
+	void D3D12Backend::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
+	{
+		engine->CreateView(buffer, container, index, params);
+	}
+
+	void D3D12Backend::EraseView(IShaderDataContainer& container, const std::uint32_t index)
+	{
+		engine->EraseView(container, index);
+	}
+
 	std::shared_ptr<IGraphicsCommandList> D3D12Backend::CreateGraphicsCommandList()
 	{
 		return engine->CreateGraphicsCommandList();
@@ -184,28 +233,6 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Backend::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
 		engine->Execute(commandLists, sync);
-	}
-
-	std::uint32_t D3D12Backend::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
-	{
-		return engine->GetCopyableFootprintCount(params, range);
-	}
-
-	std::uint32_t D3D12Backend::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
-	{
-		return engine->GetCopyableFootprintCount(texture, range);
-	}
-
-	std::pair<std::uint64_t, std::uint64_t> D3D12Backend::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
-		const std::span<CopyableFootprint> footprints) const
-	{
-		return engine->GetCopyableFootprints(params, offset, range, footprints);
-	}
-
-	std::pair<std::uint64_t, std::uint64_t> D3D12Backend::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
-		const std::span<CopyableFootprint> footprints) const
-	{
-		return engine->GetCopyableFootprints(texture, offset, range, footprints);
 	}
 
 	std::shared_ptr<IFence> D3D12Backend::CreateFence()

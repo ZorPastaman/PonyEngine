@@ -37,6 +37,7 @@ import :D3D12CopyCommandList;
 import :D3D12Device;
 import :D3D12Fence;
 import :D3D12GraphicsCommandList;
+import :D3D12ShaderDataContainer;
 import :D3D12SwapChain;
 import :D3D12Texture;
 import :D3D12Utility;
@@ -50,6 +51,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	public:
 		static constexpr std::string_view ApiName = D3D12Device::ApiName;
 		static constexpr auto ApiVersion = D3D12Device::ApiVersion;
+
+		static constexpr std::uint32_t CBVAlignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
 
 		[[nodiscard("Pure constructor")]]
 		explicit D3D12Engine(IRenderDeviceContext& renderDevice);
@@ -73,6 +76,20 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params);
 
 		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const;
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const;
+		CopyableFootprintSize GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+		CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params);
+		void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params);
+		void EraseView(IShaderDataContainer& container, std::uint32_t index);
+
+		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IComputeCommandList> CreateComputeCommandList();
@@ -81,15 +98,6 @@ export namespace PonyEngine::RenderDevice::Windows
 		void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync);
 		void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync);
 		void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync);
-
-		[[nodiscard("Pure function")]]
-		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const;
-		[[nodiscard("Pure function")]]
-		std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const;
-		std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
-			std::span<CopyableFootprint> footprints) const;
-		std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
-			std::span<CopyableFootprint> footprints) const;
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IFence> CreateFence();
@@ -124,16 +132,25 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range, DXGI_FORMAT format) const;
 		[[nodiscard("Pure function")]]
 		std::uint32_t GetCopyableFootprintCount(const D3D12_RESOURCE_DESC1& resourceDesc, const SubTextureRange& range) const;
-		std::pair<std::uint64_t, std::uint64_t> GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, std::uint32_t footprintCount, std::uint64_t offset, const SubTextureRange& range,
+		CopyableFootprintSize GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, std::uint32_t footprintCount, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const;
 
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetFormat(TextureFormatId format) const;
 
 		[[nodiscard("Pure function")]]
-		D3D12Texture& ToNativeTexture(ITexture& texture) const;
+		static D3D12Buffer& ToNativeBuffer(IBuffer& buffer);
 		[[nodiscard("Pure function")]]
-		const D3D12Texture& ToNativeTexture(const ITexture& texture) const;
+		static const D3D12Buffer& ToNativeBuffer(const IBuffer& buffer);
+		[[nodiscard("Pure function")]]
+		static D3D12Texture& ToNativeTexture(ITexture& texture);
+		[[nodiscard("Pure function")]]
+		static const D3D12Texture& ToNativeTexture(const ITexture& texture);
+
+		[[nodiscard("Pure function")]]
+		static D3D12ShaderDataContainer& ToNativeContainer(IShaderDataContainer& container);
+		[[nodiscard("Pure function")]]
+		static const D3D12ShaderDataContainer& ToNativeContainer(const IShaderDataContainer& container);
 
 		template<typename T> [[nodiscard("Pure function")]]
 		std::shared_ptr<T> CreateCommandList(D3D12_COMMAND_LIST_TYPE type);
@@ -153,11 +170,14 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateDimension(const TextureParams& params);
 		static void ValidateColorTexture(const TextureParams& params);
 		static void ValidateDepthTexture(const TextureParams& params);
+		static void ValidateCBVParams(const D3D12Buffer& buffer, const CBVParams& params);
 		static void ValidateSwapChainParams(const SwapChainParams& params);
 
+		template<typename Container>
+		static void ValidateContainer(const Container& container, std::uint32_t index);
 		template<typename CommandList, typename CommandListInterface>
-		void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
-		void ValidateFences(std::span<const FenceValue> fences);
+		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
+		static void ValidateFences(std::span<const FenceValue> fences);
 
 		// {132D4628-84F4-40F4-B72F-8A7B08C3C566}
 		static constexpr GUID CreatorId = { 0x132d4628, 0x84f4, 0x40f4, { 0xb7, 0x2f, 0x8a, 0x7b, 0x8, 0xc3, 0xc5, 0x66 } };
@@ -330,6 +350,70 @@ namespace PonyEngine::RenderDevice::Windows
 			static_cast<std::uint16_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
 	}
 
+	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
+	{
+		return GetCopyableFootprintCount(params, range, GetFormat(params.format));
+	}
+
+	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
+	{
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
+		return GetCopyableFootprintCount(resourceDesc, range);
+	}
+
+	CopyableFootprintSize D3D12Engine::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		const DXGI_FORMAT format = GetFormat(params.format);
+		const std::uint32_t footprintCount = GetCopyableFootprintCount(params, range, format);
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range, footprints);
+	}
+
+	CopyableFootprintSize D3D12Engine::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
+		const std::uint32_t footprintCount = GetCopyableFootprintCount(resourceDesc, range);
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range, footprints);
+	}
+
+	std::shared_ptr<IShaderDataContainer> D3D12Engine::CreateShaderDataContainer(const ShaderDataContainerParams& params)
+	{
+		const auto descriptorHeapDesc = D3D12_DESCRIPTOR_HEAP_DESC
+		{
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			.NumDescriptors = static_cast<UINT>(params.size),
+			.Flags = params.shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
+			.NodeMask = 0u
+		};
+
+		return std::make_shared<D3D12ShaderDataContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV),
+			params.size, params.shaderVisible);
+	}
+
+	void D3D12Engine::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
+	{
+		const D3D12Buffer& nativeBuffer = ToNativeBuffer(buffer);
+		ValidateCBVParams(nativeBuffer, params);
+
+		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainer(nativeContainer, index);
+
+		const D3D12_GPU_VIRTUAL_ADDRESS address = nativeBuffer.Resource().GetGPUVirtualAddress();
+		const D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = ToCBVDesc(address, params);
+		device.CreateCBV(cbvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
+
+		nativeContainer.Set(index, BufferCBVMeta{.buffer = &nativeBuffer, .params = params});
+	}
+
+	void D3D12Engine::EraseView(IShaderDataContainer& container, const std::uint32_t index)
+	{
+		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainer(nativeContainer, index);
+		nativeContainer.Set(index, EmptyShaderDataMeta{});
+	}
+
 	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
 	{
 		return CreateCommandList<D3D12GraphicsCommandList>(D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -358,34 +442,6 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Engine::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
 		Execute<D3D12CopyCommandList>(commandLists, sync, copyCommandQueue);
-	}
-
-	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
-	{
-		return GetCopyableFootprintCount(params, range, GetFormat(params.format));
-	}
-
-	std::uint32_t D3D12Engine::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
-	{
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
-		return GetCopyableFootprintCount(resourceDesc, range);
-	}
-
-	std::pair<std::uint64_t, std::uint64_t> D3D12Engine::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
-		const std::span<CopyableFootprint> footprints) const
-	{
-		const DXGI_FORMAT format = GetFormat(params.format);
-		const std::uint32_t footprintCount = GetCopyableFootprintCount(params, range, format);
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
-		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range, footprints);
-	}
-
-	std::pair<std::uint64_t, std::uint64_t> D3D12Engine::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
-		const std::span<CopyableFootprint> footprints) const
-	{
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
-		const std::uint32_t footprintCount = GetCopyableFootprintCount(resourceDesc, range);
-		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range, footprints);
 	}
 
 	std::shared_ptr<IFence> D3D12Engine::CreateFence()
@@ -650,7 +706,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return static_cast<std::uint32_t>(count);
 	}
 
-	std::pair<std::uint64_t, std::uint64_t> D3D12Engine::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const std::uint32_t footprintCount, const std::uint64_t offset, const SubTextureRange& range,
+	CopyableFootprintSize D3D12Engine::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const std::uint32_t footprintCount, const std::uint64_t offset, const SubTextureRange& range,
 		const std::span<CopyableFootprint> footprints) const
 	{
 		if (footprints.size() != 0uz && footprints.size() != footprintCount) [[unlikely]]
@@ -716,7 +772,7 @@ namespace PonyEngine::RenderDevice::Windows
 			totalRowSizes += subresourceFootprintsSpan[i].Footprint.Depth * rowCountsSpan[i] * rowSizesSpan[i];
 		}
 
-		return std::pair(static_cast<std::uint64_t>(totalRowSizes), static_cast<std::uint64_t>(totalSize));
+		return CopyableFootprintSize{.sourceTotalSize = static_cast<std::uint64_t>(totalRowSizes), .destinationTotalSize = static_cast<std::uint64_t>(totalSize)};
 	}
 
 	DXGI_FORMAT D3D12Engine::GetFormat(const TextureFormatId format) const
@@ -730,7 +786,27 @@ namespace PonyEngine::RenderDevice::Windows
 		return textureFormatMap.DXGIFormat(formatIndex);
 	}
 
-	D3D12Texture& D3D12Engine::ToNativeTexture(ITexture& texture) const
+	D3D12Buffer& D3D12Engine::ToNativeBuffer(IBuffer& buffer)
+	{
+		if (typeid(buffer) != typeid(D3D12Buffer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer");
+		}
+
+		return static_cast<D3D12Buffer&>(buffer);
+	}
+
+	const D3D12Buffer& D3D12Engine::ToNativeBuffer(const IBuffer& buffer)
+	{
+		if (typeid(buffer) != typeid(D3D12Buffer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer");
+		}
+
+		return static_cast<const D3D12Buffer&>(buffer);
+	}
+
+	D3D12Texture& D3D12Engine::ToNativeTexture(ITexture& texture)
 	{
 		if (typeid(texture) != typeid(D3D12Texture)) [[unlikely]]
 		{
@@ -740,7 +816,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return static_cast<D3D12Texture&>(texture);
 	}
 
-	const D3D12Texture& D3D12Engine::ToNativeTexture(const ITexture& texture) const
+	const D3D12Texture& D3D12Engine::ToNativeTexture(const ITexture& texture)
 	{
 		if (typeid(texture) != typeid(D3D12Texture)) [[unlikely]]
 		{
@@ -748,6 +824,26 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return static_cast<const D3D12Texture&>(texture);
+	}
+
+	D3D12ShaderDataContainer& D3D12Engine::ToNativeContainer(IShaderDataContainer& container)
+	{
+		if (typeid(container) != typeid(D3D12ShaderDataContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+
+		return static_cast<D3D12ShaderDataContainer&>(container);
+	}
+
+	const D3D12ShaderDataContainer& D3D12Engine::ToNativeContainer(const IShaderDataContainer& container)
+	{
+		if (typeid(container) != typeid(D3D12ShaderDataContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+
+		return static_cast<const D3D12ShaderDataContainer&>(container);
 	}
 
 	template<typename T>
@@ -900,6 +996,22 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
+	void D3D12Engine::ValidateCBVParams(const D3D12Buffer& buffer, const CBVParams& params)
+	{
+		if (params.offset % CBVAlignment) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid offset");
+		}
+		if (params.size == 0ull || params.size % CBVAlignment) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid size");
+		}
+		if (params.offset + params.size > buffer.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid cbv params");
+		}
+	}
+
 	void D3D12Engine::ValidateSwapChainParams(const SwapChainParams& params)
 	{
 		if (params.size)
@@ -923,6 +1035,19 @@ namespace PonyEngine::RenderDevice::Windows
 		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid usage");
+		}
+	}
+
+	template<typename Container>
+	void D3D12Engine::ValidateContainer(const Container& container, const std::uint32_t index)
+	{
+		if (index >= container.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container index");
+		}
+		if (container.IsShaderVisible()) [[unlikely]]
+		{
+			throw std::invalid_argument("Container is shader visible: it's allowed to copy into it only");
 		}
 	}
 

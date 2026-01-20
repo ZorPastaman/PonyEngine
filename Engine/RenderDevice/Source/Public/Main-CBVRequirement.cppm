@@ -7,18 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:CopyableFootprint;
+export module PonyEngine.RenderDevice:CBVRequirement;
 
 import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct CopyableFootprint final
+	struct CBVRequirement final
 	{
-		std::uint64_t offset;
-		std::uint64_t rowSize;
-		std::uint64_t rowPitch;
-		std::uint32_t rowCount;
-		std::uint32_t sliceCount;
+		std::uint32_t offsetAlignment = 0ull;
+		std::uint32_t sizeAlignment = 0u;
 	};
 }

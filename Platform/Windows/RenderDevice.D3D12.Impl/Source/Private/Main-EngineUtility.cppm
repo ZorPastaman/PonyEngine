@@ -36,6 +36,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureDimension dimension) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureUsage usage) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(HeapType heapType) noexcept;
@@ -64,7 +66,7 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr D3D12_CLEAR_VALUE ToClearValue(const ClearValue& clearValue, DXGI_FORMAT format) noexcept;
 
 	[[nodiscard("Pure function")]]
-	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC ToCBVDesc(D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, DXGI_FORMAT format) noexcept;
@@ -165,6 +167,97 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return support;
+	}
+
+	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	{
+		auto features = TextureFormatFeature::None;
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_LOAD)
+		{
+			features |= TextureFormatFeature::ShaderLoad;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE)
+		{
+			features |= TextureFormatFeature::ShaderSample;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE_COMPARISON)
+		{
+			features |= TextureFormatFeature::ShaderSampleComparison;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER)
+		{
+			features |= TextureFormatFeature::ShaderGather;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER_COMPARISON)
+		{
+			features |= TextureFormatFeature::ShaderGatherComparison;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET)
+		{
+			features |= TextureFormatFeature::RenderTarget;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_BLENDABLE)
+		{
+			features |= TextureFormatFeature::Blendable;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_OUTPUT_MERGER_LOGIC_OP)
+		{
+			features |= TextureFormatFeature::LogicBlendable;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL)
+		{
+			features |= TextureFormatFeature::DepthStencil;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TYPED_UNORDERED_ACCESS_VIEW)
+		{
+			features |= TextureFormatFeature::UnorderedAccess;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_ADD)
+		{
+			features |= TextureFormatFeature::UnorderedAccessAtomicAdd;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_BITWISE_OPS)
+		{
+			features |= TextureFormatFeature::UnorderedAccessAtomicBitwise;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_EXCHANGE)
+		{
+			features |= TextureFormatFeature::UnorderedAccessAtomicExchange;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_COMPARE_STORE_OR_COMPARE_EXCHANGE)
+		{
+			features |= TextureFormatFeature::UnorderedAccessAtomicExchangeComparison;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_SIGNED_MIN_OR_MAX)
+		{
+			features |= TextureFormatFeature::UnorderedAccessAtomicSignedMinMax;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_UNSIGNED_MIN_OR_MAX)
+		{
+			features |= TextureFormatFeature::UnorderedAccessAtomicUnsignedMinMax;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD)
+		{
+			features |= TextureFormatFeature::UnorderedAccessLoad;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE)
+		{
+			features |= TextureFormatFeature::UnorderedAccessStore;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DISPLAY)
+		{
+			features |= TextureFormatFeature::SwapChain;
+		}
+		if (GetSrgbFormat(support.Format) != DXGI_FORMAT_UNKNOWN)
+		{
+			features |= TextureFormatFeature::SRGB;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURECUBE)
+		{
+			features |= TextureFormatFeature::Cube;
+		}
+
+		return features;
 	}
 
 	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(const HeapType heapType) noexcept
@@ -366,95 +459,13 @@ namespace PonyEngine::RenderDevice::Windows
 		return clear;
 	}
 
-	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC ToCBVDesc(const D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept
 	{
-		auto features = TextureFormatFeature::None;
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_LOAD)
+		return D3D12_CONSTANT_BUFFER_VIEW_DESC
 		{
-			features |= TextureFormatFeature::ShaderLoad;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE)
-		{
-			features |= TextureFormatFeature::ShaderSample;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE_COMPARISON)
-		{
-			features |= TextureFormatFeature::ShaderSampleComparison;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER)
-		{
-			features |= TextureFormatFeature::ShaderGather;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER_COMPARISON)
-		{
-			features |= TextureFormatFeature::ShaderGatherComparison;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET)
-		{
-			features |= TextureFormatFeature::RenderTarget;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_BLENDABLE)
-		{
-			features |= TextureFormatFeature::Blendable;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_OUTPUT_MERGER_LOGIC_OP)
-		{
-			features |= TextureFormatFeature::LogicBlendable;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL)
-		{
-			features |= TextureFormatFeature::DepthStencil;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TYPED_UNORDERED_ACCESS_VIEW)
-		{
-			features |= TextureFormatFeature::UnorderedAccess;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_ADD)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicAdd;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_BITWISE_OPS)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicBitwise;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_EXCHANGE)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicExchange;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_COMPARE_STORE_OR_COMPARE_EXCHANGE)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicExchangeComparison;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_SIGNED_MIN_OR_MAX)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicSignedMinMax;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_UNSIGNED_MIN_OR_MAX)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicUnsignedMinMax;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD)
-		{
-			features |= TextureFormatFeature::UnorderedAccessLoad;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE)
-		{
-			features |= TextureFormatFeature::UnorderedAccessStore;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DISPLAY)
-		{
-			features |= TextureFormatFeature::SwapChain;
-		}
-		if (GetSrgbFormat(support.Format) != DXGI_FORMAT_UNKNOWN)
-		{
-			features |= TextureFormatFeature::SRGB;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURECUBE)
-		{
-			features |= TextureFormatFeature::Cube;
-		}
-
-		return features;
+			.BufferLocation = address + static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(params.offset),
+			.SizeInBytes = static_cast<UINT>(params.size)
+		};
 	}
 
 	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, const DXGI_FORMAT format) noexcept
