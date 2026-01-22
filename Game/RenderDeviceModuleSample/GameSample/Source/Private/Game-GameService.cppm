@@ -91,15 +91,15 @@ namespace Game
 		{
 			.format = textureFormat,
 			.castableFormats = std::span<const PonyEngine::RenderDevice::TextureFormatId>(&castableTextureFormat, 1uz),
-			.size = PonyEngine::Math::Vector3<std::uint32_t>(140u, 230u, 300u),
+			.size = PonyEngine::Math::Vector3<std::uint32_t>(140u, 230u, 156u),
 			.mipCount = 3u,
 			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture3D,
 			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget,
 			.flags = PonyEngine::RenderDevice::TextureFlag::SRGB
 		});
-		const std::uint32_t copyableCount = renderDevice->GetCopyableFootprintCount(*texture, PonyEngine::RenderDevice::TextureAllRange{});
+		const std::uint32_t copyableCount = renderDevice->GetCopyableFootprintCount(*texture, PonyEngine::RenderDevice::SubTextureRange{});
 		auto footprints = std::vector<PonyEngine::RenderDevice::CopyableFootprint>(copyableCount);
-		const auto [sourceSize, destinationSize] = renderDevice->GetCopyableFootprints(*texture, 0u, PonyEngine::RenderDevice::TextureAllRange{}, footprints);
+		const auto [sourceSize, destinationSize] = renderDevice->GetCopyableFootprints(*texture, 0u, PonyEngine::RenderDevice::SubTextureRange{}, footprints);
 
 		const std::shared_ptr<PonyEngine::RenderDevice::IShaderDataContainer> shaderDataContainer = renderDevice->CreateShaderDataContainer(PonyEngine::RenderDevice::ShaderDataContainerParams
 		{

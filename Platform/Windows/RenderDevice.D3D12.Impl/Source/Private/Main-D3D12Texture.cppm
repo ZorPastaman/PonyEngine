@@ -20,6 +20,7 @@ import PonyEngine.RenderDevice;
 
 import :D3D12Resource;
 import :D3D12Utility;
+import :EngineUtility;
 
 export namespace PonyEngine::RenderDevice::Windows
 {
@@ -99,7 +100,7 @@ namespace PonyEngine::RenderDevice::Windows
 		resource(resource),
 		format(format),
 		castableFormatCount(castableFormats.size()),
-		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(castableFormatCount) : nullptr),
+		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(this->castableFormatCount) : nullptr),
 		width{width},
 		height{height},
 		depth{depth},
@@ -121,7 +122,7 @@ namespace PonyEngine::RenderDevice::Windows
 		resource(std::move(resource)),
 		format(format),
 		castableFormatCount(castableFormats.size()),
-		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(castableFormatCount) : nullptr),
+		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(this->castableFormatCount) : nullptr),
 		width{width},
 		height{height},
 		depth{depth},
@@ -188,22 +189,22 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void* D3D12Texture::Map(const SubTextureIndex& index)
 	{
-		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex));
+		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)));
 	}
 
 	void* D3D12Texture::Map(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
 	{
-		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
 	void D3D12Texture::Unmap(const SubTextureIndex& index)
 	{
-		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex));
+		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)));
 	}
 
 	void D3D12Texture::Unmap(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
 	{
-		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.planeIndex), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
 	void D3D12Texture::SetName(const std::string_view name)

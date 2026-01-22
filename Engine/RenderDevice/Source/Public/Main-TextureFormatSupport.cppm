@@ -11,6 +11,7 @@ export module PonyEngine.RenderDevice:TextureFormatSupport;
 
 import std;
 
+import :Aspect;
 import :TextureFormatFeature;
 
 export namespace PonyEngine::RenderDevice
@@ -18,7 +19,7 @@ export namespace PonyEngine::RenderDevice
 	struct TextureFormatSupport final
 	{
 		TextureFormatFeature features = TextureFormatFeature::None;
-		std::uint8_t planeCount = 0u;
+		AspectMask aspects = AspectMask::None;
 		bool supported = false;
 	};
 }

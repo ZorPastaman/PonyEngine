@@ -9,11 +9,14 @@
 
 export module PonyEngine.RenderDevice;
 
+export import :Aspect;
 export import :BufferParams;
 export import :BufferUsage;
 export import :CBVParams;
 export import :CBVRequirement;
 export import :ClearValue;
+export import :ComponentMapping;
+export import :ComponentSwizzle;
 export import :CopyableFootprint;
 export import :CopyableFootprintSize;
 export import :DepthStencil;
@@ -36,7 +39,9 @@ export import :RenderAPI;
 export import :SampleCount;
 export import :ShaderDataContainerParams;
 export import :ShaderDataMeta;
+export import :SRVParams;
 export import :SubTextureIndex;
+export import :SubTextureRange;
 export import :SwapChainAlphaMode;
 export import :SwapChainEffect;
 export import :SwapChainFlag;

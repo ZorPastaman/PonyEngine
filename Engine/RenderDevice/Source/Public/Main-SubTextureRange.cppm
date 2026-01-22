@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:SubTextureIndex;
+export module PonyEngine.RenderDevice:SubTextureRange;
 
 import std;
 
@@ -15,10 +15,22 @@ import :Aspect;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct SubTextureIndex final
+	struct MipRange final
 	{
-		std::uint32_t mipIndex = 0u;
-		std::uint32_t arrayIndex = 0u;
+		std::uint32_t mostDetailedMipIndex = 0u;
+		std::optional<std::uint32_t> mipCount = std::nullopt;
+	};
+
+	struct ArrayRange final
+	{
+		std::uint32_t firstArrayIndex = 0u;
+		std::optional<std::uint32_t> arrayCount = std::nullopt;
+	};
+
+	struct SubTextureRange final
+	{
+		MipRange mipRange;
+		ArrayRange arrayRange;
 		Aspect aspect = Aspect::Color;
 	};
 }
