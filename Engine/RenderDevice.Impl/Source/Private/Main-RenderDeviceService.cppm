@@ -83,6 +83,16 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
+		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DSRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DArraySRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DSRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DArraySRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSSRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSArraySRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture3DSRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params) override;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) override;
 
 		[[nodiscard("Wierd call")]] 
@@ -393,6 +403,56 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
 	{
 		GetCurrentBackend().CreateView(buffer, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
+	{
+		GetCurrentBackend().CreateView(buffer, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture1DSRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture1DArraySRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DSRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DArraySRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DMSSRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DMSArraySRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture3DSRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureCubeSRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureCubeArraySRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
 	}
 
 	void RenderDeviceService::EraseView(IShaderDataContainer& container, const std::uint32_t index)

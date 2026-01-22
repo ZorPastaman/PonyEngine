@@ -57,7 +57,7 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	}
 	catch (const std::exception& e)
 	{
-		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on setting process priority: {}", e.what()));
+		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on setting process priority:\n{}.", e.what()));
 	}
 
 #if PONY_ENGINE_CREATE_CONSOLE
@@ -67,7 +67,7 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	}
 	catch (const std::exception& e)
 	{
-		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on creating console: {}", e.what()));
+		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on creating console:\n{}.", e.what()));
 	}
 #endif
 
@@ -78,7 +78,7 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	}
 	catch (const std::exception& e)
 	{
-		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on creating default logger: {}", e.what()));
+		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on creating default logger:\n{}.", e.what()));
 	}
 	catch (...)
 	{
@@ -94,7 +94,7 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	catch (const std::exception& e)
 	{
 		PONY_LOG_X(*logger, std::current_exception(), "On creating application.");
-		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on creating application: {}", e.what()));
+		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on creating application:\n{}.", e.what()));
 	}
 	catch (...)
 	{
@@ -111,7 +111,7 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	catch (const std::exception& e)
 	{
 		PONY_LOG_X(*logger, std::current_exception(), "On application running.");
-		return std::pair(PonyEngine::Application::ExitCodes::RunningException, std::format("Exception on application running: {}", e.what()));
+		return std::pair(PonyEngine::Application::ExitCodes::RunningException, std::format("Exception on application running:\n{}.", e.what()));
 	}
 	catch (...)
 	{
@@ -132,7 +132,7 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	}
 	catch (const std::exception& e)
 	{
-		return std::pair(PonyEngine::Application::ExitCodes::DeinitializationException, std::format("Exception on destroying console: {}", e.what()));
+		return std::pair(PonyEngine::Application::ExitCodes::DeinitializationException, std::format("Exception on destroying console:\n{}.", e.what()));
 	}
 #endif
 

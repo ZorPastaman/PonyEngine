@@ -40,6 +40,9 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 
 	[[nodiscard("Pure function")]]
+	constexpr std::uint8_t ToPlaneIndex(Aspect aspect) noexcept;
+
+	[[nodiscard("Pure function")]]
 	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(HeapType heapType) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage usage) noexcept;
@@ -67,6 +70,31 @@ export namespace PonyEngine::RenderDevice::Windows
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC ToCBVDesc(D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const BufferSRVParams& params) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture1DSRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture1DArraySRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount, std::uint32_t resourceArraySize) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DSRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DArraySRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount, std::uint32_t resourceArraySize) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DMSSRVParams& params, DXGI_FORMAT format) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DMSArraySRVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture3DSRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureCubeSRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureCubeArraySRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount, std::uint32_t resourceArraySize) noexcept;
+
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_SHADER_COMPONENT_MAPPING ToShaderMapping(ComponentSwizzle swizzle) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr UINT ToShaderMapping(ComponentMapping mapping) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, DXGI_FORMAT format) noexcept;
@@ -258,6 +286,11 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return features;
+	}
+
+	constexpr std::uint8_t ToPlaneIndex(const Aspect aspect) noexcept
+	{
+		return aspect == Aspect::Stencil;
 	}
 
 	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(const HeapType heapType) noexcept
@@ -466,6 +499,206 @@ namespace PonyEngine::RenderDevice::Windows
 			.BufferLocation = address + static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(params.offset),
 			.SizeInBytes = static_cast<UINT>(params.size)
 		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const BufferSRVParams& params) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = DXGI_FORMAT_UNKNOWN,
+			.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
+			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+			.Buffer = D3D12_BUFFER_SRV
+			{
+				.FirstElement = static_cast<UINT64>(params.firstElementIndex),
+				.NumElements = static_cast<UINT>(params.elementCount),
+				.StructureByteStride = static_cast<UINT>(params.stride),
+				.Flags = params.raw ? D3D12_BUFFER_SRV_FLAG_RAW : D3D12_BUFFER_SRV_FLAG_NONE
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture1DSRVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceMipCount) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.Texture1D = D3D12_TEX1D_SRV
+			{
+				.MostDetailedMip = static_cast<UINT>(params.mipRange.mostDetailedMipIndex),
+				.MipLevels = static_cast<UINT>(params.mipRange.mipCount.value_or(resourceMipCount - params.mipRange.mostDetailedMipIndex)),
+				.ResourceMinLODClamp = 0.f
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture1DArraySRVParams& params, const DXGI_FORMAT format, 
+		const std::uint32_t resourceMipCount, const std::uint32_t resourceArraySize) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.Texture1DArray = D3D12_TEX1D_ARRAY_SRV
+			{
+				.MostDetailedMip = static_cast<UINT>(params.mipRange.mostDetailedMipIndex),
+				.MipLevels = static_cast<UINT>(params.mipRange.mipCount.value_or(resourceMipCount - params.mipRange.mostDetailedMipIndex)),
+				.FirstArraySlice = static_cast<UINT>(params.arrayRange.firstArrayIndex),
+				.ArraySize = static_cast<UINT>(params.arrayRange.arrayCount.value_or(resourceArraySize - params.arrayRange.firstArrayIndex)),
+				.ResourceMinLODClamp = 0.f
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DSRVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceMipCount) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.Texture2D = D3D12_TEX2D_SRV
+			{
+				.MostDetailedMip = static_cast<UINT>(params.mipRange.mostDetailedMipIndex),
+				.MipLevels = static_cast<UINT>(params.mipRange.mipCount.value_or(resourceMipCount - params.mipRange.mostDetailedMipIndex)),
+				.PlaneSlice = ToPlaneIndex(params.aspect),
+				.ResourceMinLODClamp = 0.f
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DArraySRVParams& params, const DXGI_FORMAT format, 
+		const std::uint32_t resourceMipCount, const std::uint32_t resourceArraySize) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.Texture2DArray = D3D12_TEX2D_ARRAY_SRV
+			{
+				.MostDetailedMip = static_cast<UINT>(params.mipRange.mostDetailedMipIndex),
+				.MipLevels = static_cast<UINT>(params.mipRange.mipCount.value_or(resourceMipCount - params.mipRange.mostDetailedMipIndex)),
+				.FirstArraySlice = static_cast<UINT>(params.arrayRange.firstArrayIndex),
+				.ArraySize = static_cast<UINT>(params.arrayRange.arrayCount.value_or(resourceArraySize - params.arrayRange.firstArrayIndex)),
+				.PlaneSlice = ToPlaneIndex(params.aspect),
+				.ResourceMinLODClamp = 0.f
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DMSSRVParams& params, const DXGI_FORMAT format) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.Texture2DMS = D3D12_TEX2DMS_SRV
+			{
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture2DMSArraySRVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceArraySize) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMSARRAY,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_SRV
+			{
+				.FirstArraySlice = static_cast<UINT>(params.arrayRange.firstArrayIndex),
+				.ArraySize = static_cast<UINT>(params.arrayRange.arrayCount.value_or(resourceArraySize - params.arrayRange.firstArrayIndex))
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const Texture3DSRVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceMipCount) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.Texture3D = D3D12_TEX3D_SRV
+			{
+				.MostDetailedMip = static_cast<UINT>(params.mipRange.mostDetailedMipIndex),
+				.MipLevels = static_cast<UINT>(params.mipRange.mipCount.value_or(resourceMipCount - params.mipRange.mostDetailedMipIndex)),
+				.ResourceMinLODClamp = 0.f
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureCubeSRVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceMipCount) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.TextureCube = D3D12_TEXCUBE_SRV
+			{
+				.MostDetailedMip = static_cast<UINT>(params.mipRange.mostDetailedMipIndex),
+				.MipLevels = static_cast<UINT>(params.mipRange.mipCount.value_or(resourceMipCount - params.mipRange.mostDetailedMipIndex)),
+				.ResourceMinLODClamp = 0.f
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureCubeArraySRVParams& params, const DXGI_FORMAT format, 
+		const std::uint32_t resourceMipCount, const std::uint32_t resourceArraySize) noexcept
+	{
+		return D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = format,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE,
+			.Shader4ComponentMapping = ToShaderMapping(params.mapping),
+			.TextureCubeArray = D3D12_TEXCUBE_ARRAY_SRV
+			{
+				.MostDetailedMip = static_cast<UINT>(params.mipRange.mostDetailedMipIndex),
+				.MipLevels = static_cast<UINT>(params.mipRange.mipCount.value_or(resourceMipCount - params.mipRange.mostDetailedMipIndex)),
+				.First2DArrayFace = static_cast<UINT>(params.arrayRange.firstArrayIndex),
+				.NumCubes = static_cast<UINT>(params.arrayRange.arrayCount.value_or(resourceArraySize - params.arrayRange.firstArrayIndex)) / 6u,
+				.ResourceMinLODClamp = 0.f
+			}
+		};
+	}
+
+	constexpr D3D12_SHADER_COMPONENT_MAPPING ToShaderMapping(const ComponentSwizzle swizzle) noexcept
+	{
+		switch (swizzle)
+		{
+		case ComponentSwizzle::Red:
+			return D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_0;
+		case ComponentSwizzle::Green:
+			return D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_1;
+		case ComponentSwizzle::Blue:
+			return D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_2;
+		case ComponentSwizzle::Alpha:
+			return D3D12_SHADER_COMPONENT_MAPPING_FROM_MEMORY_COMPONENT_3;
+		case ComponentSwizzle::Zero:
+			return D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_0;
+		case ComponentSwizzle::One:
+			return D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_1;
+		default: [[unlikely]]
+			assert(false && "Invalid swizzle.");
+			return D3D12_SHADER_COMPONENT_MAPPING_FORCE_VALUE_0;
+		}
+	}
+
+	constexpr UINT ToShaderMapping(const ComponentMapping mapping) noexcept
+	{
+		return D3D12_ENCODE_SHADER_4_COMPONENT_MAPPING(
+			ToShaderMapping(mapping.red),
+			ToShaderMapping(mapping.green),
+			ToShaderMapping(mapping.blue),
+			ToShaderMapping(mapping.alpha)
+		);
 	}
 
 	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, const DXGI_FORMAT format) noexcept

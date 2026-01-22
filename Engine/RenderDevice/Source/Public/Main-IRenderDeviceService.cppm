@@ -33,7 +33,8 @@ import :ITexture;
 import :IWaiter;
 import :QueueSync;
 import :ShaderDataContainerParams;
-import :SubTextureIndex;
+import :SRVParams;
+import :SubTextureRange;
 import :SwapChainParams;
 import :SwapChainSupport;
 import :TextureFormatFeature;
@@ -93,6 +94,16 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) = 0;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) = 0;
+		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DSRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DArraySRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DSRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DArraySRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSSRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSArraySRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture3DSRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params) = 0;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) = 0;
 
 		[[nodiscard("Wierd call")]]

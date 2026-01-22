@@ -7,18 +7,31 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:SubTextureIndex;
+module;
+
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:Aspect;
 
 import std;
 
-import :Aspect;
-
 export namespace PonyEngine::RenderDevice
 {
-	struct SubTextureIndex final
+	enum class Aspect : std::uint8_t
 	{
-		std::uint32_t mipIndex = 0u;
-		std::uint32_t arrayIndex = 0u;
-		Aspect aspect = Aspect::Color;
+		Color,
+		Depth,
+		Stencil
 	};
+
+	enum class AspectMask : std::uint8_t
+	{
+		None = 0,
+		Color = 1 << 0,
+		Depth = 1 << 1,
+		Stencil = 1 << 2,
+		All = (1 << 3) - 1
+	};
+
+	PONY_ENUM_VALUE_MASK_FEATURES(Aspect, AspectMask)
 }

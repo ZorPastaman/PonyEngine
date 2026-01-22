@@ -7,18 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:SubTextureIndex;
+export module PonyEngine.RenderDevice:ComponentMapping;
 
-import std;
-
-import :Aspect;
+import :ComponentSwizzle;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct SubTextureIndex final
+	struct ComponentMapping final
 	{
-		std::uint32_t mipIndex = 0u;
-		std::uint32_t arrayIndex = 0u;
-		Aspect aspect = Aspect::Color;
+		ComponentSwizzle red = ComponentSwizzle::Red;
+		ComponentSwizzle green = ComponentSwizzle::Green;
+		ComponentSwizzle blue = ComponentSwizzle::Blue;
+		ComponentSwizzle alpha = ComponentSwizzle::Alpha;
 	};
 }

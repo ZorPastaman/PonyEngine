@@ -31,6 +31,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr DXGI_FORMAT GetStencilViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
 
 	[[nodiscard("Pure function")]]
+	constexpr UINT16 GetArraySize(const D3D12_RESOURCE_DESC1& resourceDesc) noexcept;
+	[[nodiscard("Pure function")]]
 	constexpr UINT CalculateSubresource(UINT16 mipIndex, UINT16 arrayIndex, UINT8 planeIndex, UINT16 mipCount, UINT16 arraySize) noexcept;
 
 	/// @brief Sets the object name.
@@ -220,6 +222,11 @@ namespace PonyEngine::RenderDevice::Windows
 		default:
 			return DXGI_FORMAT_UNKNOWN;
 		}
+	}
+
+	constexpr UINT16 GetArraySize(const D3D12_RESOURCE_DESC1& resourceDesc) noexcept
+	{
+		return resourceDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D ? 1u : resourceDesc.DepthOrArraySize;
 	}
 
 	constexpr UINT CalculateSubresource(const UINT16 mipIndex, const UINT16 arrayIndex, const UINT8 planeIndex, const UINT16 mipCount, const UINT16 arraySize) noexcept
