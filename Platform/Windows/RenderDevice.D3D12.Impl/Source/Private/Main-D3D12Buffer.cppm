@@ -53,6 +53,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		D3D12Buffer& operator =(D3D12Buffer&&) = delete;
 
 	private:
+		void ValidateRange(std::uint64_t offset, std::uint64_t length) const;
+
 		D3D12Resource resource;
 
 		std::uint64_t size;
@@ -93,6 +95,8 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void* D3D12Buffer::Map(const std::uint64_t offset, const std::uint64_t length)
 	{
+		ValidateRange(offset, length);
+
 		return resource.Map(0u, static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
@@ -103,6 +107,8 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void D3D12Buffer::Unmap(const std::uint64_t offset, const std::uint64_t length)
 	{
+		ValidateRange(offset, length);
+
 		resource.Unmap(0u, static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
@@ -114,5 +120,13 @@ namespace PonyEngine::RenderDevice::Windows
 	ID3D12Resource2& D3D12Buffer::Resource() const noexcept
 	{
 		return resource.Resource();
+	}
+
+	void D3D12Buffer::ValidateRange(const std::uint64_t offset, const std::uint64_t length) const
+	{
+		if (offset + length > size) [[unlikely]]
+		{
+			throw std::out_of_range("Out of range");
+		}
 	}
 }

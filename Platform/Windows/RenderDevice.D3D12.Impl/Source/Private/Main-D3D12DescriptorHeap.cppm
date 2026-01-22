@@ -78,6 +78,6 @@ namespace PonyEngine::RenderDevice::Windows
 
 	D3D12_GPU_DESCRIPTOR_HANDLE D3D12DescriptorHeap::GpuHandle(const UINT index) const noexcept
 	{
-		return D3D12_GPU_DESCRIPTOR_HANDLE{ descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + index * handleIncrement };
+		return D3D12_GPU_DESCRIPTOR_HANDLE{descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + index * handleIncrement};
 	}
 }

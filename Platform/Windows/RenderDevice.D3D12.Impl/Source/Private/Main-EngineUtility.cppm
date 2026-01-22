@@ -31,6 +31,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr AspectMask GetAspect(DXGI_FORMAT format) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureDimension dimension) noexcept;
@@ -161,6 +163,18 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return true;
+	}
+
+	constexpr AspectMask GetAspect(const DXGI_FORMAT format) noexcept
+	{
+		if (IsDepthStencilFormat(format))
+		{
+			return GetStencilViewFormat(format) == DXGI_FORMAT_UNKNOWN ? AspectMask::Depth : AspectMask::Depth | AspectMask::Stencil;
+		}
+		else
+		{
+			return AspectMask::Color;
+		}
 	}
 
 	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureDimension dimension) noexcept
