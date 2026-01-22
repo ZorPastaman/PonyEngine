@@ -277,19 +277,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 			auto support = RenderDevice::TextureFormatSupport{.supported = true};
 			support.features = ToTextureFormatFeature(device.GetFormatSupport(format));
-			
-			if (IsDepthStencilFormat(format))
-			{
-				support.aspects |= AspectMask::Depth;
-				if (GetStencilViewFormat(format) != DXGI_FORMAT_UNKNOWN)
-				{
-					support.aspects |= AspectMask::Stencil;
-				}
-			}
-			else
-			{
-				support.aspects |= AspectMask::Color;
-			}
+			support.aspects = GetAspect(format);
 
 			return support;
 		}

@@ -107,7 +107,7 @@ namespace PonyEngine::RenderDevice::Windows
 	BOOL DXGIFactory::GetTearingSupport() const
 	{
 		BOOL tearingSupport;
-		if (const HRESULT result = factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &tearingSupport, sizeof(tearingSupport))) [[unlikely]]
+		if (const HRESULT result = factory->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &tearingSupport, sizeof(tearingSupport)); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to check tearing support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

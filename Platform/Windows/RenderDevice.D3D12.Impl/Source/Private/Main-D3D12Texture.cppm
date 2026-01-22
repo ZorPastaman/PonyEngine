@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Texture;
@@ -74,7 +76,7 @@ export namespace PonyEngine::RenderDevice::Windows
 
 	private:
 		[[nodiscard("Pure function")]]
-		UINT CalculateSubresourceIndex(std::uint32_t mipIndex, std::uint32_t arrayIndex, std::uint8_t planeIndex) const;
+		UINT CalculateSubresourceIndex(std::uint32_t mipIndex, std::uint32_t arrayIndex, Aspect aspect) const;
 
 		D3D12Resource resource;
 
@@ -189,22 +191,22 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void* D3D12Texture::Map(const SubTextureIndex& index)
 	{
-		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)));
+		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect));
 	}
 
 	void* D3D12Texture::Map(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
 	{
-		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
 	void D3D12Texture::Unmap(const SubTextureIndex& index)
 	{
-		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)));
+		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect));
 	}
 
 	void D3D12Texture::Unmap(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
 	{
-		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, ToPlaneIndex(index.aspect)), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
 	void D3D12Texture::SetName(const std::string_view name)
@@ -217,9 +219,43 @@ namespace PonyEngine::RenderDevice::Windows
 		return resource.Resource();
 	}
 
-	UINT D3D12Texture::CalculateSubresourceIndex(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const std::uint8_t planeIndex) const
+	UINT D3D12Texture::CalculateSubresourceIndex(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const Aspect aspect) const
 	{
-		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), static_cast<UINT8>(planeIndex),
+		if (mipIndex >= mipCount) [[unlikely]]
+		{
+			throw std::out_of_range("Mip index is out of range");
+		}
+		if (arrayIndex >= ArraySize()) [[unlikely]]
+		{
+			throw std::out_of_range("Array index is out of range");
+		}
+		const DXGI_FORMAT nativeFormat = resource.Resource().GetDesc1().Format;
+		switch (aspect)
+		{
+		case Aspect::Color:
+			if (IsDepthStencilFormat(nativeFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid aspect");
+			}
+			break;
+		case Aspect::Depth:
+			if (!IsDepthStencilFormat(nativeFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid aspect");
+			}
+			break;
+		case Aspect::Stencil:
+			if (GetStencilViewFormat(nativeFormat) == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid aspect");
+			}
+			break;
+		default: [[unlikely]]
+			assert(false && "Invalid aspect");
+			break;
+		}
+
+		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), static_cast<UINT8>(ToPlaneIndex(aspect)),
 			static_cast<UINT16>(mipCount), static_cast<UINT16>(ArraySize()));
 	}
 }

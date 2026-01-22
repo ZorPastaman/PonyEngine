@@ -193,6 +193,11 @@ namespace PonyEngine::RenderDevice::Windows
 		const D3D12_RESOURCE_DESC1& resourceDesc, const D3D12_BARRIER_LAYOUT initialLayout, const D3D12_CLEAR_VALUE& clearValue,
 		const std::span<const DXGI_FORMAT> castableFormats)
 	{
+		if (castableFormats.size() > std::numeric_limits<UINT32>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Castable format count is too great");
+		}
+
 		Platform::Windows::ComPtr<ID3D12Resource2> resource;
 		if (const HRESULT result = device->CreateCommittedResource3(&heapProperties, heapFlags, &resourceDesc, initialLayout, 
 			clearValue.Format != DXGI_FORMAT_UNKNOWN ? &clearValue : nullptr, nullptr, 
