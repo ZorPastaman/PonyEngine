@@ -21,7 +21,7 @@ import PonyEngine.Meta;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice.Ext;
 
-import :D3D12Utility;
+import :D3D12ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Windows
 {

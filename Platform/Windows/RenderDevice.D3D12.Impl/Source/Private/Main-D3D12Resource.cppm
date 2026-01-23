@@ -19,7 +19,7 @@ import std;
 
 import PonyEngine.Platform.Windows;
 
-import :D3D12Utility;
+import :D3D12ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Windows
 {
