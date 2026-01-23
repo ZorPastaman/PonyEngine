@@ -38,7 +38,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		UINT GetCurrentBufferIndex() const noexcept;
 		template<std::derived_from<IUnknown> T> [[nodiscard("Pure function")]]
-		void GetBuffer(UINT index, Platform::Windows::ComPtr<T>& resource) const;
+		Platform::Windows::ComPtr<T> GetBuffer(UINT index) const;
 
 		void SetFullscreenState(BOOL fullscreen);
 
@@ -71,12 +71,15 @@ namespace PonyEngine::RenderDevice::Windows
 	}
 
 	template<std::derived_from<IUnknown> T>
-	void DXGISwapChain::GetBuffer(const UINT index, Platform::Windows::ComPtr<T>& resource) const
+	Platform::Windows::ComPtr<T> DXGISwapChain::GetBuffer(const UINT index) const
 	{
-		if (const HRESULT result = swapChain->GetBuffer(index, IID_PPV_ARGS(resource.ReleaseAndGetAddress())); FAILED(result)) [[unlikely]]
+		Platform::Windows::ComPtr<T> resource;
+		if (const HRESULT result = swapChain->GetBuffer(index, IID_PPV_ARGS(resource.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to get swap chain buffer: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+
+		return resource;
 	}
 
 	void DXGISwapChain::SetFullscreenState(const BOOL fullscreen)

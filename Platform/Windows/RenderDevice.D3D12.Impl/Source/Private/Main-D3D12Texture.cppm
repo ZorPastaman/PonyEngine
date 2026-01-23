@@ -20,9 +20,10 @@ import std;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
+import :DXGISwapChainUtility;
+import :D3D12FormatUtility;
 import :D3D12Resource;
-import :D3D12Utility;
-import :EngineUtility;
+import :D3D12TextureUtility;
 
 export namespace PonyEngine::RenderDevice::Windows
 {
@@ -30,11 +31,11 @@ export namespace PonyEngine::RenderDevice::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		D3D12Texture(ID3D12Resource2& resource, TextureFormatId format, std::span<const TextureFormatId> castableFormats,
+		D3D12Texture(ID3D12Resource2& resource, TextureFormatId format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatId> castableFormats,
 			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint16_t mipCount, TextureDimension dimension, 
 			enum SampleCount sampleCount, TextureUsage usage, bool srgbCompatible);
 		[[nodiscard("Pure constructor")]]
-		D3D12Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, TextureFormatId format, std::span<const TextureFormatId> castableFormats,
+		D3D12Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, TextureFormatId format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatId> castableFormats,
 			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint16_t mipCount, TextureDimension dimension,
 			enum SampleCount sampleCount, TextureUsage usage, bool srgbCompatible);
 		D3D12Texture(const D3D12Texture&) = delete;
@@ -70,6 +71,8 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& Resource() const noexcept;
+		[[nodiscard("Pure function")]]
+		DXGI_FORMAT NativeFormat() const noexcept;
 
 		D3D12Texture& operator =(const D3D12Texture&) = delete;
 		D3D12Texture& operator =(D3D12Texture&&) = delete;
@@ -81,7 +84,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		D3D12Resource resource;
 
 		TextureFormatId format;
-		std::size_t castableFormatCount;
+		DXGI_FORMAT nativeFormat;
+		std::uint32_t castableFormatCount;
 		std::unique_ptr<TextureFormatId[]> castableFormats;
 		std::uint32_t width;
 		std::uint32_t height;
@@ -96,13 +100,14 @@ export namespace PonyEngine::RenderDevice::Windows
 
 namespace PonyEngine::RenderDevice::Windows
 {
-	D3D12Texture::D3D12Texture(ID3D12Resource2& resource, const TextureFormatId format, const std::span<const TextureFormatId> castableFormats,
+	D3D12Texture::D3D12Texture(ID3D12Resource2& resource, const TextureFormatId format, const DXGI_FORMAT nativeFormat, const std::span<const TextureFormatId> castableFormats,
 		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint16_t mipCount, const TextureDimension dimension,
 		const enum SampleCount sampleCount, const TextureUsage usage, const bool srgbCompatible) :
 		resource(resource),
 		format(format),
-		castableFormatCount(castableFormats.size()),
-		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(this->castableFormatCount) : nullptr),
+		nativeFormat{nativeFormat},
+		castableFormatCount{static_cast<std::uint32_t>(castableFormats.size())},
+		castableFormats(this->castableFormatCount > 0u ? std::make_unique<TextureFormatId[]>(this->castableFormatCount) : nullptr),
 		width{width},
 		height{height},
 		depth{depth},
@@ -112,18 +117,22 @@ namespace PonyEngine::RenderDevice::Windows
 		usage{usage},
 		srgbCompatible{srgbCompatible}
 	{
+		assert(castableFormats.size() <= std::numeric_limits<std::uint32_t>::max() && "Castable format count is too great.");
+
 		if (this->castableFormatCount > 0uz)
 		{
 			std::memcpy(this->castableFormats.get(), castableFormats.data(), castableFormats.size_bytes());
 		}
 	}
 
-	D3D12Texture::D3D12Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const TextureFormatId format, const std::span<const TextureFormatId> castableFormats,
+	D3D12Texture::D3D12Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const TextureFormatId format, const DXGI_FORMAT nativeFormat, 
+		const std::span<const TextureFormatId> castableFormats,
 		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint16_t mipCount, const TextureDimension dimension,
 		const enum SampleCount sampleCount, const TextureUsage usage, const bool srgbCompatible) :
 		resource(std::move(resource)),
 		format(format),
-		castableFormatCount(castableFormats.size()),
+		nativeFormat{nativeFormat},
+		castableFormatCount{static_cast<std::uint32_t>(castableFormats.size())},
 		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(this->castableFormatCount) : nullptr),
 		width{width},
 		height{height},
@@ -134,6 +143,8 @@ namespace PonyEngine::RenderDevice::Windows
 		usage{usage},
 		srgbCompatible{srgbCompatible}
 	{
+		assert(castableFormats.size() <= std::numeric_limits<std::uint32_t>::max() && "Castable format count is too great.");
+
 		if (this->castableFormatCount > 0uz)
 		{
 			std::memcpy(this->castableFormats.get(), castableFormats.data(), castableFormats.size_bytes());
@@ -219,6 +230,11 @@ namespace PonyEngine::RenderDevice::Windows
 		return resource.Resource();
 	}
 
+	DXGI_FORMAT D3D12Texture::NativeFormat() const noexcept
+	{
+		return nativeFormat;
+	}
+
 	UINT D3D12Texture::CalculateSubresourceIndex(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const Aspect aspect) const
 	{
 		if (mipIndex >= mipCount) [[unlikely]]
@@ -229,30 +245,9 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::out_of_range("Array index is out of range");
 		}
-		const DXGI_FORMAT nativeFormat = resource.Resource().GetDesc1().Format;
-		switch (aspect)
+		if (None(ToMask(aspect), GetAspects(nativeFormat))) [[unlikely]]
 		{
-		case Aspect::Color:
-			if (IsDepthStencilFormat(nativeFormat)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid aspect");
-			}
-			break;
-		case Aspect::Depth:
-			if (!IsDepthStencilFormat(nativeFormat)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid aspect");
-			}
-			break;
-		case Aspect::Stencil:
-			if (GetStencilViewFormat(nativeFormat) == DXGI_FORMAT_UNKNOWN) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid aspect");
-			}
-			break;
-		default: [[unlikely]]
-			assert(false && "Invalid aspect");
-			break;
+			throw std::invalid_argument("Invalid aspect");
 		}
 
 		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), static_cast<UINT8>(ToPlaneIndex(aspect)),

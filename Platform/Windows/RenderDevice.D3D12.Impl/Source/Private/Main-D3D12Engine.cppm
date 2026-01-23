@@ -29,20 +29,24 @@ import PonyEngine.Type;
 
 import :DXGIFactory;
 import :DXGISwapChain;
-import :DXGITextureFormatMap;
+import :DXGISwapChainUtility;
 import :D3D12Buffer;
+import :D3D12BufferUtility;
 import :D3D12CommandQueue;
 import :D3D12ComputeCommandList;
 import :D3D12CopyCommandList;
+import :D3D12DescriptorHeapUtility;
 import :D3D12Device;
 import :D3D12Fence;
+import :D3D12FormatUtility;
 import :D3D12GraphicsCommandList;
+import :D3D12HeapUtility;
 import :D3D12ShaderDataContainer;
 import :D3D12SwapChain;
 import :D3D12Texture;
-import :D3D12Utility;
+import :D3D12TextureFormatMap;
+import :D3D12TextureUtility;
 import :D3D12Waiter;
-import :EngineUtility;
 
 export namespace PonyEngine::RenderDevice::Windows
 {
@@ -209,7 +213,6 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateMipRange(const D3D12Texture& texture, const MipRange& range);
 		static void ValidateArrayRange(const D3D12Texture& texture, const ArrayRange& range);
 		static void ValidateSampleCount(const D3D12Texture& texture, bool shouldBeMS);
-		static void ValidatePlane0Aspect(Aspect aspect);
 		static void ValidateSwapChainParams(const SwapChainParams& params);
 
 		template<typename Container>
@@ -225,7 +228,7 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		mutable Memory::Arena arena;
 
-		DXGITextureFormatMap textureFormatMap;
+		D3D12TextureFormatMap textureFormatMap;
 
 		DXGIFactory factory;
 		D3D12Device device;
@@ -277,7 +280,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 			auto support = RenderDevice::TextureFormatSupport{.supported = true};
 			support.features = ToTextureFormatFeature(device.GetFormatSupport(format));
-			support.aspects = GetAspect(format);
+			support.aspects = GetAspects(format);
 
 			return support;
 		}
@@ -287,11 +290,6 @@ namespace PonyEngine::RenderDevice::Windows
 
 	TextureSupportResponse D3D12Engine::TextureSupport(const TextureSupportRequest& request) const
 	{
-		if (!IsValidUsage(request.usage))
-		{
-			return TextureSupportResponse{};
-		}
-
 		if (const std::size_t index = textureFormatMap.IndexOf(request.format); index < textureFormatMap.Size())
 		{
 			const DXGI_FORMAT format = textureFormatMap.DXGIFormat(index);
@@ -326,15 +324,10 @@ namespace PonyEngine::RenderDevice::Windows
 	std::shared_ptr<ITexture> D3D12Engine::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
 		ValidateDimension(params);
-		if (!IsValidUsage(params.usage))
-		{
-			throw std::invalid_argument("Invalid usage");
-		}
-
 		DXGI_FORMAT format = GetFormat(params.format);
+		const bool srgb = Any(TextureFlag::SRGB, params.flags);
 
 		arena.Free();
-		const bool srgb = Any(TextureFlag::SRGB, params.flags);
 		auto castableFormats = Memory::Arena::Slice<DXGI_FORMAT>{};
 		if (IsDepthStencilFormat(format))
 		{
@@ -367,7 +360,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 			if (srgb)
 			{
-				const DXGI_FORMAT srgbFormat = GetSrgbFormat(format);
+				const DXGI_FORMAT srgbFormat = GetSRGBFormat(format);
 				if (srgbFormat == DXGI_FORMAT_UNKNOWN) [[unlikely]]
 				{
 					throw std::invalid_argument("Invalid srgb flag");
@@ -384,7 +377,7 @@ namespace PonyEngine::RenderDevice::Windows
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
 			resourceDesc, initialLayout, clearValue, arena.Span(castableFormats));
 
-		return std::make_shared<D3D12Texture>(std::move(resource), params.format, params.castableFormats, 
+		return std::make_shared<D3D12Texture>(std::move(resource), params.format, format, params.castableFormats, 
 			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), static_cast<std::uint16_t>(resourceDesc.DepthOrArraySize),
 			static_cast<std::uint16_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
 	}
@@ -423,15 +416,8 @@ namespace PonyEngine::RenderDevice::Windows
 
 	std::shared_ptr<IShaderDataContainer> D3D12Engine::CreateShaderDataContainer(const ShaderDataContainerParams& params)
 	{
-		const auto descriptorHeapDesc = D3D12_DESCRIPTOR_HEAP_DESC
-		{
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = static_cast<UINT>(params.size),
-			.Flags = params.shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-			.NodeMask = 0u
-		};
-
-		return std::make_shared<D3D12ShaderDataContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV),
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = ToDescriptorHeapDesc(params);		
+		return std::make_shared<D3D12ShaderDataContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type),
 			params.size, params.shaderVisible);
 	}
 
@@ -682,7 +668,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 		const DXGI_FORMAT format = GetFormat(params.format);
 		const bool srgb = Any(SwapChainFlag::SRGB, params.flags);
-		if (srgb && GetSrgbFormat(format) == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		if (srgb && !IsSRGBCompatibleFormat(format)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid srgb flag");
 		}
@@ -697,9 +683,8 @@ namespace PonyEngine::RenderDevice::Windows
 		auto buffers = std::vector<std::shared_ptr<D3D12Texture>>(params.bufferCount);
 		for (UINT i = 0u; i < params.bufferCount; ++i)
 		{
-			Platform::Windows::ComPtr<ID3D12Resource2> resource;
-			dxgiSwapChain.GetBuffer(i, resource);
-			buffers[i] = std::make_shared<D3D12Texture>(std::move(resource), params.format, std::span<const TextureFormatId>(),
+			Platform::Windows::ComPtr<ID3D12Resource2> resource = dxgiSwapChain.GetBuffer<ID3D12Resource2>(i);
+			buffers[i] = std::make_shared<D3D12Texture>(std::move(resource), params.format, format, std::span<const TextureFormatId>(),
 				static_cast<std::uint32_t>(swapChainDesc.Width), static_cast<std::uint32_t>(swapChainDesc.Height), 1u, 1u,
 				TextureDimension::Texture2D, SampleCount::X1, params.usage, srgb);
 		}
@@ -1000,11 +985,14 @@ namespace PonyEngine::RenderDevice::Windows
 		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
 		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> beforeFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.before.size());
 		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> afterFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.after.size());
-		GetCommandLists<CommandList, CommandListInterface>(commandLists, arena.Span(lists));
-		GetFences(sync.before, arena.Span(beforeFences));
-		GetFences(sync.after, arena.Span(afterFences));
+		const std::span<ID3D12CommandList*> listsSpan = arena.Span(lists);
+		const std::span<std::pair<ID3D12Fence*, UINT64>> beforeFencesSpan = arena.Span(beforeFences);
+		const std::span<std::pair<ID3D12Fence*, UINT64>> afterFencesSpan = arena.Span(afterFences);
 
-		commandQueue.Execute(arena.Span(lists), arena.Span(beforeFences), arena.Span(afterFences));
+		GetCommandLists<CommandList, CommandListInterface>(commandLists, listsSpan);
+		GetFences(sync.before, beforeFencesSpan);
+		GetFences(sync.after, afterFencesSpan);
+		commandQueue.Execute(listsSpan, beforeFencesSpan, afterFencesSpan);
 	}
 
 	template<typename CommandList, typename CommandListInterface>
@@ -1221,6 +1209,8 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Invalid texture usage");
 		}
+
+		ValidateAspect(params.aspect, texture.NativeFormat());
 	}
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture1DSRVParams& params)
@@ -1228,7 +1218,7 @@ namespace PonyEngine::RenderDevice::Windows
 		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
 		ValidateDimension(texture, TextureDimension::Texture1D);
 		ValidateMipRange(texture, params.mipRange);
-		ValidatePlane0Aspect(params.aspect);
+		ValidateSampleCount(texture, false);
 	}
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture1DArraySRVParams& params)
@@ -1256,7 +1246,6 @@ namespace PonyEngine::RenderDevice::Windows
 		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
 		ValidateDimension(texture, TextureDimension::Texture2D);
 		ValidateSampleCount(texture, true);
-		ValidatePlane0Aspect(params.aspect);
 	}
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture2DMSArraySRVParams& params)
@@ -1270,7 +1259,7 @@ namespace PonyEngine::RenderDevice::Windows
 		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
 		ValidateDimension(texture, TextureDimension::Texture3D);
 		ValidateMipRange(texture, params.mipRange);
-		ValidatePlane0Aspect(params.aspect);
+		ValidateSampleCount(texture, false);
 	}
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const TextureCubeSRVParams& params)
@@ -1280,7 +1269,6 @@ namespace PonyEngine::RenderDevice::Windows
 		ValidateMipRange(texture, params.mipRange);
 		ValidateArrayRange(texture, ArrayRange{.firstArrayIndex = 0u, .arrayCount = 6u});
 		ValidateSampleCount(texture, false);
-		ValidatePlane0Aspect(params.aspect);
 	}
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const TextureCubeArraySRVParams& params)
@@ -1323,14 +1311,6 @@ namespace PonyEngine::RenderDevice::Windows
 		if (ToNumber(texture.SampleCount()) > 1u != shouldBeMS) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid sample count");
-		}
-	}
-
-	void D3D12Engine::ValidatePlane0Aspect(const Aspect aspect)
-	{
-		if (aspect != Aspect::Color && aspect != Aspect::Depth) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
 		}
 	}
 
