@@ -228,6 +228,7 @@ export namespace PonyEngine::RawInput
 
 	InputProviderHandle RawInputService::AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory)
 	{
+#ifndef NDEBUG
 		if (!nextProviderHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more input provider handles available");
@@ -236,8 +237,10 @@ export namespace PonyEngine::RawInput
 		{
 			throw std::logic_error("Input providers can be added only on start-up");
 		}
+#endif
 
 		const std::shared_ptr<IInputProvider> provider = factory(*this);
+#ifndef NDEBUG
 		if (!provider) [[unlikely]]
 		{
 			throw std::invalid_argument("Input provider is nullptr");
@@ -246,6 +249,7 @@ export namespace PonyEngine::RawInput
 		{
 			throw std::invalid_argument("Input provider has already been added");
 		}
+#endif
 
 		const InputProviderHandle currentHandle = nextProviderHandle;
 		providers.Add(currentHandle, provider);
@@ -258,10 +262,12 @@ export namespace PonyEngine::RawInput
 
 	void RawInputService::RemoveProvider(const InputProviderHandle providerHandle)
 	{
+#ifndef NDEBUG
 		if (application->FlowState() != Application::FlowState::StartingUp && application->FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Input provider can be removed only on start-up or shut-down");
 		}
+#endif
 
 		if (const std::size_t index = providers.IndexOf(providerHandle); index < providers.Size()) [[likely]]
 		{
@@ -319,10 +325,12 @@ export namespace PonyEngine::RawInput
 			throw std::overflow_error("No more device handles available");
 		}
 
+#ifndef NDEBUG
 		if (!deviceTypeHashMap.contains(deviceType))
 		{
 			throw std::invalid_argument("Device type is invalid");
 		}
+#endif
 
 		const DeviceHandle currentHandle = nextDeviceHandle;
 		devices.Add(currentHandle, deviceType, deviceName, isConnected, features);
@@ -359,26 +367,26 @@ export namespace PonyEngine::RawInput
 
 	void RawInputService::AddInput(const DeviceHandle deviceHandle, const RawInputEvent& input)
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			inputQueue.AddInput(deviceHandle, input);
-		}
-		else [[unlikely]]
+#ifndef NDEBUG
+		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		inputQueue.AddInput(deviceHandle, input);
 	}
 
 	void RawInputService::Connect(const DeviceHandle deviceHandle, const ConnectionEvent& connection)
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			inputQueue.AddConnection(deviceHandle, connection);
-		}
-		else [[unlikely]]
+#ifndef NDEBUG
+		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		inputQueue.AddConnection(deviceHandle, connection);
 	}
 
 	float RawInputService::Value(const AxisId axis) const noexcept
@@ -403,10 +411,12 @@ export namespace PonyEngine::RawInput
 
 	DeviceHandle RawInputService::Device(const std::size_t index) const
 	{
+#ifndef NDEBUG
 		if (index >= devices.Size()) [[unlikely]]
 		{
 			throw std::out_of_range("Index is out of range");
 		}
+#endif
 
 		return devices.Handle(index);
 	}
@@ -418,80 +428,86 @@ export namespace PonyEngine::RawInput
 
 	bool RawInputService::IsConnected(const DeviceHandle deviceHandle) const
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			return devices.IsConnected(index);
-		}
-		else [[unlikely]]
+		const std::size_t index = devices.IndexOf(deviceHandle);
+#ifndef NDEBUG
+		if (index >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		return devices.IsConnected(index);
 	}
 
 	std::string_view RawInputService::DeviceName(const DeviceHandle deviceHandle) const
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			return devices.DeviceName(index);
-		}
-		else [[unlikely]]
+		const std::size_t index = devices.IndexOf(deviceHandle);
+#ifndef NDEBUG
+		if (index >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		return devices.DeviceName(index);
 	}
 
 	DeviceTypeId RawInputService::DeviceType(const DeviceHandle deviceHandle) const
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			return devices.DeviceType(index);
-		}
-		else [[unlikely]]
+		const std::size_t index = devices.IndexOf(deviceHandle);
+#ifndef NDEBUG
+		if (index >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		return devices.DeviceType(index);
 	}
 
 	std::span<const std::type_index> RawInputService::FeatureTypes(const DeviceHandle deviceHandle) const
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			return devices.DeviceFeatures(index).FeatureTypes();
-		}
-		else [[unlikely]]
+		const std::size_t index = devices.IndexOf(deviceHandle);
+#ifndef NDEBUG
+		if (index >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		return devices.DeviceFeatures(index).FeatureTypes();
 	}
 
 	void* RawInputService::FindFeature(const DeviceHandle deviceHandle, const std::type_index type)
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			const DeviceFeatureContainer& features = devices.DeviceFeatures(index);
-			const std::size_t featureIndex = features.IndexOf(type);
-
-			return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
-		}
-		else [[unlikely]]
+		const std::size_t index = devices.IndexOf(deviceHandle);
+#ifndef NDEBUG
+		if (index >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		const DeviceFeatureContainer& features = devices.DeviceFeatures(index);
+		const std::size_t featureIndex = features.IndexOf(type);
+
+		return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
 	}
 
 	const void* RawInputService::FindFeature(const DeviceHandle deviceHandle, const std::type_index type) const
 	{
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			const DeviceFeatureContainer& features = devices.DeviceFeatures(index);
-			const std::size_t featureIndex = features.IndexOf(type);
-
-			return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
-		}
-		else [[unlikely]]
+		const std::size_t index = devices.IndexOf(deviceHandle);
+#ifndef NDEBUG
+		if (index >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
 		}
+#endif
+
+		const DeviceFeatureContainer& features = devices.DeviceFeatures(index);
+		const std::size_t featureIndex = features.IndexOf(type);
+
+		return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
 	}
 
 	AxisId RawInputService::Hash(const Axis& axis)
@@ -528,15 +544,15 @@ export namespace PonyEngine::RawInput
 
 	const Axis& RawInputService::Unhash(const AxisId axisId) const
 	{
-		if (const auto position = axisHashMap.find(axisId.hash); position != axisHashMap.cend()) [[likely]]
+		const auto position = axisHashMap.find(axisId.hash);
+#ifndef NDEBUG
+		if (position == axisHashMap.cend() || axisId.index >= position->second.size()) [[unlikely]]
 		{
-			if (axisId.index < position->second.size()) [[likely]]
-			{
-				return position->second[axisId.index];
-			}
+			throw std::invalid_argument("Invalid axis ID");
 		}
+#endif
 
-		throw std::invalid_argument("Invalid axis ID");
+		return position->second[axisId.index];
 	}
 
 	bool RawInputService::IsValid(const AxisId axisId) const noexcept
@@ -567,12 +583,15 @@ export namespace PonyEngine::RawInput
 
 	const DeviceType& RawInputService::Unhash(const DeviceTypeId deviceTypeId)
 	{
-		if (const auto position = deviceTypeHashMap.find(deviceTypeId); position != deviceTypeHashMap.cend()) [[likely]]
+		const auto position = deviceTypeHashMap.find(deviceTypeId);
+#ifndef NDEBUG
+		if (position == deviceTypeHashMap.cend()) [[unlikely]]
 		{
-			return position->second;
+			throw std::invalid_argument("Invalid device type ID");
 		}
+#endif
 
-		throw std::invalid_argument("Invalid device type ID");
+		return position->second;
 	}
 
 	bool RawInputService::IsValid(const DeviceTypeId deviceTypeId) const noexcept

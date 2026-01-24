@@ -44,10 +44,12 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12BackendModule::StartUp(Application::IModuleContext& context)
 	{
 		IRenderDeviceModuleContext* renderDeviceModuleContext = context.GetData<IRenderDeviceModuleContext>();
+#ifndef NDEBUG
 		if (!renderDeviceModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Render device module context not found.");
 		}
+#endif
 
 		d3d12Handle = renderDeviceModuleContext->AddBackend([](IRenderDeviceContext& renderDevice)
 		{
@@ -58,10 +60,12 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12BackendModule::ShutDown(Application::IModuleContext& context)
 	{
 		IRenderDeviceModuleContext* renderDeviceModuleContext = context.GetData<IRenderDeviceModuleContext>();
+#ifndef NDEBUG
 		if (!renderDeviceModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Render device module context not found.");
 		}
+#endif
 
 		renderDeviceModuleContext->RemoveBackend(d3d12Handle);
 	}

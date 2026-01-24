@@ -206,6 +206,7 @@ namespace PonyEngine::RenderDevice
 
 	BackendHandle RenderDeviceService::AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceContext&)>& factory)
 	{
+#ifndef NDEBUG
 		if (!nextBackendHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more backend handles available");
@@ -214,8 +215,10 @@ namespace PonyEngine::RenderDevice
 		{
 			throw std::logic_error("Backends can be added only on start-up");
 		}
+#endif
 
 		const std::shared_ptr<IBackend> backend = factory(*this);
+#ifndef NDEBUG
 		if (!backend) [[unlikely]]
 		{
 			throw std::invalid_argument("Backend is nullptr");
@@ -224,6 +227,7 @@ namespace PonyEngine::RenderDevice
 		{
 			throw std::invalid_argument("Backend has already been added");
 		}
+#endif
 
 		const BackendHandle currentHandle = nextBackendHandle;
 		backends.Add(currentHandle, backend);
@@ -235,10 +239,12 @@ namespace PonyEngine::RenderDevice
 
 	void RenderDeviceService::RemoveBackend(const BackendHandle backendHandle)
 	{
+#ifndef NDEBUG
 		if (application->FlowState() != Application::FlowState::StartingUp && application->FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Backend can be removed only on start-up or shut-down");
 		}
+#endif
 
 		if (const std::size_t index = backends.IndexOf(backendHandle); index < backends.Size()) [[likely]]
 		{
@@ -279,10 +285,12 @@ namespace PonyEngine::RenderDevice
 
 	void RenderDeviceService::SwitchBackend(const std::optional<std::size_t> backendIndex)
 	{
+#ifndef NDEBUG
 		if (backendIndex && backendIndex >= backends.Size()) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
 		}
+#endif
 
 		if (activeBackendIndex)
 		{
@@ -347,12 +355,15 @@ namespace PonyEngine::RenderDevice
 
 	std::string_view RenderDeviceService::TextureFormat(const struct TextureFormatId textureFormatId) const
 	{
-		if (const auto position = textureFormatHashMap.find(textureFormatId); position != textureFormatHashMap.cend()) [[likely]]
+		const auto position = textureFormatHashMap.find(textureFormatId);
+#ifndef NDEBUG
+		if (position == textureFormatHashMap.cend()) [[unlikely]]
 		{
-			return position->second;
+			throw std::invalid_argument("Invalid texture format ID");
 		}
+#endif
 
-		throw std::invalid_argument("Invalid texture format ID");
+		return position->second;
 	}
 
 	bool RenderDeviceService::IsValid(const struct TextureFormatId textureFormatId) const noexcept
@@ -362,20 +373,24 @@ namespace PonyEngine::RenderDevice
 
 	struct TextureFormatSupport RenderDeviceService::TextureFormatSupport(const struct TextureFormatId textureFormatId) const
 	{
+#ifndef NDEBUG
 		if (!IsValid(textureFormatId)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid format");
 		}
+#endif
 
 		return GetCurrentBackend().TextureFormatSupport(textureFormatId);
 	}
 
 	TextureSupportResponse RenderDeviceService::TextureSupport(const TextureSupportRequest& request) const
 	{
+#ifndef NDEBUG
 		if (!IsValid(request.format)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid format");
 		}
+#endif
 
 		return GetCurrentBackend().TextureSupport(request);
 	}
@@ -600,40 +615,48 @@ namespace PonyEngine::RenderDevice
 
 	IBackend& RenderDeviceService::GetCurrentBackend()
 	{
+#ifndef NDEBUG
 		if (!activeBackendIndex) [[unlikely]]
 		{
 			throw std::logic_error("No active backend");
 		}
+#endif
 
 		return backends.Backend(*activeBackendIndex);
 	}
 
 	const IBackend& RenderDeviceService::GetCurrentBackend() const
 	{
+#ifndef NDEBUG
 		if (!activeBackendIndex) [[unlikely]]
 		{
 			throw std::logic_error("No active backend");
 		}
+#endif
 
 		return backends.Backend(*activeBackendIndex);
 	}
 
 	IBackend& RenderDeviceService::GetBackend(const std::size_t index)
 	{
+#ifndef NDEBUG
 		if (index >= backends.Size()) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
 		}
+#endif
 
 		return backends.Backend(index);
 	}
 
 	const IBackend& RenderDeviceService::GetBackend(const std::size_t index) const
 	{
+#ifndef NDEBUG
 		if (index >= backends.Size()) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
 		}
+#endif
 
 		return backends.Backend(index);
 	}

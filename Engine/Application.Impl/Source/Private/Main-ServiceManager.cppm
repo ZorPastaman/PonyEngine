@@ -224,6 +224,7 @@ namespace PonyEngine::Application
 
 	ServiceHandle ServiceManager::AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory)
 	{
+#ifndef NDEBUG
 		if (!nextServiceHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more service handles available");
@@ -233,18 +234,23 @@ namespace PonyEngine::Application
 		{
 			throw std::logic_error("Service can be added only on start-up");
 		}
+#endif
 
 		const std::shared_ptr<IService> service = factory(*application);
+#ifndef NDEBUG
 		if (!service) [[unlikely]]
 		{
 			throw std::invalid_argument("Service is nullptr");
 		}
+#endif
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Adding '{}' service...", typeid(*service).name());
+#ifndef NDEBUG
 		if (serviceContainer.IndexOf(*service) < serviceContainer.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Service has already been added");
 		}
+#endif
 
 		const ServiceHandle currentHandle = nextServiceHandle;
 		const std::size_t serviceIndex = serviceContainer.Add(currentHandle, service);
@@ -291,10 +297,12 @@ namespace PonyEngine::Application
 
 	void ServiceManager::RemoveService(const ServiceHandle handle)
 	{
+#ifndef NDEBUG
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Service can be removed only on start-up or shut-down");
 		}
+#endif
 
 		if (const std::size_t index = serviceContainer.IndexOf(handle); index < serviceContainer.Size()) [[likely]]
 		{
@@ -342,6 +350,7 @@ namespace PonyEngine::Application
 
 	void ServiceManager::ServiceInterfaceAdder::AddInterface(const std::type_index type, void* const interface)
 	{
+#ifndef NDEBUG
 		if (container->IndexOf(type) < container->Size()) [[unlikely]]
 		{
 			throw std::invalid_argument(std::format("Interface of type '{}' has already been added", type.name()));
@@ -355,6 +364,7 @@ namespace PonyEngine::Application
 		{
 			throw std::invalid_argument("Interface is nullptr");
 		}
+#endif
 
 		container->Add(type, interface);
 		try

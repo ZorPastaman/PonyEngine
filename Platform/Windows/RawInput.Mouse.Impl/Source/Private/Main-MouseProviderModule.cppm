@@ -50,26 +50,30 @@ namespace PonyEngine::RawInput::Windows
 	void MouseProviderModule::StartUp(Application::IModuleContext& context)
 	{
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
+#ifndef NDEBUG
 		if (!inputModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Raw input module context not found");
 		}
+#endif
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(MouseProvider).name());
 		mouseProviderHandle = inputModuleContext->AddProvider([&](IRawInputContext& input)
-			{
-				return std::make_shared<MouseProvider>(input);
-			});
+		{
+			return std::make_shared<MouseProvider>(input);
+		});
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(MouseProvider).name());
 	}
 
 	void MouseProviderModule::ShutDown(Application::IModuleContext& context)
 	{
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
+#ifndef NDEBUG
 		if (!inputModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Raw input module context not found");
 		}
+#endif
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(MouseProvider).name());
 		inputModuleContext->RemoveProvider(mouseProviderHandle);

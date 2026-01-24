@@ -179,10 +179,12 @@ namespace PonyEngine::Application
 	T& IApplicationContext::GetService()
 	{
 		T* const service = FindService<T>();
+#ifndef NDEBUG
 		if (!service) [[unlikely]]
 		{
 			throw std::logic_error("Service not found");
 		}
+#endif
 
 		return *service;
 	}
@@ -191,10 +193,12 @@ namespace PonyEngine::Application
 	const T& IApplicationContext::GetService() const
 	{
 		const T* const service = FindService<T>();
+#ifndef NDEBUG
 		if (!service) [[unlikely]]
 		{
 			throw std::logic_error("Service not found");
 		}
+#endif
 
 		return *service;
 	}

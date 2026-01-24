@@ -158,6 +158,7 @@ namespace PonyEngine::Application
 
 	ModuleDataHandle ModuleManager::AddData(const std::type_index type, const std::shared_ptr<void>& data)
 	{
+#ifndef NDEBUG
 		if (!nextDataHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more data handles available");
@@ -172,6 +173,7 @@ namespace PonyEngine::Application
 		{
 			throw std::invalid_argument(std::format("Data of type '{}' has already been added", type.name()));
 		}
+#endif
 
 		const ModuleDataHandle currentHandle = nextDataHandle;
 		dataContainer.Add(currentHandle, type, data);
@@ -184,10 +186,12 @@ namespace PonyEngine::Application
 
 	void ModuleManager::RemoveData(const ModuleDataHandle handle)
 	{
+#ifndef NDEBUG
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Data can be removed only on start-up or shut-down");
 		}
+#endif
 
 		if (const std::size_t index = dataContainer.IndexOf(handle); index < dataContainer.Size()) [[likely]]
 		{
@@ -212,10 +216,12 @@ namespace PonyEngine::Application
 			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
 			{
 				IModule* const module = *modulePtr;
+#ifndef NDEBUG
 				if (!module) [[unlikely]]
 				{
 					throw std::logic_error("Module is nullptr");
 				}
+#endif
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*&*module).name());
 				try
 				{

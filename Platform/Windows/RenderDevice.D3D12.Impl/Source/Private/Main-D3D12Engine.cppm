@@ -361,10 +361,12 @@ namespace PonyEngine::RenderDevice::Windows
 			if (srgb)
 			{
 				const DXGI_FORMAT srgbFormat = GetSRGBFormat(format);
+#ifndef NDEBUG
 				if (srgbFormat == DXGI_FORMAT_UNKNOWN) [[unlikely]]
 				{
 					throw std::invalid_argument("Invalid srgb flag");
 				}
+#endif
 				formats[formats.size() - 1] = srgbFormat;
 			}
 		}
@@ -659,19 +661,23 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void D3D12Engine::CreateSwapChain(const SwapChainParams& params)
 	{
+#ifndef NDEBUG
 		if (swapChain) [[unlikely]]
 		{
 			throw std::logic_error("Swap chain is alive");
 		}
+#endif
 
 		ValidateSwapChainParams(params);
 
 		const DXGI_FORMAT format = GetFormat(params.format);
 		const bool srgb = Any(SwapChainFlag::SRGB, params.flags);
+#ifndef NDEBUG
 		if (srgb && !IsSRGBCompatibleFormat(format)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid srgb flag");
 		}
+#endif
 
 		const HWND windowHandle = renderDevice->Application().GetService<Surface::Windows::ISurfaceService>().Handle();
 		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = ToSwapChainDesc(params, format);
@@ -797,22 +803,25 @@ namespace PonyEngine::RenderDevice::Windows
 
 	D3D12Engine::CopyableFootprintInfo D3D12Engine::GetCopyableFootprintCount(const std::uint32_t resourceMipCount, const std::uint32_t resourceArrayCount, const SubTextureRange& range)
 	{
+#ifndef NDEBUG
 		if (range.mipRange.mostDetailedMipIndex + range.mipRange.mipCount.value_or(1u) > resourceMipCount) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid mip range");
 		}
-		const std::uint32_t mipCount = range.mipRange.mipCount.value_or(resourceMipCount - range.mipRange.mostDetailedMipIndex);
-
 		if (range.arrayRange.firstArrayIndex + range.arrayRange.arrayCount.value_or(1u) > resourceArrayCount) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid array range");
 		}
-		const std::uint32_t arrayCount = range.arrayRange.arrayCount.value_or(resourceArrayCount - range.arrayRange.firstArrayIndex);
+#endif
 
+		const std::uint32_t mipCount = range.mipRange.mipCount.value_or(resourceMipCount - range.mipRange.mostDetailedMipIndex);
+		const std::uint32_t arrayCount = range.arrayRange.arrayCount.value_or(resourceArrayCount - range.arrayRange.firstArrayIndex);
+#ifndef NDEBUG
 		if (arrayCount > 1u && (range.mipRange.mostDetailedMipIndex != 0u || mipCount != resourceMipCount))
 		{
 			throw std::invalid_argument("Invalid mip range: mip gaps aren't allowed");
 		}
+#endif
 
 		return CopyableFootprintInfo{.mipCount = mipCount, .arrayCount = arrayCount};
 	}
@@ -821,10 +830,12 @@ namespace PonyEngine::RenderDevice::Windows
 		const UINT16 mostDetailedMipIndex, const UINT16 firstArrayIndex, const Aspect aspect, const std::span<CopyableFootprint> footprints) const
 	{
 		const std::uint32_t footprintCount = footprintCountInfo.mipCount * footprintCountInfo.arrayCount;
+#ifndef NDEBUG
 		if (footprints.size() != 0uz && footprints.size() != footprintCount) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid footprints count");
 		}
+#endif
 
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprints = arena.Allocate<D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount);
@@ -866,10 +877,12 @@ namespace PonyEngine::RenderDevice::Windows
 	DXGI_FORMAT D3D12Engine::GetFormat(const TextureFormatId format) const
 	{
 		const std::size_t formatIndex = textureFormatMap.IndexOf(format);
+#ifndef NDEBUG
 		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture format");
 		}
+#endif
 
 		return textureFormatMap.DXGIFormat(formatIndex);
 	}
@@ -895,10 +908,12 @@ namespace PonyEngine::RenderDevice::Windows
 			break;
 		}
 
+#ifndef NDEBUG
 		if (viewFormat == DXGI_FORMAT_UNKNOWN) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid aspect");
 		}
+#endif
 
 		return viewFormat;
 	}
@@ -910,60 +925,72 @@ namespace PonyEngine::RenderDevice::Windows
 
 	D3D12Buffer& D3D12Engine::ToNativeBuffer(IBuffer& buffer)
 	{
+#ifndef NDEBUG
 		if (typeid(buffer) != typeid(D3D12Buffer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid buffer");
 		}
+#endif
 
 		return static_cast<D3D12Buffer&>(buffer);
 	}
 
 	const D3D12Buffer& D3D12Engine::ToNativeBuffer(const IBuffer& buffer)
 	{
+#ifndef NDEBUG
 		if (typeid(buffer) != typeid(D3D12Buffer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid buffer");
 		}
+#endif
 
 		return static_cast<const D3D12Buffer&>(buffer);
 	}
 
 	D3D12Texture& D3D12Engine::ToNativeTexture(ITexture& texture)
 	{
+#ifndef NDEBUG
 		if (typeid(texture) != typeid(D3D12Texture)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture");
 		}
+#endif
 
 		return static_cast<D3D12Texture&>(texture);
 	}
 
 	const D3D12Texture& D3D12Engine::ToNativeTexture(const ITexture& texture)
 	{
+#ifndef NDEBUG
 		if (typeid(texture) != typeid(D3D12Texture)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture");
 		}
+#endif
 
 		return static_cast<const D3D12Texture&>(texture);
 	}
 
 	D3D12ShaderDataContainer& D3D12Engine::ToNativeContainer(IShaderDataContainer& container)
 	{
+#ifndef NDEBUG
 		if (typeid(container) != typeid(D3D12ShaderDataContainer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid container");
 		}
+#endif
 
 		return static_cast<D3D12ShaderDataContainer&>(container);
 	}
 
 	const D3D12ShaderDataContainer& D3D12Engine::ToNativeContainer(const IShaderDataContainer& container)
 	{
+#ifndef NDEBUG
 		if (typeid(container) != typeid(D3D12ShaderDataContainer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid container");
 		}
+#endif
 
 		return static_cast<const D3D12ShaderDataContainer&>(container);
 	}
@@ -1027,24 +1054,29 @@ namespace PonyEngine::RenderDevice::Windows
 
 	D3D12SwapChain& D3D12Engine::GetSwapChain() const
 	{
+#ifndef NDEBUG
 		if (!swapChain) [[unlikely]]
 		{
 			throw std::logic_error("Swap chain is not created");
 		}
+#endif
 
 		return *swapChain;
 	}
 
 	void D3D12Engine::ValidateSize(const BufferParams& params)
 	{
+#ifndef NDEBUG
 		if (params.size == 0uz) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid size");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateDimension(const TextureParams& params)
 	{
+#ifndef NDEBUG
 		if (params.size.Min() == 0u) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid size");
@@ -1107,18 +1139,22 @@ namespace PonyEngine::RenderDevice::Windows
 			}
 			break;
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateColorTexture(const TextureParams& params)
 	{
+#ifndef NDEBUG
 		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid usage");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateDepthTexture(const TextureParams& params)
 	{
+#ifndef NDEBUG
 		if (params.castableFormats.size() > 0uz) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid castable texture format");
@@ -1131,10 +1167,12 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Invalid usage");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateAspect(const Aspect aspect, const DXGI_FORMAT format)
 	{
+#ifndef NDEBUG
 		switch (aspect)
 		{
 		case Aspect::Color:
@@ -1158,10 +1196,12 @@ namespace PonyEngine::RenderDevice::Windows
 		default: [[unlikely]]
 			throw std::invalid_argument("Invalid aspect");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateCBVParams(const D3D12Buffer& buffer, const CBVParams& params)
 	{
+#ifndef NDEBUG
 		if (params.offset % CBVAlignment) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid offset");
@@ -1179,10 +1219,12 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Invalid buffer usage");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Buffer& buffer, const BufferSRVParams& params)
 	{
+#ifndef NDEBUG
 		if (params.stride == 0u) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid stride");
@@ -1196,10 +1238,12 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Invalid buffer usage");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const TextureSRVParams& params)
 	{
+#ifndef NDEBUG
 		if (texture.Format() != params.format && std::ranges::find(texture.CastableFormats(), params.format) == texture.CastableFormats().cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid format");
@@ -1209,6 +1253,7 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Invalid texture usage");
 		}
+#endif
 
 		ValidateAspect(params.aspect, texture.NativeFormat());
 	}
@@ -1276,46 +1321,58 @@ namespace PonyEngine::RenderDevice::Windows
 		ValidateSRVParams(texture, static_cast<const TextureCubeSRVParams&>(params));
 		const auto arrayRange = ArrayRange{.firstArrayIndex = params.arrayRange.firstArrayIndex, .arrayCount = params.arrayRange.arrayCount.value_or(texture.ArraySize() - params.arrayRange.firstArrayIndex)};
 		ValidateArrayRange(texture, arrayRange);
+
+#ifndef NDEBUG
 		if (arrayRange.arrayCount.value() % 6) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid array range");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateDimension(const D3D12Texture& texture, const TextureDimension dimension)
 	{
+#ifndef NDEBUG
 		if (texture.Dimension() != dimension) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid dimension");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateMipRange(const D3D12Texture& texture, const MipRange& range)
 	{
+#ifndef NDEBUG
 		if (range.mostDetailedMipIndex + range.mipCount.value_or(1u) > texture.MipCount()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid mip range");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateArrayRange(const D3D12Texture& texture, const ArrayRange& range)
 	{
+#ifndef NDEBUG
 		if (range.firstArrayIndex + range.arrayCount.value_or(1u) > texture.ArraySize()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid array range");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateSampleCount(const D3D12Texture& texture, const bool shouldBeMS)
 	{
+#ifndef NDEBUG
 		if (ToNumber(texture.SampleCount()) > 1u != shouldBeMS) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid sample count");
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateSwapChainParams(const SwapChainParams& params)
 	{
+#ifndef NDEBUG
 		if (params.size)
 		{
 			if (params.size->X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size->Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION) [[unlikely]]
@@ -1338,11 +1395,13 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Invalid usage");
 		}
+#endif
 	}
 
 	template<typename Container>
 	void D3D12Engine::ValidateContainer(const Container& container, const std::uint32_t index)
 	{
+#ifndef NDEBUG
 		if (index >= container.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid container index");
@@ -1351,11 +1410,13 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Container is shader visible: it's allowed to copy into it only");
 		}
+#endif
 	}
 
 	template<typename CommandList, typename CommandListInterface>
 	void D3D12Engine::ValidateCommandLists(const std::span<const CommandListInterface* const> commandLists)
 	{
+#ifndef NDEBUG
 		for (const CommandListInterface* const commandList : commandLists)
 		{
 			if (!commandList || typeid(*commandList) != typeid(CommandList)) [[unlikely]]
@@ -1363,10 +1424,12 @@ namespace PonyEngine::RenderDevice::Windows
 				throw std::invalid_argument("Invalid command list");
 			}
 		}
+#endif
 	}
 
 	void D3D12Engine::ValidateFences(const std::span<const FenceValue> fences)
 	{
+#ifndef NDEBUG
 		for (const FenceValue& fenceValue : fences)
 		{
 			if (!fenceValue.fence || typeid(*fenceValue.fence) != typeid(D3D12Fence))
@@ -1374,5 +1437,6 @@ namespace PonyEngine::RenderDevice::Windows
 				throw std::invalid_argument("Invalid fence");
 			}
 		}
+#endif
 	}
 }

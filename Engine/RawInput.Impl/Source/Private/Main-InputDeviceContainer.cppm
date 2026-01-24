@@ -261,6 +261,7 @@ namespace PonyEngine::RawInput
 					auto featureContainer = DeviceFeatureContainer();
 					for (const FeatureEntry& featureEntry : features)
 					{
+#ifndef NDEBUG
 						if (featureContainer.IndexOf(featureEntry.featureType) < featureContainer.Size())
 						{
 							throw std::invalid_argument(std::format("Feature of type '{}' is added twice", featureEntry.featureType.name()));
@@ -269,6 +270,7 @@ namespace PonyEngine::RawInput
 						{
 							throw std::invalid_argument("Feature is nullptr");
 						}
+#endif
 						featureContainer.Add(featureEntry.featureType, featureEntry.feature);
 					}
 					deviceFeatures.push_back(std::move(featureContainer));

@@ -9,6 +9,20 @@
 
 #pragma once
 
+#ifndef NDEBUG
+#define PONY_ENUM_FORMATTER_ERROR_CHECK \
+	if (context.begin() == context.end()) [[unlikely]] \
+	{ \
+		throw std::format_error("Unexpected context end.");\
+	} \
+	if (*context.begin() != '}') [[unlikely]] \
+	{ \
+		throw std::format_error("Unexpected format specifier."); \
+	}
+#else
+#define PONY_ENUM_FORMATTER_ERROR_CHECK
+#endif
+
 /// @brief Creates a formatter for an enum value.
 /// @note This define must be used in a global namespace.
 /// @param Value Value enum type.
@@ -19,14 +33,7 @@
 	{ \
 		static constexpr auto parse(std::format_parse_context& context) \
 		{ \
-			if (context.begin() == context.end()) [[unlikely]] \
-			{ \
-				throw std::format_error("Unexpected context end.");\
-			} \
-			if (*context.begin() != '}') [[unlikely]] \
-			{ \
-				throw std::format_error("Unexpected format specifier."); \
-			} \
+			PONY_ENUM_FORMATTER_ERROR_CHECK \
 			return context.begin(); \
 		} \
 		static auto format(const Value value, std::format_context& context) \
@@ -47,14 +54,7 @@
 	{ \
 		static constexpr auto parse(std::format_parse_context& context) \
 		{ \
-			if (context.begin() == context.end()) [[unlikely]] \
-			{ \
-				throw std::format_error("Unexpected context end.");\
-			} \
-			if (*context.begin() != '}') [[unlikely]] \
-			{ \
-				throw std::format_error("Unexpected format specifier."); \
-			} \
+			PONY_ENUM_FORMATTER_ERROR_CHECK \
 			return context.begin(); \
 		} \
 		static auto format(const Mask mask, std::format_context& context) \

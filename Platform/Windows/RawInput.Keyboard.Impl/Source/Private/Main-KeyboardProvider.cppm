@@ -158,7 +158,7 @@ namespace PonyEngine::RawInput::Windows
 
 	void KeyboardProvider::Observe(const RAWINPUT& rawInput)
 	{
-#if !NDEBUG
+#ifndef NDEBUG
 		if (rawInput.header.dwType != RIM_TYPEKEYBOARD) [[unlikely]]
 		{
 			throw std::logic_error("Not keyboard input");

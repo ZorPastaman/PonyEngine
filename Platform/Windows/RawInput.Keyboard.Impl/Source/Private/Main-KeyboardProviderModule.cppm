@@ -50,10 +50,12 @@ namespace PonyEngine::RawInput::Windows
 	void KeyboardProviderModule::StartUp(Application::IModuleContext& context)
 	{
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
+#ifndef NDEBUG
 		if (!inputModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Raw input module context not found");
 		}
+#endif
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(KeyboardProvider).name());
 		keyboardProviderHandle = inputModuleContext->AddProvider([&](IRawInputContext& input)
@@ -66,10 +68,12 @@ namespace PonyEngine::RawInput::Windows
 	void KeyboardProviderModule::ShutDown(Application::IModuleContext& context)
 	{
 		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
+#ifndef NDEBUG
 		if (!inputModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Raw input module context not found");
 		}
+#endif
 
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(KeyboardProvider).name());
 		inputModuleContext->RemoveProvider(keyboardProviderHandle);

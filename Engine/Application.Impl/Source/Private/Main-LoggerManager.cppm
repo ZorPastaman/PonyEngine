@@ -94,6 +94,7 @@ namespace PonyEngine::Application
 
 	LoggerHandle LoggerManager::SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory)
 	{
+#ifndef NDEBUG
 		if (!nextHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more logger handles available");
@@ -107,12 +108,15 @@ namespace PonyEngine::Application
 		{
 			throw std::logic_error("External logger has already been set");
 		}
+#endif
 
 		const std::shared_ptr<Log::ILogger> newLogger = factory(*this);
+#ifndef NDEBUG
 		if (!newLogger) [[unlikely]]
 		{
 			throw std::logic_error("Created logger is nullptr");
 		}
+#endif
 
 		externalLogger = newLogger;
 		logger = externalLogger.get();
@@ -126,6 +130,7 @@ namespace PonyEngine::Application
 
 	void LoggerManager::UnsetLogger(const LoggerHandle handle)
 	{
+#ifndef NDEBUG
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Logger can be removed only on start-up or shut-down");
@@ -138,6 +143,7 @@ namespace PonyEngine::Application
 		{
 			throw std::logic_error("Incorrect handle");
 		}
+#endif
 
 		PONY_LOG(*logger, Log::LogType::Info, "External logger unset. Logger: '{}'; Handle: '0x{:X}'.", typeid(*externalLogger).name(), handle.id);
 		logger = defaultLogger.get();

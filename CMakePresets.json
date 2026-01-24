@@ -79,6 +79,22 @@
 			}
 		},
 		{
+			"name": "Optimized",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_GAME_OPTIMIZATION": "Release",
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_GAME_LOG_LEVEL": "Info",
+				"PONY_ENGINE_LOG_LEVEL": "Info",
+				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_CREATE_CONSOLE": true,
+				"PONY_MAKE_GROUPS": false
+			}
+		},
+		{
 			"name": "Release",
 			"inherits": "Base",
 			"hidden": true,
@@ -163,6 +179,11 @@
 			"inherits": [ "Development", "Windows-x64-msvc" ]
 		},
 		{
+			"name": "Windows-x64-msvc-Optimized",
+			"displayName": "Windows x64 MSVC - Optimized",
+			"inherits": [ "Optimized", "Windows-x64-msvc" ]
+		},
+		{
 			"name": "Windows-x64-msvc-Release",
 			"displayName": "Windows x64 MSVC - Release",
 			"inherits": [ "Release", "Windows-x64-msvc" ]
@@ -185,6 +206,11 @@
 			"configurePreset": "Windows-x64-msvc-Development"
 		},
 		{
+			"name": "Windows-x64-msvc-Optimized",
+			"displayName": "Windows x64 MSVC - Optimized",
+			"configurePreset": "Windows-x64-msvc-Optimized"
+		},
+		{
 			"name": "Windows-x64-msvc-Release",
 			"displayName": "Windows x64 MSVC - Release",
 			"configurePreset": "Windows-x64-msvc-Release"
@@ -205,6 +231,11 @@
 			"name": "Windows-x64-msvc-Development",
 			"displayName": "Windows x64 MSVC - Development",
 			"configurePreset": "Windows-x64-msvc-Development"
+		},
+		{
+			"name": "Windows-x64-msvc-Optimized",
+			"displayName": "Windows x64 MSVC - Optimized",
+			"configurePreset": "Windows-x64-msvc-Optimized"
 		},
 		{
 			"name": "Windows-x64-msvc-Release",
