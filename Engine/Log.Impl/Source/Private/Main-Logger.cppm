@@ -192,6 +192,7 @@ namespace PonyEngine::Log
 
 	SubLoggerHandle Logger::AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory)
 	{
+#ifndef NDEBUG
 		if (!nextSubLoggerHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more sub-logger handles available");
@@ -200,8 +201,10 @@ namespace PonyEngine::Log
 		{
 			throw std::logic_error("Sub-logger can be added only on start-up");
 		}
+#endif
 
 		const std::shared_ptr<ISubLogger> subLogger = factory(*this);
+#ifndef NDEBUG
 		if (!subLogger) [[unlikely]]
 		{
 			throw std::invalid_argument("Sub-logger is nullptr");
@@ -210,6 +213,7 @@ namespace PonyEngine::Log
 		{
 			throw std::invalid_argument("Sub-logger has already been added");
 		}
+#endif
 
 		const SubLoggerHandle currentHandle = nextSubLoggerHandle;
 		subLoggerContainer.Add(currentHandle, subLogger);
@@ -222,10 +226,12 @@ namespace PonyEngine::Log
 
 	void Logger::RemoveSubLogger(const SubLoggerHandle handle)
 	{
+#ifndef NDEBUG
 		if (loggerContext->Application().FlowState() != Application::FlowState::StartingUp && loggerContext->Application().FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Sub-logger can be removed only on start-up or shut-down");
 		}
+#endif
 
 		if (const std::size_t index = subLoggerContainer.IndexOf(handle); index < subLoggerContainer.Size()) [[likely]]
 		{

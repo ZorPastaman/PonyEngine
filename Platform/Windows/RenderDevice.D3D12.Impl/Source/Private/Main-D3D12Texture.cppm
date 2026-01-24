@@ -237,6 +237,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 	UINT D3D12Texture::CalculateSubresourceIndex(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const Aspect aspect) const
 	{
+#ifndef NDEBUG
 		if (mipIndex >= mipCount) [[unlikely]]
 		{
 			throw std::out_of_range("Mip index is out of range");
@@ -249,6 +250,7 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			throw std::invalid_argument("Invalid aspect");
 		}
+#endif
 
 		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), static_cast<UINT8>(ToPlaneIndex(aspect)),
 			static_cast<UINT16>(mipCount), static_cast<UINT16>(ArraySize()));

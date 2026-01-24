@@ -418,10 +418,12 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::RectStyle(const Surface::RectStyle& rectStyle)
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
 		}
+#endif
 
 		const Style originalStyle = GetStyle();
 		const Style style = ConvertToWindowsStyle(rectStyle);
@@ -454,35 +456,44 @@ namespace PonyEngine::Surface::Windows
 
 	Math::CornerRect<std::int32_t> SurfaceService::ClientRect() const
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
 		}
+#endif
 
 		return static_cast<Math::CornerRect<std::int32_t>>(GetClientRect());
 	}
 
 	void SurfaceService::ClientRect(const Math::CornerRect<std::int32_t>& clientRect)
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
 		}
+#endif
 
 		std::visit(Type::Overload
 		{
 			[](const FullscreenRectStyle&)
 			{
+#ifndef NDEBUG
 				throw std::logic_error("Rect is fullscreen");
+#endif
 			},
 			[&](const WindowRectStyle& s)
 			{
+#ifndef NDEBUG
 				if (clientRect.Size().X() < minimalClientSize.X() || clientRect.Size().Y() < minimalClientSize.Y()) [[unlikely]]
 				{
 					throw std::invalid_argument("Size is less than minimal size");
 				}
+#endif
 
 				const Math::CornerRect<int> currentRect = GetClientRect();
+#ifndef NDEBUG
 				if (!s.movable && currentRect.Position() != clientRect.Position()) [[unlikely]]
 				{
 					throw std::invalid_argument("Can't move unmovable window");
@@ -491,6 +502,7 @@ namespace PonyEngine::Surface::Windows
 				{
 					throw std::invalid_argument("Can't resize non-resizable window");
 				}
+#endif
 
 				const Math::CornerRect<int> adjustedRect = AdjustRect(static_cast<Math::CornerRect<int>>(clientRect), GetStyle());
 				SetWindowRect(adjustedRect);
@@ -505,6 +517,7 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::MinimalSize(const Math::Vector2<std::int32_t>& minimalSize)
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -513,9 +526,11 @@ namespace PonyEngine::Surface::Windows
 		{
 			throw std::invalid_argument("Minimal size must be at least one pixel");
 		}
+#endif
 
 		const auto minSize = static_cast<Math::Vector2<int>>(minimalSize);
 
+#ifndef NDEBUG
 		if (std::holds_alternative<WindowRectStyle>(rectStyle))
 		{
 			const Math::CornerRect<int> clientRect = GetClientRect();
@@ -524,6 +539,7 @@ namespace PonyEngine::Surface::Windows
 				throw std::invalid_argument("Minimal size is bigger than current client rect");
 			}
 		}
+#endif
 
 		minimalClientSize = minSize;
 	}
@@ -545,10 +561,12 @@ namespace PonyEngine::Surface::Windows
 
 	std::string_view SurfaceService::Title() const
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
 		}
+#endif
 
 		SetLastError(DWORD{0});
 		const int length = GetWindowTextLengthA(windowHandle);
@@ -574,10 +592,12 @@ namespace PonyEngine::Surface::Windows
 
 	void SurfaceService::Title(const std::string_view title)
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
 		}
+#endif
 
 		if (!SetWindowTextA(windowHandle, title.data())) [[unlikely]]
 		{
@@ -640,10 +660,12 @@ namespace PonyEngine::Surface::Windows
 
 	Math::Vector2<std::int32_t> SurfaceService::ClientToScreen(const Math::Vector2<std::int32_t>& clientPoint) const
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
 		}
+#endif
 
 		auto screenPoint = POINT{.x = static_cast<LONG>(clientPoint.X()), .y = static_cast<LONG>(clientPoint.Y())};
 		if (!::ClientToScreen(windowHandle, &screenPoint)) [[unlikely]]
@@ -656,10 +678,12 @@ namespace PonyEngine::Surface::Windows
 
 	Math::Vector2<std::int32_t> SurfaceService::ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const
 	{
+#ifndef NDEBUG
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
 		}
+#endif
 
 		auto clientPoint = POINT{.x = static_cast<LONG>(screenPoint.X()), .y = static_cast<LONG>(screenPoint.Y())};
 		if (!::ScreenToClient(windowHandle, &clientPoint)) [[unlikely]]

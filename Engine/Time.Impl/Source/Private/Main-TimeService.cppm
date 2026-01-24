@@ -79,15 +79,15 @@ export namespace PonyEngine::Time
 
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds DeltaTimeCap() const noexcept override;
-		virtual void DeltaTimeCap(std::chrono::nanoseconds cap) override;
+		virtual void DeltaTimeCap(std::chrono::nanoseconds cap) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual double TimeScale() const noexcept override;
-		virtual void TimeScale(double scale) override;
+		virtual void TimeScale(double scale) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds FramePeriod() const noexcept override;
-		virtual void FramePeriod(std::chrono::nanoseconds period) override;
+		virtual void FramePeriod(std::chrono::nanoseconds period) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds TargetFrameTime() const noexcept override;
@@ -264,14 +264,9 @@ namespace PonyEngine::Time
 		return deltaTimeCap;
 	}
 
-	void TimeService::DeltaTimeCap(const std::chrono::nanoseconds cap)
+	void TimeService::DeltaTimeCap(const std::chrono::nanoseconds cap) noexcept
 	{
-		if (cap <= std::chrono::nanoseconds(0)) [[unlikely]]
-		{
-			throw std::invalid_argument("Delta time cap must be greater than zero");
-		}
-
-		deltaTimeCap = cap;
+		deltaTimeCap = std::max(cap, std::chrono::nanoseconds(1));
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Delta time cap changed to '{}'.", deltaTimeCap);
 	}
 
@@ -280,14 +275,9 @@ namespace PonyEngine::Time
 		return timeScale;
 	}
 
-	void TimeService::TimeScale(const double scale)
+	void TimeService::TimeScale(const double scale) noexcept
 	{
-		if (scale < 0.) [[unlikely]]
-		{
-			throw std::invalid_argument("Time scale must be greater or equal zero");
-		}
-
-		timeScale = scale;
+		timeScale = std::max(scale, 0.);
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Time scale changed to '{}'.", timeScale);
 	}
 
@@ -296,14 +286,9 @@ namespace PonyEngine::Time
 		return framePeriod;
 	}
 
-	void TimeService::FramePeriod(const std::chrono::nanoseconds period)
+	void TimeService::FramePeriod(const std::chrono::nanoseconds period) noexcept
 	{
-		if (period <= std::chrono::nanoseconds(0)) [[unlikely]]
-		{
-			throw std::invalid_argument("Frame period must be greater than zero");
-		}
-
-		framePeriod = period;
+		framePeriod = std::max(period, std::chrono::nanoseconds(1));
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Frame period changed to '{}'.", framePeriod);
 	}
 

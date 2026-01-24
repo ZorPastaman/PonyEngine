@@ -124,9 +124,11 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void D3D12Buffer::ValidateRange(const std::uint64_t offset, const std::uint64_t length) const
 	{
+#ifndef NDEBUG
 		if (offset + length > size) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
 		}
+#endif
 	}
 }

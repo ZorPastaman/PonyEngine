@@ -89,7 +89,7 @@ export namespace PonyEngine::Time
 		/// @brief Sets the delta time cap.
 		/// @details It affects a virtual time only. Its delta can't exceed this value.
 		/// @param cap Delta time cap to set.
-		virtual void DeltaTimeCap(std::chrono::nanoseconds cap) = 0;
+		virtual void DeltaTimeCap(std::chrono::nanoseconds cap) noexcept = 0;
 
 		/// @brief Gets the timescale.
 		/// @details It affects a virtual time only. Its delta can't exceed this value.
@@ -99,7 +99,7 @@ export namespace PonyEngine::Time
 		/// @brief Sets the timescale.
 		/// @details It affects a virtual time only. Its delta can't exceed this value.
 		/// @param scale Timescale to set.
-		virtual void TimeScale(double scale) = 0;
+		virtual void TimeScale(double scale) noexcept = 0;
 
 		/// @brief Gets the frame period.
 		/// @details Every such period elapsed increments a delta frame.
@@ -109,7 +109,7 @@ export namespace PonyEngine::Time
 		/// @brief Sets the frame period.
 		/// @details Every such period elapsed increments a delta frame.
 		/// @param period Frame period to set.
-		virtual void FramePeriod(std::chrono::nanoseconds period) = 0;
+		virtual void FramePeriod(std::chrono::nanoseconds period) noexcept = 0;
 
 		/// @brief Gets the target frame time.
 		/// @return Target frame time. 0 or less means no target frame time (it's not restricted).

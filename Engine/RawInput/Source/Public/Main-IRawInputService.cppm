@@ -183,10 +183,12 @@ namespace PonyEngine::RawInput
 	T& IRawInputService::GetFeature(const DeviceHandle deviceHandle)
 	{
 		T* const feature = FindFeature<T>(deviceHandle);
+#ifndef NDEBUG
 		if (!feature) [[unlikely]]
 		{
 			throw std::logic_error("Feature not found");
 		}
+#endif
 
 		return *feature;
 	}
@@ -195,10 +197,12 @@ namespace PonyEngine::RawInput
 	const T& IRawInputService::GetFeature(const DeviceHandle deviceHandle) const
 	{
 		const T* const feature = FindFeature<T>(deviceHandle);
+#ifndef NDEBUG
 		if (!feature) [[unlikely]]
 		{
 			throw std::logic_error("Feature not found");
 		}
+#endif
 
 		return *feature;
 	}

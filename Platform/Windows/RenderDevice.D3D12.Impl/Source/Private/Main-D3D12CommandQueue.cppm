@@ -79,10 +79,12 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12CommandQueue::Execute(const std::span<ID3D12CommandList* const> commandLists,
 		const std::span<const std::pair<ID3D12Fence*, UINT64>> beforeFences, const std::span<const std::pair<ID3D12Fence*, UINT64>> afterFences)
 	{
+#ifndef NDEBUG
 		if (commandLists.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Command lists span is too large");
 		}
+#endif
 
 		for (const auto [fence, fenceValue] : beforeFences)
 		{

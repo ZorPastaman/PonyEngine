@@ -190,7 +190,7 @@ namespace PonyEngine::RawInput::Windows
 
 	void MouseProvider::Observe(const RAWINPUT& rawInput)
 	{
-#if !NDEBUG
+#ifndef NDEBUG
 		if (rawInput.header.dwType != RIM_TYPEMOUSE) [[unlikely]]
 		{
 			throw std::logic_error("Not mouse input");

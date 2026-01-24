@@ -50,10 +50,12 @@ namespace PonyEngine::Log
 	void FileSubLoggerModule::StartUp(Application::IModuleContext& context)
 	{
 		ILoggerModuleContext* const loggerModuleContext = context.GetData<ILoggerModuleContext>();
+#ifndef NDEBUG
 		if (!loggerModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Logger module context not found");
 		}
+#endif
 
 		PONY_LOG(context.Logger(), LogType::Info, "Constructing '{}'...", typeid(FileSubLogger).name());
 		fileSubLoggerHandle = loggerModuleContext->AddSubLogger([&](ILoggerContext& loggerContext)
@@ -79,10 +81,12 @@ namespace PonyEngine::Log
 	void FileSubLoggerModule::ShutDown(Application::IModuleContext& context)
 	{
 		ILoggerModuleContext* const loggerModuleContext = context.GetData<ILoggerModuleContext>();
+#ifndef NDEBUG
 		if (!loggerModuleContext) [[unlikely]]
 		{
 			throw std::logic_error("Logger module context not found");
 		}
+#endif
 
 		PONY_LOG(context.Logger(), LogType::Info, "Releasing '{}'...", typeid(FileSubLogger).name());
 		loggerModuleContext->RemoveSubLogger(fileSubLoggerHandle);

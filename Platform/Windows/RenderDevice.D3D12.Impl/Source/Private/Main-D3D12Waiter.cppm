@@ -72,10 +72,12 @@ namespace PonyEngine::RenderDevice::Windows
 
 		for (const FenceValue& fenceValue : fenceValues)
 		{
+#ifndef NDEBUG
 			if (!fenceValue.fence || typeid(*fenceValue.fence) != typeid(D3D12Fence)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid fence");
 			}
+#endif
 
 			if (const auto fence = static_cast<const D3D12Fence*>(fenceValue.fence); fence->CompletedValue() < fenceValue.value)
 			{
