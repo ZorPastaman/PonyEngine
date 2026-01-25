@@ -65,15 +65,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DArraySRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DArraySRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSArraySRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture3DSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) override;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) override;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) override;
 
@@ -216,47 +208,7 @@ namespace PonyEngine::RenderDevice::Windows
 		engine->CreateView(buffer, container, index, params);
 	}
 
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture1DSRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture1DArraySRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DSRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DArraySRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DMSSRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DMSArraySRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture3DSRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureCubeSRVParams& params)
-	{
-		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureCubeArraySRVParams& params)
+	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
 	{
 		engine->CreateView(texture, container, index, params);
 	}

@@ -61,15 +61,7 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) = 0;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) = 0;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DSRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DArraySRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DSRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DArraySRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSSRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSArraySRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture3DSRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) = 0;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) = 0;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) = 0;
 

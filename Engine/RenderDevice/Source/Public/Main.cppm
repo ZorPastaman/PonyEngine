@@ -59,5 +59,6 @@ export import :TextureParams;
 export import :TextureSupportRequest;
 export import :TextureSupportResponse;
 export import :TextureUsage;
+export import :TextureViewDimension;
 export import :Utility;
 export import :ViewContainerCopyRange;

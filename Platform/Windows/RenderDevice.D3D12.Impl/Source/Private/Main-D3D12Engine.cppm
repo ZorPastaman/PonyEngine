@@ -92,15 +92,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params);
 		void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params);
 		void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DSRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture1DArraySRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DSRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DArraySRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSSRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture2DMSArraySRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const Texture3DSRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params);
-		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params);
+		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params);
 		void EraseView(IShaderDataContainer& container, std::uint32_t index);
 		void CopyViews(std::span<const ShaderDataCopyRange> ranges);
 
@@ -161,7 +153,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetFormat(TextureFormatId format) const;
 		[[nodiscard("Pure function")]]
-		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, Aspect aspect);
+		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, Aspect aspect) noexcept;
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetViewFormat(TextureFormatId format, Aspect aspect) const;
 
@@ -201,16 +193,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateCBVParams(const D3D12Buffer& buffer, const CBVParams& params);
 		static void ValidateSRVParams(const D3D12Buffer& buffer, const BufferSRVParams& params);
 		static void ValidateSRVParams(const D3D12Texture& texture, const TextureSRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const Texture1DSRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const Texture1DArraySRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const Texture2DSRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const Texture2DArraySRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const Texture2DMSSRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const Texture2DMSArraySRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const Texture3DSRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const TextureCubeSRVParams& params);
-		static void ValidateSRVParams(const D3D12Texture& texture, const TextureCubeArraySRVParams& params);
-		static void ValidateDimension(const D3D12Texture& texture, TextureDimension dimension);
+		static void ValidateViewFormat(const D3D12Texture& texture, TextureFormatId viewFormat);
+		static void ValidateDimension(const D3D12Texture& texture, TextureViewDimension dimension);
+		static void ValidateLayout(const D3D12Texture& texture, const TextureSRVLayout& layout, TextureViewDimension dimension);
 		static void ValidateMipRange(const D3D12Texture& texture, const MipRange& range);
 		static void ValidateArrayRange(const D3D12Texture& texture, const ArrayRange& range);
 		static void ValidateSampleCount(const D3D12Texture& texture, bool shouldBeMS);
@@ -438,7 +423,7 @@ namespace PonyEngine::RenderDevice::Windows
 		const D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = ToCBVDesc(address, params);
 		device.CreateCBV(cbvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
 
-		nativeContainer.Set(index, BufferCBVMeta{.resource = &nativeBuffer, .params = params});
+		nativeContainer.Set(index, CBVMeta{.resource = &nativeBuffer, .params = params});
 	}
 
 	void D3D12Engine::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
@@ -455,22 +440,7 @@ namespace PonyEngine::RenderDevice::Windows
 		nativeContainer.Set(index, BufferSRVMeta{.resource = &nativeBuffer, .params = params});
 	}
 
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture1DSRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, nativeTexture.MipCount());
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, Texture1DSRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture1DArraySRVParams& params)
+	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
 	{
 		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
 		ValidateSRVParams(nativeTexture, params);
@@ -482,112 +452,7 @@ namespace PonyEngine::RenderDevice::Windows
 		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, nativeTexture.MipCount(), nativeTexture.ArraySize());
 		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
 
-		nativeContainer.Set(index, Texture1DArraySRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DSRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, nativeTexture.MipCount());
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, Texture2DSRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DArraySRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, nativeTexture.MipCount(), nativeTexture.ArraySize());
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, Texture2DArraySRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DMSSRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat);
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, Texture2DMSSRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture2DMSArraySRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, texture.ArraySize());
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, Texture2DMSArraySRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const Texture3DSRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, nativeTexture.MipCount());
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, Texture3DSRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureCubeSRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, nativeTexture.MipCount());
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, TextureCubeSRVMeta{.resource = &nativeTexture, .params = params});
-	}
-
-	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureCubeArraySRVParams& params)
-	{
-		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
-		ValidateSRVParams(nativeTexture, params);
-
-		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
-
-		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, nativeTexture.MipCount(), nativeTexture.ArraySize());
-		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
-
-		nativeContainer.Set(index, TextureCubeArraySRVMeta{.resource = &nativeTexture, .params = params});
+		nativeContainer.Set(index, TextureSRVMeta{.resource = &nativeTexture, .params = params});
 	}
 
 	void D3D12Engine::EraseView(IShaderDataContainer& container, const std::uint32_t index)
@@ -922,35 +787,20 @@ namespace PonyEngine::RenderDevice::Windows
 		return textureFormatMap.DXGIFormat(formatIndex);
 	}
 
-	DXGI_FORMAT D3D12Engine::GetViewFormat(const DXGI_FORMAT format, const Aspect aspect)
+	DXGI_FORMAT D3D12Engine::GetViewFormat(const DXGI_FORMAT format, const Aspect aspect) noexcept
 	{
-		DXGI_FORMAT viewFormat = DXGI_FORMAT_UNKNOWN;
-
 		switch (aspect)
 		{
 		case Aspect::Color:
-			viewFormat = IsDepthStencilFormat(format) ? DXGI_FORMAT_UNKNOWN : format;
-			break;
+			return format;
 		case Aspect::Depth:
-			viewFormat = GetDepthViewFormat(format);
-			break;
+			return GetDepthViewFormat(format);
 		case Aspect::Stencil:
-			viewFormat = GetStencilViewFormat(format);
-			break;
+			return GetStencilViewFormat(format);
 		default: [[unlikely]]
 			assert(false && "Invalid aspect.");
-			viewFormat = DXGI_FORMAT_UNKNOWN;
-			break;
+			return DXGI_FORMAT_UNKNOWN;
 		}
-
-#ifndef NDEBUG
-		if (viewFormat == DXGI_FORMAT_UNKNOWN) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
-		}
-#endif
-
-		return viewFormat;
 	}
 
 	DXGI_FORMAT D3D12Engine::GetViewFormat(const TextureFormatId format, const Aspect aspect) const
@@ -1229,7 +1079,8 @@ namespace PonyEngine::RenderDevice::Windows
 			}
 			break;
 		default: [[unlikely]]
-			throw std::invalid_argument("Invalid aspect");
+			assert(false && "Invalid aspect.");
+			break;
 		}
 #endif
 	}
@@ -1278,101 +1129,114 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const TextureSRVParams& params)
 	{
-#ifndef NDEBUG
-		if (texture.Format() != params.format && std::ranges::find(texture.CastableFormats(), params.format) == texture.CastableFormats().cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid format");
-		}
+		ValidateViewFormat(texture, params.format);
+		ValidateDimension(texture, params.dimension);
+		ValidateAspect(params.aspect, texture.NativeFormat());
+		ValidateLayout(texture, params.layout, params.dimension);
 
+#ifndef NDEBUG
 		if (None(TextureUsage::ShaderResource, texture.Usage())) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture usage");
 		}
 #endif
-
-		ValidateAspect(params.aspect, texture.NativeFormat());
 	}
 
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture1DSRVParams& params)
+	void D3D12Engine::ValidateViewFormat(const D3D12Texture& texture, const TextureFormatId viewFormat)
 	{
-		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
-		ValidateDimension(texture, TextureDimension::Texture1D);
-		ValidateMipRange(texture, params.mipRange);
-		ValidateSampleCount(texture, false);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture1DArraySRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const Texture1DSRVParams&>(params));
-		ValidateArrayRange(texture, params.arrayRange);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture2DSRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
-		ValidateDimension(texture, TextureDimension::Texture2D);
-		ValidateMipRange(texture, params.mipRange);
-		ValidateSampleCount(texture, false);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture2DArraySRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const Texture2DSRVParams&>(params));
-		ValidateArrayRange(texture, params.arrayRange);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture2DMSSRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
-		ValidateDimension(texture, TextureDimension::Texture2D);
-		ValidateSampleCount(texture, true);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture2DMSArraySRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const Texture2DMSSRVParams&>(params));
-		ValidateArrayRange(texture, params.arrayRange);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const Texture3DSRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
-		ValidateDimension(texture, TextureDimension::Texture3D);
-		ValidateMipRange(texture, params.mipRange);
-		ValidateSampleCount(texture, false);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const TextureCubeSRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const TextureSRVParams&>(params));
-		ValidateDimension(texture, TextureDimension::Texture2D);
-		ValidateMipRange(texture, params.mipRange);
-		ValidateArrayRange(texture, ArrayRange{.firstArrayIndex = 0u, .arrayCount = 6u});
-		ValidateSampleCount(texture, false);
-	}
-
-	void D3D12Engine::ValidateSRVParams(const D3D12Texture& texture, const TextureCubeArraySRVParams& params)
-	{
-		ValidateSRVParams(texture, static_cast<const TextureCubeSRVParams&>(params));
-		const auto arrayRange = ArrayRange{.firstArrayIndex = params.arrayRange.firstArrayIndex, .arrayCount = params.arrayRange.arrayCount.value_or(texture.ArraySize() - params.arrayRange.firstArrayIndex)};
-		ValidateArrayRange(texture, arrayRange);
-
 #ifndef NDEBUG
-		if (arrayRange.arrayCount.value() % 6) [[unlikely]]
+		if (texture.Format() != viewFormat && std::ranges::find(texture.CastableFormats(), viewFormat) == texture.CastableFormats().cend()) [[unlikely]]
 		{
-			throw std::invalid_argument("Invalid array range");
+			throw std::invalid_argument("Invalid format");
 		}
 #endif
 	}
 
-	void D3D12Engine::ValidateDimension(const D3D12Texture& texture, const TextureDimension dimension)
+	void D3D12Engine::ValidateDimension(const D3D12Texture& texture, const TextureViewDimension dimension)
 	{
 #ifndef NDEBUG
-		if (texture.Dimension() != dimension) [[unlikely]]
+		switch (dimension)
 		{
-			throw std::invalid_argument("Invalid dimension");
+		case TextureViewDimension::Texture1D:
+			if (texture.Dimension() != TextureDimension::Texture1D) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid dimension");
+			}
+			break;
+		case TextureViewDimension::Texture2D:
+		case TextureViewDimension::TextureCube:
+			if (texture.Dimension() != TextureDimension::Texture2D) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid dimension");
+			}
+			break;
+		case TextureViewDimension::Texture3D:
+			if (texture.Dimension() != TextureDimension::Texture3D) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid dimension");
+			}
+			break;
+		default: [[unlikely]]
+			assert(false && "Invalid dimension");
+			break;
 		}
 #endif
+	}
+
+	void D3D12Engine::ValidateLayout(const D3D12Texture& texture, const TextureSRVLayout& layout, const TextureViewDimension dimension)
+	{
+		std::visit(Type::Overload
+		{
+			[&](const TextureSingleSRVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, l.mipRange);
+				if (dimension == TextureViewDimension::TextureCube) [[unlikely]]
+				{
+					ValidateArrayRange(texture, ArrayRange{.firstArrayIndex = 0u, .arrayCount = 6u});
+				}
+			},
+			[&](const TextureArraySRVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, l.mipRange);
+				if (dimension == TextureViewDimension::TextureCube)
+				{
+					if (l.arrayRange.arrayCount)
+					{
+						if (*l.arrayRange.arrayCount % 6) [[unlikely]]
+						{
+							throw std::invalid_argument("Invalid array range");
+						}
+					}
+					else
+					{
+						if ((texture.ArraySize() - l.arrayRange.firstArrayIndex) % 6) [[unlikely]]
+						{
+							throw std::invalid_argument("Invalid array range");
+						}
+					}
+				}
+				ValidateArrayRange(texture, l.arrayRange);
+			},
+			[&](const TextureMSSRVLayout)
+			{
+				ValidateSampleCount(texture, true);
+				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid dimension");
+				}
+			},
+			[&](const TextureMSArraySRVLayout& l)
+			{
+				ValidateSampleCount(texture, true);
+				ValidateArrayRange(texture, l.arrayRange);
+				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid dimension");
+				}
+			}
+		}, layout);
 	}
 
 	void D3D12Engine::ValidateMipRange(const D3D12Texture& texture, const MipRange& range)
@@ -1478,7 +1342,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 		if (container.IsShaderVisible()) [[unlikely]]
 		{
-			throw std::invalid_argument("Container is shader visible: it's allowed to copy into it only");
+			throw std::invalid_argument("Container is shader visible");
 		}
 #endif
 	}
