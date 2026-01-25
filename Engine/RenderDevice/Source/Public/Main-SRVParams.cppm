@@ -15,6 +15,7 @@ import :Aspect;
 import :ComponentMapping;
 import :SubTextureRange;
 import :TextureFormatId;
+import :TextureViewDimension;
 
 export namespace PonyEngine::RenderDevice
 {
@@ -26,54 +27,30 @@ export namespace PonyEngine::RenderDevice
 		bool raw = false;
 	};
 
-	struct TextureSRVParams
+	struct TextureSingleSRVLayout final
+	{
+		MipRange mipRange;
+	};
+	struct TextureArraySRVLayout final
+	{
+		MipRange mipRange;
+		ArrayRange arrayRange;
+	};
+	struct TextureMSSRVLayout final
+	{
+	};
+	struct TextureMSArraySRVLayout final
+	{
+		ArrayRange arrayRange;
+	};
+	using TextureSRVLayout = std::variant<TextureSingleSRVLayout, TextureArraySRVLayout, TextureMSSRVLayout, TextureMSArraySRVLayout>;
+
+	struct TextureSRVParams final
 	{
 		TextureFormatId format;
+		TextureViewDimension dimension;
 		Aspect aspect;
 		ComponentMapping mapping;
-	};
-
-	struct Texture1DSRVParams : TextureSRVParams
-	{
-		MipRange mipRange;
-	};
-
-	struct Texture1DArraySRVParams final : Texture1DSRVParams
-	{
-		ArrayRange arrayRange;
-	};
-
-	struct Texture2DSRVParams : TextureSRVParams
-	{
-		MipRange mipRange;
-	};
-
-	struct Texture2DArraySRVParams final : Texture2DSRVParams
-	{
-		ArrayRange arrayRange;
-	};
-
-	struct Texture2DMSSRVParams : TextureSRVParams
-	{
-	};
-
-	struct Texture2DMSArraySRVParams final : Texture2DMSSRVParams
-	{
-		ArrayRange arrayRange;
-	};
-
-	struct Texture3DSRVParams final : TextureSRVParams
-	{
-		MipRange mipRange;
-	};
-
-	struct TextureCubeSRVParams : TextureSRVParams
-	{
-		MipRange mipRange;
-	};
-
-	struct TextureCubeArraySRVParams final : TextureCubeSRVParams
-	{
-		ArrayRange arrayRange;
+		TextureSRVLayout layout;
 	};
 }
