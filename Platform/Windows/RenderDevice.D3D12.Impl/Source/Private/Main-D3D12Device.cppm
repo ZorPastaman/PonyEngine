@@ -65,6 +65,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		Platform::Windows::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc);
 		void CreateCBV(const D3D12_CONSTANT_BUFFER_VIEW_DESC& cbvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
 		void CreateSRV(ID3D12Resource2& resource, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		void CopyDescriptors(UINT rangeCount, const UINT* rangeSizes, 
+			const D3D12_CPU_DESCRIPTOR_HANDLE* sourceHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* destinationHandles,
+			D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept;
 
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
@@ -230,6 +233,15 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Device::CreateSRV(ID3D12Resource2& resource, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc, const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept
 	{
 		device->CreateShaderResourceView(&resource, &srvDesc, handle);
+	}
+
+	void D3D12Device::CopyDescriptors(const UINT rangeCount, const UINT* const rangeSizes,
+		const D3D12_CPU_DESCRIPTOR_HANDLE* const sourceHandles,
+		const D3D12_CPU_DESCRIPTOR_HANDLE* const destinationHandles,
+		const D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept
+	{
+		device->CopyDescriptors(rangeCount, destinationHandles, rangeSizes, 
+			rangeCount, sourceHandles, rangeSizes, descriptorHeapType);
 	}
 
 	Platform::Windows::ComPtr<ID3D12CommandAllocator> D3D12Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)

@@ -60,3 +60,4 @@ export import :TextureSupportRequest;
 export import :TextureSupportResponse;
 export import :TextureUsage;
 export import :Utility;
+export import :ViewContainerCopyRange;

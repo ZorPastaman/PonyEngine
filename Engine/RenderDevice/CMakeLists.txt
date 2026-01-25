@@ -57,6 +57,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-TextureSupportResponse.cppm"
 	"Source/Public/Main-TextureUsage.cppm"
 	"Source/Public/Main-Utility.cppm"
+	"Source/Public/Main-ViewContainerCopyRange.cppm"
 )
 
 message(VERBOSE "Setting properties")
