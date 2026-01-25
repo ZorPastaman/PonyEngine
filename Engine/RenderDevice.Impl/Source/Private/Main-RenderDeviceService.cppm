@@ -94,6 +94,7 @@ export namespace PonyEngine::RenderDevice
 		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params) override;
 		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params) override;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) override;
+		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
@@ -473,6 +474,11 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::EraseView(IShaderDataContainer& container, const std::uint32_t index)
 	{
 		GetCurrentBackend().EraseView(container, index);
+	}
+
+	void RenderDeviceService::CopyViews(const std::span<const ShaderDataCopyRange> ranges)
+	{
+		GetCurrentBackend().CopyViews(ranges);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> RenderDeviceService::CreateGraphicsCommandList()

@@ -102,6 +102,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params);
 		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params);
 		void EraseView(IShaderDataContainer& container, std::uint32_t index);
+		void CopyViews(std::span<const ShaderDataCopyRange> ranges);
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
@@ -217,6 +218,8 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		template<typename Container>
 		static void ValidateContainer(const Container& container, std::uint32_t index);
+		static void ValidateCopyRange(std::span<const ShaderDataCopyRange> ranges);
+
 		template<typename CommandList, typename CommandListInterface>
 		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
 		static void ValidateFences(std::span<const FenceValue> fences);
@@ -592,6 +595,38 @@ namespace PonyEngine::RenderDevice::Windows
 		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
 		nativeContainer.Set(index, EmptyShaderDataMeta{});
+	}
+
+	void D3D12Engine::CopyViews(const std::span<const ShaderDataCopyRange> ranges)
+	{
+		ValidateCopyRange(ranges);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> sources = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
+		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> destinations = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
+		const Memory::Arena::Slice<UINT> rangeSizes = arena.Allocate<UINT>(ranges.size());
+		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> sourcesSpan = arena.Span(sources);
+		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> destinationsSpan = arena.Span(destinations);
+		const std::span<UINT> rangesSizesSpan = arena.Span(rangeSizes);
+
+		for (std::size_t i = 0uz; i < ranges.size(); ++i)
+		{
+			const ShaderDataCopyRange& range = ranges[i];
+			sourcesSpan[i] = static_cast<const D3D12ShaderDataContainer*>(range.source)->CpuHandle(range.sourceOffset);
+			destinationsSpan[i] = static_cast<const D3D12ShaderDataContainer*>(range.destination)->CpuHandle(range.destinationOffset);
+			rangesSizesSpan[i] = static_cast<UINT>(range.count);
+		}
+
+		device.CopyDescriptors(static_cast<UINT>(ranges.size()), rangesSizesSpan.data(), 
+			sourcesSpan.data(), destinationsSpan.data(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+		for (std::size_t i = 0uz; i < ranges.size(); ++i)
+		{
+			const ShaderDataCopyRange& range = ranges[i];
+			const auto source = static_cast<const D3D12ShaderDataContainer*>(range.source);
+			const auto destination = static_cast<D3D12ShaderDataContainer*>(range.destination);
+			std::ranges::copy(&source->Meta(range.sourceOffset), &source->Meta(range.sourceOffset) + range.count, &destination->Meta(range.destinationOffset));
+		}
 	}
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
@@ -1394,6 +1429,41 @@ namespace PonyEngine::RenderDevice::Windows
 		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid usage");
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidateCopyRange(const std::span<const ShaderDataCopyRange> ranges)
+	{
+#ifndef NDEBUG
+		if (ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Range count is too great");
+		}
+		for (const ShaderDataCopyRange& range : ranges)
+		{
+			if (!range.source || typeid(*range.source) != typeid(D3D12ShaderDataContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source");
+			}
+			const D3D12ShaderDataContainer* const source = static_cast<const D3D12ShaderDataContainer*>(range.source);
+			if (source->Size() < range.sourceOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source range");
+			}
+			if (source->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Source is shader visible");
+			}
+
+			if (!range.destination || typeid(*range.destination) != typeid(D3D12ShaderDataContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination");
+			}
+			if (static_cast<const D3D12ShaderDataContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination range");
+			}
 		}
 #endif
 	}

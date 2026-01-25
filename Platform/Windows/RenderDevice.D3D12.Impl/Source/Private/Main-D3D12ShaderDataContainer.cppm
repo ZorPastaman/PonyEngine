@@ -39,6 +39,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]] 
 		virtual bool IsShaderVisible() const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		ShaderDataMeta& Meta(std::uint32_t index) noexcept;
 		[[nodiscard("Pure function")]] 
 		virtual const ShaderDataMeta& Meta(std::uint32_t index) const noexcept override;
 
@@ -94,6 +96,11 @@ namespace PonyEngine::RenderDevice::Windows
 	bool D3D12ShaderDataContainer::IsShaderVisible() const noexcept
 	{
 		return shaderVisible;
+	}
+
+	ShaderDataMeta& D3D12ShaderDataContainer::Meta(const std::uint32_t index) noexcept
+	{
+		return metas[index];
 	}
 
 	const ShaderDataMeta& D3D12ShaderDataContainer::Meta(const std::uint32_t index) const noexcept

@@ -43,6 +43,7 @@ import :TextureFormatSupport;
 import :TextureParams;
 import :TextureSupportRequest;
 import :TextureSupportResponse;
+import :ViewContainerCopyRange;
 
 export namespace PonyEngine::RenderDevice
 {
@@ -105,6 +106,7 @@ export namespace PonyEngine::RenderDevice
 		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeSRVParams& params) = 0;
 		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureCubeArraySRVParams& params) = 0;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) = 0;
+		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;
