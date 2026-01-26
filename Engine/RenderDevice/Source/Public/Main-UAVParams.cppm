@@ -7,19 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:SRVParams;
+export module PonyEngine.RenderDevice:UAVParams;
 
 import std;
 
-import :Aspect;
-import :ComponentMapping;
 import :SubTextureRange;
 import :TextureFormatId;
-import :TextureViewDimension;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct BufferSRVParams final
+	struct BufferUAVParams final
 	{
 		std::uint64_t firstElementIndex = 0ull;
 		std::uint32_t elementCount = 0u;
@@ -27,30 +24,21 @@ export namespace PonyEngine::RenderDevice
 		bool raw = false;
 	};
 
-	struct TextureSingleSRVLayout final
+	struct TextureSingleUAVLayout final
 	{
-		MipRange mipRange;
+		std::uint32_t mipIndex = 0u;
 	};
-	struct TextureArraySRVLayout final
+	struct TextureArrayUAVLayout final
 	{
-		MipRange mipRange;
+		std::uint32_t mipIndex = 0u;
 		ArrayRange arrayRange;
 	};
-	struct TextureMSSRVLayout final
-	{
-	};
-	struct TextureMSArraySRVLayout final
-	{
-		ArrayRange arrayRange;
-	};
-	using TextureSRVLayout = std::variant<TextureSingleSRVLayout, TextureArraySRVLayout, TextureMSSRVLayout, TextureMSArraySRVLayout>;
+	using TextureUAVLayout = std::variant<TextureSingleUAVLayout, TextureArrayUAVLayout>;
 
-	struct TextureSRVParams final
+	struct TextureUAVParams final
 	{
 		TextureFormatId format;
-		TextureViewDimension dimension = TextureViewDimension::Texture2D;
 		Aspect aspect = Aspect::Color;
-		ComponentMapping mapping;
-		TextureSRVLayout layout;
+		TextureUAVLayout layout;
 	};
 }

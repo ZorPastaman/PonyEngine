@@ -85,6 +85,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
 		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) override;
+		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) override;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) override;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) override;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) override;
 
@@ -419,6 +421,16 @@ namespace PonyEngine::RenderDevice
 	}
 
 	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
+	{
+		GetCurrentBackend().CreateView(buffer, container, index, params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
 	{
 		GetCurrentBackend().CreateView(texture, container, index, params);
 	}

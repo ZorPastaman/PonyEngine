@@ -60,5 +60,6 @@ export import :TextureSupportRequest;
 export import :TextureSupportResponse;
 export import :TextureUsage;
 export import :TextureViewDimension;
+export import :UAVParams;
 export import :Utility;
 export import :ViewContainerCopyRange;

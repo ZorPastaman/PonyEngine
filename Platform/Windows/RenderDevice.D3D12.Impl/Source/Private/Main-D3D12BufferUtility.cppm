@@ -33,6 +33,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC ToCBVDesc(D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const BufferSRVParams& params) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const BufferUAVParams& params) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Windows
@@ -93,6 +95,23 @@ namespace PonyEngine::RenderDevice::Windows
 				.NumElements = static_cast<UINT>(params.elementCount),
 				.StructureByteStride = static_cast<UINT>(params.stride),
 				.Flags = params.raw ? D3D12_BUFFER_SRV_FLAG_RAW : D3D12_BUFFER_SRV_FLAG_NONE
+			}
+		};
+	}
+
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const BufferUAVParams& params) noexcept
+	{
+		return D3D12_UNORDERED_ACCESS_VIEW_DESC
+		{
+			.Format = DXGI_FORMAT_UNKNOWN,
+			.ViewDimension = D3D12_UAV_DIMENSION_BUFFER,
+			.Buffer = D3D12_BUFFER_UAV
+			{
+				.FirstElement = static_cast<UINT64>(params.firstElementIndex),
+				.NumElements = static_cast<UINT>(params.elementCount),
+				.StructureByteStride = static_cast<UINT>(params.stride),
+				.CounterOffsetInBytes = 0ull,
+				.Flags = params.raw ? D3D12_BUFFER_UAV_FLAG_RAW : D3D12_BUFFER_UAV_FLAG_NONE
 			}
 		};
 	}

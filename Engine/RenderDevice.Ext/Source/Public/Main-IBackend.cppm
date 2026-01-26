@@ -62,6 +62,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) = 0;
 		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) = 0;
 		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) = 0;
+		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) = 0;
+		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) = 0;
 		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) = 0;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) = 0;
 

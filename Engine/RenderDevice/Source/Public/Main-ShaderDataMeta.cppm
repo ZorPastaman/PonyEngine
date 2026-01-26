@@ -15,6 +15,7 @@ import :CBVParams;
 import :IBuffer;
 import :ITexture;
 import :SRVParams;
+import :UAVParams;
 
 export namespace PonyEngine::RenderDevice
 {
@@ -31,6 +32,8 @@ export namespace PonyEngine::RenderDevice
 	using CBVMeta = ResourceViewMeta<IBuffer, CBVParams>;
 	using BufferSRVMeta = ResourceViewMeta<IBuffer, BufferSRVParams>;
 	using TextureSRVMeta = ResourceViewMeta<ITexture, TextureSRVParams>;
+	using BufferUAVMeta = ResourceViewMeta<IBuffer, BufferUAVParams>;
+	using TextureUAVMeta = ResourceViewMeta<ITexture, TextureUAVParams>;
 
-	using ShaderDataMeta = std::variant<EmptyShaderDataMeta, CBVMeta, BufferSRVMeta, TextureSRVMeta>;
+	using ShaderDataMeta = std::variant<EmptyShaderDataMeta, CBVMeta, BufferSRVMeta, TextureSRVMeta, BufferUAVMeta, TextureUAVMeta>;
 }
