@@ -93,6 +93,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params);
 		void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params);
 		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params);
+		void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params);
+		void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params);
 		void EraseView(IShaderDataContainer& container, std::uint32_t index);
 		void CopyViews(std::span<const ShaderDataCopyRange> ranges);
 
@@ -193,9 +195,13 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateCBVParams(const D3D12Buffer& buffer, const CBVParams& params);
 		static void ValidateSRVParams(const D3D12Buffer& buffer, const BufferSRVParams& params);
 		static void ValidateSRVParams(const D3D12Texture& texture, const TextureSRVParams& params);
+		static void ValidateUAVParams(const D3D12Buffer& buffer, const BufferUAVParams& params);
+		static void ValidateUAVParams(const D3D12Texture& texture, const TextureUAVParams& params);
+		static void ValidateSize(const D3D12Buffer& buffer, std::uint64_t firstElementIndex, std::uint32_t elementCount, std::uint32_t stride);
 		static void ValidateViewFormat(const D3D12Texture& texture, TextureFormatId viewFormat);
 		static void ValidateDimension(const D3D12Texture& texture, TextureViewDimension dimension);
 		static void ValidateLayout(const D3D12Texture& texture, const TextureSRVLayout& layout, TextureViewDimension dimension);
+		static void ValidateLayout(const D3D12Texture& texture, const TextureUAVLayout& layout);
 		static void ValidateMipRange(const D3D12Texture& texture, const MipRange& range);
 		static void ValidateArrayRange(const D3D12Texture& texture, const ArrayRange& range);
 		static void ValidateSampleCount(const D3D12Texture& texture, bool shouldBeMS);
@@ -453,6 +459,35 @@ namespace PonyEngine::RenderDevice::Windows
 		device.CreateSRV(nativeTexture.Resource(), srvDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
 
 		nativeContainer.Set(index, TextureSRVMeta{.resource = &nativeTexture, .params = params});
+	}
+
+	void D3D12Engine::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
+	{
+		const D3D12Buffer& nativeBuffer = ToNativeBuffer(buffer); 
+		ValidateUAVParams(nativeBuffer, params);
+
+		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainer(nativeContainer, index);
+
+		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = ToUAVDesc(params);
+		device.CreateUAV(nativeBuffer.Resource(), uavDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
+
+		nativeContainer.Set(index, BufferUAVMeta{.resource = &nativeBuffer, .params = params});
+	}
+
+	void D3D12Engine::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
+	{
+		const D3D12Texture& nativeTexture = ToNativeTexture(texture);
+		ValidateUAVParams(nativeTexture, params);
+
+		D3D12ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainer(nativeContainer, index);
+
+		const DXGI_FORMAT viewFormat = GetViewFormat(params.format, params.aspect);
+		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = ToUAVDesc(params, viewFormat, nativeTexture.Dimension(), nativeTexture.ArraySize());
+		device.CreateUAV(nativeTexture.Resource(), uavDesc, nativeContainer.CpuHandle(static_cast<UINT>(index)));
+
+		nativeContainer.Set(index, TextureUAVMeta{.resource = &nativeTexture, .params = params});
 	}
 
 	void D3D12Engine::EraseView(IShaderDataContainer& container, const std::uint32_t index)
@@ -1110,16 +1145,9 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void D3D12Engine::ValidateSRVParams(const D3D12Buffer& buffer, const BufferSRVParams& params)
 	{
-#ifndef NDEBUG
-		if (params.stride == 0u) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid stride");
-		}
-		if ((params.firstElementIndex + params.elementCount) * params.stride > buffer.Size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid size");
-		}
+		ValidateSize(buffer, params.firstElementIndex, params.elementCount, params.stride);
 
+#ifndef NDEBUG
 		if (None(BufferUsage::ShaderResource, buffer.Usage())) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid buffer usage");
@@ -1138,6 +1166,46 @@ namespace PonyEngine::RenderDevice::Windows
 		if (None(TextureUsage::ShaderResource, texture.Usage())) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture usage");
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidateUAVParams(const D3D12Buffer& buffer, const BufferUAVParams& params)
+	{
+		ValidateSize(buffer, params.firstElementIndex, params.elementCount, params.stride);
+
+#ifndef NDEBUG
+		if (None(BufferUsage::UnorderedAccess, buffer.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer usage");
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidateUAVParams(const D3D12Texture& texture, const TextureUAVParams& params)
+	{
+		ValidateViewFormat(texture, params.format);
+		ValidateAspect(params.aspect, texture.NativeFormat());
+		ValidateLayout(texture, params.layout);
+
+#ifndef NDEBUG
+		if (None(TextureUsage::UnorderedAccess, texture.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture usage");
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidateSize(const D3D12Buffer& buffer, const std::uint64_t firstElementIndex, const std::uint32_t elementCount, const std::uint32_t stride)
+	{
+#ifndef NDEBUG
+		if (stride == 0u) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid stride");
+		}
+		if ((firstElementIndex + elementCount) * stride > buffer.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid size");
 		}
 #endif
 	}
@@ -1235,6 +1303,24 @@ namespace PonyEngine::RenderDevice::Windows
 				{
 					throw std::invalid_argument("Invalid dimension");
 				}
+			}
+		}, layout);
+	}
+
+	void D3D12Engine::ValidateLayout(const D3D12Texture& texture, const TextureUAVLayout& layout)
+	{
+		std::visit(Type::Overload
+		{
+			[&](const TextureSingleUAVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+			},
+			[&](const TextureArrayUAVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+				ValidateArrayRange(texture, l.arrayRange);
 			}
 		}, layout);
 	}

@@ -65,6 +65,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		Platform::Windows::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc);
 		void CreateCBV(const D3D12_CONSTANT_BUFFER_VIEW_DESC& cbvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
 		void CreateSRV(ID3D12Resource2& resource, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		void CreateUAV(ID3D12Resource2& resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
 		void CopyDescriptors(UINT rangeCount, const UINT* rangeSizes, 
 			const D3D12_CPU_DESCRIPTOR_HANDLE* sourceHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* destinationHandles,
 			D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept;
@@ -233,6 +234,11 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Device::CreateSRV(ID3D12Resource2& resource, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc, const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept
 	{
 		device->CreateShaderResourceView(&resource, &srvDesc, handle);
+	}
+
+	void D3D12Device::CreateUAV(ID3D12Resource2& resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept
+	{
+		device->CreateUnorderedAccessView(&resource, nullptr, &uavDesc, handle);
 	}
 
 	void D3D12Device::CopyDescriptors(const UINT rangeCount, const UINT* const rangeSizes,
