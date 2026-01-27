@@ -24,16 +24,16 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	template<std::derived_from<IResource> Resource, typename Params>
-	struct ResourceViewMeta final
+	struct ShaderDataResourceMeta final
 	{
 		const Resource* resource = nullptr;
 		Params params;
 	};
-	using CBVMeta = ResourceViewMeta<IBuffer, CBVParams>;
-	using BufferSRVMeta = ResourceViewMeta<IBuffer, BufferSRVParams>;
-	using TextureSRVMeta = ResourceViewMeta<ITexture, TextureSRVParams>;
-	using BufferUAVMeta = ResourceViewMeta<IBuffer, BufferUAVParams>;
-	using TextureUAVMeta = ResourceViewMeta<ITexture, TextureUAVParams>;
+	using CBVMeta = ShaderDataResourceMeta<IBuffer, CBVParams>;
+	using BufferSRVMeta = ShaderDataResourceMeta<IBuffer, BufferSRVParams>;
+	using TextureSRVMeta = ShaderDataResourceMeta<ITexture, TextureSRVParams>;
+	using BufferUAVMeta = ShaderDataResourceMeta<IBuffer, BufferUAVParams>;
+	using TextureUAVMeta = ShaderDataResourceMeta<ITexture, TextureUAVParams>;
 
 	using ShaderDataMeta = std::variant<EmptyShaderDataMeta, CBVMeta, BufferSRVMeta, TextureSRVMeta, BufferUAVMeta, TextureUAVMeta>;
 }

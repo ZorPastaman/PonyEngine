@@ -42,6 +42,7 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/Main-D3D12GraphicsCommandList.cppm"
 	"Source/Private/Main-D3D12HeapUtility.cppm"
 	"Source/Private/Main-D3D12ObjectUtility.cppm"
+	"Source/Private/Main-D3D12RenderTargetContainer.cppm"
 	"Source/Private/Main-D3D12Resource.cppm"
 	"Source/Private/Main-D3D12ShaderDataContainer.cppm"
 	"Source/Private/Main-D3D12SwapChain.cppm"

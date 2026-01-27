@@ -28,10 +28,13 @@ import :IComputeCommandList;
 import :ICopyCommandList;
 import :IFence;
 import :IGraphicsCommandList;
+import :IRenderTargetContainer;
 import :IShaderDataContainer;
 import :ITexture;
 import :IWaiter;
 import :QueueSync;
+import :RenderTargetContainerParams;
+import :RTVParams;
 import :ShaderDataContainerParams;
 import :SRVParams;
 import :SubTextureRange;
@@ -95,13 +98,17 @@ export namespace PonyEngine::RenderDevice
 		virtual struct CBVRequirement CBVRequirement() const = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) = 0;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) = 0;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) = 0;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) = 0;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) = 0;
-		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) = 0;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) = 0;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) = 0;
+		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) = 0;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) = 0;
+		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) = 0;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) = 0;
+
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) = 0;
+		virtual void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params) = 0;
+		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;

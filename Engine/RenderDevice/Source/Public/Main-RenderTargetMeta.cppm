@@ -7,26 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:ViewContainerCopyRange;
+export module PonyEngine.RenderDevice:RenderTargetMeta;
 
 import std;
 
-import :IRenderTargetContainer;
-import :IShaderDataContainer;
+import :ITexture;
+import :RTVParams;
 
 export namespace PonyEngine::RenderDevice
 {
-	template<typename T>
-	struct ViewContainerCopyRange final
+	struct EmptyRenderTargetMeta final
 	{
-		const T* source = nullptr;
-		T* destination = nullptr;
-		std::uint32_t sourceOffset;
-		std::uint32_t destinationOffset;
-		std::uint32_t count;
 	};
 
-	using ShaderDataCopyRange = ViewContainerCopyRange<IShaderDataContainer>;
-	using RenderTargetCopyRange = ViewContainerCopyRange<IRenderTargetContainer>;
+	struct RenderTargetTextureMeta final
+	{
+		const ITexture* texture = nullptr;
+		RTVParams params;
+	};
 
+	using RenderTargetMeta = std::variant<EmptyRenderTargetMeta, RenderTargetTextureMeta>;
 }

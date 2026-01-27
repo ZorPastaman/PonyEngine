@@ -63,13 +63,17 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual struct CBVRequirement CBVRequirement() const noexcept override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) override;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) override;
-		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) override;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
+		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) override;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) override;
+		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) override;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) override;
+
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) override;
+		virtual void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params) override;
+		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
@@ -200,37 +204,47 @@ namespace PonyEngine::RenderDevice::Windows
 		return engine->CreateShaderDataContainer(params);
 	}
 
-	void D3D12Backend::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
+	void D3D12Backend::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
 	{
 		engine->CreateView(buffer, container, index, params);
 	}
 
-	void D3D12Backend::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
+	void D3D12Backend::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
 	{
 		engine->CreateView(buffer, container, index, params);
 	}
 
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
+	void D3D12Backend::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
 	{
 		engine->CreateView(texture, container, index, params);
 	}
 
-	void D3D12Backend::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
+	void D3D12Backend::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
 	{
 		engine->CreateView(buffer, container, index, params);
 	}
 
-	void D3D12Backend::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
+	void D3D12Backend::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
 	{
 		engine->CreateView(texture, container, index, params);
-	}
-
-	void D3D12Backend::EraseView(IShaderDataContainer& container, const std::uint32_t index)
-	{
-		engine->EraseView(container, index);
 	}
 
 	void D3D12Backend::CopyViews(const std::span<const ShaderDataCopyRange> ranges)
+	{
+		engine->CopyViews(ranges);
+	}
+
+	std::shared_ptr<IRenderTargetContainer> D3D12Backend::CreateRenderTargetContainer(const RenderTargetContainerParams& params)
+	{
+		return engine->CreateRenderTargetContainer(params);
+	}
+
+	void D3D12Backend::CreateView(const ITexture* const texture, IRenderTargetContainer& container, const std::uint32_t index, const RTVParams& params)
+	{
+		engine->CreateView(texture, container, index, params);
+	}
+
+	void D3D12Backend::CopyViews(const std::span<const RenderTargetCopyRange> ranges)
 	{
 		engine->CopyViews(ranges);
 	}

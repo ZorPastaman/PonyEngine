@@ -82,13 +82,17 @@ export namespace PonyEngine::RenderDevice
 		virtual struct CBVRequirement CBVRequirement() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) override;
-		virtual void CreateView(const IBuffer& buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) override;
-		virtual void CreateView(const ITexture& texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) override;
-		virtual void EraseView(IShaderDataContainer& container, std::uint32_t index) override;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
+		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) override;
+		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) override;
+		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) override;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) override;
+
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) override;
+		virtual void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params) override;
+		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
@@ -410,37 +414,47 @@ namespace PonyEngine::RenderDevice
 		return GetCurrentBackend().CreateShaderDataContainer(params);
 	}
 
-	void RenderDeviceService::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
+	void RenderDeviceService::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
 	{
 		GetCurrentBackend().CreateView(buffer, container, index, params);
 	}
 
-	void RenderDeviceService::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
+	void RenderDeviceService::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
 	{
 		GetCurrentBackend().CreateView(buffer, container, index, params);
 	}
 
-	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
+	void RenderDeviceService::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
 	{
 		GetCurrentBackend().CreateView(texture, container, index, params);
 	}
 
-	void RenderDeviceService::CreateView(const IBuffer& buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
+	void RenderDeviceService::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
 	{
 		GetCurrentBackend().CreateView(buffer, container, index, params);
 	}
 
-	void RenderDeviceService::CreateView(const ITexture& texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
+	void RenderDeviceService::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
 	{
 		GetCurrentBackend().CreateView(texture, container, index, params);
-	}
-
-	void RenderDeviceService::EraseView(IShaderDataContainer& container, const std::uint32_t index)
-	{
-		GetCurrentBackend().EraseView(container, index);
 	}
 
 	void RenderDeviceService::CopyViews(const std::span<const ShaderDataCopyRange> ranges)
+	{
+		GetCurrentBackend().CopyViews(ranges);
+	}
+
+	std::shared_ptr<IRenderTargetContainer> RenderDeviceService::CreateRenderTargetContainer(const RenderTargetContainerParams& params)
+	{
+		return GetCurrentBackend().CreateRenderTargetContainer(params);
+	}
+
+	void RenderDeviceService::CreateView(const ITexture* const texture, IRenderTargetContainer& container, const std::uint32_t index, const RTVParams& params)
+	{
+		GetCurrentBackend().CreateView(texture, container, index, params);
+	}
+
+	void RenderDeviceService::CopyViews(const std::span<const RenderTargetCopyRange> ranges)
 	{
 		GetCurrentBackend().CopyViews(ranges);
 	}
