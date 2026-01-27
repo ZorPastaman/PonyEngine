@@ -30,5 +30,7 @@ export namespace PonyEngine::RenderDevice
 
 		[[nodiscard("Pure function")]]
 		virtual const ShaderDataMeta& Meta(std::uint32_t index) const noexcept = 0;
+
+		virtual void SetName(std::string_view name) = 0;
 	};
 }

@@ -107,12 +107,11 @@ namespace Game
 			.shaderVisible = false
 		});
 		const PonyEngine::RenderDevice::CBVRequirement cbvRequirement = renderDevice->CBVRequirement();
-		renderDevice->CreateView(*buffer, *shaderDataContainer, 1u, PonyEngine::RenderDevice::CBVParams
+		renderDevice->CreateView(buffer.get(), *shaderDataContainer, 1u, PonyEngine::RenderDevice::CBVParams
 		{
 			.offset = cbvRequirement.offsetAlignment,
 			.size = cbvRequirement.sizeAlignment
 		});
-		renderDevice->EraseView(*shaderDataContainer, 1u);
 
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{

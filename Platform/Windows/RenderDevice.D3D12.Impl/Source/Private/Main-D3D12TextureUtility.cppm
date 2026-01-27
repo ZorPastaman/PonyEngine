@@ -61,7 +61,9 @@ export namespace PonyEngine::RenderDevice::Windows
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureSRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount, std::uint32_t resourceArraySize) noexcept;
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, DXGI_FORMAT format, TextureDimension dimension, std::uint32_t resourceArraySize) noexcept;
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_SHADER_COMPONENT_MAPPING ToShaderMapping(ComponentSwizzle swizzle) noexcept;
@@ -420,8 +422,7 @@ namespace PonyEngine::RenderDevice::Windows
 		return viewDesc;
 	}
 
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, const DXGI_FORMAT format, 
-		const TextureDimension dimension, const std::uint32_t resourceArraySize) noexcept
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_UNORDERED_ACCESS_VIEW_DESC
 		{
@@ -432,7 +433,7 @@ namespace PonyEngine::RenderDevice::Windows
 		{
 			[&](const TextureSingleUAVLayout& l) noexcept
 			{
-				switch (dimension)
+				switch (params.dimension)
 				{
 				case TextureDimension::Texture1D:
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1D;
@@ -465,7 +466,7 @@ namespace PonyEngine::RenderDevice::Windows
 			},
 			[&](const TextureArrayUAVLayout& l) noexcept
 			{
-				switch (dimension)
+				switch (params.dimension)
 				{
 				case TextureDimension::Texture1D:
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1DARRAY;
@@ -499,6 +500,106 @@ namespace PonyEngine::RenderDevice::Windows
 					assert(false && "Invalid dimension");
 					break;
 				}
+			}
+		}, params.layout);
+
+		return viewDesc;
+	}
+
+	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceArraySize) noexcept
+	{
+		auto viewDesc = D3D12_RENDER_TARGET_VIEW_DESC
+		{
+			.Format = format
+		};
+		
+		std::visit(Type::Overload
+		{
+			[&](const SingleRTVLayout& l) noexcept
+			{
+				switch (params.dimension)
+				{
+				case TextureDimension::Texture1D:
+					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE1D;
+					viewDesc.Texture1D = D3D12_TEX1D_RTV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex)
+					};
+					break;
+				case TextureDimension::Texture2D:
+					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+					viewDesc.Texture2D = D3D12_TEX2D_RTV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(Aspect::Color))
+					};
+					break;
+				case TextureDimension::Texture3D:
+					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
+					viewDesc.Texture3D = D3D12_TEX3D_RTV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.FirstWSlice = 0u,
+						.WSize = std::numeric_limits<UINT>::max()
+					};
+					break;
+				default: [[unlikely]]
+					assert(false && "Invalid dimension");
+					break;
+				}
+			},
+			[&](const ArrayRTVLayout& l) noexcept
+			{
+				switch (params.dimension)
+				{
+				case TextureDimension::Texture1D:
+					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE1DARRAY;
+					viewDesc.Texture1DArray = D3D12_TEX1D_ARRAY_RTV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
+						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+					};
+					break;
+				case TextureDimension::Texture2D:
+					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
+					viewDesc.Texture2DArray = D3D12_TEX2D_ARRAY_RTV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
+						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
+						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(Aspect::Color))
+					};
+					break;
+				case TextureDimension::Texture3D:
+					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
+					viewDesc.Texture3D = D3D12_TEX3D_RTV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.FirstWSlice = 0u,
+						.WSize = std::numeric_limits<UINT>::max()
+					};
+					break;
+				default: [[unlikely]]
+					assert(false && "Invalid dimension");
+					break;
+				}
+			},
+			[&](const MSRTVLayout) noexcept
+			{
+				viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
+				viewDesc.Texture2DMS = D3D12_TEX2DMS_RTV
+				{
+				};
+			},
+			[&](const MSArrayRTVLayout& l) noexcept
+			{
+				viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY;
+				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_RTV
+				{
+					.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
+					.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+				};
 			}
 		}, params.layout);
 

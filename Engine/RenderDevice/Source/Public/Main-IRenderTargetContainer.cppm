@@ -7,26 +7,28 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:ViewContainerCopyRange;
+module;
+
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.RenderDevice:IRenderTargetContainer;
 
 import std;
 
-import :IRenderTargetContainer;
-import :IShaderDataContainer;
+import :RenderTargetMeta;
 
 export namespace PonyEngine::RenderDevice
 {
-	template<typename T>
-	struct ViewContainerCopyRange final
+	class IRenderTargetContainer
 	{
-		const T* source = nullptr;
-		T* destination = nullptr;
-		std::uint32_t sourceOffset;
-		std::uint32_t destinationOffset;
-		std::uint32_t count;
+		PONY_INTERFACE_BODY(IRenderTargetContainer)
+
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t Size() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual const RenderTargetMeta& Meta(std::uint32_t index) const noexcept = 0;
+
+		virtual void SetName(std::string_view name) = 0;
 	};
-
-	using ShaderDataCopyRange = ViewContainerCopyRange<IShaderDataContainer>;
-	using RenderTargetCopyRange = ViewContainerCopyRange<IRenderTargetContainer>;
-
 }

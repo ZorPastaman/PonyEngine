@@ -44,6 +44,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]] 
 		virtual const ShaderDataMeta& Meta(std::uint32_t index) const noexcept override;
 
+		virtual void SetName(std::string_view name) override;
+
 		[[nodiscard("Pure function")]]
 		ID3D12DescriptorHeap& DescriptorHeap() const noexcept;
 
@@ -106,6 +108,11 @@ namespace PonyEngine::RenderDevice::Windows
 	const ShaderDataMeta& D3D12ShaderDataContainer::Meta(const std::uint32_t index) const noexcept
 	{
 		return metas[index];
+	}
+
+	void D3D12ShaderDataContainer::SetName(const std::string_view name)
+	{
+		descriptorHeap.SetName(name);
 	}
 
 	ID3D12DescriptorHeap& D3D12ShaderDataContainer::DescriptorHeap() const noexcept
