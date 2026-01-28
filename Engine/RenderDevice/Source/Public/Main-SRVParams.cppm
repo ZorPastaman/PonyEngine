@@ -13,7 +13,7 @@ import std;
 
 import :Aspect;
 import :ComponentMapping;
-import :SubTextureRange;
+import :SRVLayout;
 import :TextureFormatId;
 import :TextureViewDimension;
 
@@ -26,24 +26,6 @@ export namespace PonyEngine::RenderDevice
 		std::uint32_t stride = 0u;
 		bool raw = false;
 	};
-
-	struct TextureSingleSRVLayout final
-	{
-		MipRange mipRange;
-	};
-	struct TextureArraySRVLayout final
-	{
-		MipRange mipRange;
-		ArrayRange arrayRange;
-	};
-	struct TextureMSSRVLayout final
-	{
-	};
-	struct TextureMSArraySRVLayout final
-	{
-		ArrayRange arrayRange;
-	};
-	using TextureSRVLayout = std::variant<TextureSingleSRVLayout, TextureArraySRVLayout, TextureMSSRVLayout, TextureMSArraySRVLayout>;
 
 	struct TextureSRVParams final
 	{

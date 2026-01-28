@@ -7,18 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:RTVParams;
+module;
 
-import :RTVLayout;
-import :TextureDimension;
-import :TextureFormatId;
+#include "PonyEngine/Type/Enum.h"
+
+export module PonyEngine.RenderDevice:DSVFlag;
+
+import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct RTVParams final
+	enum class DSVFlag : std::uint8_t
 	{
-		TextureFormatId format;
-		TextureDimension dimension = TextureDimension::Texture2D;
-		RTVLayout layout;
+		None = 0,
+		DepthReadOnly = 1 << 0,
+		StencilReadOnly = 1 << 1,
+		All = (1 << 2) - 1
 	};
+
+	PONY_ENUM_MASK_FEATURES(DSVFlag)
 }

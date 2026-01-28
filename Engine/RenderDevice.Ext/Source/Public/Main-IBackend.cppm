@@ -72,6 +72,11 @@ export namespace PonyEngine::RenderDevice
 		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) = 0;
 
 		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params) = 0;
+		virtual void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params) = 0;
+		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) = 0;
+
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() = 0;

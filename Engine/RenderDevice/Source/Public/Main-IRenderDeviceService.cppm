@@ -22,10 +22,13 @@ import :CBVParams;
 import :CBVRequirement;
 import :CopyableFootprint;
 import :CopyableFootprintSize;
+import :DepthStencilContainerParams;
+import :DSVParams;
 import :HeapType;
 import :IBuffer;
 import :IComputeCommandList;
 import :ICopyCommandList;
+import :IDepthStencilContainer;
 import :IFence;
 import :IGraphicsCommandList;
 import :IRenderTargetContainer;
@@ -109,6 +112,11 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) = 0;
 		virtual void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params) = 0;
 		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) = 0;
+
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params) = 0;
+		virtual void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params) = 0;
+		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;

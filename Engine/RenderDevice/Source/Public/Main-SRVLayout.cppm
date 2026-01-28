@@ -7,30 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:UAVParams;
+export module PonyEngine.RenderDevice:SRVLayout;
 
-import std;
-
-import :Aspect;
-import :TextureDimension;
-import :TextureFormatId;
-import :UAVLayout;
+import :SubTextureRange;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct BufferUAVParams final
+	struct TextureSingleSRVLayout final
 	{
-		std::uint64_t firstElementIndex = 0ull;
-		std::uint32_t elementCount = 0u;
-		std::uint32_t stride = 0u;
-		bool raw = false;
+		MipRange mipRange;
 	};
-
-	struct TextureUAVParams final
+	struct TextureArraySRVLayout final
 	{
-		TextureFormatId format;
-		TextureDimension dimension = TextureDimension::Texture2D;
-		Aspect aspect = Aspect::Color;
-		TextureUAVLayout layout;
+		MipRange mipRange;
+		ArrayRange arrayRange;
 	};
+	struct TextureMSSRVLayout final
+	{
+	};
+	struct TextureMSArraySRVLayout final
+	{
+		ArrayRange arrayRange;
+	};
+	using TextureSRVLayout = std::variant<TextureSingleSRVLayout, TextureArraySRVLayout, TextureMSSRVLayout, TextureMSArraySRVLayout>;
 }
