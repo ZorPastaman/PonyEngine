@@ -33,6 +33,7 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/Main-D3D12CommandQueue.cppm"
 	"Source/Private/Main-D3D12ComputeCommandList.cppm"
 	"Source/Private/Main-D3D12CopyCommandList.cppm"
+	"Source/Private/Main-D3D12DepthStencilContainer.cppm"
 	"Source/Private/Main-D3D12DescriptorHeap.cppm"
 	"Source/Private/Main-D3D12DescriptorHeapUtility.cppm"
 	"Source/Private/Main-D3D12Device.cppm"

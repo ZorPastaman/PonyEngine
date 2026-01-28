@@ -7,30 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:UAVParams;
+export module PonyEngine.RenderDevice:DSVDimension;
 
 import std;
 
-import :Aspect;
-import :TextureDimension;
-import :TextureFormatId;
-import :UAVLayout;
-
 export namespace PonyEngine::RenderDevice
 {
-	struct BufferUAVParams final
+	enum class DSVDimension : std::uint8_t
 	{
-		std::uint64_t firstElementIndex = 0ull;
-		std::uint32_t elementCount = 0u;
-		std::uint32_t stride = 0u;
-		bool raw = false;
-	};
-
-	struct TextureUAVParams final
-	{
-		TextureFormatId format;
-		TextureDimension dimension = TextureDimension::Texture2D;
-		Aspect aspect = Aspect::Color;
-		TextureUAVLayout layout;
+		Texture1D,
+		Texture2D
 	};
 }

@@ -76,6 +76,11 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params) override;
+		virtual void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params) override;
+		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) override;
+
+		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
@@ -245,6 +250,21 @@ namespace PonyEngine::RenderDevice::Windows
 	}
 
 	void D3D12Backend::CopyViews(const std::span<const RenderTargetCopyRange> ranges)
+	{
+		engine->CopyViews(ranges);
+	}
+
+	std::shared_ptr<IDepthStencilContainer> D3D12Backend::CreateDepthStencilContainer(const DepthStencilContainerParams& params)
+	{
+		return engine->CreateDepthStencilContainer(params);
+	}
+
+	void D3D12Backend::CreateView(const ITexture* const texture, IDepthStencilContainer& container, const std::uint32_t index, const DSVParams& params)
+	{
+		engine->CreateView(texture, container, index, params);
+	}
+
+	void D3D12Backend::CopyViews(const std::span<const DepthStencilCopyRange> ranges)
 	{
 		engine->CopyViews(ranges);
 	}

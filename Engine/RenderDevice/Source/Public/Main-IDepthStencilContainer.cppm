@@ -7,30 +7,28 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:UAVParams;
+module;
+
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.RenderDevice:IDepthStencilContainer;
 
 import std;
 
-import :Aspect;
-import :TextureDimension;
-import :TextureFormatId;
-import :UAVLayout;
+import :DepthStencilMeta;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct BufferUAVParams final
+	class IDepthStencilContainer
 	{
-		std::uint64_t firstElementIndex = 0ull;
-		std::uint32_t elementCount = 0u;
-		std::uint32_t stride = 0u;
-		bool raw = false;
-	};
+		PONY_INTERFACE_BODY(IDepthStencilContainer)
 
-	struct TextureUAVParams final
-	{
-		TextureFormatId format;
-		TextureDimension dimension = TextureDimension::Texture2D;
-		Aspect aspect = Aspect::Color;
-		TextureUAVLayout layout;
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t Size() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual const DepthStencilMeta& Meta(std::uint32_t index) const noexcept = 0;
+
+		virtual void SetName(std::string_view name) = 0;
 	};
 }

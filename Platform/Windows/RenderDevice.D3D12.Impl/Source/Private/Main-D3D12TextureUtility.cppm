@@ -64,6 +64,10 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_DSV_FLAGS ToDSVFlags(DSVFlag flags) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_SHADER_COMPONENT_MAPPING ToShaderMapping(ComponentSwizzle swizzle) noexcept;
@@ -604,6 +608,102 @@ namespace PonyEngine::RenderDevice::Windows
 		}, params.layout);
 
 		return viewDesc;
+	}
+
+	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceArraySize) noexcept
+	{
+		auto viewDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
+		{
+			.Format = format,
+			.Flags = ToDSVFlags(params.flags)
+		};
+
+		std::visit(Type::Overload
+		{
+			[&](const SingleDSVLayout& l) noexcept
+			{
+				switch (params.dimension)
+				{
+				case DSVDimension::Texture1D:
+					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE1D;
+					viewDesc.Texture1D = D3D12_TEX1D_DSV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex)
+					};
+					break;
+				case DSVDimension::Texture2D:
+					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+					viewDesc.Texture2D = D3D12_TEX2D_DSV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex)
+					};
+					break;
+				default: [[unlikely]]
+					assert(false && "Invalid dimension");
+					break;
+				}
+			},
+			[&](const ArrayDSVLayout& l) noexcept
+			{
+				switch (params.dimension)
+				{
+				case DSVDimension::Texture1D:
+					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE1DARRAY;
+					viewDesc.Texture1DArray = D3D12_TEX1D_ARRAY_DSV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
+						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+					};
+					break;
+				case DSVDimension::Texture2D:
+					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+					viewDesc.Texture2DArray = D3D12_TEX2D_ARRAY_DSV
+					{
+						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
+						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+					};
+					break;
+				default: [[unlikely]]
+					assert(false && "Invalid dimension");
+					break;
+				}
+			},
+			[&](const MSDSVLayout) noexcept
+			{
+				viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
+				viewDesc.Texture2DMS = D3D12_TEX2DMS_DSV
+				{
+				};
+			},
+			[&](const MSArrayDSVLayout& l) noexcept
+			{
+				viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMSARRAY;
+				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_DSV
+				{
+					.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
+					.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+				};
+			}
+		}, params.layout);
+
+		return viewDesc;
+	}
+
+	constexpr D3D12_DSV_FLAGS ToDSVFlags(const DSVFlag flags) noexcept
+	{
+		auto answer = D3D12_DSV_FLAG_NONE;
+		if (Any(DSVFlag::DepthReadOnly, flags))
+		{
+			answer |= D3D12_DSV_FLAG_READ_ONLY_DEPTH;
+		}
+		if (Any(DSVFlag::StencilReadOnly, flags))
+		{
+			answer |= D3D12_DSV_FLAG_READ_ONLY_STENCIL;
+		}
+
+		return answer;
 	}
 
 	constexpr D3D12_SHADER_COMPONENT_MAPPING ToShaderMapping(const ComponentSwizzle swizzle) noexcept

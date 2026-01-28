@@ -11,6 +11,7 @@ export module PonyEngine.RenderDevice:ViewContainerCopyRange;
 
 import std;
 
+import :IDepthStencilContainer;
 import :IRenderTargetContainer;
 import :IShaderDataContainer;
 
@@ -28,5 +29,5 @@ export namespace PonyEngine::RenderDevice
 
 	using ShaderDataCopyRange = ViewContainerCopyRange<IShaderDataContainer>;
 	using RenderTargetCopyRange = ViewContainerCopyRange<IRenderTargetContainer>;
-
+	using DepthStencilCopyRange = ViewContainerCopyRange<IDepthStencilContainer>;
 }
