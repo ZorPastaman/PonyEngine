@@ -28,25 +28,25 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		~D3D12Backend() noexcept = default;
 
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual std::string_view RenderApiName() const noexcept override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual Meta::Version RenderApiVersion() const noexcept override;
 
 		virtual void Activate() override;
 		virtual void Deactivate() override;
 
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual struct DeviceSupport DeviceSupport() const override;
 
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
 		[[nodiscard("Pure function")]]
@@ -58,7 +58,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const override;
 
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
@@ -67,46 +67,48 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) override;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) override;
 		virtual void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params) override;
 		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params) override;
 		virtual void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params) override;
 		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params) override;
 		virtual void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params) override;
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() override;
 		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList() override;
 
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IFence> CreateFence() override;
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IWaiter> CreateWaiter() override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsSwapChainAlive() const override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual void CreateSwapChain(const SwapChainParams& params) override;
 		virtual void DestroySwapChain() override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual std::uint8_t SwapChainBufferCount() const override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual std::uint8_t CurrentSwapChainBufferIndex() const override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const override;
 		virtual void PresentNextSwapChainBuffer() override;
 
@@ -309,6 +311,11 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Backend::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
 		engine->Execute(commandLists, sync);
+	}
+
+	std::shared_ptr<ISecondaryGraphicsCommandList> D3D12Backend::CreateSecondaryGraphicsCommandList()
+	{
+		return engine->CreateSecondaryGraphicsCommandList();
 	}
 
 	std::shared_ptr<IFence> D3D12Backend::CreateFence()
