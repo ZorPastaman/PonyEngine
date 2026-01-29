@@ -13,6 +13,7 @@ import std;
 
 import :IDepthStencilContainer;
 import :IRenderTargetContainer;
+import :ISamplerContainer;
 import :IShaderDataContainer;
 
 export namespace PonyEngine::RenderDevice
@@ -30,4 +31,5 @@ export namespace PonyEngine::RenderDevice
 	using ShaderDataCopyRange = ViewContainerCopyRange<IShaderDataContainer>;
 	using RenderTargetCopyRange = ViewContainerCopyRange<IRenderTargetContainer>;
 	using DepthStencilCopyRange = ViewContainerCopyRange<IDepthStencilContainer>;
+	using SamplerCopyRange = ViewContainerCopyRange<ISamplerContainer>;
 }

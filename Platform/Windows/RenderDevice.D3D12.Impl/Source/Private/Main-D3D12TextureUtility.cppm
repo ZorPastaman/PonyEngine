@@ -190,7 +190,7 @@ namespace PonyEngine::RenderDevice::Windows
 		};
 		std::visit(Type::Overload
 			{
-				[&](const NoClear) noexcept
+				[&](const NoClear&) noexcept
 				{
 					clear.Format = DXGI_FORMAT_UNKNOWN;
 				},
@@ -405,7 +405,7 @@ namespace PonyEngine::RenderDevice::Windows
 					break;
 				}
 			},
-			[&](const TextureMSSRVLayout) noexcept
+			[&](const TextureMSSRVLayout&) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
 				viewDesc.Texture2DMS = D3D12_TEX2DMS_SRV
@@ -589,7 +589,7 @@ namespace PonyEngine::RenderDevice::Windows
 					break;
 				}
 			},
-			[&](const MSRTVLayout) noexcept
+			[&](const MSRTVLayout&) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
 				viewDesc.Texture2DMS = D3D12_TEX2DMS_RTV
@@ -670,7 +670,7 @@ namespace PonyEngine::RenderDevice::Windows
 					break;
 				}
 			},
-			[&](const MSDSVLayout) noexcept
+			[&](const MSDSVLayout&) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
 				viewDesc.Texture2DMS = D3D12_TEX2DMS_DSV

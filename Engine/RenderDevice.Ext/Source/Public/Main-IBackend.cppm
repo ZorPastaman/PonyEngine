@@ -33,7 +33,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void Deactivate() = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual HeapTypeMask BufferHeapTypeSupport() const = 0;
+		virtual struct DeviceSupport DeviceSupport() const = 0;
+
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) = 0;
 
@@ -41,8 +42,6 @@ export namespace PonyEngine::RenderDevice
 		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual HeapTypeMask TextureHeapTypeSupport() const = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
 
@@ -55,8 +54,6 @@ export namespace PonyEngine::RenderDevice
 		virtual CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const = 0;
 
-		[[nodiscard("Pure function")]]
-		virtual struct CBVRequirement CBVRequirement() const noexcept = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) = 0;
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) = 0;
@@ -77,6 +74,11 @@ export namespace PonyEngine::RenderDevice
 		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) = 0;
 
 		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params) = 0;
+		virtual void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params) = 0;
+		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) = 0;
+
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() = 0;
@@ -86,8 +88,6 @@ export namespace PonyEngine::RenderDevice
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) = 0;
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) = 0;
 
-		[[nodiscard("Pure function")]]
-		virtual struct SwapChainSupport SwapChainSupport() const = 0;
 		[[nodiscard("Pure function")]]
 		virtual bool IsSwapChainAlive() const = 0;
 		[[nodiscard("Pure function")]]

@@ -62,7 +62,6 @@ TEST_CASE("Arena: reserve", "[Memory][Arena]")
 TEST_CASE("Arena: realign", "[Memory][Arena]")
 {
 	constexpr std::size_t alignment = 64uz;
-	constexpr std::size_t reserve = 256uz;
 	auto arena = PonyEngine::Memory::Arena(alignment);
 	REQUIRE(arena.Alignment() == alignment);
 	REQUIRE(arena.Size() == 0uz);

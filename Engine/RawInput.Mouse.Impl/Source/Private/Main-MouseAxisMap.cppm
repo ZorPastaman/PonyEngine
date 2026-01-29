@@ -49,23 +49,23 @@ export namespace PonyEngine::RawInput
 		/// @brief Gets all the button axes.
 		/// @return Buton axes.
 		[[nodiscard("Pure function")]]
-		std::span<const AxisId, static_cast<std::size_t>(MouseButton::Count)> Buttons() const noexcept;
+		std::span<const AxisId, MouseButtonCount> Buttons() const noexcept;
 		/// @brief Gets all the wheel axes.
 		/// @return Wheel axes.
 		[[nodiscard("Pure function")]]
-		std::span<const AxisId, static_cast<std::size_t>(MouseWheel::Count)> Wheels() const noexcept;
+		std::span<const AxisId, MouseWheelCount> Wheels() const noexcept;
 		/// @brief Gets all the pointer axes.
 		/// @return Pointer axes.
 		[[nodiscard("Pure function")]]
-		std::span<const AxisId, static_cast<std::size_t>(MousePointer::Count)> Pointers() const noexcept;
+		std::span<const AxisId, MousePointerCount> Pointers() const noexcept;
 
 		MouseAxisMap& operator =(const MouseAxisMap&) = delete;
 		MouseAxisMap& operator =(MouseAxisMap&&) = delete;
 
 	private:
-		std::array<AxisId, static_cast<std::size_t>(MouseButton::Count)> buttonAxes; ///< Button axes.
-		std::array<AxisId, static_cast<std::size_t>(MouseWheel::Count)> wheelAxes; ///< Wheel axes.
-		std::array<AxisId, static_cast<std::size_t>(MousePointer::Count)> pointerAxes; ///< Pointer axes.
+		std::array<AxisId, MouseButtonCount> buttonAxes; ///< Button axes.
+		std::array<AxisId, MouseWheelCount> wheelAxes; ///< Wheel axes.
+		std::array<AxisId, MousePointerCount> pointerAxes; ///< Pointer axes.
 	};
 }
 
@@ -100,17 +100,17 @@ namespace PonyEngine::RawInput
 		return pointerAxes[static_cast<std::size_t>(pointer)];
 	}
 
-	std::span<const AxisId, static_cast<std::size_t>(MouseButton::Count)> MouseAxisMap::Buttons() const noexcept
+	std::span<const AxisId, MouseButtonCount> MouseAxisMap::Buttons() const noexcept
 	{
 		return buttonAxes;
 	}
 
-	std::span<const AxisId, static_cast<std::size_t>(MouseWheel::Count)> MouseAxisMap::Wheels() const noexcept
+	std::span<const AxisId, MouseWheelCount> MouseAxisMap::Wheels() const noexcept
 	{
 		return wheelAxes;
 	}
 
-	std::span<const AxisId, static_cast<std::size_t>(MousePointer::Count)> MouseAxisMap::Pointers() const noexcept
+	std::span<const AxisId, MousePointerCount> MouseAxisMap::Pointers() const noexcept
 	{
 		return pointerAxes;
 	}

@@ -75,9 +75,7 @@ namespace Game
 			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture2D,
 			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget
 		});
-		const PonyEngine::RenderDevice::SwapChainSupport swapChainSupport = renderDevice->SwapChainSupport();
-		const PonyEngine::RenderDevice::HeapTypeMask bufferHeaps = renderDevice->BufferHeapTypeSupport();
-		const PonyEngine::RenderDevice::HeapTypeMask textureHeaps = renderDevice->TextureHeapTypeSupport();
+		const PonyEngine::RenderDevice::DeviceSupport deviceSupport = renderDevice->DeviceSupport();
 
 		const std::shared_ptr<PonyEngine::RenderDevice::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::RenderDevice::HeapType::Default, PonyEngine::RenderDevice::BufferParams
 		{
@@ -106,11 +104,10 @@ namespace Game
 			.size = 128u,
 			.shaderVisible = false
 		});
-		const PonyEngine::RenderDevice::CBVRequirement cbvRequirement = renderDevice->CBVRequirement();
 		renderDevice->CreateView(buffer.get(), *shaderDataContainer, 1u, PonyEngine::RenderDevice::CBVParams
 		{
-			.offset = cbvRequirement.offsetAlignment,
-			.size = cbvRequirement.sizeAlignment
+			.offset = deviceSupport.cbvRequirement.offsetAlignment,
+			.size = deviceSupport.cbvRequirement.sizeAlignment
 		});
 
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
