@@ -110,6 +110,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList() override;
 
 		[[nodiscard("Pure function")]] 
 		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const override;
@@ -512,6 +514,11 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
 		GetCurrentBackend().Execute(commandLists, sync);
+	}
+
+	std::shared_ptr<ISecondaryGraphicsCommandList> RenderDeviceService::CreateSecondaryGraphicsCommandList()
+	{
+		return GetCurrentBackend().CreateSecondaryGraphicsCommandList();
 	}
 
 	std::uint32_t RenderDeviceService::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const

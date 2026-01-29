@@ -33,6 +33,7 @@ import :IFence;
 import :IGraphicsCommandList;
 import :IRenderTargetContainer;
 import :ISamplerContainer;
+import :ISecondaryGraphicsCommandList;
 import :IShaderDataContainer;
 import :ITexture;
 import :IWaiter;
@@ -131,6 +132,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync = QueueSync{}) = 0;
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync = QueueSync{}) = 0;
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync = QueueSync{}) = 0;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList() = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsSwapChainAlive() const = 0;

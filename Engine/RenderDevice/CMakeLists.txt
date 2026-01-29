@@ -39,6 +39,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-IRenderTargetContainer.cppm"
 	"Source/Public/Main-IResource.cppm"
 	"Source/Public/Main-ISamplerContainer.cppm"
+	"Source/Public/Main-ISecondaryGraphicsCommandList.cppm"
 	"Source/Public/Main-IShaderDataContainer.cppm"
 	"Source/Public/Main-ITexture.cppm"
 	"Source/Public/Main-IWaiter.cppm"

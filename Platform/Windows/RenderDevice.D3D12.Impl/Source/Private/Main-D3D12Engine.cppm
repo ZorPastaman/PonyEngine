@@ -32,6 +32,7 @@ import :DXGISwapChain;
 import :DXGISwapChainUtility;
 import :D3D12Buffer;
 import :D3D12BufferUtility;
+import :D3D12BundleCommandList;
 import :D3D12CommandQueue;
 import :D3D12ComputeCommandList;
 import :D3D12CopyCommandList;
@@ -126,6 +127,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync);
 		void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync);
 		void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync);
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList();
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IFence> CreateFence();
@@ -723,6 +726,11 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Engine::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
 		Execute<D3D12CopyCommandList>(commandLists, sync, copyCommandQueue);
+	}
+
+	std::shared_ptr<ISecondaryGraphicsCommandList> D3D12Engine::CreateSecondaryGraphicsCommandList()
+	{
+		return CreateCommandList<D3D12BundleCommandList>(D3D12_COMMAND_LIST_TYPE_BUNDLE);
 	}
 
 	std::shared_ptr<IFence> D3D12Engine::CreateFence()

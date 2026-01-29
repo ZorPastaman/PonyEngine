@@ -42,6 +42,7 @@ export import :IRenderDeviceService;
 export import :IRenderTargetContainer;
 export import :IResource;
 export import :ISamplerContainer;
+export import :ISecondaryGraphicsCommandList;
 export import :IShaderDataContainer;
 export import :ITexture;
 export import :IWaiter;
