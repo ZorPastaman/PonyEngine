@@ -20,23 +20,24 @@ export namespace PonyEngine::RawInput
 		Right,
 		Middle,
 		X1,
-		X2,
-		Count
+		X2
 	};
 
 	/// @brief Mouse wheel.
 	enum class MouseWheel : std::uint8_t
 	{
 		Horizontal,
-		Vertical,
-		Count
+		Vertical
 	};
 
 	/// @brief Mouse pointer.
 	enum class MousePointer : std::uint8_t
 	{
 		X,
-		Y,
-		Count
+		Y
 	};
+
+	constexpr std::size_t MouseButtonCount = 5uz;
+	constexpr std::size_t MouseWheelCount = 2uz;
+	constexpr std::size_t MousePointerCount = 2uz;
 }

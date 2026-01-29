@@ -86,7 +86,7 @@ TEST_CASE("Serialize array text", "[Serialization][Array]")
 
 		if constexpr (!std::is_floating_point_v<T>)
 		{
-			REQUIRE(serializedPoint - data.data() == PonyEngine::Serialization::GetSerializedArrayTextLength<T>(values));
+			REQUIRE(static_cast<std::uintptr_t>(serializedPoint - data.data()) == PonyEngine::Serialization::GetSerializedArrayTextLength<T>(values));
 		}
 
 		serializedPoint = PonyEngine::Serialization::SerializeArrayText<true, T>(values, data);
@@ -99,7 +99,7 @@ TEST_CASE("Serialize array text", "[Serialization][Array]")
 
 		if constexpr (!std::is_floating_point_v<T>)
 		{
-			REQUIRE(serializedPoint - data.data() == PonyEngine::Serialization::GetSerializedArrayTextLength<T>(values));
+			REQUIRE(static_cast<std::uintptr_t>(serializedPoint - data.data()) == PonyEngine::Serialization::GetSerializedArrayTextLength<T>(values));
 		}
 	};
 

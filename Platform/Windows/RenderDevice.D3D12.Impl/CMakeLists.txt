@@ -45,11 +45,14 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/Main-D3D12ObjectUtility.cppm"
 	"Source/Private/Main-D3D12RenderTargetContainer.cppm"
 	"Source/Private/Main-D3D12Resource.cppm"
+	"Source/Private/Main-D3D12SamplerContainer.cppm"
+	"Source/Private/Main-D3D12SamplerUtility.cppm"
 	"Source/Private/Main-D3D12ShaderDataContainer.cppm"
 	"Source/Private/Main-D3D12SwapChain.cppm"
 	"Source/Private/Main-D3D12Texture.cppm"
 	"Source/Private/Main-D3D12TextureFormatMap.cppm"
 	"Source/Private/Main-D3D12TextureUtility.cppm"
+	"Source/Private/Main-D3D12Utility.cppm"
 	"Source/Private/Main-D3D12Waiter.cppm"
 )
 

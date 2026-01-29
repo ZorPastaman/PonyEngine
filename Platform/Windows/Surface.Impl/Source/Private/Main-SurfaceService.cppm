@@ -1254,7 +1254,7 @@ namespace PonyEngine::Surface::Windows
 
 		std::visit(Type::Overload
 		{
-			[&](const FullscreenRectStyle& s)
+			[&](const FullscreenRectStyle&)
 			{
 				try
 				{
@@ -1269,7 +1269,7 @@ namespace PonyEngine::Surface::Windows
 					cursorClippingRect = std::nullopt;
 				}
 			},
-			[&](const WindowRectStyle& s)
+			[&](const WindowRectStyle&)
 			{
 				UpdateCursorClipping();
 			}

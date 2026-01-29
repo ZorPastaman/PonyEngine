@@ -98,7 +98,7 @@ export namespace PonyEngine::RawInput
 		/// @return Button states.
 		/// @remark They are placed in the order they are declared in the enum.
 		[[nodiscard("Pure function")]]
-		std::span<const bool, static_cast<std::size_t>(MouseButton::Count)> ButtonStates(std::size_t index) const noexcept;
+		std::span<const bool, MouseButtonCount> ButtonStates(std::size_t index) const noexcept;
 		/// @brief Sets a button state.
 		/// @param index Mouse index.
 		/// @param button Button ID.
@@ -127,7 +127,7 @@ export namespace PonyEngine::RawInput
 		std::vector<struct DeviceHandle> deviceHandles; ///< Device handles.
 		std::vector<std::string> mouseNames;
 		std::vector<bool> connections;
-		std::vector<std::array<bool, static_cast<std::size_t>(MouseButton::Count)>> buttonStates;
+		std::vector<std::array<bool, MouseButtonCount>> buttonStates;
 	};
 }
 
@@ -206,7 +206,7 @@ namespace PonyEngine::RawInput
 	}
 
 	template<typename NativeHandleType>
-	std::span<const bool, static_cast<std::size_t>(MouseButton::Count)> MouseContainer<NativeHandleType>::ButtonStates(const std::size_t index) const noexcept
+	std::span<const bool, MouseButtonCount> MouseContainer<NativeHandleType>::ButtonStates(const std::size_t index) const noexcept
 	{
 		return buttonStates[index];
 	}
@@ -239,7 +239,7 @@ namespace PonyEngine::RawInput
 					connections.push_back(isConnected);
 					try
 					{
-						auto buttons = std::array<bool, static_cast<std::size_t>(MouseButton::Count)>();
+						auto buttons = std::array<bool, MouseButtonCount>();
 						std::ranges::fill(buttons, false);
 						buttonStates.push_back(buttons);
 					}

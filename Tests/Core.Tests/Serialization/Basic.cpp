@@ -130,7 +130,7 @@ TEST_CASE("Serialize text", "[Serialization][Basic]")
 
 		if constexpr (!std::is_floating_point_v<T>)
 		{
-			REQUIRE(serializedPoint - data.data() == PonyEngine::Serialization::GetSerializedTextLength(value));
+			REQUIRE(static_cast<std::uintptr_t>(serializedPoint - data.data()) == PonyEngine::Serialization::GetSerializedTextLength(value));
 		}
 	};
 	

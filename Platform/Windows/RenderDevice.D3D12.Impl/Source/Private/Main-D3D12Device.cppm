@@ -68,6 +68,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		void CreateUAV(ID3D12Resource2* resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
 		void CreateRTV(ID3D12Resource2* resource, const D3D12_RENDER_TARGET_VIEW_DESC& rtvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
 		void CreateDSV(ID3D12Resource2* resource, const D3D12_DEPTH_STENCIL_VIEW_DESC& dsvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		void CreateSampler(const D3D12_SAMPLER_DESC2& samplerDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
 		void CopyDescriptors(UINT rangeCount, const UINT* rangeSizes, 
 			const D3D12_CPU_DESCRIPTOR_HANDLE* sourceHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* destinationHandles,
 			D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept;
@@ -251,6 +252,11 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Device::CreateDSV(ID3D12Resource2* const resource, const D3D12_DEPTH_STENCIL_VIEW_DESC& dsvDesc, const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept
 	{
 		device->CreateDepthStencilView(resource, &dsvDesc, handle);
+	}
+
+	void D3D12Device::CreateSampler(const D3D12_SAMPLER_DESC2& samplerDesc, const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept
+	{
+		device->CreateSampler2(&samplerDesc, handle);
 	}
 
 	void D3D12Device::CopyDescriptors(const UINT rangeCount, const UINT* const rangeSizes,

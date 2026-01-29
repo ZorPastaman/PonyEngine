@@ -59,7 +59,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) override;
 
 		[[nodiscard("Pure function")]] 
-		virtual HeapTypeMask BufferHeapTypeSupport() const override;
+		virtual struct DeviceSupport DeviceSupport() const override;
+
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
@@ -73,13 +74,9 @@ export namespace PonyEngine::RenderDevice
 		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
-		[[nodiscard("Pure function")]] 
-		virtual HeapTypeMask TextureHeapTypeSupport() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
-		[[nodiscard("Pure function")]] 
-		virtual struct CBVRequirement CBVRequirement() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
@@ -100,6 +97,11 @@ export namespace PonyEngine::RenderDevice
 		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params) override;
+		virtual void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params) override;
+		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
+
+		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
@@ -118,8 +120,6 @@ export namespace PonyEngine::RenderDevice
 		virtual CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const override;
 
-		[[nodiscard("Pure function")]] 
-		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]] 
 		virtual bool IsSwapChainAlive() const override;
 		[[nodiscard("Pure function")]] 
@@ -327,9 +327,9 @@ namespace PonyEngine::RenderDevice
 		activeBackendIndex = backendIndex;
 	}
 
-	HeapTypeMask RenderDeviceService::BufferHeapTypeSupport() const
+	struct DeviceSupport RenderDeviceService::DeviceSupport() const
 	{
-		return GetCurrentBackend().BufferHeapTypeSupport();
+		return GetCurrentBackend().DeviceSupport();
 	}
 
 	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const HeapType heapType, const BufferParams& params)
@@ -399,19 +399,9 @@ namespace PonyEngine::RenderDevice
 		return GetCurrentBackend().TextureSupport(request);
 	}
 
-	HeapTypeMask RenderDeviceService::TextureHeapTypeSupport() const
-	{
-		return GetCurrentBackend().TextureHeapTypeSupport();
-	}
-
 	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureParams& params)
 	{
 		return GetCurrentBackend().CreateTexture(heapType, params);
-	}
-
-	struct CBVRequirement RenderDeviceService::CBVRequirement() const
-	{
-		return GetCurrentBackend().CBVRequirement();
 	}
 
 	std::shared_ptr<IShaderDataContainer> RenderDeviceService::CreateShaderDataContainer(const ShaderDataContainerParams& params)
@@ -479,6 +469,21 @@ namespace PonyEngine::RenderDevice
 		GetCurrentBackend().CopyViews(ranges);
 	}
 
+	std::shared_ptr<ISamplerContainer> RenderDeviceService::CreateSamplerContainer(const SamplerContainerParams& params)
+	{
+		return GetCurrentBackend().CreateSamplerContainer(params);
+	}
+
+	void RenderDeviceService::CreateSampler(ISamplerContainer& container, const std::uint32_t index, const SamplerParams& params)
+	{
+		GetCurrentBackend().CreateSampler(container, index, params);
+	}
+
+	void RenderDeviceService::CopySamplers(const std::span<const SamplerCopyRange> ranges)
+	{
+		GetCurrentBackend().CopySamplers(ranges);
+	}
+
 	std::shared_ptr<IGraphicsCommandList> RenderDeviceService::CreateGraphicsCommandList()
 	{
 		return GetCurrentBackend().CreateGraphicsCommandList();
@@ -529,11 +534,6 @@ namespace PonyEngine::RenderDevice
 		const std::span<CopyableFootprint> footprints) const
 	{
 		return GetCurrentBackend().GetCopyableFootprints(texture, offset, range, footprints);
-	}
-
-	struct SwapChainSupport RenderDeviceService::SwapChainSupport() const
-	{
-		return GetCurrentBackend().SwapChainSupport();
 	}
 
 	bool RenderDeviceService::IsSwapChainAlive() const

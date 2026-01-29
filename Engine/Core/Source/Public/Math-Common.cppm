@@ -435,11 +435,11 @@ namespace PonyEngine::Math
 		{
 			if consteval
 			{
-				return value < T{0} ? -value : value;
+				return value < T{0} ? static_cast<T>(-value) : value;
 			}
 			else
 			{
-				return std::abs(value);
+				return static_cast<T>(std::abs(value));
 			}
 		}
 	}

@@ -264,7 +264,7 @@ namespace PonyEngine::RawInput::Windows
 	void MouseProvider::ResetInput(const std::size_t mouseIndex, const std::chrono::time_point<std::chrono::steady_clock> eventTime,
 		const Math::Vector2<std::int32_t>& cursorPosition)
 	{
-		const std::span<const bool, static_cast<std::size_t>(MouseButton::Count)> buttonStates = mouseContainer.ButtonStates(mouseIndex);
+		const std::span<const bool, 5> buttonStates = mouseContainer.ButtonStates(mouseIndex);
 
 		for (std::size_t i = 0uz; i < buttonStates.size(); ++i)
 		{

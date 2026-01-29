@@ -43,6 +43,8 @@ import :D3D12FormatUtility;
 import :D3D12GraphicsCommandList;
 import :D3D12HeapUtility;
 import :D3D12RenderTargetContainer;
+import :D3D12SamplerContainer;
+import :D3D12SamplerUtility;
 import :D3D12ShaderDataContainer;
 import :D3D12SwapChain;
 import :D3D12Texture;
@@ -58,7 +60,12 @@ export namespace PonyEngine::RenderDevice::Windows
 		static constexpr std::string_view ApiName = D3D12Device::ApiName;
 		static constexpr auto ApiVersion = D3D12Device::ApiVersion;
 
-		static constexpr std::uint32_t CBVAlignment = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+		static constexpr auto BufferHeapTypeSupport = HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download;
+		static constexpr auto TextureHeapTypeSupport = HeapTypeMask::Default;
+
+		static constexpr std::uint32_t CBVAlignment = std::uint32_t{D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT};
+
+		static constexpr float MaxAnisotropy = float{D3D12_DEFAULT_MAX_ANISOTROPY};
 
 		[[nodiscard("Pure constructor")]]
 		explicit D3D12Engine(IRenderDeviceContext& renderDevice);
@@ -68,16 +75,12 @@ export namespace PonyEngine::RenderDevice::Windows
 		~D3D12Engine() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		static HeapTypeMask BufferHeapTypeSupport() noexcept;
-		[[nodiscard("Pure function")]]
 		std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params);
 
 		[[nodiscard("Pure function")]]
 		struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const;
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
-		[[nodiscard("Pure function")]]
-		static HeapTypeMask TextureHeapTypeSupport() noexcept;
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params);
 
@@ -108,6 +111,11 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params);
 		void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params);
 		void CopyViews(std::span<const DepthStencilCopyRange> ranges);
+
+		[[nodiscard("Wierd call")]]
+		std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params);
+		void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params);
+		void CopySamplers(std::span<const SamplerCopyRange> ranges);
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
@@ -205,6 +213,10 @@ export namespace PonyEngine::RenderDevice::Windows
 		static D3D12DepthStencilContainer& ToNativeContainer(IDepthStencilContainer& container);
 		[[nodiscard("Pure function")]]
 		static const D3D12DepthStencilContainer& ToNativeContainer(const IDepthStencilContainer& container);
+		[[nodiscard("Pure function")]]
+		static D3D12SamplerContainer& ToNativeContainer(ISamplerContainer& container);
+		[[nodiscard("Pure function")]]
+		static const D3D12SamplerContainer& ToNativeContainer(const ISamplerContainer& container);
 
 		template<typename Container, typename Range>
 		void CopyViews(std::span<const Range> ranges, D3D12_DESCRIPTOR_HEAP_TYPE type);
@@ -265,6 +277,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateCopyRange(std::span<const RenderTargetCopyRange> ranges);
 		static void ValidateContainer(const D3D12DepthStencilContainer& container, std::uint32_t index);
 		static void ValidateCopyRange(std::span<const DepthStencilCopyRange> ranges);
+		static void ValidateContainer(const D3D12SamplerContainer& container, std::uint32_t index);
+		static void ValidateCopyRange(std::span<const SamplerCopyRange> ranges);
 
 		template<typename CommandList, typename CommandListInterface>
 		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
@@ -302,11 +316,6 @@ namespace PonyEngine::RenderDevice::Windows
 		computeCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COMPUTE), CreatorId)),
 		copyCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COPY), CreatorId))
 	{
-	}
-
-	HeapTypeMask D3D12Engine::BufferHeapTypeSupport() noexcept
-	{
-		return HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download;
 	}
 
 	std::shared_ptr<IBuffer> D3D12Engine::CreateBuffer(const HeapType heapType, const BufferParams& params)
@@ -363,11 +372,6 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return TextureSupportResponse{};
-	}
-
-	HeapTypeMask D3D12Engine::TextureHeapTypeSupport() noexcept
-	{
-		return HeapTypeMask::Default;
 	}
 
 	std::shared_ptr<ITexture> D3D12Engine::CreateTexture(const HeapType heapType, const TextureParams& params)
@@ -667,6 +671,30 @@ namespace PonyEngine::RenderDevice::Windows
 		CopyViews<D3D12DepthStencilContainer>(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	}
 
+	std::shared_ptr<ISamplerContainer> D3D12Engine::CreateSamplerContainer(const SamplerContainerParams& params)
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = ToDescriptorHeapDesc(params);
+		return std::make_shared<D3D12SamplerContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type), 
+			params.size, params.shaderVisible);
+	}
+
+	void D3D12Engine::CreateSampler(ISamplerContainer& container, const std::uint32_t index, const SamplerParams& params)
+	{
+		D3D12SamplerContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainer(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+
+		const D3D12_SAMPLER_DESC2 samplerDesc = ToSamplerDesc(params);
+		device.CreateSampler(samplerDesc, handle);
+
+		nativeContainer.Set(index, params);
+	}
+
+	void D3D12Engine::CopySamplers(const std::span<const SamplerCopyRange> ranges)
+	{
+		CopyViews<D3D12SamplerContainer>(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+	}
+
 	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
 	{
 		return CreateCommandList<D3D12GraphicsCommandList>(D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -775,7 +803,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 	std::uint8_t D3D12Engine::SwapChainBufferCount() const
 	{
-		return GetSwapChain().BufferCount();
+		return static_cast<std::uint8_t>(GetSwapChain().BufferCount());
 	}
 
 	std::uint8_t D3D12Engine::CurrentSwapChainBufferIndex() const
@@ -1182,6 +1210,30 @@ namespace PonyEngine::RenderDevice::Windows
 #endif
 
 		return static_cast<const D3D12DepthStencilContainer&>(container);
+	}
+
+	D3D12SamplerContainer& D3D12Engine::ToNativeContainer(ISamplerContainer& container)
+	{
+#ifndef NDEBUG
+		if (typeid(container) != typeid(D3D12SamplerContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<D3D12SamplerContainer&>(container);
+	}
+
+	const D3D12SamplerContainer& D3D12Engine::ToNativeContainer(const ISamplerContainer& container)
+	{
+#ifndef NDEBUG
+		if (typeid(container) != typeid(D3D12SamplerContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<const D3D12SamplerContainer&>(container);
 	}
 
 	template<typename Container, typename Range>
@@ -1678,7 +1730,7 @@ namespace PonyEngine::RenderDevice::Windows
 				}
 				ValidateArrayRange(texture, l.arrayRange);
 			},
-			[&](const TextureMSSRVLayout)
+			[&](const TextureMSSRVLayout&)
 			{
 				ValidateSampleCount(texture, true);
 				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
@@ -1733,7 +1785,7 @@ namespace PonyEngine::RenderDevice::Windows
 				}
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			},
-			[&](const TextureMSSRVLayout)
+			[&](const TextureMSSRVLayout&)
 			{
 				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
 				{
@@ -1800,7 +1852,7 @@ namespace PonyEngine::RenderDevice::Windows
 				ValidateMipRange(texture, MipRange{ .mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
 				ValidateArrayRange(texture, l.arrayRange);
 			},
-			[&](const MSRTVLayout)
+			[&](const MSRTVLayout&)
 			{
 				ValidateSampleCount(texture, true);
 			},
@@ -1825,7 +1877,7 @@ namespace PonyEngine::RenderDevice::Windows
 				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			},
-			[&](const MSRTVLayout)
+			[&](const MSRTVLayout&)
 			{
 			},
 			[&](const MSArrayRTVLayout& l)
@@ -1850,7 +1902,7 @@ namespace PonyEngine::RenderDevice::Windows
 				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
 				ValidateArrayRange(texture, l.arrayRange);
 			},
-			[&](const MSDSVLayout)
+			[&](const MSDSVLayout&)
 			{
 				ValidateSampleCount(texture, true);
 			},
@@ -1875,7 +1927,7 @@ namespace PonyEngine::RenderDevice::Windows
 				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			},
-			[&](const MSDSVLayout)
+			[&](const MSDSVLayout&)
 			{
 			},
 			[&](const MSArrayDSVLayout& l)
@@ -2077,6 +2129,55 @@ namespace PonyEngine::RenderDevice::Windows
 				throw std::invalid_argument("Invalid destination");
 			}
 			if (static_cast<const D3D12DepthStencilContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination range");
+			}
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidateContainer(const D3D12SamplerContainer& container, const std::uint32_t index)
+	{
+#ifndef NDEBUG
+		if (index >= container.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container index");
+		}
+		if (container.IsShaderVisible()) [[unlikely]]
+		{
+			throw std::invalid_argument("Container is shader visible");
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidateCopyRange(const std::span<const SamplerCopyRange> ranges)
+	{
+#ifndef NDEBUG
+		if (ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Range count is too great");
+		}
+		for (const SamplerCopyRange& range : ranges)
+		{
+			if (!range.source || typeid(*range.source) != typeid(D3D12SamplerContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source");
+			}
+			const D3D12SamplerContainer* const source = static_cast<const D3D12SamplerContainer*>(range.source);
+			if (source->Size() < range.sourceOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source range");
+			}
+			if (source->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Source is shader visible");
+			}
+
+			if (!range.destination || typeid(*range.destination) != typeid(D3D12SamplerContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination");
+			}
+			if (static_cast<const D3D12SamplerContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid destination range");
 			}

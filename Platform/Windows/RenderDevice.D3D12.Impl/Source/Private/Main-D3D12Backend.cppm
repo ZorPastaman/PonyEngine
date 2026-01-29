@@ -37,7 +37,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void Deactivate() override;
 
 		[[nodiscard("Pure function")]] 
-		virtual HeapTypeMask BufferHeapTypeSupport() const override;
+		virtual struct DeviceSupport DeviceSupport() const override;
+
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
 
@@ -45,8 +46,6 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]] 
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
-		[[nodiscard("Pure function")]] 
-		virtual HeapTypeMask TextureHeapTypeSupport() const override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
 
@@ -59,8 +58,6 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const override;
 
-		[[nodiscard("Pure function")]] 
-		virtual struct CBVRequirement CBVRequirement() const noexcept override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
@@ -81,6 +78,11 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params) override;
+		virtual void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params) override;
+		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
+
+		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
@@ -95,8 +97,6 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IWaiter> CreateWaiter() override;
 
-		[[nodiscard("Pure function")]] 
-		virtual struct SwapChainSupport SwapChainSupport() const override;
 		[[nodiscard("Pure function")]]
 		virtual bool IsSwapChainAlive() const override;
 		[[nodiscard("Pure function")]] 
@@ -147,9 +147,16 @@ namespace PonyEngine::RenderDevice::Windows
 		engine.reset();
 	}
 
-	HeapTypeMask D3D12Backend::BufferHeapTypeSupport() const
+	struct DeviceSupport D3D12Backend::DeviceSupport() const
 	{
-		return engine->BufferHeapTypeSupport();
+		return RenderDevice::DeviceSupport
+		{
+			.bufferHeaps = D3D12Engine::BufferHeapTypeSupport,
+			.textureHeaps = D3D12Engine::TextureHeapTypeSupport,
+			.cbvRequirement = CBVRequirement{.offsetAlignment = D3D12Engine::CBVAlignment, .sizeAlignment = D3D12Engine::CBVAlignment},
+			.samplerSupport = SamplerSupport{.maxAnisotropy = D3D12Engine::MaxAnisotropy},
+			.swapChainSupport = engine->SwapChainSupport()
+		};
 	}
 
 	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const HeapType heapType, const BufferParams& params)
@@ -165,11 +172,6 @@ namespace PonyEngine::RenderDevice::Windows
 	TextureSupportResponse D3D12Backend::TextureSupport(const TextureSupportRequest& request) const
 	{
 		return engine->TextureSupport(request);
-	}
-
-	HeapTypeMask D3D12Backend::TextureHeapTypeSupport() const
-	{
-		return engine->TextureHeapTypeSupport();
 	}
 
 	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureParams& params)
@@ -197,11 +199,6 @@ namespace PonyEngine::RenderDevice::Windows
 		const std::span<CopyableFootprint> footprints) const
 	{
 		return engine->GetCopyableFootprints(texture, offset, range, footprints);
-	}
-
-	struct CBVRequirement D3D12Backend::CBVRequirement() const noexcept
-	{
-		return RenderDevice::CBVRequirement{.offsetAlignment = D3D12Engine::CBVAlignment, .sizeAlignment = D3D12Engine::CBVAlignment};
 	}
 
 	std::shared_ptr<IShaderDataContainer> D3D12Backend::CreateShaderDataContainer(const ShaderDataContainerParams& params)
@@ -269,6 +266,21 @@ namespace PonyEngine::RenderDevice::Windows
 		engine->CopyViews(ranges);
 	}
 
+	std::shared_ptr<ISamplerContainer> D3D12Backend::CreateSamplerContainer(const SamplerContainerParams& params)
+	{
+		return engine->CreateSamplerContainer(params);
+	}
+
+	void D3D12Backend::CreateSampler(ISamplerContainer& container, const std::uint32_t index, const SamplerParams& params)
+	{
+		engine->CreateSampler(container, index, params);
+	}
+
+	void D3D12Backend::CopySamplers(const std::span<const SamplerCopyRange> ranges)
+	{
+		engine->CopySamplers(ranges);
+	}
+
 	std::shared_ptr<IGraphicsCommandList> D3D12Backend::CreateGraphicsCommandList()
 	{
 		return engine->CreateGraphicsCommandList();
@@ -307,11 +319,6 @@ namespace PonyEngine::RenderDevice::Windows
 	std::shared_ptr<IWaiter> D3D12Backend::CreateWaiter()
 	{
 		return engine->CreateWaiter();
-	}
-
-	struct SwapChainSupport D3D12Backend::SwapChainSupport() const
-	{
-		return engine->SwapChainSupport();
 	}
 
 	bool D3D12Backend::IsSwapChainAlive() const
