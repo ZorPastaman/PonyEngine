@@ -59,6 +59,8 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-SamplerSupport.cppm"
 	"Source/Public/Main-ShaderDataContainerParams.cppm"
 	"Source/Public/Main-ShaderDataMeta.cppm"
+	"Source/Public/Main-ShaderIR.cppm"
+	"Source/Public/Main-ShaderSupport.cppm"
 	"Source/Public/Main-SRVLayout.cppm"
 	"Source/Public/Main-SRVParams.cppm"
 	"Source/Public/Main-SubTextureIndex.cppm"

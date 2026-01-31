@@ -62,6 +62,8 @@ export import :SamplerParams;
 export import :SamplerSupport;
 export import :ShaderDataContainerParams;
 export import :ShaderDataMeta;
+export import :ShaderIR;
+export import :ShaderSupport;
 export import :SRVLayout;
 export import :SRVParams;
 export import :SubTextureIndex;

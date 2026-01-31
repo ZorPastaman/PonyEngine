@@ -31,6 +31,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		static constexpr std::string_view ApiName = RenderAPI::Direct3D;
 		static constexpr auto ApiVersion = Meta::Version(12, 2);
 		static constexpr D3D_FEATURE_LEVEL FeatureLevel = D3D_FEATURE_LEVEL_12_2;
+		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL;
 
 		[[nodiscard("Pure constructor")]]
 		explicit D3D12Device(IRenderDeviceContext& renderDevice);
@@ -39,6 +40,8 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		~D3D12Device() noexcept;
 
+		[[nodiscard("Pure function")]]
+		D3D_SHADER_MODEL GetShaderModel() const;
 		[[nodiscard("Pure function")]]
 		D3D12_FEATURE_DATA_FORMAT_SUPPORT GetFormatSupport(DXGI_FORMAT format) const;
 		[[nodiscard("Pure function")]]
@@ -132,6 +135,17 @@ namespace PonyEngine::RenderDevice::Windows
 		debug.Reset();
 		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing D3D12 debug interface done.");
 #endif
+	}
+
+	D3D_SHADER_MODEL D3D12Device::GetShaderModel() const
+	{
+		auto shaderModel = D3D12_FEATURE_DATA_SHADER_MODEL{.HighestShaderModel = D3D_SHADER_MODEL_6_9};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to check shader model support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return shaderModel.HighestShaderModel;
 	}
 
 	D3D12_FEATURE_DATA_FORMAT_SUPPORT D3D12Device::GetFormatSupport(const DXGI_FORMAT format) const

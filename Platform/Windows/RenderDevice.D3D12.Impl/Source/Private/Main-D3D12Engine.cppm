@@ -60,6 +60,7 @@ export namespace PonyEngine::RenderDevice::Windows
 	public:
 		static constexpr std::string_view ApiName = D3D12Device::ApiName;
 		static constexpr auto ApiVersion = D3D12Device::ApiVersion;
+		static constexpr std::string_view ShaderIRName = D3D12Device::ShaderIRName;
 
 		static constexpr auto BufferHeapTypeSupport = HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download;
 		static constexpr auto TextureHeapTypeSupport = HeapTypeMask::Default;
@@ -117,6 +118,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params);
 		void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params);
 		void CopySamplers(std::span<const SamplerCopyRange> ranges);
+
+		[[nodiscard("Pure function")]]
+		Meta::Version ShaderIRVersion() const;
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
@@ -696,6 +700,12 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Engine::CopySamplers(const std::span<const SamplerCopyRange> ranges)
 	{
 		CopyViews<D3D12SamplerContainer>(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+	}
+
+	Meta::Version D3D12Engine::ShaderIRVersion() const
+	{
+		const auto shaderModel = std::to_underlying(device.GetShaderModel());
+		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
