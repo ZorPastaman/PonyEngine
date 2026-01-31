@@ -7,25 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DeviceSupport;
+export module PonyEngine.RenderDevice:ShaderSupport;
 
 import std;
 
-import :CBVRequirement;
-import :HeapType;
-import :SamplerSupport;
-import :ShaderSupport;
-import :SwapChainSupport;
+import PonyEngine.Meta;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct DeviceSupport final
+	struct ShaderSupport final
 	{
-		HeapTypeMask bufferHeaps;
-		HeapTypeMask textureHeaps;
-		CBVRequirement cbvRequirement;
-		SamplerSupport samplerSupport;
-		SwapChainSupport swapChainSupport;
-		ShaderSupport shaderSupport;
+		std::string_view shaderIRName;
+		Meta::Version version;
 	};
 }

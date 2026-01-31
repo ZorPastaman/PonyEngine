@@ -24,7 +24,5 @@ export namespace PonyEngine::RenderDevice
 		static constexpr std::string_view Direct3D = "Direct3D";
 		static constexpr std::string_view Vulkan = "Vulkan";
 		static constexpr std::string_view Metal = "Metal";
-
-		static constexpr std::string_view Empty = "Empty";
 	};
 }

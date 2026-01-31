@@ -7,25 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DeviceSupport;
+module;
+
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.RenderDevice:ShaderIR;
 
 import std;
 
-import :CBVRequirement;
-import :HeapType;
-import :SamplerSupport;
-import :ShaderSupport;
-import :SwapChainSupport;
-
 export namespace PonyEngine::RenderDevice
 {
-	struct DeviceSupport final
+	struct ShaderIR final
 	{
-		HeapTypeMask bufferHeaps;
-		HeapTypeMask textureHeaps;
-		CBVRequirement cbvRequirement;
-		SamplerSupport samplerSupport;
-		SwapChainSupport swapChainSupport;
-		ShaderSupport shaderSupport;
+		PONY_NON_CONSTRUCTIBLE_BODY(ShaderIR)
+
+		static constexpr std::string_view DXIL = "DXIL";
+		static constexpr std::string_view SPIRV = "SPIR-V";
+		static constexpr std::string_view AIR = "AIR";
 	};
 }

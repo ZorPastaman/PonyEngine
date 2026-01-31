@@ -157,7 +157,8 @@ namespace PonyEngine::RenderDevice::Windows
 			.textureHeaps = D3D12Engine::TextureHeapTypeSupport,
 			.cbvRequirement = CBVRequirement{.offsetAlignment = D3D12Engine::CBVAlignment, .sizeAlignment = D3D12Engine::CBVAlignment},
 			.samplerSupport = SamplerSupport{.maxAnisotropy = D3D12Engine::MaxAnisotropy},
-			.swapChainSupport = engine->SwapChainSupport()
+			.swapChainSupport = engine->SwapChainSupport(),
+			.shaderSupport = ShaderSupport{.shaderIRName = D3D12Engine::ShaderIRName, .version = engine->ShaderIRVersion()}
 		};
 	}
 
