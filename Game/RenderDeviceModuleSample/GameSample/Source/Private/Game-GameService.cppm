@@ -146,6 +146,17 @@ namespace Game
 		computeFenceValue = computeFence->CompletedValue();
 		copyFenceValue = copyFence->CompletedValue();
 		waiter = renderDevice->CreateWaiter();
+
+		const auto ranges = std::array<PonyEngine::RenderDevice::DescriptorRange, 1uz>
+		{
+			PonyEngine::RenderDevice::DescriptorRange{.type = PonyEngine::RenderDevice::DescriptorType::BufferShaderResource, .baseShaderRegister = 0uz, .count = 3u}
+		};
+		const auto sets = std::array<PonyEngine::RenderDevice::DescriptorSet, 1uz>
+		{
+			PonyEngine::RenderDevice::DescriptorSet{.ranges = ranges}
+		};
+		const auto pipelineLayoutParams = PonyEngine::RenderDevice::PipelineLayoutParams{.descriptorSets = sets, .flags = PonyEngine::RenderDevice::PipelineLayoutFlag::DirectlyIndexed};
+		const std::shared_ptr<PonyEngine::RenderDevice::IPipelineLayout> pipelineLayout = renderDevice->CreatePipelineLayout(pipelineLayoutParams);
 	}
 
 	void GameService::End()

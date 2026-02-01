@@ -44,6 +44,8 @@ import :D3D12FormatUtility;
 import :D3D12GraphicsCommandList;
 import :D3D12HeapUtility;
 import :D3D12RenderTargetContainer;
+import :D3D12RootSignature;
+import :D3D12RootSignatureUtility;
 import :D3D12SamplerContainer;
 import :D3D12SamplerUtility;
 import :D3D12ShaderDataContainer;
@@ -121,6 +123,9 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		[[nodiscard("Pure function")]]
 		Meta::Version ShaderIRVersion() const;
+
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params);
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
@@ -286,6 +291,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateCopyRange(std::span<const DepthStencilCopyRange> ranges);
 		static void ValidateContainer(const D3D12SamplerContainer& container, std::uint32_t index);
 		static void ValidateCopyRange(std::span<const SamplerCopyRange> ranges);
+
+		static void ValidatePipelineLayoutParams(const PipelineLayoutParams& params);
 
 		template<typename CommandList, typename CommandListInterface>
 		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
@@ -706,6 +713,23 @@ namespace PonyEngine::RenderDevice::Windows
 	{
 		const auto shaderModel = std::to_underlying(device.GetShaderModel());
 		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
+	}
+
+	std::shared_ptr<IPipelineLayout> D3D12Engine::CreatePipelineLayout(const PipelineLayoutParams& params)
+	{
+		ValidatePipelineLayoutParams(params);
+
+		arena.Free();
+		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
+		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(static_cast<std::size_t>(rootSigDescCounts.tableCount));
+		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(static_cast<std::size_t>(rootSigDescCounts.rangeCount));
+		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC1> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC1>(static_cast<std::size_t>(rootSigDescCounts.staticSamplerCount));
+		const std::span<D3D12_ROOT_PARAMETER1> parametersSpan = arena.Span(parameters);
+		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
+		const std::span<D3D12_STATIC_SAMPLER_DESC1> staticSamplersSpan = arena.Span(staticSamplers);
+
+		const D3D12_ROOT_SIGNATURE_DESC2 rootSigDesc = ToRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
+		return std::make_shared<D3D12RootSignature>(device.CreateRootSignature(rootSigDesc), params);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
@@ -2198,6 +2222,28 @@ namespace PonyEngine::RenderDevice::Windows
 			if (static_cast<const D3D12SamplerContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid destination range");
+			}
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidatePipelineLayoutParams(const PipelineLayoutParams& params)
+	{
+#ifndef NDEBUG
+		if (params.descriptorSets.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Descriptor set count is too great");
+		}
+
+		for (const DescriptorSet& set : params.descriptorSets)
+		{
+			if (set.ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Descriptor set range count is too great");
+			}
+			if (set.staticSamplers.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Descriptor set static sampler count is too great");
 			}
 		}
 #endif

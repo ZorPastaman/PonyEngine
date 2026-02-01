@@ -7,24 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:Layout;
+export module PonyEngine.RenderDevice:PipelineLayoutParams;
 
 import std;
 
+import :DescriptorSet;
+import :PipelineLayoutFlag;
+
 export namespace PonyEngine::RenderDevice
 {
-	enum class Layout : std::uint8_t
+	struct PipelineLayoutParams final
 	{
-		Common,
-		Present,
-		ShaderResource,
-		RenderTarget,
-		DepthStencilRead,
-		DepthStencilWrite,
-		UnorderedAccess,
-		CopySource,
-		CopyDestination,
-		ResolveSource,
-		ResolveDestination
+		std::span<const DescriptorSet> descriptorSets;
+		PipelineLayoutFlag flags = PipelineLayoutFlag::None;
 	};
 }

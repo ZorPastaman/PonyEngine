@@ -31,12 +31,14 @@ import :ICopyCommandList;
 import :IDepthStencilContainer;
 import :IFence;
 import :IGraphicsCommandList;
+import :IPipelineLayout;
 import :IRenderTargetContainer;
 import :ISamplerContainer;
 import :ISecondaryGraphicsCommandList;
 import :IShaderDataContainer;
 import :ITexture;
 import :IWaiter;
+import :PipelineLayoutParams;
 import :QueueSync;
 import :RenderTargetContainerParams;
 import :RTVParams;
@@ -122,6 +124,9 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params) = 0;
 		virtual void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params) = 0;
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) = 0;
+
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;

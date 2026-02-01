@@ -83,6 +83,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) override;
+
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
@@ -282,6 +285,11 @@ namespace PonyEngine::RenderDevice::Windows
 	void D3D12Backend::CopySamplers(const std::span<const SamplerCopyRange> ranges)
 	{
 		engine->CopySamplers(ranges);
+	}
+
+	std::shared_ptr<IPipelineLayout> D3D12Backend::CreatePipelineLayout(const PipelineLayoutParams& params)
+	{
+		return engine->CreatePipelineLayout(params);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Backend::CreateGraphicsCommandList()

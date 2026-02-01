@@ -77,6 +77,9 @@ export namespace PonyEngine::RenderDevice::Windows
 			D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept;
 
 		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12RootSignature> CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC2& rootSigDesc);
+
+		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
@@ -280,6 +283,37 @@ namespace PonyEngine::RenderDevice::Windows
 	{
 		device->CopyDescriptors(rangeCount, destinationHandles, rangeSizes, 
 			rangeCount, sourceHandles, rangeSizes, descriptorHeapType);
+	}
+
+	Platform::Windows::ComPtr<ID3D12RootSignature> D3D12Device::CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC2& rootSigDesc)
+	{
+		const auto versionedDesc = D3D12_VERSIONED_ROOT_SIGNATURE_DESC
+		{
+			.Version = D3D_ROOT_SIGNATURE_VERSION_1_2,
+			.Desc_1_2 = rootSigDesc,
+		};
+
+		Platform::Windows::ComPtr<ID3DBlob> successBlob;
+		Platform::Windows::ComPtr<ID3DBlob> errorBlob;
+		if (const HRESULT result = D3D12SerializeVersionedRootSignature(&versionedDesc, successBlob.GetAddress(), errorBlob.GetAddress()); FAILED(result)) [[unlikely]]
+		{
+			if (errorBlob && errorBlob->GetBufferSize() > 0)
+			{
+				throw std::runtime_error(std::format("Failed to serialize D3D12 root signature: Result = '0x{:X}', Message = '{}'", 
+					static_cast<std::make_unsigned_t<HRESULT>>(result), static_cast<const char*>(errorBlob->GetBufferPointer())));
+			}
+
+			throw std::runtime_error(std::format("Failed to serialize D3D12 root signature: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		Platform::Windows::ComPtr<ID3D12RootSignature> rootSignature;
+		if (const HRESULT result = device->CreateRootSignature(0u, successBlob->GetBufferPointer(), successBlob->GetBufferSize(), 
+			IID_PPV_ARGS(rootSignature.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 root signature: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return rootSignature;
 	}
 
 	Platform::Windows::ComPtr<ID3D12CommandAllocator> D3D12Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)
