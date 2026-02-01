@@ -46,6 +46,8 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Private/Main-D3D12ObjectUtility.cppm"
 	"Source/Private/Main-D3D12RenderTargetContainer.cppm"
 	"Source/Private/Main-D3D12Resource.cppm"
+	"Source/Private/Main-D3D12RootSignature.cppm"
+	"Source/Private/Main-D3D12RootSignatureUtility.cppm"
 	"Source/Private/Main-D3D12SamplerContainer.cppm"
 	"Source/Private/Main-D3D12SamplerUtility.cppm"
 	"Source/Private/Main-D3D12ShaderDataContainer.cppm"

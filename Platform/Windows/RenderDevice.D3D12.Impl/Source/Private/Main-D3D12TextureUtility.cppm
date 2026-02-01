@@ -36,7 +36,7 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr std::uint8_t ToPlaneIndex(Aspect aspect) noexcept;
 
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_BARRIER_LAYOUT ToLayout(Layout layout) noexcept;
+	constexpr D3D12_BARRIER_LAYOUT ToLayout(ResourceLayout layout) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_CLEAR_VALUE ToClearValue(const ClearValue& clearValue, DXGI_FORMAT format) noexcept;
@@ -150,31 +150,31 @@ namespace PonyEngine::RenderDevice::Windows
 		return aspect == Aspect::Stencil;
 	}
 
-	constexpr D3D12_BARRIER_LAYOUT ToLayout(const Layout layout) noexcept
+	constexpr D3D12_BARRIER_LAYOUT ToLayout(const ResourceLayout layout) noexcept
 	{
 		switch (layout)
 		{
-		case Layout::Common:
+		case ResourceLayout::Common:
 			return D3D12_BARRIER_LAYOUT_COMMON;
-		case Layout::Present:
+		case ResourceLayout::Present:
 			return D3D12_BARRIER_LAYOUT_PRESENT;
-		case Layout::ShaderResource:
+		case ResourceLayout::ShaderResource:
 			return D3D12_BARRIER_LAYOUT_SHADER_RESOURCE;
-		case Layout::RenderTarget:
+		case ResourceLayout::RenderTarget:
 			return D3D12_BARRIER_LAYOUT_RENDER_TARGET;
-		case Layout::DepthStencilRead:
+		case ResourceLayout::DepthStencilRead:
 			return D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ;
-		case Layout::DepthStencilWrite:
+		case ResourceLayout::DepthStencilWrite:
 			return D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE;
-		case Layout::UnorderedAccess:
+		case ResourceLayout::UnorderedAccess:
 			return D3D12_BARRIER_LAYOUT_UNORDERED_ACCESS;
-		case Layout::CopySource:
+		case ResourceLayout::CopySource:
 			return D3D12_BARRIER_LAYOUT_COPY_SOURCE;
-		case Layout::CopyDestination:
+		case ResourceLayout::CopyDestination:
 			return D3D12_BARRIER_LAYOUT_COPY_DEST;
-		case Layout::ResolveSource:
+		case ResourceLayout::ResolveSource:
 			return D3D12_BARRIER_LAYOUT_RESOLVE_SOURCE;
-		case Layout::ResolveDestination:
+		case ResourceLayout::ResolveDestination:
 			return D3D12_BARRIER_LAYOUT_RESOLVE_DEST;
 		default: [[unlikely]]
 			assert(false && "Invalid layout");
