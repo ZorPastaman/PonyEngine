@@ -17,8 +17,10 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12RootSignature;
 
 import std;
 
+import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
+import PonyEngine.Type;
 
 import :D3D12ObjectUtility;
 
@@ -37,10 +39,7 @@ export namespace PonyEngine::RenderDevice::Windows
 		~D3D12RootSignature() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
-		virtual std::span<const DescriptorRangeMeta> Ranges() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::span<const StaticSamplerMeta> StaticSamplers() const noexcept override;
-
+		virtual std::span<const DescriptorSetMeta> Sets() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual PipelineLayoutFlag Flags() const noexcept override;
 
@@ -50,15 +49,12 @@ export namespace PonyEngine::RenderDevice::Windows
 		D3D12RootSignature& operator =(D3D12RootSignature&&) = delete;
 
 	private:
-		void SetMetas(const PipelineLayoutParams& params);
+		static std::unique_ptr<std::byte[]> CreateMetas(std::span<const DescriptorSet> descriptorSets);
 
 		Platform::Windows::ComPtr<ID3D12RootSignature> rootSignature;
 		
-		std::size_t rangeMetaCount;
-		std::unique_ptr<DescriptorRangeMeta[]> rangeMetas;
-		std::size_t staticSamplerCount;
-		std::unique_ptr<StaticSamplerMeta[]> staticSamplerMetas;
-
+		std::size_t setCount;
+		std::unique_ptr<std::byte[]> metas;
 		PipelineLayoutFlag flags;
 	};
 }
@@ -67,31 +63,26 @@ namespace PonyEngine::RenderDevice::Windows
 {
 	D3D12RootSignature::D3D12RootSignature(ID3D12RootSignature& rootSignature, const PipelineLayoutParams& params) :
 		rootSignature(&rootSignature),
-		rangeMetaCount{0uz},
-		staticSamplerCount{0uz},
+		setCount{params.descriptorSets.size()},
+		metas(setCount > 0uz ? CreateMetas(params.descriptorSets) : nullptr),
 		flags{params.flags}
 	{
-		SetMetas(params);
 	}
 
 	D3D12RootSignature::D3D12RootSignature(Platform::Windows::ComPtr<ID3D12RootSignature>&& rootSignature, const PipelineLayoutParams& params) :
 		rootSignature(std::move(rootSignature)),
-		rangeMetaCount{0uz},
-		staticSamplerCount{0uz},
+		setCount{params.descriptorSets.size()},
+		metas(setCount > 0uz ? CreateMetas(params.descriptorSets) : nullptr),
 		flags{params.flags}
 	{
 		assert(this->rootSignature && "The root signature is nullptr.");
-		SetMetas(params);
 	}
 
-	std::span<const DescriptorRangeMeta> D3D12RootSignature::Ranges() const noexcept
+	std::span<const DescriptorSetMeta> D3D12RootSignature::Sets() const noexcept
 	{
-		return rangeMetaCount > 0uz ? std::span<const DescriptorRangeMeta>(rangeMetas.get(), rangeMetaCount) : std::span<const DescriptorRangeMeta>();
-	}
-
-	std::span<const StaticSamplerMeta> D3D12RootSignature::StaticSamplers() const noexcept
-	{
-		return staticSamplerCount > 0uz ? std::span<const StaticSamplerMeta>(staticSamplerMetas.get(), staticSamplerCount) : std::span<const StaticSamplerMeta>();
+		return setCount > 0uz 
+			? std::span<const DescriptorSetMeta>(reinterpret_cast<const DescriptorSetMeta*>(metas.get()), setCount) 
+			: std::span<const DescriptorSetMeta>();
 	}
 
 	PipelineLayoutFlag D3D12RootSignature::Flags() const noexcept
@@ -104,44 +95,77 @@ namespace PonyEngine::RenderDevice::Windows
 		SetObjectName(*rootSignature, name);
 	}
 
-	void D3D12RootSignature::SetMetas(const PipelineLayoutParams& params)
+	std::unique_ptr<std::byte[]> D3D12RootSignature::CreateMetas(const std::span<const DescriptorSet> descriptorSets)
 	{
-		for (const DescriptorSet& set : params.descriptorSets)
+		std::size_t shaderDataCount = 0uz;
+		std::size_t samplerCount = 0uz;
+		std::size_t staticSamplerCount = 0uz;
+		for (const DescriptorSet& set : descriptorSets)
 		{
-			rangeMetaCount += set.ranges.size();
+			std::visit(Type::Overload
+			{
+				[&](const std::span<const ShaderDataDescriptorRange> r) noexcept
+				{
+					shaderDataCount += r.size();
+				},
+				[&](const std::span<const SamplerDescriptorRange> r) noexcept
+				{
+					samplerCount += r.size();
+				}
+			}, set.ranges);
 			staticSamplerCount += set.staticSamplers.size();
 		}
 
-		if (rangeMetaCount > 0uz)
-		{
-			rangeMetas = std::make_unique<DescriptorRangeMeta[]>(rangeMetaCount);
-		}
-		if (staticSamplerCount > 0uz)
-		{
-			staticSamplerMetas = std::make_unique<StaticSamplerMeta[]>(staticSamplerCount);
-		}
+		const std::size_t setByteSize = descriptorSets.size() * sizeof(DescriptorSet);
+		const std::size_t shaderDataByteOffset = (setByteSize / alignof(ShaderDataDescriptorRange) + (setByteSize % alignof(ShaderDataDescriptorRange) != 0)) * alignof(ShaderDataDescriptorRange);
+		const std::size_t shaderDataByteSize = shaderDataCount * sizeof(ShaderDataDescriptorRange);
+		const std::size_t shaderDataByteEnd = shaderDataByteOffset + shaderDataByteSize;
+		const std::size_t samplerByteOffset = (shaderDataByteEnd / alignof(SamplerDescriptorRange) + (shaderDataByteEnd % alignof(SamplerDescriptorRange) != 0)) * alignof(SamplerDescriptorRange);
+		const std::size_t samplerByteSize = samplerCount * sizeof(SamplerDescriptorRange);
+		const std::size_t samplerByteEnd = samplerByteOffset + samplerByteSize;
+		const std::size_t staticSamplerByteOffset = (samplerByteEnd / alignof(StaticSamplerParams) + (samplerByteEnd % alignof(StaticSamplerParams) != 0)) * alignof(StaticSamplerParams);
+		const std::size_t staticSamplerByteSize = staticSamplerCount * sizeof(StaticSamplerParams);
+		const std::size_t staticSamplerByteEnd = staticSamplerByteOffset + staticSamplerByteSize;
 
-		for (std::size_t setIndex = 0uz, rangeIndex = 0uz, staticSamplerIndex = 0uz; setIndex < params.descriptorSets.size(); ++setIndex)
+		auto metas = std::make_unique<std::byte[]>(staticSamplerByteEnd);
+		DescriptorSetMeta* setMeta = reinterpret_cast<DescriptorSetMeta*>(metas.get());
+		ShaderDataDescriptorRange* shaderDataRange = reinterpret_cast<ShaderDataDescriptorRange*>(metas.get() + shaderDataByteOffset);
+		SamplerDescriptorRange* samplerRange = reinterpret_cast<SamplerDescriptorRange*>(metas.get() + samplerByteOffset);
+		StaticSamplerParams* staticSamplerParams = reinterpret_cast<StaticSamplerParams*>(metas.get() + staticSamplerByteOffset);
+		for (const DescriptorSet& set : descriptorSets)
 		{
-			const DescriptorSet& set = params.descriptorSets[setIndex];
-			
-			for (const DescriptorRange& range : set.ranges)
+			std::visit(Type::Overload
 			{
-				rangeMetas[rangeIndex++] = DescriptorRangeMeta
+				[&](const std::span<const ShaderDataDescriptorRange> r) noexcept
 				{
-					.range = range,
-					.descriptorSetIndex = setIndex
-				};
+					setMeta->shaderDataRanges = std::span<const ShaderDataDescriptorRange>(shaderDataRange, r.size());
+					setMeta->samplerRanges = std::span<const SamplerDescriptorRange>();
+					std::memcpy(shaderDataRange, r.data(), r.size() * sizeof(ShaderDataDescriptorRange));
+					shaderDataRange += r.size();
+				},
+				[&](const std::span<const SamplerDescriptorRange> r) noexcept
+				{
+					setMeta->shaderDataRanges = std::span<const ShaderDataDescriptorRange>();
+					setMeta->samplerRanges = std::span<const SamplerDescriptorRange>(samplerRange, r.size());
+					std::memcpy(samplerRange, r.data(), r.size() * sizeof(SamplerDescriptorRange));
+					samplerRange += r.size();
+				}
+			}, set.ranges);
+
+			if (set.staticSamplers.size() > 0uz)
+			{
+				setMeta->staticSamplers = std::span<const StaticSamplerParams>(staticSamplerParams, set.staticSamplers.size());
+				std::memcpy(staticSamplerParams, set.staticSamplers.data(), set.staticSamplers.size() * sizeof(StaticSamplerParams));
+				staticSamplerParams += set.staticSamplers.size();
+			}
+			else
+			{
+				setMeta->staticSamplers = std::span<const StaticSamplerParams>();
 			}
 
-			for (const StaticSamplerParams& samplerParams : set.staticSamplers)
-			{
-				staticSamplerMetas[staticSamplerIndex++] = StaticSamplerMeta
-				{
-					.samplerParams = samplerParams,
-					.descriptorSetIndex = setIndex
-				};
-			}
+			++setMeta;
 		}
+
+		return metas;
 	}
 }
