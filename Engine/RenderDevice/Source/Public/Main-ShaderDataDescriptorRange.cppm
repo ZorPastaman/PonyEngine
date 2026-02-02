@@ -7,17 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DescriptorRange;
+export module PonyEngine.RenderDevice:ShaderDataDescriptorRange;
 
 import std;
 
-import :DescriptorType;
+import :ShaderDataDescriptorType;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct DescriptorRange final
+	struct ShaderDataDescriptorRange final
 	{
-		DescriptorType type = DescriptorType::ConstantBuffer;
+		ShaderDataDescriptorType type = ShaderDataDescriptorType::ConstantBuffer;
 		std::uint32_t baseShaderRegister = 0u;
 		std::uint32_t count = 1u;
 	};

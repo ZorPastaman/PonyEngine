@@ -147,9 +147,9 @@ namespace Game
 		copyFenceValue = copyFence->CompletedValue();
 		waiter = renderDevice->CreateWaiter();
 
-		const auto ranges = std::array<PonyEngine::RenderDevice::DescriptorRange, 1uz>
+		const auto ranges = std::array<PonyEngine::RenderDevice::ShaderDataDescriptorRange, 1uz>
 		{
-			PonyEngine::RenderDevice::DescriptorRange{.type = PonyEngine::RenderDevice::DescriptorType::BufferShaderResource, .baseShaderRegister = 0uz, .count = 3u}
+			PonyEngine::RenderDevice::ShaderDataDescriptorRange{.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::BufferShaderResource, .baseShaderRegister = 0uz, .count = 3u}
 		};
 		const auto sets = std::array<PonyEngine::RenderDevice::DescriptorSet, 1uz>
 		{

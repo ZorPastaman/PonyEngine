@@ -7,19 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DescriptorSet;
+export module PonyEngine.RenderDevice:SamplerDescriptorRange;
 
 import std;
 
-import :SamplerDescriptorRange;
-import :ShaderDataDescriptorRange;
-import :StaticSamplerParams;
-
 export namespace PonyEngine::RenderDevice
 {
-	struct DescriptorSet final
+	struct SamplerDescriptorRange final
 	{
-		std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>> ranges;
-		std::span<const StaticSamplerParams> staticSamplers;
+		std::uint32_t baseShaderRegister = 0u;
+		std::uint32_t count = 1u;
 	};
 }

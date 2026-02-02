@@ -18,6 +18,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12RootSignatureUtili
 import std;
 
 import PonyEngine.RenderDevice;
+import PonyEngine.Type;
 
 import :D3D12SamplerUtility;
 
@@ -37,20 +38,24 @@ export namespace PonyEngine::RenderDevice::Windows
 	constexpr D3D12_ROOT_SIGNATURE_DESC2 ToRootSignatureDesc(const PipelineLayoutParams& params, std::span<D3D12_ROOT_PARAMETER1> parameters,
 		std::span<D3D12_DESCRIPTOR_RANGE1> ranges, std::span<D3D12_STATIC_SAMPLER_DESC1> staticSamplers) noexcept;
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_DESCRIPTOR_RANGE_TYPE ToDescriptorRangeType(DescriptorType descriptorType) noexcept;
+	constexpr D3D12_DESCRIPTOR_RANGE_TYPE ToDescriptorRangeType(ShaderDataDescriptorType descriptorType) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_ROOT_SIGNATURE_FLAGS ToRootSignatureFlags(PipelineLayoutFlag flags) noexcept;
+
+	[[nodiscard("Pure function")]]
+	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& ranges) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Windows
 {
 	constexpr RootSignatureDescCounts GetRootSignatureCounts(const std::span<const DescriptorSet> descriptorSets) noexcept
 	{
-		RootSignatureDescCounts counts;
+		auto counts = RootSignatureDescCounts{};
 		for (const DescriptorSet& set : descriptorSets)
 		{
-			counts.tableCount += set.ranges.size() > 0uz;
-			counts.rangeCount += static_cast<UINT>(set.ranges.size());
+			const std::size_t rangeCount = GetRangeCount(set.ranges);
+			counts.tableCount += rangeCount > 0uz;
+			counts.rangeCount += static_cast<UINT>(rangeCount);
 			counts.staticSamplerCount += static_cast<UINT>(set.staticSamplers.size());
 		}
 
@@ -66,31 +71,52 @@ namespace PonyEngine::RenderDevice::Windows
 			const DescriptorSet& set = params.descriptorSets[setIndex];
 			const UINT registerSpace = static_cast<UINT>(setIndex);
 			
-			if (set.ranges.size() > 0uz)
+			if (const std::size_t rangeCount = GetRangeCount(set.ranges); rangeCount > 0uz)
 			{
 				parameters[parameterIndex++] = D3D12_ROOT_PARAMETER1
 				{
 					.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE,
 					.DescriptorTable = D3D12_ROOT_DESCRIPTOR_TABLE1
 					{
-						.NumDescriptorRanges = static_cast<UINT>(set.ranges.size()),
+						.NumDescriptorRanges = static_cast<UINT>(rangeCount),
 						.pDescriptorRanges = &ranges[rangeIndex]
 					},
 					.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
 				};
 
-				for (const DescriptorRange& range : set.ranges)
+				std::visit(Type::Overload
 				{
-					ranges[rangeIndex++] = D3D12_DESCRIPTOR_RANGE1
+					[&](const std::span<const ShaderDataDescriptorRange> r) noexcept
 					{
-						.RangeType = ToDescriptorRangeType(range.type),
-						.NumDescriptors = static_cast<UINT>(range.count),
-						.BaseShaderRegister = static_cast<UINT>(range.baseShaderRegister),
-						.RegisterSpace = registerSpace,
-						.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
-						.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
-					};
-				}
+						for (const ShaderDataDescriptorRange& range : r)
+						{
+							ranges[rangeIndex++] = D3D12_DESCRIPTOR_RANGE1
+							{
+								.RangeType = ToDescriptorRangeType(range.type),
+								.NumDescriptors = static_cast<UINT>(range.count),
+								.BaseShaderRegister = static_cast<UINT>(range.baseShaderRegister),
+								.RegisterSpace = registerSpace,
+								.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
+								.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
+							};
+						}
+					},
+					[&](const std::span<const SamplerDescriptorRange> r) noexcept
+					{
+						for (const SamplerDescriptorRange& range : r)
+						{
+							ranges[rangeIndex++] = D3D12_DESCRIPTOR_RANGE1
+							{
+								.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER,
+								.NumDescriptors = static_cast<UINT>(range.count),
+								.BaseShaderRegister = static_cast<UINT>(range.baseShaderRegister),
+								.RegisterSpace = registerSpace,
+								.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
+								.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
+							};
+						}
+					},
+				}, set.ranges);
 			}
 
 			for (const StaticSamplerParams& staticSamplerParams : set.staticSamplers)
@@ -126,20 +152,18 @@ namespace PonyEngine::RenderDevice::Windows
 		};
 	}
 
-	constexpr D3D12_DESCRIPTOR_RANGE_TYPE ToDescriptorRangeType(const DescriptorType descriptorType) noexcept
+	constexpr D3D12_DESCRIPTOR_RANGE_TYPE ToDescriptorRangeType(const ShaderDataDescriptorType descriptorType) noexcept
 	{
 		switch (descriptorType)
 		{
-		case DescriptorType::ConstantBuffer:
+		case ShaderDataDescriptorType::ConstantBuffer:
 			return D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-		case DescriptorType::BufferShaderResource:
-		case DescriptorType::TextureShaderResource:
+		case ShaderDataDescriptorType::BufferShaderResource:
+		case ShaderDataDescriptorType::TextureShaderResource:
 			return D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-		case DescriptorType::BufferUnorderedAccess:
-		case DescriptorType::TextureUnorderedAccess:
+		case ShaderDataDescriptorType::BufferUnorderedAccess:
+		case ShaderDataDescriptorType::TextureUnorderedAccess:
 			return D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-		case DescriptorType::Sampler:
-			return D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
 		default: [[unlikely]]
 			assert(false && "Invalid descriptor type.");
 			return D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
@@ -155,5 +179,20 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return rootSigFlags;
+	}
+
+	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& ranges) noexcept
+	{
+		return std::visit(Type::Overload
+		{
+			[](const std::span<const ShaderDataDescriptorRange> r) noexcept
+			{
+				return r.size();
+			},
+			[](const std::span<const SamplerDescriptorRange> r) noexcept
+			{
+				return r.size();
+			},
+		}, ranges);
 	}
 }

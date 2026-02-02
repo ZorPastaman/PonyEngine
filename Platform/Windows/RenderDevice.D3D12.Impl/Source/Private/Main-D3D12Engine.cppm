@@ -293,6 +293,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidateCopyRange(std::span<const SamplerCopyRange> ranges);
 
 		static void ValidatePipelineLayoutParams(const PipelineLayoutParams& params);
+		static void ValidatePipelineLayoutSizes(const PipelineLayoutParams& params);
+		static void ValidatePipelineLayoutOverlaps(std::span<const DescriptorSet> descriptorSets);
 
 		template<typename CommandList, typename CommandListInterface>
 		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
@@ -2229,6 +2231,12 @@ namespace PonyEngine::RenderDevice::Windows
 
 	void D3D12Engine::ValidatePipelineLayoutParams(const PipelineLayoutParams& params)
 	{
+		ValidatePipelineLayoutSizes(params);
+		ValidatePipelineLayoutOverlaps(params.descriptorSets);
+	}
+
+	void D3D12Engine::ValidatePipelineLayoutSizes(const PipelineLayoutParams& params)
+	{
 #ifndef NDEBUG
 		if (params.descriptorSets.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
 		{
@@ -2237,13 +2245,71 @@ namespace PonyEngine::RenderDevice::Windows
 
 		for (const DescriptorSet& set : params.descriptorSets)
 		{
-			if (set.ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+			if (GetRangeCount(set.ranges) > std::numeric_limits<UINT>::max()) [[unlikely]]
 			{
 				throw std::invalid_argument("Descriptor set range count is too great");
 			}
 			if (set.staticSamplers.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
 			{
 				throw std::invalid_argument("Descriptor set static sampler count is too great");
+			}
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidatePipelineLayoutOverlaps(const std::span<const DescriptorSet> descriptorSets)
+	{
+#ifndef NDEBUG
+		static constexpr auto checkRange = []<typename T>(const std::span<const T> r, const DescriptorSet& set)
+		{
+			for (std::size_t i = 0uz; i < r.size(); ++i)
+			{
+				const T& base = r[i];
+				std::uint32_t baseBegin = base.baseShaderRegister;
+				std::uint32_t baseEnd = base.baseShaderRegister + base.count;
+				for (std::size_t j = i + 1uz; j < r.size(); ++j)
+				{
+					const T& compared = r[j];
+					std::uint32_t comparedBegin = compared.baseShaderRegister;
+					std::uint32_t comparedEnd = compared.baseShaderRegister + compared.count;
+					if (!(comparedBegin >= baseEnd || comparedEnd <= baseBegin)) [[unlikely]]
+					{
+						throw std::invalid_argument("Overlapping ranges");
+					}
+				}
+				for (const StaticSamplerParams& compared : set.staticSamplers)
+				{
+					if (compared.shaderRegister >= baseBegin && compared.shaderRegister < baseEnd) [[unlikely]]
+					{
+						throw std::invalid_argument("Overlapping ranges");
+					}
+				}
+			}
+		};
+
+		for (const DescriptorSet& set : descriptorSets)
+		{
+			std::visit(Type::Overload
+			{
+				[&](const std::span<const ShaderDataDescriptorRange> r)
+				{
+					checkRange(r, set);
+				},
+				[&](const std::span<const SamplerDescriptorRange> r)
+				{
+					checkRange(r, set);
+				}
+			}, set.ranges);
+
+			for (std::size_t i = 0uz; i < set.staticSamplers.size(); ++i)
+			{
+				for (std::size_t j = i + 1uz; j < set.staticSamplers.size(); ++j)
+				{
+					if (set.staticSamplers[i].shaderRegister == set.staticSamplers[j].shaderRegister) [[unlikely]]
+					{
+						throw std::invalid_argument("Overlapping ranges");
+					}
+				}
 			}
 		}
 #endif
