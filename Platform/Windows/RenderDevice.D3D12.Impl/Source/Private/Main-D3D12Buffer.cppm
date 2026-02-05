@@ -44,7 +44,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void Unmap() override;
 		virtual void Unmap(std::uint64_t offset, std::uint64_t length) override;
 
-		virtual void SetName(std::string_view name) override;
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept override;
+		virtual void Name(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& Resource() const noexcept;
@@ -112,9 +114,14 @@ namespace PonyEngine::RenderDevice::Windows
 		resource.Unmap(0u, static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
 	}
 
-	void D3D12Buffer::SetName(const std::string_view name)
+	std::string_view D3D12Buffer::Name() const noexcept
 	{
-		resource.SetName(name);
+		return resource.Name();
+	}
+
+	void D3D12Buffer::Name(const std::string_view name)
+	{
+		resource.Name(name);
 	}
 
 	ID3D12Resource2& D3D12Buffer::Resource() const noexcept

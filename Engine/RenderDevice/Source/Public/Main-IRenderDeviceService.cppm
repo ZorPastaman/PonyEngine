@@ -24,6 +24,7 @@ import :CopyableFootprintSize;
 import :DepthStencilContainerParams;
 import :DeviceSupport;
 import :DSVParams;
+import :GraphicsPipelineStateParams;
 import :HeapType;
 import :IBuffer;
 import :IComputeCommandList;
@@ -31,10 +32,12 @@ import :ICopyCommandList;
 import :IDepthStencilContainer;
 import :IFence;
 import :IGraphicsCommandList;
+import :IGraphicsPipelineState;
 import :IPipelineLayout;
 import :IRenderTargetContainer;
 import :ISamplerContainer;
 import :ISecondaryGraphicsCommandList;
+import :IShader;
 import :IShaderDataContainer;
 import :ITexture;
 import :IWaiter;
@@ -126,7 +129,12 @@ export namespace PonyEngine::RenderDevice
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) = 0;
 
 		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IShader> CreateShader(std::span<const std::byte> byteCode) = 0;
+
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) = 0;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;

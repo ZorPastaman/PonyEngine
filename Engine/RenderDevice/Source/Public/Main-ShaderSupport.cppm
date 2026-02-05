@@ -19,5 +19,6 @@ export namespace PonyEngine::RenderDevice
 	{
 		std::string_view shaderIRName;
 		Meta::Version version;
+		std::uint8_t simultaneousTargetCount = 0u;
 	};
 }

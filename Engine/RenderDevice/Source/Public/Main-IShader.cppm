@@ -11,24 +11,18 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.RenderDevice:IPipelineLayout;
+export module PonyEngine.RenderDevice:IShader;
 
 import std;
 
-import :DescriptorSetMeta;
-import :PipelineLayoutFlag;
-import :StaticSamplerMeta;
-
 export namespace PonyEngine::RenderDevice
 {
-	class IPipelineLayout
+	class IShader
 	{
-		PONY_INTERFACE_BODY(IPipelineLayout)
+		PONY_INTERFACE_BODY(IShader)
 
 		[[nodiscard("Pure function")]]
-		virtual std::span<const DescriptorSetMeta> Sets() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual PipelineLayoutFlag Flags() const noexcept = 0;
+		virtual std::span<const std::byte> ByteCode() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;

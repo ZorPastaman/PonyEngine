@@ -42,12 +42,16 @@ import :D3D12Device;
 import :D3D12Fence;
 import :D3D12FormatUtility;
 import :D3D12GraphicsCommandList;
+import :D3D12GraphicsPipelineState;
 import :D3D12HeapUtility;
+import :D3D12PipelineStateSubobject;
+import :D3D12PipelineStateUtility;
 import :D3D12RenderTargetContainer;
 import :D3D12RootSignature;
 import :D3D12RootSignatureUtility;
 import :D3D12SamplerContainer;
 import :D3D12SamplerUtility;
+import :D3D12Shader;
 import :D3D12ShaderDataContainer;
 import :D3D12SwapChain;
 import :D3D12Texture;
@@ -62,7 +66,9 @@ export namespace PonyEngine::RenderDevice::Windows
 	public:
 		static constexpr std::string_view ApiName = D3D12Device::ApiName;
 		static constexpr auto ApiVersion = D3D12Device::ApiVersion;
-		static constexpr std::string_view ShaderIRName = D3D12Device::ShaderIRName;
+
+		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL;
+		static constexpr std::uint8_t SimultaneousTargetCount = std::uint8_t{D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT};
 
 		static constexpr auto BufferHeapTypeSupport = HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download;
 		static constexpr auto TextureHeapTypeSupport = HeapTypeMask::Default;
@@ -123,9 +129,14 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		[[nodiscard("Pure function")]]
 		Meta::Version ShaderIRVersion() const;
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IShader> CreateShader(std::span<const std::byte> byteCode);
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params);
+		[[nodiscard("Wierd call")]]
+		std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout,
+			const GraphicsPipelineStateParams& params);
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
@@ -296,6 +307,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		static void ValidatePipelineLayoutSizes(const PipelineLayoutParams& params);
 		static void ValidatePipelineLayoutOverlaps(std::span<const DescriptorSet> descriptorSets);
 
+		static void ValidatePipelineLayout(const IPipelineLayout* layout);
+		void ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const;
+
 		template<typename CommandList, typename CommandListInterface>
 		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
 		static void ValidateFences(std::span<const FenceValue> fences);
@@ -404,15 +418,15 @@ namespace PonyEngine::RenderDevice::Windows
 
 			if (Any(TextureUsage::ShaderResource, params.usage))
 			{
-				if (GetStencilViewFormat(format) == DXGI_FORMAT_UNKNOWN)
+				if (HasStencil(format))
+				{
+					format = GetTypelessFormat(format);
+				}
+				else
 				{
 					castableFormats = arena.Allocate<DXGI_FORMAT>(1uz);
 					const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
 					formats[0] = GetDepthViewFormat(format);
-				}
-				else
-				{
-					format = GetTypelessFormat(format);
 				}
 			}
 
@@ -717,6 +731,11 @@ namespace PonyEngine::RenderDevice::Windows
 		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
 	}
 
+	std::shared_ptr<IShader> D3D12Engine::CreateShader(const std::span<const std::byte> byteCode)
+	{
+		return std::make_shared<D3D12Shader>(byteCode);
+	}
+
 	std::shared_ptr<IPipelineLayout> D3D12Engine::CreatePipelineLayout(const PipelineLayoutParams& params)
 	{
 		ValidatePipelineLayoutParams(params);
@@ -732,6 +751,71 @@ namespace PonyEngine::RenderDevice::Windows
 
 		const D3D12_ROOT_SIGNATURE_DESC2 rootSigDesc = ToRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
 		return std::make_shared<D3D12RootSignature>(device.CreateRootSignature(rootSigDesc), params);
+	}
+
+	std::shared_ptr<IGraphicsPipelineState> D3D12Engine::CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
+		const GraphicsPipelineStateParams& params)
+	{
+		ValidatePipelineLayout(layout.get());
+		ValidatePipelineStateParams(params);
+
+		arena.Free();
+
+		const Memory::Arena::Slice<D3D12PipelineStateSubobjectRootSignature> rootSignature = arena.Allocate<D3D12PipelineStateSubobjectRootSignature>(1u);
+		arena.Span(rootSignature)[0] = &static_cast<const D3D12RootSignature&>(*layout).RootSignature();
+		if (params.amplificationShader)
+		{
+			const Memory::Arena::Slice<D3D12PipelineStateSubobjectAmplificationShader> amplificationShader = arena.Allocate<D3D12PipelineStateSubobjectAmplificationShader>(1u);
+			arena.Span(amplificationShader)[0] = static_cast<const D3D12Shader*>(params.amplificationShader)->ShaderByteCode();
+		}
+		const Memory::Arena::Slice<D3D12PipelineStateSubobjectMeshShader> meshShader = arena.Allocate<D3D12PipelineStateSubobjectMeshShader>(1u);
+		arena.Span(meshShader)[0] = static_cast<const D3D12Shader*>(params.meshShader)->ShaderByteCode();
+		if (params.pixelShader)
+		{
+			const Memory::Arena::Slice<D3D12PipelineStateSubobjectPixelShader> pixelShader = arena.Allocate<D3D12PipelineStateSubobjectPixelShader>(1u);
+			arena.Span(pixelShader)[0] = static_cast<const D3D12Shader*>(params.pixelShader)->ShaderByteCode();
+		}
+
+		const Memory::Arena::Slice<D3D12PipelineStateSubobjectRasterizer> rasterizer = arena.Allocate<D3D12PipelineStateSubobjectRasterizer>(1u);
+		arena.Span(rasterizer)[0] = ToRasterizerDesc(params.rasterizer);
+
+		if (params.attachmentParams.renderTargetFormats.size() > 0uz)
+		{
+			const Memory::Arena::Slice<D3D12PipelineStateSubobjectBlend> blend = arena.Allocate<D3D12PipelineStateSubobjectBlend>(1u);
+			arena.Span(blend)[0] = ToBlendDesc(params);
+			const Memory::Arena::Slice<D3D12PipelineStateSubobjectRenderTargetFormats> rtFormats = arena.Allocate<D3D12PipelineStateSubobjectRenderTargetFormats>(1u);
+			arena.Span(rtFormats)[0] = D3D12_RT_FORMAT_ARRAY{.NumRenderTargets = static_cast<UINT>(params.attachmentParams.renderTargetFormats.size())};
+			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Span(rtFormats)[0].Data();
+			for (std::size_t i = 0uz; i < std::min(std::size(rtArray.RTFormats), params.attachmentParams.renderTargetFormats.size()); ++i)
+			{
+				rtArray.RTFormats[i] = GetFormat(params.attachmentParams.renderTargetFormats[i]);
+			}
+		}
+
+		if (params.attachmentParams.depthStencilFormat)
+		{
+			const Memory::Arena::Slice<D3D12PipelineStateSubobjectDepthStencil> depthStencil = arena.Allocate<D3D12PipelineStateSubobjectDepthStencil>(1u);
+			arena.Span(depthStencil)[0] = ToDepthStencilDesc(params.depthStencil);
+			const Memory::Arena::Slice<D3D12PipelineStateSubobjectDepthStencilFormat> dsFormat = arena.Allocate<D3D12PipelineStateSubobjectDepthStencilFormat>(1u);
+			arena.Span(dsFormat)[0] = GetFormat(*params.attachmentParams.depthStencilFormat);
+		}
+
+		const Memory::Arena::Slice<D3D12PipelineStateSubobjectSampleDesc> sampleDesc = arena.Allocate<D3D12PipelineStateSubobjectSampleDesc>(1u);
+		arena.Span(sampleDesc)[0] = DXGI_SAMPLE_DESC{.Count = static_cast<UINT>(ToNumber(params.sample.sampleCount)), .Quality = 0u};
+		const Memory::Arena::Slice<D3D12PipelineStateSubobjectSampleMask> sampleMask = arena.Allocate<D3D12PipelineStateSubobjectSampleMask>(1u);
+		arena.Span(sampleMask)[0] = static_cast<UINT>(params.sample.sampleMask);
+
+#ifndef NDEBUG
+		const Memory::Arena::Slice<D3D12PipelineStateSubobjectFlags> flags = arena.Allocate<D3D12PipelineStateSubobjectFlags>(1u);
+		arena.Span(flags)[0] = D3D12_PIPELINE_STATE_FLAG_TOOL_DEBUG;
+#endif
+
+		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
+		{
+			.SizeInBytes = static_cast<SIZE_T>(arena.Size()),
+			.pPipelineStateSubobjectStream = arena.Data()
+		};
+		return std::make_shared<D3D12GraphicsPipelineState>(device.CreatePipelineState(pipelineStateStream), layout, params);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Engine::CreateGraphicsCommandList()
@@ -776,7 +860,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 	std::shared_ptr<IWaiter> D3D12Engine::CreateWaiter()
 	{
-		return std::make_shared<D3D12Waiter>(*renderDevice);
+		return std::make_shared<D3D12Waiter>();
 	}
 
 	struct SwapChainSupport D3D12Engine::SwapChainSupport() const
@@ -826,7 +910,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 		auto dxgiSwapChain = DXGISwapChain(factory.CreateSwapChain(graphicsCommandQueue.CommandQueue(), windowHandle, swapChainDesc));
 		factory.MakeWindowAssociation(windowHandle);
-		dxgiSwapChain.SetFullscreenState(FALSE);
+		dxgiSwapChain.SetFullscreenState(false);
 
 		auto buffers = std::vector<std::shared_ptr<D3D12Texture>>(params.bufferCount);
 		for (UINT i = 0u; i < params.bufferCount; ++i)
@@ -1506,7 +1590,7 @@ namespace PonyEngine::RenderDevice::Windows
 			}
 			break;
 		case Aspect::Stencil:
-			if (GetStencilViewFormat(format) == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+			if (!HasStencil(format)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid aspect");
 			}
@@ -2310,6 +2394,79 @@ namespace PonyEngine::RenderDevice::Windows
 						throw std::invalid_argument("Overlapping ranges");
 					}
 				}
+			}
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidatePipelineLayout(const IPipelineLayout* const layout)
+	{
+#ifndef NDEBUG
+		if (!layout || typeid(*layout) != typeid(D3D12RootSignature)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline layout");
+		}
+#endif
+	}
+
+	void D3D12Engine::ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const
+	{
+#ifndef NDEBUG
+		if (params.amplificationShader && typeid(*params.amplificationShader) != typeid(D3D12Shader)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid amplification shader");
+		}
+		if (!params.meshShader || typeid(*params.meshShader) != typeid(D3D12Shader)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid mesh shader");
+		}
+		if (params.pixelShader && typeid(*params.pixelShader) != typeid(D3D12Shader)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid amplification shader");
+		}
+
+		const std::size_t blendCount = std::visit(Type::Overload
+		{
+			[](const BlendGroupParams& p)
+			{
+				return p.renderTargetBlend.size();
+			},
+			[](const LogicBlendGroupParams& p)
+			{
+				return p.renderTargetBlend.size();
+			}
+		}, params.blend.blendGroup);
+		if (blendCount != params.attachmentParams.renderTargetFormats.size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Blend render target count and attachment render target count don't match");
+		}
+		if (blendCount > SimultaneousTargetCount) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid render target count");
+		}
+		if ((params.depthStencil.depth || params.depthStencil.stencil) != params.attachmentParams.depthStencilFormat.has_value()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid depth stencil format");
+		}
+
+		for (const TextureFormatId format : params.attachmentParams.renderTargetFormats)
+		{
+			if (None(AspectMask::Color, GetAspects(GetFormat(format)))) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid render target format");
+			}
+		}
+
+		if (params.attachmentParams.depthStencilFormat)
+		{
+			const DXGI_FORMAT depthStencilFormat = GetFormat(*params.attachmentParams.depthStencilFormat);
+			if (!IsDepthStencilFormat(depthStencilFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid depth stencil format");
+			}
+			if (params.depthStencil.stencil && HasStencil(depthStencilFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid depth stencil format");
 			}
 		}
 #endif

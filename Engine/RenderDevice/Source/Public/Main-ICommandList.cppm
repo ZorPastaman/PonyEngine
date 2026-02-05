@@ -24,6 +24,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void Reset() = 0;
 		virtual void Close() = 0;
 
-		virtual void SetName(std::string_view name) = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
+		virtual void Name(std::string_view name) = 0;
 	};
 }

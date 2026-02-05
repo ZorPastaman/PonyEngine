@@ -7,26 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.RenderDevice:IFence;
+export module PonyEngine.RenderDevice:BlendOperation;
 
 import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	class IFence
+	enum class BlendOperation : std::uint8_t
 	{
-		PONY_INTERFACE_BODY(IFence)
-
-		[[nodiscard("Pure function")]]
-		virtual std::uint64_t CompletedValue() const noexcept = 0;
-		virtual void Signal(std::uint64_t value) = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-		virtual void Name(std::string_view name) = 0;
+		Add,
+		Subtract,
+		ReverseSubtract,
+		Min,
+		Max
 	};
 }
