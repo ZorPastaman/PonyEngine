@@ -43,7 +43,12 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]] 
 		virtual PipelineLayoutFlag Flags() const noexcept override;
 
-		virtual void SetName(std::string_view name) noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept override;
+		virtual void Name(std::string_view name) override;
+
+		[[nodiscard("Pure function")]]
+		ID3D12RootSignature& RootSignature() const noexcept;
 
 		D3D12RootSignature& operator =(const D3D12RootSignature&) = delete;
 		D3D12RootSignature& operator =(D3D12RootSignature&&) = delete;
@@ -56,6 +61,8 @@ export namespace PonyEngine::RenderDevice::Windows
 		std::size_t setCount;
 		std::unique_ptr<std::byte[]> metas;
 		PipelineLayoutFlag flags;
+
+		std::string name;
 	};
 }
 
@@ -90,9 +97,29 @@ namespace PonyEngine::RenderDevice::Windows
 		return flags;
 	}
 
-	void D3D12RootSignature::SetName(const std::string_view name) noexcept
+	std::string_view D3D12RootSignature::Name() const noexcept
+	{
+		return name;
+	}
+
+	void D3D12RootSignature::Name(const std::string_view name)
 	{
 		SetObjectName(*rootSignature, name);
+
+		try
+		{
+			this->name = name;
+		}
+		catch (...)
+		{
+			SetObjectName(*rootSignature, this->name);
+			throw;
+		}
+	}
+
+	ID3D12RootSignature& D3D12RootSignature::RootSignature() const noexcept
+	{
+		return *rootSignature;
 	}
 
 	std::unique_ptr<std::byte[]> D3D12RootSignature::CreateMetas(const std::span<const DescriptorSet> descriptorSets)

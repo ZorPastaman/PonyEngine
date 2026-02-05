@@ -835,6 +835,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_FORMAT GetDepthViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
 	[[nodiscard("Pure function")]]
+	constexpr bool HasStencil(DXGI_FORMAT format) noexcept;
+	[[nodiscard("Pure function")]]
 	constexpr DXGI_FORMAT GetStencilViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
 
 	[[nodiscard("Pure function")]]
@@ -869,6 +871,11 @@ namespace PonyEngine::RenderDevice::Windows
 	constexpr DXGI_FORMAT GetDepthViewFormat(const DXGI_FORMAT depthStencilFormat) noexcept
 	{
 		return DepthFormatMap.GetValue(DepthFormatMap.IndexOf(depthStencilFormat));
+	}
+
+	constexpr bool HasStencil(const DXGI_FORMAT format) noexcept
+	{
+		return StencilFormatMap.GetValue(StencilFormatMap.IndexOf(format)) < StencilFormatMap.MapSize();
 	}
 
 	constexpr DXGI_FORMAT GetStencilViewFormat(const DXGI_FORMAT depthStencilFormat) noexcept

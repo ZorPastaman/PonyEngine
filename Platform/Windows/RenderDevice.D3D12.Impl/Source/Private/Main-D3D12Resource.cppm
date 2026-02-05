@@ -45,13 +45,16 @@ export namespace PonyEngine::RenderDevice::Windows
 		void Unmap(UINT subresourceIndex, SIZE_T offset, SIZE_T length) noexcept;
 		void Unmap(UINT subresourceIndex, const D3D12_RANGE* range) noexcept;
 
-		void SetName(std::string_view name);
+		std::string_view Name() const noexcept;
+		void Name(std::string_view name);
 
 		D3D12Resource& operator =(const D3D12Resource&) = delete;
 		D3D12Resource& operator =(D3D12Resource&&) = delete;
 
 	private:
 		Platform::Windows::ComPtr<ID3D12Resource2> resource;
+
+		std::string name;
 	};
 }
 
@@ -111,8 +114,23 @@ namespace PonyEngine::RenderDevice::Windows
 		resource->Unmap(subresourceIndex, range);
 	}
 
-	void D3D12Resource::SetName(const std::string_view name)
+	std::string_view D3D12Resource::Name() const noexcept
+	{
+		return name;
+	}
+
+	void D3D12Resource::Name(const std::string_view name)
 	{
 		SetObjectName(*resource, name);
+
+		try
+		{
+			this->name = name;
+		}
+		catch (...)
+		{
+			SetObjectName(*resource, this->name);
+			throw;
+		}
 	}
 }

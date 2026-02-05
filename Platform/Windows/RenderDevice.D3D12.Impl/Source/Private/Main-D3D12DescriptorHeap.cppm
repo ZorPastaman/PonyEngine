@@ -44,7 +44,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		D3D12_GPU_DESCRIPTOR_HANDLE GpuHandle(UINT index) const noexcept;
 
-		void SetName(std::string_view name);
+		[[nodiscard("Pure function")]]
+		std::string_view Name() const noexcept;
+		void Name(std::string_view name);
 
 		D3D12DescriptorHeap& operator =(const D3D12DescriptorHeap&) = delete;
 		D3D12DescriptorHeap& operator =(D3D12DescriptorHeap&&) = delete;
@@ -52,6 +54,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	private:
 		Platform::Windows::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 		SIZE_T handleIncrement;
+
+		std::string name;
 	};
 }
 
@@ -85,8 +89,23 @@ namespace PonyEngine::RenderDevice::Windows
 		return D3D12_GPU_DESCRIPTOR_HANDLE{descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + index * handleIncrement};
 	}
 
-	void D3D12DescriptorHeap::SetName(const std::string_view name)
+	std::string_view D3D12DescriptorHeap::Name() const noexcept
+	{
+		return name;
+	}
+
+	void D3D12DescriptorHeap::Name(const std::string_view name)
 	{
 		SetObjectName(*descriptorHeap, name);
+
+		try
+		{
+			this->name = name;
+		}
+		catch (...)
+		{
+			SetObjectName(*descriptorHeap, this->name);
+			throw;
+		}
 	}
 }

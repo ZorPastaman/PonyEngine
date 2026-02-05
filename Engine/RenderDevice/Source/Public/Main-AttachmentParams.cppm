@@ -7,26 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.RenderDevice:IFence;
+export module PonyEngine.RenderDevice:AttachmentParams;
 
 import std;
 
+import :TextureFormatId;
+
 export namespace PonyEngine::RenderDevice
 {
-	class IFence
+	struct AttachmentParams final
 	{
-		PONY_INTERFACE_BODY(IFence)
-
-		[[nodiscard("Pure function")]]
-		virtual std::uint64_t CompletedValue() const noexcept = 0;
-		virtual void Signal(std::uint64_t value) = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-		virtual void Name(std::string_view name) = 0;
+		std::span<const TextureFormatId> renderTargetFormats;
+		std::optional<TextureFormatId> depthStencilFormat;
 	};
 }

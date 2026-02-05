@@ -37,7 +37,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void Reset() override;
 		virtual void Close() override;
 
-		virtual void SetName(std::string_view name) override;
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept override;
+		virtual void Name(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
 		ID3D12GraphicsCommandList10& CommandList() const noexcept;
@@ -73,9 +75,14 @@ namespace PonyEngine::RenderDevice::Windows
 		commandList.Close();
 	}
 
-	void D3D12CopyCommandList::SetName(const std::string_view name)
+	std::string_view D3D12CopyCommandList::Name() const noexcept
 	{
-		commandList.SetName(name);
+		return commandList.Name();
+	}
+
+	void D3D12CopyCommandList::Name(const std::string_view name)
+	{
+		commandList.Name(name);
 	}
 
 	ID3D12GraphicsCommandList10& D3D12CopyCommandList::CommandList() const noexcept

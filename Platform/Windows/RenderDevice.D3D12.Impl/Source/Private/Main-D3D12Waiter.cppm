@@ -9,15 +9,13 @@
 
 module;
 
-#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12Waiter;
 
 import std;
 
-import PonyEngine.Log;
-import PonyEngine.RenderDevice.Ext;
+import PonyEngine.RenderDevice;
 
 import :D3D12Fence;
 
@@ -27,7 +25,7 @@ export namespace PonyEngine::RenderDevice::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit D3D12Waiter(IRenderDeviceContext& renderDevice);
+		D3D12Waiter();
 		D3D12Waiter(const D3D12Waiter&) = delete;
 		D3D12Waiter(D3D12Waiter&&) = delete;
 
@@ -35,35 +33,33 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		virtual void Wait(std::span<const FenceValue> fenceValues, std::chrono::nanoseconds timeout) override;
 
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept override;
+		virtual void Name(std::string_view name) override;
+
 		D3D12Waiter& operator =(const D3D12Waiter&) = delete;
 		D3D12Waiter& operator =(D3D12Waiter&&) = delete;
 
 	private:
-		IRenderDeviceContext* renderDevice;
-
 		HANDLE waitEvent;
+
+		std::string name;
 	};
 }
 
 namespace PonyEngine::RenderDevice::Windows
 {
-	D3D12Waiter::D3D12Waiter(IRenderDeviceContext& renderDevice) :
-		renderDevice{&renderDevice}
+	D3D12Waiter::D3D12Waiter()
 	{
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Creating wait handle done...");
 		if (!((waitEvent = CreateEventA(nullptr, false, false, nullptr)))) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create wait event: Error code: '0x{:X}'", GetLastError()));
 		}
-		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Creating wait handle done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(waitEvent));
 	}
 
 	D3D12Waiter::~D3D12Waiter() noexcept
 	{
-		if (!CloseHandle(waitEvent)) [[unlikely]]
-		{
-			PONY_LOG(renderDevice->Logger(), Log::LogType::Error, "Failed to close wait handle. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(waitEvent));
-		}
+		CloseHandle(waitEvent);
 	}
 
 	void D3D12Waiter::Wait(const std::span<const FenceValue> fenceValues, const std::chrono::nanoseconds timeout)
@@ -101,5 +97,15 @@ namespace PonyEngine::RenderDevice::Windows
 				}
 			}
 		}
+	}
+
+	std::string_view D3D12Waiter::Name() const noexcept
+	{
+		return name;
+	}
+
+	void D3D12Waiter::Name(const std::string_view name)
+	{
+		this->name = name;
 	}
 }

@@ -9,24 +9,31 @@
 
 module;
 
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Type/Enum.h"
 
-export module PonyEngine.RenderDevice:IFence;
+export module PonyEngine.RenderDevice:ColorComponent;
 
 import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	class IFence
+	enum class ColorComponent : std::uint8_t
 	{
-		PONY_INTERFACE_BODY(IFence)
-
-		[[nodiscard("Pure function")]]
-		virtual std::uint64_t CompletedValue() const noexcept = 0;
-		virtual void Signal(std::uint64_t value) = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-		virtual void Name(std::string_view name) = 0;
+		Red,
+		Green,
+		Blue,
+		Alpha
 	};
+
+	enum class ColorComponentMask : std::uint8_t
+	{
+		None = 0,
+		Red = 1 << 0,
+		Green = 1 << 1,
+		Blue = 1 << 2,
+		Alpha = 1 << 3,
+		All = (1 << 4) - 1
+	};
+
+	PONY_ENUM_VALUE_MASK_FEATURES(ColorComponent, ColorComponentMask)
 }

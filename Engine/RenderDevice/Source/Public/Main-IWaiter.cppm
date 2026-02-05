@@ -24,5 +24,9 @@ export namespace PonyEngine::RenderDevice
 		PONY_INTERFACE_BODY(IWaiter)
 
 		virtual void Wait(std::span<const FenceValue> fenceValues, std::chrono::nanoseconds timeout) = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
+		virtual void Name(std::string_view name) = 0;
 	};
 }

@@ -83,7 +83,13 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IShader> CreateShader(std::span<const std::byte> byteCode) override;
+
+		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) override;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
+			const GraphicsPipelineStateParams& params) override;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
@@ -161,7 +167,12 @@ namespace PonyEngine::RenderDevice::Windows
 			.cbvRequirement = CBVRequirement{.offsetAlignment = D3D12Engine::CBVAlignment, .sizeAlignment = D3D12Engine::CBVAlignment},
 			.samplerSupport = SamplerSupport{.maxAnisotropy = D3D12Engine::MaxAnisotropy},
 			.swapChainSupport = engine->SwapChainSupport(),
-			.shaderSupport = ShaderSupport{.shaderIRName = D3D12Engine::ShaderIRName, .version = engine->ShaderIRVersion()}
+			.shaderSupport = ShaderSupport
+			{
+				.shaderIRName = D3D12Engine::ShaderIRName, 
+				.version = engine->ShaderIRVersion(),
+				.simultaneousTargetCount = D3D12Engine::SimultaneousTargetCount
+			}
 		};
 	}
 
@@ -287,9 +298,20 @@ namespace PonyEngine::RenderDevice::Windows
 		engine->CopySamplers(ranges);
 	}
 
+	std::shared_ptr<IShader> D3D12Backend::CreateShader(const std::span<const std::byte> byteCode)
+	{
+		return engine->CreateShader(byteCode);
+	}
+
 	std::shared_ptr<IPipelineLayout> D3D12Backend::CreatePipelineLayout(const PipelineLayoutParams& params)
 	{
 		return engine->CreatePipelineLayout(params);
+	}
+
+	std::shared_ptr<IGraphicsPipelineState> D3D12Backend::CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
+		const GraphicsPipelineStateParams& params)
+	{
+		return engine->CreateGraphicsPipelineState(layout, params);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Backend::CreateGraphicsCommandList()

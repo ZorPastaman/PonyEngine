@@ -31,7 +31,6 @@ export namespace PonyEngine::RenderDevice::Windows
 		static constexpr std::string_view ApiName = RenderAPI::Direct3D;
 		static constexpr auto ApiVersion = Meta::Version(12, 2);
 		static constexpr D3D_FEATURE_LEVEL FeatureLevel = D3D_FEATURE_LEVEL_12_2;
-		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL;
 
 		[[nodiscard("Pure constructor")]]
 		explicit D3D12Device(IRenderDeviceContext& renderDevice);
@@ -78,6 +77,8 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12RootSignature> CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC2& rootSigDesc);
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12PipelineState> CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream);
 
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
@@ -314,6 +315,17 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 
 		return rootSignature;
+	}
+
+	Platform::Windows::ComPtr<ID3D12PipelineState> D3D12Device::CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream)
+	{
+		Platform::Windows::ComPtr<ID3D12PipelineState> pipelineState;
+		if (const HRESULT result = device->CreatePipelineState(&pipelineStateStream, IID_PPV_ARGS(pipelineState.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 pipeline state: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return pipelineState;
 	}
 
 	Platform::Windows::ComPtr<ID3D12CommandAllocator> D3D12Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)

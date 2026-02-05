@@ -42,7 +42,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		void Reset();
 		void Close();
 
-		void SetName(std::string_view name);
+		[[nodiscard("Pure function")]]
+		std::string_view Name() const noexcept;
+		void Name(std::string_view name);
 
 		D3D12CommandList& operator =(const D3D12CommandList&) = delete;
 		D3D12CommandList& operator =(D3D12CommandList&&) = delete;
@@ -50,6 +52,8 @@ export namespace PonyEngine::RenderDevice::Windows
 	private:
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator;
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList;
+
+		std::string name;
 	};
 }
 
@@ -95,9 +99,33 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	void D3D12CommandList::SetName(const std::string_view name)
+	std::string_view D3D12CommandList::Name() const noexcept
+	{
+		return name;
+	}
+
+	void D3D12CommandList::Name(const std::string_view name)
 	{
 		SetObjectName(*allocator, name);
-		SetObjectName(*commandList, name);
+
+		try
+		{
+			SetObjectName(*commandList, name);
+
+			try
+			{
+				this->name = name;
+			}
+			catch (...)
+			{
+				SetObjectName(*commandList, this->name);
+				throw;
+			}
+		}
+		catch (...)
+		{
+			SetObjectName(*allocator, this->name);
+			throw;
+		}
 	}
 }

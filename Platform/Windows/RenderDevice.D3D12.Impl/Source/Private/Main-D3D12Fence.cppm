@@ -40,7 +40,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		virtual std::uint64_t CompletedValue() const noexcept override;
 		virtual void Signal(std::uint64_t value) override;
 
-		virtual void SetName(std::string_view name) override;
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept override;
+		virtual void Name(std::string_view name) override;
 
 		[[nodiscard("Pure function")]]
 		ID3D12Fence1& Fence() const noexcept;
@@ -52,6 +54,8 @@ export namespace PonyEngine::RenderDevice::Windows
 
 	private:
 		Platform::Windows::ComPtr<ID3D12Fence1> fence;
+
+		std::string name;
 	};
 }
 
@@ -80,9 +84,24 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 	}
 
-	void D3D12Fence::SetName(const std::string_view name)
+	std::string_view D3D12Fence::Name() const noexcept
+	{
+		return name;
+	}
+
+	void D3D12Fence::Name(const std::string_view name)
 	{
 		SetObjectName(*fence, name);
+
+		try
+		{
+			this->name = name;
+		}
+		catch (...)
+		{
+			SetObjectName(*fence, this->name);
+			throw;
+		}
 	}
 
 	ID3D12Fence1& D3D12Fence::Fence() const noexcept
