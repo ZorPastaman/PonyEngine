@@ -7,22 +7,29 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+#include "PonyEngine/Core.hlsli"
+#include "PonyEngine/MaterialBase.hlsli"
 
-#include "PonyEngine/Object/Body.h"
+#ifndef MATERIAL_SET
+#define MATERIAL_SET 3
+#endif
 
-export module PonyEngine.RenderDevice:ShaderIR;
-
-import std;
-
-export namespace PonyEngine::RenderDevice
+struct PixelInput
 {
-	struct ShaderIR final
-	{
-		PONY_NON_CONSTRUCTIBLE_BODY(ShaderIR)
+	float3 position : TEXCOORD0;
+};
 
-		static constexpr std::string_view DXIL = "DXIL";
-		static constexpr std::string_view SPIRV = "SPIRV";
-		static constexpr std::string_view AIR = "AIR";
-	};
+struct PixelOutput
+{
+	float4 color : SV_TARGET;
+};
+
+ConstantBuffer<Pony_MaterialBase> MaterialBase : PONY_CBV_REGISTER(MATERIAL_SET, 0);
+
+PixelOutput main(in PixelInput input)
+{
+	PixelOutput output;
+	output.color = MaterialBase.color;
+
+	return output;
 }

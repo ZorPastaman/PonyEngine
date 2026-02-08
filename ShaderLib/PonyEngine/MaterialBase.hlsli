@@ -7,22 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.RenderDevice:ShaderIR;
-
-import std;
-
-export namespace PonyEngine::RenderDevice
+/// @brief Material basic scalars. It corresponds to @p PonyEngine::Shader::MaterialBase on the C++ side.
+struct Pony_MaterialBase
 {
-	struct ShaderIR final
-	{
-		PONY_NON_CONSTRUCTIBLE_BODY(ShaderIR)
-
-		static constexpr std::string_view DXIL = "DXIL";
-		static constexpr std::string_view SPIRV = "SPIRV";
-		static constexpr std::string_view AIR = "AIR";
-	};
-}
+	float4 color; ///< Whole object color.
+};
