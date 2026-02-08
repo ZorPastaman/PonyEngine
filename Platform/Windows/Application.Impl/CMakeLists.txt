@@ -40,7 +40,7 @@ else()
 	set(PONY_ENGINE_ROOT_PATH "")
 endif()
 if(PONY_APP_ICON STREQUAL "<Default>")
-	set(PONY_APP_ICON "${PONY_ROOT}/Logo/Windows/Logo.ico")
+	set(PONY_APP_ICON "${PONY_ENGINE_ROOT}/Logo/Windows/Logo.ico")
 endif()
 target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_ENGINE_ROOT_PATH=${PONY_ENGINE_ROOT_PATH}
