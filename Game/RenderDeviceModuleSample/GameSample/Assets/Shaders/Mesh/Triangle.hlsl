@@ -9,7 +9,6 @@
 
 #include "PonyEngine/Core.hlsli"
 #include "PonyEngine/Meshlet.hlsli"
-#include "PonyEngine/Transform.hlsli"
 
 #ifndef VERTEX_COUNT
 #define VERTEX_COUNT 64
@@ -29,17 +28,23 @@
 #define VERTEX_SET 2
 #endif
 
+struct Transform
+{
+	float4x4 mvp;
+	float mvpDet;
+};
+
 struct Vertex
 {
 	float4 clipPosition : SV_POSITION;
 	float3 position : TEXCOORD0;
 };
 
-ConstantBuffer<Pony_Transform> Transform : PONY_CBV_REGISTER(CONTEXT_SET, 0);
+ConstantBuffer<Transform> Transform : PONY_CBV_REGISTER(CONTEXT_SET, 0);
 
 StructuredBuffer<Pony_Meshlet> Meshlets : PONY_SRV_REGISTER(MESHLET_SET, 0);
 StructuredBuffer<uint> VertexIndices : PONY_SRV_REGISTER(MESHLET_SET, 1);
-ByteAddressBuffer Primitives : PONY_SRV_REGISTER(MESHLET_SET, 2);
+ByteAddressBuffer Indices : PONY_SRV_REGISTER(MESHLET_SET, 2);
 
 StructuredBuffer<float3> Positions : PONY_SRV_REGISTER(VERTEX_SET, 0);
 
@@ -77,7 +82,7 @@ void main(in uint groupId : SV_GROUPID,
 		if (groupThreadSubId < primitiveCount)
 		{
 			uint primitiveIndex = meshlet.primitiveOffset + groupThreadSubId;
-			outTriangles[groupThreadSubId] = UnpackTriangle(Primitives, primitiveIndex, Transform.mvpDet < 0.f);
+			outTriangles[groupThreadSubId] = UnpackTriangle(Indices, primitiveIndex, Transform.mvpDet < 0.f);
 		}
 	}
 }

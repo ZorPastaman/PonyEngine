@@ -32,12 +32,14 @@ target_link_libraries(GameSample PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
 	PonyEngine.RenderDevice
+	PonyEngine.Shader
 )
 
-set(PONY_ENGINE_SHADER_ASSETS "${PONY_ENGINE_ASSETS}/Shaders")
-set(DATA "${CMAKE_BINARY_DIR}/Data")
-set(DATA_SHADERS "${DATA}/Shaders")
+# Add data.
+set(DATA "Data")
 
+# Add shaders.
+get_target_property(PONY_ENGINE_SHADER_LIB PonyEngine.Shader PONY_ENGINE_SHADER_INCLUDE)
 set(SHADER_REGISTRY "")
 macro(compile_shader)
 	cmake_parse_arguments(
@@ -48,14 +50,22 @@ macro(compile_shader)
 		${ARGN}
 	)
 
-	compile_shader_with_dxc("${SHADER_INPUT}" "${SHADER_OUTPUT}" 
-		PROFILE ${SHADER_PROFILE} 
-		INCLUDES ${PONY_ENGINE_SHADER_LIB}
+	compile_shader_with_dxc("${SHADER_INPUT}" "${SHADER_OUTPUT}" "${SHADER_PROFILE}"
+		PDB
+		INCLUDES ${PONY_ENGINE_SHADER_LIB} "${CMAKE_CURRENT_LIST_DIR}/ShaderInclude"
 	)
 	list(APPEND SHADER_REGISTRY "${SHADER_OUTPUT}")
 endmacro()
-compile_shader(INPUT "${PONY_ENGINE_SHADER_ASSETS}/Mesh/DefaultTriangle.hlsl" OUTPUT "${DATA_SHADERS}/Mesh/DefaultTriangle.cso" PROFILE ms_6_6)
-compile_shader(INPUT "${PONY_ENGINE_SHADER_ASSETS}/Pixel/DefaultPixel.hlsl" OUTPUT "${DATA_SHADERS}/Pixel/DefaultPixel.cso" PROFILE ps_6_6)
+set(TRIANGLE_SHADER "${DATA}/Shaders/Mesh/Triangle.cso")
+set(PIXEL_SHADER "${DATA}/Shaders/Pixel/Pixel.cso")
+compile_shader(INPUT "Assets/Shaders/Mesh/Triangle.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${TRIANGLE_SHADER}" PROFILE ms_6_6)
+compile_shader(INPUT "Assets/Shaders/Pixel/Pixel.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${PIXEL_SHADER}" PROFILE ps_6_6)
 add_custom_target(Shaders ALL DEPENDS ${SHADER_REGISTRY})
 
-install(DIRECTORY ${DATA} DESTINATION . FILES_MATCHING PATTERN "*.cso")
+message(VERBOSE "Configuring defines")
+target_compile_definitions(GameSample PRIVATE
+	TRIANGLE_SHADER="${TRIANGLE_SHADER}"
+	PIXEL_SHADER="${PIXEL_SHADER}"
+)
+
+install(DIRECTORY "${CMAKE_BINARY_DIR}/${DATA}" DESTINATION . FILES_MATCHING PATTERN "*.cso")

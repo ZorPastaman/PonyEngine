@@ -28,6 +28,9 @@ export namespace Game
 	private:
 		virtual void Tick() override;
 
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<PonyEngine::RenderDevice::IShader> LoadShader(const std::filesystem::path& path);
+
 		PonyEngine::Application::IApplicationContext* application;
 		PonyEngine::RenderDevice::IRenderDeviceService* renderDevice;
 
@@ -42,6 +45,8 @@ export namespace Game
 		std::uint64_t computeFenceValue = 0ull;
 		std::uint64_t copyFenceValue = 0ull;
 		std::shared_ptr<PonyEngine::RenderDevice::IWaiter> waiter;
+
+		std::shared_ptr<PonyEngine::RenderDevice::IGraphicsPipelineState> boxPipelineState;
 	};
 }
 
@@ -67,52 +72,10 @@ namespace Game
 
 	void GameService::Begin()
 	{
-		const PonyEngine::RenderDevice::TextureFormatId format = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm);
-		const PonyEngine::RenderDevice::TextureFormatSupport formatSupport = renderDevice->TextureFormatSupport(format);
-		const PonyEngine::RenderDevice::TextureSupportResponse textureSupport = renderDevice->TextureSupport(PonyEngine::RenderDevice::TextureSupportRequest
-		{
-			.format = format,
-			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture2D,
-			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget
-		});
-		const PonyEngine::RenderDevice::DeviceSupport deviceSupport = renderDevice->DeviceSupport();
-
-		const std::shared_ptr<PonyEngine::RenderDevice::IBuffer> buffer = renderDevice->CreateBuffer(PonyEngine::RenderDevice::HeapType::Default, PonyEngine::RenderDevice::BufferParams
-		{
-			.size = 1024ull,
-			.usage = PonyEngine::RenderDevice::BufferUsage::ShaderResource
-		});
-
-		const PonyEngine::RenderDevice::TextureFormatId textureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm);
-		const PonyEngine::RenderDevice::TextureFormatId castableTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Snorm);
-		const std::shared_ptr<PonyEngine::RenderDevice::ITexture> texture = renderDevice->CreateTexture(PonyEngine::RenderDevice::HeapType::Default, PonyEngine::RenderDevice::TextureParams
-		{
-			.format = textureFormat,
-			.castableFormats = std::span<const PonyEngine::RenderDevice::TextureFormatId>(&castableTextureFormat, 1uz),
-			.size = PonyEngine::Math::Vector3<std::uint32_t>(140u, 230u, 156u),
-			.mipCount = 3u,
-			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture3D,
-			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource | PonyEngine::RenderDevice::TextureUsage::RenderTarget,
-			.flags = PonyEngine::RenderDevice::TextureFlag::SRGB
-		});
-		const std::uint32_t copyableCount = renderDevice->GetCopyableFootprintCount(*texture, PonyEngine::RenderDevice::SubTextureRange{});
-		auto footprints = std::vector<PonyEngine::RenderDevice::CopyableFootprint>(copyableCount);
-		const auto [sourceSize, destinationSize] = renderDevice->GetCopyableFootprints(*texture, 0u, PonyEngine::RenderDevice::SubTextureRange{}, footprints);
-
-		const std::shared_ptr<PonyEngine::RenderDevice::IShaderDataContainer> shaderDataContainer = renderDevice->CreateShaderDataContainer(PonyEngine::RenderDevice::ShaderDataContainerParams
-		{
-			.size = 128u,
-			.shaderVisible = false
-		});
-		renderDevice->CreateView(buffer.get(), *shaderDataContainer, 1u, PonyEngine::RenderDevice::CBVParams
-		{
-			.offset = deviceSupport.cbvRequirement.offsetAlignment,
-			.size = deviceSupport.cbvRequirement.sizeAlignment
-		});
-
+		const PonyEngine::RenderDevice::TextureFormatId swapChainTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm);
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{
-			.format = textureFormat,
+			.format = swapChainTextureFormat,
 			.size = std::nullopt,
 			.bufferCount = 3u,
 			.alphaMode = PonyEngine::RenderDevice::SwapChainAlphaMode::Ignore,
@@ -126,19 +89,6 @@ namespace Game
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
 		computeCommandList = renderDevice->CreateComputeCommandList();
 		copyCommandList = renderDevice->CreateCopyCommandList();
-		graphicsCommandList->Reset();
-		computeCommandList->Reset();
-		copyCommandList->Reset();
-		graphicsCommandList->Close();
-		computeCommandList->Close();
-		copyCommandList->Close();
-		const auto graphics = std::array<const PonyEngine::RenderDevice::IGraphicsCommandList*, 1>{ graphicsCommandList.get() };
-		const auto compute = std::array<const PonyEngine::RenderDevice::IComputeCommandList*, 1>{ computeCommandList.get() };
-		const auto copy = std::array<const PonyEngine::RenderDevice::ICopyCommandList*, 1>{ copyCommandList.get() };
-		renderDevice->Execute(std::span(graphics.data(), 1u));
-		renderDevice->Execute(std::span(compute.data(), 1u));
-		renderDevice->Execute(std::span(copy.data(), 1u));
-
 		graphicsFence = renderDevice->CreateFence();
 		computeFence = renderDevice->CreateFence();
 		copyFence = renderDevice->CreateFence();
@@ -147,31 +97,113 @@ namespace Game
 		copyFenceValue = copyFence->CompletedValue();
 		waiter = renderDevice->CreateWaiter();
 
-		const auto ranges = std::array<PonyEngine::RenderDevice::ShaderDataDescriptorRange, 1uz>
+		constexpr auto contextRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
-			PonyEngine::RenderDevice::ShaderDataDescriptorRange{.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::BufferShaderResource, .baseShaderRegister = 0uz, .count = 3u}
+			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::ConstantBuffer,
+			.baseShaderRegister = 0u,
+			.count = 1u
 		};
-		const auto sets = std::array<PonyEngine::RenderDevice::DescriptorSet, 1uz>
+		const auto contextDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
 		{
-			PonyEngine::RenderDevice::DescriptorSet{.ranges = ranges}
+			.ranges = std::span<const PonyEngine::RenderDevice::ShaderDataDescriptorRange>(&contextRange, 1uz),
+			.setIndex = 0u
 		};
-		const auto pipelineLayoutParams = PonyEngine::RenderDevice::PipelineLayoutParams{.descriptorSets = sets, .flags = PonyEngine::RenderDevice::PipelineLayoutFlag::DirectlyIndexed};
-		const std::shared_ptr<PonyEngine::RenderDevice::IPipelineLayout> pipelineLayout = renderDevice->CreatePipelineLayout(pipelineLayoutParams);
+		constexpr auto meshletRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
+		{
+			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::BufferShaderResource,
+			.baseShaderRegister = 0u,
+			.count = 3u
+		};
+		const auto meshletDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
+		{
+			.ranges = std::span<const PonyEngine::RenderDevice::ShaderDataDescriptorRange>(&meshletRange, 1uz),
+			.setIndex = 1u
+		};
+		constexpr auto vertexRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
+		{
+			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::BufferShaderResource,
+			.baseShaderRegister = 0u,
+			.count = 1u
+		};
+		const auto vertexDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
+		{
+			.ranges = std::span<const PonyEngine::RenderDevice::ShaderDataDescriptorRange>(&vertexRange, 1uz),
+			.setIndex = 2u
+		};
+		constexpr auto materialRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
+		{
+			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::ConstantBuffer,
+			.baseShaderRegister = 0u,
+			.count = 1u
+		};
+		const auto materialDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
+		{
+			.ranges = std::span<const PonyEngine::RenderDevice::ShaderDataDescriptorRange>(&materialRange, 1uz),
+			.setIndex = 3u
+		};
+		const auto descriptorSets = std::array<PonyEngine::RenderDevice::DescriptorSet, 4>
+		{
+			contextDescriptorSet,
+			meshletDescriptorSet,
+			vertexDescriptorSet,
+			materialDescriptorSet
+		};
+		const std::shared_ptr<PonyEngine::RenderDevice::IPipelineLayout> layout = renderDevice->CreatePipelineLayout(PonyEngine::RenderDevice::PipelineLayoutParams
+		{
+			.descriptorSets = descriptorSets,
+			.flags = PonyEngine::RenderDevice::PipelineLayoutFlag::None
+		});
+
+		const std::shared_ptr<PonyEngine::RenderDevice::IShader> triangleShader = LoadShader(TRIANGLE_SHADER);
+		const std::shared_ptr<PonyEngine::RenderDevice::IShader> pixelShader = LoadShader(PIXEL_SHADER);
+		constexpr auto opaqueBlendParams = PonyEngine::RenderDevice::RenderTargetBlendParams
+		{
+			.blend = PonyEngine::RenderDevice::ColorBlendParams{},
+		};
+		const PonyEngine::RenderDevice::TextureFormatId renderTargetTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm);
+		const PonyEngine::RenderDevice::TextureFormatId depthStencilTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::D32_Float_S8X24_Uint);
+		boxPipelineState = renderDevice->CreateGraphicsPipelineState(layout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
+		{
+			.meshShader = triangleShader.get(),
+			.pixelShader = pixelShader.get(),
+			.rasterizer = PonyEngine::RenderDevice::RasterizerParams{},
+			.blend = PonyEngine::RenderDevice::BlendParams
+			{
+				.blendGroup = PonyEngine::RenderDevice::BlendGroupParams
+				{
+					.renderTargetBlend = std::span<const PonyEngine::RenderDevice::RenderTargetBlendParams>(&opaqueBlendParams, 1uz),
+				}
+			},
+			.depthStencil = PonyEngine::RenderDevice::DepthStencilParams
+			{
+				.depth = PonyEngine::RenderDevice::DepthParams{},
+				.stencil = PonyEngine::RenderDevice::StencilParams{}
+			},
+			.sample = PonyEngine::RenderDevice::SampleParams
+			{
+				.sampleCount = PonyEngine::RenderDevice::SampleCount::X4
+			},
+			.attachmentParams = PonyEngine::RenderDevice::AttachmentParams
+			{
+				.renderTargetFormats = std::span<const PonyEngine::RenderDevice::TextureFormatId>(&renderTargetTextureFormat, 1uz),
+				.depthStencilFormat = depthStencilTextureFormat
+			}
+		});
 	}
 
 	void GameService::End()
 	{
-		const auto graphicsFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = graphicsFence.get(), .value = graphicsFenceValue + 1ull};
+		const auto graphicsFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = graphicsFence.get(), .value = ++graphicsFenceValue};
 		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::IGraphicsCommandList* const>(), PonyEngine::RenderDevice::QueueSync
 		{
 			.after = std::span<const PonyEngine::RenderDevice::FenceValue>(&graphicsFenceValueSync, 1uz)
 		});
-		const auto computeFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = computeFence.get(), .value = computeFenceValue + 1ull};
+		const auto computeFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = computeFence.get(), .value = ++computeFenceValue};
 		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::IComputeCommandList* const>(), PonyEngine::RenderDevice::QueueSync
 		{
 			.after = std::span<const PonyEngine::RenderDevice::FenceValue>(&computeFenceValueSync, 1uz)
 		});
-		const auto copyFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = copyFence.get(), .value = copyFenceValue + 1ull};
+		const auto copyFenceValueSync = PonyEngine::RenderDevice::FenceValue{.fence = copyFence.get(), .value = ++copyFenceValue};
 		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::ICopyCommandList* const>(), PonyEngine::RenderDevice::QueueSync
 		{
 			.after = std::span<const PonyEngine::RenderDevice::FenceValue>(&copyFenceValueSync, 1uz)
@@ -188,5 +220,22 @@ namespace Game
 	void GameService::Tick()
 	{
 		renderDevice->PresentNextSwapChainBuffer();
+	}
+
+	std::shared_ptr<PonyEngine::RenderDevice::IShader> GameService::LoadShader(const std::filesystem::path& path)
+	{
+		auto file = std::ifstream(path, std::ios::binary | std::ios::ate);
+		if (!file) [[unlikely]]
+		{
+			throw std::runtime_error("Failed to open file");
+		}
+
+		const auto size = file.tellg();
+		file.seekg(0);
+
+		auto data = std::vector<std::byte>(static_cast<size_t>(size));
+		file.read(reinterpret_cast<char*>(data.data()), size);
+
+		return renderDevice->CreateShader(data);
 	}
 }

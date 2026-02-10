@@ -17,6 +17,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12RootSignature;
 
 import std;
 
+import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
@@ -143,14 +144,14 @@ namespace PonyEngine::RenderDevice::Windows
 			staticSamplerCount += set.staticSamplers.size();
 		}
 
-		const std::size_t setByteSize = descriptorSets.size() * sizeof(DescriptorSet);
-		const std::size_t shaderDataByteOffset = (setByteSize / alignof(ShaderDataDescriptorRange) + (setByteSize % alignof(ShaderDataDescriptorRange) != 0)) * alignof(ShaderDataDescriptorRange);
+		const std::size_t setByteSize = descriptorSets.size() * sizeof(DescriptorSetMeta);
+		const std::size_t shaderDataByteOffset = Math::Align(setByteSize, alignof(ShaderDataDescriptorRange));
 		const std::size_t shaderDataByteSize = shaderDataCount * sizeof(ShaderDataDescriptorRange);
 		const std::size_t shaderDataByteEnd = shaderDataByteOffset + shaderDataByteSize;
-		const std::size_t samplerByteOffset = (shaderDataByteEnd / alignof(SamplerDescriptorRange) + (shaderDataByteEnd % alignof(SamplerDescriptorRange) != 0)) * alignof(SamplerDescriptorRange);
+		const std::size_t samplerByteOffset = Math::Align(shaderDataByteEnd, alignof(SamplerDescriptorRange));
 		const std::size_t samplerByteSize = samplerCount * sizeof(SamplerDescriptorRange);
 		const std::size_t samplerByteEnd = samplerByteOffset + samplerByteSize;
-		const std::size_t staticSamplerByteOffset = (samplerByteEnd / alignof(StaticSamplerParams) + (samplerByteEnd % alignof(StaticSamplerParams) != 0)) * alignof(StaticSamplerParams);
+		const std::size_t staticSamplerByteOffset = Math::Align(samplerByteEnd, alignof(StaticSamplerParams));
 		const std::size_t staticSamplerByteSize = staticSamplerCount * sizeof(StaticSamplerParams);
 		const std::size_t staticSamplerByteEnd = staticSamplerByteOffset + staticSamplerByteSize;
 
@@ -189,6 +190,7 @@ namespace PonyEngine::RenderDevice::Windows
 			{
 				setMeta->staticSamplers = std::span<const StaticSamplerParams>();
 			}
+			setMeta->setIndex = set.setIndex;
 
 			++setMeta;
 		}

@@ -805,10 +805,8 @@ namespace PonyEngine::RenderDevice::Windows
 		const Memory::Arena::Slice<D3D12PipelineStateSubobjectSampleMask> sampleMask = arena.Allocate<D3D12PipelineStateSubobjectSampleMask>(1u);
 		arena.Span(sampleMask)[0] = static_cast<UINT>(params.sample.sampleMask);
 
-#ifndef NDEBUG
 		const Memory::Arena::Slice<D3D12PipelineStateSubobjectFlags> flags = arena.Allocate<D3D12PipelineStateSubobjectFlags>(1u);
-		arena.Span(flags)[0] = D3D12_PIPELINE_STATE_FLAG_TOOL_DEBUG;
-#endif
+		arena.Span(flags)[0] = D3D12_PIPELINE_STATE_FLAG_DYNAMIC_DEPTH_BIAS;
 
 		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
@@ -2371,8 +2369,17 @@ namespace PonyEngine::RenderDevice::Windows
 			}
 		};
 
-		for (const DescriptorSet& set : descriptorSets)
+		for (std::size_t setIndex = 0uz; setIndex < descriptorSets.size(); ++setIndex)
 		{
+			const DescriptorSet& set = descriptorSets[setIndex];
+			for (std::size_t i = 0uz; i < setIndex; ++i)
+			{
+				if (set.setIndex == descriptorSets[i].setIndex) [[unlikely]]
+				{
+					throw std::invalid_argument("Overlapping set indices");
+				}
+			}
+
 			std::visit(Type::Overload
 			{
 				[&](const std::span<const ShaderDataDescriptorRange> r)
