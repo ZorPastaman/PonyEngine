@@ -22,5 +22,6 @@ export namespace PonyEngine::RenderDevice
 		std::span<const ShaderDataDescriptorRange> shaderDataRanges;
 		std::span<const SamplerDescriptorRange> samplerRanges;
 		std::span<const StaticSamplerParams> staticSamplers;
+		std::uint32_t setIndex = 0u;
 	};
 }

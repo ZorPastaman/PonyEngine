@@ -69,7 +69,7 @@ namespace PonyEngine::RenderDevice::Windows
 			setIndex < params.descriptorSets.size(); ++setIndex)
 		{
 			const DescriptorSet& set = params.descriptorSets[setIndex];
-			const UINT registerSpace = static_cast<UINT>(setIndex);
+			const UINT registerSpace = static_cast<UINT>(set.setIndex);
 			
 			if (const std::size_t rangeCount = GetRangeCount(set.ranges); rangeCount > 0uz)
 			{

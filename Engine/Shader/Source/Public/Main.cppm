@@ -7,8 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-/// @brief Material basic scalars. It corresponds to @p PonyEngine::Shader::MaterialBase on the C++ side.
-struct Pony_MaterialBase
-{
-	float4 color; ///< Whole object color.
-};
+export module PonyEngine.Shader;
+
+export import :Bool;

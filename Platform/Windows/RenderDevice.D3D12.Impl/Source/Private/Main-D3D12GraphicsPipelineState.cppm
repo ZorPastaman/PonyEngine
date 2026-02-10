@@ -15,6 +15,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:D3D12GraphicsPipelineSt
 
 import std;
 
+import PonyEngine.Math;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 import PonyEngine.Type;
@@ -174,7 +175,7 @@ namespace PonyEngine::RenderDevice::Windows
 				return std::pair(p.renderTargetBlend.size_bytes(), alignof(LogicRenderTargetBlendParams));
 			}
 		}, params.blend.blendGroup);
-		const std::size_t rtBlendByteOffset = (rtFormatByteSize / rtBlendAlignment + (rtFormatByteSize % rtBlendAlignment != 0)) * rtBlendAlignment;
+		const std::size_t rtBlendByteOffset = Math::Align(rtFormatByteSize, rtBlendAlignment);
 		const std::size_t rtBlendByteEnd = rtBlendByteOffset + rtBlendByteSize;
 
 		if (rtBlendByteEnd > 0uz)
@@ -201,7 +202,7 @@ namespace PonyEngine::RenderDevice::Windows
 
 		blend.blendGroup = std::visit(Type::Overload
 		{
-	[&](const BlendGroupParams& p) noexcept
+			[&](const BlendGroupParams& p) noexcept
 			{
 				return std::variant<BlendGroupParams, LogicBlendGroupParams>(BlendGroupParams
 				{

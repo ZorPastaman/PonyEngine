@@ -23,9 +23,6 @@ export namespace PonyEngine::RenderDevice
 		CullMode cullMode = CullMode::Back;
 		bool counterClockwiseFrontFace = false;
 		bool depthClipping = true;
-		float depthBias = 0.f;
-		float depthBiasClamp = 0.f;
-		float slopeScaledDepthBias = 0.f;
 		LineRasterizationMode lineRasterizationMode = LineRasterizationMode::Aliased;
 		bool conservativeRasterization = false;
 	};
