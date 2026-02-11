@@ -19,6 +19,7 @@ import :DeviceHandle;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Device observer.
+	/// @note The observer functions are always called during a raw input service tick.
 	class IDeviceObserver
 	{
 		PONY_INTERFACE_BODY(IDeviceObserver)

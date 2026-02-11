@@ -95,6 +95,11 @@ namespace PonyEngine::Application
 	LoggerHandle LoggerManager::SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!nextHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more logger handles available");
@@ -131,6 +136,11 @@ namespace PonyEngine::Application
 	void LoggerManager::UnsetLogger(const LoggerHandle handle)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Logger can be removed only on start-up or shut-down");

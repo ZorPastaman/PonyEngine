@@ -23,6 +23,9 @@ import :FlowState;
 export namespace PonyEngine::Application
 {
 	/// @brief Application context.
+	/// @note By default, all the functions here are thread-safe unless stated otherwise.
+	/// @note It's recommended not to call functions from other modules including the application module during 
+	///       starting-up (before Begin()) and shutting-down (after End()) on non-main thread because some guarantees may not work.
 	class IApplicationContext
 	{
 		PONY_INTERFACE_BODY(IApplicationContext)
@@ -95,6 +98,11 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual const std::filesystem::path& TempDataDirectory() const noexcept = 0;
 
+		/// @brief Gets the main thread ID.
+		/// @return Main thread ID.
+		[[nodiscard("Pure function")]]
+		virtual std::thread::id MainThreadId() const noexcept = 0;
+
 		/// @brief Gets the command line excluding an executable name.
 		/// @return Command line.
 		[[nodiscard("Pure function")]]
@@ -152,7 +160,8 @@ export namespace PonyEngine::Application
 		/// @brief Stops the application with the @p exitCode.
 		/// @remark If the application is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
-		virtual void Stop(int exitCode = 0) noexcept = 0;
+		/// @note Must be called on a main thread.
+		virtual void Stop(int exitCode = 0) = 0;
 
 		/// @brief Gets the current frame count.
 		/// @return Current frame count.

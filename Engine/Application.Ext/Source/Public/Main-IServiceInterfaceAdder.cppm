@@ -18,6 +18,7 @@ import std;
 export namespace PonyEngine::Application
 {
 	/// @brief Service interface adder.
+	/// @note All the functions here must be called on a main thread.
 	class IServiceInterfaceAdder
 	{
 		PONY_INTERFACE_BODY(IServiceInterfaceAdder)

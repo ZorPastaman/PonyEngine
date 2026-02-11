@@ -49,13 +49,17 @@ export namespace PonyEngine::Application
 		virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept = 0;
 
 	private:
-		static constexpr std::string_view OnLogExceptionPrefix = "On making a log message:\n"; ///< The text that is posted before an exception.
+		/// @brief Logs to a console.
+		/// @param logType Log type.
+		/// @param message Log message.
+		void LogInternal(Log::LogType logType, std::string_view message) const noexcept;
 
-		static constexpr std::string_view UnknownExceptionWithNewLine = "Unknown exception.\n"; ///< Unknown exception with a new line text.
+		static constexpr std::string_view AllocationError = "Log message allocation failed."; ///< Allocation error message.
 		static constexpr std::string_view UnknownException = "Unknown exception."; ///< Unknown exception without a new line text.
 		static constexpr std::string_view NullptrException = "Nullptr exception."; ///< Nullptr exception text.
 
-		mutable std::string stringTemp; ///< Temporal string.
+		static inline thread_local std::string stringTemp; ///< Temporal string.
+		mutable std::mutex logMutex; ///< Log mutex.
 	};
 }
 
@@ -68,17 +72,11 @@ namespace PonyEngine::Application
 		{
 			stringTemp.clear();
 			std::format_to(std::back_inserter(stringTemp), "{}: {}\n", logType, message);
-			LogToConsole(logType, stringTemp);
-		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
+			LogInternal(logType, stringTemp);
 		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(logType, AllocationError);
 		}
 #endif
 	}
@@ -92,15 +90,9 @@ namespace PonyEngine::Application
 			std::format_to(std::back_inserter(stringTemp), "{}: {}\n{}\n", logType, message, stacktrace);
 			LogToConsole(logType, stringTemp);
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(logType, AllocationError);
 		}
 #endif
 	}
@@ -116,15 +108,9 @@ namespace PonyEngine::Application
 			stringTemp.push_back('\n');
 			LogToConsole(logType, stringTemp);
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(logType, AllocationError);
 		}
 #endif
 	}
@@ -140,15 +126,9 @@ namespace PonyEngine::Application
 			std::format_to(std::back_inserter(stringTemp), "\n{}\n", stacktrace);
 			LogToConsole(logType, stringTemp);
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(logType, AllocationError);
 		}
 #endif
 	}
@@ -183,15 +163,9 @@ namespace PonyEngine::Application
 				LogToConsole(Log::LogType::Exception, stringTemp);
 			}
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(Log::LogType::Exception, AllocationError);
 		}
 #endif
 	}
@@ -226,15 +200,9 @@ namespace PonyEngine::Application
 				LogToConsole(Log::LogType::Exception, stringTemp);
 			}
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(Log::LogType::Exception, AllocationError);
 		}
 #endif
 	}
@@ -275,15 +243,9 @@ namespace PonyEngine::Application
 				LogToConsole(Log::LogType::Exception, stringTemp);
 			}
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(Log::LogType::Exception, AllocationError);
 		}
 #endif
 	}
@@ -318,15 +280,9 @@ namespace PonyEngine::Application
 				LogToConsole(Log::LogType::Exception, stringTemp);
 			}
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(Log::LogType::Exception, AllocationError);
 		}
 #endif
 	}
@@ -361,15 +317,9 @@ namespace PonyEngine::Application
 				LogToConsole(Log::LogType::Exception, stringTemp);
 			}
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(Log::LogType::Exception, AllocationError);
 		}
 #endif
 	}
@@ -410,16 +360,16 @@ namespace PonyEngine::Application
 				LogToConsole(Log::LogType::Exception, stringTemp);
 			}
 		}
-		catch (const std::exception& e)
-		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, e.what());
-		}
 		catch (...)
 		{
-			LogToConsole(Log::LogType::Exception, OnLogExceptionPrefix);
-			LogToConsole(Log::LogType::Exception, UnknownExceptionWithNewLine);
+			LogInternal(Log::LogType::Exception, AllocationError);
 		}
 #endif
+	}
+
+	void DefaultLogger::LogInternal(const Log::LogType logType, const std::string_view message) const noexcept
+	{
+		const auto lock = std::lock_guard(logMutex);
+		LogToConsole(logType, message);
 	}
 }

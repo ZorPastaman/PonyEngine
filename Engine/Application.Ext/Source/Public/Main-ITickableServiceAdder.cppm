@@ -20,6 +20,7 @@ import :ITickableService;
 export namespace PonyEngine::Application
 {
 	/// @brief Tickable service adder.
+	/// @note All the functions here must be called on a main thread.
 	class ITickableServiceAdder
 	{
 		PONY_INTERFACE_BODY(ITickableServiceAdder)

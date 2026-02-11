@@ -9,7 +9,8 @@
 
 #pragma once
 
- // To use this header, you have to import PonyEngine.Log.Ext as well.
+// To use this header, you have to import PonyEngine.Log.Ext as well.
+// All the macros here are thread-safe.
 
 #include "PonyEngine/Log/Log.h"
 

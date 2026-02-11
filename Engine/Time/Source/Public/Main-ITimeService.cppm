@@ -20,6 +20,8 @@ import :Utility;
 export namespace PonyEngine::Time
 {
 	/// @brief Time service.
+	/// @note All the functions here mustn't be called during the time service tick.
+	/// @note The getter functions may be called concurrently but the setter functions mayn't.
 	class ITimeService
 	{
 		PONY_INTERFACE_BODY(ITimeService)

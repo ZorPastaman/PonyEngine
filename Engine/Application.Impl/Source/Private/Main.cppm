@@ -13,6 +13,7 @@ export import PonyEngine.Application.Ext;
 
 export import :Console;
 export import :DefaultLogger;
+export import :EnvironmentManager;
 export import :ExitCodes;
 export import :FlowManager;
 export import :InterfaceContainer;

@@ -83,10 +83,12 @@ export namespace PonyEngine::Log
 
 		SubLoggerContainer subLoggerContainer; ///< Sub-logger container.
 
-		mutable std::string logStringTemp; ///< Temporal log string.
-		mutable std::string consoleStringTemp; ///< Temporal log string that is used in @p LogToString().
+		static inline thread_local std::string logStringTemp; ///< Temporal log string.
+		static inline thread_local std::string consoleStringTemp; ///< Temporal log string that is used in @p LogToString().
 
 		SubLoggerHandle nextSubLoggerHandle; ///< Next sub-logger handle.
+
+		mutable std::mutex logMutex; ///< Log mutex.
 	};
 }
 
@@ -193,6 +195,11 @@ namespace PonyEngine::Log
 	SubLoggerHandle Logger::AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != loggerContext->Application().MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!nextSubLoggerHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more sub-logger handles available");
@@ -227,6 +234,11 @@ namespace PonyEngine::Log
 	void Logger::RemoveSubLogger(const SubLoggerHandle handle)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != loggerContext->Application().MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (loggerContext->Application().FlowState() != Application::FlowState::StartingUp && loggerContext->Application().FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Sub-logger can be removed only on start-up or shut-down");
@@ -327,6 +339,8 @@ namespace PonyEngine::Log
 
 	void Logger::Log(const LogEntry& logEntry) const noexcept
 	{
+		const auto lock = std::lock_guard(logMutex);
+
 		loggerContext->LogToConsole(logEntry.logType, logEntry.formattedMessage);
 
 		for (std::size_t i = 0uz; i < subLoggerContainer.Size(); ++i)

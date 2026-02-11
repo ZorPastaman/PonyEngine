@@ -20,6 +20,7 @@ import PonyEngine.Math;
 export namespace PonyEngine::Surface
 {
 	/// @brief Surface observer.
+	/// @note All the observer functions are always called on a main thread.
 	class ISurfaceObserver
 	{
 		PONY_INTERFACE_BODY(ISurfaceObserver)

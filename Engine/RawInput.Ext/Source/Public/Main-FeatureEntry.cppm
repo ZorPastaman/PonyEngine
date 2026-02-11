@@ -19,11 +19,10 @@ export namespace PonyEngine::RawInput
 		std::type_index featureType; ///< Feature type.
 		void* feature; ///< Feature.
 
-		FeatureEntry() noexcept = default;
 		/// @brief Creates a feature entry.
 		/// @tparam T Feature type.
 		/// @param feature Feature.
-		template<typename T>
+		template<typename T> [[nodiscard("Pure constructor")]]
 		explicit FeatureEntry(T& feature) noexcept;
 		FeatureEntry(const FeatureEntry& other) noexcept = default;
 		FeatureEntry(FeatureEntry&& other) noexcept = default;

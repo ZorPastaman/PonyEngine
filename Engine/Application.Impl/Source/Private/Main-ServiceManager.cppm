@@ -225,6 +225,11 @@ namespace PonyEngine::Application
 	ServiceHandle ServiceManager::AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!nextServiceHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more service handles available");
@@ -298,6 +303,11 @@ namespace PonyEngine::Application
 	void ServiceManager::RemoveService(const ServiceHandle handle)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Service can be removed only on start-up or shut-down");
@@ -336,6 +346,13 @@ namespace PonyEngine::Application
 
 	void ServiceManager::TickableServiceAdder::Add(ITickableService& tickable, const std::int32_t tickOrder)
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		container->push_back(TickableServiceInfo{.tickableService = &tickable, .tickOrder = tickOrder});
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Tickable of type '{}' added.", typeid(tickable).name());
 	}
@@ -351,6 +368,11 @@ namespace PonyEngine::Application
 	void ServiceManager::ServiceInterfaceAdder::AddInterface(const std::type_index type, void* const interface)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (container->IndexOf(type) < container->Size()) [[unlikely]]
 		{
 			throw std::invalid_argument(std::format("Interface of type '{}' has already been added", type.name()));

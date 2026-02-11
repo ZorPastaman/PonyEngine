@@ -24,6 +24,9 @@ import :IServiceModuleContext;
 export namespace PonyEngine::Application
 {
 	/// @brief Module context. It's a context used by modules.
+	/// @note All the functions here must be called on a main thread.
+	/// @note It's recommended not to call functions from other modules including the application module during 
+	///       starting-up (before Begin()) and shutting-down (after End()) on a non-main thread because some guarantees may not work.
 	class IModuleContext
 	{
 		PONY_INTERFACE_BODY(IModuleContext)

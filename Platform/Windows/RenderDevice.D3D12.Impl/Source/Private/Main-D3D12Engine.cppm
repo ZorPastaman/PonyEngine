@@ -258,6 +258,9 @@ export namespace PonyEngine::RenderDevice::Windows
 		[[nodiscard("Pure function")]]
 		D3D12SwapChain& GetSwapChain() const;
 
+		[[nodiscard("Pure function")]]
+		static Memory::Arena& Arena();
+
 		static void ValidateSize(const BufferParams& params);
 		static void ValidateDimension(const TextureParams& params);
 		static void ValidateColorTexture(const TextureParams& params);
@@ -319,8 +322,6 @@ export namespace PonyEngine::RenderDevice::Windows
 
 		IRenderDeviceContext* renderDevice;
 
-		mutable Memory::Arena arena;
-
 		D3D12TextureFormatMap textureFormatMap;
 
 		DXGIFactory factory;
@@ -338,7 +339,6 @@ namespace PonyEngine::RenderDevice::Windows
 {
 	D3D12Engine::D3D12Engine(IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice},
-		arena(0uz, 256uz),
 		textureFormatMap(*this->renderDevice),
 		factory(*this->renderDevice),
 		device(*this->renderDevice),
@@ -410,6 +410,7 @@ namespace PonyEngine::RenderDevice::Windows
 		DXGI_FORMAT format = GetFormat(params.format);
 		const bool srgb = Any(TextureFlag::SRGB, params.flags);
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		auto castableFormats = Memory::Arena::Slice<DXGI_FORMAT>{};
 		if (IsDepthStencilFormat(format))
@@ -740,6 +741,7 @@ namespace PonyEngine::RenderDevice::Windows
 	{
 		ValidatePipelineLayoutParams(params);
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
 		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(static_cast<std::size_t>(rootSigDescCounts.tableCount));
@@ -759,6 +761,7 @@ namespace PonyEngine::RenderDevice::Windows
 		ValidatePipelineLayout(layout.get());
 		ValidatePipelineStateParams(params);
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 
 		const Memory::Arena::Slice<D3D12PipelineStateSubobjectRootSignature> rootSignature = arena.Allocate<D3D12PipelineStateSubobjectRootSignature>(1u);
@@ -1052,6 +1055,7 @@ namespace PonyEngine::RenderDevice::Windows
 		}
 #endif
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprints = arena.Allocate<D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount);
 		const Memory::Arena::Slice<UINT> rowCounts = arena.Allocate<UINT>(footprintCount);
@@ -1367,6 +1371,7 @@ namespace PonyEngine::RenderDevice::Windows
 	{
 		ValidateCopyRange(ranges);
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> sources = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
 		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> destinations = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
@@ -1408,6 +1413,7 @@ namespace PonyEngine::RenderDevice::Windows
 		ValidateFences(sync.before);
 		ValidateFences(sync.after);
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
 		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> beforeFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.before.size());
@@ -1462,6 +1468,12 @@ namespace PonyEngine::RenderDevice::Windows
 #endif
 
 		return *swapChain;
+	}
+
+	Memory::Arena& D3D12Engine::Arena()
+	{
+		thread_local auto arena = Memory::Arena(0uz, 1024uz);
+		return arena;
 	}
 
 	void D3D12Engine::ValidateSize(const BufferParams& params)

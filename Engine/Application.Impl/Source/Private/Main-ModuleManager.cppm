@@ -148,6 +148,13 @@ namespace PonyEngine::Application
 
 	void* ModuleManager::GetData(const std::type_index type) const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		if (const std::size_t index = dataContainer.IndexOf(type); index < dataContainer.Size())
 		{
 			return dataContainer.Data(index);
@@ -159,6 +166,11 @@ namespace PonyEngine::Application
 	ModuleDataHandle ModuleManager::AddData(const std::type_index type, const std::shared_ptr<void>& data)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!nextDataHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more data handles available");
@@ -187,6 +199,11 @@ namespace PonyEngine::Application
 	void ModuleManager::RemoveData(const ModuleDataHandle handle)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (application->FlowState() != FlowState::StartingUp && application->FlowState() != FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Data can be removed only on start-up or shut-down");

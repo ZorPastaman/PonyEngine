@@ -16,7 +16,7 @@ export module PonyEngine.RawInput.Ext:IInputProvider;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Input provider.
-	/// @note The provider must write to an input service only inside its tick or begin/end.
+	/// @note All the functions here are always called on a main thread.
 	class IInputProvider
 	{
 		PONY_INTERFACE_BODY(IInputProvider)

@@ -10,6 +10,7 @@
 #pragma once
 
 // To use this header, you have to import PonyEngine.Log as well.
+// All the macros here are thread-safe.
 
 #ifdef PONY_LOG_VERBOSE
 /// @brief Verbose log mask.
