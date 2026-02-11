@@ -15,7 +15,7 @@ import PonyEngine.RawInput;
 
 import :MouseAxis;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse container.
 	/// @tparam NativeHandleType Native mouse handle type.
@@ -131,7 +131,7 @@ export namespace PonyEngine::RawInput
 	};
 }
 
-namespace PonyEngine::RawInput
+namespace PonyEngine::RawInput::Mouse
 {
 	template<typename NativeHandleType>
 	std::size_t MouseContainer<NativeHandleType>::Size() const noexcept

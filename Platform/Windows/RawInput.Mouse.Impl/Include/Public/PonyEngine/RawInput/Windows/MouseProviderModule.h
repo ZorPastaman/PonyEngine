@@ -13,7 +13,7 @@
 
 import PonyEngine.Application.Ext;
 
-namespace PonyEngine::RawInput::Windows
+namespace PonyEngine::RawInput::Mouse::Windows
 {
 	/// @brief Gets the mouse provider module.
 	/// @return Mouse provider module.

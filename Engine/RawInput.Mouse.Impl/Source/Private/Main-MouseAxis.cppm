@@ -11,7 +11,7 @@ export module PonyEngine.RawInput.Mouse.Impl:MouseAxis;
 
 import std;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse button.
 	enum class MouseButton : std::uint8_t

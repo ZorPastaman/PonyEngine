@@ -17,7 +17,7 @@ import std;
 
 import PonyEngine.Log.Ext;
 
-export namespace PonyEngine::Log
+export namespace PonyEngine::Log::File
 {
 	/// @brief Sub-logger that writes logs to a file.
 	class FileSubLogger final : public ISubLogger
@@ -45,7 +45,7 @@ export namespace PonyEngine::Log
 	};
 }
 
-namespace PonyEngine::Log
+namespace PonyEngine::Log::File
 {
 	FileSubLogger::FileSubLogger(ILoggerContext& logger, const std::filesystem::path& path) :
 		logger{&logger},

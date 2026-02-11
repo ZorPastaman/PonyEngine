@@ -24,10 +24,10 @@ import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.Surface.Windows;
 
-import :XInputAxisMap;
-import :XInputContainer;
+import :GamepadAxisMap;
+import :GamepadContainer;
 
-export namespace PonyEngine::RawInput::Windows
+export namespace PonyEngine::RawInput::XInput::Windows
 {
 	/// @brief XInput gamepad provider.
 	class XInputProvider final : public IInputProvider
@@ -124,22 +124,22 @@ export namespace PonyEngine::RawInput::Windows
 		IRawInputContext* input; ///< Raw input context.
 		Surface::ISurfaceService* surface; ///< Surface service.
 
-		XInputAxisMap axisMap; ///< Gamepad axis map.
-		XInputContainer gamepadContainer; ///< Gamepad containers.
-		std::array<Vibrator, XUSER_MAX_COUNT> vibrators; ///< Gamepad 
+		GamepadAxisMap gamepadAxisMap; ///< Gamepad axis map.
+		GamepadContainer gamepadContainer; ///< Gamepad containers.
+		std::array<Vibrator, XUSER_MAX_COUNT> gamepadVibrators; ///< Gamepad 
 	};
 }
 
-namespace PonyEngine::RawInput::Windows
+namespace PonyEngine::RawInput::XInput::Windows
 {
 	XInputProvider::XInputProvider(IRawInputContext& input) noexcept :
 		input{&input},
 		surface{&this->input->Application().GetService<Surface::ISurfaceService>()},
-		axisMap(*this->input)
+		gamepadAxisMap(*this->input)
 	{
 		for (DWORD i = 0uz; i < XUSER_MAX_COUNT; ++i)
 		{
-			vibrators[i] = Vibrator(*this, i);
+			gamepadVibrators[i] = Vibrator(*this, i);
 		}
 	}
 
@@ -226,7 +226,7 @@ namespace PonyEngine::RawInput::Windows
 
 		for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-			IVibrating& vibrator = vibrators[i] = Vibrator(*this, i);
+			IVibrating& vibrator = gamepadVibrators[i] = Vibrator(*this, i);
 
 			const DeviceHandle handle = input->RegisterDevice(type, std::format("XInput_{}", i), false,
 				std::array<FeatureEntry, 1>{ FeatureEntry(vibrator) });
@@ -241,7 +241,7 @@ namespace PonyEngine::RawInput::Windows
 	{
 		for (DWORD i = count; i-- > 0; )
 		{
-			vibrators[i].Vibrate(0.f, 0.f);
+			gamepadVibrators[i].Vibrate(0.f, 0.f);
 			input->UnregisterDevice(gamepadContainer.DeviceHandle(i));
 			gamepadContainer.DeviceHandle(i) = DeviceHandle{};
 		}
@@ -318,7 +318,7 @@ namespace PonyEngine::RawInput::Windows
 
 			const bool pressed = current;
 			const float value = pressed;
-			const AxisId axis = axisMap.Button(button);
+			const AxisId axis = gamepadAxisMap.Button(button);
 			input->AddInput(handle, RawInputEvent
 			{
 				.axes = std::span<const AxisId>(&axis, 1uz),
@@ -332,7 +332,7 @@ namespace PonyEngine::RawInput::Windows
 	void XInputProvider::UpdateTriggerInput(const DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState, 
 		const std::chrono::time_point<std::chrono::steady_clock> now)
 	{
-		const auto updateTriggerInput = [&](const BYTE prev, const BYTE current, const XInputAxisMap::TriggerAxis trigger)
+		const auto updateTriggerInput = [&](const BYTE prev, const BYTE current, const GamepadAxisMap::TriggerAxis trigger)
 		{
 			if (prev == current || (prev <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD && current <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD))
 			{
@@ -340,7 +340,7 @@ namespace PonyEngine::RawInput::Windows
 			}
 
 			const float value = Math::UnormToNormalized<float>(current, Math::Range<BYTE>{.min = XINPUT_GAMEPAD_TRIGGER_THRESHOLD});
-			const AxisId axis = axisMap.Trigger(trigger);
+			const AxisId axis = gamepadAxisMap.Trigger(trigger);
 
 			input->AddInput(handle, RawInputEvent
 			{
@@ -351,15 +351,15 @@ namespace PonyEngine::RawInput::Windows
 			});
 		};
 
-		updateTriggerInput(prevState.bLeftTrigger, currentState.bLeftTrigger, XInputAxisMap::TriggerAxis::Left);
-		updateTriggerInput(prevState.bRightTrigger, currentState.bRightTrigger, XInputAxisMap::TriggerAxis::Right);
+		updateTriggerInput(prevState.bLeftTrigger, currentState.bLeftTrigger, GamepadAxisMap::TriggerAxis::Left);
+		updateTriggerInput(prevState.bRightTrigger, currentState.bRightTrigger, GamepadAxisMap::TriggerAxis::Right);
 	}
 
 	void XInputProvider::UpdateStickInput(const DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState, 
 		const std::chrono::time_point<std::chrono::steady_clock> now)
 	{
 		const auto updateStickInput = [&](const Math::Vector2<SHORT>& prev, const Math::Vector2<SHORT>& current, const SHORT threshold, 
-			const XInputAxisMap::StickPlacement placement)
+			const GamepadAxisMap::StickPlacement placement)
 		{
 			if (prev == current)
 			{
@@ -375,7 +375,7 @@ namespace PonyEngine::RawInput::Windows
 
 			input->AddInput(handle, RawInputEvent
 			{
-				.axes = axisMap.Stick(placement),
+				.axes = gamepadAxisMap.Stick(placement),
 				.values = currentNormalized.Span(),
 				.eventType = InputEventType::State,
 				.timePoint = now
@@ -383,8 +383,8 @@ namespace PonyEngine::RawInput::Windows
 		};
 
 		updateStickInput(Math::Vector2<SHORT>(prevState.sThumbLX, prevState.sThumbLY), Math::Vector2<SHORT>(currentState.sThumbLX, currentState.sThumbLY),
-			XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, XInputAxisMap::StickPlacement::Left);
+			XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, GamepadAxisMap::StickPlacement::Left);
 		updateStickInput(Math::Vector2<SHORT>(prevState.sThumbRX, prevState.sThumbRY), Math::Vector2<SHORT>(currentState.sThumbRX, currentState.sThumbRY),
-			XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, XInputAxisMap::StickPlacement::Right);
+			XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, GamepadAxisMap::StickPlacement::Right);
 	}
 }

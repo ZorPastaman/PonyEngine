@@ -26,7 +26,7 @@ import PonyEngine.Platform.Windows;
 import PonyEngine.Surface.Windows;
 import PonyEngine.Type;
 
-export namespace PonyEngine::RawInput::Windows
+export namespace PonyEngine::RawInput::Mouse::Windows
 {
 	/// @brief Mouse provider.
 	class MouseProvider final : public IInputProvider, private Surface::Windows::IRawInputObserver, private Surface::ISurfaceObserver
@@ -107,7 +107,7 @@ export namespace PonyEngine::RawInput::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::Windows
+namespace PonyEngine::RawInput::Mouse::Windows
 {
 	MouseProvider::MouseProvider(IRawInputContext& input) :
 		input{&input},

@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/RawInput/Windows/XInputProviderModule.h"
 
-PONY_MODULE(PonyEngine::RawInput::Windows::GetXInputProviderModule, PonyEngineRawInputXInputProvider, PONY_ENGINE_RAW_INPUT_XINPUT_ORDER);
+PONY_MODULE(PonyEngine::RawInput::XInput::Windows::GetXInputProviderModule, PonyEngineRawInputXInputProvider, PONY_ENGINE_RAW_INPUT_XINPUT_ORDER);

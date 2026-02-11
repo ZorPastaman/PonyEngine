@@ -21,7 +21,7 @@ import PonyEngine.Log.Ext;
 
 import :FileSubLogger;
 
-export namespace PonyEngine::Log
+export namespace PonyEngine::Log::File
 {
 	/// @brief File sub-logger module.
 	class FileSubLoggerModule final : public Application::IModule
@@ -45,7 +45,7 @@ export namespace PonyEngine::Log
 	};
 }
 
-namespace PonyEngine::Log
+namespace PonyEngine::Log::File
 {
 	void FileSubLoggerModule::StartUp(Application::IModuleContext& context)
 	{

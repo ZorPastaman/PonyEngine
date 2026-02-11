@@ -15,7 +15,7 @@ import PonyEngine.Math;
 
 import :MouseAxis;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse button event.
 	struct MouseButtonEvent final
