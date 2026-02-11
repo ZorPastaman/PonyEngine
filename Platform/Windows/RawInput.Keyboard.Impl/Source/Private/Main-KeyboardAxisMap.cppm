@@ -17,7 +17,7 @@ import std;
 
 import PonyEngine.RawInput.Ext;
 
-export namespace PonyEngine::RawInput::Windows
+export namespace PonyEngine::RawInput::Keyboard::Windows
 {
 	/// @brief Windows keyboard axis map.
 	class KeyboardAxisMap final
@@ -59,7 +59,7 @@ export namespace PonyEngine::RawInput::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::Windows
+namespace PonyEngine::RawInput::Keyboard::Windows
 {
 	KeyboardAxisMap::KeyboardAxisMap(IRawInputContext& input) :
 		input{&input}

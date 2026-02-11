@@ -13,7 +13,7 @@
 
 import PonyEngine.Application.Ext;
 
-namespace PonyEngine::Log
+namespace PonyEngine::Log::File
 {
 	/// @brief Gets the file sub-logger module.
 	/// @return File sub-logger module.

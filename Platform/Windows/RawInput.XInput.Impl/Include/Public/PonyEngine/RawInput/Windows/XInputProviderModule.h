@@ -13,7 +13,7 @@
 
 import PonyEngine.Application.Ext;
 
-namespace PonyEngine::RawInput::Windows
+namespace PonyEngine::RawInput::XInput::Windows
 {
 	/// @brief Gets the XInput provider module.
 	/// @return XInput provider module.

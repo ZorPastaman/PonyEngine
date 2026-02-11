@@ -12,7 +12,7 @@
 import PonyEngine.Application.Ext;
 import PonyEngine.RawInput.XInput.Impl.Windows;
 
-namespace PonyEngine::RawInput::Windows
+namespace PonyEngine::RawInput::XInput::Windows
 {
 	Application::IModule* GetXInputProviderModule()
 	{

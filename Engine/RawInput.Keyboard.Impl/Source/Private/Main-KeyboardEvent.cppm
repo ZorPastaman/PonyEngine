@@ -13,7 +13,7 @@ import std;
 
 import PonyEngine.Math;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Keyboard input event.
 	/// @tparam NativeKeyType Native key type.

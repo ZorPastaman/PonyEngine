@@ -15,7 +15,7 @@ import PonyEngine.RawInput;
 
 import :MouseEvent;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse event queue.
 	class MouseEventQueue final
@@ -65,7 +65,7 @@ export namespace PonyEngine::RawInput
 	};
 }
 
-namespace PonyEngine::RawInput
+namespace PonyEngine::RawInput::Mouse
 {
 	std::size_t MouseEventQueue::Size() const noexcept
 	{

@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Log/FileSubLoggerModule.h"
 
-PONY_MODULE(PonyEngine::Log::GetFileSubLoggerModule, PonyEngineFileSubLogger, PONY_ENGINE_LOG_FILE_ORDER);
+PONY_MODULE(PonyEngine::Log::File::GetFileSubLoggerModule, PonyEngineFileSubLogger, PONY_ENGINE_LOG_FILE_ORDER);

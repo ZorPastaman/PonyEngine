@@ -29,7 +29,7 @@ import PonyEngine.Type;
 
 import :KeyboardAxisMap;
 
-export namespace PonyEngine::RawInput::Windows
+export namespace PonyEngine::RawInput::Keyboard::Windows
 {
 	/// @brief Windows keyboard provider.
 	class KeyboardProvider final : public IInputProvider, private Surface::Windows::IRawInputObserver, private Surface::ISurfaceObserver
@@ -97,7 +97,7 @@ export namespace PonyEngine::RawInput::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::Windows
+namespace PonyEngine::RawInput::Keyboard::Windows
 {
 	KeyboardProvider::KeyboardProvider(IRawInputContext& input) :
 		input{&input},

@@ -13,7 +13,7 @@ import std;
 
 import PonyEngine.RawInput;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Keyboard container.
 	/// @tparam NativeHandleType Native keyboard handle type.
@@ -131,7 +131,7 @@ export namespace PonyEngine::RawInput
 	};
 }
 
-namespace PonyEngine::RawInput
+namespace PonyEngine::RawInput::Keyboard
 {
 	template<typename NativeHandleType, typename NativeKeyType>
 	std::size_t KeyboardContainer<NativeHandleType, NativeKeyType>::Size() const noexcept

@@ -15,7 +15,7 @@ import PonyEngine.RawInput;
 
 import :KeyboardEvent;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Keyboard event queue.
 	/// @tparam NativeKeyType Native key type.
@@ -67,7 +67,7 @@ export namespace PonyEngine::RawInput
 	};
 }
 
-namespace PonyEngine::RawInput
+namespace PonyEngine::RawInput::Keyboard
 {
 	template<typename NativeKeyType>
 	std::size_t KeyboardEventQueue<NativeKeyType>::Size() const noexcept

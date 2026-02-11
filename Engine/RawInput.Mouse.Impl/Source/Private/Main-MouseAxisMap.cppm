@@ -15,7 +15,7 @@ import PonyEngine.RawInput.Ext;
 
 import :MouseAxis;
 
-export namespace PonyEngine::RawInput
+export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse axis map.
 	class MouseAxisMap final
@@ -69,7 +69,7 @@ export namespace PonyEngine::RawInput
 	};
 }
 
-namespace PonyEngine::RawInput
+namespace PonyEngine::RawInput::Mouse
 {
 	MouseAxisMap::MouseAxisMap(IRawInputContext& input)
 	{
