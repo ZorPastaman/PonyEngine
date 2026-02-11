@@ -20,6 +20,7 @@ import :IApplicationContext;
 export namespace PonyEngine::Application
 {
 	/// @brief Logger context.
+	/// @note By default, all the functions here are thread-safe. If a function isn't thread-safe, its docs must tell it.
 	class ILoggerContext
 	{
 		PONY_INTERFACE_BODY(ILoggerContext)
@@ -36,6 +37,7 @@ export namespace PonyEngine::Application
 		/// @brief Logs to console.
 		/// @param logType Log type.
 		/// @param message Log message.
+		/// @note It's not guarded with a lock. The caller must prevent simultaneous calls on different threads.
 		virtual void LogToConsole(Log::LogType logType, std::string_view message) const noexcept = 0;
 	};
 }

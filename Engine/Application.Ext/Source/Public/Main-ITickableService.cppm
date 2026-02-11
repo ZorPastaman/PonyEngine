@@ -16,6 +16,7 @@ export module PonyEngine.Application.Ext:ITickableService;
 export namespace PonyEngine::Application
 {
 	/// @brief Tickable service.
+	/// @note The service functions are always called on a main thread.
 	class ITickableService
 	{
 		PONY_INTERFACE_BODY(ITickableService)

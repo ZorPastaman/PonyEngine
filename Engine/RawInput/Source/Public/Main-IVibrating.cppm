@@ -23,6 +23,7 @@ export namespace PonyEngine::RawInput
 		/// @brief Sets a vibration state.
 		/// @param lowFrequency Low frequency motor speed. Must be in range [0, 1].
 		/// @param highFrequency High frequency motor speed. Must be in range [0, 1].
+		/// @note This function mustn't be called on different threads at the same time.
 		virtual void Vibrate(float lowFrequency, float highFrequency) = 0;
 	};
 }

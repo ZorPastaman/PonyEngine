@@ -22,13 +22,14 @@ import :IRawInputContext;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Raw input module context.
+	/// @note All the functions here must be called on a main thread.
 	class IRawInputModuleContext
 	{
 		PONY_INTERFACE_BODY(IRawInputModuleContext)
 
 		/// @brief Adds an input provider.
 		/// @param factory Input provider factory.
-		/// @return Input provider handle.
+		/// @return Input provider handle. Must be used to remove a provider before a destruction of the raw input service.
 		[[nodiscard("Must be used to remove")]]
 		virtual InputProviderHandle AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory) = 0;
 		/// @brief Removes an input provider.

@@ -26,6 +26,7 @@ export namespace PonyEngine::Log
 
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.
+		/// @note The function may be called on different threads, but it is guaranteed that it will not be executed concurrently.
 		virtual void Log(const LogEntry& logEntry) noexcept = 0;
 	};
 }

@@ -20,6 +20,7 @@ import :LogType;
 export namespace PonyEngine::Log
 {
 	/// @brief Logger.
+	/// @note All the functions here are thread-safe.
 	class ILogger
 	{
 		PONY_INTERFACE_BODY(ILogger)

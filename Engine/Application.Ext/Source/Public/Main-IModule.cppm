@@ -20,6 +20,7 @@ import :IModuleContext;
 export namespace PonyEngine::Application
 {
 	/// @brief Module.
+	/// @note The module functions are always called on a main thread.
 	class IModule
 	{
 		PONY_INTERFACE_BODY(IModule)

@@ -24,12 +24,14 @@ import :SurfaceFeature;
 export namespace PonyEngine::Surface
 {
 	/// @brief Surface service.
+	/// @note By default, all the functions here must be called only on a main thread.
 	class ISurfaceService
 	{
 		PONY_INTERFACE_BODY(ISurfaceService)
 
 		/// @brief Gets the supported features.
 		/// @return Supported features.
+		/// @note This function may be called on any thread and concurrently with any other function.
 		[[nodiscard("Pure function")]]
 		virtual SurfaceFeature SupportedFeatures() const noexcept = 0;
 

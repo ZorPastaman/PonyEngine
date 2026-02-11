@@ -19,6 +19,7 @@ import :ITickableServiceAdder;
 export namespace PonyEngine::Application
 {
 	/// @brief Service
+	/// @note The service functions are always called on a main thread.
 	class IService
 	{
 		PONY_INTERFACE_BODY(IService)

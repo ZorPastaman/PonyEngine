@@ -19,6 +19,7 @@ import PonyEngine.Application.Ext;
 export namespace PonyEngine::Application::Windows
 {
 	/// @brief Windows application context.
+	/// @note All the functions here are thread-safe.
 	class IApplicationContext : public Application::IApplicationContext
 	{
 		PONY_INTERFACE_BODY(IApplicationContext)

@@ -45,6 +45,7 @@ export namespace PonyEngine::Application::Windows
 
 		/// @brief Runs the application.
 		/// @return Exit code.
+		/// @note Must be called on the same thread it was created on.
 		[[nodiscard("Must be returned from main")]]
 		int Run();
 
@@ -84,6 +85,9 @@ export namespace PonyEngine::Application::Windows
 		virtual const std::filesystem::path& TempDataDirectory() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual std::thread::id MainThreadId() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual std::string_view CommandLine() const noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -100,7 +104,7 @@ export namespace PonyEngine::Application::Windows
 		virtual enum FlowState FlowState() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual int ExitCode() const noexcept override;
-		virtual void Stop(int exitCode) noexcept override;
+		virtual void Stop(int exitCode) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t FrameCount() const noexcept override;
@@ -119,6 +123,7 @@ export namespace PonyEngine::Application::Windows
 
 		FlowManager flowManager; ///< Flow manager.
 		LoggerManager loggerManager; ///< Logger manager.
+		EnvironmentManager environmentManager; ///< Environment manager.
 		AppDataManager appDataManager; ///< Application data manager.
 		PathManager pathManager; ///< Path manager.
 		ServiceManager serviceManager; ///< Service manager.
@@ -131,6 +136,7 @@ namespace PonyEngine::Application::Windows
 	App::App(const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand, const std::shared_ptr<Log::ILogger>& defaultLogger) :
 		flowManager(*this),
 		loggerManager(*this, defaultLogger),
+		environmentManager(*this),
 		appDataManager(*this, instance, prevInstance, commandLine, showCommand),
 		pathManager(*this),
 		serviceManager(*this),
@@ -222,6 +228,11 @@ namespace PonyEngine::Application::Windows
 		return pathManager.TempDataDirectory();
 	}
 
+	std::thread::id App::MainThreadId() const noexcept
+	{
+		return environmentManager.MainThreadId();
+	}
+
 	std::string_view App::CommandLine() const noexcept
 	{
 		return appDataManager.CommandLine();
@@ -257,7 +268,7 @@ namespace PonyEngine::Application::Windows
 		return flowManager.ExitCode();
 	}
 
-	void App::Stop(const int exitCode) noexcept
+	void App::Stop(const int exitCode)
 	{
 		flowManager.Stop(exitCode);
 	}

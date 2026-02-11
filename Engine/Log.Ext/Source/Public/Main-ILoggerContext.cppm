@@ -21,6 +21,8 @@ import PonyEngine.Log;
 export namespace PonyEngine::Log
 {
 	/// @brief Logger context.
+	/// @note All the functions here except for the application getters must be called on the same thread a sub-logger was called on.
+	/// @note The application getters are thread-safe.
 	class ILoggerContext
 	{
 		PONY_INTERFACE_BODY(ILoggerContext)

@@ -12,6 +12,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Main.cppm"
 	"Source/Private/Main-Console.cppm"
 	"Source/Private/Main-DefaultLogger.cppm"
+	"Source/Private/Main-EnvironmentManager.cppm"
 	"Source/Private/Main-ExitCodes.cppm"
 	"Source/Private/Main-FlowManager.cppm"
 	"Source/Private/Main-InterfaceContainer.cppm"
