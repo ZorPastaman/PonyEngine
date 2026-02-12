@@ -54,6 +54,7 @@ export import :IGraphicsCommandList;
 export import :IGraphicsPipelineState;
 export import :IPipelineLayout;
 export import :IRenderDeviceService;
+export import :IRenderDeviceServiceObserver;
 export import :IRenderTargetContainer;
 export import :IResource;
 export import :ISamplerContainer;

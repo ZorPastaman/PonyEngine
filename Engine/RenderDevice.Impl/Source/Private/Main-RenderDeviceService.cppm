@@ -148,6 +148,9 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IWaiter> CreateWaiter() override;
 
+		virtual void AddObserver(IRenderDeviceServiceObserver& observer) override;
+		virtual void RemoveObserver(IRenderDeviceServiceObserver& observer) noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual Application::IApplicationContext& Application() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -175,6 +178,8 @@ export namespace PonyEngine::RenderDevice
 		std::optional<std::size_t> activeBackendIndex;
 
 		std::unordered_map<struct TextureFormatId, std::string> textureFormatHashMap;
+
+		std::vector<IRenderDeviceServiceObserver*> observers;
 
 		BackendHandle nextBackendHandle;
 	};
@@ -306,6 +311,18 @@ namespace PonyEngine::RenderDevice
 		}
 #endif
 
+		for (IRenderDeviceServiceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnBeforeBackendSwitch(activeBackendIndex, backendIndex);
+			}
+			catch (...)
+			{
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing before backend switch. Observer: '{}'.", typeid(*observer).name());
+			}
+		}
+
 		if (activeBackendIndex)
 		{
 			try
@@ -319,8 +336,8 @@ namespace PonyEngine::RenderDevice
 			}
 		}
 
+		const std::optional<std::size_t> prevActiveBackendIndex = activeBackendIndex;
 		activeBackendIndex = std::nullopt;
-		
 		if (backendIndex)
 		{
 			try
@@ -333,8 +350,19 @@ namespace PonyEngine::RenderDevice
 				throw;
 			}
 		}
-
 		activeBackendIndex = backendIndex;
+
+		for (IRenderDeviceServiceObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnAfterBackendSwitch(prevActiveBackendIndex, activeBackendIndex);
+			}
+			catch (...)
+			{
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing after backend switch. Observer: '{}'.", typeid(*observer).name());
+			}
+		}
 	}
 
 	struct DeviceSupport RenderDeviceService::DeviceSupport() const
@@ -611,6 +639,23 @@ namespace PonyEngine::RenderDevice
 	std::shared_ptr<IWaiter> RenderDeviceService::CreateWaiter()
 	{
 		return GetCurrentBackend().CreateWaiter();
+	}
+
+	void RenderDeviceService::AddObserver(IRenderDeviceServiceObserver& observer)
+	{
+		observers.push_back(&observer);
+	}
+
+	void RenderDeviceService::RemoveObserver(IRenderDeviceServiceObserver& observer) noexcept
+	{
+		if (const auto position = std::ranges::find(observers, &observer); position != observers.cend()) [[likely]]
+		{
+			observers.erase(position);
+		}
+		else [[unlikely]]
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to remove render device observer that hadn't been added.");
+		}
 	}
 
 	Application::IApplicationContext& RenderDeviceService::Application() noexcept

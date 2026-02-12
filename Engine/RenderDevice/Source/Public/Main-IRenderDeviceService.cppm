@@ -36,6 +36,7 @@ import :IFence;
 import :IGraphicsCommandList;
 import :IGraphicsPipelineState;
 import :IPipelineLayout;
+import :IRenderDeviceServiceObserver;
 import :IRenderTargetContainer;
 import :ISamplerContainer;
 import :ISecondaryGraphicsCommandList;
@@ -165,5 +166,8 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IFence> CreateFence() = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IWaiter> CreateWaiter() = 0;
+
+		virtual void AddObserver(IRenderDeviceServiceObserver& observer) = 0;
+		virtual void RemoveObserver(IRenderDeviceServiceObserver& observer) noexcept = 0;
 	};
 }
