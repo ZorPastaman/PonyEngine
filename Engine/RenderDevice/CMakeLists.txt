@@ -51,6 +51,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-IGraphicsPipelineState.cppm"
 	"Source/Public/Main-IPipelineLayout.cppm"
 	"Source/Public/Main-IRenderDeviceService.cppm"
+	"Source/Public/Main-IRenderDeviceServiceObserver.cppm"
 	"Source/Public/Main-IRenderTargetContainer.cppm"
 	"Source/Public/Main-IResource.cppm"
 	"Source/Public/Main-ISamplerContainer.cppm"

@@ -823,7 +823,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing focus change.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing focus change. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 	}
@@ -1087,7 +1087,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing active change.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing active change. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -1206,7 +1206,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing move.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing move. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -1227,7 +1227,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing resize.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing resize. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -1248,7 +1248,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing display change.");
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing display change. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
