@@ -14,7 +14,6 @@ import std;
 import :AttachmentParams;
 import :BlendParams;
 import :DepthStencilParams;
-import :IShader;
 import :SampleParams;
 import :RasterizerParams;
 
@@ -22,9 +21,9 @@ export namespace PonyEngine::RenderDevice
 {
 	struct GraphicsPipelineStateParams final
 	{
-		const IShader* amplificationShader = nullptr;
-		const IShader* meshShader = nullptr;
-		const IShader* pixelShader = nullptr;
+		std::span<const std::byte> amplificationShader;
+		std::span<const std::byte> meshShader;
+		std::span<const std::byte> pixelShader;
 		RasterizerParams rasterizer;
 		BlendParams blend;
 		DepthStencilParams depthStencil;

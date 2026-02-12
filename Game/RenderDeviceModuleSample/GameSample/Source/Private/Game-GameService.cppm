@@ -29,7 +29,7 @@ export namespace Game
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<PonyEngine::RenderDevice::IShader> LoadShader(const std::filesystem::path& path);
+		static std::vector<std::byte> LoadShader(const std::filesystem::path& path);
 
 		PonyEngine::Application::IApplicationContext* application;
 		PonyEngine::RenderDevice::IRenderDeviceService* renderDevice;
@@ -154,8 +154,8 @@ namespace Game
 			.flags = PonyEngine::RenderDevice::PipelineLayoutFlag::None
 		});
 
-		const std::shared_ptr<PonyEngine::RenderDevice::IShader> triangleShader = LoadShader(TRIANGLE_SHADER);
-		const std::shared_ptr<PonyEngine::RenderDevice::IShader> pixelShader = LoadShader(PIXEL_SHADER);
+		const std::vector<std::byte> triangleShader = LoadShader(TRIANGLE_SHADER);
+		const std::vector<std::byte>  pixelShader = LoadShader(PIXEL_SHADER);
 		constexpr auto opaqueBlendParams = PonyEngine::RenderDevice::RenderTargetBlendParams
 		{
 			.blend = PonyEngine::RenderDevice::ColorBlendParams{},
@@ -164,8 +164,8 @@ namespace Game
 		const PonyEngine::RenderDevice::TextureFormatId depthStencilTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::D32_Float_S8X24_Uint);
 		boxPipelineState = renderDevice->CreateGraphicsPipelineState(layout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
 		{
-			.meshShader = triangleShader.get(),
-			.pixelShader = pixelShader.get(),
+			.meshShader = triangleShader,
+			.pixelShader = pixelShader,
 			.rasterizer = PonyEngine::RenderDevice::RasterizerParams{},
 			.blend = PonyEngine::RenderDevice::BlendParams
 			{
@@ -222,7 +222,7 @@ namespace Game
 		renderDevice->PresentNextSwapChainBuffer();
 	}
 
-	std::shared_ptr<PonyEngine::RenderDevice::IShader> GameService::LoadShader(const std::filesystem::path& path)
+	std::vector<std::byte> GameService::LoadShader(const std::filesystem::path& path)
 	{
 		auto file = std::ifstream(path, std::ios::binary | std::ios::ate);
 		if (!file) [[unlikely]]
@@ -236,6 +236,6 @@ namespace Game
 		auto data = std::vector<std::byte>(static_cast<size_t>(size));
 		file.read(reinterpret_cast<char*>(data.data()), size);
 
-		return renderDevice->CreateShader(data);
+		return data;
 	}
 }

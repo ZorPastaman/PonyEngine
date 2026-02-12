@@ -102,13 +102,12 @@ export namespace PonyEngine::RenderDevice
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IShader> CreateShader(std::span<const std::byte> byteCode) override;
-
-		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) override;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
 			const GraphicsPipelineStateParams& params) override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params) override;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
@@ -495,11 +494,6 @@ namespace PonyEngine::RenderDevice
 		GetCurrentBackend().CopySamplers(ranges);
 	}
 
-	std::shared_ptr<IShader> RenderDeviceService::CreateShader(const std::span<const std::byte> byteCode)
-	{
-		return GetCurrentBackend().CreateShader(byteCode);
-	}
-
 	std::shared_ptr<IPipelineLayout> RenderDeviceService::CreatePipelineLayout(const PipelineLayoutParams& params)
 	{
 		return GetCurrentBackend().CreatePipelineLayout(params);
@@ -509,6 +503,12 @@ namespace PonyEngine::RenderDevice
 		const GraphicsPipelineStateParams& params)
 	{
 		return GetCurrentBackend().CreateGraphicsPipelineState(layout, params);
+	}
+
+	std::shared_ptr<IComputePipelineState> RenderDeviceService::CreateComputePipelineState(
+		const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params)
+	{
+		return GetCurrentBackend().CreateComputePipelineState(layout, params);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> RenderDeviceService::CreateGraphicsCommandList()

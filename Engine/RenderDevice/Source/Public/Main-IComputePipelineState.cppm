@@ -11,18 +11,20 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.RenderDevice:IShader;
+export module PonyEngine.RenderDevice:IComputePipelineState;
 
 import std;
 
+import :IPipelineLayout;
+
 export namespace PonyEngine::RenderDevice
 {
-	class IShader
+	class IComputePipelineState
 	{
-		PONY_INTERFACE_BODY(IShader)
+		PONY_INTERFACE_BODY(IComputePipelineState)
 
 		[[nodiscard("Pure function")]]
-		virtual std::span<const std::byte> ByteCode() const noexcept = 0;
+		virtual const std::shared_ptr<const IPipelineLayout>& Layout() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;

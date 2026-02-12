@@ -195,7 +195,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			}, params.blend.blendGroup);
 		}
 
-		attachment.renderTargetFormats = params.attachmentParams.renderTargetFormats.size() > 0uz 
+		attachment.renderTargetFormats = !params.attachmentParams.renderTargetFormats.empty() 
 			? std::span<const TextureFormatId>(reinterpret_cast<const TextureFormatId*>(data.get()), params.attachmentParams.renderTargetFormats.size())
 			: std::span<const TextureFormatId>();
 		attachment.depthStencilFormat = params.attachmentParams.depthStencilFormat;
@@ -206,7 +206,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				return std::variant<BlendGroupParams, LogicBlendGroupParams>(BlendGroupParams
 				{
-					.renderTargetBlend = p.renderTargetBlend.size() > 0uz
+					.renderTargetBlend = !p.renderTargetBlend.empty()
 						? std::span<const RenderTargetBlendParams>(reinterpret_cast<const RenderTargetBlendParams*>(data.get() + rtBlendByteOffset), p.renderTargetBlend.size())
 						: std::span<const RenderTargetBlendParams>()
 				});
@@ -216,7 +216,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				return std::variant<BlendGroupParams, LogicBlendGroupParams>(LogicBlendGroupParams
 				{
 					.logicOperation = p.logicOperation,
-					.renderTargetBlend = p.renderTargetBlend.size() > 0uz
+					.renderTargetBlend = !p.renderTargetBlend.empty()
 						? std::span<const LogicRenderTargetBlendParams>(reinterpret_cast<const LogicRenderTargetBlendParams*>(data.get() + rtBlendByteOffset), p.renderTargetBlend.size())
 						: std::span<const LogicRenderTargetBlendParams>()
 				});
@@ -227,15 +227,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ShaderTypeMask GraphicsPipelineState::GetShaderStages(const GraphicsPipelineStateParams& params) noexcept
 	{
 		auto stages = ShaderTypeMask::None;
-		if (params.amplificationShader)
+		if (!params.amplificationShader.empty())
 		{
 			stages |= ShaderTypeMask::Amplification;
 		}
-		if (params.meshShader)
+		if (!params.meshShader.empty())
 		{
 			stages |= ShaderTypeMask::Mesh;
 		}
-		if (params.pixelShader)
+		if (!params.pixelShader.empty())
 		{
 			stages |= ShaderTypeMask::Pixel;
 		}

@@ -83,13 +83,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IShader> CreateShader(std::span<const std::byte> byteCode) override;
-
-		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) override;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
 			const GraphicsPipelineStateParams& params) override;
+		[[nodiscard("Wierd call")]] 
+		virtual std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params) override;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
@@ -298,11 +297,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		engine->CopySamplers(ranges);
 	}
 
-	std::shared_ptr<IShader> D3D12Backend::CreateShader(const std::span<const std::byte> byteCode)
-	{
-		return engine->CreateShader(byteCode);
-	}
-
 	std::shared_ptr<IPipelineLayout> D3D12Backend::CreatePipelineLayout(const PipelineLayoutParams& params)
 	{
 		return engine->CreatePipelineLayout(params);
@@ -312,6 +306,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const GraphicsPipelineStateParams& params)
 	{
 		return engine->CreateGraphicsPipelineState(layout, params);
+	}
+
+	std::shared_ptr<IComputePipelineState> D3D12Backend::CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params)
+	{
+		return engine->CreateComputePipelineState(layout, params);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> D3D12Backend::CreateGraphicsCommandList()
