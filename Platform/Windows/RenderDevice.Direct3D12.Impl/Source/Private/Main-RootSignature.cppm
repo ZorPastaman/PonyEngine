@@ -180,7 +180,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				}
 			}, set.ranges);
 
-			if (set.staticSamplers.size() > 0uz)
+			if (!set.staticSamplers.empty())
 			{
 				setMeta->staticSamplers = std::span<const StaticSamplerParams>(staticSamplerParams, set.staticSamplers.size());
 				std::memcpy(staticSamplerParams, set.staticSamplers.data(), set.staticSamplers.size() * sizeof(StaticSamplerParams));

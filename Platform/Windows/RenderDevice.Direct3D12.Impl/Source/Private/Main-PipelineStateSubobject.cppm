@@ -54,6 +54,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	using PipelineStateSubobjectAmplificationShader = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_AS, D3D12_SHADER_BYTECODE>;
 	using PipelineStateSubobjectMeshShader = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_MS, D3D12_SHADER_BYTECODE>;
 	using PipelineStateSubobjectPixelShader = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS, D3D12_SHADER_BYTECODE>;
+	using PipelineStateSubobjectComputeShader = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CS, D3D12_SHADER_BYTECODE>;
 	using PipelineStateSubobjectRasterizer = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_RASTERIZER2, D3D12_RASTERIZER_DESC2>;
 	using PipelineStateSubobjectBlend = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_BLEND, D3D12_BLEND_DESC>;
 	using PipelineStateSubobjectRenderTargetFormats = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_RENDER_TARGET_FORMATS, D3D12_RT_FORMAT_ARRAY>;

@@ -94,7 +94,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			}
 		}
 
-		if (commandLists.size() > 0uz) [[likely]]
+		if (!commandLists.empty()) [[likely]]
 		{
 			commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
 		}

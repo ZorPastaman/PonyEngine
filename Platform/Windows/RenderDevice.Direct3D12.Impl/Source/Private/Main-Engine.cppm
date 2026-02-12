@@ -34,6 +34,7 @@ import :BufferUtility;
 import :BundleCommandList;
 import :CommandQueue;
 import :ComputeCommandList;
+import :ComputePipelineState;
 import :CopyCommandList;
 import :DepthStencilContainer;
 import :DescriptorHeapUtility;
@@ -51,7 +52,6 @@ import :RootSignature;
 import :RootSignatureUtility;
 import :SamplerContainer;
 import :SamplerUtility;
-import :Shader;
 import :ShaderDataContainer;
 import :SwapChainWrapper;
 import :Texture;
@@ -129,14 +129,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		[[nodiscard("Pure function")]]
 		Meta::Version ShaderIRVersion() const;
-		[[nodiscard("Pure function")]]
-		std::shared_ptr<IShader> CreateShader(std::span<const std::byte> byteCode);
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params);
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout,
 			const GraphicsPipelineStateParams& params);
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params);
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
@@ -241,6 +241,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		static const SamplerContainer& ToNativeContainer(const ISamplerContainer& container);
 
+		[[nodiscard("Pure function")]]
+		static D3D12_SHADER_BYTECODE ToByteCode(std::span<const std::byte> byteCode) noexcept;
+
 		template<typename Container, typename Range>
 		void CopyViews(std::span<const Range> ranges, D3D12_DESCRIPTOR_HEAP_TYPE type);
 
@@ -312,6 +315,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		static void ValidatePipelineLayout(const IPipelineLayout* layout);
 		void ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const;
+		static void ValidatePipelineStateParams(const ComputePipelineStateParams& params);
 
 		template<typename CommandList, typename CommandListInterface>
 		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
@@ -732,11 +736,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
 	}
 
-	std::shared_ptr<IShader> Engine::CreateShader(const std::span<const std::byte> byteCode)
-	{
-		return std::make_shared<Shader>(byteCode);
-	}
-
 	std::shared_ptr<IPipelineLayout> Engine::CreatePipelineLayout(const PipelineLayoutParams& params)
 	{
 		ValidatePipelineLayoutParams(params);
@@ -764,25 +763,29 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Memory::Arena& arena = Arena();
 		arena.Free();
 
-		const Memory::Arena::Slice<PipelineStateSubobjectRootSignature> rootSignature = arena.Allocate<PipelineStateSubobjectRootSignature>(1u);
-		arena.Span(rootSignature)[0] = &static_cast<const RootSignature&>(*layout).GetRootSignature();
-		if (params.amplificationShader)
+		if (layout)
+		{
+			const Memory::Arena::Slice<PipelineStateSubobjectRootSignature> rootSignature = arena.Allocate<PipelineStateSubobjectRootSignature>(1u);
+			arena.Span(rootSignature)[0] = &static_cast<const RootSignature&>(*layout).GetRootSignature();
+		}
+
+		if (!params.amplificationShader.empty())
 		{
 			const Memory::Arena::Slice<PipelineStateSubobjectAmplificationShader> amplificationShader = arena.Allocate<PipelineStateSubobjectAmplificationShader>(1u);
-			arena.Span(amplificationShader)[0] = static_cast<const Shader*>(params.amplificationShader)->ShaderByteCode();
+			arena.Span(amplificationShader)[0] = ToByteCode(params.amplificationShader);
 		}
 		const Memory::Arena::Slice<PipelineStateSubobjectMeshShader> meshShader = arena.Allocate<PipelineStateSubobjectMeshShader>(1u);
-		arena.Span(meshShader)[0] = static_cast<const Shader*>(params.meshShader)->ShaderByteCode();
-		if (params.pixelShader)
+		arena.Span(meshShader)[0] = ToByteCode(params.meshShader);
+		if (!params.pixelShader.empty())
 		{
 			const Memory::Arena::Slice<PipelineStateSubobjectPixelShader> pixelShader = arena.Allocate<PipelineStateSubobjectPixelShader>(1u);
-			arena.Span(pixelShader)[0] = static_cast<const Shader*>(params.pixelShader)->ShaderByteCode();
+			arena.Span(pixelShader)[0] = ToByteCode(params.pixelShader);
 		}
 
 		const Memory::Arena::Slice<PipelineStateSubobjectRasterizer> rasterizer = arena.Allocate<PipelineStateSubobjectRasterizer>(1u);
 		arena.Span(rasterizer)[0] = ToRasterizerDesc(params.rasterizer);
 
-		if (params.attachmentParams.renderTargetFormats.size() > 0uz)
+		if (!params.attachmentParams.renderTargetFormats.empty())
 		{
 			const Memory::Arena::Slice<PipelineStateSubobjectBlend> blend = arena.Allocate<PipelineStateSubobjectBlend>(1u);
 			arena.Span(blend)[0] = ToBlendDesc(params);
@@ -817,6 +820,31 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.pPipelineStateSubobjectStream = arena.Data()
 		};
 		return std::make_shared<GraphicsPipelineState>(device.CreatePipelineState(pipelineStateStream), layout, params);
+	}
+
+	std::shared_ptr<IComputePipelineState> Engine::CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params)
+	{
+		ValidatePipelineLayout(layout.get());
+		ValidatePipelineStateParams(params);
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+
+		if (layout)
+		{
+			const Memory::Arena::Slice<PipelineStateSubobjectRootSignature> rootSignature = arena.Allocate<PipelineStateSubobjectRootSignature>(1u);
+			arena.Span(rootSignature)[0] = &static_cast<const RootSignature&>(*layout).GetRootSignature();
+		}
+
+		const Memory::Arena::Slice<PipelineStateSubobjectComputeShader> computeShader = arena.Allocate<PipelineStateSubobjectComputeShader>(1u);
+		arena.Span(computeShader)[0] = ToByteCode(params.computeShader);
+
+		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
+		{
+			.SizeInBytes = static_cast<SIZE_T>(arena.Size()),
+			.pPipelineStateSubobjectStream = arena.Data()
+		};
+		return std::make_shared<ComputePipelineState>(device.CreatePipelineState(pipelineStateStream), layout);
 	}
 
 	std::shared_ptr<IGraphicsCommandList> Engine::CreateGraphicsCommandList()
@@ -1366,6 +1394,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return static_cast<const SamplerContainer&>(container);
 	}
 
+	D3D12_SHADER_BYTECODE Engine::ToByteCode(const std::span<const std::byte> byteCode) noexcept
+	{
+		return D3D12_SHADER_BYTECODE{.pShaderBytecode = byteCode.data(), .BytecodeLength = static_cast<SIZE_T>(byteCode.size())};
+	}
+
 	template<typename Container, typename Range>
 	void Engine::CopyViews(const std::span<const Range> ranges, const D3D12_DESCRIPTOR_HEAP_TYPE type)
 	{
@@ -1567,7 +1600,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void Engine::ValidateDepthTexture(const TextureParams& params)
 	{
 #ifndef NDEBUG
-		if (params.castableFormats.size() > 0uz) [[unlikely]]
+		if (!params.castableFormats.empty()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid castable texture format");
 		}
@@ -2421,7 +2454,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void Engine::ValidatePipelineLayout(const IPipelineLayout* const layout)
 	{
 #ifndef NDEBUG
-		if (!layout || typeid(*layout) != typeid(RootSignature)) [[unlikely]]
+		if (layout && typeid(*layout) != typeid(RootSignature)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid pipeline layout");
 		}
@@ -2431,17 +2464,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void Engine::ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const
 	{
 #ifndef NDEBUG
-		if (params.amplificationShader && typeid(*params.amplificationShader) != typeid(Shader)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid amplification shader");
-		}
-		if (!params.meshShader || typeid(*params.meshShader) != typeid(Shader)) [[unlikely]]
+		if (params.meshShader.empty()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid mesh shader");
-		}
-		if (params.pixelShader && typeid(*params.pixelShader) != typeid(Shader)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid amplification shader");
 		}
 
 		const std::size_t blendCount = std::visit(Type::Overload
@@ -2487,6 +2512,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				throw std::invalid_argument("Invalid depth stencil format");
 			}
+		}
+#endif
+	}
+
+	void Engine::ValidatePipelineStateParams(const ComputePipelineStateParams& params)
+	{
+#ifndef NDEBUG
+		if (params.computeShader.empty()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid mesh shader");
 		}
 #endif
 	}

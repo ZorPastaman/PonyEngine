@@ -79,12 +79,11 @@ export namespace PonyEngine::RenderDevice
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) = 0;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IShader> CreateShader(std::span<const std::byte> byteCode) = 0;
-
-		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) = 0;
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) = 0;
+		[[nodiscard("Wierd call")]]
+		virtual std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;

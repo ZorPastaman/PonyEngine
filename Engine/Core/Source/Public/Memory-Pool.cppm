@@ -211,7 +211,7 @@ namespace PonyEngine::Memory
 	template<typename T>
 	T& Pool<T>::Acquire()
 	{
-		std::unique_ptr<T, std::function<void(T*)>> acquired = inactive.size() > 0uz ? GetFromInactive() : create();
+		std::unique_ptr<T, std::function<void(T*)>> acquired = inactive.empty() ? create() : GetFromInactive();
 		T& ref = *acquired;
 		acquire(ref);
 		active.push_back(std::move(acquired));
