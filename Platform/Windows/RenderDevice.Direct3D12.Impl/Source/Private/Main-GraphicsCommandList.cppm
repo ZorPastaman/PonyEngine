@@ -18,6 +18,7 @@ import std;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
+import :BundleCommandList;
 import :CommandList;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -26,9 +27,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept;
+		GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		[[nodiscard("Pure constructor")]]
-		GraphicsCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept;
+		GraphicsCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		GraphicsCommandList(const GraphicsCommandList&) = delete;
 		GraphicsCommandList(GraphicsCommandList&&) = delete;
 
@@ -36,6 +37,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void Reset() override;
 		virtual void Close() override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsOpen() const noexcept override;
+
+		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
+		virtual void Execute(ISecondaryGraphicsCommandList& secondary) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -54,13 +60,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	GraphicsCommandList::GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept :
+	GraphicsCommandList::GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		commandList(allocator, commandList)
 	{
 	}
 
 	GraphicsCommandList::GraphicsCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, 
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept :
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		commandList(std::move(allocator), std::move(commandList))
 	{
 	}
@@ -73,6 +79,37 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::Close()
 	{
 		commandList.Close();
+	}
+
+	bool GraphicsCommandList::IsOpen() const noexcept
+	{
+		return commandList.IsOpen();
+	}
+
+	void GraphicsCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
+	{
+		commandList.Barrier(bufferBarriers, textureBarriers);
+	}
+
+	void GraphicsCommandList::Execute(ISecondaryGraphicsCommandList& secondary)
+	{
+#ifndef NDEBUG
+		if (typeid(secondary) != typeid(BundleCommandList)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid secondary graphics command list");
+		}
+#endif
+
+		const auto& bundle = static_cast<BundleCommandList&>(secondary);
+
+#ifndef NDEBUG
+		if (bundle.IsOpen()) [[unlikely]]
+		{
+			throw std::invalid_argument("Secondary graphics command list is open");
+		}
+#endif
+
+		commandList.ExecuteBundle(bundle.CommandList());
 	}
 
 	std::string_view GraphicsCommandList::Name() const noexcept

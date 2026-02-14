@@ -7,25 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:ResourceLayout;
+export module PonyEngine.RenderDevice:BufferBarrier;
 
 import std;
 
+import :IBuffer;
+import :PipelineStage;
+import :ResourceAccess;
+
 export namespace PonyEngine::RenderDevice
 {
-	enum class ResourceLayout : std::uint8_t
+	struct BufferBarrier final
 	{
-		Common,
-		Present,
-		ShaderResource,
-		RenderTarget,
-		DepthStencilRead,
-		DepthStencilWrite,
-		UnorderedAccess,
-		CopySource,
-		CopyDestination,
-		ResolveSource,
-		ResolveDestination,
-		Undefined
+		IBuffer* buffer = nullptr;
+		PipelineStage beforeStages = PipelineStage::None;
+		PipelineStage afterStages = PipelineStage::None;
+		std::optional<ResourceAccess> beforeAccesses;
+		std::optional<ResourceAccess> afterAccesses;
 	};
 }

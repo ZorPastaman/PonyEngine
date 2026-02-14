@@ -26,9 +26,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		ComputeCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept;
+		ComputeCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		[[nodiscard("Pure constructor")]]
-		ComputeCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept;
+		ComputeCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		ComputeCommandList(const ComputeCommandList&) = delete;
 		ComputeCommandList(ComputeCommandList&&) = delete;
 
@@ -36,6 +36,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void Reset() override;
 		virtual void Close() override;
+		[[nodiscard("Pure function")]] 
+		virtual bool IsOpen() const noexcept override;
+
+		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -54,13 +58,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	ComputeCommandList::ComputeCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept :
+	ComputeCommandList::ComputeCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		commandList(allocator, commandList)
 	{
 	}
 
 	ComputeCommandList::ComputeCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept :
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		commandList(std::move(allocator), std::move(commandList))
 	{
 	}
@@ -73,6 +77,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void ComputeCommandList::Close()
 	{
 		commandList.Close();
+	}
+
+	bool ComputeCommandList::IsOpen() const noexcept
+	{
+		return commandList.IsOpen();
+	}
+
+	void ComputeCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
+	{
+		commandList.Barrier(bufferBarriers, textureBarriers);
 	}
 
 	std::string_view ComputeCommandList::Name() const noexcept

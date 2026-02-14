@@ -33,7 +33,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureUsage usage) noexcept;
 
 	[[nodiscard("Pure function")]]
-	constexpr std::uint8_t ToPlaneIndex(Aspect aspect) noexcept;
+	constexpr UINT8 ToPlaneIndex(Aspect aspect) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr UINT8 ToFirstPlaneIndex(AspectMask aspects) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr UINT8 ToPlaneCount(AspectMask aspects) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BARRIER_LAYOUT ToLayout(ResourceLayout layout) noexcept;
@@ -145,9 +149,19 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return support;
 	}
 
-	constexpr std::uint8_t ToPlaneIndex(const Aspect aspect) noexcept
+	constexpr UINT8 ToPlaneIndex(const Aspect aspect) noexcept
 	{
 		return aspect == Aspect::Stencil;
+	}
+
+	constexpr UINT8 ToFirstPlaneIndex(const AspectMask aspects) noexcept
+	{
+		return aspects == AspectMask::None || Any(AspectMask::Color | AspectMask::Depth, aspects) ? 0u : 1u;
+	}
+
+	constexpr UINT8 ToPlaneCount(const AspectMask aspects) noexcept
+	{
+		return Any(AspectMask::Stencil, aspects) && Any(AspectMask::Color | AspectMask::Depth, aspects) ? 2u : 1u;
 	}
 
 	constexpr D3D12_BARRIER_LAYOUT ToLayout(const ResourceLayout layout) noexcept
@@ -176,6 +190,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			return D3D12_BARRIER_LAYOUT_RESOLVE_SOURCE;
 		case ResourceLayout::ResolveDestination:
 			return D3D12_BARRIER_LAYOUT_RESOLVE_DEST;
+		case ResourceLayout::Undefined:
+			return D3D12_BARRIER_LAYOUT_UNDEFINED;
 		default: [[unlikely]]
 			assert(false && "Invalid layout");
 			return D3D12_BARRIER_LAYOUT_COMMON;
@@ -326,7 +342,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					{
 						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
 						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
-						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(params.aspect)),
+						.PlaneSlice = ToPlaneIndex(params.aspect),
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -376,7 +392,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
 						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
 						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
-						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(params.aspect)),
+						.PlaneSlice = ToPlaneIndex(params.aspect),
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -451,7 +467,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.Texture2D = D3D12_TEX2D_UAV
 					{
 						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(params.aspect))
+						.PlaneSlice = ToPlaneIndex(params.aspect)
 					};
 					break;
 				case TextureDimension::Texture3D:
@@ -488,7 +504,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 						.MipSlice = static_cast<UINT>(l.mipIndex),
 						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
 						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
-						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(params.aspect))
+						.PlaneSlice = ToPlaneIndex(params.aspect)
 					};
 					break;
 				case TextureDimension::Texture3D:
@@ -535,7 +551,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.Texture2D = D3D12_TEX2D_RTV
 					{
 						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(Aspect::Color))
+						.PlaneSlice = ToPlaneIndex(Aspect::Color)
 					};
 					break;
 				case TextureDimension::Texture3D:
@@ -572,7 +588,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 						.MipSlice = static_cast<UINT>(l.mipIndex),
 						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
 						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
-						.PlaneSlice = static_cast<UINT>(ToPlaneIndex(Aspect::Color))
+						.PlaneSlice = ToPlaneIndex(Aspect::Color)
 					};
 					break;
 				case TextureDimension::Texture3D:

@@ -23,6 +23,8 @@ export namespace PonyEngine::RenderDevice
 
 		virtual void Reset() = 0;
 		virtual void Close() = 0;
+		[[nodiscard("Pure function")]]
+		virtual bool IsOpen() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;

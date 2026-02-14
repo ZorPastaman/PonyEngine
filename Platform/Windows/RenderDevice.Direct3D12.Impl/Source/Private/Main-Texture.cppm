@@ -258,7 +258,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), static_cast<UINT8>(ToPlaneIndex(aspect)),
+		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), ToPlaneIndex(aspect),
 			static_cast<UINT16>(mipCount), static_cast<UINT16>(ArraySize()));
 	}
 }

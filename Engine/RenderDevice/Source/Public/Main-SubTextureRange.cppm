@@ -33,4 +33,11 @@ export namespace PonyEngine::RenderDevice
 		ArrayRange arrayRange;
 		Aspect aspect = Aspect::Color;
 	};
+
+	struct MultiAspectSubTextureRange final
+	{
+		MipRange mipRange;
+		ArrayRange arrayRange;
+		AspectMask aspects = AspectMask::Color;
+	};
 }

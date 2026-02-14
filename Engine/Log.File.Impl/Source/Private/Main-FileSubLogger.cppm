@@ -31,7 +31,7 @@ export namespace PonyEngine::Log::File
 		FileSubLogger(const FileSubLogger&) = delete;
 		FileSubLogger(FileSubLogger&&) = delete;
 
-		~FileSubLogger() noexcept;
+		~FileSubLogger() noexcept = default;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -54,21 +54,6 @@ namespace PonyEngine::Log::File
 		if (!logFile.is_open()) [[unlikely]]
 		{
 			throw std::runtime_error("Failed to open log file");
-		}
-	}
-
-	FileSubLogger::~FileSubLogger() noexcept
-	{
-		if (logFile.is_open()) [[likely]]
-		{
-			try
-			{
-				logFile.close();
-			}
-			catch (...)
-			{
-				PONY_CONSOLE_X(*logger, std::current_exception(), "On closing log file.");
-			}
 		}
 	}
 

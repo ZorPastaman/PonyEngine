@@ -37,6 +37,7 @@ export namespace Game
 		std::shared_ptr<PonyEngine::RenderDevice::IGraphicsCommandList> graphicsCommandList;
 		std::shared_ptr<PonyEngine::RenderDevice::IComputeCommandList> computeCommandList;
 		std::shared_ptr<PonyEngine::RenderDevice::ICopyCommandList> copyCommandList;
+		std::shared_ptr<PonyEngine::RenderDevice::ISecondaryGraphicsCommandList> secondaryCommandList;
 
 		std::shared_ptr<PonyEngine::RenderDevice::IFence> graphicsFence;
 		std::shared_ptr<PonyEngine::RenderDevice::IFence> computeFence;
@@ -89,6 +90,7 @@ namespace Game
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
 		computeCommandList = renderDevice->CreateComputeCommandList();
 		copyCommandList = renderDevice->CreateCopyCommandList();
+		secondaryCommandList = renderDevice->CreateSecondaryGraphicsCommandList();
 		graphicsFence = renderDevice->CreateFence();
 		computeFence = renderDevice->CreateFence();
 		copyFence = renderDevice->CreateFence();

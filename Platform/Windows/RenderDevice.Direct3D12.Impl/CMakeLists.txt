@@ -25,6 +25,7 @@ target_sources(PonyEngine.RenderDevice.Direct3D12.Impl PUBLIC FILE_SET CXX_MODUL
 	"Source/Private/Main-BufferUtility.cppm"
 	"Source/Private/Main-BundleCommandList.cppm"
 	"Source/Private/Main-CommandList.cppm"
+	"Source/Private/Main-CommandListUtility.cppm"
 	"Source/Private/Main-CommandQueue.cppm"
 	"Source/Private/Main-ComputeCommandList.cppm"
 	"Source/Private/Main-ComputePipelineState.cppm"

@@ -26,9 +26,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		BundleCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept;
+		BundleCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		[[nodiscard("Pure constructor")]]
-		BundleCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept;
+		BundleCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		BundleCommandList(const BundleCommandList&) = delete;
 		BundleCommandList(BundleCommandList&&) = delete;
 
@@ -36,6 +36,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void Reset() override;
 		virtual void Close() override;
+		[[nodiscard("Pure function")]] 
+		virtual bool IsOpen() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -54,13 +56,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	BundleCommandList::BundleCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept :
+	BundleCommandList::BundleCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		commandList(allocator, commandList)
 	{
 	}
 
 	BundleCommandList::BundleCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept :
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		commandList(std::move(allocator), std::move(commandList))
 	{
 	}
@@ -73,6 +75,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void BundleCommandList::Close()
 	{
 		commandList.Close();
+	}
+
+	bool BundleCommandList::IsOpen() const noexcept
+	{
+		return commandList.IsOpen();
 	}
 
 	std::string_view BundleCommandList::Name() const noexcept

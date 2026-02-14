@@ -15,12 +15,31 @@ export module PonyEngine.RenderDevice:ICopyCommandList;
 
 import std;
 
+import :BufferBarrier;
 import :ICommandList;
+import :TextureBarrier;
 
 export namespace PonyEngine::RenderDevice
 {
 	class ICopyCommandList : public ICommandList
 	{
 		PONY_INTERFACE_BODY(ICopyCommandList)
+
+		void Barrier(std::span<const BufferBarrier> bufferBarriers);
+		void Barrier(std::span<const TextureBarrier> textureBarriers);
+		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) = 0;
 	};
+}
+
+namespace PonyEngine::RenderDevice
+{
+	void ICopyCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers)
+	{
+		Barrier(bufferBarriers, std::span<const TextureBarrier>());
+	}
+
+	void ICopyCommandList::Barrier(const std::span<const TextureBarrier> textureBarriers)
+	{
+		Barrier(std::span<const BufferBarrier>(), textureBarriers);
+	}
 }

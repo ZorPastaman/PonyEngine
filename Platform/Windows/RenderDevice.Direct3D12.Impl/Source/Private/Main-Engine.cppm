@@ -1092,7 +1092,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const std::span<UINT> rowCountsSpan = arena.Span(rowCounts);
 		const std::span<UINT64> rowSizesSpan = arena.Span(rowSizes);
 
-		const UINT8 planeIndex = static_cast<UINT8>(ToPlaneIndex(aspect));
+		const UINT8 planeIndex = ToPlaneIndex(aspect);
 		const UINT16 arraySize = GetArraySize(resourceDesc);
 		const UINT footprintOffset = CalculateSubresource(mostDetailedMipIndex, firstArrayIndex, 
 			planeIndex, resourceDesc.MipLevels, arraySize);
