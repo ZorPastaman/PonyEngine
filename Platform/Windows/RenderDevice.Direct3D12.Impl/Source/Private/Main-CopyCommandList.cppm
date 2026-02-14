@@ -26,9 +26,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept;
+		CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		[[nodiscard("Pure constructor")]]
-		CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept;
+		CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		CopyCommandList(const CopyCommandList&) = delete;
 		CopyCommandList(CopyCommandList&&) = delete;
 
@@ -36,6 +36,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void Reset() override;
 		virtual void Close() override;
+		[[nodiscard("Pure function")]] 
+		virtual bool IsOpen() const noexcept override;
+
+		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -54,13 +58,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	CopyCommandList::CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) noexcept :
+	CopyCommandList::CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		commandList(allocator, commandList)
 	{
 	}
 
 	CopyCommandList::CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) noexcept :
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		commandList(std::move(allocator), std::move(commandList))
 	{
 	}
@@ -73,6 +77,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void CopyCommandList::Close()
 	{
 		commandList.Close();
+	}
+
+	bool CopyCommandList::IsOpen() const noexcept
+	{
+		return commandList.IsOpen();
+	}
+
+	void CopyCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
+	{
+		commandList.Barrier(bufferBarriers, textureBarriers);
 	}
 
 	std::string_view CopyCommandList::Name() const noexcept
