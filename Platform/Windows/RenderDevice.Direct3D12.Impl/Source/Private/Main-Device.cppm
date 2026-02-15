@@ -76,7 +76,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept;
 
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12RootSignature> CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC2& rootSigDesc);
+		Platform::Windows::ComPtr<ID3D12RootSignature> CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc);
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12PipelineState> CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream);
 
@@ -126,6 +126,62 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			throw std::runtime_error(std::format("Failed to acquire D3D12 device: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring D3D12 device done.");
+
+		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Checking D3D12 required support...");
+		auto options12 = D3D12_FEATURE_DATA_D3D12_OPTIONS12{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS12, &options12, sizeof(options12)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options12 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (!options12.EnhancedBarriersSupported) [[unlikely]]
+		{
+			throw std::runtime_error("D3D12 enhanced barriers aren't supported");
+		}
+		if (!options12.RelaxedFormatCastingSupported) [[unlikely]]
+		{
+			throw std::runtime_error("D3D12 relaxed format casting isn't supported");
+		}
+		auto options13 = D3D12_FEATURE_DATA_D3D12_OPTIONS13{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS13, &options13, sizeof(options13)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options13 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (!options13.AlphaBlendFactorSupported) [[unlikely]]
+		{
+			throw std::runtime_error("D3D12 alpha blend factor isn't supported");
+		}
+		auto options14 = D3D12_FEATURE_DATA_D3D12_OPTIONS14{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS14, &options14, sizeof(options14)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options14 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (!options14.IndependentFrontAndBackStencilRefMaskSupported) [[unlikely]]
+		{
+			throw std::runtime_error("D3D12 independent front and back stencil ref mask isn't supported");
+		}
+		auto options16 = D3D12_FEATURE_DATA_D3D12_OPTIONS16{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS16, &options16, sizeof(options16)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options16 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (!options16.DynamicDepthBiasSupported) [[unlikely]]
+		{
+			throw std::runtime_error("D3D12 dynamic depth bias isn't supported");
+		}
+		auto options19 = D3D12_FEATURE_DATA_D3D12_OPTIONS19{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS19, &options19, sizeof(options19)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options19 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (!options19.RasterizerDesc2Supported) [[unlikely]]
+		{
+			throw std::runtime_error("D3D12 rasterizer desc 2 isn't supported");
+		}
+		if (!options19.NarrowQuadrilateralLinesSupported) [[unlikely]]
+		{
+			throw std::runtime_error("D3D12 narrow quadrilateral lines aren't supported");
+		}
+		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Checking D3D12 required support done.");
 	}
 
 	Device::~Device() noexcept
@@ -286,12 +342,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			rangeCount, sourceHandles, rangeSizes, descriptorHeapType);
 	}
 
-	Platform::Windows::ComPtr<ID3D12RootSignature> Device::CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC2& rootSigDesc)
+	Platform::Windows::ComPtr<ID3D12RootSignature> Device::CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc)
 	{
 		const auto versionedDesc = D3D12_VERSIONED_ROOT_SIGNATURE_DESC
 		{
-			.Version = D3D_ROOT_SIGNATURE_VERSION_1_2,
-			.Desc_1_2 = rootSigDesc,
+			.Version = D3D_ROOT_SIGNATURE_VERSION_1_1,
+			.Desc_1_1 = rootSigDesc,
 		};
 
 		Platform::Windows::ComPtr<ID3DBlob> successBlob;

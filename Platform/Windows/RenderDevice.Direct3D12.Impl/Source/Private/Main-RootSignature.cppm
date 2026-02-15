@@ -41,8 +41,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const DescriptorSetMeta> Sets() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual PipelineLayoutFlag Flags() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -61,7 +59,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		
 		std::size_t setCount;
 		std::unique_ptr<std::byte[]> metas;
-		PipelineLayoutFlag flags;
 
 		std::string name;
 	};
@@ -72,16 +69,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	RootSignature::RootSignature(ID3D12RootSignature& rootSignature, const PipelineLayoutParams& params) :
 		rootSignature(&rootSignature),
 		setCount{params.descriptorSets.size()},
-		metas(setCount > 0uz ? CreateMetas(params.descriptorSets) : nullptr),
-		flags{params.flags}
+		metas(setCount > 0uz ? CreateMetas(params.descriptorSets) : nullptr)
 	{
 	}
 
 	RootSignature::RootSignature(Platform::Windows::ComPtr<ID3D12RootSignature>&& rootSignature, const PipelineLayoutParams& params) :
 		rootSignature(std::move(rootSignature)),
 		setCount{params.descriptorSets.size()},
-		metas(setCount > 0uz ? CreateMetas(params.descriptorSets) : nullptr),
-		flags{params.flags}
+		metas(setCount > 0uz ? CreateMetas(params.descriptorSets) : nullptr)
 	{
 		assert(this->rootSignature && "The root signature is nullptr.");
 	}
@@ -91,11 +86,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return setCount > 0uz 
 			? std::span<const DescriptorSetMeta>(reinterpret_cast<const DescriptorSetMeta*>(metas.get()), setCount) 
 			: std::span<const DescriptorSetMeta>();
-	}
-
-	PipelineLayoutFlag RootSignature::Flags() const noexcept
-	{
-		return flags;
 	}
 
 	std::string_view RootSignature::Name() const noexcept

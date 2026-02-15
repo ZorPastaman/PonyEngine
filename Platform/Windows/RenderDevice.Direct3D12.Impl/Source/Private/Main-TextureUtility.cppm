@@ -156,12 +156,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	constexpr UINT8 ToFirstPlaneIndex(const AspectMask aspects) noexcept
 	{
-		return aspects == AspectMask::None || Any(AspectMask::Color | AspectMask::Depth, aspects) ? 0u : 1u;
+		return All(AspectMask::Stencil, aspects);
 	}
 
 	constexpr UINT8 ToPlaneCount(const AspectMask aspects) noexcept
 	{
-		return Any(AspectMask::Stencil, aspects) && Any(AspectMask::Color | AspectMask::Depth, aspects) ? 2u : 1u;
+		return (aspects != AspectMask::None) + (Any(AspectMask::Stencil, aspects) && Any(AspectMask::Color | AspectMask::Depth, aspects));
 	}
 
 	constexpr D3D12_BARRIER_LAYOUT ToLayout(const ResourceLayout layout) noexcept
