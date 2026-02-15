@@ -745,12 +745,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
 		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(static_cast<std::size_t>(rootSigDescCounts.tableCount));
 		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(static_cast<std::size_t>(rootSigDescCounts.rangeCount));
-		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC1> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC1>(static_cast<std::size_t>(rootSigDescCounts.staticSamplerCount));
+		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC>(static_cast<std::size_t>(rootSigDescCounts.staticSamplerCount));
 		const std::span<D3D12_ROOT_PARAMETER1> parametersSpan = arena.Span(parameters);
 		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
-		const std::span<D3D12_STATIC_SAMPLER_DESC1> staticSamplersSpan = arena.Span(staticSamplers);
+		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplersSpan = arena.Span(staticSamplers);
 
-		const D3D12_ROOT_SIGNATURE_DESC2 rootSigDesc = ToRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
+		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = ToRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
 		return std::make_shared<RootSignature>(device.CreateRootSignature(rootSigDesc), params);
 	}
 

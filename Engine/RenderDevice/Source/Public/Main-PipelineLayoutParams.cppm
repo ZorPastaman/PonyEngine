@@ -12,13 +12,11 @@ export module PonyEngine.RenderDevice:PipelineLayoutParams;
 import std;
 
 import :DescriptorSet;
-import :PipelineLayoutFlag;
 
 export namespace PonyEngine::RenderDevice
 {
 	struct PipelineLayoutParams final
 	{
 		std::span<const DescriptorSet> descriptorSets;
-		PipelineLayoutFlag flags = PipelineLayoutFlag::None;
 	};
 }

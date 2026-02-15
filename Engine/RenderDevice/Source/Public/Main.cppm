@@ -65,7 +65,6 @@ export import :ITexture;
 export import :IWaiter;
 export import :LineRasterizationMode;
 export import :LogicOperation;
-export import :PipelineLayoutFlag;
 export import :PipelineLayoutParams;
 export import :PipelineStage;
 export import :QueueSync;

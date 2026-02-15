@@ -62,7 +62,6 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-IWaiter.cppm"
 	"Source/Public/Main-LineRasterizationMode.cppm"
 	"Source/Public/Main-LogicOperation.cppm"
-	"Source/Public/Main-PipelineLayoutFlag.cppm"
 	"Source/Public/Main-PipelineLayoutParams.cppm"
 	"Source/Public/Main-PipelineStage.cppm"
 	"Source/Public/Main-QueueSync.cppm"

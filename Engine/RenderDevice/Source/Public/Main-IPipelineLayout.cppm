@@ -16,7 +16,6 @@ export module PonyEngine.RenderDevice:IPipelineLayout;
 import std;
 
 import :DescriptorSetMeta;
-import :PipelineLayoutFlag;
 import :StaticSamplerMeta;
 
 export namespace PonyEngine::RenderDevice
@@ -27,8 +26,6 @@ export namespace PonyEngine::RenderDevice
 
 		[[nodiscard("Pure function")]]
 		virtual std::span<const DescriptorSetMeta> Sets() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual PipelineLayoutFlag Flags() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;

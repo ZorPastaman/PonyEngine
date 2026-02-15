@@ -35,12 +35,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr RootSignatureDescCounts GetRootSignatureCounts(std::span<const DescriptorSet> descriptorSets) noexcept;
 
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_ROOT_SIGNATURE_DESC2 ToRootSignatureDesc(const PipelineLayoutParams& params, std::span<D3D12_ROOT_PARAMETER1> parameters,
-		std::span<D3D12_DESCRIPTOR_RANGE1> ranges, std::span<D3D12_STATIC_SAMPLER_DESC1> staticSamplers) noexcept;
+	constexpr D3D12_ROOT_SIGNATURE_DESC1 ToRootSignatureDesc(const PipelineLayoutParams& params, std::span<D3D12_ROOT_PARAMETER1> parameters,
+		std::span<D3D12_DESCRIPTOR_RANGE1> ranges, std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplers) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_DESCRIPTOR_RANGE_TYPE ToDescriptorRangeType(ShaderDataDescriptorType descriptorType) noexcept;
-	[[nodiscard("Pure function")]]
-	constexpr D3D12_ROOT_SIGNATURE_FLAGS ToRootSignatureFlags(PipelineLayoutFlag flags) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& ranges) noexcept;
@@ -62,8 +60,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return counts;
 	}
 
-	constexpr D3D12_ROOT_SIGNATURE_DESC2 ToRootSignatureDesc(const PipelineLayoutParams& params, const std::span<D3D12_ROOT_PARAMETER1> parameters, 
-		const std::span<D3D12_DESCRIPTOR_RANGE1> ranges, const std::span<D3D12_STATIC_SAMPLER_DESC1> staticSamplers) noexcept
+	constexpr D3D12_ROOT_SIGNATURE_DESC1 ToRootSignatureDesc(const PipelineLayoutParams& params, const std::span<D3D12_ROOT_PARAMETER1> parameters, 
+		const std::span<D3D12_DESCRIPTOR_RANGE1> ranges, const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplers) noexcept
 	{
 		for (std::size_t setIndex = 0uz, parameterIndex = 0uz, rangeIndex = 0uz, staticSamplerIndex = 0uz; 
 			setIndex < params.descriptorSets.size(); ++setIndex)
@@ -122,7 +120,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			for (const StaticSamplerParams& staticSamplerParams : set.staticSamplers)
 			{
 				const D3D12_SAMPLER_DESC2 samplerDesc = ToSamplerDesc(staticSamplerParams.samplerParams);
-				staticSamplers[staticSamplerIndex++] = D3D12_STATIC_SAMPLER_DESC1
+				staticSamplers[staticSamplerIndex++] = D3D12_STATIC_SAMPLER_DESC
 				{
 					.Filter = samplerDesc.Filter,
 					.AddressU = samplerDesc.AddressU,
@@ -136,19 +134,18 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					.MaxLOD = samplerDesc.MaxLOD,
 					.ShaderRegister = static_cast<UINT>(staticSamplerParams.shaderRegister),
 					.RegisterSpace = registerSpace,
-					.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL,
-					.Flags = samplerDesc.Flags
+					.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
 				};
 			}
 		}
 
-		return D3D12_ROOT_SIGNATURE_DESC2
+		return D3D12_ROOT_SIGNATURE_DESC1
 		{
 			.NumParameters = static_cast<UINT>(parameters.size()), 
 			.pParameters = parameters.data(),
 			.NumStaticSamplers = static_cast<UINT>(staticSamplers.size()),
 			.pStaticSamplers = staticSamplers.data(),
-			.Flags = ToRootSignatureFlags(params.flags)
+			.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE
 		};
 	}
 
@@ -168,17 +165,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			assert(false && "Invalid descriptor type.");
 			return D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 		}
-	}
-
-	constexpr D3D12_ROOT_SIGNATURE_FLAGS ToRootSignatureFlags(const PipelineLayoutFlag flags) noexcept
-	{
-		auto rootSigFlags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
-		if (Any(PipelineLayoutFlag::DirectlyIndexed, flags))
-		{
-			rootSigFlags |= D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED;
-		}
-
-		return rootSigFlags;
 	}
 
 	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& ranges) noexcept

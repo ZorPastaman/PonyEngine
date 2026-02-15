@@ -152,8 +152,7 @@ namespace Game
 		};
 		const std::shared_ptr<PonyEngine::RenderDevice::IPipelineLayout> layout = renderDevice->CreatePipelineLayout(PonyEngine::RenderDevice::PipelineLayoutParams
 		{
-			.descriptorSets = descriptorSets,
-			.flags = PonyEngine::RenderDevice::PipelineLayoutFlag::None
+			.descriptorSets = descriptorSets
 		});
 
 		const std::vector<std::byte> triangleShader = LoadShader(TRIANGLE_SHADER);
