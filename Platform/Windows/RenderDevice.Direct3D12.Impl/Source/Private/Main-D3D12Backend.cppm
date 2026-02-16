@@ -161,17 +161,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		return RenderDevice::DeviceSupport
 		{
-			.bufferHeaps = Engine::BufferHeapTypeSupport,
-			.textureHeaps = Engine::TextureHeapTypeSupport,
+			.shaderSupport = engine->ShaderSupport(),
 			.cbvRequirement = CBVRequirement{.offsetAlignment = Engine::CBVAlignment, .sizeAlignment = Engine::CBVAlignment},
 			.samplerSupport = SamplerSupport{.maxAnisotropy = Engine::MaxAnisotropy},
 			.swapChainSupport = engine->SwapChainSupport(),
-			.shaderSupport = ShaderSupport
-			{
-				.shaderIRName = Engine::ShaderIRName, 
-				.version = engine->ShaderIRVersion(),
-				.simultaneousTargetCount = Engine::SimultaneousTargetCount
-			}
+			.rasterizerSupport = engine->RasterizerSupport(),
+			.bufferHeaps = Engine::BufferHeapTypeSupport,
+			.textureHeaps = Engine::TextureHeapTypeSupport
 		};
 	}
 

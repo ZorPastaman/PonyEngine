@@ -21,6 +21,7 @@ import PonyEngine.Meta;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice.Ext;
 
+import :AtomicSupport;
 import :ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -32,12 +33,22 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static constexpr auto ApiVersion = Meta::Version(12, 2);
 		static constexpr D3D_FEATURE_LEVEL FeatureLevel = D3D_FEATURE_LEVEL_12_2;
 
+		static constexpr bool Int64BitSupport = true; ///< Are 64 bit int operations supported? On fl 12.2 they are mandatory.
+		static constexpr bool ConservativeRasterizationSupport = true;
+
 		[[nodiscard("Pure constructor")]]
-		explicit Device(IRenderDeviceContext& renderDevice);
+		Device(IRenderDeviceContext& renderDevice, IUnknown& adapter);
 		Device(const Device&) = delete;
 		Device(Device&&) = delete;
 
 		~Device() noexcept;
+
+		[[nodiscard("Pure function")]]
+		bool IsIntFloat16Supported() const;
+		[[nodiscard("Pure function")]]
+		bool IsFloat64Supported() const;
+		[[nodiscard("Pure function")]]
+		struct AtomicSupport AtomicSupport() const;
 
 		[[nodiscard("Pure function")]]
 		D3D_SHADER_MODEL GetShaderModel() const;
@@ -47,6 +58,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		UINT8 GetPlaneCount(DXGI_FORMAT format) const;
 		[[nodiscard("Pure function")]]
 		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
+
+		[[nodiscard("Pure function")]]
+		bool IsQuadrilateralNarrowLineSupported() const;
 
 		UINT64 GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, UINT subresourceOffset, UINT subresourceCount,
 			UINT64 baseOffset, D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprints, UINT* rowCounts, UINT64* rowSizes) const;
@@ -105,7 +119,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	Device::Device(IRenderDeviceContext& renderDevice) :
+	Device::Device(IRenderDeviceContext& renderDevice, IUnknown& adapter) :
 		renderDevice{&renderDevice}
 	{
 #ifndef NDEBUG
@@ -121,7 +135,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 
 		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Acquiring D3D12 device...");
-		if (const HRESULT result = D3D12CreateDevice(nullptr, FeatureLevel, IID_PPV_ARGS(device.GetAddress())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = D3D12CreateDevice(&adapter, FeatureLevel, IID_PPV_ARGS(device.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to acquire D3D12 device: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -177,10 +191,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			throw std::runtime_error("D3D12 rasterizer desc 2 isn't supported");
 		}
-		if (!options19.NarrowQuadrilateralLinesSupported) [[unlikely]]
-		{
-			throw std::runtime_error("D3D12 narrow quadrilateral lines aren't supported");
-		}
 		PONY_LOG(this->renderDevice->Logger(), Log::LogType::Info, "Checking D3D12 required support done.");
 	}
 
@@ -195,6 +205,49 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		debug.Reset();
 		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing D3D12 debug interface done.");
 #endif
+	}
+
+	bool Device::IsIntFloat16Supported() const
+	{
+		auto options = D3D12_FEATURE_DATA_D3D12_OPTIONS4{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS4, &options, sizeof(options)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options4 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return options.Native16BitShaderOpsSupported;
+	}
+
+	bool Device::IsFloat64Supported() const
+	{
+		auto options = D3D12_FEATURE_DATA_D3D12_OPTIONS{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(options)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options0 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return options.DoublePrecisionFloatShaderOps;
+	}
+
+	struct AtomicSupport Device::AtomicSupport() const
+	{
+		auto options9 = D3D12_FEATURE_DATA_D3D12_OPTIONS9{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS9, &options9, sizeof(options9)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options9 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		auto options11 = D3D12_FEATURE_DATA_D3D12_OPTIONS11{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS11, &options11, sizeof(options11)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options11 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return Windows::AtomicSupport
+		{
+			.atomicInt64 = static_cast<bool>(options9.AtomicInt64OnTypedResourceSupported),
+			.groupSharedAtomicInt64 = static_cast<bool>(options9.AtomicInt64OnGroupSharedSupported),
+			.atomicInt64OnDescriptorHeap = static_cast<bool>(options11.AtomicInt64OnDescriptorHeapResourceSupported)
+		};
 	}
 
 	D3D_SHADER_MODEL Device::GetShaderModel() const
@@ -239,6 +292,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		return levels.NumQualityLevels;
+	}
+
+	bool Device::IsQuadrilateralNarrowLineSupported() const
+	{
+		auto options19 = D3D12_FEATURE_DATA_D3D12_OPTIONS19{};
+		if (const HRESULT result = device->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS19, &options19, sizeof(options19)); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get options19 feature support: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return options19.NarrowQuadrilateralLinesSupported;
 	}
 
 	UINT64 Device::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const UINT subresourceOffset, const UINT subresourceCount, const UINT64 baseOffset, 

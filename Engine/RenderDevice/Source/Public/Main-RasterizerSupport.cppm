@@ -7,27 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DeviceSupport;
+export module PonyEngine.RenderDevice:RasterizerSupport;
 
-import std;
-
-import :CBVRequirement;
-import :HeapType;
-import :RasterizerSupport;
-import :SamplerSupport;
-import :ShaderSupport;
-import :SwapChainSupport;
+import :LineRasterizationMode;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct DeviceSupport final
+	struct RasterizerSupport final
 	{
-		ShaderSupport shaderSupport;
-		CBVRequirement cbvRequirement;
-		SamplerSupport samplerSupport;
-		SwapChainSupport swapChainSupport;
-		RasterizerSupport rasterizerSupport;
-		HeapTypeMask bufferHeaps;
-		HeapTypeMask textureHeaps;
+		LineRasterizationModeMask lineRasterizationModes = LineRasterizationModeMask::None;
+		bool conservativeRasterization = false;
 	};
 }
