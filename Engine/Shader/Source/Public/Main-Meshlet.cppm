@@ -79,7 +79,7 @@ export namespace PonyEngine::Shader
 	private:
 		std::uint32_t vertexOffset; ///< Vertex offset.
 		std::uint32_t primitiveOffset; ///< Primitive offset.
-		std::array<std::uint8_t, 4> packedCounts; ///< Packed counts: vertex count, primitive count and 2 elements for alignment with shader data.
+		std::array<std::uint8_t, 2> packedCounts; ///< Packed counts: vertex count and primitive count.
 	};
 }
 
@@ -88,7 +88,7 @@ namespace PonyEngine::Shader
 	constexpr Meshlet::Meshlet(const std::uint32_t vertexOffset, const std::uint32_t primitiveOffset, const std::uint8_t vertexCount, const std::uint8_t primitiveCount) noexcept :
 		vertexOffset{vertexOffset},
 		primitiveOffset{primitiveOffset},
-		packedCounts{vertexCount, primitiveCount, 0u, 0u}
+		packedCounts{vertexCount, primitiveCount}
 	{
 	}
 

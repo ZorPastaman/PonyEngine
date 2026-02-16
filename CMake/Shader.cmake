@@ -1,5 +1,5 @@
 function(compile_shader_with_dxc source output profile)
-	set(options SPIRV PDB)
+	set(options SPIRV PDB ENABLE_16_BIT)
 	set(oneValueArgs ROOT_SIG_VER ENTRY OPTIMIZATION SPIRV_TARGET)
 	set(multiValueArgs DEFINES INCLUDES ADDITIONAL_PARAMS)
 	cmake_parse_arguments(PARSE_ARGV 0 dxc_arg "${options}" "${oneValueArgs}" "${multiValueArgs}")
@@ -41,6 +41,10 @@ function(compile_shader_with_dxc source output profile)
 		get_filename_component(include_abs ${include} ABSOLUTE)
 		list(APPEND DXC_OPTIONS -I ${include_abs})
 	endforeach()
+
+	if(dxc_arg_ENABLE_16_BIT)
+		list(APPEND DXC_OPTIONS -enable-16bit-types)
+	endif()
 
 	if(dxc_arg_SPIRV)
 		list(APPEND DXC_OPTIONS -spirv)

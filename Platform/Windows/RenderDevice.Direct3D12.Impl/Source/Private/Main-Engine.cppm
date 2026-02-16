@@ -27,8 +27,7 @@ import PonyEngine.RenderDevice.Ext;
 import PonyEngine.Surface.Windows;
 import PonyEngine.Type;
 
-import :SwapChain;
-import :SwapChainUtility;
+import :AtomicSupport;
 import :Buffer;
 import :BufferUtility;
 import :BundleCommandList;
@@ -53,6 +52,8 @@ import :RootSignatureUtility;
 import :SamplerContainer;
 import :SamplerUtility;
 import :ShaderDataContainer;
+import :SwapChain;
+import :SwapChainUtility;
 import :SwapChainWrapper;
 import :Texture;
 import :TextureFormatMap;
@@ -129,6 +130,19 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		[[nodiscard("Pure function")]]
 		Meta::Version ShaderIRVersion() const;
+		[[nodiscard("Pure function")]]
+		ShaderScalarTypeMask ScalarTypeSupport() const;
+		[[nodiscard("Pure function")]]
+		static ShaderScalarTypeMask ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
+		[[nodiscard("Pure function")]]
+		static ShaderScalarTypeMask ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
+		[[nodiscard("Pure function")]]
+		struct ShaderSupport ShaderSupport() const;
+
+		[[nodiscard("Pure function")]]
+		LineRasterizationModeMask LineRasterizationSupport() const;
+		[[nodiscard("Pure function")]]
+		struct RasterizerSupport RasterizerSupport() const;
 
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params);
@@ -345,7 +359,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		renderDevice{&renderDevice},
 		textureFormatMap(*this->renderDevice),
 		factory(*this->renderDevice),
-		device(*this->renderDevice),
+		device(*this->renderDevice, *factory.GetMostPerformantAdapter()),
 		graphicsCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_DIRECT), CreatorId)),
 		computeCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COMPUTE), CreatorId)),
 		copyCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COPY), CreatorId))
@@ -734,6 +748,82 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const auto shaderModel = std::to_underlying(device.GetShaderModel());
 		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
+	}
+
+	ShaderScalarTypeMask Engine::ScalarTypeSupport() const
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (device.IsIntFloat16Supported())
+		{
+			answer |= ShaderScalarTypeMask::Int16 | ShaderScalarTypeMask::Float16;
+		}
+		if constexpr (Device::Int64BitSupport)
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+		if (device.IsFloat64Supported())
+		{
+			answer |= ShaderScalarTypeMask::Float64;
+		}
+
+		return answer;
+	}
+
+	ShaderScalarTypeMask Engine::ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (support.atomicInt64 && support.atomicInt64OnDescriptorHeap) // The engine doesn't support direct views.
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+
+		return answer;
+	}
+
+	ShaderScalarTypeMask Engine::ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (support.groupSharedAtomicInt64)
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+
+		return answer;
+	}
+
+	LineRasterizationModeMask Engine::LineRasterizationSupport() const
+	{
+		auto answer = LineRasterizationModeMask::Aliased | LineRasterizationModeMask::AlphaAntialiased | LineRasterizationModeMask::QuadrilateralWide;
+		if (device.IsQuadrilateralNarrowLineSupported())
+		{
+			answer |= LineRasterizationModeMask::QuadrilateralNarrow;
+		}
+
+		return answer;
+	}
+
+	struct ShaderSupport Engine::ShaderSupport() const
+	{
+		const AtomicSupport atomicSupport = device.AtomicSupport();
+
+		return RenderDevice::ShaderSupport
+		{
+			.shaderIRName = ShaderIRName,
+			.version = ShaderIRVersion(),
+			.scalarTypes = ScalarTypeSupport(),
+			.atomicTypes = ToAtomicScalarTypeSupport(atomicSupport),
+			.groupSharedAtomicTypes = ToGroupSharedAtomicScalarTypeSupport(atomicSupport),
+			.simultaneousTargetCount = SimultaneousTargetCount
+		};
+	}
+
+	struct RasterizerSupport Engine::RasterizerSupport() const
+	{
+		return RenderDevice::RasterizerSupport
+		{
+			.lineRasterizationModes = LineRasterizationSupport(),
+			.conservativeRasterization = Device::ConservativeRasterizationSupport
+		};
 	}
 
 	std::shared_ptr<IPipelineLayout> Engine::CreatePipelineLayout(const PipelineLayoutParams& params)

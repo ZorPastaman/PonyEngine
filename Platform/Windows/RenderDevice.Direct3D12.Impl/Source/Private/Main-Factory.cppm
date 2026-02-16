@@ -35,6 +35,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		~Factory() noexcept;
 
 		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<IDXGIAdapter4> GetMostPerformantAdapter() const;
+
+		[[nodiscard("Pure function")]]
 		BOOL GetTearingSupport() const;
 
 		[[nodiscard("Pure function")]]
@@ -102,6 +105,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		debug.Reset();
 		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Releasing DXGI debug interface done.");
 #endif
+	}
+
+	Platform::Windows::ComPtr<IDXGIAdapter4> Factory::GetMostPerformantAdapter() const
+	{
+		Platform::Windows::ComPtr<IDXGIAdapter4> adapter;
+		if (const HRESULT result = factory->EnumAdapterByGpuPreference(0u, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(adapter.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get adapter: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return adapter;
 	}
 
 	BOOL Factory::GetTearingSupport() const
