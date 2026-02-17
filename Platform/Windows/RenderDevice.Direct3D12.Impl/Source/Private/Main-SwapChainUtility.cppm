@@ -48,13 +48,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		return DXGI_SWAP_CHAIN_DESC1
 		{
-			.Width = params.size ? static_cast<UINT>(params.size->X()) : 0u,
-			.Height = params.size ? static_cast<UINT>(params.size->Y()) : 0u,
+			.Width = params.size ? params.size->X() : 0u,
+			.Height = params.size ? params.size->Y() : 0u,
 			.Format = format,
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.BufferUsage = ToDXGIUsage(params.usage),
-			.BufferCount = static_cast<UINT>(params.bufferCount),
+			.BufferCount = params.bufferCount,
 			.Scaling = ToScaling(params.scalingMode),
 			.SwapEffect = ToSwapEffect(params.swapEffect),
 			.AlphaMode = ToAlphaMode(params.alphaMode),

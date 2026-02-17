@@ -44,9 +44,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.AddressU = ToAddressMode(params.addressU),
 			.AddressV = ToAddressMode(params.addressV),
 			.AddressW = ToAddressMode(params.addressW),
-			.MipLODBias = static_cast<FLOAT>(params.mipLodBias),
-			.MinLOD = static_cast<FLOAT>(params.minLod),
-			.MaxLOD = static_cast<FLOAT>(params.maxLod),
+			.MipLODBias = params.mipLodBias,
+			.MinLOD = params.minLod,
+			.MaxLOD = params.maxLod,
 			.Flags = D3D12_SAMPLER_FLAG_NONE
 		};
 

@@ -375,7 +375,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params);
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
 
-		return std::make_shared<Buffer>(std::move(resource), static_cast<std::uint64_t>(resourceDesc.Width), params.usage);
+		return std::make_shared<Buffer>(std::move(resource), resourceDesc.Width, params.usage);
 	}
 
 	struct TextureFormatSupport Engine::TextureFormatSupport(const TextureFormatId textureFormatId) const
@@ -489,8 +489,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			resourceDesc, initialLayout, clearValue, arena.Span(castableFormats));
 
 		return std::make_shared<Texture>(std::move(resource), params.format, format, params.castableFormats, 
-			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), static_cast<std::uint16_t>(resourceDesc.DepthOrArraySize),
-			static_cast<std::uint16_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
+			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), resourceDesc.DepthOrArraySize,
+			resourceDesc.MipLevels, params.dimension, params.sampleCount, params.usage, srgb);
 	}
 
 	std::uint32_t Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
@@ -512,7 +512,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const DXGI_FORMAT format = GetFormat(params.format);
 		const CopyableFootprintInfo footprintCount = GetCopyableFootprintCount(params, range, format);
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
-		return GetCopyableFootprints(resourceDesc, footprintCount, static_cast<UINT64>(offset), 
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, 
 			static_cast<UINT16>(range.mipRange.mostDetailedMipIndex), static_cast<UINT16>(range.arrayRange.firstArrayIndex), range.aspect, footprints);
 	}
 
@@ -521,7 +521,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
 		const CopyableFootprintInfo footprintCount = GetCopyableFootprintCount(resourceDesc, range);
-		return GetCopyableFootprints(resourceDesc, footprintCount, static_cast<UINT64>(offset), 
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, 
 			static_cast<UINT16>(range.mipRange.mostDetailedMipIndex), static_cast<UINT16>(range.arrayRange.firstArrayIndex), range.aspect, footprints);
 	}
 
@@ -542,7 +542,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		if (nativeBuffer)
 		{
@@ -568,7 +568,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params);
 		device.CreateSRV(nativeBuffer ? &nativeBuffer->Resource() : nullptr, srvDesc, handle);
@@ -593,7 +593,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.aspect);
 		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, mipCount, arraySize);
@@ -612,7 +612,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = ToUAVDesc(params);
 		device.CreateUAV(nativeBuffer ? &nativeBuffer->Resource() : nullptr, uavDesc, handle);
@@ -636,7 +636,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.aspect);
 		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = ToUAVDesc(params, viewFormat, arraySize);
@@ -672,7 +672,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		RenderTargetContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = ToRTVDesc(params, format, arraySize);
 		device.CreateRTV(nativeTexture ? &nativeTexture->Resource() : nullptr, rtvDesc, handle);
@@ -707,7 +707,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		DepthStencilContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = ToDSVDesc(params, format, arraySize);
 		device.CreateDSV(nativeTexture ? &nativeTexture->Resource() : nullptr, dsvDesc, handle);
@@ -731,7 +731,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		SamplerContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
-		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(static_cast<UINT>(index));
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_SAMPLER_DESC2 samplerDesc = ToSamplerDesc(params);
 		device.CreateSampler(samplerDesc, handle);
@@ -833,9 +833,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Memory::Arena& arena = Arena();
 		arena.Free();
 		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
-		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(static_cast<std::size_t>(rootSigDescCounts.tableCount));
-		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(static_cast<std::size_t>(rootSigDescCounts.rangeCount));
-		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC>(static_cast<std::size_t>(rootSigDescCounts.staticSamplerCount));
+		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(rootSigDescCounts.tableCount);
+		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(rootSigDescCounts.rangeCount);
+		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC>(rootSigDescCounts.staticSamplerCount);
 		const std::span<D3D12_ROOT_PARAMETER1> parametersSpan = arena.Span(parameters);
 		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
 		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplersSpan = arena.Span(staticSamplers);
@@ -897,16 +897,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		const Memory::Arena::Slice<PipelineStateSubobjectSampleDesc> sampleDesc = arena.Allocate<PipelineStateSubobjectSampleDesc>(1u);
-		arena.Span(sampleDesc)[0] = DXGI_SAMPLE_DESC{.Count = static_cast<UINT>(ToNumber(params.sample.sampleCount)), .Quality = 0u};
+		arena.Span(sampleDesc)[0] = DXGI_SAMPLE_DESC{.Count = ToNumber(params.sample.sampleCount), .Quality = 0u};
 		const Memory::Arena::Slice<PipelineStateSubobjectSampleMask> sampleMask = arena.Allocate<PipelineStateSubobjectSampleMask>(1u);
-		arena.Span(sampleMask)[0] = static_cast<UINT>(params.sample.sampleMask);
+		arena.Span(sampleMask)[0] = params.sample.sampleMask;
 
 		const Memory::Arena::Slice<PipelineStateSubobjectFlags> flags = arena.Allocate<PipelineStateSubobjectFlags>(1u);
 		arena.Span(flags)[0] = D3D12_PIPELINE_STATE_FLAG_DYNAMIC_DEPTH_BIAS;
 
 		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
-			.SizeInBytes = static_cast<SIZE_T>(arena.Size()),
+			.SizeInBytes = arena.Size(),
 			.pPipelineStateSubobjectStream = arena.Data()
 		};
 		return std::make_shared<GraphicsPipelineState>(device.CreatePipelineState(pipelineStateStream), layout, params);
@@ -931,7 +931,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
-			.SizeInBytes = static_cast<SIZE_T>(arena.Size()),
+			.SizeInBytes = arena.Size(),
 			.pPipelineStateSubobjectStream = arena.Data()
 		};
 		return std::make_shared<ComputePipelineState>(device.CreatePipelineState(pipelineStateStream), layout);
@@ -1134,7 +1134,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateAspect(range.aspect, resourceDesc.Format);
 
 		const UINT16 arraySize = GetArraySize(resourceDesc);
-		return GetCopyableFootprintCount(static_cast<std::uint32_t>(resourceDesc.MipLevels), static_cast<std::uint32_t>(arraySize), range);
+		return GetCopyableFootprintCount(resourceDesc.MipLevels, arraySize, range);
 	}
 
 	Engine::CopyableFootprintInfo Engine::GetCopyableFootprintCount(const std::uint32_t resourceMipCount, const std::uint32_t resourceArrayCount, const SubTextureRange& range)
@@ -1194,11 +1194,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			footprints[i] = CopyableFootprint
 			{
-				.offset = static_cast<std::uint64_t>(subresourceFootprintsSpan[i].Offset),
-				.rowSize = static_cast<std::uint64_t>(rowSizesSpan[i]),
-				.rowPitch = static_cast<std::uint64_t>(subresourceFootprintsSpan[i].Footprint.RowPitch),
-				.rowCount = static_cast<std::uint32_t>(rowCountsSpan[i]),
-				.sliceCount = static_cast<std::uint32_t>(subresourceFootprintsSpan[i].Footprint.Depth)
+				.offset = subresourceFootprintsSpan[i].Offset,
+				.rowSize = rowSizesSpan[i],
+				.rowPitch = subresourceFootprintsSpan[i].Footprint.RowPitch,
+				.rowCount = rowCountsSpan[i],
+				.sliceCount = subresourceFootprintsSpan[i].Footprint.Depth
 			};
 		}
 
@@ -1208,7 +1208,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			totalRowSizes += subresourceFootprintsSpan[i].Footprint.Depth * rowCountsSpan[i] * rowSizesSpan[i];
 		}
 
-		return CopyableFootprintSize{.sourceTotalSize = static_cast<std::uint64_t>(totalRowSizes), .destinationTotalSize = static_cast<std::uint64_t>(totalSize)};
+		return CopyableFootprintSize{.sourceTotalSize = totalRowSizes, .destinationTotalSize = totalSize};
 	}
 
 	DXGI_FORMAT Engine::GetFormat(const TextureFormatId format) const
@@ -1508,7 +1508,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			const Range& range = ranges[i];
 			sourcesSpan[i] = static_cast<const Container*>(range.source)->CpuHandle(range.sourceOffset);
 			destinationsSpan[i] = static_cast<const Container*>(range.destination)->CpuHandle(range.destinationOffset);
-			rangesSizesSpan[i] = static_cast<UINT>(range.count);
+			rangesSizesSpan[i] = range.count;
 		}
 
 		device.CopyDescriptors(static_cast<UINT>(ranges.size()), rangesSizesSpan.data(),
@@ -1566,7 +1566,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		assert(input.size() == output.size() && "Input and output sizes are not the same.");
 		for (std::size_t i = 0uz; i < input.size(); ++i)
 		{
-			output[i] = std::pair(&static_cast<const Fence*>(input[i].fence)->GetFence(), static_cast<UINT64>(input[i].value));
+			output[i] = std::pair(&static_cast<const Fence*>(input[i].fence)->GetFence(), input[i].value);
 		}
 	}
 
@@ -2625,6 +2625,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			if (!commandList || typeid(*commandList) != typeid(CommandList)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid command list");
+			}
+
+			if (static_cast<const CommandList*>(commandList)->IsOpen()) [[unlikely]]
+			{
+				throw std::invalid_argument("Command list is open");
 			}
 		}
 #endif

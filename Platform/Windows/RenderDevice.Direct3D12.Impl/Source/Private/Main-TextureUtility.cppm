@@ -205,24 +205,24 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.Format = format,
 		};
 		std::visit(Type::Overload
+		{
+			[&](const NoClear&) noexcept
 			{
-				[&](const NoClear&) noexcept
+				clear.Format = DXGI_FORMAT_UNKNOWN;
+			},
+			[&](const Math::ColorRGBA<float>& color) noexcept
+			{
+				for (std::size_t i = 0uz; i < color.ChannelCount; ++i)
 				{
-					clear.Format = DXGI_FORMAT_UNKNOWN;
-				},
-				[&](const Math::ColorRGBA<float>& color) noexcept
-				{
-					for (std::size_t i = 0uz; i < color.ChannelCount; ++i)
-					{
-						clear.Color[i] = static_cast<FLOAT>(color[i]);
-					}
-				},
-				[&](const DepthStencil& depthStencil) noexcept
-				{
-					clear.DepthStencil.Depth = static_cast<FLOAT>(depthStencil.depth);
-					clear.DepthStencil.Stencil = static_cast<UINT8>(depthStencil.stencil);
+					clear.Color[i] = color[i];
 				}
-			}, clearValue);
+			},
+			[&](const DepthStencil& depthStencil) noexcept
+			{
+				clear.DepthStencil.Depth = depthStencil.depth;
+				clear.DepthStencil.Stencil = depthStencil.stencil;
+			}
+		}, clearValue);
 
 		return clear;
 	}
@@ -254,12 +254,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			.Dimension = ToResourceDimension(params.dimension),
 			.Alignment = 0ull,
-			.Width = static_cast<UINT64>(params.size.X()),
-			.Height = static_cast<UINT>(params.size.Y()),
+			.Width = params.size.X(),
+			.Height = params.size.Y(),
 			.DepthOrArraySize = ToDepthArraySize(params),
 			.MipLevels = static_cast<UINT16>(params.mipCount),
 			.Format = format,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = static_cast<UINT>(ToNumber(params.sampleCount)), .Quality = 0u},
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = ToNumber(params.sampleCount), .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
 			.Flags = ToResourceFlags(params.usage),
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
@@ -331,8 +331,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
 					viewDesc.Texture1D = D3D12_TEX1D_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -340,8 +340,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2D = D3D12_TEX2D_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
 						.PlaneSlice = ToPlaneIndex(params.aspect),
 						.ResourceMinLODClamp = 0.f
 					};
@@ -350,8 +350,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
 					viewDesc.Texture3D = D3D12_TEX3D_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -359,8 +359,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 					viewDesc.TextureCube = D3D12_TEXCUBE_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -377,10 +377,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1DARRAY;
 					viewDesc.Texture1DArray = D3D12_TEX1D_ARRAY_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex),
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -388,10 +388,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
 					viewDesc.Texture2DArray = D3D12_TEX2D_ARRAY_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex),
 						.PlaneSlice = ToPlaneIndex(params.aspect),
 						.ResourceMinLODClamp = 0.f
 					};
@@ -400,8 +400,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
 					viewDesc.Texture3D = D3D12_TEX3D_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -409,10 +409,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
 					viewDesc.TextureCubeArray = D3D12_TEXCUBE_ARRAY_SRV
 					{
-						.MostDetailedMip = static_cast<UINT>(l.mipRange.mostDetailedMipIndex),
-						.MipLevels = static_cast<UINT>(l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex)),
-						.First2DArrayFace = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.NumCubes = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex) / 6u),
+						.MostDetailedMip = l.mipRange.mostDetailedMipIndex,
+						.MipLevels = l.mipRange.mipCount.value_or(resourceMipCount - l.mipRange.mostDetailedMipIndex),
+						.First2DArrayFace = l.arrayRange.firstArrayIndex,
+						.NumCubes = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex) / 6u,
 						.ResourceMinLODClamp = 0.f
 					};
 					break;
@@ -433,8 +433,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMSARRAY;
 				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_SRV
 				{
-					.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-					.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+					.FirstArraySlice = l.arrayRange.firstArrayIndex,
+					.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 				};
 			}
 		}, params.layout);
@@ -459,14 +459,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1D;
 					viewDesc.Texture1D = D3D12_TEX1D_UAV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex)
+						.MipSlice = l.mipIndex
 					};
 					break;
 				case TextureDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2D = D3D12_TEX2D_UAV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.MipSlice = l.mipIndex,
 						.PlaneSlice = ToPlaneIndex(params.aspect)
 					};
 					break;
@@ -474,7 +474,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
 					viewDesc.Texture3D = D3D12_TEX3D_UAV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.MipSlice = l.mipIndex,
 						.FirstWSlice = 0u,
 						.WSize = std::numeric_limits<UINT>::max()
 					};
@@ -492,18 +492,18 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1DARRAY;
 					viewDesc.Texture1DArray = D3D12_TEX1D_ARRAY_UAV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+						.MipSlice = l.mipIndex,
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 					};
 					break;
 				case TextureDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
 					viewDesc.Texture2DArray = D3D12_TEX2D_ARRAY_UAV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
+						.MipSlice = l.mipIndex,
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex),
 						.PlaneSlice = ToPlaneIndex(params.aspect)
 					};
 					break;
@@ -511,7 +511,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
 					viewDesc.Texture3D = D3D12_TEX3D_UAV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.MipSlice = l.mipIndex,
 						.FirstWSlice = 0u,
 						.WSize = std::numeric_limits<UINT>::max()
 					};
@@ -543,14 +543,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE1D;
 					viewDesc.Texture1D = D3D12_TEX1D_RTV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex)
+						.MipSlice = l.mipIndex
 					};
 					break;
 				case TextureDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2D = D3D12_TEX2D_RTV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.MipSlice = l.mipIndex,
 						.PlaneSlice = ToPlaneIndex(Aspect::Color)
 					};
 					break;
@@ -558,7 +558,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
 					viewDesc.Texture3D = D3D12_TEX3D_RTV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.MipSlice = l.mipIndex,
 						.FirstWSlice = 0u,
 						.WSize = std::numeric_limits<UINT>::max()
 					};
@@ -576,18 +576,18 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE1DARRAY;
 					viewDesc.Texture1DArray = D3D12_TEX1D_ARRAY_RTV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+						.MipSlice = l.mipIndex,
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 					};
 					break;
 				case TextureDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
 					viewDesc.Texture2DArray = D3D12_TEX2D_ARRAY_RTV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)),
+						.MipSlice = l.mipIndex,
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex),
 						.PlaneSlice = ToPlaneIndex(Aspect::Color)
 					};
 					break;
@@ -595,7 +595,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE3D;
 					viewDesc.Texture3D = D3D12_TEX3D_RTV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
+						.MipSlice = l.mipIndex,
 						.FirstWSlice = 0u,
 						.WSize = std::numeric_limits<UINT>::max()
 					};
@@ -617,8 +617,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY;
 				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_RTV
 				{
-					.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-					.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+					.FirstArraySlice = l.arrayRange.firstArrayIndex,
+					.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 				};
 			}
 		}, params.layout);
@@ -644,14 +644,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE1D;
 					viewDesc.Texture1D = D3D12_TEX1D_DSV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex)
+						.MipSlice = l.mipIndex
 					};
 					break;
 				case DSVDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2D = D3D12_TEX2D_DSV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex)
+						.MipSlice = l.mipIndex
 					};
 					break;
 				default: [[unlikely]]
@@ -667,18 +667,18 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE1DARRAY;
 					viewDesc.Texture1DArray = D3D12_TEX1D_ARRAY_DSV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+						.MipSlice = l.mipIndex,
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 					};
 					break;
 				case DSVDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2DArray = D3D12_TEX2D_ARRAY_DSV
 					{
-						.MipSlice = static_cast<UINT>(l.mipIndex),
-						.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-						.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+						.MipSlice = l.mipIndex,
+						.FirstArraySlice = l.arrayRange.firstArrayIndex,
+						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 					};
 					break;
 				default: [[unlikely]]
@@ -698,8 +698,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMSARRAY;
 				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_DSV
 				{
-					.FirstArraySlice = static_cast<UINT>(l.arrayRange.firstArrayIndex),
-					.ArraySize = static_cast<UINT>(l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex))
+					.FirstArraySlice = l.arrayRange.firstArrayIndex,
+					.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 				};
 			}
 		}, params.layout);

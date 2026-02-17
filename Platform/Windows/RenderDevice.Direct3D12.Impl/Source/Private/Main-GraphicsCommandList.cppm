@@ -41,6 +41,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual bool IsOpen() const noexcept override;
 
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
+
+		virtual void SetDepthBias(const DepthBias& bias) override;
+		virtual void SetDepthBounds(float min, float max) override;
+		virtual void SetStencilReference(const StencilReference& reference) override;
+
+		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+
 		virtual void Execute(ISecondaryGraphicsCommandList& secondary) override;
 
 		[[nodiscard("Pure function")]]
@@ -89,6 +96,26 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
 		commandList.Barrier(bufferBarriers, textureBarriers);
+	}
+
+	void GraphicsCommandList::SetDepthBias(const DepthBias& bias)
+	{
+		commandList.SetDepthBias(bias);
+	}
+
+	void GraphicsCommandList::SetDepthBounds(const float min, const float max)
+	{
+		commandList.SetDepthBounds(min, max);
+	}
+
+	void GraphicsCommandList::SetStencilReference(const StencilReference& reference)
+	{
+		commandList.SetStencilReference(reference);
+	}
+
+	void GraphicsCommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	{
+		commandList.DispatchMesh(threadGroupCounts);
 	}
 
 	void GraphicsCommandList::Execute(ISecondaryGraphicsCommandList& secondary)
