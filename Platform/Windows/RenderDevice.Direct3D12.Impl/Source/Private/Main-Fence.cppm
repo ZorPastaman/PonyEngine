@@ -73,7 +73,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::uint64_t Fence::CompletedValue() const noexcept
 	{
-		return static_cast<std::uint64_t>(fence->GetCompletedValue());
+		return fence->GetCompletedValue();
 	}
 
 	void Fence::Signal(const std::uint64_t value)
@@ -111,7 +111,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Fence::SetEventOnCompletion(const std::uint64_t value, const HANDLE event) const
 	{
-		if (const HRESULT result = fence->SetEventOnCompletion(static_cast<UINT64>(value), event); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = fence->SetEventOnCompletion(value, event); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to set event on completion: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

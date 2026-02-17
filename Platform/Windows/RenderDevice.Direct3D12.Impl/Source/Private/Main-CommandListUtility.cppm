@@ -128,10 +128,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		return D3D12_BARRIER_SUBRESOURCE_RANGE
 		{
-			.IndexOrFirstMipLevel = static_cast<UINT>(mipRange.mostDetailedMipIndex),
-			.NumMipLevels = static_cast<UINT>(mipRange.mipCount.value_or(resourceMipCount - mipRange.mostDetailedMipIndex)),
-			.FirstArraySlice = static_cast<UINT>(arrayRange.firstArrayIndex),
-			.NumArraySlices = static_cast<UINT>(arrayRange.arrayCount.value_or(resourceArraySize - arrayRange.firstArrayIndex)),
+			.IndexOrFirstMipLevel = mipRange.mostDetailedMipIndex,
+			.NumMipLevels = mipRange.mipCount.value_or(resourceMipCount - mipRange.mostDetailedMipIndex),
+			.FirstArraySlice = arrayRange.firstArrayIndex,
+			.NumArraySlices = arrayRange.arrayCount.value_or(resourceArraySize - arrayRange.firstArrayIndex),
 			.FirstPlane = ToFirstPlaneIndex(aspects),
 			.NumPlanes = ToPlaneCount(aspects)
 		};

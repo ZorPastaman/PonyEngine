@@ -50,6 +50,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers);
 
+		void SetDepthBias(const DepthBias& bias) noexcept;
+		void SetDepthBounds(float min, float max) noexcept;
+		void SetStencilReference(const StencilReference& reference) noexcept;
+
+		void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
+
 		void ExecuteBundle(ID3D12GraphicsCommandList10& bundle) noexcept;
 
 		[[nodiscard("Pure function")]]
@@ -175,6 +181,26 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
+	void CommandList::SetDepthBias(const DepthBias& bias) noexcept
+	{
+		commandList->RSSetDepthBias(bias.depthBias, bias.depthBiasClamp, bias.slopeScaledDepthBias);
+	}
+
+	void CommandList::SetDepthBounds(const float min, const float max) noexcept
+	{
+		commandList->OMSetDepthBounds(min, max);
+	}
+
+	void CommandList::SetStencilReference(const StencilReference& reference) noexcept
+	{
+		commandList->OMSetFrontAndBackStencilRef(reference.front, reference.back);
+	}
+
+	void CommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
+	{
+		commandList->DispatchMesh(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
+	}
+
 	void CommandList::ExecuteBundle(ID3D12GraphicsCommandList10& bundle) noexcept
 	{
 		commandList->ExecuteBundle(&bundle);
@@ -254,6 +280,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void CommandList::ValidateBarriers(const std::span<const BufferBarrier> bufferBarriers)
 	{
 #ifndef NDEBUG
+		if (bufferBarriers.size() > std::numeric_limits<UINT32>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Too many buffer barriers");
+		}
+
 		for (const BufferBarrier& barrier : bufferBarriers)
 		{
 			if (!barrier.buffer || typeid(*barrier.buffer) != typeid(Buffer)) [[unlikely]]
@@ -267,6 +298,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void CommandList::ValidateBarriers(const std::span<const TextureBarrier> textureBarriers)
 	{
 #ifndef NDEBUG
+		if (textureBarriers.size() > std::numeric_limits<UINT32>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Too many texture barriers");
+		}
+
 		for (const TextureBarrier& barrier : textureBarriers)
 		{
 			if (!barrier.texture || typeid(*barrier.texture) != typeid(Texture)) [[unlikely]]

@@ -36,7 +36,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = static_cast<UINT>(params.size),
+			.NumDescriptors = params.size,
 			.Flags = params.shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
@@ -47,7 +47,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-			.NumDescriptors = static_cast<UINT>(params.size),
+			.NumDescriptors = params.size,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
@@ -58,7 +58,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV,
-			.NumDescriptors = static_cast<UINT>(params.size),
+			.NumDescriptors = params.size,
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
@@ -69,7 +69,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER,
-			.NumDescriptors = static_cast<UINT>(params.size),
+			.NumDescriptors = params.size,
 			.Flags = params.shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};

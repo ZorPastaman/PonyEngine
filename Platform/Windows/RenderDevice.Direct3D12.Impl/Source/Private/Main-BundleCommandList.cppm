@@ -39,6 +39,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]] 
 		virtual bool IsOpen() const noexcept override;
 
+		virtual void SetDepthBias(const DepthBias& bias) override;
+		virtual void SetDepthBounds(float min, float max) override;
+		virtual void SetStencilReference(const StencilReference& reference) override;
+
+		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
@@ -80,6 +86,26 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	bool BundleCommandList::IsOpen() const noexcept
 	{
 		return commandList.IsOpen();
+	}
+
+	void BundleCommandList::SetDepthBias(const DepthBias& bias)
+	{
+		commandList.SetDepthBias(bias);
+	}
+
+	void BundleCommandList::SetDepthBounds(const float min, const float max)
+	{
+		commandList.SetDepthBounds(min, max);
+	}
+
+	void BundleCommandList::SetStencilReference(const StencilReference& reference)
+	{
+		commandList.SetStencilReference(reference);
+	}
+
+	void BundleCommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	{
+		commandList.DispatchMesh(threadGroupCounts);
 	}
 
 	std::string_view BundleCommandList::Name() const noexcept

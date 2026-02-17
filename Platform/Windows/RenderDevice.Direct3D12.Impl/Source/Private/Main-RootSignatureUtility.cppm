@@ -67,7 +67,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			setIndex < params.descriptorSets.size(); ++setIndex)
 		{
 			const DescriptorSet& set = params.descriptorSets[setIndex];
-			const UINT registerSpace = static_cast<UINT>(set.setIndex);
+			const UINT registerSpace = set.setIndex;
 			
 			if (const std::size_t rangeCount = GetRangeCount(set.ranges); rangeCount > 0uz)
 			{
@@ -91,8 +91,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 							ranges[rangeIndex++] = D3D12_DESCRIPTOR_RANGE1
 							{
 								.RangeType = ToDescriptorRangeType(range.type),
-								.NumDescriptors = static_cast<UINT>(range.count),
-								.BaseShaderRegister = static_cast<UINT>(range.baseShaderRegister),
+								.NumDescriptors = range.count,
+								.BaseShaderRegister = range.baseShaderRegister,
 								.RegisterSpace = registerSpace,
 								.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
 								.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
@@ -106,8 +106,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 							ranges[rangeIndex++] = D3D12_DESCRIPTOR_RANGE1
 							{
 								.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER,
-								.NumDescriptors = static_cast<UINT>(range.count),
-								.BaseShaderRegister = static_cast<UINT>(range.baseShaderRegister),
+								.NumDescriptors = range.count,
+								.BaseShaderRegister = range.baseShaderRegister,
 								.RegisterSpace = registerSpace,
 								.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
 								.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
@@ -132,7 +132,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK,
 					.MinLOD = samplerDesc.MinLOD,
 					.MaxLOD = samplerDesc.MaxLOD,
-					.ShaderRegister = static_cast<UINT>(staticSamplerParams.shaderRegister),
+					.ShaderRegister = staticSamplerParams.shaderRegister,
 					.RegisterSpace = registerSpace,
 					.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL
 				};

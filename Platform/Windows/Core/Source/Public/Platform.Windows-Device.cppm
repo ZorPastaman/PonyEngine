@@ -50,7 +50,7 @@ namespace PonyEngine::Platform::Windows
 			throw std::runtime_error(std::format("Failed to get device name size: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
-		return static_cast<std::size_t>(size);
+		return size;
 	}
 
 	std::string GetDeviceName(const HANDLE deviceHandle)
@@ -77,6 +77,6 @@ namespace PonyEngine::Platform::Windows
 			throw std::runtime_error(std::format("Failed to get device name: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
-		return static_cast<std::size_t>(copied - 1uz); // Minus null-terminator.
+		return copied - 1uz; // Minus null-terminator.
 	}
 }

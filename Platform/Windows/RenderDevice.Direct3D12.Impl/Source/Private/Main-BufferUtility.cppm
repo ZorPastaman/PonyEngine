@@ -54,7 +54,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
 			.Alignment = 0ull,
-			.Width = static_cast<UINT64>(params.size),
+			.Width = params.size,
 			.Height = 1u,
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
@@ -75,8 +75,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		return D3D12_CONSTANT_BUFFER_VIEW_DESC
 		{
-			.BufferLocation = address + static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(params.offset),
-			.SizeInBytes = static_cast<UINT>(params.size)
+			.BufferLocation = address + params.offset,
+			.SizeInBytes = params.size
 		};
 	}
 
@@ -89,9 +89,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 			.Buffer = D3D12_BUFFER_SRV
 			{
-				.FirstElement = static_cast<UINT64>(params.firstElementIndex),
-				.NumElements = static_cast<UINT>(params.elementCount),
-				.StructureByteStride = static_cast<UINT>(params.stride),
+				.FirstElement = params.firstElementIndex,
+				.NumElements = params.elementCount,
+				.StructureByteStride = params.stride,
 				.Flags = params.raw ? D3D12_BUFFER_SRV_FLAG_RAW : D3D12_BUFFER_SRV_FLAG_NONE
 			}
 		};
@@ -105,9 +105,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.ViewDimension = D3D12_UAV_DIMENSION_BUFFER,
 			.Buffer = D3D12_BUFFER_UAV
 			{
-				.FirstElement = static_cast<UINT64>(params.firstElementIndex),
-				.NumElements = static_cast<UINT>(params.elementCount),
-				.StructureByteStride = static_cast<UINT>(params.stride),
+				.FirstElement = params.firstElementIndex,
+				.NumElements = params.elementCount,
+				.StructureByteStride = params.stride,
 				.CounterOffsetInBytes = 0ull,
 				.Flags = params.raw ? D3D12_BUFFER_UAV_FLAG_RAW : D3D12_BUFFER_UAV_FLAG_NONE
 			}
