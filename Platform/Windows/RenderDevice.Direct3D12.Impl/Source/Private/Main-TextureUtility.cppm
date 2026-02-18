@@ -63,13 +63,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(TextureUsage usage) noexcept;
 
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureSRVParams& params, DXGI_FORMAT format, std::uint32_t resourceMipCount, std::uint32_t resourceArraySize) noexcept;
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureSRVParams& params, DXGI_FORMAT format, std::uint8_t resourceMipCount, std::uint16_t resourceArraySize) noexcept;
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
+	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, DXGI_FORMAT format, std::uint32_t resourceArraySize) noexcept;
+	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_DSV_FLAGS ToDSVFlags(DSVFlag flags) noexcept;
 
@@ -257,7 +257,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.Width = params.size.X(),
 			.Height = params.size.Y(),
 			.DepthOrArraySize = ToDepthArraySize(params),
-			.MipLevels = static_cast<UINT16>(params.mipCount),
+			.MipLevels = params.mipCount,
 			.Format = format,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = ToNumber(params.sampleCount), .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
@@ -313,7 +313,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureSRVParams& params, const DXGI_FORMAT format, 
-		const std::uint32_t resourceMipCount, const std::uint32_t resourceArraySize) noexcept
+		const std::uint8_t resourceMipCount, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
 		{
@@ -442,7 +442,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return viewDesc;
 	}
 
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceArraySize) noexcept
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_UNORDERED_ACCESS_VIEW_DESC
 		{
@@ -526,7 +526,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return viewDesc;
 	}
 
-	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceArraySize) noexcept
+	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_RENDER_TARGET_VIEW_DESC
 		{
@@ -626,7 +626,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return viewDesc;
 	}
 
-	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, const DXGI_FORMAT format, const std::uint32_t resourceArraySize) noexcept
+	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
 		{

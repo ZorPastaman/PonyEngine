@@ -24,6 +24,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-ComputePipelineStateParams.cppm"
 	"Source/Public/Main-CopyableFootprint.cppm"
 	"Source/Public/Main-CopyableFootprintSize.cppm"
+	"Source/Public/Main-CopyUtility.cppm"
 	"Source/Public/Main-CullMode.cppm"
 	"Source/Public/Main-DepthBias.cppm"
 	"Source/Public/Main-DepthStencil.cppm"
@@ -63,6 +64,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-IWaiter.cppm"
 	"Source/Public/Main-LineRasterizationMode.cppm"
 	"Source/Public/Main-LogicOperation.cppm"
+	"Source/Public/Main-MipUtility.cppm"
 	"Source/Public/Main-PipelineLayoutParams.cppm"
 	"Source/Public/Main-PipelineStage.cppm"
 	"Source/Public/Main-QueueSync.cppm"
@@ -121,7 +123,6 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-TextureViewDimension.cppm"
 	"Source/Public/Main-UAVLayout.cppm"
 	"Source/Public/Main-UAVParams.cppm"
-	"Source/Public/Main-Utility.cppm"
 	"Source/Public/Main-ViewContainerCopyRange.cppm"
 )
 

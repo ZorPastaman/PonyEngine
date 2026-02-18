@@ -31,11 +31,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	public:
 		[[nodiscard("Pure constructor")]]
 		Texture(ID3D12Resource2& resource, TextureFormatId format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatId> castableFormats,
-			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint16_t mipCount, TextureDimension dimension, 
+			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint8_t mipCount, TextureDimension dimension, 
 			enum SampleCount sampleCount, TextureUsage usage, bool srgbCompatible);
 		[[nodiscard("Pure constructor")]]
 		Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, TextureFormatId format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatId> castableFormats,
-			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint16_t mipCount, TextureDimension dimension,
+			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint8_t mipCount, TextureDimension dimension,
 			enum SampleCount sampleCount, TextureUsage usage, bool srgbCompatible);
 		Texture(const Texture&) = delete;
 		Texture(Texture&&) = delete;
@@ -51,9 +51,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]] 
 		virtual Math::Vector3<std::uint32_t> Size() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::uint32_t MipCount() const noexcept override;
+		virtual std::uint8_t MipCount() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::uint32_t ArraySize() const noexcept override;
+		virtual std::uint16_t ArraySize() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual enum SampleCount SampleCount() const noexcept override;
 		[[nodiscard("Pure function")]]
@@ -80,7 +80,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	private:
 		[[nodiscard("Pure function")]]
-		UINT CalculateSubresourceIndex(std::uint32_t mipIndex, std::uint32_t arrayIndex, Aspect aspect) const;
+		UINT CalculateSubresourceIndex(std::uint8_t mipIndex, std::uint16_t arrayIndex, Aspect aspect) const;
 
 		class Resource resource;
 
@@ -91,7 +91,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		std::uint32_t width;
 		std::uint32_t height;
 		std::uint16_t depth;
-		std::uint16_t mipCount;
+		std::uint8_t mipCount;
 		TextureDimension dimension;
 		enum SampleCount sampleCount;
 		TextureUsage usage;
@@ -102,7 +102,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	Texture::Texture(ID3D12Resource2& resource, const TextureFormatId format, const DXGI_FORMAT nativeFormat, const std::span<const TextureFormatId> castableFormats,
-		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint16_t mipCount, const TextureDimension dimension,
+		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint8_t mipCount, const TextureDimension dimension,
 		const enum SampleCount sampleCount, const TextureUsage usage, const bool srgbCompatible) :
 		resource(resource),
 		format(format),
@@ -128,7 +128,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	Texture::Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const TextureFormatId format, const DXGI_FORMAT nativeFormat, 
 		const std::span<const TextureFormatId> castableFormats,
-		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint16_t mipCount, const TextureDimension dimension,
+		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint8_t mipCount, const TextureDimension dimension,
 		const enum SampleCount sampleCount, const TextureUsage usage, const bool srgbCompatible) :
 		resource(std::move(resource)),
 		format(format),
@@ -176,12 +176,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			: Math::Vector3<std::uint32_t>(width, height, 1u);
 	}
 
-	std::uint32_t Texture::MipCount() const noexcept
+	std::uint8_t Texture::MipCount() const noexcept
 	{
 		return mipCount;
 	}
 
-	std::uint32_t Texture::ArraySize() const noexcept
+	std::uint16_t Texture::ArraySize() const noexcept
 	{
 		return dimension == TextureDimension::Texture3D ? 1u : depth;
 	}
@@ -241,7 +241,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return nativeFormat;
 	}
 
-	UINT Texture::CalculateSubresourceIndex(const std::uint32_t mipIndex, const std::uint32_t arrayIndex, const Aspect aspect) const
+	UINT Texture::CalculateSubresourceIndex(const std::uint8_t mipIndex, const std::uint16_t arrayIndex, const Aspect aspect) const
 	{
 #ifndef NDEBUG
 		if (mipIndex >= mipCount) [[unlikely]]
@@ -258,7 +258,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		return CalculateSubresource(static_cast<UINT16>(mipIndex), static_cast<UINT16>(arrayIndex), ToPlaneIndex(aspect),
-			mipCount, static_cast<UINT16>(ArraySize()));
+		return CalculateSubresource(mipIndex, arrayIndex, ToPlaneIndex(aspect), mipCount, ArraySize());
 	}
 }

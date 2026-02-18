@@ -44,6 +44,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void SetStencilReference(const StencilReference& reference) override;
 
 		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -106,6 +107,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void BundleCommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
 		commandList.DispatchMesh(threadGroupCounts);
+	}
+
+	void BundleCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	{
+		commandList.DispatchCompute(threadGroupCounts);
 	}
 
 	std::string_view BundleCommandList::Name() const noexcept

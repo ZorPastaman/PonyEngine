@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.RenderDevice:Utility;
+export module PonyEngine.RenderDevice:CopyUtility;
 
 import std;
 

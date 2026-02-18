@@ -39,9 +39,9 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector3<std::uint32_t> Size() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t MipCount() const noexcept = 0;
+		virtual std::uint8_t MipCount() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t ArraySize() const noexcept = 0;
+		virtual std::uint16_t ArraySize() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual SampleCount SampleCount() const noexcept = 0;
 		[[nodiscard("Pure function")]]

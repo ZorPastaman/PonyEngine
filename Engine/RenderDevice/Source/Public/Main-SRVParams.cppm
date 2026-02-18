@@ -30,6 +30,7 @@ export namespace PonyEngine::RenderDevice
 	struct TextureSRVParams final
 	{
 		TextureFormatId format;
+		bool srgb = false;
 		TextureViewDimension dimension = TextureViewDimension::Texture2D;
 		Aspect aspect = Aspect::Color;
 		ComponentMapping mapping;

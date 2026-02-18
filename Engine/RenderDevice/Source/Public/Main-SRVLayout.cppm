@@ -19,8 +19,8 @@ export namespace PonyEngine::RenderDevice
 	};
 	struct TextureArraySRVLayout final
 	{
-		MipRange mipRange;
 		ArrayRange arrayRange;
+		MipRange mipRange;
 	};
 	struct TextureMSSRVLayout final
 	{

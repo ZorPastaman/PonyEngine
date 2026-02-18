@@ -47,6 +47,19 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void SetStencilReference(const StencilReference& reference) override;
 
 		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+
+		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
+		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) override;
+		virtual void Copy(const ITexture& source, ITexture& destination) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
 
 		virtual void Execute(ISecondaryGraphicsCommandList& secondary) override;
 
@@ -116,6 +129,66 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
 		commandList.DispatchMesh(threadGroupCounts);
+	}
+
+	void GraphicsCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	{
+		commandList.DispatchCompute(threadGroupCounts);
+	}
+
+	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination)
+	{
+		commandList.Copy(source, destination);
+	}
+
+	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination, const std::uint64_t sourceOffset, const std::uint64_t destinationOffset, const std::uint64_t size)
+	{
+		commandList.Copy(source, destination, sourceOffset, destinationOffset, size);
+	}
+
+	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination)
+	{
+		commandList.Copy(source, destination);
+	}
+
+	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, range);
+	}
+
+	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, range);
+	}
+
+	void GraphicsCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints)
+	{
+		commandList.Copy(source, destination, footprints);
+	}
+
+	void GraphicsCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
+	}
+
+	void GraphicsCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
+	}
+
+	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints)
+	{
+		commandList.Copy(source, destination, footprints);
+	}
+
+	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
+	}
+
+	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
 	}
 
 	void GraphicsCommandList::Execute(ISecondaryGraphicsCommandList& secondary)

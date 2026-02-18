@@ -41,6 +41,18 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
 
+		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
+		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) override;
+		virtual void Copy(const ITexture& source, ITexture& destination) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
+
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
@@ -87,6 +99,61 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void CopyCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
 		commandList.Barrier(bufferBarriers, textureBarriers);
+	}
+
+	void CopyCommandList::Copy(const IBuffer& source, IBuffer& destination)
+	{
+		commandList.Copy(source, destination);
+	}
+
+	void CopyCommandList::Copy(const IBuffer& source, IBuffer& destination, const std::uint64_t sourceOffset, const std::uint64_t destinationOffset, const std::uint64_t size)
+	{
+		commandList.Copy(source, destination, sourceOffset, destinationOffset, size);
+	}
+
+	void CopyCommandList::Copy(const ITexture& source, ITexture& destination)
+	{
+		commandList.Copy(source, destination);
+	}
+
+	void CopyCommandList::Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, range);
+	}
+
+	void CopyCommandList::Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, range);
+	}
+
+	void CopyCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints)
+	{
+		commandList.Copy(source, destination, footprints);
+	}
+
+	void CopyCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
+	}
+
+	void CopyCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
+	}
+
+	void CopyCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints)
+	{
+		commandList.Copy(source, destination, footprints);
+	}
+
+	void CopyCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
+	}
+
+	void CopyCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
+	{
+		commandList.Copy(source, destination, footprints, range);
 	}
 
 	std::string_view CopyCommandList::Name() const noexcept

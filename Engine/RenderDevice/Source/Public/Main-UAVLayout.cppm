@@ -17,12 +17,12 @@ export namespace PonyEngine::RenderDevice
 {
 	struct TextureSingleUAVLayout final
 	{
-		std::uint32_t mipIndex = 0u;
+		std::uint8_t mipIndex = 0u;
 	};
 	struct TextureArrayUAVLayout final
 	{
-		std::uint32_t mipIndex = 0u;
 		ArrayRange arrayRange;
+		std::uint8_t mipIndex = 0u;
 	};
 	using TextureUAVLayout = std::variant<TextureSingleUAVLayout, TextureArrayUAVLayout>;
 }

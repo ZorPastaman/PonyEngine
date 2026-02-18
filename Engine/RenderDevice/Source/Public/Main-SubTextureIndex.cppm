@@ -17,8 +17,8 @@ export namespace PonyEngine::RenderDevice
 {
 	struct SubTextureIndex final
 	{
-		std::uint32_t mipIndex = 0u;
-		std::uint32_t arrayIndex = 0u;
+		std::uint16_t arrayIndex = 0u;
+		std::uint8_t mipIndex = 0u;
 		Aspect aspect = Aspect::Color;
 	};
 }

@@ -17,12 +17,12 @@ export namespace PonyEngine::RenderDevice
 {
 	struct SingleDSVLayout final
 	{
-		std::uint32_t mipIndex = 0u;
+		std::uint8_t mipIndex = 0u;
 	};
 	struct ArrayDSVLayout final
 	{
-		std::uint32_t mipIndex = 0u;
 		ArrayRange arrayRange;
+		std::uint8_t mipIndex = 0u;
 	};
 	struct MSDSVLayout final
 	{
