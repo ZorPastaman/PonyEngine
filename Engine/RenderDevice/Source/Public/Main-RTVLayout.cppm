@@ -17,12 +17,12 @@ export namespace PonyEngine::RenderDevice
 {
 	struct SingleRTVLayout final
 	{
-		std::uint32_t mipIndex = 0u;
+		std::uint8_t mipIndex = 0u;
 	};
 	struct ArrayRTVLayout final
 	{
-		std::uint32_t mipIndex = 0u;
 		ArrayRange arrayRange;
+		std::uint8_t mipIndex = 0u;
 	};
 	struct MSRTVLayout final
 	{

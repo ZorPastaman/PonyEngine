@@ -190,8 +190,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	private:
 		struct CopyableFootprintInfo final
 		{
-			std::uint32_t mipCount;
-			std::uint32_t arrayCount;
+			std::uint8_t mipCount;
+			std::uint16_t arrayCount;
 		};
 
 		[[nodiscard("Pure function")]]
@@ -204,22 +204,22 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		static CopyableFootprintInfo GetCopyableFootprintCount(const D3D12_RESOURCE_DESC1& resourceDesc, const SubTextureRange& range);
 		[[nodiscard("Pure function")]]
-		static CopyableFootprintInfo GetCopyableFootprintCount(std::uint32_t resourceMipCount, std::uint32_t resourceArrayCount, const SubTextureRange& range);
+		static CopyableFootprintInfo GetCopyableFootprintCount(std::uint8_t resourceMipCount, std::uint16_t resourceArrayCount, const SubTextureRange& range);
 		CopyableFootprintSize GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const CopyableFootprintInfo& footprintCountInfo, UINT64 offset, 
 			UINT16 mostDetailedMipIndex, UINT16 firstArrayIndex, Aspect aspect, std::span<CopyableFootprint> footprints) const;
 
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetFormat(TextureFormatId format) const;
 		[[nodiscard("Pure function")]]
-		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, Aspect aspect) noexcept;
+		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, bool srgb, Aspect aspect) noexcept;
 		[[nodiscard("Pure function")]]
-		DXGI_FORMAT GetViewFormat(TextureFormatId format, Aspect aspect) const;
+		DXGI_FORMAT GetViewFormat(TextureFormatId format, bool srgb, Aspect aspect) const;
 		[[nodiscard("Pure function")]]
-		static std::uint32_t GetMaxArraySize(TextureDimension dimension) noexcept;
+		static std::uint16_t GetMaxArraySize(TextureDimension dimension) noexcept;
 		[[nodiscard("Pure function")]]
-		static std::uint32_t GetMaxArraySize(TextureViewDimension dimension) noexcept;
+		static std::uint16_t GetMaxArraySize(TextureViewDimension dimension) noexcept;
 		[[nodiscard("Pure function")]]
-		static std::uint32_t GetMaxArraySize(DSVDimension dimension) noexcept;
+		static std::uint16_t GetMaxArraySize(DSVDimension dimension) noexcept;
 
 		[[nodiscard("Pure function")]]
 		static Buffer& ToNativeBuffer(IBuffer& buffer);
@@ -282,35 +282,36 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static void ValidateDimension(const TextureParams& params);
 		static void ValidateColorTexture(const TextureParams& params);
 		static void ValidateDepthTexture(const TextureParams& params);
+		static void ValidateSRGBFlag(bool srgb, DXGI_FORMAT format);
 		static void ValidateAspect(Aspect aspect, DXGI_FORMAT format);
 		static void ValidateCBVParams(const Buffer& buffer, const CBVParams& params);
 		static void ValidateSRVParams(const Buffer& buffer, const BufferSRVParams& params);
 		static void ValidateSRVParams(const Texture& texture, const TextureSRVParams& params);
-		static void ValidateSRVParams(const TextureSRVParams& params, DXGI_FORMAT format, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateSRVParams(const TextureSRVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateUAVParams(const Buffer& buffer, const BufferUAVParams& params);
 		static void ValidateUAVParams(const Texture& texture, const TextureUAVParams& params);
-		static void ValidateUAVParams(const TextureUAVParams& params, DXGI_FORMAT format, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateUAVParams(const TextureUAVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateRTVParams(const Texture& texture, const RTVParams& params);
-		static void ValidateRTVParams(const RTVParams& params, DXGI_FORMAT format, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateRTVParams(const RTVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateDSVParams(const Texture& texture, const DSVParams& params);
-		static void ValidateDSVParams(const DSVParams& params, DXGI_FORMAT format, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateDSVParams(const DSVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateSize(const Buffer& buffer, std::uint64_t firstElementIndex, std::uint32_t elementCount, std::uint32_t stride);
-		static void ValidateViewFormat(const Texture& texture, TextureFormatId viewFormat);
+		static void ValidateViewFormat(const Texture& texture, TextureFormatId viewFormat, bool srgb);
 		static void ValidateDimension(const Texture& texture, TextureViewDimension dimension);
 		static void ValidateDimension(const Texture& texture, TextureDimension dimension);
 		static void ValidateDimension(const Texture& texture, DSVDimension dimension);
 		static void ValidateLayout(const Texture& texture, const TextureSRVLayout& layout, TextureViewDimension dimension);
-		static void ValidateLayout(const TextureSRVLayout& layout, TextureViewDimension dimension, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateLayout(const TextureSRVLayout& layout, TextureViewDimension dimension, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateLayout(const Texture& texture, const TextureUAVLayout& layout);
-		static void ValidateLayout(const TextureUAVLayout& layout, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateLayout(const TextureUAVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateLayout(const Texture& texture, const RTVLayout& layout);
-		static void ValidateLayout(const RTVLayout& layout, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateLayout(const RTVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateLayout(const Texture& texture, const DSVLayout& layout);
-		static void ValidateLayout(const DSVLayout& layout, std::uint32_t maxMipCount, std::uint32_t maxArraySize);
+		static void ValidateLayout(const DSVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateMipRange(const Texture& texture, const MipRange& range);
-		static void ValidateMipRange(const MipRange& range, std::uint32_t maxMipCount);
+		static void ValidateMipRange(const MipRange& range, std::uint8_t maxMipCount);
 		static void ValidateArrayRange(const Texture& texture, const ArrayRange& range);
-		static void ValidateArrayRange(const ArrayRange& range, std::uint32_t maxArraySize);
+		static void ValidateArrayRange(const ArrayRange& range, std::uint16_t maxArraySize);
 		static void ValidateSampleCount(const Texture& texture, bool shouldBeMS);
 		static void ValidateSwapChainParams(const SwapChainParams& params);
 
@@ -490,7 +491,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		return std::make_shared<Texture>(std::move(resource), params.format, format, params.castableFormats, 
 			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), resourceDesc.DepthOrArraySize,
-			resourceDesc.MipLevels, params.dimension, params.sampleCount, params.usage, srgb);
+			static_cast<std::uint8_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
 	}
 
 	std::uint32_t Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
@@ -512,8 +513,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const DXGI_FORMAT format = GetFormat(params.format);
 		const CopyableFootprintInfo footprintCount = GetCopyableFootprintCount(params, range, format);
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
-		return GetCopyableFootprints(resourceDesc, footprintCount, offset, 
-			static_cast<UINT16>(range.mipRange.mostDetailedMipIndex), static_cast<UINT16>(range.arrayRange.firstArrayIndex), range.aspect, footprints);
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, range.aspect, footprints);
 	}
 
 	CopyableFootprintSize Engine::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
@@ -521,8 +521,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
 		const CopyableFootprintInfo footprintCount = GetCopyableFootprintCount(resourceDesc, range);
-		return GetCopyableFootprints(resourceDesc, footprintCount, offset, 
-			static_cast<UINT16>(range.mipRange.mostDetailedMipIndex), static_cast<UINT16>(range.arrayRange.firstArrayIndex), range.aspect, footprints);
+		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, range.aspect, footprints);
 	}
 
 	std::shared_ptr<IShaderDataContainer> Engine::CreateShaderDataContainer(const ShaderDataContainerParams& params)
@@ -580,8 +579,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const Texture* const nativeTexture = ToNativeTexture(texture);
 		const DXGI_FORMAT format = GetFormat(params.format);
-		const std::uint32_t mipCount = nativeTexture ? nativeTexture->MipCount() : std::uint32_t{D3D12_REQ_MIP_LEVELS};
-		const std::uint32_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		const std::uint8_t mipCount = nativeTexture ? nativeTexture->MipCount() : std::uint8_t{D3D12_REQ_MIP_LEVELS};
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
 		if (nativeTexture)
 		{
 			ValidateSRVParams(*nativeTexture, params);
@@ -595,7 +594,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.aspect);
+		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.srgb, params.aspect);
 		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, mipCount, arraySize);
 		device.CreateSRV(nativeTexture ? &nativeTexture->Resource() : nullptr, srvDesc, handle);
 
@@ -624,21 +623,21 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const Texture* const nativeTexture = ToNativeTexture(texture);
 		const DXGI_FORMAT format = GetFormat(params.format);
-		const std::uint32_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
 		if (nativeTexture)
 		{
 			ValidateUAVParams(*nativeTexture, params);
 		}
 		else
 		{
-			ValidateUAVParams(params, format, std::uint32_t{D3D12_REQ_MIP_LEVELS}, arraySize);
+			ValidateUAVParams(params, format, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
 		}
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.aspect);
+		const DXGI_FORMAT viewFormat = GetViewFormat(format, false, params.aspect);
 		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = ToUAVDesc(params, viewFormat, arraySize);
 		device.CreateUAV(nativeTexture ? &nativeTexture->Resource() : nullptr, uavDesc, handle);
 
@@ -660,21 +659,21 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const Texture* const nativeTexture = ToNativeTexture(texture);
 		const DXGI_FORMAT format = GetFormat(params.format);
-		const std::uint32_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
 		if (nativeTexture)
 		{
 			ValidateRTVParams(*nativeTexture, params);
 		}
 		else
 		{
-			ValidateRTVParams(params, format, std::uint32_t{D3D12_REQ_MIP_LEVELS}, arraySize);
+			ValidateRTVParams(params, format, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
 		}
 
 		RenderTargetContainer& nativeContainer = ToNativeContainer(container);
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = ToRTVDesc(params, format, arraySize);
+		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = ToRTVDesc(params, GetViewFormat(format, params.srgb, Aspect::Color), arraySize);
 		device.CreateRTV(nativeTexture ? &nativeTexture->Resource() : nullptr, rtvDesc, handle);
 
 		nativeContainer.Set(index, RenderTargetTextureMeta{.texture = nativeTexture, .params = params});
@@ -695,14 +694,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const Texture* const nativeTexture = ToNativeTexture(texture);
 		const DXGI_FORMAT format = GetFormat(params.format);
-		const std::uint32_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
 		if (nativeTexture)
 		{
 			ValidateDSVParams(*nativeTexture, params);
 		}
 		else
 		{
-			ValidateDSVParams(params, format, std::uint32_t{D3D12_REQ_MIP_LEVELS}, arraySize);
+			ValidateDSVParams(params, format, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
 		}
 
 		DepthStencilContainer& nativeContainer = ToNativeContainer(container);
@@ -1077,19 +1076,19 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 		case TextureDimension::Texture1D:
 			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE1D_U_DIMENSION}, 1u, 1u);
-			response.maxMipCount = std::uint32_t{D3D12_REQ_MIP_LEVELS};
-			response.maxArraySize = std::uint32_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
+			response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
+			response.maxArraySize = std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
 			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
 		case TextureDimension::Texture2D:
 			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, 1u);
-			response.maxMipCount = std::uint32_t{D3D12_REQ_MIP_LEVELS};
-			response.maxArraySize = std::uint32_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
+			response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
+			response.maxArraySize = std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
 			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
 		case TextureDimension::Texture3D:
 			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION});
-			response.maxMipCount = std::uint32_t{D3D12_REQ_MIP_LEVELS};
+			response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
 			response.maxArraySize = 1u;
 			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
@@ -1134,10 +1133,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateAspect(range.aspect, resourceDesc.Format);
 
 		const UINT16 arraySize = GetArraySize(resourceDesc);
-		return GetCopyableFootprintCount(resourceDesc.MipLevels, arraySize, range);
+		return GetCopyableFootprintCount(static_cast<std::uint8_t>(resourceDesc.MipLevels), arraySize, range);
 	}
 
-	Engine::CopyableFootprintInfo Engine::GetCopyableFootprintCount(const std::uint32_t resourceMipCount, const std::uint32_t resourceArrayCount, const SubTextureRange& range)
+	Engine::CopyableFootprintInfo Engine::GetCopyableFootprintCount(const std::uint8_t resourceMipCount, const std::uint16_t resourceArrayCount, const SubTextureRange& range)
 	{
 #ifndef NDEBUG
 		if (range.mipRange.mostDetailedMipIndex + range.mipRange.mipCount.value_or(1u) > resourceMipCount) [[unlikely]]
@@ -1150,8 +1149,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		const std::uint32_t mipCount = range.mipRange.mipCount.value_or(resourceMipCount - range.mipRange.mostDetailedMipIndex);
-		const std::uint32_t arrayCount = range.arrayRange.arrayCount.value_or(resourceArrayCount - range.arrayRange.firstArrayIndex);
+		const std::uint8_t mipCount = range.mipRange.mipCount.value_or(resourceMipCount - range.mipRange.mostDetailedMipIndex);
+		const std::uint16_t arrayCount = range.arrayRange.arrayCount.value_or(resourceArrayCount - range.arrayRange.firstArrayIndex);
 #ifndef NDEBUG
 		if (arrayCount > 1u && (range.mipRange.mostDetailedMipIndex != 0u || mipCount != resourceMipCount))
 		{
@@ -1198,6 +1197,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				.rowSize = rowSizesSpan[i],
 				.rowPitch = subresourceFootprintsSpan[i].Footprint.RowPitch,
 				.rowCount = rowCountsSpan[i],
+				.width = subresourceFootprintsSpan[i].Footprint.Width,
+				.height = subresourceFootprintsSpan[i].Footprint.Height,
 				.sliceCount = subresourceFootprintsSpan[i].Footprint.Depth
 			};
 		}
@@ -1224,12 +1225,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return textureFormatMap.DXGIFormat(formatIndex);
 	}
 
-	DXGI_FORMAT Engine::GetViewFormat(const DXGI_FORMAT format, const Aspect aspect) noexcept
+	DXGI_FORMAT Engine::GetViewFormat(const DXGI_FORMAT format, const bool srgb, const Aspect aspect) noexcept
 	{
 		switch (aspect)
 		{
 		case Aspect::Color:
-			return format;
+			return srgb ? GetSRGBFormat(format) : format;
 		case Aspect::Depth:
 			return GetDepthViewFormat(format);
 		case Aspect::Stencil:
@@ -1240,19 +1241,19 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	DXGI_FORMAT Engine::GetViewFormat(const TextureFormatId format, const Aspect aspect) const
+	DXGI_FORMAT Engine::GetViewFormat(const TextureFormatId format, const bool srgb, const Aspect aspect) const
 	{
-		return GetViewFormat(GetFormat(format), aspect);
+		return GetViewFormat(GetFormat(format), srgb, aspect);
 	}
 
-	std::uint32_t Engine::GetMaxArraySize(const TextureDimension dimension) noexcept
+	std::uint16_t Engine::GetMaxArraySize(const TextureDimension dimension) noexcept
 	{
 		switch (dimension)
 		{
 		case TextureDimension::Texture1D:
-			return std::uint32_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
+			return std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
 		case TextureDimension::Texture2D:
-			return std::uint32_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
+			return std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
 		case TextureDimension::Texture3D:
 			return 1u;
 		default: [[unlikely]]
@@ -1261,15 +1262,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	std::uint32_t Engine::GetMaxArraySize(const TextureViewDimension dimension) noexcept
+	std::uint16_t Engine::GetMaxArraySize(const TextureViewDimension dimension) noexcept
 	{
 		switch (dimension)
 		{
 		case TextureViewDimension::Texture1D:
-			return std::uint32_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
+			return std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
 		case TextureViewDimension::Texture2D:
 		case TextureViewDimension::TextureCube:
-			return std::uint32_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
+			return std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
 		case TextureViewDimension::Texture3D:
 			return 1u;
 		default: [[unlikely]]
@@ -1278,14 +1279,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	std::uint32_t Engine::GetMaxArraySize(const DSVDimension dimension) noexcept
+	std::uint16_t Engine::GetMaxArraySize(const DSVDimension dimension) noexcept
 	{
 		switch (dimension)
 		{
 		case DSVDimension::Texture1D:
-			return std::uint32_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
+			return std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
 		case DSVDimension::Texture2D:
-			return std::uint32_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
+			return std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
 		default: [[unlikely]]
 			assert(false && "Invalid dimension.");
 			return 1u;
@@ -1705,6 +1706,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
+	void Engine::ValidateSRGBFlag(const bool srgb, const DXGI_FORMAT format)
+	{
+#ifndef NDEBUG
+		if (srgb && !IsSRGBCompatibleFormat(format))
+		{
+			throw std::invalid_argument("Invalid srgb flag");
+		}
+#endif
+	}
+
 	void Engine::ValidateAspect(const Aspect aspect, const DXGI_FORMAT format)
 	{
 #ifndef NDEBUG
@@ -1772,7 +1783,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::ValidateSRVParams(const Texture& texture, const TextureSRVParams& params)
 	{
-		ValidateViewFormat(texture, params.format);
+		ValidateViewFormat(texture, params.format, params.srgb);
 		ValidateDimension(texture, params.dimension);
 		ValidateAspect(params.aspect, texture.NativeFormat());
 		ValidateLayout(texture, params.layout, params.dimension);
@@ -1785,8 +1796,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateSRVParams(const TextureSRVParams& params, const DXGI_FORMAT format, const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateSRVParams(const TextureSRVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
+		ValidateSRGBFlag(params.srgb, format);
 		ValidateAspect(params.aspect, format);
 		ValidateLayout(params.layout, params.dimension, maxMipCount, maxArraySize);
 	}
@@ -1805,7 +1817,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::ValidateUAVParams(const Texture& texture, const TextureUAVParams& params)
 	{
-		ValidateViewFormat(texture, params.format);
+		ValidateViewFormat(texture, params.format, false);
 		ValidateDimension(texture, params.dimension);
 		ValidateAspect(params.aspect, texture.NativeFormat());
 		ValidateLayout(texture, params.layout);
@@ -1818,7 +1830,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateUAVParams(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateUAVParams(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		ValidateAspect(params.aspect, format);
 		ValidateLayout(params.layout, maxMipCount, maxArraySize);
@@ -1826,7 +1838,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::ValidateRTVParams(const Texture& texture, const RTVParams& params)
 	{
-		ValidateViewFormat(texture, params.format);
+		ValidateViewFormat(texture, params.format, params.srgb);
 		ValidateDimension(texture, params.dimension);
 		ValidateAspect(Aspect::Color, texture.NativeFormat());
 		ValidateLayout(texture, params.layout);
@@ -1839,15 +1851,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateRTVParams(const RTVParams& params, const DXGI_FORMAT format, const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateRTVParams(const RTVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
+		ValidateSRGBFlag(params.srgb, format);
 		ValidateAspect(Aspect::Color, format);
 		ValidateLayout(params.layout, maxMipCount, maxArraySize);
 	}
 
 	void Engine::ValidateDSVParams(const Texture& texture, const DSVParams& params)
 	{
-		ValidateViewFormat(texture, params.format);
+		ValidateViewFormat(texture, params.format, false);
 		ValidateDimension(texture, params.dimension);
 		ValidateAspect(Aspect::Depth, texture.NativeFormat());
 		ValidateLayout(texture, params.layout);
@@ -1860,7 +1873,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateDSVParams(const DSVParams& params, const DXGI_FORMAT format, const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateDSVParams(const DSVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		ValidateAspect(Aspect::Depth, format);
 		ValidateLayout(params.layout, maxMipCount, maxArraySize);
@@ -1880,10 +1893,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateViewFormat(const Texture& texture, const TextureFormatId viewFormat)
+	void Engine::ValidateViewFormat(const Texture& texture, const TextureFormatId viewFormat, const bool srgb)
 	{
 #ifndef NDEBUG
-		if (texture.Format() != viewFormat && std::ranges::find(texture.CastableFormats(), viewFormat) == texture.CastableFormats().cend()) [[unlikely]]
+		if (srgb)
+		{
+			if (texture.Format() != viewFormat || !texture.SRGBCompatible())
+			{
+				throw std::invalid_argument("Invalid format");
+			}
+		}
+		else if (texture.Format() != viewFormat && std::ranges::find(texture.CastableFormats(), viewFormat) == texture.CastableFormats().cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid format");
 		}
@@ -2011,8 +2031,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, layout);
 	}
 
-	void Engine::ValidateLayout(const TextureSRVLayout& layout, const TextureViewDimension dimension,
-		const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateLayout(const TextureSRVLayout& layout, const TextureViewDimension dimension, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		std::visit(Type::Overload
 		{
@@ -2082,7 +2101,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, layout);
 	}
 
-	void Engine::ValidateLayout(const TextureUAVLayout& layout, const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateLayout(const TextureUAVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		std::visit(Type::Overload
 		{
@@ -2125,7 +2144,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, layout);
 	}
 
-	void Engine::ValidateLayout(const RTVLayout& layout, const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateLayout(const RTVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		std::visit(Type::Overload
 		{
@@ -2175,7 +2194,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, layout);
 	}
 
-	void Engine::ValidateLayout(const DSVLayout& layout, const std::uint32_t maxMipCount, const std::uint32_t maxArraySize)
+	void Engine::ValidateLayout(const DSVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		std::visit(Type::Overload
 		{
@@ -2203,7 +2222,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateMipRange(range, texture.MipCount());
 	}
 
-	void Engine::ValidateMipRange(const MipRange& range, const std::uint32_t maxMipCount)
+	void Engine::ValidateMipRange(const MipRange& range, const std::uint8_t maxMipCount)
 	{
 #ifndef NDEBUG
 		if (range.mostDetailedMipIndex + range.mipCount.value_or(1u) > maxMipCount) [[unlikely]]
@@ -2218,7 +2237,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateArrayRange(range, texture.ArraySize());
 	}
 
-	void Engine::ValidateArrayRange(const ArrayRange& range, const std::uint32_t maxArraySize)
+	void Engine::ValidateArrayRange(const ArrayRange& range, const std::uint16_t maxArraySize)
 	{
 #ifndef NDEBUG
 		if (range.firstArrayIndex + range.arrayCount.value_or(1u) > maxArraySize) [[unlikely]]

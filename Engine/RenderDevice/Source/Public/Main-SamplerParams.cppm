@@ -19,11 +19,11 @@ export namespace PonyEngine::RenderDevice
 	struct SamplerParams final
 	{
 		SamplerFilter filter;
-		SamplerAddressMode addressU;
-		SamplerAddressMode addressV;
-		SamplerAddressMode addressW;
-		float mipLodBias;
-		float minLod;
-		float maxLod;
+		SamplerAddressMode addressU = SamplerAddressMode::Wrap;
+		SamplerAddressMode addressV = SamplerAddressMode::Wrap;
+		SamplerAddressMode addressW = SamplerAddressMode::Wrap;
+		float mipLodBias = 0.f;
+		float minLod = 0.f;
+		float maxLod = 0.f;
 	};
 }

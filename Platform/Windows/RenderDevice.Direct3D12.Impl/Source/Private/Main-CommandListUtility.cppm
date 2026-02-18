@@ -27,7 +27,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr D3D12_BARRIER_ACCESS ToAccess(std::optional<ResourceAccess> accesses) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE ToSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, AspectMask aspects,
-		std::uint32_t resourceMipCount, std::uint32_t resourceArraySize) noexcept;
+		std::uint8_t resourceMipCount, std::uint16_t resourceArraySize) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -124,7 +124,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE ToSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, const AspectMask aspects,
-		const std::uint32_t resourceMipCount, const std::uint32_t resourceArraySize) noexcept
+		const std::uint8_t resourceMipCount, const std::uint16_t resourceArraySize) noexcept
 	{
 		return D3D12_BARRIER_SUBRESOURCE_RANGE
 		{

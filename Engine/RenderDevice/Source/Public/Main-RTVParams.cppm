@@ -18,6 +18,7 @@ export namespace PonyEngine::RenderDevice
 	struct RTVParams final
 	{
 		TextureFormatId format;
+		bool srgb = false;
 		TextureDimension dimension = TextureDimension::Texture2D;
 		RTVLayout layout;
 	};

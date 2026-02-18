@@ -32,5 +32,6 @@ export namespace PonyEngine::RenderDevice
 		virtual void SetStencilReference(const StencilReference& reference) = 0;
 
 		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
+		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
 	};
 }
