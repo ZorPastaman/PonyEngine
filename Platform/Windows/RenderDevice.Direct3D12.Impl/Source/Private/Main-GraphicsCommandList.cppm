@@ -61,6 +61,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
 		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
 
+		virtual void Resolve(const ITexture& source, ITexture& destination, ResolveMode mode) override;
+		virtual void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode) override;
+		virtual void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode) override;
+
 		virtual void Execute(ISecondaryGraphicsCommandList& secondary) override;
 
 		[[nodiscard("Pure function")]]
@@ -189,6 +193,21 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
 	{
 		commandList.Copy(source, destination, footprints, range);
+	}
+
+	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const ResolveMode mode)
+	{
+		commandList.Resolve(source, destination, mode);
+	}
+
+	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, const ResolveMode mode)
+	{
+		commandList.Resolve(source, destination, range, mode);
+	}
+
+	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, const ResolveMode mode)
+	{
+		commandList.Resolve(source, destination, range, mode);
 	}
 
 	void GraphicsCommandList::Execute(ISecondaryGraphicsCommandList& secondary)
