@@ -22,6 +22,7 @@ import :CopyableFootprint;
 import :DepthBias;
 import :ICommandList;
 import :ISecondaryGraphicsCommandList;
+import :ResolveMode;
 import :StencilReference;
 import :TextureBarrier;
 
@@ -53,6 +54,10 @@ export namespace PonyEngine::RenderDevice
 		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints) = 0;
 		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) = 0;
 		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) = 0;
+
+		virtual void Resolve(const ITexture& source, ITexture& destination, ResolveMode mode = ResolveMode::Average) = 0;
+		virtual void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode = ResolveMode::Average) = 0;
+		virtual void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average) = 0;
 
 		virtual void Execute(ISecondaryGraphicsCommandList& secondary) = 0;
 	};

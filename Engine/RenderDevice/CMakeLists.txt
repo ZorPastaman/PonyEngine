@@ -74,6 +74,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-RenderAPI.cppm"
 	"Source/Public/Main-RenderTargetContainerParams.cppm"
 	"Source/Public/Main-RenderTargetMeta.cppm"
+	"Source/Public/Main-ResolveMode.cppm"
 	"Source/Public/Main-ResourceAccess.cppm"
 	"Source/Public/Main-ResourceLayout.cppm"
 	"Source/Public/Main-RTVLayout.cppm"

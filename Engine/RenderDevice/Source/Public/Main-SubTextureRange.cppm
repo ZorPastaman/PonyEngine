@@ -56,9 +56,9 @@ export namespace PonyEngine::RenderDevice
 
 	struct BoxCopySubTextureRange final
 	{
-		const Math::Vector3<std::uint32_t>* sourceOffsets = nullptr;
-		const Math::Vector3<std::uint32_t>* destinationOffsets = nullptr;
-		const Math::Vector3<std::uint32_t>* sourceSizes = nullptr;
+		std::span<const Math::Vector3<std::uint32_t>> sourceOffsets;
+		std::span<const Math::Vector3<std::uint32_t>> destinationOffsets;
+		std::span<const Math::Vector3<std::uint32_t>> sourceSizes;
 		std::uint16_t sourceArrayIndex = 0u;
 		std::uint16_t destinationArrayIndex = 0u;
 		std::uint16_t arrayCount = 1u;
@@ -79,9 +79,9 @@ export namespace PonyEngine::RenderDevice
 
 	struct FootprintedBoxCopySubTextureRange final
 	{
-		const Math::Vector3<std::uint32_t>* sourceOffsets = nullptr;
-		const Math::Vector3<std::uint32_t>* destinationOffsets = nullptr;
-		const Math::Vector3<std::uint32_t>* sourceSizes = nullptr;
+		std::span<const Math::Vector3<std::uint32_t>> sourceOffsets;
+		std::span<const Math::Vector3<std::uint32_t>> destinationOffsets;
+		std::span<const Math::Vector3<std::uint32_t>> sourceSizes;
 		std::uint16_t arrayIndex = 0u;
 		std::uint16_t arrayCount = 1u;
 		std::uint8_t mipIndex = 0u;

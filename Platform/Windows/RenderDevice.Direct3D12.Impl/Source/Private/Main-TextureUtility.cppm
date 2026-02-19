@@ -77,6 +77,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr D3D12_SHADER_COMPONENT_MAPPING ToShaderMapping(ComponentSwizzle swizzle) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr UINT ToShaderMapping(ComponentMapping mapping) noexcept;
+
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_RESOLVE_MODE ToResolveMode(ResolveMode mode) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -752,5 +755,21 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			ToShaderMapping(mapping.blue),
 			ToShaderMapping(mapping.alpha)
 		);
+	}
+
+	constexpr D3D12_RESOLVE_MODE ToResolveMode(const ResolveMode mode) noexcept
+	{
+		switch (mode)
+		{
+		case ResolveMode::Average:
+			return D3D12_RESOLVE_MODE_AVERAGE;
+		case ResolveMode::Minimum:
+			return D3D12_RESOLVE_MODE_MIN;
+		case ResolveMode::Maximum:
+			return D3D12_RESOLVE_MODE_MAX;
+		default: [[unlikely]]
+			assert(false && "Invalid resolve mode.");
+			return D3D12_RESOLVE_MODE_AVERAGE;
+		}
 	}
 }

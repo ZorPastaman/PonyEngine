@@ -77,6 +77,7 @@ export import :Reduction;
 export import :RenderAPI;
 export import :RenderTargetContainerParams;
 export import :RenderTargetMeta;
+export import :ResolveMode;
 export import :ResourceAccess;
 export import :ResourceLayout;
 export import :RTVLayout;
