@@ -52,11 +52,19 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers);
 
+		void SetRasterRegions(std::span<const RasterRegion> regions);
+
+		void SetGraphicsRootSignature(ID3D12RootSignature* rootSig);
+		void SetComputeRootSignature(ID3D12RootSignature* rootSig);
+		void SetPipelineState(ID3D12PipelineState& pso);
+
 		void SetDepthBias(const DepthBias& bias) noexcept;
-		void SetDepthBounds(float min, float max) noexcept;
+		void SetDepthBounds(const DepthRange& range) noexcept;
 		void SetStencilReference(const StencilReference& reference) noexcept;
 
-		void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
+		void SetBlendFactor(const Math::ColorRGBA<float>& factor) noexcept;
+
+		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 
 		void Copy(const IBuffer& source, IBuffer& destination);
@@ -85,8 +93,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		CommandList& operator =(CommandList&&) = delete;
 
 	private:
-		void ToNativeBarriers(std::span<const BufferBarrier> bufferBarriers, std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriers) noexcept;
-		void ToNativeBarriers(std::span<const TextureBarrier> textureBarriers, std::span<D3D12_TEXTURE_BARRIER> nativeTextureBarriers) noexcept;
+		static void ToNativeBarriers(std::span<const BufferBarrier> bufferBarriers, std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriers) noexcept;
+		static void ToNativeBarriers(std::span<const TextureBarrier> textureBarriers, std::span<D3D12_TEXTURE_BARRIER> nativeTextureBarriers) noexcept;
+
+		static void ToViewports(std::span<const RasterRegion> regions, std::span<D3D12_VIEWPORT> viewports) noexcept;
+		static void ToScissors(std::span<const RasterRegion> regions, std::span<D3D12_RECT> rects) noexcept;
 
 		[[nodiscard("Pure function")]]
 		static D3D12_TEXTURE_COPY_LOCATION ToCopyLocation(const Buffer& buffer, const CopyableFootprint& footprint, DXGI_FORMAT format) noexcept;
@@ -99,8 +110,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		static D3D12_BOX ToBox(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
 
+		void ValidateState() const;
+
 		static void ValidateBarriers(std::span<const BufferBarrier> bufferBarriers);
 		static void ValidateBarriers(std::span<const TextureBarrier> textureBarriers);
+
+		static void ValidateRasterRegion(std::span<const RasterRegion> regions);
 
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination);
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
@@ -191,6 +206,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
+		ValidateState();
 		ValidateBarriers(bufferBarriers);
 		ValidateBarriers(textureBarriers);
 
@@ -229,51 +245,106 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
+	void CommandList::SetRasterRegions(const std::span<const RasterRegion> regions)
+	{
+		ValidateState();
+		ValidateRasterRegion(regions);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_VIEWPORT> viewports = arena.Allocate<D3D12_VIEWPORT>(regions.size());
+		const std::span<D3D12_VIEWPORT> viewportsSpan = arena.Span(viewports);
+		ToViewports(regions, viewportsSpan);
+		commandList->RSSetViewports(static_cast<UINT>(viewportsSpan.size()), viewportsSpan.data());
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_RECT> scissors = arena.Allocate<D3D12_RECT>(regions.size());
+		const std::span<D3D12_RECT> scissorsSpan = arena.Span(scissors);
+		ToScissors(regions, scissorsSpan);
+		commandList->RSSetScissorRects(static_cast<UINT>(scissorsSpan.size()), scissorsSpan.data());
+	}
+
+	void CommandList::SetGraphicsRootSignature(ID3D12RootSignature* const rootSig)
+	{
+		ValidateState();
+		commandList->SetGraphicsRootSignature(rootSig);
+	}
+
+	void CommandList::SetComputeRootSignature(ID3D12RootSignature* const rootSig)
+	{
+		ValidateState();
+		commandList->SetComputeRootSignature(rootSig);
+	}
+
+	void CommandList::SetPipelineState(ID3D12PipelineState& pso)
+	{
+		ValidateState();
+		commandList->SetPipelineState(&pso);
+	}
+
 	void CommandList::SetDepthBias(const DepthBias& bias) noexcept
 	{
+		ValidateState();
 		commandList->RSSetDepthBias(bias.depthBias, bias.depthBiasClamp, bias.slopeScaledDepthBias);
 	}
 
-	void CommandList::SetDepthBounds(const float min, const float max) noexcept
+	void CommandList::SetDepthBounds(const DepthRange& range) noexcept
 	{
-		commandList->OMSetDepthBounds(min, max);
+		ValidateState();
+		commandList->OMSetDepthBounds(range.min, range.max);
 	}
 
 	void CommandList::SetStencilReference(const StencilReference& reference) noexcept
 	{
+		ValidateState();
 		commandList->OMSetFrontAndBackStencilRef(reference.front, reference.back);
 	}
 
-	void CommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
+	void CommandList::SetBlendFactor(const Math::ColorRGBA<float>& factor) noexcept
 	{
+		ValidateState();
+		const FLOAT blendFactor[4] = { factor.R(), factor.G(), factor.B(), factor.A() };
+		commandList->OMSetBlendFactor(blendFactor);
+	}
+
+	void CommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
+	{
+		ValidateState();
 		commandList->DispatchMesh(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
 	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
 	{
+		ValidateState();
 		commandList->Dispatch(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
 	void CommandList::Copy(const IBuffer& source, IBuffer& destination)
 	{
+		ValidateState();
 		ValidateCopy(source, destination);
+
 		commandList->CopyResource(&static_cast<Buffer&>(destination).Resource(), &static_cast<const Buffer&>(source).Resource());
 	}
 
 	void CommandList::Copy(const IBuffer& source, IBuffer& destination, const std::uint64_t sourceOffset, const std::uint64_t destinationOffset, const std::uint64_t size)
 	{
+		ValidateState();
 		ValidateCopy(source, destination, sourceOffset, destinationOffset, size);
+
 		commandList->CopyBufferRegion(&static_cast<Buffer&>(destination).Resource(), destinationOffset, &static_cast<const Buffer&>(source).Resource(), sourceOffset, size);
 	}
 
 	void CommandList::Copy(const ITexture& source, ITexture& destination)
 	{
+		ValidateState();
 		ValidateCopy(source, destination);
+
 		commandList->CopyResource(&static_cast<Texture&>(destination).Resource(), &static_cast<const Texture&>(source).Resource());
 	}
 
 	void CommandList::Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range)
 	{
+		ValidateState();
 		ValidateCopy(source, destination, range);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -302,6 +373,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range)
 	{
+		ValidateState();
 		ValidateCopy(source, destination, range);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -332,6 +404,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints)
 	{
+		ValidateState();
 		ValidateCopy(source, destination, footprints);
 
 		const auto& sourceBuffer = static_cast<const Buffer&>(source);
@@ -347,6 +420,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
 	{
+		ValidateState();
 		ValidateCopy(source, destination, footprints, range);
 
 		const auto& sourceBuffer = static_cast<const Buffer&>(source);
@@ -369,6 +443,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
 	{
+		ValidateState();
 		ValidateCopy(source, destination, footprints, range, false);
 
 		const auto& sourceBuffer = static_cast<const Buffer&>(source);
@@ -393,6 +468,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints)
 	{
+		ValidateState();
 		ValidateCopy(destination, source, footprints);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -408,6 +484,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
 	{
+		ValidateState();
 		ValidateCopy(destination, source, footprints, range);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -430,6 +507,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
 	{
+		ValidateState();
 		ValidateCopy(destination, source, footprints, range, true);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -454,6 +532,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Resolve(const ITexture& source, ITexture& destination, const ResolveMode mode)
 	{
+		ValidateState();
 		ValidateResolve(source, destination);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -477,6 +556,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, const ResolveMode mode)
 	{
+		ValidateState();
 		ValidateResolve(source, destination, range);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -502,6 +582,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, const ResolveMode mode)
 	{
+		ValidateState();
 		ValidateResolve(source, destination, range);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
@@ -529,6 +610,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::ExecuteBundle(ID3D12GraphicsCommandList10& bundle) noexcept
 	{
+		ValidateState();
 		commandList->ExecuteBundle(&bundle);
 	}
 
@@ -603,6 +685,38 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
+	void CommandList::ToViewports(const std::span<const RasterRegion> regions, const std::span<D3D12_VIEWPORT> viewports) noexcept
+	{
+		for (std::size_t i = 0uz; i < regions.size(); ++i)
+		{
+			const RasterRegion& region = regions[i];
+			viewports[i] = D3D12_VIEWPORT
+			{
+				.TopLeftX = region.viewport.Position().X(),
+				.TopLeftY = region.viewport.Position().Y(),
+				.Width = region.viewport.Size().X(),
+				.Height = region.viewport.Size().Y(),
+				.MinDepth = region.depthRange.min,
+				.MaxDepth = region.depthRange.max
+			};
+		}
+	}
+
+	void CommandList::ToScissors(const std::span<const RasterRegion> regions, const std::span<D3D12_RECT> rects) noexcept
+	{
+		for (std::size_t i = 0uz; i < regions.size(); ++i)
+		{
+			const RasterRegion& region = regions[i];
+			rects[i] = D3D12_RECT
+			{
+				.left = static_cast<LONG>(region.scissor.Position().X()),
+				.top = static_cast<LONG>(region.scissor.Position().Y()),
+				.right = static_cast<LONG>(region.scissor.Position().X() + region.scissor.Size().X()),
+				.bottom = static_cast<LONG>(region.scissor.Position().Y() + region.scissor.Size().Y())
+			};
+		}
+	}
+
 	D3D12_TEXTURE_COPY_LOCATION CommandList::ToCopyLocation(const Buffer& buffer, const CopyableFootprint& footprint, const DXGI_FORMAT format) noexcept
 	{
 		return D3D12_TEXTURE_COPY_LOCATION
@@ -668,6 +782,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
+	void CommandList::ValidateState() const
+	{
+#ifndef NDEBUG
+		if (!isOpen) [[unlikely]]
+		{
+			throw std::logic_error("Command list is closed");
+		}
+#endif
+	}
+
 	void CommandList::ValidateBarriers(const std::span<const BufferBarrier> bufferBarriers)
 	{
 #ifndef NDEBUG
@@ -720,6 +844,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				throw std::invalid_argument("Invalid discard flag");
 			}
+		}
+#endif
+	}
+
+	void CommandList::ValidateRasterRegion(std::span<const RasterRegion> regions)
+	{
+#ifndef NDEBUG
+		if (regions.size() > D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE) [[unlikely]]
+		{
+			throw std::invalid_argument("Region count is too great");
 		}
 #endif
 	}

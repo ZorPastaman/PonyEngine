@@ -13,21 +13,12 @@ module;
 
 export module PonyEngine.RenderDevice:IComputePipelineState;
 
-import std;
-
-import :IPipelineLayout;
+import :IPipelineState;
 
 export namespace PonyEngine::RenderDevice
 {
-	class IComputePipelineState
+	class IComputePipelineState : public IPipelineState
 	{
 		PONY_INTERFACE_BODY(IComputePipelineState)
-
-		[[nodiscard("Pure function")]]
-		virtual const std::shared_ptr<const IPipelineLayout>& Layout() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-		virtual void Name(std::string_view name) = 0;
 	};
 }

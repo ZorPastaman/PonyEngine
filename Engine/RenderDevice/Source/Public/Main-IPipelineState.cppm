@@ -7,16 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:RasterizerSupport;
+module;
 
-import :LineRasterizationMode;
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.RenderDevice:IPipelineState;
+
+import std;
+
+import :IPipelineLayout;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct RasterizerSupport final
+	class IPipelineState
 	{
-		std::uint8_t maxRasterRegionCount = 0u;
-		LineRasterizationModeMask lineRasterizationModes = LineRasterizationModeMask::None;
-		bool conservativeRasterization = false;
+		PONY_INTERFACE_BODY(IPipelineState)
+
+		[[nodiscard("Pure function")]]
+		virtual const std::shared_ptr<const IPipelineLayout>& Layout() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
+		virtual void Name(std::string_view name) = 0;
 	};
 }

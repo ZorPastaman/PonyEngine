@@ -19,6 +19,7 @@ import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
 import :CommandList;
+import :GraphicsComputePipelineBinding;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
@@ -39,11 +40,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]] 
 		virtual bool IsOpen() const noexcept override;
 
+		virtual void SetPipelineState(const IGraphicsPipelineState& pipelineState) override;
+		virtual void SetPipelineState(const IComputePipelineState& pipelineState) override;
+
 		virtual void SetDepthBias(const DepthBias& bias) override;
-		virtual void SetDepthBounds(float min, float max) override;
+		virtual void SetDepthBounds(const DepthRange& range) override;
 		virtual void SetStencilReference(const StencilReference& reference) override;
 
-		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+		virtual void SetBlendFactor(const Math::ColorRGBA<float>& factor) override;
+
+		virtual void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 
 		[[nodiscard("Pure function")]]
@@ -57,7 +63,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		BundleCommandList& operator =(BundleCommandList&&) = delete;
 
 	private:
+		void ValidateState() const;
+
+		void ValidatePipelineStateForGraphics() const;
+		void ValidatePipelineStateForCompute() const;
+
 		class CommandList commandList;
+		GraphicsComputePipelineBinding pipelineBinding;
 	};
 }
 
@@ -77,6 +89,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void BundleCommandList::Reset()
 	{
 		commandList.Reset();
+		pipelineBinding.Reset();
 	}
 
 	void BundleCommandList::Close()
@@ -89,14 +102,26 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return commandList.IsOpen();
 	}
 
+	void BundleCommandList::SetPipelineState(const IGraphicsPipelineState& pipelineState)
+	{
+		ValidateState();
+		pipelineBinding.SetPipelineState(pipelineState, commandList);
+	}
+
+	void BundleCommandList::SetPipelineState(const IComputePipelineState& pipelineState)
+	{
+		ValidateState();
+		pipelineBinding.SetPipelineState(pipelineState, commandList);
+	}
+
 	void BundleCommandList::SetDepthBias(const DepthBias& bias)
 	{
 		commandList.SetDepthBias(bias);
 	}
 
-	void BundleCommandList::SetDepthBounds(const float min, const float max)
+	void BundleCommandList::SetDepthBounds(const DepthRange& range)
 	{
-		commandList.SetDepthBounds(min, max);
+		commandList.SetDepthBounds(range);
 	}
 
 	void BundleCommandList::SetStencilReference(const StencilReference& reference)
@@ -104,9 +129,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.SetStencilReference(reference);
 	}
 
-	void BundleCommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	void BundleCommandList::SetBlendFactor(const Math::ColorRGBA<float>& factor)
 	{
-		commandList.DispatchMesh(threadGroupCounts);
+		commandList.SetBlendFactor(factor);
+	}
+
+	void BundleCommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	{
+		commandList.DispatchGraphics(threadGroupCounts);
 	}
 
 	void BundleCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
@@ -127,5 +157,35 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ID3D12GraphicsCommandList10& BundleCommandList::CommandList() const noexcept
 	{
 		return commandList.GetCommandList();
+	}
+
+	void BundleCommandList::ValidateState() const
+	{
+#ifndef NDEBUG
+		if (!commandList.IsOpen())
+		{
+			throw std::logic_error("Command list is closed");
+		}
+#endif
+	}
+
+	void BundleCommandList::ValidatePipelineStateForGraphics() const
+	{
+#ifndef NDEBUG
+		if (!pipelineBinding.IsLastPSOGraphics())
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+	}
+
+	void BundleCommandList::ValidatePipelineStateForCompute() const
+	{
+#ifndef NDEBUG
+		if (!pipelineBinding.IsLastPSOCompute())
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
 	}
 }

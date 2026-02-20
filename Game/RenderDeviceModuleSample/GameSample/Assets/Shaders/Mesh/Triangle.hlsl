@@ -65,8 +65,8 @@ void main(in uint groupId : SV_GROUPID,
 	out indices uint3 outTriangles[TRIANGLE_COUNT])
 {
 	Pony_Meshlet meshlet = Meshlets[groupId];
-	uint vertexCount = UnpackVertexCount(meshlet);
-	uint primitiveCount = UnpackPrimitiveCount(meshlet);
+	uint vertexCount = meshlet.UnpackVertexCount();
+	uint primitiveCount = meshlet.UnpackPrimitiveCount();
 	SetMeshOutputCounts(vertexCount, primitiveCount);
 
 	if (groupThreadId < vertexCount)

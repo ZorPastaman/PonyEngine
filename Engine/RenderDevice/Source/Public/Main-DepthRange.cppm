@@ -7,16 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:RasterizerSupport;
-
-import :LineRasterizationMode;
+export module PonyEngine.RenderDevice:DepthRange;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct RasterizerSupport final
+	struct DepthRange final
 	{
-		std::uint8_t maxRasterRegionCount = 0u;
-		LineRasterizationModeMask lineRasterizationModes = LineRasterizationModeMask::None;
-		bool conservativeRasterization = false;
+		float min = 0.f;
+		float max = 1.f;
 	};
 }

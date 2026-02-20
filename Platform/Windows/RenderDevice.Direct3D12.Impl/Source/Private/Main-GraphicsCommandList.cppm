@@ -20,6 +20,7 @@ import PonyEngine.RenderDevice;
 
 import :BundleCommandList;
 import :CommandList;
+import :GraphicsComputePipelineBinding;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
@@ -42,11 +43,18 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
 
+		virtual void SetRasterRegions(std::span<const RasterRegion> regions) override;
+
+		virtual void SetPipelineState(const IGraphicsPipelineState& pipelineState) override;
+		virtual void SetPipelineState(const IComputePipelineState& pipelineState) override;
+
 		virtual void SetDepthBias(const DepthBias& bias) override;
-		virtual void SetDepthBounds(float min, float max) override;
+		virtual void SetDepthBounds(const DepthRange& range) override;
 		virtual void SetStencilReference(const StencilReference& reference) override;
 
-		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+		virtual void SetBlendFactor(const Math::ColorRGBA<float>& factor) override;
+
+		virtual void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
@@ -65,7 +73,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode) override;
 		virtual void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode) override;
 
-		virtual void Execute(ISecondaryGraphicsCommandList& secondary) override;
+		virtual void Execute(const ISecondaryGraphicsCommandList& secondary) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -78,7 +86,15 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		GraphicsCommandList& operator =(GraphicsCommandList&&) = delete;
 
 	private:
+		void ValidateState() const;
+
+		void ValidatePipelineStateForGraphics() const;
+		void ValidatePipelineStateForCompute() const;
+
+		static void ValidateBundle(const ISecondaryGraphicsCommandList& secondary);
+
 		class CommandList commandList;
+		GraphicsComputePipelineBinding pipelineBinding;
 	};
 }
 
@@ -98,6 +114,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::Reset()
 	{
 		commandList.Reset();
+		pipelineBinding.Reset();
 	}
 
 	void GraphicsCommandList::Close()
@@ -115,14 +132,31 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Barrier(bufferBarriers, textureBarriers);
 	}
 
+	void GraphicsCommandList::SetRasterRegions(const std::span<const RasterRegion> regions)
+	{
+		commandList.SetRasterRegions(regions);
+	}
+
+	void GraphicsCommandList::SetPipelineState(const IGraphicsPipelineState& pipelineState)
+	{
+		ValidateState();
+		pipelineBinding.SetPipelineState(pipelineState, commandList);
+	}
+
+	void GraphicsCommandList::SetPipelineState(const IComputePipelineState& pipelineState)
+	{
+		ValidateState();
+		pipelineBinding.SetPipelineState(pipelineState, commandList);
+	}
+
 	void GraphicsCommandList::SetDepthBias(const DepthBias& bias)
 	{
 		commandList.SetDepthBias(bias);
 	}
 
-	void GraphicsCommandList::SetDepthBounds(const float min, const float max)
+	void GraphicsCommandList::SetDepthBounds(const DepthRange& range)
 	{
-		commandList.SetDepthBounds(min, max);
+		commandList.SetDepthBounds(range);
 	}
 
 	void GraphicsCommandList::SetStencilReference(const StencilReference& reference)
@@ -130,13 +164,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.SetStencilReference(reference);
 	}
 
-	void GraphicsCommandList::DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	void GraphicsCommandList::SetBlendFactor(const Math::ColorRGBA<float>& factor)
 	{
-		commandList.DispatchMesh(threadGroupCounts);
+		commandList.SetBlendFactor(factor);
+	}
+
+	void GraphicsCommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	{
+		ValidatePipelineStateForGraphics();
+		commandList.DispatchGraphics(threadGroupCounts);
 	}
 
 	void GraphicsCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
+		ValidatePipelineStateForCompute();
 		commandList.DispatchCompute(threadGroupCounts);
 	}
 
@@ -210,24 +251,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Resolve(source, destination, range, mode);
 	}
 
-	void GraphicsCommandList::Execute(ISecondaryGraphicsCommandList& secondary)
+	void GraphicsCommandList::Execute(const ISecondaryGraphicsCommandList& secondary)
 	{
-#ifndef NDEBUG
-		if (typeid(secondary) != typeid(BundleCommandList)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid secondary graphics command list");
-		}
-#endif
+		ValidateBundle(secondary);
 
-		const auto& bundle = static_cast<BundleCommandList&>(secondary);
-
-#ifndef NDEBUG
-		if (bundle.IsOpen()) [[unlikely]]
-		{
-			throw std::invalid_argument("Secondary graphics command list is open");
-		}
-#endif
-
+		const auto& bundle = static_cast<const BundleCommandList&>(secondary);
 		commandList.ExecuteBundle(bundle.CommandList());
 	}
 
@@ -244,5 +272,51 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ID3D12GraphicsCommandList10& GraphicsCommandList::CommandList() const noexcept
 	{
 		return commandList.GetCommandList();
+	}
+
+	void GraphicsCommandList::ValidateState() const
+	{
+#ifndef NDEBUG
+		if (!commandList.IsOpen())
+		{
+			throw std::logic_error("Command list is closed");
+		}
+#endif
+	}
+
+	void GraphicsCommandList::ValidatePipelineStateForGraphics() const
+	{
+#ifndef NDEBUG
+		if (!pipelineBinding.IsLastPSOGraphics())
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+	}
+
+	void GraphicsCommandList::ValidatePipelineStateForCompute() const
+	{
+#ifndef NDEBUG
+		if (!pipelineBinding.IsLastPSOCompute())
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+	}
+
+	void GraphicsCommandList::ValidateBundle(const ISecondaryGraphicsCommandList& secondary)
+	{
+#ifndef NDEBUG
+		if (typeid(secondary) != typeid(BundleCommandList)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid secondary graphics command list");
+		}
+
+		const auto& bundle = static_cast<const BundleCommandList&>(secondary);
+		if (bundle.IsOpen()) [[unlikely]]
+		{
+			throw std::invalid_argument("Secondary graphics command list is open");
+		}
+#endif
 	}
 }
