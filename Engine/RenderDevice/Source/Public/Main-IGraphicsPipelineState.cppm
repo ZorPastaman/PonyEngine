@@ -18,19 +18,17 @@ import std;
 import :AttachmentParams;
 import :BlendParams;
 import :DepthStencilParams;
-import :IPipelineLayout;
+import :IPipelineState;
 import :RasterizerParams;
 import :SampleParams;
 import :ShaderType;
 
 export namespace PonyEngine::RenderDevice
 {
-	class IGraphicsPipelineState
+	class IGraphicsPipelineState : public IPipelineState
 	{
 		PONY_INTERFACE_BODY(IGraphicsPipelineState)
 
-		[[nodiscard("Pure function")]]
-		virtual const std::shared_ptr<const IPipelineLayout>& Layout() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual ShaderTypeMask ShaderStages() const noexcept = 0;
 
@@ -44,9 +42,5 @@ export namespace PonyEngine::RenderDevice
 		virtual const SampleParams& Sample() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual const AttachmentParams& Attachment() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-		virtual void Name(std::string_view name) = 0;
 	};
 }

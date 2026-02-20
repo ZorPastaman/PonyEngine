@@ -19,6 +19,7 @@ import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
 import :CommandList;
+import :ComputePipelineBinding;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
@@ -40,6 +41,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual bool IsOpen() const noexcept override;
 
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
+
+		virtual void SetPipelineState(const IComputePipelineState& pipelineState) override;
 
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 
@@ -66,7 +69,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ComputeCommandList& operator =(ComputeCommandList&&) = delete;
 
 	private:
+		void ValidateState() const;
+
+		void ValidatePipelineStateForCompute() const;
+
 		class CommandList commandList;
+		ComputePipelineBinding pipelineBinding;
 	};
 }
 
@@ -101,6 +109,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void ComputeCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
 		commandList.Barrier(bufferBarriers, textureBarriers);
+	}
+
+	void ComputeCommandList::SetPipelineState(const IComputePipelineState& pipelineState)
+	{
+		ValidateState();
+		pipelineBinding.SetPipelineState(pipelineState, commandList);
 	}
 
 	void ComputeCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
@@ -176,5 +190,25 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ID3D12GraphicsCommandList10& ComputeCommandList::CommandList() const noexcept
 	{
 		return commandList.GetCommandList();
+	}
+
+	void ComputeCommandList::ValidateState() const
+	{
+#ifndef NDEBUG
+		if (!commandList.IsOpen())
+		{
+			throw std::logic_error("Command list is closed");
+		}
+#endif
+	}
+
+	void ComputeCommandList::ValidatePipelineStateForCompute() const
+	{
+#ifndef NDEBUG
+		if (!pipelineBinding.HasPSO())
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
 	}
 }

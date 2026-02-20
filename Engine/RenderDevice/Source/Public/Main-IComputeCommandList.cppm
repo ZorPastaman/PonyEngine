@@ -18,6 +18,7 @@ import std;
 import :BufferBarrier;
 import :CopyableFootprint;
 import :ICommandList;
+import :IComputePipelineState;
 import :TextureBarrier;
 
 export namespace PonyEngine::RenderDevice
@@ -29,6 +30,8 @@ export namespace PonyEngine::RenderDevice
 		void Barrier(std::span<const BufferBarrier> bufferBarriers);
 		void Barrier(std::span<const TextureBarrier> textureBarriers);
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) = 0;
+
+		virtual void SetPipelineState(const IComputePipelineState& pipelineState) = 0;
 
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
 

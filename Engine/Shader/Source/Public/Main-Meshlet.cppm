@@ -79,7 +79,8 @@ export namespace PonyEngine::Shader
 	private:
 		std::uint32_t vertexOffset; ///< Vertex offset.
 		std::uint32_t primitiveOffset; ///< Primitive offset.
-		std::array<std::uint8_t, 2> packedCounts; ///< Packed counts: vertex count and primitive count.
+		std::uint8_t vertexCount; ///< Vertex count.
+		std::uint8_t primitiveCount; ///< Primitive count.
 	};
 }
 
@@ -88,7 +89,8 @@ namespace PonyEngine::Shader
 	constexpr Meshlet::Meshlet(const std::uint32_t vertexOffset, const std::uint32_t primitiveOffset, const std::uint8_t vertexCount, const std::uint8_t primitiveCount) noexcept :
 		vertexOffset{vertexOffset},
 		primitiveOffset{primitiveOffset},
-		packedCounts{vertexCount, primitiveCount}
+		vertexCount{vertexCount},
+		primitiveCount{primitiveCount}
 	{
 	}
 
@@ -114,21 +116,21 @@ namespace PonyEngine::Shader
 
 	constexpr std::uint8_t& Meshlet::VertexCount() noexcept
 	{
-		return packedCounts[0];
+		return vertexCount;
 	}
 
 	constexpr const std::uint8_t& Meshlet::VertexCount() const noexcept
 	{
-		return packedCounts[0];
+		return vertexCount;
 	}
 
 	constexpr std::uint8_t& Meshlet::PrimitiveCount() noexcept
 	{
-		return packedCounts[1];
+		return primitiveCount;
 	}
 
 	constexpr const std::uint8_t& Meshlet::PrimitiveCount() const noexcept
 	{
-		return packedCounts[1];
+		return primitiveCount;
 	}
 }

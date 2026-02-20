@@ -70,6 +70,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL;
 		static constexpr std::uint8_t SimultaneousTargetCount = std::uint8_t{D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT};
+		static constexpr std::uint8_t ViewportScissorCount = std::uint8_t{D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE};
 
 		static constexpr auto BufferHeapTypeSupport = HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download;
 		static constexpr auto TextureHeapTypeSupport = HeapTypeMask::Default;
@@ -820,6 +821,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		return RenderDevice::RasterizerSupport
 		{
+			.maxRasterRegionCount = ViewportScissorCount,
 			.lineRasterizationModes = LineRasterizationSupport(),
 			.conservativeRasterization = Device::ConservativeRasterizationSupport
 		};

@@ -20,8 +20,12 @@ import PonyEngine.Math;
 import :BufferBarrier;
 import :CopyableFootprint;
 import :DepthBias;
+import :DepthRange;
 import :ICommandList;
+import :IComputePipelineState;
+import :IGraphicsPipelineState;
 import :ISecondaryGraphicsCommandList;
+import :RasterRegion;
 import :ResolveMode;
 import :StencilReference;
 import :TextureBarrier;
@@ -36,11 +40,19 @@ export namespace PonyEngine::RenderDevice
 		void Barrier(std::span<const TextureBarrier> textureBarriers);
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) = 0;
 
+		void SetRasterRegion(const RasterRegion& region);
+		virtual void SetRasterRegions(std::span<const RasterRegion> regions) = 0;
+
+		virtual void SetPipelineState(const IGraphicsPipelineState& pipelineState) = 0;
+		virtual void SetPipelineState(const IComputePipelineState& pipelineState) = 0;
+
 		virtual void SetDepthBias(const DepthBias& bias) = 0;
-		virtual void SetDepthBounds(float min, float max) = 0;
+		virtual void SetDepthBounds(const DepthRange& range) = 0;
 		virtual void SetStencilReference(const StencilReference& reference) = 0;
 
-		virtual void DispatchMesh(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
+		virtual void SetBlendFactor(const Math::ColorRGBA<float>& factor) = 0;
+
+		virtual void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) = 0;
@@ -59,7 +71,7 @@ export namespace PonyEngine::RenderDevice
 		virtual void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode = ResolveMode::Average) = 0;
 		virtual void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average) = 0;
 
-		virtual void Execute(ISecondaryGraphicsCommandList& secondary) = 0;
+		virtual void Execute(const ISecondaryGraphicsCommandList& secondary) = 0;
 	};
 }
 
@@ -73,5 +85,10 @@ namespace PonyEngine::RenderDevice
 	void IGraphicsCommandList::Barrier(const std::span<const TextureBarrier> textureBarriers)
 	{
 		Barrier(std::span<const BufferBarrier>(), textureBarriers);
+	}
+
+	void IGraphicsCommandList::SetRasterRegion(const RasterRegion& region)
+	{
+		SetRasterRegions(std::span(&region, 1uz));
 	}
 }
