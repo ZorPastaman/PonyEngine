@@ -53,6 +53,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	private:
 		Platform::Windows::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+		SIZE_T cpuStart;
+		SIZE_T gpuStart;
 		SIZE_T handleIncrement;
 
 		std::string name;
@@ -63,12 +65,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	DescriptorHeap::DescriptorHeap(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement) noexcept :
 		descriptorHeap(&descriptorHeap),
+		cpuStart{this->descriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr},
+		gpuStart{this->descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr},
 		handleIncrement{handleIncrement}
 	{
 	}
 
 	DescriptorHeap::DescriptorHeap(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement) noexcept :
 		descriptorHeap(std::move(descriptorHeap)),
+		cpuStart{this->descriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr},
+		gpuStart{this->descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr},
 		handleIncrement{handleIncrement}
 	{
 		assert(this->descriptorHeap && "The descriptor heap is nullptr.");
@@ -81,12 +87,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::CpuHandle(const UINT index) const noexcept
 	{
-		return D3D12_CPU_DESCRIPTOR_HANDLE{descriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr + index * handleIncrement};
+		return D3D12_CPU_DESCRIPTOR_HANDLE{.ptr = cpuStart + index * handleIncrement};
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GpuHandle(const UINT index) const noexcept
 	{
-		return D3D12_GPU_DESCRIPTOR_HANDLE{descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + index * handleIncrement};
+		return D3D12_GPU_DESCRIPTOR_HANDLE{.ptr = gpuStart + index * handleIncrement};
 	}
 
 	std::string_view DescriptorHeap::Name() const noexcept

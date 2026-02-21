@@ -15,6 +15,8 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:ComputePipelineBin
 
 import std;
 
+import PonyEngine.RenderDevice;
+
 import :CommandList;
 import :ComputePipelineState;
 import :RootSignature;
@@ -33,64 +35,56 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		[[nodiscard("Pure function")]]
 		bool HasPSO() const noexcept;
+		[[nodiscard("Pure function")]]
+		const RootSignature* GetRootSignature() const noexcept;
 		void Reset() noexcept;
 
-		void SetPipelineState(const IComputePipelineState& pipelineState, CommandList& commandList, bool forceUpdatePipeline = false);
+		void BindPipelineState(const ComputePipelineState& pipelineState, CommandList& commandList);
+		void SetPipelineState(CommandList& commandList);
 
 		ComputePipelineBinding& operator =(const ComputePipelineBinding&) = delete;
 		ComputePipelineBinding& operator =(ComputePipelineBinding&&) = delete;
 
 	private:
-		static void ValidatePipelineState(const IComputePipelineState& pipelineState);
-
-		const ComputePipelineState* lastComputePSO;
+		const ComputePipelineState* boundPSO;
 	};
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	ComputePipelineBinding::ComputePipelineBinding() noexcept :
-		lastComputePSO{nullptr}
+		boundPSO{nullptr}
 	{
 	}
 
 	bool ComputePipelineBinding::HasPSO() const noexcept
 	{
-		return lastComputePSO;
+		return boundPSO;
+	}
+
+	const RootSignature* ComputePipelineBinding::GetRootSignature() const noexcept
+	{
+		return boundPSO ? static_cast<const RootSignature*>(boundPSO->Layout().get()) : nullptr;
 	}
 
 	void ComputePipelineBinding::Reset() noexcept
 	{
-		lastComputePSO = nullptr;
+		boundPSO = nullptr;
 	}
 
-	void ComputePipelineBinding::SetPipelineState(const IComputePipelineState& pipelineState, CommandList& commandList, const bool forceUpdatePipeline)
+	void ComputePipelineBinding::BindPipelineState(const ComputePipelineState& pipelineState, CommandList& commandList)
 	{
-		ValidatePipelineState(pipelineState);
-
-		if (!forceUpdatePipeline && lastComputePSO == &pipelineState)
+		if (!boundPSO || boundPSO->Layout() != pipelineState.Layout())
 		{
-			return;
-		}
-
-		const auto& pso = static_cast<const ComputePipelineState&>(pipelineState);
-		if (!lastComputePSO || lastComputePSO->Layout() != pso.Layout())
-		{
-			ID3D12RootSignature* const rootSig = pso.Layout() ? &static_cast<const RootSignature&>(*pso.Layout()).GetRootSignature() : nullptr;
+			ID3D12RootSignature* const rootSig = pipelineState.Layout() ? &static_cast<const RootSignature&>(*pipelineState.Layout()).GetRootSignature() : nullptr;
 			commandList.SetComputeRootSignature(rootSig);
 		}
-		commandList.SetPipelineState(pso.PipelineState());
 
-		lastComputePSO = &pso;
+		boundPSO = &pipelineState;
 	}
 
-	void ComputePipelineBinding::ValidatePipelineState(const IComputePipelineState& pipelineState)
+	void ComputePipelineBinding::SetPipelineState(CommandList& commandList)
 	{
-#ifndef NDEBUG
-		if (typeid(pipelineState) != typeid(ComputePipelineState)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid pipeline state");
-		}
-#endif
+		commandList.SetPipelineState(boundPSO->PipelineState());
 	}
 }

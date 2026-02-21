@@ -15,6 +15,8 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:GraphicsPipelineBi
 
 import std;
 
+import PonyEngine.RenderDevice;
+
 import :CommandList;
 import :GraphicsPipelineState;
 import :RootSignature;
@@ -33,64 +35,56 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		[[nodiscard("Pure function")]]
 		bool HasPSO() const noexcept;
+		[[nodiscard("Pure function")]]
+		const RootSignature* BoundRootSignature() const noexcept;
 		void Reset() noexcept;
 
-		void SetPipelineState(const IGraphicsPipelineState& pipelineState, CommandList& commandList, bool forceUpdatePipeline = false);
+		void BindPipelineState(const GraphicsPipelineState& pipelineState, CommandList& commandList);
+		void SetPipelineState(CommandList& commandList);
 
 		GraphicsPipelineBinding& operator =(const GraphicsPipelineBinding&) = delete;
 		GraphicsPipelineBinding& operator =(GraphicsPipelineBinding&&) = delete;
 
 	private:
-		static void ValidatePipelineState(const IGraphicsPipelineState& pipelineState);
-
-		const GraphicsPipelineState* lastGraphicsPSO;
+		const GraphicsPipelineState* boundPSO;
 	};
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	GraphicsPipelineBinding::GraphicsPipelineBinding() noexcept :
-		lastGraphicsPSO{nullptr}
+		boundPSO{nullptr}
 	{
 	}
 
 	bool GraphicsPipelineBinding::HasPSO() const noexcept
 	{
-		return lastGraphicsPSO;
+		return boundPSO;
+	}
+
+	const RootSignature* GraphicsPipelineBinding::BoundRootSignature() const noexcept
+	{
+		return boundPSO ? static_cast<const RootSignature*>(boundPSO->Layout().get()) : nullptr;
 	}
 
 	void GraphicsPipelineBinding::Reset() noexcept
 	{
-		lastGraphicsPSO = nullptr;
+		boundPSO = nullptr;
 	}
 
-	void GraphicsPipelineBinding::SetPipelineState(const IGraphicsPipelineState& pipelineState, CommandList& commandList, const bool forceUpdatePipeline)
+	void GraphicsPipelineBinding::BindPipelineState(const GraphicsPipelineState& pipelineState, CommandList& commandList)
 	{
-		ValidatePipelineState(pipelineState);
-
-		if (!forceUpdatePipeline && lastGraphicsPSO == &pipelineState)
+		if (!boundPSO || boundPSO->Layout() != pipelineState.Layout())
 		{
-			return;
-		}
-
-		const auto& pso = static_cast<const GraphicsPipelineState&>(pipelineState);
-		if (!lastGraphicsPSO || lastGraphicsPSO->Layout() != pso.Layout())
-		{
-			ID3D12RootSignature* const rootSig = pso.Layout() ? &static_cast<const RootSignature&>(*pso.Layout()).GetRootSignature() : nullptr;
+			ID3D12RootSignature* const rootSig = pipelineState.Layout() ? &static_cast<const RootSignature&>(*pipelineState.Layout()).GetRootSignature() : nullptr;
 			commandList.SetGraphicsRootSignature(rootSig);
 		}
-		commandList.SetPipelineState(pso.PipelineState());
 
-		lastGraphicsPSO = &pso;
+		boundPSO = &pipelineState;
 	}
 
-	void GraphicsPipelineBinding::ValidatePipelineState(const IGraphicsPipelineState& pipelineState)
+	void GraphicsPipelineBinding::SetPipelineState(CommandList& commandList)
 	{
-#ifndef NDEBUG
-		if (typeid(pipelineState) != typeid(GraphicsPipelineState)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid pipeline state");
-		}
-#endif
+		commandList.SetPipelineState(boundPSO->PipelineState());
 	}
 }

@@ -11,6 +11,8 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:GraphicsComputePip
 
 import std;
 
+import PonyEngine.RenderDevice;
+
 import :ComputePipelineBinding;
 import :GraphicsPipelineBinding;
 
@@ -34,10 +36,17 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		bool IsLastPSOGraphics() const noexcept;
 		[[nodiscard("Pure function")]]
 		bool IsLastPSOCompute() const noexcept;
+		[[nodiscard("Pure function")]]
+		const RootSignature* GraphicsRootSignature() const noexcept;
+		[[nodiscard("Pure function")]]
+		const RootSignature* ComputeRootSignature() const noexcept;
 		void Reset() noexcept;
 
-		void SetPipelineState(const IGraphicsPipelineState& pipelineState, CommandList& commandList);
-		void SetPipelineState(const IComputePipelineState& pipelineState, CommandList& commandList);
+		void BindPipelineState(const GraphicsPipelineState& pipelineState, CommandList& commandList);
+		void BindPipelineState(const ComputePipelineState& pipelineState, CommandList& commandList);
+
+		void SetGraphicsPipelineState(CommandList& commandList);
+		void SetComputePipelineState(CommandList& commandList);
 
 		GraphicsComputePipelineBinding& operator =(const GraphicsComputePipelineBinding&) = delete;
 		GraphicsComputePipelineBinding& operator =(GraphicsComputePipelineBinding&&) = delete;
@@ -71,6 +80,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return isLastBindingGraphics == false;
 	}
 
+	const RootSignature* GraphicsComputePipelineBinding::GraphicsRootSignature() const noexcept
+	{
+		return graphicsBinding.BoundRootSignature();
+	}
+
+	const RootSignature* GraphicsComputePipelineBinding::ComputeRootSignature() const noexcept
+	{
+		return computeBinding.GetRootSignature();
+	}
+
 	void GraphicsComputePipelineBinding::Reset() noexcept
 	{
 		graphicsBinding.Reset();
@@ -78,15 +97,35 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		isLastBindingGraphics = std::nullopt;
 	}
 
-	void GraphicsComputePipelineBinding::SetPipelineState(const IGraphicsPipelineState& pipelineState, CommandList& commandList)
+	void GraphicsComputePipelineBinding::BindPipelineState(const GraphicsPipelineState& pipelineState, CommandList& commandList)
 	{
-		graphicsBinding.SetPipelineState(pipelineState, commandList, !IsLastPSOGraphics());
+		graphicsBinding.BindPipelineState(pipelineState, commandList);
+	}
+
+	void GraphicsComputePipelineBinding::BindPipelineState(const ComputePipelineState& pipelineState, CommandList& commandList)
+	{
+		computeBinding.BindPipelineState(pipelineState, commandList);
+	}
+
+	void GraphicsComputePipelineBinding::SetGraphicsPipelineState(CommandList& commandList)
+	{
+		if (IsLastPSOGraphics()) [[likely]]
+		{
+			return;
+		}
+
+		graphicsBinding.SetPipelineState(commandList);
 		isLastBindingGraphics = true;
 	}
 
-	void GraphicsComputePipelineBinding::SetPipelineState(const IComputePipelineState& pipelineState, CommandList& commandList)
+	void GraphicsComputePipelineBinding::SetComputePipelineState(CommandList& commandList)
 	{
-		computeBinding.SetPipelineState(pipelineState, commandList, !IsLastPSOCompute());
+		if (IsLastPSOCompute()) [[likely]]
+		{
+			return;
+		}
+
+		computeBinding.SetPipelineState(commandList);
 		isLastBindingGraphics = false;
 	}
 }
