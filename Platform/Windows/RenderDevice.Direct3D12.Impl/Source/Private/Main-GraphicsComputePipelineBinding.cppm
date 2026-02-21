@@ -100,11 +100,21 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsComputePipelineBinding::BindPipelineState(const GraphicsPipelineState& pipelineState, CommandList& commandList)
 	{
 		graphicsBinding.BindPipelineState(pipelineState, commandList);
+
+		if (IsLastPSOGraphics())
+		{
+			isLastBindingGraphics = std::nullopt;
+		}
 	}
 
 	void GraphicsComputePipelineBinding::BindPipelineState(const ComputePipelineState& pipelineState, CommandList& commandList)
 	{
 		computeBinding.BindPipelineState(pipelineState, commandList);
+
+		if (IsLastPSOCompute())
+		{
+			isLastBindingGraphics = std::nullopt;
+		}
 	}
 
 	void GraphicsComputePipelineBinding::SetGraphicsPipelineState(CommandList& commandList)
