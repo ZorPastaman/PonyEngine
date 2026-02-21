@@ -200,9 +200,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void BundleCommandList::ValidatePipelineStateForGraphics() const
 	{
 #ifndef NDEBUG
-		if (!pipelineBinding.IsLastPSOGraphics())
+		if (!pipelineBinding.HasGraphicsPSO())
 		{
-			throw std::invalid_argument("Invalid pipeline state");
+			throw std::logic_error("No graphics pipeline state bound");
 		}
 #endif
 	}
@@ -210,9 +210,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void BundleCommandList::ValidatePipelineStateForCompute() const
 	{
 #ifndef NDEBUG
-		if (!pipelineBinding.IsLastPSOCompute())
+		if (!pipelineBinding.HasComputePSO())
 		{
-			throw std::invalid_argument("Invalid pipeline state");
+			throw std::logic_error("Nn compute pipeline state bound");
 		}
 #endif
 	}
