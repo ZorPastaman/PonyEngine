@@ -316,7 +316,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #ifndef NDEBUG
 		if (!pipelineBinding.HasGraphicsPSO())
 		{
-			throw std::invalid_argument("No graphics pipeline state bound");
+			throw std::logic_error("No graphics pipeline state bound");
 		}
 #endif
 	}
@@ -326,7 +326,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #ifndef NDEBUG
 		if (!pipelineBinding.HasComputePSO())
 		{
-			throw std::invalid_argument("No compute pipeline state bound");
+			throw std::logic_error("No compute pipeline state bound");
 		}
 #endif
 	}

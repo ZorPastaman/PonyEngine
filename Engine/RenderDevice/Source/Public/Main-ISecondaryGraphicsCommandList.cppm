@@ -53,7 +53,13 @@ export namespace PonyEngine::RenderDevice
 		void BindCompute(std::span<const SamplerBinding> samplerBindings);
 		virtual void BindCompute(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) = 0;
 
+		void DispatchGraphics(std::uint32_t threadGroupCount);
+		void DispatchGraphics(const Math::Vector1<std::uint32_t>& threadGroupCounts);
+		void DispatchGraphics(const Math::Vector2<std::uint32_t>& threadGroupCounts);
 		virtual void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
+		void DispatchCompute(std::uint32_t threadGroupCount);
+		void DispatchCompute(const Math::Vector1<std::uint32_t>& threadGroupCounts);
+		void DispatchCompute(const Math::Vector2<std::uint32_t>& threadGroupCounts);
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
 	};
 }
@@ -98,5 +104,35 @@ namespace PonyEngine::RenderDevice
 	void ISecondaryGraphicsCommandList::BindCompute(const std::span<const SamplerBinding> samplerBindings)
 	{
 		BindCompute(std::span<const ShaderDataBinding>(), samplerBindings);
+	}
+
+	void ISecondaryGraphicsCommandList::DispatchGraphics(const std::uint32_t threadGroupCount)
+	{
+		DispatchGraphics(Math::Vector3<std::uint32_t>(threadGroupCount, 1u, 1u));
+	}
+
+	void ISecondaryGraphicsCommandList::DispatchGraphics(const Math::Vector1<std::uint32_t>& threadGroupCounts)
+	{
+		DispatchGraphics(Math::Vector3<std::uint32_t>(threadGroupCounts.X(), 1u, 1u));
+	}
+
+	void ISecondaryGraphicsCommandList::DispatchGraphics(const Math::Vector2<std::uint32_t>& threadGroupCounts)
+	{
+		DispatchGraphics(Math::Vector3<std::uint32_t>(threadGroupCounts.X(), threadGroupCounts.Y(), 1u));
+	}
+
+	void ISecondaryGraphicsCommandList::DispatchCompute(const std::uint32_t threadGroupCount)
+	{
+		DispatchCompute(Math::Vector3<std::uint32_t>(threadGroupCount, 1u, 1u));
+	}
+
+	void ISecondaryGraphicsCommandList::DispatchCompute(const Math::Vector1<std::uint32_t>& threadGroupCounts)
+	{
+		DispatchCompute(Math::Vector3<std::uint32_t>(threadGroupCounts.X(), 1u, 1u));
+	}
+
+	void ISecondaryGraphicsCommandList::DispatchCompute(const Math::Vector2<std::uint32_t>& threadGroupCounts)
+	{
+		DispatchCompute(Math::Vector3<std::uint32_t>(threadGroupCounts.X(), threadGroupCounts.Y(), 1u));
 	}
 }

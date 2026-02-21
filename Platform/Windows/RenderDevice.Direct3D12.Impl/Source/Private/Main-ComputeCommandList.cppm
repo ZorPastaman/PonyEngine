@@ -223,7 +223,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #ifndef NDEBUG
 		if (!pipelineBinding.HasPSO())
 		{
-			throw std::invalid_argument("Invalid pipeline state");
+			throw std::logic_error("No compute pipeline state bound");
 		}
 #endif
 	}
