@@ -31,6 +31,7 @@ target_sources(PonyEngine.RenderDevice.Direct3D12.Impl PUBLIC FILE_SET CXX_MODUL
 	"Source/Private/Main-ComputeCommandList.cppm"
 	"Source/Private/Main-ComputePipelineBinding.cppm"
 	"Source/Private/Main-ComputePipelineState.cppm"
+	"Source/Private/Main-ContainerBinding.cppm"
 	"Source/Private/Main-CopyCommandList.cppm"
 	"Source/Private/Main-DepthStencilContainer.cppm"
 	"Source/Private/Main-DescriptorHeap.cppm"

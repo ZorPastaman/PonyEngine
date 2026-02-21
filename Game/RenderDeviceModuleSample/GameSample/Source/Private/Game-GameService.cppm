@@ -29,7 +29,7 @@ export namespace Game
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		static std::vector<std::byte> LoadShader(const std::filesystem::path& path);
+		std::vector<std::byte> LoadShader(const std::filesystem::path& path);
 
 		PonyEngine::Application::IApplicationContext* application;
 		PonyEngine::RenderDevice::IRenderDeviceService* renderDevice;
@@ -225,7 +225,7 @@ namespace Game
 
 	std::vector<std::byte> GameService::LoadShader(const std::filesystem::path& path)
 	{
-		auto file = std::ifstream(path, std::ios::binary | std::ios::ate);
+		auto file = std::ifstream(application->RootDirectory() / path, std::ios::binary | std::ios::ate);
 		if (!file) [[unlikely]]
 		{
 			throw std::runtime_error("Failed to open file");

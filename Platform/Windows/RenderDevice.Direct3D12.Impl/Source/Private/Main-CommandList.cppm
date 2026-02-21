@@ -23,8 +23,12 @@ import PonyEngine.RenderDevice;
 
 import :Buffer;
 import :CommandListUtility;
+import :ComputePipelineState;
 import :FormatUtility;
+import :GraphicsPipelineState;
 import :ObjectUtility;
+import :SamplerContainer;
+import :ShaderDataContainer;
 import :Texture;
 import :TextureUtility;
 
@@ -53,16 +57,17 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers);
 
 		void SetRasterRegions(std::span<const RasterRegion> regions);
-
-		void SetGraphicsRootSignature(ID3D12RootSignature* rootSig);
-		void SetComputeRootSignature(ID3D12RootSignature* rootSig);
-		void SetPipelineState(ID3D12PipelineState& pso);
-
 		void SetDepthBias(const DepthBias& bias) noexcept;
 		void SetDepthBounds(const DepthRange& range) noexcept;
 		void SetStencilReference(const StencilReference& reference) noexcept;
-
 		void SetBlendFactor(const Math::ColorRGBA<float>& factor) noexcept;
+
+		void SetContainers(const ShaderDataContainer* shaderDataContainer, const SamplerContainer* samplerContainer);
+		void SetGraphicsRootSignature(ID3D12RootSignature* rootSig);
+		void SetComputeRootSignature(ID3D12RootSignature* rootSig);
+		void SetPipelineState(ID3D12PipelineState& pso);
+		void BindGraphicsTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		void BindComputeTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
@@ -84,6 +89,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average);
 
 		void ExecuteBundle(ID3D12GraphicsCommandList10& bundle) noexcept;
+
+		void ValidateState() const;
+		void ValidateContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer) const;
+		void ValidatePipelineState(const IGraphicsPipelineState& pipelineState) const;
+		void ValidatePipelineState(const IComputePipelineState& pipelineState) const;
 
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
@@ -109,8 +119,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static D3D12_RECT ToRect(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
 		[[nodiscard("Pure function")]]
 		static D3D12_BOX ToBox(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
-
-		void ValidateState() const;
 
 		static void ValidateBarriers(std::span<const BufferBarrier> bufferBarriers);
 		static void ValidateBarriers(std::span<const TextureBarrier> textureBarriers);
@@ -263,24 +271,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->RSSetScissorRects(static_cast<UINT>(scissorsSpan.size()), scissorsSpan.data());
 	}
 
-	void CommandList::SetGraphicsRootSignature(ID3D12RootSignature* const rootSig)
-	{
-		ValidateState();
-		commandList->SetGraphicsRootSignature(rootSig);
-	}
-
-	void CommandList::SetComputeRootSignature(ID3D12RootSignature* const rootSig)
-	{
-		ValidateState();
-		commandList->SetComputeRootSignature(rootSig);
-	}
-
-	void CommandList::SetPipelineState(ID3D12PipelineState& pso)
-	{
-		ValidateState();
-		commandList->SetPipelineState(&pso);
-	}
-
 	void CommandList::SetDepthBias(const DepthBias& bias) noexcept
 	{
 		ValidateState();
@@ -306,15 +296,54 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->OMSetBlendFactor(blendFactor);
 	}
 
+	void CommandList::SetContainers(const ShaderDataContainer* const shaderDataContainer, const SamplerContainer* const samplerContainer)
+	{
+		std::array<ID3D12DescriptorHeap*, 2> heaps;
+		UINT heapCount = 0u;
+		if (shaderDataContainer)
+		{
+			heaps[heapCount++] = &shaderDataContainer->DescriptorHeap();
+		}
+		if (samplerContainer)
+		{
+			heaps[heapCount++] = &samplerContainer->DescriptorHeap();
+		}
+
+		commandList->SetDescriptorHeaps(heapCount, heaps.data());
+	}
+
+	void CommandList::SetGraphicsRootSignature(ID3D12RootSignature* const rootSig)
+	{
+		commandList->SetGraphicsRootSignature(rootSig);
+	}
+
+	void CommandList::SetComputeRootSignature(ID3D12RootSignature* const rootSig)
+	{
+		commandList->SetComputeRootSignature(rootSig);
+	}
+
+	void CommandList::SetPipelineState(ID3D12PipelineState& pso)
+	{
+		commandList->SetPipelineState(&pso);
+	}
+
+	void CommandList::BindGraphicsTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	{
+		commandList->SetGraphicsRootDescriptorTable(tableIndex, handle);
+	}
+
+	void CommandList::BindComputeTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	{
+		commandList->SetComputeRootDescriptorTable(tableIndex, handle);
+	}
+
 	void CommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
 	{
-		ValidateState();
 		commandList->DispatchMesh(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
 	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
 	{
-		ValidateState();
 		commandList->Dispatch(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
@@ -614,6 +643,73 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->ExecuteBundle(&bundle);
 	}
 
+	void CommandList::ValidateState() const
+	{
+#ifndef NDEBUG
+		if (!isOpen) [[unlikely]]
+		{
+			throw std::logic_error("Command list is closed");
+		}
+#endif
+	}
+
+	void CommandList::ValidateContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer) const
+	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (shaderDataContainer)
+		{
+			if (typeid(*shaderDataContainer) != typeid(ShaderDataContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid shader data container");
+			}
+
+			if (!static_cast<const ShaderDataContainer*>(shaderDataContainer)->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Shader data container is not shader visible");
+			}
+		}
+
+		if (samplerContainer)
+		{
+			if (typeid(*samplerContainer) != typeid(SamplerContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid sampler container");
+			}
+
+			if (!static_cast<const SamplerContainer*>(samplerContainer)->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Sampler container is not shader visible");
+			}
+		}
+#endif
+	}
+
+	void CommandList::ValidatePipelineState(const IGraphicsPipelineState& pipelineState) const
+	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (typeid(pipelineState) != typeid(GraphicsPipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+	}
+
+	void CommandList::ValidatePipelineState(const IComputePipelineState& pipelineState) const
+	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (typeid(pipelineState) != typeid(ComputePipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+	}
+
 	std::string_view CommandList::Name() const noexcept
 	{
 		return name;
@@ -780,16 +876,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.bottom = offset.Y() + size.Y(),
 			.back = offset.Z() + size.Z()
 		};
-	}
-
-	void CommandList::ValidateState() const
-	{
-#ifndef NDEBUG
-		if (!isOpen) [[unlikely]]
-		{
-			throw std::logic_error("Command list is closed");
-		}
-#endif
 	}
 
 	void CommandList::ValidateBarriers(const std::span<const BufferBarrier> bufferBarriers)
