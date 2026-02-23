@@ -21,6 +21,7 @@ import :BufferBarrier;
 import :CopyableFootprint;
 import :DepthBias;
 import :DepthRange;
+import :DepthStencilBinding;
 import :ICommandList;
 import :IComputePipelineState;
 import :IGraphicsPipelineState;
@@ -28,6 +29,7 @@ import :ISecondaryGraphicsCommandList;
 import :ISamplerContainer;
 import :IShaderDataContainer;
 import :RasterRegion;
+import :RenderTargetBinding;
 import :ResolveMode;
 import :SamplerBinding;
 import :ShaderDataBinding;
@@ -51,6 +53,8 @@ export namespace PonyEngine::RenderDevice
 		virtual void SetStencilReference(const StencilReference& reference) = 0;
 		virtual void SetBlendFactor(const Math::ColorRGBA<float>& factor) = 0;
 
+		virtual void BindTargets(std::span<const RenderTargetBinding> renderTargetBindings, const DepthStencilBinding* depthStencilBinding) = 0;
+		virtual void BindTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount, const DepthStencilBinding* depthStencilBinding) = 0;
 		virtual void BindContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer) = 0;
 		virtual void BindPipelineState(const IGraphicsPipelineState& pipelineState) = 0;
 		virtual void BindPipelineState(const IComputePipelineState& pipelineState) = 0;

@@ -161,7 +161,11 @@ namespace Game
 		{
 			.blend = PonyEngine::RenderDevice::ColorBlendParams{},
 		};
-		const PonyEngine::RenderDevice::TextureFormatId renderTargetTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm);
+		const auto renderTargetTextureFormat = PonyEngine::RenderDevice::RenderTargetAttachmentFormat
+		{
+			.format = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm),
+			.srgb = false
+		};
 		const PonyEngine::RenderDevice::TextureFormatId depthStencilTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::D32_Float_S8X24_Uint);
 		boxPipelineState = renderDevice->CreateGraphicsPipelineState(layout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
 		{
@@ -186,7 +190,7 @@ namespace Game
 			},
 			.attachmentParams = PonyEngine::RenderDevice::AttachmentParams
 			{
-				.renderTargetFormats = std::span<const PonyEngine::RenderDevice::TextureFormatId>(&renderTargetTextureFormat, 1uz),
+				.renderTargetFormats = std::span<const PonyEngine::RenderDevice::RenderTargetAttachmentFormat>(&renderTargetTextureFormat, 1uz),
 				.depthStencilFormat = depthStencilTextureFormat
 			}
 		});

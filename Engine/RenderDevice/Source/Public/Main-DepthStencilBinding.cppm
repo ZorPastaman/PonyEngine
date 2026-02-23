@@ -7,23 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:AttachmentParams;
+export module PonyEngine.RenderDevice:DepthStencilBinding;
 
 import std;
 
-import :TextureFormatId;
+import :IDepthStencilContainer;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct RenderTargetAttachmentFormat final
+	struct DepthStencilBinding final
 	{
-		TextureFormatId format;
-		bool srgb = false;
-	};
-
-	struct AttachmentParams final
-	{
-		std::span<const RenderTargetAttachmentFormat> renderTargetFormats;
-		std::optional<TextureFormatId> depthStencilFormat;
+		const IDepthStencilContainer* container = nullptr;
+		std::uint32_t index = 0u;
 	};
 }

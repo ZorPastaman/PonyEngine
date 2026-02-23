@@ -24,9 +24,11 @@ import PonyEngine.RenderDevice;
 import :Buffer;
 import :CommandListUtility;
 import :ComputePipelineState;
+import :DepthStencilContainer;
 import :FormatUtility;
 import :GraphicsPipelineState;
 import :ObjectUtility;
+import :RenderTargetContainer;
 import :SamplerContainer;
 import :ShaderDataContainer;
 import :Texture;
@@ -62,12 +64,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void SetStencilReference(const StencilReference& reference) noexcept;
 		void SetBlendFactor(const Math::ColorRGBA<float>& factor) noexcept;
 
+		void SetTargets(std::span<const RenderTargetBinding> renderTargetBindings, const DepthStencilBinding* depthStencilBinding);
+		void SetTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount, const DepthStencilBinding* depthStencilBinding);
 		void SetContainers(const ShaderDataContainer* shaderDataContainer, const SamplerContainer* samplerContainer);
 		void SetGraphicsRootSignature(ID3D12RootSignature* rootSig);
 		void SetComputeRootSignature(ID3D12RootSignature* rootSig);
 		void SetPipelineState(ID3D12PipelineState& pso);
-		void BindGraphicsTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
-		void BindComputeTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		void SetGraphicsDescriptorTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		void SetComputeDescriptorTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
@@ -124,6 +128,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static void ValidateBarriers(std::span<const TextureBarrier> textureBarriers);
 
 		static void ValidateRasterRegion(std::span<const RasterRegion> regions);
+
+		static void ValidateRenderTargets(std::span<const RenderTargetBinding> renderTargetBindings);
+		static void ValidateRenderTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount);
+		static void ValidateDepthTarget(const DepthStencilBinding* binding);
 
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination);
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
@@ -296,6 +304,42 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->OMSetBlendFactor(blendFactor);
 	}
 
+	void CommandList::SetTargets(const std::span<const RenderTargetBinding> renderTargetBindings, const DepthStencilBinding* const depthStencilBinding)
+	{
+		ValidateState();
+		ValidateRenderTargets(renderTargetBindings);
+		ValidateDepthTarget(depthStencilBinding);
+
+		std::array<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT> renderTargets;
+		const std::size_t renderTargetCount = std::min(renderTargetBindings.size(), renderTargets.size());
+		for (std::size_t i = 0uz; i < renderTargetCount; ++i)
+		{
+			renderTargets[i] = static_cast<const RenderTargetContainer*>(renderTargetBindings[i].container)->CpuHandle(renderTargetBindings[i].index);
+		}
+		const D3D12_CPU_DESCRIPTOR_HANDLE depthStencil = depthStencilBinding 
+			? static_cast<const DepthStencilContainer*>(depthStencilBinding->container)->CpuHandle(depthStencilBinding->index)
+			: D3D12_CPU_DESCRIPTOR_HANDLE{};
+
+		commandList->OMSetRenderTargets(static_cast<UINT>(renderTargetCount), renderTargetCount > 0uz ? renderTargets.data() : nullptr, false,
+			depthStencilBinding ? &depthStencil : nullptr);
+	}
+
+	void CommandList::SetTargets(const RenderTargetBinding* const renderTargetBinding, const std::uint8_t renderTargetCount, const DepthStencilBinding* const depthStencilBinding)
+	{
+		ValidateState();
+		ValidateRenderTargets(renderTargetBinding, renderTargetCount);
+		ValidateDepthTarget(depthStencilBinding);
+
+		const D3D12_CPU_DESCRIPTOR_HANDLE renderTarget = renderTargetCount > 0u
+			? static_cast<const RenderTargetContainer*>(renderTargetBinding->container)->CpuHandle(renderTargetBinding->index)
+			: D3D12_CPU_DESCRIPTOR_HANDLE{};
+		const D3D12_CPU_DESCRIPTOR_HANDLE depthStencil = depthStencilBinding
+			? static_cast<const DepthStencilContainer*>(depthStencilBinding->container)->CpuHandle(depthStencilBinding->index)
+			: D3D12_CPU_DESCRIPTOR_HANDLE{};
+
+		commandList->OMSetRenderTargets(renderTargetCount, renderTargetCount > 0uz ? &renderTarget : nullptr, false, depthStencilBinding ? &depthStencil : nullptr);
+	}
+
 	void CommandList::SetContainers(const ShaderDataContainer* const shaderDataContainer, const SamplerContainer* const samplerContainer)
 	{
 		std::array<ID3D12DescriptorHeap*, 2> heaps;
@@ -327,12 +371,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->SetPipelineState(&pso);
 	}
 
-	void CommandList::BindGraphicsTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	void CommandList::SetGraphicsDescriptorTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
 	{
 		commandList->SetGraphicsRootDescriptorTable(tableIndex, handle);
 	}
 
-	void CommandList::BindComputeTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	void CommandList::SetComputeDescriptorTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
 	{
 		commandList->SetComputeRootDescriptorTable(tableIndex, handle);
 	}
@@ -934,12 +978,103 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void CommandList::ValidateRasterRegion(std::span<const RasterRegion> regions)
+	void CommandList::ValidateRasterRegion(const std::span<const RasterRegion> regions)
 	{
 #ifndef NDEBUG
 		if (regions.size() > D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE) [[unlikely]]
 		{
 			throw std::invalid_argument("Region count is too great");
+		}
+#endif
+	}
+
+	void CommandList::ValidateRenderTargets(const std::span<const RenderTargetBinding> renderTargetBindings)
+	{
+#ifndef NDEBUG
+		if (renderTargetBindings.size() > D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT) [[unlikely]]
+		{
+			throw std::invalid_argument("Render target binding count is too great");
+		}
+
+		for (const RenderTargetBinding& binding : renderTargetBindings)
+		{
+			if (!binding.container || typeid(*binding.container) != typeid(RenderTargetContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid render target container");
+			}
+
+			const auto container = static_cast<const RenderTargetContainer*>(binding.container);
+			if (binding.index >= container->Size()) [[unlikely]]
+			{
+				throw std::invalid_argument("Index is too great");
+			}
+			if (std::holds_alternative<EmptyRenderTargetMeta>(container->Meta(binding.index))) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid render target view");
+			}
+		}
+#endif
+	}
+
+	void CommandList::ValidateRenderTargets(const RenderTargetBinding* const renderTargetBinding, const std::uint8_t renderTargetCount)
+	{
+#ifndef NDEBUG
+		if (renderTargetCount == 0u)
+		{
+			return;
+		}
+
+		if (renderTargetCount > D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT) [[unlikely]]
+		{
+			throw std::invalid_argument("Render target binding count is too great");
+		}
+		if (renderTargetCount > 0u && !renderTargetBinding) [[unlikely]]
+		{
+			throw std::invalid_argument("Render target binding is nullptr");
+		}
+
+		if (!renderTargetBinding->container || typeid(*renderTargetBinding->container) != typeid(RenderTargetContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid render target container");
+		}
+
+		const auto container = static_cast<const RenderTargetContainer*>(renderTargetBinding->container);
+		if (renderTargetBinding->index >= container->Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Index is too great");
+		}
+
+		for (std::uint8_t i = 0u; i < renderTargetCount; ++i)
+		{
+			if (std::holds_alternative<EmptyRenderTargetMeta>(container->Meta(renderTargetBinding->index + i))) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid render target view");
+			}
+		}
+#endif
+	}
+
+	void CommandList::ValidateDepthTarget(const DepthStencilBinding* const binding)
+	{
+#ifndef NDEBUG
+		if (!binding)
+		{
+			return;
+		}
+
+		if (!binding->container || typeid(*binding->container) != typeid(DepthStencilBinding)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid depth stencil container");
+		}
+
+		const auto container = static_cast<const DepthStencilContainer*>(binding->container);
+		if (binding->index >= container->Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Index is too great");
+		}
+		if (std::holds_alternative<EmptyDepthStencilMeta>(container->Meta(binding->index))) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid depth stencil view");
 		}
 #endif
 	}

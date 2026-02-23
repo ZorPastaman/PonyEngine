@@ -84,7 +84,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		for (const ShaderDataBinding& binding : shaderDataBindings)
 		{
-			commandList.BindGraphicsTable(binding.layoutSetIndex, shaderDataContainer->GpuHandle(binding.containerIndex));
+			commandList.SetGraphicsDescriptorTable(binding.layoutSetIndex, shaderDataContainer->GpuHandle(binding.containerIndex));
 		}
 	}
 
@@ -92,7 +92,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		for (const SamplerBinding& binding : samplerBindings)
 		{
-			commandList.BindGraphicsTable(binding.layoutSetIndex, samplerContainer->GpuHandle(binding.containerIndex));
+			commandList.SetGraphicsDescriptorTable(binding.layoutSetIndex, samplerContainer->GpuHandle(binding.containerIndex));
 		}
 	}
 
@@ -100,7 +100,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		for (const ShaderDataBinding& binding : shaderDataBindings)
 		{
-			commandList.BindComputeTable(binding.layoutSetIndex, shaderDataContainer->GpuHandle(binding.containerIndex));
+			commandList.SetComputeDescriptorTable(binding.layoutSetIndex, shaderDataContainer->GpuHandle(binding.containerIndex));
 		}
 	}
 
@@ -108,7 +108,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		for (const SamplerBinding& binding : samplerBindings)
 		{
-			commandList.BindComputeTable(binding.layoutSetIndex, samplerContainer->GpuHandle(binding.containerIndex));
+			commandList.SetComputeDescriptorTable(binding.layoutSetIndex, samplerContainer->GpuHandle(binding.containerIndex));
 		}
 	}
 
@@ -207,6 +207,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (samplerContainer->Size() - samplerIndex < requiredDescriptorCount) [[unlikely]]
 		{
 			throw std::invalid_argument("Unexpected sampler container end");
+		}
+
+		for (std::uint32_t containerIndex = samplerIndex; const ShaderDataDescriptorRange& range : set.shaderDataRanges)
+		{
+			for (std::uint32_t i = 0u; i < range.count; ++i, ++containerIndex)
+			{
+				if (std::holds_alternative<EmptySamplerParams>(samplerContainer->Meta(containerIndex))) [[unlikely]]
+				{
+					throw std::invalid_argument("View type mismatch");
+				}
+			}
 		}
 #endif
 	}
