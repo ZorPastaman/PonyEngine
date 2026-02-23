@@ -212,6 +212,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetFormat(TextureFormatId format) const;
 		[[nodiscard("Pure function")]]
+		DXGI_FORMAT GetFormat(TextureFormatId format, bool srgb) const;
+		[[nodiscard("Pure function")]]
 		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, bool srgb, Aspect aspect) noexcept;
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetViewFormat(TextureFormatId format, bool srgb, Aspect aspect) const;
@@ -885,7 +887,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Span(rtFormats)[0].Data();
 			for (std::size_t i = 0uz; i < std::min(std::size(rtArray.RTFormats), params.attachmentParams.renderTargetFormats.size()); ++i)
 			{
-				rtArray.RTFormats[i] = GetFormat(params.attachmentParams.renderTargetFormats[i]);
+				rtArray.RTFormats[i] = GetFormat(params.attachmentParams.renderTargetFormats[i].format, params.attachmentParams.renderTargetFormats[i].srgb);
 			}
 		}
 
@@ -1225,6 +1227,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 
 		return textureFormatMap.DXGIFormat(formatIndex);
+	}
+
+	DXGI_FORMAT Engine::GetFormat(const TextureFormatId format, const bool srgb) const
+	{
+		const DXGI_FORMAT nativeFormat = GetFormat(format);
+		return srgb ? GetSRGBFormat(nativeFormat) : nativeFormat;
 	}
 
 	DXGI_FORMAT Engine::GetViewFormat(const DXGI_FORMAT format, const bool srgb, const Aspect aspect) noexcept
@@ -2604,11 +2612,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			throw std::invalid_argument("Invalid depth stencil format");
 		}
 
-		for (const TextureFormatId format : params.attachmentParams.renderTargetFormats)
+		for (const RenderTargetAttachmentFormat& format : params.attachmentParams.renderTargetFormats)
 		{
-			if (None(AspectMask::Color, GetAspects(GetFormat(format)))) [[unlikely]]
+			const DXGI_FORMAT nativeFormat = GetFormat(format.format);
+			if (None(AspectMask::Color, GetAspects(nativeFormat))) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid render target format");
+			}
+			if (format.srgb && !IsSRGBCompatibleFormat(nativeFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Not SRGB-compatible format");
 			}
 		}
 

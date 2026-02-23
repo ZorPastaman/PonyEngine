@@ -21,7 +21,9 @@ import PonyEngine.RenderDevice;
 import :BundleCommandList;
 import :CommandList;
 import :ContainerBinding;
+import :DepthStencilContainer;
 import :GraphicsComputePipelineBinding;
+import :RenderTargetContainer;
 import :SamplerContainer;
 import :ShaderDataContainer;
 
@@ -52,6 +54,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void SetStencilReference(const StencilReference& reference) override;
 		virtual void SetBlendFactor(const Math::ColorRGBA<float>& factor) override;
 
+		virtual void BindTargets(std::span<const RenderTargetBinding> renderTargetBindings, const DepthStencilBinding* depthStencilBinding) override;
+		virtual void BindTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount, const DepthStencilBinding* depthStencilBinding) override;
 		virtual void BindContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer) override;
 		virtual void BindPipelineState(const IGraphicsPipelineState& pipelineState) override;
 		virtual void BindPipelineState(const IComputePipelineState& pipelineState) override;
@@ -162,6 +166,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::SetBlendFactor(const Math::ColorRGBA<float>& factor)
 	{
 		commandList.SetBlendFactor(factor);
+	}
+
+	void GraphicsCommandList::BindTargets(const std::span<const RenderTargetBinding> renderTargetBindings, const DepthStencilBinding* const depthStencilBinding)
+	{
+		commandList.SetTargets(renderTargetBindings, depthStencilBinding);
+	}
+
+	void GraphicsCommandList::BindTargets(const RenderTargetBinding* const renderTargetBinding, const std::uint8_t renderTargetCount, 
+		const DepthStencilBinding* const depthStencilBinding)
+	{
+		commandList.SetTargets(renderTargetBinding, renderTargetCount, depthStencilBinding);
 	}
 
 	void GraphicsCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)

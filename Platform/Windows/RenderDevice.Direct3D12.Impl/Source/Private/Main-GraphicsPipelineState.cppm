@@ -196,8 +196,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		attachment.renderTargetFormats = !params.attachmentParams.renderTargetFormats.empty() 
-			? std::span<const TextureFormatId>(reinterpret_cast<const TextureFormatId*>(data.get()), params.attachmentParams.renderTargetFormats.size())
-			: std::span<const TextureFormatId>();
+			? std::span<const RenderTargetAttachmentFormat>(reinterpret_cast<const RenderTargetAttachmentFormat*>(data.get()), params.attachmentParams.renderTargetFormats.size())
+			: std::span<const RenderTargetAttachmentFormat>();
 		attachment.depthStencilFormat = params.attachmentParams.depthStencilFormat;
 
 		blend.blendGroup = std::visit(Type::Overload
