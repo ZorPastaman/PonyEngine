@@ -77,9 +77,17 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 
-		void Clear(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, std::span<const Math::CornerRect<std::uint32_t>> rects);
-		void Clear(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
+		void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, std::span<const Math::CornerRect<std::uint32_t>> rects);
+		void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
 			std::span<const Math::CornerRect<std::uint32_t>> rects);
+		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
+		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
+		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
+		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
 
 		void Copy(const IBuffer& source, IBuffer& destination);
 		void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
@@ -142,6 +150,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		void ValidateRenderTarget(const IRenderTargetContainer& container, std::uint32_t viewIndex);
 		void ValidateDepthStencil(const IDepthStencilContainer& container, std::uint32_t viewIndex);
+		template<typename UAVMeta, typename NativeResource, typename Resource>
+		void ValidateUnorderedAccess(const Resource& resource, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, 
+			const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex);
 
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination);
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
@@ -401,7 +412,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->Dispatch(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
-	void CommandList::Clear(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
+	void CommandList::ClearRTV(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
 		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
 		ValidateRenderTarget(container, viewIndex);
@@ -419,7 +430,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
 	}
 
-	void CommandList::Clear(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
+	void CommandList::ClearDSV(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
 		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
 		ValidateDepthStencil(container, viewIndex);
@@ -440,6 +451,82 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const auto clearFlags = static_cast<D3D12_CLEAR_FLAGS>((depth ? D3D12_CLEAR_FLAG_DEPTH : 0) | (stencil ? D3D12_CLEAR_FLAG_STENCIL : 0));
 		commandList->ClearDepthStencilView(static_cast<const DepthStencilContainer&>(container).CpuHandle(viewIndex), clearFlags, depth.value_or(0.f), stencil.value_or(0u),
 			static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
+	}
+
+	void CommandList::ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
+		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		ValidateUnorderedAccess<BufferUAVMeta, Buffer>(buffer, gpuContainer, gpuViewIndex, cpuContainer, cpuViewIndex);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
+		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
+		for (std::size_t i = 0uz; i < rects.size(); ++i)
+		{
+			clearRectsSpan[i] = ToRect(rects[i]);
+		}
+
+		const UINT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
+		commandList->ClearUnorderedAccessViewUint(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
+			&static_cast<const Buffer&>(buffer).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
+	}
+
+	void CommandList::ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
+		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		ValidateUnorderedAccess<TextureUAVMeta, Texture>(texture, gpuContainer, gpuViewIndex, cpuContainer, cpuViewIndex);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
+		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
+		for (std::size_t i = 0uz; i < rects.size(); ++i)
+		{
+			clearRectsSpan[i] = ToRect(rects[i]);
+		}
+
+		const UINT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
+		commandList->ClearUnorderedAccessViewUint(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
+			&static_cast<const Texture&>(texture).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
+	}
+
+	void CommandList::ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
+		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		ValidateUnorderedAccess<BufferUAVMeta, Buffer>(buffer, gpuContainer, gpuViewIndex, cpuContainer, cpuViewIndex);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
+		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
+		for (std::size_t i = 0uz; i < rects.size(); ++i)
+		{
+			clearRectsSpan[i] = ToRect(rects[i]);
+		}
+
+		const FLOAT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
+		commandList->ClearUnorderedAccessViewFloat(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
+			&static_cast<const Buffer&>(buffer).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
+	}
+
+	void CommandList::ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
+		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		ValidateUnorderedAccess<TextureUAVMeta, Texture>(texture, gpuContainer, gpuViewIndex, cpuContainer, cpuViewIndex);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
+		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
+		for (std::size_t i = 0uz; i < rects.size(); ++i)
+		{
+			clearRectsSpan[i] = ToRect(rects[i]);
+		}
+
+		const FLOAT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
+		commandList->ClearUnorderedAccessViewFloat(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
+			&static_cast<const Texture&>(texture).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
 	}
 
 	void CommandList::Copy(const IBuffer& source, IBuffer& destination)
@@ -1173,6 +1260,54 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (viewIndex >= nativeContainer.Size() || std::holds_alternative<EmptyDepthStencilMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid view index");
+		}
+#endif
+	}
+
+	template<typename UAVMeta, typename NativeResource, typename Resource>
+	void CommandList::ValidateUnorderedAccess(const Resource& resource, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex,
+		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex)
+	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (typeid(resource) != typeid(NativeResource)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid resource");
+		}
+		if (typeid(cpuContainer) != typeid(ShaderDataContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid cpu container");
+		}
+
+		const auto& nativeCpuContainer = static_cast<const ShaderDataContainer&>(cpuContainer);
+		if (nativeCpuContainer.IsShaderVisible()) [[unlikely]]
+		{
+			throw std::invalid_argument("Cpu container is shader visible");
+		}
+
+		if (gpuViewIndex >= gpuContainer.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid gpu container index");
+		}
+		if (cpuViewIndex >= nativeCpuContainer.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid cpu container index");
+		}
+
+		if (!std::holds_alternative<UAVMeta>(gpuContainer.Meta(gpuViewIndex))) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid gpu view");
+		}
+		if (!std::holds_alternative<UAVMeta>(nativeCpuContainer.Meta(cpuViewIndex))) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid cpu view");
+		}
+
+		if (std::get<UAVMeta>(gpuContainer.Meta(gpuViewIndex)).resource != &resource ||
+			std::get<UAVMeta>(nativeCpuContainer.Meta(cpuViewIndex)).resource != &resource) [[unlikely]]
+		{
+			throw std::invalid_argument("Resource mismatch");
 		}
 #endif
 	}

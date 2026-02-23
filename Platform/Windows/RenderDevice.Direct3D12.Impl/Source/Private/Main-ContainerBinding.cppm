@@ -38,6 +38,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		void Reset() noexcept;
 
+		[[nodiscard("Pure function")]]
+		bool HasShaderDataContainer() const noexcept;
+		[[nodiscard("Pure function")]]
+		bool HasSamplerContainer() const noexcept;
+
+		[[nodiscard("Pure function")]]
+		const ShaderDataContainer* GetShaderDataContainer() const noexcept;
+		[[nodiscard("Pure function")]]
+		const SamplerContainer* GetSamplerContainer() const noexcept;
+
 		void SetContainers(const ShaderDataContainer* shaderDataContainer, const SamplerContainer* samplerContainer, CommandList& commandList);
 		void BindGraphicsShaderData(std::span<const ShaderDataBinding> shaderDataBindings, CommandList& commandList) const;
 		void BindGraphicsSampler(std::span<const SamplerBinding> samplerBindings, CommandList& commandList) const;
@@ -71,6 +81,26 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		shaderDataContainer = nullptr;
 		samplerContainer = nullptr;
+	}
+
+	bool ContainerBinding::HasShaderDataContainer() const noexcept
+	{
+		return shaderDataContainer;
+	}
+
+	bool ContainerBinding::HasSamplerContainer() const noexcept
+	{
+		return samplerContainer;
+	}
+
+	const ShaderDataContainer* ContainerBinding::GetShaderDataContainer() const noexcept
+	{
+		return shaderDataContainer;
+	}
+
+	const SamplerContainer* ContainerBinding::GetSamplerContainer() const noexcept
+	{
+		return samplerContainer;
 	}
 
 	void ContainerBinding::SetContainers(const ShaderDataContainer* const shaderDataContainer, const SamplerContainer* const samplerContainer, CommandList& commandList)

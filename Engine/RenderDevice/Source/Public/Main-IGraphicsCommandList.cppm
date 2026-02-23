@@ -22,6 +22,7 @@ import :CopyableFootprint;
 import :DepthBias;
 import :DepthRange;
 import :DepthStencilBinding;
+import :IBuffer;
 import :ICommandList;
 import :IComputePipelineState;
 import :IDepthStencilContainer;
@@ -30,6 +31,7 @@ import :IRenderTargetContainer;
 import :ISecondaryGraphicsCommandList;
 import :ISamplerContainer;
 import :IShaderDataContainer;
+import :ITexture;
 import :RasterRegion;
 import :RenderTargetBinding;
 import :ResolveMode;
@@ -80,10 +82,18 @@ export namespace PonyEngine::RenderDevice
 		void DispatchCompute(const Math::Vector2<std::uint32_t>& threadGroupCounts);
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
 
-		virtual void Clear(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color,
+		virtual void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color,
 			std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
-		virtual void Clear(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
+		virtual void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
 			std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) = 0;
 		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) = 0;

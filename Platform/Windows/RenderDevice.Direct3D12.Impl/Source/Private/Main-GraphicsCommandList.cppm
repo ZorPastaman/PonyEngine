@@ -66,10 +66,18 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 
-		virtual void Clear(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
+		virtual void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
 			std::span<const Math::CornerRect<std::uint32_t>> rects) override;
-		virtual void Clear(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
+		virtual void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
 			std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex, 
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex, 
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
 		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) override;
@@ -239,16 +247,68 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.DispatchCompute(threadGroupCounts);
 	}
 
-	void GraphicsCommandList::Clear(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color,
+	void GraphicsCommandList::ClearRTV(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color,
 		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.Clear(container, viewIndex, color, rects);
+		commandList.ClearRTV(container, viewIndex, color, rects);
 	}
 
-	void GraphicsCommandList::Clear(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
+	void GraphicsCommandList::ClearDSV(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
 		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.Clear(container, viewIndex, depth, stencil, rects);
+		commandList.ClearDSV(container, viewIndex, depth, stencil, rects);
+	}
+
+	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+	}
+
+	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+	}
+
+	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+	}
+
+	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
 	}
 
 	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination)
