@@ -15,6 +15,7 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:GraphicsCommandLis
 
 import std;
 
+import PonyEngine.Math;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
@@ -64,6 +65,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
+
+		virtual void Clear(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
+			std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void Clear(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
+			std::span<const Math::CornerRect<std::uint32_t>> rects) override;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
 		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) override;
@@ -231,6 +237,18 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		pipelineBinding.SetComputePipelineState(commandList);
 		commandList.DispatchCompute(threadGroupCounts);
+	}
+
+	void GraphicsCommandList::Clear(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color,
+		const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		commandList.Clear(container, viewIndex, color, rects);
+	}
+
+	void GraphicsCommandList::Clear(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
+		const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		commandList.Clear(container, viewIndex, depth, stencil, rects);
 	}
 
 	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination)
