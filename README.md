@@ -19,4 +19,4 @@ That license applies to the contents of that folder and all its subfolders.
 
 -The engine logo is licensed under the [CC BY 4.0 License](Logo/LICENSE.md).
 
-When in doubt, always check for a LICENSE file inside a folder before using its contents.
+When in doubt, always check for a LICENSE file inside a folder before using its content.

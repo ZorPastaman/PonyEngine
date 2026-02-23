@@ -50,6 +50,15 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) override;
 
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
 		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) override;
 		virtual void Copy(const ITexture& source, ITexture& destination) override;
@@ -147,6 +156,58 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidatePipelineStateForCompute();
 
 		commandList.DispatchCompute(threadGroupCounts);
+	}
+
+	void ComputeCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+	}
+
+	void ComputeCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+	}
+
+	void ComputeCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+	}
+
+	void ComputeCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container bound");
+		}
+#endif
+
+		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
 	}
 
 	void ComputeCommandList::Copy(const IBuffer& source, IBuffer& destination)

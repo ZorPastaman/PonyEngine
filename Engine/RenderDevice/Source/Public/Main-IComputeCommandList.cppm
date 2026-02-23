@@ -17,10 +17,12 @@ import std;
 
 import :BufferBarrier;
 import :CopyableFootprint;
+import :IBuffer;
 import :ICommandList;
 import :IComputePipelineState;
 import :ISamplerContainer;
 import :IShaderDataContainer;
+import :ITexture;
 import :SamplerBinding;
 import :ShaderDataBinding;
 import :TextureBarrier;
@@ -47,6 +49,15 @@ export namespace PonyEngine::RenderDevice
 		void DispatchCompute(const Math::Vector1<std::uint32_t>& threadGroupCounts);
 		void DispatchCompute(const Math::Vector2<std::uint32_t>& threadGroupCounts);
 		virtual void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) = 0;
+
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
+		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
+		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>()) = 0;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) = 0;
 		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) = 0;
