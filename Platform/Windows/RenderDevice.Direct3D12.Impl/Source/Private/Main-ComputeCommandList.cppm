@@ -15,6 +15,7 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:ComputeCommandList
 
 import std;
 
+import PonyEngine.Math;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 

@@ -1,7 +1,7 @@
 /***************************************************
  * MIT License                                     *
  *                                                 *
- * right (c) 2023-present Vladimir Popov       *
+ * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
  * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
@@ -17,6 +17,7 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:CommandList;
 
 import std;
 
+import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
@@ -76,6 +77,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
 
+		void Clear(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, std::span<const Math::CornerRect<std::uint32_t>> rects);
+		void Clear(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
+			std::span<const Math::CornerRect<std::uint32_t>> rects);
+
 		void Copy(const IBuffer& source, IBuffer& destination);
 		void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
 		void Copy(const ITexture& source, ITexture& destination);
@@ -120,6 +125,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		static D3D12_TEXTURE_COPY_LOCATION ToCopyLocation(const Texture& texture, UINT subresourceIndex) noexcept;
 		[[nodiscard("Pure function")]]
+		static D3D12_RECT ToRect(const Math::CornerRect<std::uint32_t>& rect) noexcept;
+		[[nodiscard("Pure function")]]
 		static D3D12_RECT ToRect(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
 		[[nodiscard("Pure function")]]
 		static D3D12_BOX ToBox(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
@@ -132,6 +139,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static void ValidateRenderTargets(std::span<const RenderTargetBinding> renderTargetBindings);
 		static void ValidateRenderTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount);
 		static void ValidateDepthTarget(const DepthStencilBinding* binding);
+
+		void ValidateRenderTarget(const IRenderTargetContainer& container, std::uint32_t viewIndex);
+		void ValidateDepthStencil(const IDepthStencilContainer& container, std::uint32_t viewIndex);
 
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination);
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
@@ -389,6 +399,47 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
 	{
 		commandList->Dispatch(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
+	}
+
+	void CommandList::Clear(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
+		const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		ValidateRenderTarget(container, viewIndex);
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
+		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
+		for (std::size_t i = 0uz; i < rects.size(); ++i)
+		{
+			clearRectsSpan[i] = ToRect(rects[i]);
+		}
+
+		const FLOAT clearColor[4] = { color.R(), color.G(), color.B(), color.A() };
+		commandList->ClearRenderTargetView(static_cast<const RenderTargetContainer&>(container).CpuHandle(viewIndex), clearColor,
+			static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
+	}
+
+	void CommandList::Clear(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
+		const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	{
+		ValidateDepthStencil(container, viewIndex);
+
+		if (!depth && !stencil)
+		{
+			return;
+		}
+
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
+		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
+		for (std::size_t i = 0uz; i < rects.size(); ++i)
+		{
+			clearRectsSpan[i] = ToRect(rects[i]);
+		}
+
+		const auto clearFlags = static_cast<D3D12_CLEAR_FLAGS>((depth ? D3D12_CLEAR_FLAG_DEPTH : 0) | (stencil ? D3D12_CLEAR_FLAG_STENCIL : 0));
+		commandList->ClearDepthStencilView(static_cast<const DepthStencilContainer&>(container).CpuHandle(viewIndex), clearFlags, depth.value_or(0.f), stencil.value_or(0u),
+			static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
 	}
 
 	void CommandList::Copy(const IBuffer& source, IBuffer& destination)
@@ -898,6 +949,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
+	D3D12_RECT CommandList::ToRect(const Math::CornerRect<std::uint32_t>& rect) noexcept
+	{
+		return D3D12_RECT
+		{
+			.left = static_cast<LONG>(rect.Position().X()),
+			.top = static_cast<LONG>(rect.Position().Y()),
+			.right = static_cast<LONG>(rect.Position().X() + rect.Size().X()),
+			.bottom = static_cast<LONG>(rect.Position().Y() + rect.Size().Y()),
+		};
+	}
+
 	D3D12_RECT CommandList::ToRect(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept
 	{
 		return D3D12_RECT
@@ -1075,6 +1137,42 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (std::holds_alternative<EmptyDepthStencilMeta>(container->Meta(binding->index))) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid depth stencil view");
+		}
+#endif
+	}
+
+	void CommandList::ValidateRenderTarget(const IRenderTargetContainer& container, const std::uint32_t viewIndex)
+	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (typeid(container) != typeid(RenderTargetContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+
+		const auto& nativeContainer = static_cast<const RenderTargetContainer&>(container);
+		if (viewIndex >= nativeContainer.Size() || std::holds_alternative<EmptyRenderTargetMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid view index");
+		}
+#endif
+	}
+
+	void CommandList::ValidateDepthStencil(const IDepthStencilContainer& container, std::uint32_t viewIndex)
+	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (typeid(container) != typeid(DepthStencilContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+
+		const auto& nativeContainer = static_cast<const DepthStencilContainer&>(container);
+		if (viewIndex >= nativeContainer.Size() || std::holds_alternative<EmptyDepthStencilMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid view index");
 		}
 #endif
 	}
