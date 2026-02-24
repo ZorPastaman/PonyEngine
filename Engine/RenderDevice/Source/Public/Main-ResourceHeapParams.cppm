@@ -7,24 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-struct PixelInput
+export module PonyEngine.RenderDevice:ResourceHeapParams;
+
+import :HeapType;
+
+export namespace PonyEngine::RenderDevice
 {
-	float4 position : SV_POSITION;
-	float2 uv : TEXCOORD;
-};
-
-struct PixelOutput
-{
-	float4 color : SV_TARGET;
-};
-
-Texture2D RenderTargetTexture : register(t0);
-sampler RenderTargetSampler : register(s0);
-
-PixelOutput main(PixelInput input)
-{
-	PixelOutput output;
-	output.color = RenderTargetTexture.Sample(RenderTargetSampler, input.uv);
-
-	return output;
+	struct ResourceHeapParams final
+	{
+		HeapType heapType = HeapType::Default;
+		bool notZeroed = false;
+	};
 }

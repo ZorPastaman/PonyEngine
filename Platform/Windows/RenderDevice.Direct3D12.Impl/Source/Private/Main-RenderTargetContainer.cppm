@@ -69,7 +69,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	RenderTargetContainer::RenderTargetContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) noexcept :
-		descriptorHeap(descriptorHeap, handleIncrement),
+		descriptorHeap(descriptorHeap, handleIncrement, false),
 		size{size},
 		metas(std::make_unique<RenderTargetMeta[]>(this->size))
 	{
@@ -78,7 +78,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	RenderTargetContainer::RenderTargetContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement,
 		const std::uint32_t size) noexcept :
-		descriptorHeap(std::move(descriptorHeap), handleIncrement),
+		descriptorHeap(std::move(descriptorHeap), handleIncrement, false),
 		size{size},
 		metas(std::make_unique<RenderTargetMeta[]>(this->size))
 	{

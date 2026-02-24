@@ -1,12 +1,3 @@
-/***************************************************
- * MIT License                                     *
- *                                                 *
- * Copyright (c) 2023-present Vladimir Popov       *
- *                                                 *
- * Email: zor1994@gmail.com                        *
- * Repo: https://github.com/ZorPastaman/PonyEngine *
- ***************************************************/
-
 #include "PonyEngine/Core.hlsli"
 #include "Game/Material.hlsli"
 
@@ -26,7 +17,7 @@ struct PixelOutput
 
 ConstantBuffer<Game_Material> Material : PONY_CBV_REGISTER(MATERIAL_SET, 0);
 
-PixelOutput main(in PixelInput input)
+PixelOutput main(in const PixelInput input)
 {
 	PixelOutput output;
 	output.color = Material.color;

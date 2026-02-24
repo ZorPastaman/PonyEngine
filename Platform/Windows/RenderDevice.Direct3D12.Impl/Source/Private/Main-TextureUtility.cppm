@@ -51,7 +51,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr UINT CalculateSubresource(UINT16 mipIndex, UINT16 arrayIndex, UINT8 planeIndex, UINT16 mipCount, UINT16 arraySize) noexcept;
 
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(TextureUsage usage) noexcept;
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(TextureUsage usage, bool notZeroed) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, DXGI_FORMAT format) noexcept;
@@ -240,9 +240,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return mipIndex + arrayIndex * mipCount + planeIndex * mipCount * arraySize;
 	}
 
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const TextureUsage usage) noexcept
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const TextureUsage usage, const bool notZeroed) noexcept
 	{
-		auto flags = D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
+		auto flags = D3D12_HEAP_FLAG_NONE;
+		if (notZeroed)
+		{
+			flags |= D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
+		}
 		if (Any(TextureUsage::UnorderedAccess, usage))
 		{
 			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;

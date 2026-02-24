@@ -28,9 +28,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		DescriptorHeap(ID3D12DescriptorHeap& descriptorHeap, UINT handleIncrement) noexcept;
+		DescriptorHeap(ID3D12DescriptorHeap& descriptorHeap, UINT handleIncrement, bool shaderVisible) noexcept;
 		[[nodiscard("Pure constructor")]]
-		DescriptorHeap(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement) noexcept;
+		DescriptorHeap(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, bool shaderVisible) noexcept;
 		DescriptorHeap(const DescriptorHeap&) = delete;
 		DescriptorHeap(DescriptorHeap&&) = delete;
 
@@ -63,18 +63,18 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	DescriptorHeap::DescriptorHeap(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement) noexcept :
+	DescriptorHeap::DescriptorHeap(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const bool shaderVisible) noexcept :
 		descriptorHeap(&descriptorHeap),
 		cpuStart{this->descriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr},
-		gpuStart{this->descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr},
+		gpuStart{shaderVisible ? this->descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr : 0},
 		handleIncrement{handleIncrement}
 	{
 	}
 
-	DescriptorHeap::DescriptorHeap(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement) noexcept :
+	DescriptorHeap::DescriptorHeap(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const bool shaderVisible) noexcept :
 		descriptorHeap(std::move(descriptorHeap)),
 		cpuStart{this->descriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr},
-		gpuStart{this->descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr},
+		gpuStart{shaderVisible ? this->descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr : 0},
 		handleIncrement{handleIncrement}
 	{
 		assert(this->descriptorHeap && "The descriptor heap is nullptr.");
