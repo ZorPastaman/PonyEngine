@@ -23,9 +23,9 @@ export namespace PonyEngine::RenderDevice
 	{
 		const T* source = nullptr;
 		T* destination = nullptr;
-		std::uint32_t sourceOffset;
-		std::uint32_t destinationOffset;
-		std::uint32_t count;
+		std::uint32_t sourceOffset = 0u;
+		std::uint32_t destinationOffset = 0u;
+		std::uint32_t count = 0u;
 	};
 
 	using ShaderDataCopyRange = ViewContainerCopyRange<IShaderDataContainer>;

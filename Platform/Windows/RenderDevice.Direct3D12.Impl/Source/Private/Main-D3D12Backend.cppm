@@ -40,14 +40,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual struct DeviceSupport DeviceSupport() const override;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
+		virtual std::shared_ptr<ITexture> CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const override;
@@ -171,9 +171,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const HeapType heapType, const BufferParams& params)
+	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params)
 	{
-		return engine->CreateBuffer(heapType, params);
+		return engine->CreateBuffer(heapParams, params);
 	}
 
 	struct TextureFormatSupport D3D12Backend::TextureFormatSupport(const TextureFormatId textureFormatId) const
@@ -186,9 +186,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return engine->TextureSupport(request);
 	}
 
-	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const HeapType heapType, const TextureParams& params)
+	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params)
 	{
-		return engine->CreateTexture(heapType, params);
+		return engine->CreateTexture(heapParams, params);
 	}
 
 	std::uint32_t D3D12Backend::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const

@@ -20,7 +20,7 @@ import PonyEngine.RenderDevice;
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage usage) noexcept;
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage usage, bool notZeroed) noexcept;
 
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept;
@@ -37,9 +37,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const BufferUsage usage) noexcept
+	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const BufferUsage usage, const bool notZeroed) noexcept
 	{
-		auto flags = D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
+		auto flags = D3D12_HEAP_FLAG_NONE;
+		if (notZeroed)
+		{
+			flags |= D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
+		}
 		if (Any(BufferUsage::UnorderedAccess, usage))
 		{
 			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;

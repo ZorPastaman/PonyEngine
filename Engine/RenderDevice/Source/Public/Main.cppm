@@ -84,6 +84,7 @@ export import :RenderTargetContainerParams;
 export import :RenderTargetMeta;
 export import :ResolveMode;
 export import :ResourceAccess;
+export import :ResourceHeapParams;
 export import :ResourceLayout;
 export import :RTVLayout;
 export import :RTVParams;

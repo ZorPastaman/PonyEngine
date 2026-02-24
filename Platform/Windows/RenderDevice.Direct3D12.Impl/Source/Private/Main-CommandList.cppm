@@ -103,7 +103,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		void Resolve(const ITexture& source, ITexture& destination, ResolveMode mode);
 		void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode = ResolveMode::Average);
-		void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average);
+		void Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average);
 
 		void ExecuteBundle(ID3D12GraphicsCommandList10& bundle) noexcept;
 
@@ -135,7 +135,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		static D3D12_RECT ToRect(const Math::CornerRect<std::uint32_t>& rect) noexcept;
 		[[nodiscard("Pure function")]]
-		static D3D12_RECT ToRect(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
+		static D3D12_RECT ToRect(const Math::Vector2<std::uint32_t>& offset, const Math::Vector2<std::uint32_t>& size) noexcept;
 		[[nodiscard("Pure function")]]
 		static D3D12_BOX ToBox(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
 
@@ -169,7 +169,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		static void ValidateResolve(const ITexture& source, const ITexture& destination);
 		static void ValidateResolve(const ITexture& source, const ITexture& destination, const CopySubTextureRange& range);
-		static void ValidateResolve(const ITexture& source, const ITexture& destination, const BoxCopySubTextureRange& range);
+		static void ValidateResolve(const ITexture& source, const ITexture& destination, const RectCopySubTextureRange& range);
 		static void ValidateResolveBase(const ITexture& source, const ITexture& destination);
 
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator;
@@ -791,7 +791,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	void CommandList::Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, const ResolveMode mode)
+	void CommandList::Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, const ResolveMode mode)
 	{
 		ValidateState();
 		ValidateResolve(source, destination, range);
@@ -1047,7 +1047,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	D3D12_RECT CommandList::ToRect(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept
+	D3D12_RECT CommandList::ToRect(const Math::Vector2<std::uint32_t>& offset, const Math::Vector2<std::uint32_t>& size) noexcept
 	{
 		return D3D12_RECT
 		{
@@ -1211,7 +1211,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			return;
 		}
 
-		if (!binding->container || typeid(*binding->container) != typeid(DepthStencilBinding)) [[unlikely]]
+		if (!binding->container || typeid(*binding->container) != typeid(DepthStencilContainer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid depth stencil container");
 		}
@@ -1668,7 +1668,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void CommandList::ValidateResolve(const ITexture& source, const ITexture& destination, const BoxCopySubTextureRange& range)
+	void CommandList::ValidateResolve(const ITexture& source, const ITexture& destination, const RectCopySubTextureRange& range)
 	{
 		ValidateResolveBase(source, destination);
 
@@ -1697,14 +1697,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			const Math::Vector3<std::uint32_t> sourceMipSize = MipSize(sourceSize, range.sourceMipIndex + i);
 			const Math::Vector3<std::uint32_t> destinationMipSize = MipSize(destinationSize, range.destinationMipIndex + i);
 
-			const Math::Vector3<std::uint32_t> sourceRequiredSize = range.sourceOffsets[i] + range.sourceSizes[i];
-			if (sourceRequiredSize.X() > sourceMipSize.X() || sourceRequiredSize.Y() > sourceMipSize.Y() || sourceRequiredSize.Z() > sourceMipSize.Z()) [[unlikely]]
+			const Math::Vector2<std::uint32_t> sourceRequiredSize = range.sourceOffsets[i] + range.sourceSizes[i];
+			if (sourceRequiredSize.X() > sourceMipSize.X() || sourceRequiredSize.Y() > sourceMipSize.Y()) [[unlikely]]
 			{
 				throw std::invalid_argument("Source box is too great");
 			}
 
-			const Math::Vector3<std::uint32_t> destinationRequiredSize = range.destinationOffsets[i];
-			if (destinationRequiredSize.X() >= destinationMipSize.X() || destinationRequiredSize.Y() >= destinationMipSize.Y() || destinationRequiredSize.Z() >= destinationMipSize.Z()) [[unlikely]]
+			const Math::Vector2<std::uint32_t> destinationRequiredSize = range.destinationOffsets[i];
+			if (destinationRequiredSize.X() >= destinationMipSize.X() || destinationRequiredSize.Y() >= destinationMipSize.Y()) [[unlikely]]
 			{
 				throw std::invalid_argument("Destination size is too little");
 			}

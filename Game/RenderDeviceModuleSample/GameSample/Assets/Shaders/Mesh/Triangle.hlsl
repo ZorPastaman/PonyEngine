@@ -1,12 +1,3 @@
-/***************************************************
- * MIT License                                     *
- *                                                 *
- * Copyright (c) 2023-present Vladimir Popov       *
- *                                                 *
- * Email: zor1994@gmail.com                        *
- * Repo: https://github.com/ZorPastaman/PonyEngine *
- ***************************************************/
-
 #include "PonyEngine/Core.hlsli"
 #include "PonyEngine/Meshlet.hlsli"
 
@@ -71,17 +62,17 @@ void main(in uint groupId : SV_GROUPID,
 
 	if (groupThreadId < vertexCount)
 	{
-		uint vertexIndex = VertexIndices[meshlet.vertexOffset + groupThreadId];
+		const uint vertexIndex = VertexIndices[meshlet.vertexOffset + groupThreadId];
 		outVertices[groupThreadId] = CreateVertex(vertexIndex);
 	}
 
 	[unroll]
 	for (uint i = 0; i < TRIANGLE_MULTIPLIER; ++i)
 	{
-		uint groupThreadSubId = groupThreadId + i * VERTEX_COUNT;
+		const uint groupThreadSubId = groupThreadId + i * VERTEX_COUNT;
 		if (groupThreadSubId < primitiveCount)
 		{
-			uint primitiveIndex = meshlet.primitiveOffset + groupThreadSubId;
+			const uint primitiveIndex = meshlet.primitiveOffset + groupThreadSubId;
 			outTriangles[groupThreadSubId] = UnpackTriangle(Indices, primitiveIndex, Transform.mvpDet < 0.f);
 		}
 	}

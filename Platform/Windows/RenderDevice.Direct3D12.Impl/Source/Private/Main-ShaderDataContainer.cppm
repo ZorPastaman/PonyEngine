@@ -74,7 +74,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	ShaderDataContainer::ShaderDataContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size, const bool shaderVisible) noexcept :
-		descriptorHeap(descriptorHeap, handleIncrement),
+		descriptorHeap(descriptorHeap, handleIncrement, shaderVisible),
 		size{size},
 		shaderVisible{shaderVisible},
 		metas(std::make_unique<ShaderDataMeta[]>(this->size))
@@ -84,7 +84,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	ShaderDataContainer::ShaderDataContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement,
 		const std::uint32_t size, const bool shaderVisible) noexcept :
-		descriptorHeap(std::move(descriptorHeap), handleIncrement),
+		descriptorHeap(std::move(descriptorHeap), handleIncrement, shaderVisible),
 		size{size},
 		shaderVisible{shaderVisible},
 		metas(std::make_unique<ShaderDataMeta[]>(this->size))

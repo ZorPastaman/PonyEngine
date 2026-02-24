@@ -26,7 +26,6 @@ import :DepthStencilContainerParams;
 import :DeviceSupport;
 import :DSVParams;
 import :GraphicsPipelineStateParams;
-import :HeapType;
 import :IBuffer;
 import :IComputeCommandList;
 import :IComputePipelineState;
@@ -46,6 +45,7 @@ import :IWaiter;
 import :PipelineLayoutParams;
 import :QueueSync;
 import :RenderTargetContainerParams;
+import :ResourceHeapParams;
 import :RTVParams;
 import :SamplerContainerParams;
 import :SamplerParams;
@@ -82,7 +82,7 @@ export namespace PonyEngine::RenderDevice
 		virtual struct DeviceSupport DeviceSupport() const = 0;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) = 0;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params) = 0;
 
 		[[nodiscard("Wierd call")]]
 		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) = 0;
@@ -95,7 +95,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) = 0;
+		virtual std::shared_ptr<ITexture> CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const = 0;

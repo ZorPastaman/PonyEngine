@@ -62,7 +62,7 @@ export namespace PonyEngine::RenderDevice
 		virtual struct DeviceSupport DeviceSupport() const override;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params) override;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params) override;
 
 		[[nodiscard("Wierd call")]]
 		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) override;
@@ -75,7 +75,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params) override;
+		virtual std::shared_ptr<ITexture> CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params) override;
 
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
@@ -370,9 +370,9 @@ namespace PonyEngine::RenderDevice
 		return GetCurrentBackend().DeviceSupport();
 	}
 
-	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const HeapType heapType, const BufferParams& params)
+	std::shared_ptr<IBuffer> RenderDeviceService::CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params)
 	{
-		return GetCurrentBackend().CreateBuffer(heapType, params);
+		return GetCurrentBackend().CreateBuffer(heapParams, params);
 	}
 
 	struct TextureFormatId RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
@@ -437,9 +437,9 @@ namespace PonyEngine::RenderDevice
 		return GetCurrentBackend().TextureSupport(request);
 	}
 
-	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const HeapType heapType, const TextureParams& params)
+	std::shared_ptr<ITexture> RenderDeviceService::CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params)
 	{
-		return GetCurrentBackend().CreateTexture(heapType, params);
+		return GetCurrentBackend().CreateTexture(heapParams, params);
 	}
 
 	std::shared_ptr<IShaderDataContainer> RenderDeviceService::CreateShaderDataContainer(const ShaderDataContainerParams& params)

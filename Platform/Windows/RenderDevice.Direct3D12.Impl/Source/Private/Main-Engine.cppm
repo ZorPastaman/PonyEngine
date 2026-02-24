@@ -87,14 +87,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		~Engine() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<IBuffer> CreateBuffer(HeapType heapType, const BufferParams& params);
+		std::shared_ptr<IBuffer> CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params);
 
 		[[nodiscard("Pure function")]]
 		struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const;
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<ITexture> CreateTexture(HeapType heapType, const TextureParams& params);
+		std::shared_ptr<ITexture> CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params);
 
 		[[nodiscard("Pure function")]]
 		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const;
@@ -370,12 +370,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	}
 
-	std::shared_ptr<IBuffer> Engine::CreateBuffer(const HeapType heapType, const BufferParams& params)
+	std::shared_ptr<IBuffer> Engine::CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params)
 	{
 		ValidateSize(params);
 
-		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapType);
-		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage);
+		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapParams.heapType);
+		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage, heapParams.notZeroed);
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params);
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
 
@@ -426,7 +426,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return TextureSupportResponse{};
 	}
 
-	std::shared_ptr<ITexture> Engine::CreateTexture(const HeapType heapType, const TextureParams& params)
+	std::shared_ptr<ITexture> Engine::CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params)
 	{
 		ValidateDimension(params);
 		DXGI_FORMAT format = GetFormat(params.format);
@@ -484,8 +484,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			}
 		}
 
-		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapType);
-		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage);
+		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapParams.heapType);
+		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage, heapParams.notZeroed);
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
 		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(params.initialLayout);
 		const D3D12_CLEAR_VALUE clearValue = ToClearValue(params.clearValue, format);
@@ -1038,8 +1038,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		for (UINT i = 0u; i < params.bufferCount; ++i)
 		{
 			Platform::Windows::ComPtr<ID3D12Resource2> resource = dxgiSwapChain.GetBuffer<ID3D12Resource2>(i);
+			const D3D12_RESOURCE_DESC1 resourceDesc = resource->GetDesc1();
 			buffers[i] = std::make_shared<Texture>(std::move(resource), params.format, format, std::span<const TextureFormatId>(),
-				static_cast<std::uint32_t>(swapChainDesc.Width), static_cast<std::uint32_t>(swapChainDesc.Height), 1u, 1u,
+				static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), 1u, 1u,
 				TextureDimension::Texture2D, SampleCount::X1, params.usage, srgb);
 		}
 
@@ -1378,7 +1379,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	Texture* Engine::ToNativeTexture(ITexture* const texture)
 	{
 #ifndef NDEBUG
-		if (texture != nullptr && typeid(texture) != typeid(Texture)) [[unlikely]]
+		if (texture != nullptr && typeid(*texture) != typeid(Texture)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture");
 		}
@@ -1390,7 +1391,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	const Texture* Engine::ToNativeTexture(const ITexture* const texture)
 	{
 #ifndef NDEBUG
-		if (texture != nullptr && typeid(texture) != typeid(Texture)) [[unlikely]]
+		if (texture != nullptr && typeid(*texture) != typeid(Texture)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture");
 		}

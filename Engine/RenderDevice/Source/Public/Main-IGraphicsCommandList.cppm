@@ -109,7 +109,7 @@ export namespace PonyEngine::RenderDevice
 
 		virtual void Resolve(const ITexture& source, ITexture& destination, ResolveMode mode = ResolveMode::Average) = 0;
 		virtual void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode = ResolveMode::Average) = 0;
-		virtual void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average) = 0;
+		virtual void Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average) = 0;
 
 		virtual void Execute(const ISecondaryGraphicsCommandList& secondary) = 0;
 	};

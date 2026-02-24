@@ -93,7 +93,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		virtual void Resolve(const ITexture& source, ITexture& destination, ResolveMode mode) override;
 		virtual void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode) override;
-		virtual void Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, ResolveMode mode) override;
+		virtual void Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, ResolveMode mode) override;
 
 		virtual void Execute(const ISecondaryGraphicsCommandList& secondary) override;
 
@@ -376,7 +376,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Resolve(source, destination, range, mode);
 	}
 
-	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range, const ResolveMode mode)
+	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, const ResolveMode mode)
 	{
 		commandList.Resolve(source, destination, range, mode);
 	}

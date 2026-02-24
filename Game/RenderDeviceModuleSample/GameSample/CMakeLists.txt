@@ -58,14 +58,20 @@ macro(compile_shader)
 endmacro()
 set(TRIANGLE_SHADER "${DATA}/Shaders/Mesh/Triangle.cso")
 set(PIXEL_SHADER "${DATA}/Shaders/Pixel/Pixel.cso")
+set(FULLSCREEN_QUAD_SHADER "${DATA}/Shaders/Mesh/FullscreenQuad.cso")
+set(TEXTURE_SHADER "${DATA}/Shaders/Pixel/Texture.cso")
 compile_shader(INPUT "Assets/Shaders/Mesh/Triangle.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${TRIANGLE_SHADER}" PROFILE ms_6_6)
 compile_shader(INPUT "Assets/Shaders/Pixel/Pixel.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${PIXEL_SHADER}" PROFILE ps_6_6)
+compile_shader(INPUT "Assets/Shaders/Mesh/FullscreenQuad.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${FULLSCREEN_QUAD_SHADER}" PROFILE ms_6_6)
+compile_shader(INPUT "Assets/Shaders/Pixel/Texture.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${TEXTURE_SHADER}" PROFILE ps_6_6)
 add_custom_target(Shaders ALL DEPENDS ${SHADER_REGISTRY})
 
 message(VERBOSE "Configuring defines")
 target_compile_definitions(GameSample PRIVATE
 	TRIANGLE_SHADER="${TRIANGLE_SHADER}"
 	PIXEL_SHADER="${PIXEL_SHADER}"
+	FULLSCREEN_QUAD_SHADER="${FULLSCREEN_QUAD_SHADER}"
+	TEXTURE_SHADER="${TEXTURE_SHADER}"
 )
 
 install(DIRECTORY "${CMAKE_BINARY_DIR}/${DATA}" DESTINATION . FILES_MATCHING PATTERN "*.cso")
