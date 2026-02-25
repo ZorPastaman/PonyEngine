@@ -22,7 +22,7 @@ export namespace PonyEngine::Platform::Windows
 	/// @brief Acquires GUID.
 	/// @return GUID.
 	[[nodiscard("Pure function")]]
-	GUID AcquireGuid();
+	GUID AcquireGUID();
 }
 
 /// @brief COM GUID formatter.
@@ -97,7 +97,7 @@ public:
 
 namespace PonyEngine::Platform::Windows
 {
-	GUID AcquireGuid()
+	GUID AcquireGUID()
 	{
 		GUID acquiredGuid;
 		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]

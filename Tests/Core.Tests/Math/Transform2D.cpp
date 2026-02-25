@@ -141,8 +141,8 @@ TEST_CASE("Transform2D trs", "[Math][Transform2D]")
 	constexpr float rotation = 0.4f;
 	constexpr auto scale = PonyEngine::Math::Vector2<float>(-2.f, 3.f);
 	const auto transform = PonyEngine::Math::Transform2D<float>(position, rotation, scale);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TrsMatrix(), PonyEngine::Math::TrsMatrix(position, rotation, scale)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TrsMatrixCompact(), PonyEngine::Math::TrsMatrixCompact(position, rotation, scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TRSMatrix(), PonyEngine::Math::TRSMatrix(position, rotation, scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TRSMatrixCompact(), PonyEngine::Math::TRSMatrixCompact(position, rotation, scale)));
 }
 
 TEST_CASE("Transform2D isFinite", "[Math][Transform2D]")

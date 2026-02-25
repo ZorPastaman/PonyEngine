@@ -15,7 +15,7 @@ export namespace PonyEngine::RenderDevice
 {
 	struct CBVRequirement final
 	{
-		std::uint32_t offsetAlignment = 0ull;
+		std::uint32_t offsetAlignment = 0u;
 		std::uint32_t sizeAlignment = 0u;
 	};
 }

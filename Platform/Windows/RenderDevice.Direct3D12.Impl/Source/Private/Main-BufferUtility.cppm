@@ -96,7 +96,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				.FirstElement = params.firstElementIndex,
 				.NumElements = params.elementCount,
 				.StructureByteStride = params.stride,
-				.Flags = params.raw ? D3D12_BUFFER_SRV_FLAG_RAW : D3D12_BUFFER_SRV_FLAG_NONE
+				.Flags = D3D12_BUFFER_SRV_FLAG_NONE
 			}
 		};
 	}
@@ -113,7 +113,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				.NumElements = params.elementCount,
 				.StructureByteStride = params.stride,
 				.CounterOffsetInBytes = 0ull,
-				.Flags = params.raw ? D3D12_BUFFER_UAV_FLAG_RAW : D3D12_BUFFER_UAV_FLAG_NONE
+				.Flags = D3D12_BUFFER_UAV_FLAG_NONE
 			}
 		};
 	}

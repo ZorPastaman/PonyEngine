@@ -57,6 +57,12 @@ export namespace PonyEngine::RenderDevice
 		virtual void SetStencilReference(const StencilReference& reference) = 0;
 		virtual void SetBlendFactor(const Math::ColorRGBA<float>& factor) = 0;
 
+		void BindTargets();
+		void BindTargets(const RenderTargetBinding& renderTargetBinding);
+		void BindTargets(std::span<const RenderTargetBinding> renderTargetBindings);
+		void BindTargets(const DepthStencilBinding& depthStencilBinding);
+		void BindTargets(const RenderTargetBinding& renderTargetBinding, const DepthStencilBinding& depthStencilBinding);
+		void BindTargets(const RenderTargetBinding& renderTargetBinding, std::uint8_t renderTargetCount);
 		virtual void BindTargets(std::span<const RenderTargetBinding> renderTargetBindings, const DepthStencilBinding* depthStencilBinding) = 0;
 		virtual void BindTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount, const DepthStencilBinding* depthStencilBinding) = 0;
 		virtual void BindContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer) = 0;
@@ -130,6 +136,36 @@ namespace PonyEngine::RenderDevice
 	void IGraphicsCommandList::SetRasterRegion(const RasterRegion& region)
 	{
 		SetRasterRegions(std::span(&region, 1uz));
+	}
+
+	void IGraphicsCommandList::BindTargets()
+	{
+		BindTargets(nullptr, 0u, nullptr);
+	}
+
+	void IGraphicsCommandList::BindTargets(const RenderTargetBinding& renderTargetBinding)
+	{
+		BindTargets(&renderTargetBinding, 1u, nullptr);
+	}
+
+	void IGraphicsCommandList::BindTargets(const std::span<const RenderTargetBinding> renderTargetBindings)
+	{
+		BindTargets(renderTargetBindings, nullptr);
+	}
+
+	void IGraphicsCommandList::BindTargets(const DepthStencilBinding& depthStencilBinding)
+	{
+		BindTargets(nullptr, 0, &depthStencilBinding);
+	}
+
+	void IGraphicsCommandList::BindTargets(const RenderTargetBinding& renderTargetBinding, const DepthStencilBinding& depthStencilBinding)
+	{
+		BindTargets(std::span<const RenderTargetBinding>(&renderTargetBinding, 1uz), &depthStencilBinding);
+	}
+
+	void IGraphicsCommandList::BindTargets(const RenderTargetBinding& renderTargetBinding, const std::uint8_t renderTargetCount)
+	{
+		BindTargets(&renderTargetBinding, renderTargetCount, nullptr);
 	}
 
 	void IGraphicsCommandList::BindGraphics(const ShaderDataBinding& shaderDataBinding)

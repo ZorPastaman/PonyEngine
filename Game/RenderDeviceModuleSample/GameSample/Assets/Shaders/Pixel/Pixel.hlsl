@@ -1,5 +1,4 @@
 #include "PonyEngine/Core.hlsli"
-#include "Game/Material.hlsli"
 
 #ifndef MATERIAL_SET
 #define MATERIAL_SET 3
@@ -15,7 +14,12 @@ struct PixelOutput
 	float4 color : SV_TARGET;
 };
 
-ConstantBuffer<Game_Material> Material : PONY_CBV_REGISTER(MATERIAL_SET, 0);
+struct Material
+{
+	float4 color;
+};
+
+ConstantBuffer<Material> Material : PONY_CBV_REGISTER(MATERIAL_SET, 0);
 
 PixelOutput main(in const PixelInput input)
 {

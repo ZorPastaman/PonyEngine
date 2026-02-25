@@ -24,7 +24,6 @@ export namespace PonyEngine::RenderDevice
 		std::uint64_t firstElementIndex = 0ull;
 		std::uint32_t elementCount = 0u;
 		std::uint32_t stride = 0u;
-		bool raw = false;
 	};
 
 	struct TextureSRVParams final

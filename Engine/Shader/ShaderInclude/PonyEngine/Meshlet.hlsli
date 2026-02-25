@@ -39,42 +39,52 @@ struct Pony_Meshlet
 };
 
 /// @brief Unpacks a point primitive.
+/// @tparam T Uint array type.
 /// @param indices Index buffer.
 /// @param index Point index.
 /// @return Point primitive.
-uint UnpackPoint(in const ByteAddressBuffer indices, in const uint index)
+template<typename T>
+uint UnpackPoint(in const T indices, in const uint index)
 {
-	return (indices.Load(index & ~3) >> ((index & 3) << 3)) & 0xFF;
+	const uint mainIndex = indices[index / 4];
+	const uint shift = (index % 4) * 8;
+	return (mainIndex >> shift) & 0xFF;
 }
 
 /// @brief Unpacks a line primitive.
+/// @tparam T Uint array type.
 /// @param indices Index buffer.
 /// @param index Line index.
 /// @param isFlipped Is the line flipped?
 /// @return Line primitive.
-uint2 UnpackLine(in const ByteAddressBuffer indices, in const uint index, in const bool isFlipped)
+template<typename T>
+uint2 UnpackLine(in const T indices, in const uint index, in const bool isFlipped)
 {
 	const uint baseIndex = index * 2;
 	return uint2(UnpackPoint(indices, baseIndex + isFlipped), UnpackPoint(indices, baseIndex + !isFlipped));
 }
 
 /// @brief Unpacks a triangle primitive.
+/// @tparam T Uint array type.
 /// @param indices Index buffer.
 /// @param index Triangle index.
 /// @param isFlipped Is the triangle flipped?
 /// @return Triangle primitive.
-uint3 UnpackTriangle(in const ByteAddressBuffer indices, in const uint index, in const bool isFlipped)
+template<typename T>
+uint3 UnpackTriangle(in const T indices, in const uint index, in const bool isFlipped)
 {
 	const uint baseIndex = index * 3;
 	return uint3(UnpackPoint(indices, baseIndex), UnpackPoint(indices, baseIndex + 1 + isFlipped), UnpackPoint(indices, baseIndex + 2 - isFlipped));
 }
 
 /// @brief Unpacks a quad.
+/// @tparam T Uint array type.
 /// @param indices Index buffer.
 /// @param index Quad index.
 /// @param isFlipped Is the quad flipped?
 /// @return Quad primitive.
-uint4 UnpackQuad(in const ByteAddressBuffer indices, in const uint index, in const bool isFlipped)
+template<typename T>
+uint4 UnpackQuad(in const T indices, in const uint index, in const bool isFlipped)
 {
 	const uint baseIndex = index * 4;
 	const uint flipShift = isFlipped * 2;

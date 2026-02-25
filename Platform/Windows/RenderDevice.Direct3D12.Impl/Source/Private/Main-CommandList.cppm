@@ -358,7 +358,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			? static_cast<const DepthStencilContainer*>(depthStencilBinding->container)->CpuHandle(depthStencilBinding->index)
 			: D3D12_CPU_DESCRIPTOR_HANDLE{};
 
-		commandList->OMSetRenderTargets(renderTargetCount, renderTargetCount > 0uz ? &renderTarget : nullptr, false, depthStencilBinding ? &depthStencil : nullptr);
+		commandList->OMSetRenderTargets(renderTargetCount, renderTargetCount > 0uz ? &renderTarget : nullptr, true, depthStencilBinding ? &depthStencil : nullptr);
 	}
 
 	void CommandList::SetContainers(const ShaderDataContainer* const shaderDataContainer, const SamplerContainer* const samplerContainer)
