@@ -184,11 +184,11 @@ TEST_CASE("Bounding box to oriented box with compact trs", "[Math][Bounds]")
 	constexpr auto translation = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
 	constexpr auto rotation = PonyEngine::Math::Vector3<float>(3.f, -2.f, -1.1f);
 	constexpr auto scaling = PonyEngine::Math::Vector3<float>(1.f, 2.f, 5.f);
-	const auto axes = PonyEngine::Math::TrsMatrixCompact(translation, rotation, scaling);
+	const auto axes = PonyEngine::Math::TRSMatrixCompact(translation, rotation, scaling);
 	const auto orientedBox = PonyEngine::Math::OrientedBoundingBox(cuboid, axes);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Center(), PonyEngine::Math::TransformPoint(axes, center)));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Extents(), PonyEngine::Math::Vector3<float>(3.f, 4.f, 30.f)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRotationMatrixFromTrs(axes)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRotationMatrixFromTRS(axes)));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -206,11 +206,11 @@ TEST_CASE("Bounding box to oriented box with trs", "[Math][Bounds]")
 	constexpr auto translation = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
 	constexpr auto rotation = PonyEngine::Math::Vector3<float>(3.f, -2.f, -1.1f);
 	constexpr auto scaling = PonyEngine::Math::Vector3<float>(1.f, 2.f, 5.f);
-	const auto axes = PonyEngine::Math::TrsMatrix(translation, rotation, scaling);
+	const auto axes = PonyEngine::Math::TRSMatrix(translation, rotation, scaling);
 	const auto orientedBox = PonyEngine::Math::OrientedBoundingBox(cuboid, axes);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Center(), PonyEngine::Math::TransformPoint(axes, center)));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Extents(), PonyEngine::Math::Vector3<float>(3.f, 4.f, 30.f)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRotationMatrixFromTrs(axes)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRotationMatrixFromTRS(axes)));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")

@@ -10,3 +10,4 @@
 export module PonyEngine.Shader;
 
 export import :Bool;
+export import :Meshlet;

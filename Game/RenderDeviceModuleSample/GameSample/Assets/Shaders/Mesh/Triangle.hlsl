@@ -35,7 +35,7 @@ ConstantBuffer<Transform> Transform : PONY_CBV_REGISTER(CONTEXT_SET, 0);
 
 StructuredBuffer<Pony_Meshlet> Meshlets : PONY_SRV_REGISTER(MESHLET_SET, 0);
 StructuredBuffer<uint> VertexIndices : PONY_SRV_REGISTER(MESHLET_SET, 1);
-ByteAddressBuffer Indices : PONY_SRV_REGISTER(MESHLET_SET, 2);
+StructuredBuffer<uint> Indices : PONY_SRV_REGISTER(MESHLET_SET, 2);
 
 StructuredBuffer<float3> Positions : PONY_SRV_REGISTER(VERTEX_SET, 0);
 
@@ -50,8 +50,8 @@ Vertex CreateVertex(in uint index)
 
 [OutputTopology("triangle")]
 [NumThreads(VERTEX_COUNT, 1, 1)]
-void main(in uint groupId : SV_GROUPID,
-	in uint groupThreadId : SV_GROUPTHREADID,
+void main(in const uint groupId : SV_GROUPID,
+	in const uint groupThreadId : SV_GROUPTHREADID,
 	out vertices Vertex outVertices[VERTEX_COUNT],
 	out indices uint3 outTriangles[TRIANGLE_COUNT])
 {

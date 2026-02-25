@@ -31,8 +31,10 @@ target_link_libraries(GameSample PUBLIC
 target_link_libraries(GameSample PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
+	PonyEngine.RawInput
 	PonyEngine.RenderDevice
 	PonyEngine.Shader
+	PonyEngine.Time
 )
 
 # Add data.

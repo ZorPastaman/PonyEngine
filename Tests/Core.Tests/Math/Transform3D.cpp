@@ -132,8 +132,8 @@ TEST_CASE("Transform3D trs", "[Math][Transform3D]")
 	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
 	constexpr auto scale = PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f);
 	const auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TrsMatrix(), PonyEngine::Math::TrsMatrix(position, rotation, scale)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TrsMatrixCompact(), PonyEngine::Math::TrsMatrixCompact(position, rotation, scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TRSMatrix(), PonyEngine::Math::TRSMatrix(position, rotation, scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.TRSMatrixCompact(), PonyEngine::Math::TRSMatrixCompact(position, rotation, scale)));
 }
 
 TEST_CASE("Transform3D isFinite", "[Math][Transform3D]")
