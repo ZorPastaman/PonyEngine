@@ -166,16 +166,24 @@ namespace Game
 	void GameService::Begin()
 	{
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
+		graphicsCommandList->Name("MainGraphics");
 		computeCommandList = renderDevice->CreateComputeCommandList();
+		computeCommandList->Name("MainCompute");
 		copyCommandList = renderDevice->CreateCopyCommandList();
+		copyCommandList->Name("MainCopy");
 		secondaryCommandList = renderDevice->CreateSecondaryGraphicsCommandList();
+		secondaryCommandList->Name("JustSecondary");
 		graphicsFence = renderDevice->CreateFence();
+		graphicsFence->Name("GraphicsFence");
 		computeFence = renderDevice->CreateFence();
+		computeFence->Name("ComputeFence");
 		copyFence = renderDevice->CreateFence();
+		copyFence->Name("CopyFence");
 		graphicsFenceValue = graphicsFence->CompletedValue();
 		computeFenceValue = computeFence->CompletedValue();
 		copyFenceValue = copyFence->CompletedValue();
 		waiter = renderDevice->CreateWaiter();
+		waiter->Name("MainWaiter");
 
 		const PonyEngine::RenderDevice::TextureFormatId swapChainTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm);
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
@@ -190,6 +198,10 @@ namespace Game
 			.flags = PonyEngine::RenderDevice::SwapChainFlag::SRGB,
 			.usage = PonyEngine::RenderDevice::TextureUsage::RenderTarget
 		});
+		for (std::uint8_t i = 0; i < renderDevice->SwapChainBufferCount(); ++i)
+		{
+			renderDevice->SwapChainBuffer(i)->Name(std::format("BackBuffer_{}", i));
+		}
 		const auto renderTargetTextureFormat = PonyEngine::RenderDevice::RenderTargetAttachmentFormat
 		{
 			.format = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm),
@@ -214,6 +226,7 @@ namespace Game
 			.usage = PonyEngine::RenderDevice::TextureUsage::RenderTarget,
 			.initialLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget
 		});
+		targetTexture->Name("MainTarget");
 		resolvedTexture = renderDevice->CreateTexture(PonyEngine::RenderDevice::ResourceHeapParams
 		{
 			.heapType = PonyEngine::RenderDevice::HeapType::Default,
@@ -228,6 +241,7 @@ namespace Game
 			.usage = PonyEngine::RenderDevice::TextureUsage::ShaderResource,
 			.initialLayout = PonyEngine::RenderDevice::ResourceLayout::ShaderResource
 		});
+		resolvedTexture->Name("MainResolved");
 		depthTexture = renderDevice->CreateTexture(PonyEngine::RenderDevice::ResourceHeapParams
 		{
 			.heapType = PonyEngine::RenderDevice::HeapType::Default,
@@ -242,6 +256,7 @@ namespace Game
 			.usage = PonyEngine::RenderDevice::TextureUsage::DepthStencil,
 			.initialLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite
 		});
+		depthTexture->Name("MainDepth");
 
 		const PonyEngine::RenderDevice::CBVRequirement cbvRequirement = renderDevice->DeviceSupport().cbvRequirement;
 
@@ -257,6 +272,7 @@ namespace Game
 			.size = transformBufferSize,
 			.usage = PonyEngine::RenderDevice::BufferUsage::None
 		});
+		stagingTransforms->Name("StagingTransforms");
 		gpuTransforms = renderDevice->CreateBuffer(PonyEngine::RenderDevice::ResourceHeapParams
 		{
 			.heapType = PonyEngine::RenderDevice::HeapType::Default,
@@ -267,6 +283,7 @@ namespace Game
 			.size = transformBufferSize,
 			.usage = PonyEngine::RenderDevice::BufferUsage::ShaderResource
 		});
+		gpuTransforms->Name("Transforms");
 		
 		constexpr auto boxMeshlets = std::array<PonyEngine::Shader::Meshlet, 2u>
 		{
@@ -295,13 +312,13 @@ namespace Game
 		constexpr auto greenBoxMaterial = Material{.color = PonyEngine::Math::ColorRGBA<float>::Green()};
 		constexpr std::uint64_t boxMeshletOffset = 0ull;
 		constexpr std::uint32_t boxMeshletSize = sizeof(boxMeshlets);
-		constexpr std::uint64_t boxVertexIndexOffset = boxMeshletOffset + boxMeshletSize;
+		constexpr std::uint64_t boxPositionOffset = boxMeshletOffset + boxMeshletSize;
+		constexpr std::uint32_t boxPositionSize = sizeof(boxPositions);
+		constexpr std::uint64_t boxVertexIndexOffset = boxPositionOffset + boxPositionSize;
 		constexpr std::uint32_t boxVertexIndexSize = sizeof(boxVertexIndices);
 		constexpr std::uint64_t boxPrimitiveOffset = boxVertexIndexOffset + boxVertexIndexSize;
 		constexpr std::uint32_t boxPrimitiveSize = PonyEngine::Math::Align(std::uint32_t{sizeof(boxPrimitiveIndices)}, 4u);
-		constexpr std::uint64_t boxPositionOffset = boxPrimitiveOffset + boxPrimitiveSize;
-		constexpr std::uint32_t boxPositionSize = sizeof(boxPositions);
-		const std::uint64_t greenBoxMaterialOffset = PonyEngine::Math::Align(boxPositionOffset + boxPositionSize, static_cast<std::uint64_t>(cbvRequirement.offsetAlignment));
+		const std::uint64_t greenBoxMaterialOffset = PonyEngine::Math::Align(boxPrimitiveOffset + boxPrimitiveSize, static_cast<std::uint64_t>(cbvRequirement.offsetAlignment));
 		const std::uint32_t greenBoxMaterialSize = PonyEngine::Math::Align(std::uint32_t{sizeof(greenBoxMaterial)}, cbvRequirement.sizeAlignment);
 		const std::uint64_t dataBufferSize = greenBoxMaterialOffset + greenBoxMaterialSize;
 
@@ -315,6 +332,7 @@ namespace Game
 			.size = dataBufferSize,
 			.usage = PonyEngine::RenderDevice::BufferUsage::None
 		});
+		stagingStaticDataBuffer->Name("StagingStaticData");
 		staticGpuDataBuffer = renderDevice->CreateBuffer(PonyEngine::RenderDevice::ResourceHeapParams
 		{
 			.heapType = PonyEngine::RenderDevice::HeapType::Default,
@@ -325,6 +343,7 @@ namespace Game
 			.size = dataBufferSize,
 			.usage = PonyEngine::RenderDevice::BufferUsage::ShaderResource
 		});
+		staticGpuDataBuffer->Name("StaticData");
 
 		constexpr std::uint32_t srvCount = 8u;
 		std::uint32_t srvIndex = 0u;
@@ -333,6 +352,7 @@ namespace Game
 			.size = srvCount,
 			.shaderVisible = false
 		});
+		stagingSrvContainer->Name("StagingSRVContainer");
 		resolvedTextureContainerIndex = srvIndex++;
 		renderDevice->CreateView(resolvedTexture.get(), *stagingSrvContainer, resolvedTextureContainerIndex, PonyEngine::RenderDevice::TextureSRVParams
 		{
@@ -387,6 +407,7 @@ namespace Game
 			.size = srvCount,
 			.shaderVisible = true
 		});
+		srvContainer->Name("SRVContainer");
 		const auto srvRange = PonyEngine::RenderDevice::ShaderDataCopyRange
 		{
 			.source = stagingSrvContainer.get(),
@@ -399,6 +420,7 @@ namespace Game
 		{
 			.size = renderDevice->SwapChainBufferCount() + 1u
 		});
+		rtvContainer->Name("RTVContainer");
 		renderTargetContainerIndex = rtvIndex++;
 		renderDevice->CreateView(targetTexture.get(), *rtvContainer, renderTargetContainerIndex, PonyEngine::RenderDevice::RTVParams
 		{
@@ -422,6 +444,7 @@ namespace Game
 		{
 			.size = 1u
 		});
+		dsvContainer->Name("DSVContainer");
 		depthContainerIndex = 0u;
 		renderDevice->CreateView(depthTexture.get(), *dsvContainer, depthContainerIndex, PonyEngine::RenderDevice::DSVParams
 		{
@@ -486,6 +509,7 @@ namespace Game
 		{
 			.descriptorSets = descriptorSets
 		});
+		layout->Name("BoxLayout");
 
 		const std::vector<std::byte> triangleShader = LoadShader(TRIANGLE_SHADER);
 		const std::vector<std::byte> pixelShader = LoadShader(PIXEL_SHADER);
@@ -517,6 +541,7 @@ namespace Game
 				.depthStencilFormat = depthStencilTextureFormat
 			}
 		});
+		boxPipelineState->Name("BoxPipelineState");
 
 		constexpr auto resolvedTextureRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
@@ -550,6 +575,7 @@ namespace Game
 		{
 			.descriptorSets = std::span(&resolvedTextureDescriptorSet, 1uz)
 		});
+		outputLayout->Name("OutputLayout");
 
 		const std::vector<std::byte> fullscreenQuadShader = LoadShader(FULLSCREEN_QUAD_SHADER);
 		const std::vector<std::byte> textureShader = LoadShader(TEXTURE_SHADER);
@@ -583,10 +609,69 @@ namespace Game
 				.renderTargetFormats = std::span<const PonyEngine::RenderDevice::RenderTargetAttachmentFormat>(&outputTextureFormat, 1uz)
 			}
 		});
+		outputPipelineState->Name("OutputPipelineState");
+
+		void* const data = stagingStaticDataBuffer->Map();
+		PonyEngine::RenderDevice::Copy(&boxMeshlets, 0ull, data, boxMeshletOffset, sizeof(boxMeshlets));
+		PonyEngine::RenderDevice::Copy(&boxVertexIndices, 0ull, data, boxVertexIndexOffset, sizeof(boxVertexIndices));
+		PonyEngine::RenderDevice::Copy(&boxPrimitiveIndices, 0ull, data, boxPrimitiveOffset, sizeof(boxPrimitiveIndices));
+		PonyEngine::RenderDevice::Copy(&boxPositions, 0ull, data, boxPositionOffset, sizeof(boxPositions));
+		PonyEngine::RenderDevice::Copy(&greenBoxMaterial, 0ull, data, greenBoxMaterialOffset, sizeof(greenBoxMaterial));
+		stagingStaticDataBuffer->Unmap();
+
+		const auto preCopyBarriers = std::array<PonyEngine::RenderDevice::BufferBarrier, 2>
+		{
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = stagingStaticDataBuffer.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.beforeAccesses = std::nullopt,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::CopySource
+			},
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = staticGpuDataBuffer.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.beforeAccesses = std::nullopt,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::CopyDestination
+			}
+		};
+		copyCommandList->Barrier(preCopyBarriers);
+		copyCommandList->Copy(*stagingStaticDataBuffer, *staticGpuDataBuffer);
+		const auto postCopyBarriers = std::array<PonyEngine::RenderDevice::BufferBarrier, 2>
+		{
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = stagingStaticDataBuffer.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::CopySource,
+				.afterAccesses = std::nullopt
+			},
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = staticGpuDataBuffer.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::CopyDestination,
+				.afterAccesses = std::nullopt
+			}
+		};
+		copyCommandList->Barrier(postCopyBarriers);
 
 		graphicsCommandList->Close();
 		computeCommandList->Close();
 		copyCommandList->Close();
+
+		const PonyEngine::RenderDevice::ICopyCommandList* const copyCommand = copyCommandList.get();
+		const auto copyFenceValueSync = PonyEngine::RenderDevice::FenceValue{ .fence = copyFence.get(), .value = ++copyFenceValue };
+		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::ICopyCommandList* const>(&copyCommand, 1uz), PonyEngine::RenderDevice::QueueSync
+		{
+			.after = std::span<const PonyEngine::RenderDevice::FenceValue>(&copyFenceValueSync, 1uz)
+		});
+		waiter->Wait(std::span<const PonyEngine::RenderDevice::FenceValue>(&copyFenceValueSync, 1uz), std::chrono::seconds(10));
 	}
 
 	void GameService::End()
@@ -628,14 +713,14 @@ namespace Game
 		const float qValue = rawInput->Value(qAxis);
 		const float eValue = rawInput->Value(eAxis);
 		const float deltaTime = time->VirtualDeltaTimeSeconds<float>();
-		const PonyEngine::Math::Vector3<float> translate = PonyEngine::Math::ClampMagnitude(PonyEngine::Math::Vector3<float>(dValue - aValue, wValue - sValue, spaceValue - ctrlValue), 1.f) * 10.f * deltaTime;
-		const float rotateZ = (eValue - qValue) * 10.f * deltaTime;
-		const PonyEngine::Math::Quaternion<float> rotate = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(xValue, yValue, rotateZ));
+		const PonyEngine::Math::Vector3<float> translate = PonyEngine::Math::ClampMagnitude(PonyEngine::Math::Vector3<float>(dValue - aValue, spaceValue - ctrlValue, wValue - sValue), 1.f) * 10.f * deltaTime;
+		const float rotateZ = (eValue - qValue) * 1.f * deltaTime;
+		const PonyEngine::Math::Quaternion<float> rotate = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(yValue * 0.001f, xValue * 0.001f, rotateZ));
 		cameraTransform.Rotate(rotate);
 		cameraTransform.Translate(cameraTransform.Rotation() * translate);
 
 		const PonyEngine::Math::Matrix4x4<float> view = cameraTransform.TRSMatrix().Inverse();
-		const PonyEngine::Math::Matrix4x4<float> projection = PonyEngine::Math::PerspectiveMatrix(60.f * PonyEngine::Math::DegToRad<float>, 16.f / 9.f, 0.03f, 1000.f);
+		const PonyEngine::Math::Matrix4x4<float> projection = PonyEngine::Math::PerspectiveMatrix(60.f * PonyEngine::Math::DegToRad<float>, static_cast<float>(resolution.X()) / resolution.Y(), 0.03f, 1000.f);
 		const PonyEngine::Math::Matrix4x4<float> vp = projection * view;
 
 		const PonyEngine::Math::Matrix4x4<float> boxModel = boxTransform.TRSMatrix();
@@ -710,6 +795,25 @@ namespace Game
 			.scissor = PonyEngine::Math::CornerRect<std::uint32_t>(resolution)
 		});
 
+		const auto renderBufferBarriers = std::array<PonyEngine::RenderDevice::BufferBarrier, 2>
+		{
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = gpuTransforms.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::VertexShading,
+				.beforeAccesses = std::nullopt,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource
+			},
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = staticGpuDataBuffer.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::VertexShading | PonyEngine::RenderDevice::PipelineStage::PixelShading,
+				.beforeAccesses = std::nullopt,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource
+			}
+		};
 		const auto renderTextureBarriers = std::array<PonyEngine::RenderDevice::TextureBarrier, 2>
 		{
 			PonyEngine::RenderDevice::TextureBarrier
@@ -733,15 +837,42 @@ namespace Game
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite
 			},
 		};
-		graphicsCommandList->Barrier(renderTextureBarriers);
+		graphicsCommandList->Barrier(renderBufferBarriers, renderTextureBarriers);
 		graphicsCommandList->ClearRTV(*rtvContainer, renderTargetContainerIndex, PonyEngine::Math::ColorRGBA<float>::Black());
 		graphicsCommandList->ClearDSV(*dsvContainer, depthContainerIndex, 1.f, 0u);
 		const auto renderTargetBinding = PonyEngine::RenderDevice::RenderTargetBinding{.container = rtvContainer.get(), .index = renderTargetContainerIndex};
 		const auto depthTargetBinding = PonyEngine::RenderDevice::DepthStencilBinding{.container = dsvContainer.get(), .index = depthContainerIndex};
 		graphicsCommandList->BindTargets(renderTargetBinding, depthTargetBinding);
 		graphicsCommandList->BindPipelineState(*boxPipelineState);
-		//graphicsCommandList->DispatchGraphics(2u);
-		const auto resolveBarriers = std::array<PonyEngine::RenderDevice::TextureBarrier, 3>
+		const auto bindings = std::array<PonyEngine::RenderDevice::ShaderDataBinding, 4>
+		{
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 0u, .containerIndex = boxTransformContainerIndex},
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 1u, .containerIndex = boxMeshletContainerIndex},
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 2u, .containerIndex = boxPositionContainerIndex},
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 3u, .containerIndex = greenBoxMaterialContainerIndex}
+		};
+		graphicsCommandList->BindGraphics(bindings);
+		graphicsCommandList->DispatchGraphics(2u);
+		const auto resolveBufferBarriers = std::array<PonyEngine::RenderDevice::BufferBarrier, 2>
+		{
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = gpuTransforms.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::VertexShading,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource,
+				.afterAccesses = std::nullopt
+			},
+			PonyEngine::RenderDevice::BufferBarrier
+			{
+				.buffer = staticGpuDataBuffer.get(),
+				.beforeStages = PonyEngine::RenderDevice::PipelineStage::VertexShading | PonyEngine::RenderDevice::PipelineStage::PixelShading,
+				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource,
+				.afterAccesses = std::nullopt
+			}
+		};
+		const auto resolveTextureBarriers = std::array<PonyEngine::RenderDevice::TextureBarrier, 3>
 		{
 			PonyEngine::RenderDevice::TextureBarrier
 			{
@@ -774,7 +905,7 @@ namespace Game
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::ResolveDestination
 			}
 		};
-		graphicsCommandList->Barrier(resolveBarriers);
+		graphicsCommandList->Barrier(resolveBufferBarriers, resolveTextureBarriers);
 		graphicsCommandList->Resolve(*targetTexture, *resolvedTexture);
 		const auto outputBarriers = std::array<PonyEngine::RenderDevice::TextureBarrier, 3>
 		{
