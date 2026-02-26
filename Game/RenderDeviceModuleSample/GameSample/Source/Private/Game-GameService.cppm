@@ -7,6 +7,7 @@ import PonyEngine.Math;
 import PonyEngine.RawInput;
 import PonyEngine.RenderDevice;
 import PonyEngine.Shader;
+import PonyEngine.Surface;
 import PonyEngine.Time;
 
 export namespace Game
@@ -165,6 +166,10 @@ namespace Game
 
 	void GameService::Begin()
 	{
+		auto& surface = application->GetService<PonyEngine::Surface::ISurfaceService>();
+		surface.CursorVisibility(false);
+		surface.CursorClippingRect(PonyEngine::Math::CornerRect<float>(PonyEngine::Math::Vector2<float>(0.5f, 0.5f), PonyEngine::Math::Vector2<float>::Zero()));
+
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
 		graphicsCommandList->Name("MainGraphics");
 		computeCommandList = renderDevice->CreateComputeCommandList();
@@ -714,8 +719,9 @@ namespace Game
 		const float eValue = rawInput->Value(eAxis);
 		const float deltaTime = time->VirtualDeltaTimeSeconds<float>();
 		const PonyEngine::Math::Vector3<float> translate = PonyEngine::Math::ClampMagnitude(PonyEngine::Math::Vector3<float>(dValue - aValue, spaceValue - ctrlValue, wValue - sValue), 1.f) * 10.f * deltaTime;
-		const float rotateZ = (eValue - qValue) * 1.f * deltaTime;
-		const PonyEngine::Math::Quaternion<float> rotate = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(yValue * 0.001f, xValue * 0.001f, rotateZ));
+		const PonyEngine::Math::Quaternion<float> rotate = PonyEngine::Math::RotationQuaternion(cameraTransform.Up(), xValue * 0.001f) *
+			PonyEngine::Math::RotationQuaternion(cameraTransform.Right(), yValue * 0.001f) * 
+			PonyEngine::Math::RotationQuaternion(cameraTransform.Forward(), (qValue - eValue) * 1.f * deltaTime);
 		cameraTransform.Rotate(rotate);
 		cameraTransform.Translate(cameraTransform.Rotation() * translate);
 
