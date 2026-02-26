@@ -418,7 +418,7 @@ namespace PonyEngine::Application
 		}
 		std::ranges::sort(orderedTickableServices, [](const TickableServiceInfo& lhs, const TickableServiceInfo& rhs) noexcept
 		{
-			return lhs.tickOrder < rhs.tickOrder;
+			return lhs.tickOrder <= rhs.tickOrder;
 		});
 
 		tickableServices.clear();

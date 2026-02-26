@@ -34,6 +34,7 @@ target_link_libraries(GameSample PRIVATE
 	PonyEngine.RawInput
 	PonyEngine.RenderDevice
 	PonyEngine.Shader
+	PonyEngine.Surface
 	PonyEngine.Time
 )
 

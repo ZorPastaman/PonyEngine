@@ -113,8 +113,9 @@ namespace PonyEngine::RawInput
 
 	std::variant<RawInputEvent, ConnectionEvent> RawInputQueue::Event(const std::size_t index) const noexcept
 	{
-		const std::variant<InputData, ConnectionData>& event = events[index];
-		const std::chrono::time_point<std::chrono::steady_clock> time = eventTimes[index];
+		const std::size_t eventIndex = eventIndices[index];
+		const std::variant<InputData, ConnectionData>& event = events[eventIndex];
+		const std::chrono::time_point<std::chrono::steady_clock> time = eventTimes[eventIndex];
 
 		return std::visit<std::variant<RawInputEvent, ConnectionEvent>>(Type::Overload
 		{
@@ -151,7 +152,7 @@ namespace PonyEngine::RawInput
 
 			if (lhsTime != rhsTime) [[likely]]
 			{
-				return lhsTime < rhsTime;
+				return lhsTime <= rhsTime;
 			}
 
 			const bool lhsConnection = std::holds_alternative<ConnectionData>(events[lhs]);
