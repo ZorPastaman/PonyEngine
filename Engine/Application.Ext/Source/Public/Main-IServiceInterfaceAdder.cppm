@@ -18,18 +18,19 @@ import std;
 export namespace PonyEngine::Application
 {
 	/// @brief Service interface adder.
-	/// @note All the functions here must be called on a main thread.
 	class IServiceInterfaceAdder
 	{
 		PONY_INTERFACE_BODY(IServiceInterfaceAdder)
 
 		/// @brief Adds an interface.
 		/// @param type Interface type.
-		/// @param interface 
+		/// @param interface Interface.
+		/// @note The function must be called on a main thread.
 		virtual void AddInterface(std::type_index type, void* interface) = 0;
 		/// @brief Adds an interface.
 		/// @tparam T Interface type.
 		/// @param interface Interface.
+		/// @note The function must be called on a main thread.
 		template<typename T>
 		void AddInterface(T& interface);
 	};

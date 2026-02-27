@@ -22,26 +22,29 @@ import :FeatureEntry;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Raw input context.
-	/// @note All the functions here except for the application and logger getters must be called only on constructor, begin, tick or end of an input provider.
 	class IRawInputContext
 	{
 		PONY_INTERFACE_BODY(IRawInputContext)
 
 		/// @brief Gets the application context.
 		/// @return Application context.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual Application::IApplicationContext& Application() noexcept = 0;
 		/// @brief Gets the application context.
 		/// @return Application context.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept = 0;
 
 		/// @brief Gets the logger.
 		/// @return Logger.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& Logger() noexcept = 0;
 		/// @brief Gets the logger.
 		/// @return Logger.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 

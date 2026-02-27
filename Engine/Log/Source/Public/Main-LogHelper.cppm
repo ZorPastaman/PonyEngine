@@ -16,12 +16,11 @@ import :LogType;
 
 export namespace PonyEngine::Log
 {
-	// Functions here are used by PonyEngine/Log/Log.h
-
 	/// @brief Logs to the logger.
 	/// @param logger Logger.
 	/// @param logType Log type.
 	/// @param message Log message.
+	/// @note The function is thread-safe.
 	void LogToLogger(const ILogger& logger, LogType logType, std::string_view message) noexcept;
 	/// @brief Logs to the logger.
 	/// @tparam Args Format argument types.
@@ -29,6 +28,7 @@ export namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @param format Log message format.
 	/// @param args Log message format arguments.
+	/// @note The function is thread-safe.
 	template<typename... Args>
 	void LogToLogger(const ILogger& logger, LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
 	/// @brief Logs to the logger.
@@ -36,6 +36,7 @@ export namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @param stacktrace Stacktrace.
 	/// @param message Log message.
+	/// @note The function is thread-safe.
 	void LogToLogger(const ILogger& logger, LogType logType, const std::stacktrace& stacktrace, std::string_view message) noexcept;
 	/// @brief Logs to the logger.
 	/// @tparam Args Format argument types.
@@ -44,17 +45,20 @@ export namespace PonyEngine::Log
 	/// @param stacktrace Stacktrace.
 	/// @param format Log message format.
 	/// @param args Log message format arguments.
+	/// @note The function is thread-safe.
 	template<typename... Args>
 	void LogToLogger(const ILogger& logger, LogType logType, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
 
 	/// @brief Logs to the logger.
 	/// @param logger Logger.
 	/// @param exception Exception.
+	/// @note The function is thread-safe.
 	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception) noexcept;
 	/// @brief Logs to the logger.
 	/// @param logger Logger.
 	/// @param exception Exception.
 	/// @param message Log message.
+	/// @note The function is thread-safe.
 	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, std::string_view message) noexcept;
 	/// @brief Logs to the logger.
 	/// @tparam Args Format argument types.
@@ -62,18 +66,21 @@ export namespace PonyEngine::Log
 	/// @param exception Exception.
 	/// @param format Log message format.
 	/// @param args Log message format arguments.
+	/// @note The function is thread-safe.
 	template<typename... Args>
 	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, std::format_string<Args...> format, Args&&... args) noexcept;
 	/// @brief Logs to the logger.
 	/// @param logger Logger.
 	/// @param exception Exception.
 	/// @param stacktrace Stacktrace.
+	/// @note The function is thread-safe.
 	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace) noexcept;
 	/// @brief Logs to the logger.
 	/// @param logger Logger.
 	/// @param exception Exception.
 	/// @param stacktrace Stacktrace.
 	/// @param message Log message.
+	/// @note The function is thread-safe.
 	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, std::string_view message) noexcept;
 	/// @brief Logs to the logger.
 	/// @tparam Args Format argument types.
@@ -82,6 +89,7 @@ export namespace PonyEngine::Log
 	/// @param stacktrace Stacktrace.
 	/// @param format Log message format.
 	/// @param args Log message format arguments.
+	/// @note The function is thread-safe.
 	template<typename... Args>
 	void LogToLogger(const ILogger& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
 }

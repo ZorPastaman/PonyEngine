@@ -20,17 +20,18 @@ import :IApplicationContext;
 export namespace PonyEngine::Application
 {
 	/// @brief Logger context.
-	/// @note By default, all the functions here are thread-safe. If a function isn't thread-safe, its docs must tell it.
 	class ILoggerContext
 	{
 		PONY_INTERFACE_BODY(ILoggerContext)
 
 		/// @brief Gets the application context.
 		/// @return Application.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual IApplicationContext& Application() noexcept = 0;
 		/// @brief Gets the application context.
 		/// @return Application.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual const IApplicationContext& Application() const noexcept = 0;
 

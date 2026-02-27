@@ -39,7 +39,7 @@
 		static auto format(const Value value, std::format_context& context) \
 		{ \
 			const std::size_t index = static_cast<std::size_t>(value); \
-			return std::ranges::copy(index < ValueNames.size() ? ValueNames[index] : "Unknown"sv, context.out()).out; \
+			return std::ranges::copy(index < ValueNames.size() ? ValueNames[index] : std::string_view("Unknown"), context.out()).out; \
 		} \
 	}; \
 
@@ -61,15 +61,15 @@
 		{ \
 			if (std::to_underlying(mask) == std::underlying_type_t<Mask>{0}) \
 			{ \
-				return std::ranges::copy("None"sv, context.out()).out; \
+				return std::ranges::copy(std::string_view("None"), context.out()).out; \
 			} \
 			if (mask == Mask::All) \
 			{ \
-				return std::ranges::copy("All"sv, context.out()).out; \
+				return std::ranges::copy(std::string_view("All"), context.out()).out; \
 			} \
 			if (std::to_underlying(mask) > std::to_underlying(Mask::All)) \
 			{ \
-				return std::ranges::copy("Unknown"sv, context.out()).out; \
+				return std::ranges::copy(std::string_view("Unknown"), context.out()).out; \
 			} \
 			\
 			bool hasText = false; \
@@ -80,7 +80,7 @@
 				{ \
 					if (hasText) \
 					{ \
-						it = std::ranges::copy(" | "sv, it).out; \
+						it = std::ranges::copy(std::string_view(" | "), it).out; \
 					} \
 					it = std::ranges::copy(MaskNames[i], it).out; \
 					hasText = true; \
