@@ -19,20 +19,22 @@ import :DeviceHandle;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Device observer.
-	/// @note The observer functions are always called during a raw input service tick.
 	class IDeviceObserver
 	{
 		PONY_INTERFACE_BODY(IDeviceObserver)
 
 		/// @brief Invoked when a new device is added.
 		/// @param deviceHandle New device handle.
-		virtual void OnDeviceAdded(DeviceHandle deviceHandle) {};
+		/// @note The function is called during a raw input service tick.
+		virtual void OnDeviceAdded(DeviceHandle deviceHandle) {}
 		/// @brief Invoked when a device is removed.
 		/// @param deviceHandle New device handle.
-		virtual void OnDeviceRemoved(DeviceHandle deviceHandle) {};
+		/// @note The function is called during a raw input service tick.
+		virtual void OnDeviceRemoved(DeviceHandle deviceHandle) {}
 		/// @brief Invoked when a device connection change.
 		/// @param deviceHandle Device handle.
 		/// @param connection Connection event.
-		virtual void OnDeviceConnectionChanged(DeviceHandle deviceHandle, const ConnectionEvent& connection) {};
+		/// @note The function is called during a raw input service tick.
+		virtual void OnDeviceConnectionChanged(DeviceHandle deviceHandle, const ConnectionEvent& connection) {}
 	};
 }

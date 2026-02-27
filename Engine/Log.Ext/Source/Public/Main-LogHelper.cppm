@@ -23,6 +23,7 @@ export namespace PonyEngine::Log
 	/// @param logger Logger.
 	/// @param logType Log type.
 	/// @param message Log message.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	void LogToConsole(const ILoggerContext& logger, LogType logType, std::string_view message) noexcept;
 	/// @brief Logs to a console.
 	/// @tparam Args Format argument types.
@@ -30,6 +31,7 @@ export namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @param format Log message format.
 	/// @param args Log message format arguments.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	template<typename... Args>
 	void LogToConsole(const ILoggerContext& logger, LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
 	/// @brief Logs to a console.
@@ -37,25 +39,29 @@ export namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @param stacktrace Stacktrace.
 	/// @param message Log message.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	void LogToConsole(const ILoggerContext& logger, LogType logType, const std::stacktrace& stacktrace, std::string_view message) noexcept;
 	/// @brief Logs to a console.
 	/// @tparam Args Format argument types.
 	/// @param logger Logger.
 	/// @param logType Log type.
-	/// @param stacktrace 
-	/// @param format 
-	/// @param args 
+	/// @param stacktrace Stack trace.
+	/// @param format Log message format.
+	/// @param args Log message format arguments.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	template<typename... Args>
 	void LogToConsole(const ILoggerContext& logger, LogType logType, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
 
 	/// @brief Logs to a console.
 	/// @param logger Logger.
 	/// @param exception Exception.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	void LogToConsole(const ILoggerContext& logger, const std::exception_ptr& exception) noexcept;
 	/// @brief Logs to a console.
 	/// @param logger Logger.
 	/// @param exception Exception.
 	/// @param message Log message.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	void LogToConsole(const ILoggerContext& logger, const std::exception_ptr& exception, std::string_view message) noexcept;
 	/// @brief Logs to a console.
 	/// @tparam Args Format argument types.
@@ -63,18 +69,21 @@ export namespace PonyEngine::Log
 	/// @param exception Exception.
 	/// @param format Log message format.
 	/// @param args Log message format arguments.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	template<typename... Args>
 	void LogToConsole(const ILoggerContext& logger, const std::exception_ptr& exception, std::format_string<Args...> format, Args&&... args) noexcept;
 	/// @brief Logs to a console.
 	/// @param logger Logger.
 	/// @param exception Exception.
 	/// @param stacktrace Stacktrace.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	void LogToConsole(const ILoggerContext& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace) noexcept;
 	/// @brief Logs to a console.
 	/// @param logger Logger.
 	/// @param exception Exception.
 	/// @param stacktrace Stacktrace.
 	/// @param message Log message.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	void LogToConsole(const ILoggerContext& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, std::string_view message) noexcept;
 	/// @brief Logs to a console.
 	/// @tparam Args Format argument types.
@@ -83,6 +92,7 @@ export namespace PonyEngine::Log
 	/// @param stacktrace Stacktrace.
 	/// @param format Log message format.
 	/// @param args Log message format arguments.
+	/// @note Must be called on the same thread a sub-logger was called on.
 	template<typename... Args>
 	void LogToConsole(const ILoggerContext& logger, const std::exception_ptr& exception, const std::stacktrace& stacktrace, std::format_string<Args...> format, Args&&... args) noexcept;
 }

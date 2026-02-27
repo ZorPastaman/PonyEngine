@@ -16,16 +16,18 @@ export module PonyEngine.RawInput.Ext:IInputProvider;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Input provider.
-	/// @note All the functions here are always called on a main thread.
 	class IInputProvider
 	{
 		PONY_INTERFACE_BODY(IInputProvider)
 
 		/// @brief Invoked before a first tick.
+		/// @note The function is always called on a main thread.
 		virtual void Begin() = 0;
 		/// @brief Invoked after a last tick.
+		/// @note The function is always called on a main thread.
 		virtual void End() = 0;
 		/// @brief Ticks the provider.
+		/// @note The function is always called on a main thread.
 		virtual void Tick() = 0;
 	};
 }

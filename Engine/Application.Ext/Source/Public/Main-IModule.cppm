@@ -20,16 +20,17 @@ import :IModuleContext;
 export namespace PonyEngine::Application
 {
 	/// @brief Module.
-	/// @note The module functions are always called on a main thread.
 	class IModule
 	{
 		PONY_INTERFACE_BODY(IModule)
 
 		/// @brief Invoked on an application start-up.
-		/// @param context Module context.
+		/// @param context Module context. The context is valid only during the start-up function.
+		/// @note The function is always called on a main thread.
 		virtual void StartUp(IModuleContext& context) = 0;
 		/// @brief Invoked on an application shut-down.
-		/// @param context Module context.
+		/// @param context Module context. The context is valid only during the shut-down function.
+		/// @note The function is always called on a main thread.
 		virtual void ShutDown(IModuleContext& context) = 0;
 	};
 }

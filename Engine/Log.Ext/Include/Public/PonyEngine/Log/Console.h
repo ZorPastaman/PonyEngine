@@ -10,7 +10,6 @@
 #pragma once
 
 // To use this header, you have to import PonyEngine.Log.Ext as well.
-// All the macros here are thread-safe.
 
 #include "PonyEngine/Log/Log.h"
 
@@ -19,6 +18,7 @@
 /// @param type PonyEngine::Log::LogType value.
 /// @param message std::string_view as a message or format string.
 /// @param ... Format arguments.
+/// @note The function is thread-safe.
 #define PONY_CONSOLE_PUSH(logger, type, message, ...) \
 	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_STACKTRACE_MASK)) \
 	{ \
@@ -34,6 +34,7 @@
 /// @param logger PonyEngine::Log::ILogger reference.
 /// @param exception std::exception_ptr reference.
 /// @param ... Message or format and format arguments.
+/// @note The function is thread-safe.
 #define PONY_CONSOLE_PUSH_X(logger, exception, ...) \
 	if constexpr (PonyEngine::Log::IsInMask(PonyEngine::Log::LogType::Exception, PONY_LOG_STACKTRACE_MASK)) \
 	{ \
@@ -50,6 +51,7 @@
 /// @param type PonyEngine::Log::LogType value.
 /// @param message std::string_view as a message or format string.
 /// @param ... Format arguments.
+/// @note The function is thread-safe.
 #define PONY_CONSOLE(logger, type, message, ...) \
 	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_MASK)) \
 	{ \
@@ -62,6 +64,7 @@
 /// @param type PonyEngine::Log::LogType value.
 /// @param message std::string_view as a message or format string.
 /// @param ... Format arguments.
+/// @note The function is thread-safe.
 #define PONY_CONSOLE_IF(condition, logger, type, message, ...) \
 	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_MASK)) \
 	{ \
@@ -76,6 +79,7 @@
 /// @param exception std::exception reference.
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Message or format and format arguments.
+/// @note The function is thread-safe.
 #define PONY_CONSOLE_X(logger, exception, ...) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogTypeMask::None) \
 	{ \
@@ -88,6 +92,7 @@
 /// @param exception std::exception reference.
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Message or format and format arguments.
+/// @note The function is thread-safe.
 #define PONY_CONSOLE_X_IF(condition, logger, exception, ...) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogTypeMask::None) \
 	{ \

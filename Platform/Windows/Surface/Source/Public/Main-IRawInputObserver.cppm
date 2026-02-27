@@ -17,18 +17,19 @@ export module PonyEngine.Surface.Windows:IRawInputObserver;
 export namespace PonyEngine::Surface::Windows
 {
 	/// @brief Windows raw input observer.
-	/// @note All the observer functions are always called on a main thread.
 	class IRawInputObserver
 	{
 		PONY_INTERFACE_BODY(IRawInputObserver)
 
 		/// @brief Observes raw input.
 		/// @param rawInput Raw input to observe.
+		/// @note The function is always called on a main thread.
 		virtual void Observe(const RAWINPUT& rawInput) {}
 
 		/// @brief Invoked on a device connection change.
 		/// @param device Device handle.
 		/// @param isConnected Is the device connected?
+		/// @note The function is always called on a main thread.
 		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) {}
 	};
 }

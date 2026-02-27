@@ -20,7 +20,6 @@ import :ITickableService;
 export namespace PonyEngine::Application
 {
 	/// @brief Tickable service adder.
-	/// @note All the functions here must be called on a main thread.
 	class ITickableServiceAdder
 	{
 		PONY_INTERFACE_BODY(ITickableServiceAdder)
@@ -28,6 +27,7 @@ export namespace PonyEngine::Application
 		/// @brief Adds a tickable service.
 		/// @param tickable Tickable service.
 		/// @param tickOrder Tick order.
+		/// @note The function must be called on a main thread.
 		virtual void Add(ITickableService& tickable, std::int32_t tickOrder) = 0;
 	};
 }

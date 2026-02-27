@@ -19,23 +19,26 @@ import :ITickableServiceAdder;
 export namespace PonyEngine::Application
 {
 	/// @brief Service
-	/// @note The service functions are always called on a main thread.
 	class IService
 	{
 		PONY_INTERFACE_BODY(IService)
 
 		/// @brief Begins the service.
 		/// @details It's called once before a first application tick.
+		/// @note The function is always called on a main thread.
 		virtual void Begin() = 0;
 		/// @brief Ends the service.
 		/// @details It's called once after a last application tick.
+		/// @note The function is always called on a main thread.
 		virtual void End() = 0;
 
 		/// @brief Adds tickable services.
 		/// @param adder Tickable service adder.
+		/// @note The function is always called on a main thread.
 		virtual void AddTickableServices(ITickableServiceAdder& adder) {}
 		/// @brief Adds a service interface.
 		/// @param adder Service interface adder.
+		/// @note The function is always called on a main thread.
 		virtual void AddInterfaces(IServiceInterfaceAdder& adder) {}
 	};
 }

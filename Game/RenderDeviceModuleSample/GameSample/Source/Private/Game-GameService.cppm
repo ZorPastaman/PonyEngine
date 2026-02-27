@@ -81,11 +81,11 @@ export namespace Game
 		PonyEngine::RawInput::AxisId yAxis;
 		PonyEngine::RawInput::AxisId qAxis;
 		PonyEngine::RawInput::AxisId eAxis;
+		PonyEngine::RawInput::AxisId enterAxis;
+		PonyEngine::RawInput::AxisId escapeAxis;
 
 		std::shared_ptr<PonyEngine::RenderDevice::IGraphicsCommandList> graphicsCommandList;
-		std::shared_ptr<PonyEngine::RenderDevice::IComputeCommandList> computeCommandList;
 		std::shared_ptr<PonyEngine::RenderDevice::ICopyCommandList> copyCommandList;
-		std::shared_ptr<PonyEngine::RenderDevice::ISecondaryGraphicsCommandList> secondaryCommandList;
 
 		std::shared_ptr<PonyEngine::RenderDevice::IFence> graphicsFence;
 		std::shared_ptr<PonyEngine::RenderDevice::IFence> computeFence;
@@ -147,6 +147,8 @@ namespace Game
 		yAxis(rawInput->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::MouseLayout::AxisYPath))),
 		qAxis(rawInput->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainQPath))),
 		eAxis(rawInput->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainEPath))),
+		enterAxis(rawInput->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainEnterPath))),
+		escapeAxis(rawInput->Hash(PonyEngine::RawInput::Axis(PonyEngine::RawInput::KeyboardLayout::MainEscapePath))),
 		boxTransform(PonyEngine::Math::Vector3<float>::Zero(), PonyEngine::Math::Quaternion<float>::Identity(), PonyEngine::Math::Vector3<float>::One()),
 		cameraTransform(PonyEngine::Math::Vector3<float>(0.f, 0.f, -10.f), PonyEngine::Math::Quaternion<float>::Identity(), PonyEngine::Math::Vector3<float>::One())
 	{
@@ -172,12 +174,8 @@ namespace Game
 
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
 		graphicsCommandList->Name("MainGraphics");
-		computeCommandList = renderDevice->CreateComputeCommandList();
-		computeCommandList->Name("MainCompute");
 		copyCommandList = renderDevice->CreateCopyCommandList();
 		copyCommandList->Name("MainCopy");
-		secondaryCommandList = renderDevice->CreateSecondaryGraphicsCommandList();
-		secondaryCommandList->Name("JustSecondary");
 		graphicsFence = renderDevice->CreateFence();
 		graphicsFence->Name("GraphicsFence");
 		computeFence = renderDevice->CreateFence();
@@ -667,7 +665,6 @@ namespace Game
 		copyCommandList->Barrier(postCopyBarriers);
 
 		graphicsCommandList->Close();
-		computeCommandList->Close();
 		copyCommandList->Close();
 
 		const PonyEngine::RenderDevice::ICopyCommandList* const copyCommand = copyCommandList.get();
@@ -717,6 +714,19 @@ namespace Game
 		const float yValue = rawInput->Value(yAxis);
 		const float qValue = rawInput->Value(qAxis);
 		const float eValue = rawInput->Value(eAxis);
+		const float enterValue = rawInput->Value(enterAxis);
+		const float escapeValue = rawInput->Value(escapeAxis);
+
+		if (enterValue > 0.5f)
+		{
+			cameraTransform.Position(PonyEngine::Math::Vector3<float>(0.f, 0.f, -10.f));
+			cameraTransform.Rotation(PonyEngine::Math::Quaternion<float>::Identity());
+		}
+		if (escapeValue > 0.5f)
+		{
+			application->Stop();
+		}
+
 		const float deltaTime = time->VirtualDeltaTimeSeconds<float>();
 		const PonyEngine::Math::Vector3<float> translate = PonyEngine::Math::ClampMagnitude(PonyEngine::Math::Vector3<float>(dValue - aValue, spaceValue - ctrlValue, wValue - sValue), 1.f) * 10.f * deltaTime;
 		const PonyEngine::Math::Quaternion<float> rotate = PonyEngine::Math::RotationQuaternion(cameraTransform.Up(), xValue * 0.001f) *

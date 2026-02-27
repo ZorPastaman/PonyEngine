@@ -19,7 +19,6 @@ import :RawInputEvent;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Raw input observer.
-	/// @note The observer functions are always called during a raw input service tick.
 	class IRawInputObserver
 	{
 		PONY_INTERFACE_BODY(IRawInputObserver)
@@ -27,6 +26,7 @@ export namespace PonyEngine::RawInput
 		/// @brief Invoked on raw input event.
 		/// @param deviceHandle Device handle.
 		/// @param inputEvent Raw input event.
+		/// @note The function is called during a raw input service tick.
 		virtual void OnRawInput(DeviceHandle deviceHandle, const RawInputEvent& inputEvent) = 0;
 	};
 }
