@@ -17,10 +17,11 @@ import :StaticSamplerParams;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Descriptor set. Every descriptor is a separate space in hlsl.
 	struct DescriptorSet final
 	{
-		std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>> ranges;
-		std::span<const StaticSamplerParams> staticSamplers;
-		std::uint32_t setIndex = 0u;
+		std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>> ranges; ///< Ranges.
+		std::span<const StaticSamplerParams> staticSamplers; ///< Static samplers.
+		std::uint32_t setIndex = 0u; ///< Set index. Space index in hlsl. Must be unique for a pipeline state.
 	};
 }

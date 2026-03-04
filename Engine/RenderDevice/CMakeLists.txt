@@ -31,16 +31,14 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-DepthStencil.cppm"
 	"Source/Public/Main-DepthStencilBinding.cppm"
 	"Source/Public/Main-DepthStencilContainerParams.cppm"
-	"Source/Public/Main-DepthStencilMeta.cppm"
 	"Source/Public/Main-DepthStencilParams.cppm"
 	"Source/Public/Main-DescriptorSet.cppm"
 	"Source/Public/Main-DescriptorSetMeta.cppm"
 	"Source/Public/Main-DeviceSupport.cppm"
-	"Source/Public/Main-DSVDimension.cppm"
 	"Source/Public/Main-DSVFlag.cppm"
 	"Source/Public/Main-DSVLayout.cppm"
+	"Source/Public/Main-DSVMeta.cppm"
 	"Source/Public/Main-DSVParams.cppm"
-	"Source/Public/Main-FenceValue.cppm"
 	"Source/Public/Main-FillMode.cppm"
 	"Source/Public/Main-Filter.cppm"
 	"Source/Public/Main-GraphicsPipelineStateParams.cppm"
@@ -83,6 +81,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-ResourceAccess.cppm"
 	"Source/Public/Main-ResourceHeapParams.cppm"
 	"Source/Public/Main-ResourceLayout.cppm"
+	"Source/Public/Main-ResourceSupport.cppm"
 	"Source/Public/Main-RTVLayout.cppm"
 	"Source/Public/Main-RTVParams.cppm"
 	"Source/Public/Main-SampleCount.cppm"
@@ -133,6 +132,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-UAVLayout.cppm"
 	"Source/Public/Main-UAVParams.cppm"
 	"Source/Public/Main-ViewContainerCopyRange.cppm"
+	"Source/Public/Main-ViewSupport.cppm"
 )
 
 message(VERBOSE "Setting properties")

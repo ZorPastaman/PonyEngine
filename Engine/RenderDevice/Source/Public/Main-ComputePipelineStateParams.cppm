@@ -13,8 +13,9 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Compute pipeline state parameters.
 	struct ComputePipelineStateParams final
 	{
-		std::span<const std::byte> computeShader;
+		std::span<const std::byte> computeShader; ///< Compute shader byte-code. Must be a valid shader.
 	};
 }

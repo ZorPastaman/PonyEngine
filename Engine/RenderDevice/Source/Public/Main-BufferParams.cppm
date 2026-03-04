@@ -15,9 +15,10 @@ import :BufferUsage;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Buffer parameters.
 	struct BufferParams final
 	{
-		std::uint64_t size = 1u;
-		BufferUsage usage = BufferUsage::ShaderResource;
+		std::uint64_t size = 1u; ///< Buffer size.
+		BufferUsage usage = BufferUsage::ShaderResource; ///< Buffer usage.
 	};
 }

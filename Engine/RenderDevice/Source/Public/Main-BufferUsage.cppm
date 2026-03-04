@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Buffer usage.
 	enum class BufferUsage : std::uint8_t
 	{
 		None = 0,
@@ -26,4 +27,19 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_MASK_FEATURES(BufferUsage)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Buffer usage names.
+	constexpr std::array<std::string_view, 2> BufferUsageNames
+	{
+		"ShaderResource",
+		"UnorderedAccess"
+	};
+}
+
+export
+{
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::BufferUsage, PonyEngine::RenderDevice::BufferUsageNames)
 }

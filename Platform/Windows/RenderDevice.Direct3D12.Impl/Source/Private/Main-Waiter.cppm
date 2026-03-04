@@ -33,7 +33,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		[[nodiscard("Pure function")]]
 		virtual std::size_t MaxFences() const noexcept override;
-		virtual void Wait(std::span<const FenceValue> fenceValues, std::chrono::nanoseconds timeout) override;
+		virtual void Wait(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, std::chrono::nanoseconds timeout) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -44,10 +44,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	private:
 		void CreateEvents(std::size_t count);
-		std::size_t Signal(std::span<const FenceValue> fenceValues);
-		void Wait(std::size_t count, std::chrono::milliseconds timeout);
+		std::size_t SetEvents(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const;
+		void WaitEvents(std::size_t count, std::chrono::milliseconds timeout);
 
-		void ValidateFences(std::span<const FenceValue> fenceValues) const;
+		void ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const;
 
 		std::vector<HANDLE> waitEvents;
 
@@ -70,13 +70,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return MAXIMUM_WAIT_OBJECTS;
 	}
 
-	void Waiter::Wait(const std::span<const FenceValue> fenceValues, const std::chrono::nanoseconds timeout)
+	void Waiter::Wait(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, const std::chrono::nanoseconds timeout)
 	{
 		ValidateFences(fenceValues);
 
 		CreateEvents(fenceValues.size());
-		const std::size_t waitCount = Signal(fenceValues);
-		Wait(waitCount, std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
+		const std::size_t waitCount = SetEvents(fenceValues);
+		WaitEvents(waitCount, std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
 	}
 
 	std::string_view Waiter::Name() const noexcept
@@ -105,21 +105,21 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	std::size_t Waiter::Signal(const std::span<const FenceValue> fenceValues)
+	std::size_t Waiter::SetEvents(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const
 	{
 		std::size_t waitCount = 0uz;
-		for (const FenceValue& fenceValue : fenceValues)
+		for (const auto [fence, fenceValue] : fenceValues)
 		{
-			if (const auto fence = static_cast<const Fence*>(fenceValue.fence); fence->CompletedValue() < fenceValue.value)
+			if (const auto nativeFence = static_cast<const Fence*>(fence); nativeFence->CompletedValue() < fenceValue)
 			{
-				fence->SetEventOnCompletion(fenceValue.value, waitEvents[waitCount++]);
+				nativeFence->SetEventOnCompletion(fenceValue, waitEvents[waitCount++]);
 			}
 		}
 
 		return waitCount;
 	}
 
-	void Waiter::Wait(const std::size_t count, const std::chrono::milliseconds timeout)
+	void Waiter::WaitEvents(const std::size_t count, const std::chrono::milliseconds timeout)
 	{
 		if (count == 0uz)
 		{
@@ -138,11 +138,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				throw std::runtime_error(std::format("Failed to wait for fence event: ErrorCode = '0x{:X}", GetLastError()));
 			}
 
-			throw std::runtime_error(std::format("Failed to wait for fence event: Result = '0x{:X}", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(std::format("Failed to set wait for fence event: Result = '0x{:X}", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 	}
 
-	void Waiter::ValidateFences(const std::span<const FenceValue> fenceValues) const
+	void Waiter::ValidateFences(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const
 	{
 #ifndef NDEBUG
 		if (fenceValues.size() > MaxFences()) [[unlikely]]
@@ -150,9 +150,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			throw std::invalid_argument("Too many fences");
 		}
 
-		for (const FenceValue& fenceValue : fenceValues)
+		for (const IFence* const fence : std::views::keys(fenceValues))
 		{
-			if (!fenceValue.fence || typeid(*fenceValue.fence) != typeid(Fence)) [[unlikely]]
+			if (!fence || typeid(*fence) != typeid(Fence)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid fence");
 			}

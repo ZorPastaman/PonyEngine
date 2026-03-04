@@ -38,9 +38,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual std::uint32_t Size() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		DepthStencilMeta& Meta(std::uint32_t index) noexcept;
+		DSVMeta& Meta(std::uint32_t index) noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const DepthStencilMeta& Meta(std::uint32_t index) const noexcept override;
+		virtual const DSVMeta& Meta(std::uint32_t index) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -52,7 +52,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle(UINT index) const noexcept;
 
-		void Set(std::uint32_t index, const DepthStencilMeta& meta) noexcept;
+		void Set(std::uint32_t index, const DSVMeta& meta) noexcept;
 
 		DepthStencilContainer& operator =(const DepthStencilContainer&) = delete;
 		DepthStencilContainer& operator =(DepthStencilContainer&&) = delete;
@@ -62,7 +62,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		std::uint32_t size;
 
-		std::unique_ptr<DepthStencilMeta[]> metas;
+		std::unique_ptr<DSVMeta[]> metas;
 	};
 }
 
@@ -71,18 +71,18 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	DepthStencilContainer::DepthStencilContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) noexcept :
 		descriptorHeap(descriptorHeap, handleIncrement, false),
 		size{size},
-		metas(std::make_unique<DepthStencilMeta[]>(this->size))
+		metas(std::make_unique<DSVMeta[]>(this->size))
 	{
-		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyDepthStencilMeta{});
+		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyDSVMeta{});
 	}
 
 	DepthStencilContainer::DepthStencilContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement,
 		const std::uint32_t size) noexcept :
 		descriptorHeap(std::move(descriptorHeap), handleIncrement, false),
 		size{size},
-		metas(std::make_unique<DepthStencilMeta[]>(this->size))
+		metas(std::make_unique<DSVMeta[]>(this->size))
 	{
-		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyDepthStencilMeta{});
+		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyDSVMeta{});
 	}
 
 	std::uint32_t DepthStencilContainer::Size() const noexcept
@@ -90,12 +90,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return size;
 	}
 
-	DepthStencilMeta& DepthStencilContainer::Meta(const std::uint32_t index) noexcept
+	DSVMeta& DepthStencilContainer::Meta(const std::uint32_t index) noexcept
 	{
 		return metas[index];
 	}
 
-	const DepthStencilMeta& DepthStencilContainer::Meta(const std::uint32_t index) const noexcept
+	const DSVMeta& DepthStencilContainer::Meta(const std::uint32_t index) const noexcept
 	{
 		return metas[index];
 	}
@@ -120,7 +120,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return descriptorHeap.CpuHandle(index);
 	}
 
-	void DepthStencilContainer::Set(const std::uint32_t index, const DepthStencilMeta& meta) noexcept
+	void DepthStencilContainer::Set(const std::uint32_t index, const DSVMeta& meta) noexcept
 	{
 		metas[index] = meta;
 	}

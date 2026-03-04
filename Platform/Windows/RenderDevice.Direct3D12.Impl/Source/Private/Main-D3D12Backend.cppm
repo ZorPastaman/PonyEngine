@@ -40,14 +40,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual struct DeviceSupport DeviceSupport() const override;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IBuffer> CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params) override;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<ITexture> CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params) override;
+		virtual std::shared_ptr<ITexture> CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const override;
@@ -162,16 +162,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return RenderDevice::DeviceSupport
 		{
 			.shaderSupport = engine->ShaderSupport(),
-			.cbvRequirement = CBVRequirement{.offsetAlignment = Engine::CBVAlignment, .sizeAlignment = Engine::CBVAlignment},
+			.viewSupport = ViewSupport{.cbvRequirement = CBVRequirement{.offsetAlignment = Engine::CBVAlignment, .sizeAlignment = Engine::CBVAlignment}},
 			.samplerSupport = SamplerSupport{.maxAnisotropy = Engine::MaxAnisotropy},
-			.swapChainSupport = engine->SwapChainSupport(),
 			.rasterizerSupport = engine->RasterizerSupport(),
-			.bufferHeaps = Engine::BufferHeapTypeSupport,
-			.textureHeaps = Engine::TextureHeapTypeSupport
+			.swapChainSupport = engine->SwapChainSupport(),
+			.resourceSupport = ResourceSupport{.bufferHeaps = Engine::BufferHeapTypeSupport, .textureHeaps = Engine::TextureHeapTypeSupport}
 		};
 	}
 
-	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params)
+	std::shared_ptr<IBuffer> D3D12Backend::CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params)
 	{
 		return engine->CreateBuffer(heapParams, params);
 	}
@@ -186,7 +185,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return engine->TextureSupport(request);
 	}
 
-	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params)
+	std::shared_ptr<ITexture> D3D12Backend::CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params)
 	{
 		return engine->CreateTexture(heapParams, params);
 	}

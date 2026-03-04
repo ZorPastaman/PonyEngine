@@ -87,14 +87,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		~Engine() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<IBuffer> CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params);
+		std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params);
 
 		[[nodiscard("Pure function")]]
 		struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const;
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<ITexture> CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params);
+		std::shared_ptr<ITexture> CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params);
 
 		[[nodiscard("Pure function")]]
 		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const;
@@ -189,25 +189,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Engine& operator =(Engine&&) = delete;
 
 	private:
-		struct CopyableFootprintInfo final
-		{
-			std::uint8_t mipCount;
-			std::uint16_t arrayCount;
-		};
-
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse MakeResponse(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
 		[[nodiscard("Pure function")]]
 		SampleCountMask GetSampleCountMask(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
 
-		[[nodiscard("Pure function")]]
-		static CopyableFootprintInfo GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range, DXGI_FORMAT format);
-		[[nodiscard("Pure function")]]
-		static CopyableFootprintInfo GetCopyableFootprintCount(const D3D12_RESOURCE_DESC1& resourceDesc, const SubTextureRange& range);
-		[[nodiscard("Pure function")]]
-		static CopyableFootprintInfo GetCopyableFootprintCount(std::uint8_t resourceMipCount, std::uint16_t resourceArrayCount, const SubTextureRange& range);
-		CopyableFootprintSize GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const CopyableFootprintInfo& footprintCountInfo, UINT64 offset, 
-			UINT16 mostDetailedMipIndex, UINT16 firstArrayIndex, Aspect aspect, std::span<CopyableFootprint> footprints) const;
+		CopyableFootprintSize GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
 
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetFormat(TextureFormatId format) const;
@@ -221,8 +209,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static std::uint16_t GetMaxArraySize(TextureDimension dimension) noexcept;
 		[[nodiscard("Pure function")]]
 		static std::uint16_t GetMaxArraySize(TextureViewDimension dimension) noexcept;
-		[[nodiscard("Pure function")]]
-		static std::uint16_t GetMaxArraySize(DSVDimension dimension) noexcept;
 
 		[[nodiscard("Pure function")]]
 		static Buffer& ToNativeBuffer(IBuffer& buffer);
@@ -270,7 +256,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void Execute(std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, CommandQueue& commandQueue);
 		template<typename CommandList, typename CommandListInterface>
 		static void GetCommandLists(std::span<const CommandListInterface* const> commandLists, std::span<ID3D12CommandList*> lists) noexcept;
-		static void GetFences(std::span<const FenceValue> input, std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept;
+		static void GetFences(std::span<const std::pair<IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept;
+		static void GetFences(std::span<const std::pair<const IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept;
 
 		[[nodiscard("Pure function")]]
 		static D3D12_COMMAND_QUEUE_DESC GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE type) noexcept;
@@ -287,6 +274,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static void ValidateDepthTexture(const TextureParams& params);
 		static void ValidateSRGBFlag(bool srgb, DXGI_FORMAT format);
 		static void ValidateAspect(Aspect aspect, DXGI_FORMAT format);
+		static void ValidateAspect(AspectMask aspects, DXGI_FORMAT format);
 		static void ValidateCBVParams(const Buffer& buffer, const CBVParams& params);
 		static void ValidateSRVParams(const Buffer& buffer, const BufferSRVParams& params);
 		static void ValidateSRVParams(const Texture& texture, const TextureSRVParams& params);
@@ -302,7 +290,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static void ValidateViewFormat(const Texture& texture, TextureFormatId viewFormat, bool srgb);
 		static void ValidateDimension(const Texture& texture, TextureViewDimension dimension);
 		static void ValidateDimension(const Texture& texture, TextureDimension dimension);
-		static void ValidateDimension(const Texture& texture, DSVDimension dimension);
 		static void ValidateLayout(const Texture& texture, const TextureSRVLayout& layout, TextureViewDimension dimension);
 		static void ValidateLayout(const TextureSRVLayout& layout, TextureViewDimension dimension, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateLayout(const Texture& texture, const TextureUAVLayout& layout);
@@ -311,6 +298,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static void ValidateLayout(const RTVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateLayout(const Texture& texture, const DSVLayout& layout);
 		static void ValidateLayout(const DSVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		static void ValidateRange(const TextureParams& params, DXGI_FORMAT format, const SubTextureRange& range);
+		static void ValidateRange(const Texture& texture, const SubTextureRange& range);
 		static void ValidateMipRange(const Texture& texture, const MipRange& range);
 		static void ValidateMipRange(const MipRange& range, std::uint8_t maxMipCount);
 		static void ValidateArrayRange(const Texture& texture, const ArrayRange& range);
@@ -337,7 +326,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		template<typename CommandList, typename CommandListInterface>
 		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
-		static void ValidateFences(std::span<const FenceValue> fences);
+		static void ValidateFences(std::span<const std::pair<IFence*, std::uint64_t>> fences);
+		static void ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fences);
 
 		// {132D4628-84F4-40F4-B72F-8A7B08C3C566}
 		static constexpr GUID CreatorId = { 0x132d4628, 0x84f4, 0x40f4, { 0xb7, 0x2f, 0x8a, 0x7b, 0x8, 0xc3, 0xc5, 0x66 } };
@@ -370,7 +360,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	}
 
-	std::shared_ptr<IBuffer> Engine::CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params)
+	std::shared_ptr<IBuffer> Engine::CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params)
 	{
 		ValidateSize(params);
 
@@ -426,7 +416,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return TextureSupportResponse{};
 	}
 
-	std::shared_ptr<ITexture> Engine::CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params)
+	std::shared_ptr<ITexture> Engine::CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params)
 	{
 		ValidateDimension(params);
 		DXGI_FORMAT format = GetFormat(params.format);
@@ -499,32 +489,37 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::uint32_t Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
 	{
-		const auto [mipCount, arrayCount] = GetCopyableFootprintCount(params, range, GetFormat(params.format));
-		return mipCount * arrayCount;
+		ValidateRange(params, GetFormat(params.format), range);
+		return range.mipRange.mipCount.value_or(params.mipCount - range.mipRange.mostDetailedMipIndex) *
+			range.arrayRange.arrayCount.value_or(params.arraySize - range.arrayRange.firstArrayIndex) *
+			ToPlaneCount(range.aspects);
 	}
 
 	std::uint32_t Engine::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
 	{
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
-		const auto [mipCount, arrayCount] = GetCopyableFootprintCount(resourceDesc, range);
-		return mipCount * arrayCount;
+		const Texture& nativeTexture = ToNativeTexture(texture);
+		ValidateRange(nativeTexture, range);
+		return range.mipRange.mipCount.value_or(nativeTexture.MipCount() - range.mipRange.mostDetailedMipIndex) *
+			range.arrayRange.arrayCount.value_or(nativeTexture.ArraySize() - range.arrayRange.firstArrayIndex) *
+			ToPlaneCount(range.aspects);
 	}
 
 	CopyableFootprintSize Engine::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
 		const std::span<CopyableFootprint> footprints) const
 	{
 		const DXGI_FORMAT format = GetFormat(params.format);
-		const CopyableFootprintInfo footprintCount = GetCopyableFootprintCount(params, range, format);
+		ValidateRange(params, format, range);
 		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
-		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, range.aspect, footprints);
+		return GetCopyableFootprints(resourceDesc, offset, range, footprints);
 	}
 
 	CopyableFootprintSize Engine::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
 		const std::span<CopyableFootprint> footprints) const
 	{
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToNativeTexture(texture).Resource().GetDesc1();
-		const CopyableFootprintInfo footprintCount = GetCopyableFootprintCount(resourceDesc, range);
-		return GetCopyableFootprints(resourceDesc, footprintCount, offset, range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, range.aspect, footprints);
+		const Texture& nativeTexture = ToNativeTexture(texture);
+		ValidateRange(nativeTexture, range);
+		const D3D12_RESOURCE_DESC1 resourceDesc = nativeTexture.Resource().GetDesc1();
+		return GetCopyableFootprints(resourceDesc, offset, range, footprints);
 	}
 
 	std::shared_ptr<IShaderDataContainer> Engine::CreateShaderDataContainer(const ShaderDataContainerParams& params)
@@ -714,7 +709,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = ToDSVDesc(params, format, arraySize);
 		device.CreateDSV(nativeTexture ? &nativeTexture->Resource() : nullptr, dsvDesc, handle);
 
-		nativeContainer.Set(index, DepthStencilTextureMeta{.texture = nativeTexture, .params = params});
+		nativeContainer.Set(index, DSVTextureMeta{.texture = nativeTexture, .params = params});
 	}
 
 	void Engine::CopyViews(const std::span<const DepthStencilCopyRange> ranges)
@@ -814,8 +809,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.version = ShaderIRVersion(),
 			.scalarTypes = ScalarTypeSupport(),
 			.atomicTypes = ToAtomicScalarTypeSupport(atomicSupport),
-			.groupSharedAtomicTypes = ToGroupSharedAtomicScalarTypeSupport(atomicSupport),
-			.simultaneousTargetCount = SimultaneousTargetCount
+			.groupSharedAtomicTypes = ToGroupSharedAtomicScalarTypeSupport(atomicSupport)
 		};
 	}
 
@@ -823,6 +817,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		return RenderDevice::RasterizerSupport
 		{
+			.simultaneousTargetCount = SimultaneousTargetCount,
 			.maxRasterRegionCount = ViewportScissorCount,
 			.lineRasterizationModes = LineRasterizationSupport(),
 			.conservativeRasterization = Device::ConservativeRasterizationSupport
@@ -878,25 +873,25 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const Memory::Arena::Slice<PipelineStateSubobjectRasterizer> rasterizer = arena.Allocate<PipelineStateSubobjectRasterizer>(1u);
 		arena.Span(rasterizer)[0] = ToRasterizerDesc(params.rasterizer);
 
-		if (!params.attachmentParams.renderTargetFormats.empty())
+		if (!params.attachment.renderTargetFormats.empty())
 		{
 			const Memory::Arena::Slice<PipelineStateSubobjectBlend> blend = arena.Allocate<PipelineStateSubobjectBlend>(1u);
 			arena.Span(blend)[0] = ToBlendDesc(params);
 			const Memory::Arena::Slice<PipelineStateSubobjectRenderTargetFormats> rtFormats = arena.Allocate<PipelineStateSubobjectRenderTargetFormats>(1u);
-			arena.Span(rtFormats)[0] = D3D12_RT_FORMAT_ARRAY{.NumRenderTargets = static_cast<UINT>(params.attachmentParams.renderTargetFormats.size())};
+			arena.Span(rtFormats)[0] = D3D12_RT_FORMAT_ARRAY{.NumRenderTargets = static_cast<UINT>(params.attachment.renderTargetFormats.size())};
 			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Span(rtFormats)[0].Data();
-			for (std::size_t i = 0uz; i < std::min(std::size(rtArray.RTFormats), params.attachmentParams.renderTargetFormats.size()); ++i)
+			for (std::size_t i = 0uz; i < std::min(std::size(rtArray.RTFormats), params.attachment.renderTargetFormats.size()); ++i)
 			{
-				rtArray.RTFormats[i] = GetFormat(params.attachmentParams.renderTargetFormats[i].format, params.attachmentParams.renderTargetFormats[i].srgb);
+				rtArray.RTFormats[i] = GetFormat(params.attachment.renderTargetFormats[i].format, params.attachment.renderTargetFormats[i].srgb);
 			}
 		}
 
-		if (params.attachmentParams.depthStencilFormat)
+		if (params.attachment.depthStencilFormat)
 		{
 			const Memory::Arena::Slice<PipelineStateSubobjectDepthStencil> depthStencil = arena.Allocate<PipelineStateSubobjectDepthStencil>(1u);
 			arena.Span(depthStencil)[0] = ToDepthStencilDesc(params.depthStencil);
 			const Memory::Arena::Slice<PipelineStateSubobjectDepthStencilFormat> dsFormat = arena.Allocate<PipelineStateSubobjectDepthStencilFormat>(1u);
-			arena.Span(dsFormat)[0] = GetFormat(*params.attachmentParams.depthStencilFormat);
+			arena.Span(dsFormat)[0] = GetFormat(*params.attachment.depthStencilFormat);
 		}
 
 		const Memory::Arena::Slice<PipelineStateSubobjectSampleDesc> sampleDesc = arena.Allocate<PipelineStateSubobjectSampleDesc>(1u);
@@ -1125,51 +1120,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return mask;
 	}
 
-	Engine::CopyableFootprintInfo Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range, const DXGI_FORMAT format)
+	CopyableFootprintSize Engine::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const std::uint64_t offset, const SubTextureRange& range, 
+		const std::span<CopyableFootprint> footprints) const
 	{
-		ValidateDimension(params);
-		ValidateAspect(range.aspect, format);
-
-		return GetCopyableFootprintCount(params.mipCount, params.arraySize, range);
-	}
-
-	Engine::CopyableFootprintInfo Engine::GetCopyableFootprintCount(const D3D12_RESOURCE_DESC1& resourceDesc, const SubTextureRange& range)
-	{
-		ValidateAspect(range.aspect, resourceDesc.Format);
-
 		const UINT16 arraySize = GetArraySize(resourceDesc);
-		return GetCopyableFootprintCount(static_cast<std::uint8_t>(resourceDesc.MipLevels), arraySize, range);
-	}
-
-	Engine::CopyableFootprintInfo Engine::GetCopyableFootprintCount(const std::uint8_t resourceMipCount, const std::uint16_t resourceArrayCount, const SubTextureRange& range)
-	{
-#ifndef NDEBUG
-		if (range.mipRange.mostDetailedMipIndex + range.mipRange.mipCount.value_or(1u) > resourceMipCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid mip range");
-		}
-		if (range.arrayRange.firstArrayIndex + range.arrayRange.arrayCount.value_or(1u) > resourceArrayCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid array range");
-		}
-#endif
-
-		const std::uint8_t mipCount = range.mipRange.mipCount.value_or(resourceMipCount - range.mipRange.mostDetailedMipIndex);
-		const std::uint16_t arrayCount = range.arrayRange.arrayCount.value_or(resourceArrayCount - range.arrayRange.firstArrayIndex);
-#ifndef NDEBUG
-		if (arrayCount > 1u && (range.mipRange.mostDetailedMipIndex != 0u || mipCount != resourceMipCount))
-		{
-			throw std::invalid_argument("Invalid mip range: mip gaps aren't allowed");
-		}
-#endif
-
-		return CopyableFootprintInfo{.mipCount = mipCount, .arrayCount = arrayCount};
-	}
-
-	CopyableFootprintSize Engine::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const CopyableFootprintInfo& footprintCountInfo, const UINT64 offset, 
-		const UINT16 mostDetailedMipIndex, const UINT16 firstArrayIndex, const Aspect aspect, const std::span<CopyableFootprint> footprints) const
-	{
-		const std::uint32_t footprintCount = footprintCountInfo.mipCount * footprintCountInfo.arrayCount;
+		const UINT16 mipCount = range.mipRange.mipCount.value_or(resourceDesc.MipLevels - range.mipRange.mostDetailedMipIndex);
+		const UINT16 arrayCount = range.arrayRange.arrayCount.value_or(GetArraySize(resourceDesc) - range.arrayRange.firstArrayIndex);
+		const UINT8 planeCount = ToPlaneCount(range.aspects);
+		const UINT footprintCount = static_cast<UINT>(mipCount) * arrayCount * planeCount;
 #ifndef NDEBUG
 		if (footprints.size() != 0uz && footprints.size() != footprintCount) [[unlikely]]
 		{
@@ -1186,13 +1144,44 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const std::span<UINT> rowCountsSpan = arena.Span(rowCounts);
 		const std::span<UINT64> rowSizesSpan = arena.Span(rowSizes);
 
-		const UINT8 planeIndex = ToPlaneIndex(aspect);
-		const UINT16 arraySize = GetArraySize(resourceDesc);
-		const UINT footprintOffset = CalculateSubresource(mostDetailedMipIndex, firstArrayIndex, 
-			planeIndex, resourceDesc.MipLevels, arraySize);
+		UINT64 totalSize = 0ull;
+		const bool hasMipGaps = (arrayCount > 1u || planeCount > 1u) && mipCount != resourceDesc.MipLevels;
+		const bool hasArrayGaps = planeCount > 1u && arrayCount != arraySize;
+		if (hasMipGaps)
+		{
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprintsSpan.data();
+			UINT* rowCount = rowCountsSpan.data();
+			UINT64* rowSize = rowSizesSpan.data();
 
-		const UINT64 totalSize = device.GetCopyableFootprints(resourceDesc, footprintOffset, footprintCount, offset, 
-			subresourceFootprintsSpan.data(), rowCountsSpan.data(), rowSizesSpan.data());
+			for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < planeCount; ++planeIndex)
+			{
+				for (UINT16 arrayIndex = range.arrayRange.firstArrayIndex; arrayIndex < arrayCount; ++arrayIndex, footprint += mipCount, rowCount += mipCount, rowSize += mipCount)
+				{
+					const UINT footprintOffset = CalculateSubresource(range.mipRange.mostDetailedMipIndex, arrayIndex, planeIndex, resourceDesc.MipLevels, arraySize);
+					totalSize += device.GetCopyableFootprints(resourceDesc, footprintOffset, mipCount, offset + totalSize, footprint, rowCount, rowSize);
+				}
+			}
+		}
+		else if (hasArrayGaps)
+		{
+			const UINT subresourceCount = mipCount * arrayCount;
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprintsSpan.data();
+			UINT* rowCount = rowCountsSpan.data();
+			UINT64* rowSize = rowSizesSpan.data();
+
+			for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < planeCount; ++planeIndex, footprint += subresourceCount, rowCount += subresourceCount, rowSize += subresourceCount)
+			{
+				const UINT footprintOffset = CalculateSubresource(range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, planeIndex, resourceDesc.MipLevels, arraySize);
+				totalSize += device.GetCopyableFootprints(resourceDesc, footprintOffset, subresourceCount, offset + totalSize, footprint, rowCount, rowSize);
+			}
+		}
+		else
+		{
+			const UINT footprintOffset = CalculateSubresource(range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, ToFirstPlaneIndex(range.aspects), 
+				resourceDesc.MipLevels, arraySize);
+			totalSize = device.GetCopyableFootprints(resourceDesc, footprintOffset, footprintCount, offset, 
+				subresourceFootprintsSpan.data(), rowCountsSpan.data(), rowSizesSpan.data());
+		}
 
 		for (std::size_t i = 0uz; i < footprints.size(); ++i)
 		{
@@ -1211,7 +1200,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		UINT64 totalRowSizes = 0ull;
 		for (std::size_t i = 0uz; i < footprintCount; ++i)
 		{
-			totalRowSizes += subresourceFootprintsSpan[i].Footprint.Depth * rowCountsSpan[i] * rowSizesSpan[i];
+			totalRowSizes += rowSizesSpan[i] * subresourceFootprintsSpan[i].Footprint.Depth * rowCountsSpan[i];
 		}
 
 		return CopyableFootprintSize{.sourceTotalSize = totalRowSizes, .destinationTotalSize = totalSize};
@@ -1284,20 +1273,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			return std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
 		case TextureViewDimension::Texture3D:
 			return 1u;
-		default: [[unlikely]]
-			assert(false && "Invalid dimension.");
-			return 1u;
-		}
-	}
-
-	std::uint16_t Engine::GetMaxArraySize(const DSVDimension dimension) noexcept
-	{
-		switch (dimension)
-		{
-		case DSVDimension::Texture1D:
-			return std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
-		case DSVDimension::Texture2D:
-			return std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
 		default: [[unlikely]]
 			assert(false && "Invalid dimension.");
 			return 1u;
@@ -1573,12 +1548,21 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	void Engine::GetFences(const std::span<const FenceValue> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept
+	void Engine::GetFences(const std::span<const std::pair<IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept
 	{
 		assert(input.size() == output.size() && "Input and output sizes are not the same.");
 		for (std::size_t i = 0uz; i < input.size(); ++i)
 		{
-			output[i] = std::pair(&static_cast<const Fence*>(input[i].fence)->GetFence(), input[i].value);
+			output[i] = std::pair(&static_cast<const Fence*>(input[i].first)->GetFence(), input[i].second);
+		}
+	}
+
+	void Engine::GetFences(const std::span<const std::pair<const IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept
+	{
+		assert(input.size() == output.size() && "Input and output sizes are not the same.");
+		for (std::size_t i = 0uz; i < input.size(); ++i)
+		{
+			output[i] = std::pair(&static_cast<const Fence*>(input[i].first)->GetFence(), input[i].second);
 		}
 	}
 
@@ -1730,29 +1714,19 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void Engine::ValidateAspect(const Aspect aspect, const DXGI_FORMAT format)
 	{
 #ifndef NDEBUG
-		switch (aspect)
+		if (!IsInMask(aspect, GetAspects(format))) [[unlikely]]
 		{
-		case Aspect::Color:
-			if (IsDepthStencilFormat(format)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid aspect");
-			}
-			break;
-		case Aspect::Depth:
-			if (!IsDepthStencilFormat(format)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid aspect");
-			}
-			break;
-		case Aspect::Stencil:
-			if (!HasStencil(format)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid aspect");
-			}
-			break;
-		default: [[unlikely]]
-			assert(false && "Invalid aspect.");
-			break;
+			throw std::invalid_argument("Invalid aspect");
+		}
+#endif
+	}
+
+	void Engine::ValidateAspect(const AspectMask aspects, const DXGI_FORMAT format)
+	{
+#ifndef NDEBUG
+		if (!All(aspects, GetAspects(format))) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid aspect");
 		}
 #endif
 	}
@@ -1958,30 +1932,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (texture.Dimension() != dimension) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid dimension");
-		}
-#endif
-	}
-
-	void Engine::ValidateDimension(const Texture& texture, const DSVDimension dimension)
-	{
-#ifndef NDEBUG
-		switch (dimension)
-		{
-		case DSVDimension::Texture1D:
-			if (texture.Dimension() != TextureDimension::Texture1D) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid dimension");
-			}
-			break;
-		case DSVDimension::Texture2D:
-			if (texture.Dimension() != TextureDimension::Texture2D) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid dimension");
-			}
-			break;
-		default: [[unlikely]]
-			assert(false && "Invalid dimension");
-			break;
 		}
 #endif
 	}
@@ -2193,11 +2143,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
 				ValidateArrayRange(texture, l.arrayRange);
 			},
-			[&](const MSDSVLayout&)
+			[&](const MultiSampleDSVLayout&)
 			{
 				ValidateSampleCount(texture, true);
 			},
-			[&](const MSArrayDSVLayout& l)
+			[&](const MultiSampleArrayDSVLayout& l)
 			{
 				ValidateSampleCount(texture, true);
 				ValidateArrayRange(texture, l.arrayRange);
@@ -2218,14 +2168,28 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			},
-			[&](const MSDSVLayout&)
+			[&](const MultiSampleDSVLayout&)
 			{
 			},
-			[&](const MSArrayDSVLayout& l)
+			[&](const MultiSampleArrayDSVLayout& l)
 			{
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			}
 		}, layout);
+	}
+
+	void Engine::ValidateRange(const TextureParams& params, const DXGI_FORMAT format, const SubTextureRange& range)
+	{
+		ValidateMipRange(range.mipRange, params.mipCount);
+		ValidateArrayRange(range.arrayRange, params.arraySize);
+		ValidateAspect(range.aspects, format);
+	}
+
+	void Engine::ValidateRange(const Texture& texture, const SubTextureRange& range)
+	{
+		ValidateMipRange(range.mipRange, texture.MipCount());
+		ValidateArrayRange(range.arrayRange, texture.ArraySize());
+		ValidateAspect(range.aspects, texture.NativeFormat());
 	}
 
 	void Engine::ValidateMipRange(const Texture& texture, const MipRange& range)
@@ -2600,7 +2564,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				return p.renderTargetBlend.size();
 			}
 		}, params.blend.blendGroup);
-		if (blendCount != params.attachmentParams.renderTargetFormats.size()) [[unlikely]]
+		if (blendCount != params.attachment.renderTargetFormats.size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Blend render target count and attachment render target count don't match");
 		}
@@ -2608,12 +2572,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			throw std::invalid_argument("Invalid render target count");
 		}
-		if ((params.depthStencil.depth || params.depthStencil.stencil) != params.attachmentParams.depthStencilFormat.has_value()) [[unlikely]]
+		if ((params.depthStencil.depth || params.depthStencil.stencil) != params.attachment.depthStencilFormat.has_value()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid depth stencil format");
 		}
 
-		for (const RenderTargetAttachmentFormat& format : params.attachmentParams.renderTargetFormats)
+		for (const RenderTargetAttachmentFormat& format : params.attachment.renderTargetFormats)
 		{
 			const DXGI_FORMAT nativeFormat = GetFormat(format.format);
 			if (None(AspectMask::Color, GetAspects(nativeFormat))) [[unlikely]]
@@ -2626,9 +2590,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			}
 		}
 
-		if (params.attachmentParams.depthStencilFormat)
+		if (params.attachment.depthStencilFormat)
 		{
-			const DXGI_FORMAT depthStencilFormat = GetFormat(*params.attachmentParams.depthStencilFormat);
+			const DXGI_FORMAT depthStencilFormat = GetFormat(*params.attachment.depthStencilFormat);
 			if (!IsDepthStencilFormat(depthStencilFormat)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid depth stencil format");
@@ -2670,12 +2634,25 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateFences(const std::span<const FenceValue> fences)
+	void Engine::ValidateFences(std::span<const std::pair<IFence*, std::uint64_t>> fences)
 	{
 #ifndef NDEBUG
-		for (const FenceValue& fenceValue : fences)
+		for (const IFence* const fence : std::views::keys(fences))
 		{
-			if (!fenceValue.fence || typeid(*fenceValue.fence) != typeid(Fence))
+			if (!fence || typeid(*fence) != typeid(Fence))
+			{
+				throw std::invalid_argument("Invalid fence");
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fences)
+	{
+#ifndef NDEBUG
+		for (const IFence* const fence: std::views::keys(fences))
+		{
+			if (!fence || typeid(*fence) != typeid(Fence))
 			{
 				throw std::invalid_argument("Invalid fence");
 			}

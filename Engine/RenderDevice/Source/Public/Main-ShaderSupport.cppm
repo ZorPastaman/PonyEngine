@@ -24,6 +24,5 @@ export namespace PonyEngine::RenderDevice
 		ShaderScalarTypeMask scalarTypes = ShaderScalarTypeMask::None;
 		ShaderScalarTypeMask atomicTypes = ShaderScalarTypeMask::None;
 		ShaderScalarTypeMask groupSharedAtomicTypes = ShaderScalarTypeMask::None;
-		std::uint8_t simultaneousTargetCount = 0u;
 	};
 }

@@ -13,7 +13,7 @@ import :HeapType;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct ResourceHeapParams final
+	struct CommittedResourceHeapParams final
 	{
 		HeapType heapType = HeapType::Default;
 		bool notZeroed = false;

@@ -40,18 +40,18 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		virtual const std::shared_ptr<const IPipelineLayout>& Layout() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual ShaderTypeMask ShaderStages() const noexcept override;
+		virtual GraphicsShaderTypeMask ShaderStages() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const RasterizerParams& Rasterizer() const noexcept override;
+		virtual const AttachmentParams& Attachment() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const BlendParams& Blend() const noexcept override;
+		virtual const RasterizerParams& Rasterizer() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const DepthStencilParams& DepthStencil() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const SampleParams& Sample() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const AttachmentParams& Attachment() const noexcept override;
+		virtual const BlendParams& Blend() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -67,7 +67,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void SetComplexData(const GraphicsPipelineStateParams& params);
 
 		[[nodiscard("Pure function")]]
-		static ShaderTypeMask GetShaderStages(const GraphicsPipelineStateParams& params) noexcept;
+		static GraphicsShaderTypeMask GetShaderStages(const GraphicsPipelineStateParams& params) noexcept;
 
 		class PipelineState pipelineState;
 		std::shared_ptr<const IPipelineLayout> layout;
@@ -76,11 +76,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		BlendParams blend;
 		AttachmentParams attachment;
-		RasterizerParams rasterizer;
 		SampleParams sample;
+		RasterizerParams rasterizer;
 		DepthStencilParams depthStencil;
 
-		ShaderTypeMask shaderStages;
+		GraphicsShaderTypeMask shaderStages;
 	};
 }
 
@@ -90,8 +90,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) :
 		pipelineState(pipelineState),
 		layout(layout),
-		rasterizer(params.rasterizer),
 		sample(params.sample),
+		rasterizer(params.rasterizer),
 		depthStencil(params.depthStencil),
 		shaderStages{GetShaderStages(params)}
 	{
@@ -103,8 +103,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) :
 		pipelineState(std::move(pipelineState)),
 		layout(layout),
-		rasterizer(params.rasterizer),
 		sample(params.sample),
+		rasterizer(params.rasterizer),
 		depthStencil(params.depthStencil),
 		shaderStages{GetShaderStages(params)}
 	{
@@ -116,7 +116,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return layout;
 	}
 
-	ShaderTypeMask GraphicsPipelineState::ShaderStages() const noexcept
+	GraphicsShaderTypeMask GraphicsPipelineState::ShaderStages() const noexcept
 	{
 		return shaderStages;
 	}
@@ -163,7 +163,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsPipelineState::SetComplexData(const GraphicsPipelineStateParams& params)
 	{
-		const std::size_t rtFormatByteSize = params.attachmentParams.renderTargetFormats.size_bytes();
+		const std::size_t rtFormatByteSize = params.attachment.renderTargetFormats.size_bytes();
 		const auto [rtBlendByteSize, rtBlendAlignment] = std::visit(Type::Overload
 		{
 			[](const BlendGroupParams& p) noexcept
@@ -181,7 +181,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (rtBlendByteEnd > 0uz)
 		{
 			data = std::make_unique<std::byte[]>(rtBlendByteEnd);
-			std::memcpy(data.get(), params.attachmentParams.renderTargetFormats.data(), params.attachmentParams.renderTargetFormats.size_bytes());
+			std::memcpy(data.get(), params.attachment.renderTargetFormats.data(), params.attachment.renderTargetFormats.size_bytes());
 			std::visit(Type::Overload
 			{
 				[&](const BlendGroupParams& p) noexcept
@@ -195,10 +195,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			}, params.blend.blendGroup);
 		}
 
-		attachment.renderTargetFormats = !params.attachmentParams.renderTargetFormats.empty() 
-			? std::span<const RenderTargetAttachmentFormat>(reinterpret_cast<const RenderTargetAttachmentFormat*>(data.get()), params.attachmentParams.renderTargetFormats.size())
+		attachment.renderTargetFormats = !params.attachment.renderTargetFormats.empty() 
+			? std::span<const RenderTargetAttachmentFormat>(reinterpret_cast<const RenderTargetAttachmentFormat*>(data.get()), params.attachment.renderTargetFormats.size())
 			: std::span<const RenderTargetAttachmentFormat>();
-		attachment.depthStencilFormat = params.attachmentParams.depthStencilFormat;
+		attachment.depthStencilFormat = params.attachment.depthStencilFormat;
 
 		blend.blendGroup = std::visit(Type::Overload
 		{
@@ -224,20 +224,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, params.blend.blendGroup);
 	}
 
-	ShaderTypeMask GraphicsPipelineState::GetShaderStages(const GraphicsPipelineStateParams& params) noexcept
+	GraphicsShaderTypeMask GraphicsPipelineState::GetShaderStages(const GraphicsPipelineStateParams& params) noexcept
 	{
-		auto stages = ShaderTypeMask::None;
+		auto stages = GraphicsShaderTypeMask::None;
 		if (!params.amplificationShader.empty())
 		{
-			stages |= ShaderTypeMask::Amplification;
+			stages |= GraphicsShaderTypeMask::Amplification;
 		}
 		if (!params.meshShader.empty())
 		{
-			stages |= ShaderTypeMask::Mesh;
+			stages |= GraphicsShaderTypeMask::Mesh;
 		}
 		if (!params.pixelShader.empty())
 		{
-			stages |= ShaderTypeMask::Pixel;
+			stages |= GraphicsShaderTypeMask::Pixel;
 		}
 
 		return stages;

@@ -9,25 +9,23 @@
 
 export module PonyEngine.RenderDevice:DeviceSupport;
 
-import std;
-
-import :CBVRequirement;
-import :HeapType;
 import :RasterizerSupport;
+import :ResourceSupport;
 import :SamplerSupport;
 import :ShaderSupport;
 import :SwapChainSupport;
+import :ViewSupport;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Device support.
 	struct DeviceSupport final
 	{
-		ShaderSupport shaderSupport;
-		CBVRequirement cbvRequirement;
-		SamplerSupport samplerSupport;
-		SwapChainSupport swapChainSupport;
-		RasterizerSupport rasterizerSupport;
-		HeapTypeMask bufferHeaps;
-		HeapTypeMask textureHeaps;
+		ShaderSupport shaderSupport; ///< Shader support.
+		ViewSupport viewSupport; ///< Resource view support.
+		SamplerSupport samplerSupport; ///< Sampler support.
+		RasterizerSupport rasterizerSupport; ///< Rasterizer support.
+		SwapChainSupport swapChainSupport; ///< Swap chain support.
+		ResourceSupport resourceSupport; ///< Resource support.
 	};
 }

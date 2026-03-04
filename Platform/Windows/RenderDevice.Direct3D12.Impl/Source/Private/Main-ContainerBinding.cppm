@@ -147,12 +147,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateShaderDataIndex(shaderDataIndex);
 
 #ifndef NDEBUG
-		if (tableIndex >= rootSig.Sets().size()) [[unlikely]]
+		if (tableIndex >= rootSig.DescriptorSets().size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Table index is invalid");
 		}
 
-		const DescriptorSetMeta& set = rootSig.Sets()[tableIndex];
+		const DescriptorSetMeta& set = rootSig.DescriptorSets()[tableIndex];
 
 		std::uint32_t requiredDescriptorCount = 0uz;
 		for (const ShaderDataDescriptorRange& range : set.shaderDataRanges)
@@ -218,12 +218,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateSamplerIndex(samplerIndex);
 
 #ifndef NDEBUG
-		if (tableIndex >= rootSig.Sets().size()) [[unlikely]]
+		if (tableIndex >= rootSig.DescriptorSets().size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Table index is invalid");
 		}
 
-		const DescriptorSetMeta& set = rootSig.Sets()[tableIndex];
+		const DescriptorSetMeta& set = rootSig.DescriptorSets()[tableIndex];
 
 		std::uint32_t requiredDescriptorCount = 0uz;
 		for (const SamplerDescriptorRange& range : set.samplerRanges)

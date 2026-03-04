@@ -40,7 +40,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		~RootSignature() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
-		virtual std::span<const DescriptorSetMeta> Sets() const noexcept override;
+		virtual std::span<const DescriptorSetMeta> DescriptorSets() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -81,7 +81,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		assert(this->rootSignature && "The root signature is nullptr.");
 	}
 
-	std::span<const DescriptorSetMeta> RootSignature::Sets() const noexcept
+	std::span<const DescriptorSetMeta> RootSignature::DescriptorSets() const noexcept
 	{
 		return setCount > 0uz 
 			? std::span<const DescriptorSetMeta>(reinterpret_cast<const DescriptorSetMeta*>(metas.get()), setCount) 

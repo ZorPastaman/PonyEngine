@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DepthStencilMeta;
+export module PonyEngine.RenderDevice:DSVMeta;
 
 import std;
 
@@ -16,15 +16,17 @@ import :ITexture;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct EmptyDepthStencilMeta final
+	/// @brief Empty depth stencil view meta. It means that no view was created.
+	struct EmptyDSVMeta final
 	{
 	};
 
-	struct DepthStencilTextureMeta final
+	/// @brief Depth stencil view to a texture meta.
+	struct DSVTextureMeta final
 	{
-		const ITexture* texture = nullptr;
-		DSVParams params;
+		const ITexture* texture = nullptr; ///< Target texture of a view.
+		DSVParams params; ///< View parameters.
 	};
 
-	using DepthStencilMeta = std::variant<EmptyDepthStencilMeta, DepthStencilTextureMeta>;
+	using DSVMeta = std::variant<EmptyDSVMeta, DSVTextureMeta>; ///< Depth stencil view meta.
 }

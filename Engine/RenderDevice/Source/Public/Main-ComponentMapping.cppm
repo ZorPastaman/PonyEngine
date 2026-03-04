@@ -13,11 +13,12 @@ import :ComponentSwizzle;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Component mapping. It sets what data a shader will get in different channels.
 	struct ComponentMapping final
 	{
-		ComponentSwizzle red = ComponentSwizzle::Red;
-		ComponentSwizzle green = ComponentSwizzle::Green;
-		ComponentSwizzle blue = ComponentSwizzle::Blue;
-		ComponentSwizzle alpha = ComponentSwizzle::Alpha;
+		ComponentSwizzle red = ComponentSwizzle::Red; ///< Red channel component.
+		ComponentSwizzle green = ComponentSwizzle::Green; ///< Green channel component.
+		ComponentSwizzle blue = ComponentSwizzle::Blue; ///< Blue channel component.
+		ComponentSwizzle alpha = ComponentSwizzle::Alpha; ///< Alpha channel component.
 	};
 }

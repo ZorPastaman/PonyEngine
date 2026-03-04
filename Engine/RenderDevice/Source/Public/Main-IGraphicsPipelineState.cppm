@@ -25,22 +25,33 @@ import :ShaderType;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Graphics pipeline state.
 	class IGraphicsPipelineState : public IPipelineState
 	{
 		PONY_INTERFACE_BODY(IGraphicsPipelineState)
 
+		/// @brief Gets the shader stages.
+		/// @return Shader stages.
 		[[nodiscard("Pure function")]]
-		virtual ShaderTypeMask ShaderStages() const noexcept = 0;
+		virtual GraphicsShaderTypeMask ShaderStages() const noexcept = 0;
 
+		/// @brief Gets the attachment parameters.
+		/// @return Attachment parameters.
+		[[nodiscard("Pure function")]]
+		virtual const AttachmentParams& Attachment() const noexcept = 0;
+		/// @brief Gets the rasterizer parameters.
+		/// @return Rasterizer parameters.
 		[[nodiscard("Pure function")]]
 		virtual const RasterizerParams& Rasterizer() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual const BlendParams& Blend() const noexcept = 0;
+		/// @brief Gets the depth stencil parameters.
+		/// @return Depth stencil parameters.
 		[[nodiscard("Pure function")]]
 		virtual const DepthStencilParams& DepthStencil() const noexcept = 0;
+		/// @brief Gets the sample parameters.
+		/// @return Sample parameters.
 		[[nodiscard("Pure function")]]
 		virtual const SampleParams& Sample() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual const AttachmentParams& Attachment() const noexcept = 0;
+		virtual const BlendParams& Blend() const noexcept = 0;
 	};
 }

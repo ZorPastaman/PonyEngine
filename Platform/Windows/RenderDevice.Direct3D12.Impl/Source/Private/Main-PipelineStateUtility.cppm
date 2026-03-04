@@ -87,7 +87,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		switch (cullMode)
 		{
-		case CullMode::None:
+		case CullMode::NoCulling:
 			return D3D12_CULL_MODE_NONE;
 		case CullMode::Front:
 			return D3D12_CULL_MODE_FRONT;
@@ -217,12 +217,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			return D3D12_BLEND_DEST_ALPHA;
 		case BlendFactor::OneMinusDestinationAlpha:
 			return D3D12_BLEND_INV_DEST_ALPHA;
-		case BlendFactor::ConstantColor:
-		case BlendFactor::ConstantAlpha:
-			return D3D12_BLEND_BLEND_FACTOR;
-		case BlendFactor::OneMinusConstantColor:
-		case BlendFactor::OneMinusConstantAlpha:
-			return D3D12_BLEND_INV_BLEND_FACTOR;
 		case BlendFactor::SourceAlphaSaturate:
 			return D3D12_BLEND_SRC_ALPHA_SAT;
 		case BlendFactor::Source1Color:
@@ -233,6 +227,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			return D3D12_BLEND_SRC1_ALPHA;
 		case BlendFactor::OneMinusSource1Alpha:
 			return D3D12_BLEND_INV_SRC1_ALPHA;
+		case BlendFactor::Constant:
+			return D3D12_BLEND_BLEND_FACTOR;
+		case BlendFactor::OneMinusConstant:
+			return D3D12_BLEND_INV_BLEND_FACTOR;
 		default: [[unlikely]]
 			assert(false && "Invalid blend factor.");
 			return D3D12_BLEND_ZERO;

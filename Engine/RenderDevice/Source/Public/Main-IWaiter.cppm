@@ -15,7 +15,7 @@ export module PonyEngine.RenderDevice:IWaiter;
 
 import std;
 
-import :FenceValue;
+import :IFence;
 
 export namespace PonyEngine::RenderDevice
 {
@@ -25,7 +25,7 @@ export namespace PonyEngine::RenderDevice
 
 		[[nodiscard("Pure function")]]
 		virtual std::size_t MaxFences() const noexcept = 0;
-		virtual void Wait(std::span<const FenceValue> fenceValues, std::chrono::nanoseconds timeout) = 0;
+		virtual void Wait(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, std::chrono::nanoseconds timeout) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;

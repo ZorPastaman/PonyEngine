@@ -81,13 +81,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
 			std::span<const Math::CornerRect<std::uint32_t>> rects);
 		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
+			const Math::Vector4<std::uint32_t>& values);
 		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects);
 		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
+			const Math::Vector4<float>& values);
 		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects = std::span<const Math::CornerRect<std::uint32_t>>());
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects);
 
 		void Copy(const IBuffer& source, IBuffer& destination);
 		void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
@@ -454,22 +454,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
-		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
-		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, const Math::Vector4<std::uint32_t>& values)
 	{
 		ValidateUnorderedAccess<BufferUAVMeta, Buffer>(buffer, gpuContainer, gpuViewIndex, cpuContainer, cpuViewIndex);
 
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
-		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
-		for (std::size_t i = 0uz; i < rects.size(); ++i)
-		{
-			clearRectsSpan[i] = ToRect(rects[i]);
-		}
-
 		const UINT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
 		commandList->ClearUnorderedAccessViewUint(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
-			&static_cast<const Buffer&>(buffer).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
+			&static_cast<const Buffer&>(buffer).Resource(), clearValue, 0u, nullptr);
 	}
 
 	void CommandList::ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
@@ -492,22 +483,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
-		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, const Math::Vector4<float>& values)
 	{
 		ValidateUnorderedAccess<BufferUAVMeta, Buffer>(buffer, gpuContainer, gpuViewIndex, cpuContainer, cpuViewIndex);
 
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
-		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
-		for (std::size_t i = 0uz; i < rects.size(); ++i)
-		{
-			clearRectsSpan[i] = ToRect(rects[i]);
-		}
-
 		const FLOAT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
 		commandList->ClearUnorderedAccessViewFloat(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
-			&static_cast<const Buffer&>(buffer).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
+			&static_cast<const Buffer&>(buffer).Resource(), clearValue, 0u, nullptr);
 	}
 
 	void CommandList::ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
@@ -1010,7 +992,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					.Width = footprint.width,
 					.Height = footprint.height,
 					.Depth = footprint.sliceCount,
-					.RowPitch = footprint.rowPitch
+					.RowPitch = static_cast<UINT>(footprint.rowPitch)
 				}
 			}
 		};
@@ -1107,7 +1089,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			if (barrier.range)
 			{
 				const Texture* const texture = static_cast<Texture*>(barrier.texture);
-				const MultiAspectSubTextureRange& range = *barrier.range;
+				const SubTextureRange& range = *barrier.range;
 
 				if (range.mipRange.mostDetailedMipIndex + range.mipRange.mipCount.value_or(1u) > texture->MipCount()) [[unlikely]]
 				{
@@ -1221,7 +1203,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			throw std::invalid_argument("Index is too great");
 		}
-		if (std::holds_alternative<EmptyDepthStencilMeta>(container->Meta(binding->index))) [[unlikely]]
+		if (std::holds_alternative<EmptyDSVMeta>(container->Meta(binding->index))) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid depth stencil view");
 		}
@@ -1257,7 +1239,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		const auto& nativeContainer = static_cast<const DepthStencilContainer&>(container);
-		if (viewIndex >= nativeContainer.Size() || std::holds_alternative<EmptyDepthStencilMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
+		if (viewIndex >= nativeContainer.Size() || std::holds_alternative<EmptyDSVMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid view index");
 		}
@@ -1612,7 +1594,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			throw std::invalid_argument("Invalid texture");
 		}
 
-		// Skip validating footprints - it's too complicated to validate them thoroughly.
+		for (const CopyableFootprint& footprint : footprints)
+		{
+			if (footprint.rowPitch > std::numeric_limits<UINT>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid row pitch");
+			}
+		}
 #endif
 	}
 

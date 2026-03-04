@@ -36,14 +36,14 @@ export namespace PonyEngine::RenderDevice
 		virtual struct DeviceSupport DeviceSupport() const = 0;
 
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<IBuffer> CreateBuffer(const ResourceHeapParams& heapParams, const BufferParams& params) = 0;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const = 0;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const = 0;
 		[[nodiscard("Wierd call")]]
-		virtual std::shared_ptr<ITexture> CreateTexture(const ResourceHeapParams& heapParams, const TextureParams& params) = 0;
+		virtual std::shared_ptr<ITexture> CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params) = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const = 0;
