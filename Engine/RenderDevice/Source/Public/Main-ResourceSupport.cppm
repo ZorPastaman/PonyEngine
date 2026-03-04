@@ -7,15 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DSVDimension;
+export module PonyEngine.RenderDevice:ResourceSupport;
 
-import std;
+import :HeapType;
 
 export namespace PonyEngine::RenderDevice
 {
-	enum class DSVDimension : std::uint8_t
+	struct ResourceSupport final
 	{
-		Texture1D,
-		Texture2D
+		HeapTypeMask bufferHeaps;
+		HeapTypeMask textureHeaps;
 	};
 }

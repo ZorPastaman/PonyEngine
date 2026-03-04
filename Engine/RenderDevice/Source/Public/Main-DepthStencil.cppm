@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Depth stencil value.
 	struct DepthStencil final
 	{
-		float depth = 1.f;
-		std::uint8_t stencil = 0u;
+		float depth = 1.f; ///< Depth.
+		std::uint8_t stencil = 0u; ///< Stencil.
 	};
 }

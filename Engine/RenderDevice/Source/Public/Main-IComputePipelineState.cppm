@@ -17,6 +17,7 @@ import :IPipelineState;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Compute pipeline state.
 	class IComputePipelineState : public IPipelineState
 	{
 		PONY_INTERFACE_BODY(IComputePipelineState)

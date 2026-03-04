@@ -13,8 +13,9 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Depth stencil container parameters.
 	struct DepthStencilContainerParams final
 	{
-		std::uint32_t size = 1u;
+		std::uint32_t size = 1u; ///< Container size.
 	};
 }

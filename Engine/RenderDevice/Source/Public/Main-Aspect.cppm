@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Texture aspect.
 	enum class Aspect : std::uint8_t
 	{
 		Color,
@@ -24,6 +25,7 @@ export namespace PonyEngine::RenderDevice
 		Stencil
 	};
 
+	/// @brief Texture aspect mask.
 	enum class AspectMask : std::uint8_t
 	{
 		None = 0,
@@ -34,4 +36,21 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(Aspect, AspectMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Texture aspect names.
+	constexpr std::array<std::string_view, 3> AspectNames
+	{
+		"Color",
+		"Depth",
+		"Stencil"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::RenderDevice::Aspect, PonyEngine::RenderDevice::AspectNames)
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::AspectMask, PonyEngine::RenderDevice::AspectNames)
 }

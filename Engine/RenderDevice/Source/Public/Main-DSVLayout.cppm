@@ -15,21 +15,29 @@ import :SubTextureRange;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Layout of a depth stencil view that points to a non-array non-ms depth stencil texture.
 	struct SingleDSVLayout final
 	{
-		std::uint8_t mipIndex = 0u;
+		std::uint8_t mipIndex = 0u; ///< Mip index.
 	};
+
+	/// @brief Layout of a depth stencil view that points to an array non-ms depth stencil texture.
 	struct ArrayDSVLayout final
 	{
-		ArrayRange arrayRange;
-		std::uint8_t mipIndex = 0u;
+		ArrayRange arrayRange; ///< Array range.
+		std::uint8_t mipIndex = 0u; ///< Mip index.
 	};
-	struct MSDSVLayout final
+
+	/// @brief Layout of a depth stencil view that points to a non-array ms depth stencil texture.
+	struct MultiSampleDSVLayout final
 	{
 	};
-	struct MSArrayDSVLayout final
+
+	/// @brief Layout of a depth stencil view that points to an array ms depth stencil texture.
+	struct MultiSampleArrayDSVLayout final
 	{
 		ArrayRange arrayRange;
 	};
-	using DSVLayout = std::variant<SingleDSVLayout, ArrayDSVLayout, MSDSVLayout, MSArrayDSVLayout>;
+
+	using DSVLayout = std::variant<SingleDSVLayout, ArrayDSVLayout, MultiSampleDSVLayout, MultiSampleArrayDSVLayout>; ///< Depth stencil view layout.
 }

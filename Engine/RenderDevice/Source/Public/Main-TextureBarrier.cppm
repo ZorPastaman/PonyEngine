@@ -23,7 +23,7 @@ export namespace PonyEngine::RenderDevice
 	struct TextureBarrier final
 	{
 		ITexture* texture = nullptr;
-		std::optional<MultiAspectSubTextureRange> range;
+		std::optional<SubTextureRange> range;
 		PipelineStage beforeStages = PipelineStage::None;
 		PipelineStage afterStages = PipelineStage::None;
 		std::optional<ResourceAccess> beforeAccesses;

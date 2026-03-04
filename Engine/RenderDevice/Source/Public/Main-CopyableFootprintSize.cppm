@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Copyable footprint size.
 	struct CopyableFootprintSize final
 	{
-		std::uint64_t sourceTotalSize;
-		std::uint64_t destinationTotalSize;
+		std::uint64_t sourceTotalSize; ///< Source byte-array total size in bytes.
+		std::uint64_t destinationTotalSize; ///< Destination texture buffer total size in bytes.
 	};
 }

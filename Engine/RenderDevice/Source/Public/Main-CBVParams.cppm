@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Constant buffer view parameters.
 	struct CBVParams final
 	{
-		std::uint64_t offset = 0ull;
-		std::uint32_t size = 0u;
+		std::uint64_t offset = 0ull; ///< Buffer offset. Must be correctly aligned.
+		std::uint32_t size = 0u; ///< View size. Must be correctly aligned.
 	};
 }

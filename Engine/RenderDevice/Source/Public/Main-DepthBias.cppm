@@ -11,10 +11,11 @@ export module PonyEngine.RenderDevice:DepthBias;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Depth bias.
 	struct DepthBias final
 	{
-		float depthBias = 0.f;
-		float depthBiasClamp = 0.f;
-		float slopeScaledDepthBias = 0.f;
+		float depthBias = 0.f; ///< Main depth bias.
+		float depthBiasClamp = 0.f; ///< Depth bias clamp.
+		float slopeScaledDepthBias = 0.f; ///< Slope scaled depth bias.
 	};
 }

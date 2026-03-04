@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Depth stencil view flags.
 	enum class DSVFlag : std::uint8_t
 	{
 		None = 0,
@@ -26,4 +27,19 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_MASK_FEATURES(DSVFlag)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Depth stencil view flag names.
+	constexpr std::array<std::string_view, 2> DSVFlagNames
+	{
+		"DepthReadOnly",
+		"StencilReadOnly"
+	};
+}
+
+export
+{
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::DSVFlag, PonyEngine::RenderDevice::DSVFlagNames)
 }

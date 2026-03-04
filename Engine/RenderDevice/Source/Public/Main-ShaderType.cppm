@@ -17,14 +17,14 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	enum class ShaderType : std::uint8_t
+	enum class GraphicsShaderType : std::uint8_t
 	{
 		Amplification,
 		Mesh,
 		Pixel
 	};
 
-	enum class ShaderTypeMask : std::uint8_t
+	enum class GraphicsShaderTypeMask : std::uint8_t
 	{
 		None = 0,
 		Amplification = 1 << 0,
@@ -33,5 +33,5 @@ export namespace PonyEngine::RenderDevice
 		All = (1 << 3) - 1
 	};
 
-	PONY_ENUM_VALUE_MASK_FEATURES(ShaderType, ShaderTypeMask)
+	PONY_ENUM_VALUE_MASK_FEATURES(GraphicsShaderType, GraphicsShaderTypeMask)
 }

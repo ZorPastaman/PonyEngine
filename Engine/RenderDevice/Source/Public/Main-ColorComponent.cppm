@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Color component.
 	enum class ColorComponent : std::uint8_t
 	{
 		Red,
@@ -25,6 +26,7 @@ export namespace PonyEngine::RenderDevice
 		Alpha
 	};
 
+	/// @brief Color component mask.
 	enum class ColorComponentMask : std::uint8_t
 	{
 		None = 0,
@@ -36,4 +38,22 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(ColorComponent, ColorComponentMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Color component names.
+	constexpr std::array<std::string_view, 4> ColorComponentNames
+	{
+		"Red",
+		"Green",
+		"Blue",
+		"Alpha"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::RenderDevice::ColorComponent, PonyEngine::RenderDevice::ColorComponentNames)
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::ColorComponentMask, PonyEngine::RenderDevice::ColorComponentNames)
 }

@@ -29,7 +29,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		switch (func)
 		{
-		case ComparisonFunc::None:
+		case ComparisonFunc::NoComparison:
 			return D3D12_COMPARISON_FUNC_NONE;
 		case ComparisonFunc::Never:
 			return D3D12_COMPARISON_FUNC_NEVER;

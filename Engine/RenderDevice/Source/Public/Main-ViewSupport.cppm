@@ -7,17 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:FenceValue;
+export module PonyEngine.RenderDevice:ViewSupport;
 
-import std;
-
-import :IFence;
+import :CBVRequirement;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct FenceValue final
+	struct ViewSupport final
 	{
-		const IFence* fence;
-		std::uint64_t value;
+		CBVRequirement cbvRequirement;
 	};
 }

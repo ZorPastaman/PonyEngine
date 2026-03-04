@@ -11,13 +11,13 @@ export module PonyEngine.RenderDevice:QueueSync;
 
 import std;
 
-import :FenceValue;
+import :IFence;
 
 export namespace PonyEngine::RenderDevice
 {
 	struct QueueSync final
 	{
-		std::span<const FenceValue> before;
-		std::span<const FenceValue> after;
+		std::span<const std::pair<const IFence*, std::uint64_t>> before;
+		std::span<const std::pair<IFence*, std::uint64_t>> after;
 	};
 }

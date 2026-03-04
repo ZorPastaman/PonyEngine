@@ -71,11 +71,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
 			std::span<const Math::CornerRect<std::uint32_t>> rects) override;
 		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+			const Math::Vector4<std::uint32_t>& values) override;
 		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
 			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
 		virtual void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex, 
-			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
+			const Math::Vector4<float>& values) override;
 		virtual void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex, 
 			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
 
@@ -260,7 +260,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+		const Math::Vector4<std::uint32_t>& values)
 	{
 #ifndef NDEBUG
 		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
@@ -269,7 +269,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values);
 	}
 
 	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
@@ -286,7 +286,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
-		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+		const Math::Vector4<float>& values)
 	{
 #ifndef NDEBUG
 		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
@@ -295,7 +295,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values);
 	}
 
 	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 

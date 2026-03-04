@@ -647,14 +647,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				switch (params.dimension)
 				{
-				case DSVDimension::Texture1D:
+				case TextureDimension::Texture1D:
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE1D;
 					viewDesc.Texture1D = D3D12_TEX1D_DSV
 					{
 						.MipSlice = l.mipIndex
 					};
 					break;
-				case DSVDimension::Texture2D:
+				case TextureDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2D = D3D12_TEX2D_DSV
 					{
@@ -670,7 +670,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				switch (params.dimension)
 				{
-				case DSVDimension::Texture1D:
+				case TextureDimension::Texture1D:
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE1DARRAY;
 					viewDesc.Texture1DArray = D3D12_TEX1D_ARRAY_DSV
 					{
@@ -679,7 +679,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 						.ArraySize = l.arrayRange.arrayCount.value_or(resourceArraySize - l.arrayRange.firstArrayIndex)
 					};
 					break;
-				case DSVDimension::Texture2D:
+				case TextureDimension::Texture2D:
 					viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 					viewDesc.Texture2DArray = D3D12_TEX2D_ARRAY_DSV
 					{
@@ -693,14 +693,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					break;
 				}
 			},
-			[&](const MSDSVLayout&) noexcept
+			[&](const MultiSampleDSVLayout&) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMS;
 				viewDesc.Texture2DMS = D3D12_TEX2DMS_DSV
 				{
 				};
 			},
-			[&](const MSArrayDSVLayout& l) noexcept
+			[&](const MultiSampleArrayDSVLayout& l) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DMSARRAY;
 				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_DSV
