@@ -60,6 +60,5 @@ export namespace PonyEngine::Log
 
 export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Log::LogType, PonyEngine::Log::LogTypeNames)
-	PONY_ENUM_MASK_FORMATTER(PonyEngine::Log::LogTypeMask, PonyEngine::Log::LogTypeNames)
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::Log::LogType, PonyEngine::Log::LogTypeMask, PonyEngine::Log::LogTypeNames)
 }

@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Default names for shader IR.
 	struct ShaderIR final
 	{
 		PONY_NON_CONSTRUCTIBLE_BODY(ShaderIR)

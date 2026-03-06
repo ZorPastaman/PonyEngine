@@ -17,12 +17,13 @@ import :ShaderScalarType;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Shader support.
 	struct ShaderSupport final
 	{
-		std::string_view shaderIRName;
-		Meta::Version version;
-		ShaderScalarTypeMask scalarTypes = ShaderScalarTypeMask::None;
-		ShaderScalarTypeMask atomicTypes = ShaderScalarTypeMask::None;
-		ShaderScalarTypeMask groupSharedAtomicTypes = ShaderScalarTypeMask::None;
+		std::string_view shaderIRName; ///< Shader IR name.
+		Meta::Version shaderIRVersion; ///< Shader IR version.
+		ShaderScalarTypeMask scalarTypes = ShaderScalarTypeMask::None; ///< Supported scalar types.
+		ShaderScalarTypeMask atomicTypes = ShaderScalarTypeMask::None; ///< Supported atomic scalar types.
+		ShaderScalarTypeMask groupSharedAtomicTypes = ShaderScalarTypeMask::None; ///< Supported group shared atomic scalar types.
 	};
 }

@@ -15,10 +15,11 @@ import :SampleCount;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Sample parameters.
 	struct SampleParams final
 	{
-		std::uint32_t sampleMask = std::numeric_limits<std::uint32_t>::max();
-		SampleCount sampleCount = SampleCount::X1;
-		bool alphaToCoverage = false;
+		std::uint32_t sampleMask = std::numeric_limits<std::uint32_t>::max(); ///< Sample mask.
+		SampleCount sampleCount = SampleCount::X1; ///< Sample count.
+		bool alphaToCoverage = false; ///< Is alpha to coverage enable?
 	};
 }

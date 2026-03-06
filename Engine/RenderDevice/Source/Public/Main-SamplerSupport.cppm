@@ -11,8 +11,9 @@ export module PonyEngine.RenderDevice:SamplerSupport;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Sampler support.
 	struct SamplerSupport final
 	{
-		float maxAnisotropy = 0.f;
+		float maxAnisotropy = 0.f; ///< Maximum level of anisotropy.
 	};
 }

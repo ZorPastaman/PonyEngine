@@ -969,10 +969,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			const RasterRegion& region = regions[i];
 			rects[i] = D3D12_RECT
 			{
-				.left = static_cast<LONG>(region.scissor.Position().X()),
-				.top = static_cast<LONG>(region.scissor.Position().Y()),
-				.right = static_cast<LONG>(region.scissor.Position().X() + region.scissor.Size().X()),
-				.bottom = static_cast<LONG>(region.scissor.Position().Y() + region.scissor.Size().Y())
+				.left = static_cast<LONG>(region.scissors.Position().X()),
+				.top = static_cast<LONG>(region.scissors.Position().Y()),
+				.right = static_cast<LONG>(region.scissors.Position().X() + region.scissors.Size().X()),
+				.bottom = static_cast<LONG>(region.scissors.Position().Y() + region.scissors.Size().Y())
 			};
 		}
 	}

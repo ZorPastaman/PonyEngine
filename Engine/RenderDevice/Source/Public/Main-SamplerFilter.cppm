@@ -16,19 +16,21 @@ import :Reduction;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Basic sampler filter.
 	struct BasicSamplerFilter final
 	{
-		Filter min = Filter::Linear;
-		Filter mag = Filter::Linear;
-		Filter mip = Filter::Linear;
-		Reduction reduction;
+		Filter min = Filter::Linear; ///< Minification filter.
+		Filter mag = Filter::Linear; ///< Magnification filter.
+		Filter mip = Filter::Linear; ///< Mip filter.
+		Reduction reduction; ///< Reduction.
 	};
 
+	/// @brief Anisotropic sampler filter.
 	struct AnisotropicSamplerFilter final
 	{
-		float maxAnisotropy = 1.f;
-		Reduction reduction;
+		float maxAnisotropy = 1.f; ///< Maximum anisotropy.
+		Reduction reduction; ///< Reduction.
 	};
 
-	using SamplerFilter = std::variant<BasicSamplerFilter, AnisotropicSamplerFilter>;
+	using SamplerFilter = std::variant<BasicSamplerFilter, AnisotropicSamplerFilter>; ///< Sampler filter.
 }

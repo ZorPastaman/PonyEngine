@@ -15,8 +15,9 @@ import :DescriptorSet;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Pipeline layout parameters.
 	struct PipelineLayoutParams final
 	{
-		std::span<const DescriptorSet> descriptorSets;
+		std::span<const DescriptorSet> descriptorSets; ///< Descriptor sets.
 	};
 }

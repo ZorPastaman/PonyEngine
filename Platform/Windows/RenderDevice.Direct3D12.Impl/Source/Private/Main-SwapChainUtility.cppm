@@ -69,13 +69,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			answer |= DXGI_USAGE_SHADER_INPUT;
 		}
-		if (Any(TextureUsage::RenderTarget, usage))
-		{
-			answer |= DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		}
 		if (Any(TextureUsage::UnorderedAccess, usage))
 		{
 			answer |= DXGI_USAGE_UNORDERED_ACCESS;
+		}
+		if (Any(TextureUsage::RenderTarget, usage))
+		{
+			answer |= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		}
 
 		return answer;

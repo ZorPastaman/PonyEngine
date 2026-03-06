@@ -166,7 +166,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.samplerSupport = SamplerSupport{.maxAnisotropy = Engine::MaxAnisotropy},
 			.rasterizerSupport = engine->RasterizerSupport(),
 			.swapChainSupport = engine->SwapChainSupport(),
-			.resourceSupport = ResourceSupport{.bufferHeaps = Engine::BufferHeapTypeSupport, .textureHeaps = Engine::TextureHeapTypeSupport}
+			.resourceSupport = ResourceSupport{.bufferHeaps = Engine::BufferHeapTypeSupport, .textureHeaps = Engine::TextureHeapTypeSupport},
+			.fenceSupport = FenceSupport{.simultaneousWaitedFences = Engine::MaxSimultaneousFences}
 		};
 	}
 

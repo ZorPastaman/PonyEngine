@@ -9,17 +9,26 @@
 
 export module PonyEngine.RenderDevice:TextureFormatSupport;
 
-import std;
-
 import :Aspect;
-import :TextureFormatFeature;
+import :BlendMode;
+import :ShaderOperation;
+import :TextureDimension;
+import :TextureUsage;
+import :TextureViewDimension;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Texture format support.
 	struct TextureFormatSupport final
 	{
-		TextureFormatFeature features = TextureFormatFeature::None;
-		AspectMask aspects = AspectMask::None;
-		bool supported = false;
+		TextureDimensionMask dimensions = TextureDimensionMask::None; ///< Supported dimension.
+		TextureViewDimensionMask viewDimensions = TextureViewDimensionMask::None; ///< Supported view dimension.
+		AspectMask aspects = AspectMask::None; ///< Supported aspects.
+		TextureUsage usage = TextureUsage::None; ///< Supported usage.
+		bool srgb = false; ///< Is the format srgb-compatible?
+		bool swapChain = false; ///< Can it be used for a swap chain buffer?
+		ShaderOperationMask shaderOperations = ShaderOperationMask::None; ///< Supported shader operations.
+		BlendModeMask blendModes = BlendModeMask::None; ///< Supported blend modes.
+		bool supported = false; ///< Does the current backend support a format at all?
 	};
 }

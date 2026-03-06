@@ -166,9 +166,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const std::size_t rtFormatByteSize = params.attachment.renderTargetFormats.size_bytes();
 		const auto [rtBlendByteSize, rtBlendAlignment] = std::visit(Type::Overload
 		{
-			[](const BlendGroupParams& p) noexcept
+			[](const ArithmeticBlendGroupParams& p) noexcept
 			{
-				return std::pair(p.renderTargetBlend.size_bytes(), alignof(RenderTargetBlendParams));
+				return std::pair(p.renderTargetBlend.size_bytes(), alignof(ArithmeticRenderTargetBlendParams));
 			},
 			[](const LogicBlendGroupParams& p) noexcept
 			{
@@ -184,7 +184,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			std::memcpy(data.get(), params.attachment.renderTargetFormats.data(), params.attachment.renderTargetFormats.size_bytes());
 			std::visit(Type::Overload
 			{
-				[&](const BlendGroupParams& p) noexcept
+				[&](const ArithmeticBlendGroupParams& p) noexcept
 				{
 					std::memcpy(data.get() + rtBlendByteOffset, p.renderTargetBlend.data(), p.renderTargetBlend.size_bytes());
 				},
@@ -202,18 +202,18 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		blend.blendGroup = std::visit(Type::Overload
 		{
-			[&](const BlendGroupParams& p) noexcept
+			[&](const ArithmeticBlendGroupParams& p) noexcept
 			{
-				return std::variant<BlendGroupParams, LogicBlendGroupParams>(BlendGroupParams
+				return std::variant<ArithmeticBlendGroupParams, LogicBlendGroupParams>(ArithmeticBlendGroupParams
 				{
 					.renderTargetBlend = !p.renderTargetBlend.empty()
-						? std::span<const RenderTargetBlendParams>(reinterpret_cast<const RenderTargetBlendParams*>(data.get() + rtBlendByteOffset), p.renderTargetBlend.size())
-						: std::span<const RenderTargetBlendParams>()
+						? std::span<const ArithmeticRenderTargetBlendParams>(reinterpret_cast<const ArithmeticRenderTargetBlendParams*>(data.get() + rtBlendByteOffset), p.renderTargetBlend.size())
+						: std::span<const ArithmeticRenderTargetBlendParams>()
 				});
 			},
 			[&](const LogicBlendGroupParams& p) noexcept
 			{
-				return std::variant<BlendGroupParams, LogicBlendGroupParams>(LogicBlendGroupParams
+				return std::variant<ArithmeticBlendGroupParams, LogicBlendGroupParams>(LogicBlendGroupParams
 				{
 					.logicOperation = p.logicOperation,
 					.renderTargetBlend = !p.renderTargetBlend.empty()

@@ -7,18 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:StaticSamplerMeta;
+export module PonyEngine.RenderDevice:SamplerMeta;
 
 import std;
 
-import :ShaderType;
-import :StaticSamplerParams;
+import :SamplerParams;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct StaticSamplerMeta final
+	/// @brief Empty sampler meta. It means no sampler was created.
+	struct EmptySamplerParams final
 	{
-		StaticSamplerParams samplerParams;
-		std::size_t descriptorSetIndex = 0u;
 	};
+
+	using SamplerMeta = std::variant<EmptySamplerParams, SamplerParams>; ///< Sampler meta.
 }

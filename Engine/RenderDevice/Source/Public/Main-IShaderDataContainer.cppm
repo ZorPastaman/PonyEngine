@@ -15,24 +15,25 @@ export module PonyEngine.RenderDevice:IShaderDataContainer;
 
 import std;
 
+import :IContainer;
 import :ShaderDataMeta;
 
 export namespace PonyEngine::RenderDevice
 {
-	class IShaderDataContainer
+	/// @brief Container of CBVs, SRVs and UAVs.
+	class IShaderDataContainer : public IContainer
 	{
 		PONY_INTERFACE_BODY(IShaderDataContainer)
 
-		[[nodiscard("Pure function")]]
-		virtual std::uint32_t Size() const noexcept = 0;
+		/// @brief Checks if the container is shader visible.
+		/// @return @a True if it's shader visible; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsShaderVisible() const noexcept = 0;
 
+		/// @brief Gets the meta at the @p index.
+		/// @param index Container element index.
+		/// @return Container element meta.
 		[[nodiscard("Pure function")]]
 		virtual const ShaderDataMeta& Meta(std::uint32_t index) const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-		virtual void Name(std::string_view name) = 0;
 	};
 }

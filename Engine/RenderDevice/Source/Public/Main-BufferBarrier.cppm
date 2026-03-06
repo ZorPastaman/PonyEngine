@@ -21,9 +21,9 @@ export namespace PonyEngine::RenderDevice
 	struct BufferBarrier final
 	{
 		IBuffer* buffer = nullptr; ///< Buffer. Mustn't be nullptr.
-		PipelineStage beforeStages = PipelineStage::None; ///< Synchronization scope of all preceding GPU work that must be completed before executing the barrier.
-		PipelineStage afterStages = PipelineStage::None; ///< Synchronization scope of all subsequent GPU work that must wait until the barrier execution is finished.
-		std::optional<ResourceAccess> beforeAccesses; ///< Access state of the buffer preceding the barrier execution. Nullopt means no access - it's compatible only with none pipeline stage.
-		std::optional<ResourceAccess> afterAccesses; ///< Access state of the buffer upon completion of barrier execution. Nullopt means no access - it's compatible only with none pipeline stage.
+		PipelineStageMask beforeStages = PipelineStageMask::None; ///< Synchronization scope of all preceding GPU work that must be completed before executing the barrier.
+		PipelineStageMask afterStages = PipelineStageMask::None; ///< Synchronization scope of all subsequent GPU work that must wait until the barrier execution is finished.
+		std::optional<ResourceAccessMask> beforeAccesses; ///< Access state of the buffer preceding the barrier execution. Nullopt means no access - it's compatible only with none pipeline stage.
+		std::optional<ResourceAccessMask> afterAccesses; ///< Access state of the buffer upon completion of barrier execution. Nullopt means no access - it's compatible only with none pipeline stage.
 	};
 }

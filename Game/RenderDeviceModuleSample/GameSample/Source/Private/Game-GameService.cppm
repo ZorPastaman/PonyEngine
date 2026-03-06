@@ -356,7 +356,7 @@ namespace Game
 		{
 			.format = renderTargetTextureFormat.format,
 			.srgb = false,
-			.layout = PonyEngine::RenderDevice::TextureSingleSRVLayout{}
+			.layout = PonyEngine::RenderDevice::SingleSRVLayout{}
 		});
 		boxTransformOffset = 0ull;
 		boxTransformContainerIndex = srvIndex++;
@@ -425,7 +425,7 @@ namespace Game
 			.format = renderTargetTextureFormat.format,
 			.srgb = renderTargetTextureFormat.srgb,
 			.dimension = PonyEngine::RenderDevice::TextureDimension::Texture2D,
-			.layout = PonyEngine::RenderDevice::MSRTVLayout{}
+			.layout = PonyEngine::RenderDevice::MultiSampleRTVLayout{}
 		});
 		backBufferContainerOffset = rtvIndex++;
 		for (std::uint8_t i = 0u, containerIndex = backBufferContainerOffset; i < renderDevice->SwapChainBufferCount(); ++i, ++containerIndex)
@@ -455,8 +455,8 @@ namespace Game
 		constexpr auto contextRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
 			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::ConstantBuffer,
-			.baseShaderRegister = 0u,
-			.count = 1u
+			.firstShaderRegister = 0u,
+			.shaderRegisterCount = 1u
 		};
 		const auto contextDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
 		{
@@ -466,8 +466,8 @@ namespace Game
 		constexpr auto meshletRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
 			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::BufferShaderResource,
-			.baseShaderRegister = 0u,
-			.count = 3u
+			.firstShaderRegister = 0u,
+			.shaderRegisterCount = 3u
 		};
 		const auto meshletDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
 		{
@@ -477,8 +477,8 @@ namespace Game
 		constexpr auto vertexRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
 			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::BufferShaderResource,
-			.baseShaderRegister = 0u,
-			.count = 1u
+			.firstShaderRegister = 0u,
+			.shaderRegisterCount = 1u
 		};
 		const auto vertexDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
 		{
@@ -488,8 +488,8 @@ namespace Game
 		constexpr auto materialRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
 			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::ConstantBuffer,
-			.baseShaderRegister = 0u,
-			.count = 1u
+			.firstShaderRegister = 0u,
+			.shaderRegisterCount = 1u
 		};
 		const auto materialDescriptorSet = PonyEngine::RenderDevice::DescriptorSet
 		{
@@ -511,7 +511,7 @@ namespace Game
 
 		const std::vector<std::byte> triangleShader = LoadShader(TRIANGLE_SHADER);
 		const std::vector<std::byte> pixelShader = LoadShader(PIXEL_SHADER);
-		constexpr auto opaqueBlendParams = PonyEngine::RenderDevice::RenderTargetBlendParams{};
+		constexpr auto opaqueBlendParams = PonyEngine::RenderDevice::ArithmeticRenderTargetBlendParams{};
 		boxPipelineState = renderDevice->CreateGraphicsPipelineState(layout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
 		{
 			.meshShader = triangleShader,
@@ -533,9 +533,9 @@ namespace Game
 			},
 			.blend = PonyEngine::RenderDevice::BlendParams
 			{
-				.blendGroup = PonyEngine::RenderDevice::BlendGroupParams
+				.blendGroup = PonyEngine::RenderDevice::ArithmeticBlendGroupParams
 				{
-					.renderTargetBlend = std::span<const PonyEngine::RenderDevice::RenderTargetBlendParams>(&opaqueBlendParams, 1uz),
+					.renderTargetBlend = std::span<const PonyEngine::RenderDevice::ArithmeticRenderTargetBlendParams>(&opaqueBlendParams, 1uz),
 				}
 			}
 		});
@@ -544,8 +544,8 @@ namespace Game
 		constexpr auto resolvedTextureRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
 			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::TextureShaderResource,
-			.baseShaderRegister = 0u,
-			.count = 1u
+			.firstShaderRegister = 0u,
+			.shaderRegisterCount = 1u
 		};
 		constexpr auto resolvedTextureSampler = PonyEngine::RenderDevice::StaticSamplerParams
 		{
@@ -601,9 +601,9 @@ namespace Game
 			},
 			.blend = PonyEngine::RenderDevice::BlendParams
 			{
-				.blendGroup = PonyEngine::RenderDevice::BlendGroupParams
+				.blendGroup = PonyEngine::RenderDevice::ArithmeticBlendGroupParams
 				{
-					.renderTargetBlend = std::span<const PonyEngine::RenderDevice::RenderTargetBlendParams>(&opaqueBlendParams, 1uz),
+					.renderTargetBlend = std::span<const PonyEngine::RenderDevice::ArithmeticRenderTargetBlendParams>(&opaqueBlendParams, 1uz),
 				}
 			}
 		});
@@ -622,18 +622,18 @@ namespace Game
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = stagingStaticDataBuffer.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::CopySource
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopySource
 			},
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = staticGpuDataBuffer.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::CopyDestination
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopyDestination
 			}
 		};
 		copyCommandList->Barrier(preCopyBarriers);
@@ -643,17 +643,17 @@ namespace Game
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = stagingStaticDataBuffer.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Copy,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::CopySource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopySource,
 				.afterAccesses = std::nullopt
 			},
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = staticGpuDataBuffer.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Copy,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::CopyDestination,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopyDestination,
 				.afterAccesses = std::nullopt
 			}
 		};
@@ -751,18 +751,18 @@ namespace Game
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = stagingTransforms.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::CopySource
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopySource
 			},
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = gpuTransforms.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::Copy,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::CopyDestination
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopyDestination
 			}
 		};
 		copyCommandList->Barrier(beforeCopyBufferBarriers);
@@ -772,17 +772,17 @@ namespace Game
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = stagingTransforms.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Copy,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::CopySource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopySource,
 				.afterAccesses = std::nullopt
 			},
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = gpuTransforms.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Copy,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::CopyDestination,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::Copy,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::CopyDestination,
 				.afterAccesses = std::nullopt
 			}
 		};
@@ -803,7 +803,7 @@ namespace Game
 		graphicsCommandList->SetRasterRegion(PonyEngine::RenderDevice::RasterRegion
 		{
 			.viewport = PonyEngine::Math::CornerRect<float>(static_cast<PonyEngine::Math::Vector2<float>>(resolution)),
-			.scissor = PonyEngine::Math::CornerRect<std::uint32_t>(resolution)
+			.scissors = PonyEngine::Math::CornerRect<std::uint32_t>(resolution)
 		});
 
 		const auto renderBufferBarriers = std::array<PonyEngine::RenderDevice::BufferBarrier, 2>
@@ -811,18 +811,18 @@ namespace Game
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = gpuTransforms.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::VertexShading,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::VertexShading,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ShaderResource
 			},
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = staticGpuDataBuffer.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::VertexShading | PonyEngine::RenderDevice::PipelineStage::PixelShading,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::VertexShading | PonyEngine::RenderDevice::PipelineStageMask::PixelShading,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ShaderResource
 			}
 		};
 		const auto renderTextureBarriers = std::array<PonyEngine::RenderDevice::TextureBarrier, 2>
@@ -830,22 +830,24 @@ namespace Game
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = targetTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::RenderTarget,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::RenderTarget,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::RenderTarget,
-				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget,
-				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::RenderTarget,
+				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::Undefined,
+				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget,
+				.discard = true
 			},
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = depthTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::DepthStencil,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::DepthStencil,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::DepthStencilWrite,
-				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite,
-				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::DepthStencilWrite,
+				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::Undefined,
+				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite,
+				.discard = true
 			},
 		};
 		graphicsCommandList->Barrier(renderBufferBarriers, renderTextureBarriers);
@@ -869,17 +871,17 @@ namespace Game
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = gpuTransforms.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::VertexShading,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::VertexShading,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ShaderResource,
 				.afterAccesses = std::nullopt
 			},
 			PonyEngine::RenderDevice::BufferBarrier
 			{
 				.buffer = staticGpuDataBuffer.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::VertexShading | PonyEngine::RenderDevice::PipelineStage::PixelShading,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::VertexShading | PonyEngine::RenderDevice::PipelineStageMask::PixelShading,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ShaderResource,
 				.afterAccesses = std::nullopt
 			}
 		};
@@ -888,19 +890,19 @@ namespace Game
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = targetTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::RenderTarget,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::Resolve,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::RenderTarget,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::ResolveSource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::RenderTarget,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::Resolve,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::RenderTarget,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ResolveSource,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::ResolveSource
 			},
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = depthTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::DepthStencil,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::DepthStencilWrite,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::DepthStencil,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::DepthStencilWrite,
 				.afterAccesses = std::nullopt,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite
@@ -908,10 +910,10 @@ namespace Game
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = resolvedTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::Resolve,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::Resolve,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::ResolveDestination,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ResolveDestination,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::ShaderResource,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::ResolveDestination
 			}
@@ -923,9 +925,9 @@ namespace Game
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = targetTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Resolve,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::ResolveSource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::Resolve,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ResolveSource,
 				.afterAccesses = std::nullopt,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::ResolveSource,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget
@@ -933,20 +935,20 @@ namespace Game
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = resolvedTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::Resolve,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::PixelShading,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::ResolveDestination,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::Resolve,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::PixelShading,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ResolveDestination,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ShaderResource,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::ResolveDestination,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::ShaderResource
 			},
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = renderDevice->SwapChainBuffer(currentBackBufferIndex).get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::RenderTarget,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::RenderTarget,
 				.beforeAccesses = std::nullopt,
-				.afterAccesses = PonyEngine::RenderDevice::ResourceAccess::RenderTarget,
+				.afterAccesses = PonyEngine::RenderDevice::ResourceAccessMask::RenderTarget,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::Present,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget
 			}
@@ -962,9 +964,9 @@ namespace Game
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = resolvedTexture.get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::PixelShading,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::ShaderResource,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::PixelShading,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::ShaderResource,
 				.afterAccesses = std::nullopt,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::ShaderResource,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::ShaderResource
@@ -972,9 +974,9 @@ namespace Game
 			PonyEngine::RenderDevice::TextureBarrier
 			{
 				.texture = renderDevice->SwapChainBuffer(currentBackBufferIndex).get(),
-				.beforeStages = PonyEngine::RenderDevice::PipelineStage::RenderTarget,
-				.afterStages = PonyEngine::RenderDevice::PipelineStage::None,
-				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccess::RenderTarget,
+				.beforeStages = PonyEngine::RenderDevice::PipelineStageMask::RenderTarget,
+				.afterStages = PonyEngine::RenderDevice::PipelineStageMask::None,
+				.beforeAccesses = PonyEngine::RenderDevice::ResourceAccessMask::RenderTarget,
 				.afterAccesses = std::nullopt,
 				.beforeLayout = PonyEngine::RenderDevice::ResourceLayout::RenderTarget,
 				.afterLayout = PonyEngine::RenderDevice::ResourceLayout::Present

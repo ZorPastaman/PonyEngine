@@ -51,6 +51,5 @@ namespace PonyEngine::RenderDevice
 
 export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::RenderDevice::HeapType, PonyEngine::RenderDevice::HeapTypeNames)
-	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::HeapTypeMask, PonyEngine::RenderDevice::HeapTypeNames)
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::HeapType, PonyEngine::RenderDevice::HeapTypeMask, PonyEngine::RenderDevice::HeapTypeNames)
 }

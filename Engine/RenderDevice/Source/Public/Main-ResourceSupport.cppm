@@ -13,9 +13,10 @@ import :HeapType;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Resource support.
 	struct ResourceSupport final
 	{
-		HeapTypeMask bufferHeaps;
-		HeapTypeMask textureHeaps;
+		HeapTypeMask bufferHeaps; ///< Supported buffer heap types.
+		HeapTypeMask textureHeaps; ///< Supported texture heap types.
 	};
 }

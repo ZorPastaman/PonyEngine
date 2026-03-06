@@ -15,11 +15,12 @@ import :TextureFormatId;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Render target view parameters.
 	struct RTVParams final
 	{
-		TextureFormatId format;
-		bool srgb = false;
-		TextureDimension dimension = TextureDimension::Texture2D;
-		RTVLayout layout;
+		TextureFormatId format; ///< Texture format. Must be compatible with a pointed texture format.
+		bool srgb = false; ///< Is srgb view? A pointed texture must be srgb-compatible.
+		TextureDimension dimension = TextureDimension::Texture2D; ///< Texture dimension.
+		RTVLayout layout; ///< Render target view layout.
 	};
 }

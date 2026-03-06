@@ -101,11 +101,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	constexpr bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
-		if (Any(TextureUsage::RenderTarget, request.usage))
-		{
-			return false;
-		}
-		if (Any(TextureUsage::UnorderedAccess, request.usage))
+		if (Any(TextureUsage::UnorderedAccess | TextureUsage::RenderTarget, request.usage))
 		{
 			return false;
 		}
@@ -136,6 +132,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureUsage usage) noexcept
 	{
 		D3D12_FORMAT_SUPPORT1 support = D3D12_FORMAT_SUPPORT1_NONE;
+		if (Any(TextureUsage::UnorderedAccess, usage))
+		{
+			support |= D3D12_FORMAT_SUPPORT1_TYPED_UNORDERED_ACCESS_VIEW;
+		}
 		if (Any(TextureUsage::RenderTarget, usage))
 		{
 			support |= D3D12_FORMAT_SUPPORT1_RENDER_TARGET;
@@ -143,10 +143,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (Any(TextureUsage::DepthStencil, usage))
 		{
 			support |= D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL;
-		}
-		if (Any(TextureUsage::UnorderedAccess, usage))
-		{
-			support |= D3D12_FORMAT_SUPPORT1_TYPED_UNORDERED_ACCESS_VIEW;
 		}
 
 		return support;
@@ -299,21 +295,24 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(const TextureUsage usage) noexcept
 	{
 		auto flags = D3D12_RESOURCE_FLAG_NONE;
-		if (Any(TextureUsage::RenderTarget, usage))
-		{
-			flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-		}
-		if (Any(TextureUsage::DepthStencil, usage))
-		{
-			flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-		}
-		if (Any(TextureUsage::UnorderedAccess, usage))
-		{
-			flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		}
 		if (usage == TextureUsage::DepthStencil)
 		{
-			flags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+			flags |= D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE | D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+		}
+		else
+		{
+			if (Any(TextureUsage::UnorderedAccess, usage))
+			{
+				flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+			}
+			if (Any(TextureUsage::RenderTarget, usage))
+			{
+				flags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+			}
+			if (Any(TextureUsage::DepthStencil, usage))
+			{
+				flags |= D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+			}
 		}
 
 		return flags;
@@ -330,7 +329,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		std::visit(Type::Overload
 		{
-			[&](const TextureSingleSRVLayout& l) noexcept
+			[&](const SingleSRVLayout& l) noexcept
 			{
 				switch (params.dimension)
 				{
@@ -376,7 +375,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					break;
 				}
 			},
-			[&](const TextureArraySRVLayout& l) noexcept
+			[&](const ArraySRVLayout& l) noexcept
 			{
 				switch (params.dimension)
 				{
@@ -428,14 +427,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					break;
 				}
 			},
-			[&](const TextureMSSRVLayout&) noexcept
+			[&](const MultiSampleSRVLayout&) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
 				viewDesc.Texture2DMS = D3D12_TEX2DMS_SRV
 				{
 				};
 			},
-			[&](const TextureMSArraySRVLayout& l) noexcept
+			[&](const MultiSampleArraySRVLayout& l) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMSARRAY;
 				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_SRV
@@ -458,7 +457,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		std::visit(Type::Overload
 		{
-			[&](const TextureSingleUAVLayout& l) noexcept
+			[&](const SingleUAVLayout& l) noexcept
 			{
 				switch (params.dimension)
 				{
@@ -491,7 +490,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					break;
 				}
 			},
-			[&](const TextureArrayUAVLayout& l) noexcept
+			[&](const ArrayUAVLayout& l) noexcept
 			{
 				switch (params.dimension)
 				{
@@ -612,14 +611,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					break;
 				}
 			},
-			[&](const MSRTVLayout&) noexcept
+			[&](const MultiSampleRTVLayout&) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
 				viewDesc.Texture2DMS = D3D12_TEX2DMS_RTV
 				{
 				};
 			},
-			[&](const MSArrayRTVLayout& l) noexcept
+			[&](const MultiSampleArrayRTVLayout& l) noexcept
 			{
 				viewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY;
 				viewDesc.Texture2DMSArray = D3D12_TEX2DMS_ARRAY_RTV

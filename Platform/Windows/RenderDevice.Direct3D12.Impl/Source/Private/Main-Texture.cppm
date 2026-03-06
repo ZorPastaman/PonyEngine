@@ -61,11 +61,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]] 
 		virtual bool SRGBCompatible() const noexcept override;
 
-		virtual void* Map(const SubTextureIndex& index) override;
-		virtual void* Map(const SubTextureIndex& index, std::uint64_t offset, std::uint64_t length) override;
-		virtual void Unmap(const SubTextureIndex& index) override;
-		virtual void Unmap(const SubTextureIndex& index, std::uint64_t offset, std::uint64_t length) override;
-
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
@@ -79,9 +74,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Texture& operator =(Texture&&) = delete;
 
 	private:
-		[[nodiscard("Pure function")]]
-		UINT CalculateSubresourceIndex(std::uint8_t mipIndex, std::uint16_t arrayIndex, Aspect aspect) const;
-
 		class Resource resource;
 
 		TextureFormatId format;
@@ -201,26 +193,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return srgbCompatible;
 	}
 
-	void* Texture::Map(const SubTextureIndex& index)
-	{
-		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect));
-	}
-
-	void* Texture::Map(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
-	{
-		return resource.Map(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
-	}
-
-	void Texture::Unmap(const SubTextureIndex& index)
-	{
-		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect));
-	}
-
-	void Texture::Unmap(const SubTextureIndex& index, const std::uint64_t offset, const std::uint64_t length)
-	{
-		resource.Unmap(CalculateSubresourceIndex(index.mipIndex, index.arrayIndex, index.aspect), static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
-	}
-
 	std::string_view Texture::Name() const noexcept
 	{
 		return resource.Name();
@@ -239,25 +211,5 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	DXGI_FORMAT Texture::NativeFormat() const noexcept
 	{
 		return nativeFormat;
-	}
-
-	UINT Texture::CalculateSubresourceIndex(const std::uint8_t mipIndex, const std::uint16_t arrayIndex, const Aspect aspect) const
-	{
-#ifndef NDEBUG
-		if (mipIndex >= mipCount) [[unlikely]]
-		{
-			throw std::out_of_range("Mip index is out of range");
-		}
-		if (arrayIndex >= ArraySize()) [[unlikely]]
-		{
-			throw std::out_of_range("Array index is out of range");
-		}
-		if (None(ToMask(aspect), GetAspects(nativeFormat))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
-		}
-#endif
-
-		return CalculateSubresource(mipIndex, arrayIndex, ToPlaneIndex(aspect), mipCount, ArraySize());
 	}
 }

@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Sampler container parameters.
 	struct SamplerContainerParams final
 	{
-		std::uint32_t size = 1u;
-		bool shaderVisible = false;
+		std::uint32_t size = 1u; ///< Container size.
+		bool shaderVisible = false; ///< Is it shader visible?
 	};
 }

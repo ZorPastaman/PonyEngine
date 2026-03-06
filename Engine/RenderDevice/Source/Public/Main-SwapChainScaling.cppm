@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Swap chain scaling.
 	enum class SwapChainScaling : std::uint8_t
 	{
 		NoScaling,
@@ -24,6 +25,7 @@ export namespace PonyEngine::RenderDevice
 		StretchAspectRatio
 	};
 
+	/// @brief Swap chain scaling mask.
 	enum class SwapChainScalingMask : std::uint8_t
 	{
 		None = 0,
@@ -34,4 +36,20 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(SwapChainScaling, SwapChainScalingMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Swap chain scaling names.
+	constexpr std::array<std::string_view, 3> SwapChainScalingNames
+	{
+		"NoScaling",
+		"Stretch",
+		"StretchAspectRatio"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::SwapChainScaling, PonyEngine::RenderDevice::SwapChainScalingMask, PonyEngine::RenderDevice::SwapChainScalingNames)
 }

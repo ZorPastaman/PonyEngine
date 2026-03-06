@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Line rasterization mode.
 	enum class LineRasterizationMode : std::uint8_t
 	{
 		Aliased,
@@ -25,6 +26,7 @@ export namespace PonyEngine::RenderDevice
 		QuadrilateralNarrow
 	};
 
+	/// @brief Line rasterization mode mask.
 	enum class LineRasterizationModeMask : std::uint8_t
 	{
 		None = 0,
@@ -36,4 +38,21 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(LineRasterizationMode, LineRasterizationModeMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Line rasterization mode names.
+	constexpr std::array<std::string_view, 4> LineRasterizationModeNames
+	{
+		"Aliased",
+		"AlphaAntialiased",
+		"QuadrilateralWide",
+		"QuadrilateralNarrow"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::LineRasterizationMode, PonyEngine::RenderDevice::LineRasterizationModeMask, PonyEngine::RenderDevice::LineRasterizationModeNames)
 }

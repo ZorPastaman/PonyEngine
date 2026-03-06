@@ -79,6 +79,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		static constexpr float MaxAnisotropy = float{D3D12_DEFAULT_MAX_ANISOTROPY};
 
+		static constexpr std::uint32_t MaxSimultaneousFences = std::uint32_t{MAXIMUM_WAIT_OBJECTS};
+
 		[[nodiscard("Pure constructor")]]
 		explicit Engine(IRenderDeviceContext& renderDevice);
 		Engine(const Engine&) = delete;
@@ -290,10 +292,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static void ValidateViewFormat(const Texture& texture, TextureFormatId viewFormat, bool srgb);
 		static void ValidateDimension(const Texture& texture, TextureViewDimension dimension);
 		static void ValidateDimension(const Texture& texture, TextureDimension dimension);
-		static void ValidateLayout(const Texture& texture, const TextureSRVLayout& layout, TextureViewDimension dimension);
-		static void ValidateLayout(const TextureSRVLayout& layout, TextureViewDimension dimension, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateLayout(const Texture& texture, const TextureUAVLayout& layout);
-		static void ValidateLayout(const TextureUAVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		static void ValidateLayout(const Texture& texture, const SRVLayout& layout, TextureViewDimension dimension);
+		static void ValidateLayout(const SRVLayout& layout, TextureViewDimension dimension, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		static void ValidateLayout(const Texture& texture, const UAVLayout& layout);
+		static void ValidateLayout(const UAVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateLayout(const Texture& texture, const RTVLayout& layout);
 		static void ValidateLayout(const RTVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
 		static void ValidateLayout(const Texture& texture, const DSVLayout& layout);
@@ -379,8 +381,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			const DXGI_FORMAT format = textureFormatMap.DXGIFormat(index);
 
 			auto support = RenderDevice::TextureFormatSupport{.supported = true};
-			support.features = ToTextureFormatFeature(device.GetFormatSupport(format));
+			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
+			support.dimensions = ToTextureDimensions(formatSupport);
+			support.viewDimensions = ToTextureViewDimensions(formatSupport);
 			support.aspects = GetAspects(format);
+			support.usage = ToTextureUsage(formatSupport);
+			support.srgb = IsSRGBCompatibleFormat(format);
+			support.swapChain = IsSwapChainCompatible(formatSupport);
+			support.shaderOperations = ToShaderOperations(formatSupport);
+			support.blendModes = ToBlendModes(formatSupport);
 
 			return support;
 		}
@@ -806,7 +815,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return RenderDevice::ShaderSupport
 		{
 			.shaderIRName = ShaderIRName,
-			.version = ShaderIRVersion(),
+			.shaderIRVersion = ShaderIRVersion(),
 			.scalarTypes = ScalarTypeSupport(),
 			.atomicTypes = ToAtomicScalarTypeSupport(atomicSupport),
 			.groupSharedAtomicTypes = ToGroupSharedAtomicScalarTypeSupport(atomicSupport)
@@ -1936,11 +1945,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateLayout(const Texture& texture, const TextureSRVLayout& layout, const TextureViewDimension dimension)
+	void Engine::ValidateLayout(const Texture& texture, const SRVLayout& layout, const TextureViewDimension dimension)
 	{
 		std::visit(Type::Overload
 		{
-			[&](const TextureSingleSRVLayout& l)
+			[&](const SingleSRVLayout& l)
 			{
 				ValidateSampleCount(texture, false);
 				ValidateMipRange(texture, l.mipRange);
@@ -1949,7 +1958,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					ValidateArrayRange(texture, ArrayRange{.firstArrayIndex = 0u, .arrayCount = 6u});
 				}
 			},
-			[&](const TextureArraySRVLayout& l)
+			[&](const ArraySRVLayout& l)
 			{
 				ValidateSampleCount(texture, false);
 				ValidateMipRange(texture, l.mipRange);
@@ -1972,7 +1981,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				}
 				ValidateArrayRange(texture, l.arrayRange);
 			},
-			[&](const TextureMSSRVLayout&)
+			[&](const MultiSampleSRVLayout&)
 			{
 				ValidateSampleCount(texture, true);
 				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
@@ -1980,7 +1989,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					throw std::invalid_argument("Invalid dimension");
 				}
 			},
-			[&](const TextureMSArraySRVLayout& l)
+			[&](const MultiSampleArraySRVLayout& l)
 			{
 				ValidateSampleCount(texture, true);
 				ValidateArrayRange(texture, l.arrayRange);
@@ -1992,11 +2001,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, layout);
 	}
 
-	void Engine::ValidateLayout(const TextureSRVLayout& layout, const TextureViewDimension dimension, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	void Engine::ValidateLayout(const SRVLayout& layout, const TextureViewDimension dimension, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		std::visit(Type::Overload
 		{
-			[&](const TextureSingleSRVLayout& l)
+			[&](const SingleSRVLayout& l)
 			{
 				ValidateMipRange(l.mipRange, maxMipCount);
 				if (dimension == TextureViewDimension::TextureCube) [[unlikely]]
@@ -2004,7 +2013,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					ValidateArrayRange(ArrayRange{.firstArrayIndex = 0u, .arrayCount = 6u}, maxArraySize);
 				}
 			},
-			[&](const TextureArraySRVLayout& l)
+			[&](const ArraySRVLayout& l)
 			{
 				ValidateMipRange(l.mipRange, maxMipCount);
 				if (dimension == TextureViewDimension::TextureCube)
@@ -2026,14 +2035,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				}
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			},
-			[&](const TextureMSSRVLayout&)
+			[&](const MultiSampleSRVLayout&)
 			{
 				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
 				{
 					throw std::invalid_argument("Invalid dimension");
 				}
 			},
-			[&](const TextureMSArraySRVLayout& l)
+			[&](const MultiSampleArraySRVLayout& l)
 			{
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
@@ -2044,16 +2053,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, layout);
 	}
 
-	void Engine::ValidateLayout(const Texture& texture, const TextureUAVLayout& layout)
+	void Engine::ValidateLayout(const Texture& texture, const UAVLayout& layout)
 	{
 		std::visit(Type::Overload
 		{
-			[&](const TextureSingleUAVLayout& l)
+			[&](const SingleUAVLayout& l)
 			{
 				ValidateSampleCount(texture, false);
 				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
 			},
-			[&](const TextureArrayUAVLayout& l)
+			[&](const ArrayUAVLayout& l)
 			{
 				ValidateSampleCount(texture, false);
 				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
@@ -2062,15 +2071,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}, layout);
 	}
 
-	void Engine::ValidateLayout(const TextureUAVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	void Engine::ValidateLayout(const UAVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
 		std::visit(Type::Overload
 		{
-			[&](const TextureSingleUAVLayout& l)
+			[&](const SingleUAVLayout& l)
 			{
 				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
 			},
-			[&](const TextureArrayUAVLayout& l)
+			[&](const ArrayUAVLayout& l)
 			{
 				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
 				ValidateArrayRange(l.arrayRange, maxArraySize);
@@ -2093,11 +2102,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateMipRange(texture, MipRange{ .mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
 				ValidateArrayRange(texture, l.arrayRange);
 			},
-			[&](const MSRTVLayout&)
+			[&](const MultiSampleRTVLayout&)
 			{
 				ValidateSampleCount(texture, true);
 			},
-			[&](const MSArrayRTVLayout& l)
+			[&](const MultiSampleArrayRTVLayout& l)
 			{
 				ValidateSampleCount(texture, true);
 				ValidateArrayRange(texture, l.arrayRange);
@@ -2118,10 +2127,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			},
-			[&](const MSRTVLayout&)
+			[&](const MultiSampleRTVLayout&)
 			{
 			},
-			[&](const MSArrayRTVLayout& l)
+			[&](const MultiSampleArrayRTVLayout& l)
 			{
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			}
@@ -2476,13 +2485,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			for (std::size_t i = 0uz; i < r.size(); ++i)
 			{
 				const T& base = r[i];
-				std::uint32_t baseBegin = base.baseShaderRegister;
-				std::uint32_t baseEnd = base.baseShaderRegister + base.count;
+				std::uint32_t baseBegin = base.firstShaderRegister;
+				std::uint32_t baseEnd = base.firstShaderRegister + base.shaderRegisterCount;
 				for (std::size_t j = i + 1uz; j < r.size(); ++j)
 				{
 					const T& compared = r[j];
-					std::uint32_t comparedBegin = compared.baseShaderRegister;
-					std::uint32_t comparedEnd = compared.baseShaderRegister + compared.count;
+					std::uint32_t comparedBegin = compared.firstShaderRegister;
+					std::uint32_t comparedEnd = compared.firstShaderRegister + compared.shaderRegisterCount;
 					if (!(comparedBegin >= baseEnd || comparedEnd <= baseBegin)) [[unlikely]]
 					{
 						throw std::invalid_argument("Overlapping ranges");
@@ -2555,7 +2564,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		const std::size_t blendCount = std::visit(Type::Overload
 		{
-			[](const BlendGroupParams& p)
+			[](const ArithmeticBlendGroupParams& p)
 			{
 				return p.renderTargetBlend.size();
 			},

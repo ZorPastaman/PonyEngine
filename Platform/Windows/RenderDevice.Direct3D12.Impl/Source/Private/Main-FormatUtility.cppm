@@ -843,7 +843,17 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr AspectMask GetAspects(DXGI_FORMAT format) noexcept;
 
 	[[nodiscard("Pure function")]]
-	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr TextureDimensionMask ToTextureDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr TextureViewDimensionMask ToTextureViewDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr TextureUsage ToTextureUsage(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr ShaderOperationMask ToShaderOperations(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr BlendModeMask ToBlendModes(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	[[nodiscard("Pure function")]]
+	constexpr bool IsSwapChainCompatible(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -888,94 +898,143 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return MainFormatMap.GetAspect(MainFormatMap.IndexOf(format));
 	}
 
-	constexpr TextureFormatFeature ToTextureFormatFeature(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr TextureDimensionMask ToTextureDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
-		auto features = TextureFormatFeature::None;
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_LOAD)
+		auto dimensions = TextureDimensionMask::None;
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE1D)
 		{
-			features |= TextureFormatFeature::ShaderLoad;
+			dimensions |= TextureDimensionMask::Texture1D;
 		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE)
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE2D)
 		{
-			features |= TextureFormatFeature::ShaderSample;
+			dimensions |= TextureDimensionMask::Texture2D;
 		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE_COMPARISON)
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE3D)
 		{
-			features |= TextureFormatFeature::ShaderSampleComparison;
+			dimensions |= TextureDimensionMask::Texture3D;
 		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER)
+
+		return dimensions;
+	}
+
+	constexpr TextureViewDimensionMask ToTextureViewDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	{
+		auto dimensions = TextureViewDimensionMask::None;
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE1D)
 		{
-			features |= TextureFormatFeature::ShaderGather;
+			dimensions |= TextureViewDimensionMask::Texture1D;
 		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER_COMPARISON)
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE2D)
 		{
-			features |= TextureFormatFeature::ShaderGatherComparison;
+			dimensions |= TextureViewDimensionMask::Texture2D;
 		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET)
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE3D)
 		{
-			features |= TextureFormatFeature::RenderTarget;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_BLENDABLE)
-		{
-			features |= TextureFormatFeature::Blendable;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_OUTPUT_MERGER_LOGIC_OP)
-		{
-			features |= TextureFormatFeature::LogicBlendable;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL)
-		{
-			features |= TextureFormatFeature::DepthStencil;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TYPED_UNORDERED_ACCESS_VIEW)
-		{
-			features |= TextureFormatFeature::UnorderedAccess;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_ADD)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicAdd;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_BITWISE_OPS)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicBitwise;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_EXCHANGE)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicExchange;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_COMPARE_STORE_OR_COMPARE_EXCHANGE)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicExchangeComparison;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_SIGNED_MIN_OR_MAX)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicSignedMinMax;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_UNSIGNED_MIN_OR_MAX)
-		{
-			features |= TextureFormatFeature::UnorderedAccessAtomicUnsignedMinMax;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD)
-		{
-			features |= TextureFormatFeature::UnorderedAccessLoad;
-		}
-		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE)
-		{
-			features |= TextureFormatFeature::UnorderedAccessStore;
-		}
-		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DISPLAY)
-		{
-			features |= TextureFormatFeature::SwapChain;
-		}
-		if (IsSRGBCompatibleFormat(support.Format))
-		{
-			features |= TextureFormatFeature::SRGB;
+			dimensions |= TextureViewDimensionMask::Texture3D;
 		}
 		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURECUBE)
 		{
-			features |= TextureFormatFeature::Cube;
+			dimensions |= TextureViewDimensionMask::TextureCube;
 		}
 
-		return features;
+		return dimensions;
+	}
+
+	constexpr TextureUsage ToTextureUsage(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	{
+		auto usage = TextureUsage::ShaderResource;
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TYPED_UNORDERED_ACCESS_VIEW)
+		{
+			usage |= TextureUsage::UnorderedAccess;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_RENDER_TARGET)
+		{
+			usage |= TextureUsage::RenderTarget;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_DEPTH_STENCIL)
+		{
+			usage |= TextureUsage::DepthStencil;
+		}
+
+		return usage;
+	}
+
+	constexpr ShaderOperationMask ToShaderOperations(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	{
+		auto operations = ShaderOperationMask::None;
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_LOAD)
+		{
+			operations |= ShaderOperationMask::ShaderLoad;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE)
+		{
+			operations |= ShaderOperationMask::ShaderSample;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_SAMPLE_COMPARISON)
+		{
+			operations |= ShaderOperationMask::ShaderSampleComparison;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER)
+		{
+			operations |= ShaderOperationMask::ShaderGather;
+		}
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_GATHER_COMPARISON)
+		{
+			operations |= ShaderOperationMask::ShaderGatherComparison;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_ADD)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessAtomicAdd;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_BITWISE_OPS)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessAtomicBitwise;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_EXCHANGE)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessAtomicExchange;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_COMPARE_STORE_OR_COMPARE_EXCHANGE)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessAtomicExchangeComparison;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_SIGNED_MIN_OR_MAX)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessAtomicSignedMinMax;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_ATOMIC_UNSIGNED_MIN_OR_MAX)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessAtomicUnsignedMinMax;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_LOAD)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessLoad;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_UAV_TYPED_STORE)
+		{
+			operations |= ShaderOperationMask::UnorderedAccessStore;
+		}
+
+		return operations;
+	}
+
+	constexpr BlendModeMask ToBlendModes(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	{
+		auto modes = BlendModeMask::None;
+		if (support.Support1 & D3D12_FORMAT_SUPPORT1_BLENDABLE)
+		{
+			modes |= BlendModeMask::Arithmetic;
+		}
+		if (support.Support2 & D3D12_FORMAT_SUPPORT2_OUTPUT_MERGER_LOGIC_OP)
+		{
+			modes |= BlendModeMask::Logic;
+		}
+
+		return modes;
+	}
+
+	constexpr bool IsSwapChainCompatible(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	{
+		return support.Support1 & D3D12_FORMAT_SUPPORT1_DISPLAY;
 	}
 }

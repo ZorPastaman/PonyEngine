@@ -9,21 +9,20 @@
 
 export module PonyEngine.RenderDevice:SamplerParams;
 
-import std;
-
 import :SamplerAddressMode;
 import :SamplerFilter;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Sampler parameters.
 	struct SamplerParams final
 	{
-		SamplerFilter filter;
-		SamplerAddressMode addressU = SamplerAddressMode::Wrap;
-		SamplerAddressMode addressV = SamplerAddressMode::Wrap;
-		SamplerAddressMode addressW = SamplerAddressMode::Wrap;
-		float mipLodBias = 0.f;
-		float minLod = 0.f;
-		float maxLod = 0.f;
+		SamplerFilter filter; ///< Sampler filter.
+		SamplerAddressMode addressU = SamplerAddressMode::Wrap; ///< Address mode of a texture U-coordinate.
+		SamplerAddressMode addressV = SamplerAddressMode::Wrap; ///< Address mode of a texture V-coordinate.
+		SamplerAddressMode addressW = SamplerAddressMode::Wrap; ///< Address mode of a texture W-coordinate.
+		float mipLodBias = 0.f; ///< Mip lod bias.
+		float minLod = 0.f; ///< Minimal lod.
+		float maxLod = 0.f; ///< Maximal lod.
 	};
 }

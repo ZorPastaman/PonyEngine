@@ -15,9 +15,10 @@ import :IRenderTargetContainer;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Render target binding.
 	struct RenderTargetBinding final
 	{
-		const IRenderTargetContainer* container = nullptr;
-		std::uint32_t index = 0u;
+		const IRenderTargetContainer* container = nullptr; ///< Render target container. Must be a valid container.
+		std::uint32_t index = 0u; ///< View index.
 	};
 }

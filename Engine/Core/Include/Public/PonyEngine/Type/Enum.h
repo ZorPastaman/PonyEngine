@@ -222,3 +222,8 @@
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
 #define PONY_ENUM_VALUE_MASK_FEATURES(Value, Mask) PONY_ENUM_MASK_FEATURES(Mask) PONY_ENUM_VALUE_MASK(Value, Mask)
+/// @brief Creates both a value and a mask formatters.
+/// @param Value Value enum type.
+/// @param Mask Mask enum type.
+/// @param ValueMaskNames Names that will be used for both the value and mask formatters. They're synced by index.
+#define PONY_ENUM_VALUE_MASK_FORMATTER(Value, Mask, ValueMaskNames) PONY_ENUM_VALUE_FORMATTER(Value, ValueMaskNames) PONY_ENUM_MASK_FORMATTER(Mask, ValueMaskNames)

@@ -11,33 +11,42 @@ module;
 
 #include "PonyEngine/Type/Enum.h"
 
-export module PonyEngine.RenderDevice:TextureFlag;
+export module PonyEngine.RenderDevice:BlendMode;
 
 import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	/// @brief Texture flags.
-	enum class TextureFlag : std::uint8_t
+	/// @brief Blend mode.
+	enum class BlendMode : std::uint8_t
 	{
-		None = 0,
-		SRGB = 1 << 0,
-		All = (1 << 1) - 1
+		Arithmetic,
+		Logic
 	};
 
-	PONY_ENUM_MASK_FEATURES(TextureFlag)
+	/// @brief Blend mode mask.
+	enum class BlendModeMask : std::uint8_t
+	{
+		None = 0,
+		Arithmetic = 1 << 0,
+		Logic = 1 << 1,
+		All = (1 << 2) - 1
+	};
+
+	PONY_ENUM_VALUE_MASK_FEATURES(BlendMode, BlendModeMask)
 }
 
 namespace PonyEngine::RenderDevice
 {
-	/// @brief Texture flag names.
-	constexpr std::array<std::string_view, 1> TextureFlagNames
+	/// @brief Blend mode names.
+	constexpr std::array<std::string_view, 2> BlendModeNames
 	{
-		"SRGB"
+		"Arithmetic",
+		"Logic"
 	};
 }
 
 export
 {
-	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::TextureFlag, PonyEngine::RenderDevice::TextureFlagNames)
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::BlendMode, PonyEngine::RenderDevice::BlendModeMask, PonyEngine::RenderDevice::BlendModeNames)
 }

@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Swap chain alpha mode.
 	enum class SwapChainAlphaMode : std::uint8_t
 	{
 		Ignore,
@@ -25,6 +26,7 @@ export namespace PonyEngine::RenderDevice
 		Inherit
 	};
 
+	/// @brief Swap chain alpha mode mask.
 	enum class SwapChainAlphaModeMask : std::uint8_t
 	{
 		None = 0,
@@ -36,4 +38,21 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(SwapChainAlphaMode, SwapChainAlphaModeMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Swap chain alpha mode names.
+	constexpr std::array<std::string_view, 4> SwapChainAlphaModeNames
+	{
+		"Ignore",
+		"Straight",
+		"Premultiplied",
+		"Inherit"
+	};
+}
+
+export 
+{
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::SwapChainAlphaMode, PonyEngine::RenderDevice::SwapChainAlphaModeMask, PonyEngine::RenderDevice::SwapChainAlphaModeNames)
 }

@@ -54,6 +54,5 @@ namespace PonyEngine::RenderDevice
 
 export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::RenderDevice::ColorComponent, PonyEngine::RenderDevice::ColorComponentNames)
-	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::ColorComponentMask, PonyEngine::RenderDevice::ColorComponentNames)
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::ColorComponent, PonyEngine::RenderDevice::ColorComponentMask, PonyEngine::RenderDevice::ColorComponentNames)
 }

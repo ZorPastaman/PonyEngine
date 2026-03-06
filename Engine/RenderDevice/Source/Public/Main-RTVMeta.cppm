@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:RenderTargetMeta;
+export module PonyEngine.RenderDevice:RTVMeta;
 
 import std;
 
@@ -16,15 +16,17 @@ import :RTVParams;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Empty render target meta. It means no view was created.
 	struct EmptyRenderTargetMeta final
 	{
 	};
 
+	/// @brief Render target view to a texture meta.
 	struct RenderTargetTextureMeta final
 	{
-		const ITexture* texture = nullptr;
-		RTVParams params;
+		const ITexture* texture = nullptr; ///< Target texture. May be nullptr.
+		RTVParams params; ///< Render target view parameters.
 	};
 
-	using RenderTargetMeta = std::variant<EmptyRenderTargetMeta, RenderTargetTextureMeta>;
+	using RenderTargetMeta = std::variant<EmptyRenderTargetMeta, RenderTargetTextureMeta>; ///< Render target view meta.
 }

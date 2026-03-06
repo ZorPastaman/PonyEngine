@@ -22,9 +22,9 @@ import :TextureUtility;
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_BARRIER_SYNC ToSync(PipelineStage stages) noexcept;
+	constexpr D3D12_BARRIER_SYNC ToSync(PipelineStageMask stages) noexcept;
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_BARRIER_ACCESS ToAccess(std::optional<ResourceAccess> accesses) noexcept;
+	constexpr D3D12_BARRIER_ACCESS ToAccess(std::optional<ResourceAccessMask> accesses) noexcept;
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE ToSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, AspectMask aspects,
 		std::uint8_t resourceMipCount, std::uint16_t resourceArraySize) noexcept;
@@ -32,38 +32,38 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	constexpr D3D12_BARRIER_SYNC ToSync(const PipelineStage stages) noexcept
+	constexpr D3D12_BARRIER_SYNC ToSync(const PipelineStageMask stages) noexcept
 	{
 		auto sync = D3D12_BARRIER_SYNC_NONE;
-		if (Any(PipelineStage::VertexShading, stages))
+		if (Any(PipelineStageMask::VertexShading, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_VERTEX_SHADING;
 		}
-		if (Any(PipelineStage::PixelShading, stages))
+		if (Any(PipelineStageMask::PixelShading, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_PIXEL_SHADING;
 		}
-		if (Any(PipelineStage::RenderTarget, stages))
+		if (Any(PipelineStageMask::RenderTarget, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_RENDER_TARGET;
 		}
-		if (Any(PipelineStage::DepthStencil, stages))
+		if (Any(PipelineStageMask::DepthStencil, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_DEPTH_STENCIL;
 		}
-		if (Any(PipelineStage::ComputeShading, stages))
+		if (Any(PipelineStageMask::ComputeShading, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_COMPUTE_SHADING;
 		}
-		if (Any(PipelineStage::Copy, stages))
+		if (Any(PipelineStageMask::Copy, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_COPY;
 		}
-		if (Any(PipelineStage::Resolve, stages))
+		if (Any(PipelineStageMask::Resolve, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_RESOLVE;
 		}
-		if (Any(PipelineStage::UnorderedAccessClearing, stages))
+		if (Any(PipelineStageMask::UnorderedAccessClearing, stages))
 		{
 			sync |= D3D12_BARRIER_SYNC_CLEAR_UNORDERED_ACCESS_VIEW;
 		}
@@ -71,7 +71,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return sync;
 	}
 
-	constexpr D3D12_BARRIER_ACCESS ToAccess(const std::optional<ResourceAccess> accesses) noexcept
+	constexpr D3D12_BARRIER_ACCESS ToAccess(const std::optional<ResourceAccessMask> accesses) noexcept
 	{
 		if (!accesses)
 		{
@@ -79,43 +79,43 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		auto access = D3D12_BARRIER_ACCESS_COMMON;
-		if (Any(ResourceAccess::ConstantBuffer, *accesses))
+		if (Any(ResourceAccessMask::ConstantBuffer, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_CONSTANT_BUFFER;
 		}
-		if (Any(ResourceAccess::ShaderResource, *accesses))
+		if (Any(ResourceAccessMask::ShaderResource, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_SHADER_RESOURCE;
 		}
-		if (Any(ResourceAccess::UnorderedAccess, *accesses))
+		if (Any(ResourceAccessMask::UnorderedAccess, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_UNORDERED_ACCESS;
 		}
-		if (Any(ResourceAccess::RenderTarget, *accesses))
+		if (Any(ResourceAccessMask::RenderTarget, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_RENDER_TARGET;
 		}
-		if (Any(ResourceAccess::DepthStencilRead, *accesses))
+		if (Any(ResourceAccessMask::DepthStencilRead, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_DEPTH_STENCIL_READ;
 		}
-		if (Any(ResourceAccess::DepthStencilWrite, *accesses))
+		if (Any(ResourceAccessMask::DepthStencilWrite, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE;
 		}
-		if (Any(ResourceAccess::CopySource, *accesses))
+		if (Any(ResourceAccessMask::CopySource, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_COPY_SOURCE;
 		}
-		if (Any(ResourceAccess::CopyDestination, *accesses))
+		if (Any(ResourceAccessMask::CopyDestination, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_COPY_DEST;
 		}
-		if (Any(ResourceAccess::ResolveSource, *accesses))
+		if (Any(ResourceAccessMask::ResolveSource, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_RESOLVE_SOURCE;
 		}
-		if (Any(ResourceAccess::ResolveDestination, *accesses))
+		if (Any(ResourceAccessMask::ResolveDestination, *accesses))
 		{
 			access |= D3D12_BARRIER_ACCESS_RESOLVE_DEST;
 		}

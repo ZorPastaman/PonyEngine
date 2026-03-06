@@ -91,8 +91,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 							ranges[rangeIndex++] = D3D12_DESCRIPTOR_RANGE1
 							{
 								.RangeType = ToDescriptorRangeType(range.type),
-								.NumDescriptors = range.count,
-								.BaseShaderRegister = range.baseShaderRegister,
+								.NumDescriptors = range.shaderRegisterCount,
+								.BaseShaderRegister = range.firstShaderRegister,
 								.RegisterSpace = registerSpace,
 								.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
 								.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
@@ -106,8 +106,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 							ranges[rangeIndex++] = D3D12_DESCRIPTOR_RANGE1
 							{
 								.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER,
-								.NumDescriptors = range.count,
-								.BaseShaderRegister = range.baseShaderRegister,
+								.NumDescriptors = range.shaderRegisterCount,
+								.BaseShaderRegister = range.firstShaderRegister,
 								.RegisterSpace = registerSpace,
 								.Flags = D3D12_DESCRIPTOR_RANGE_FLAG_NONE,
 								.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND

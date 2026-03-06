@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Sampler descriptor range.
 	struct SamplerDescriptorRange final
 	{
-		std::uint32_t baseShaderRegister = 0u;
-		std::uint32_t count = 1u;
+		std::uint32_t firstShaderRegister = 0u; ///< First shader register.
+		std::uint32_t shaderRegisterCount = 1u; ///< Shader register count.
 	};
 }

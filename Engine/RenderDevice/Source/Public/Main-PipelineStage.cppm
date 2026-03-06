@@ -17,7 +17,21 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	enum class PipelineStage : std::uint16_t
+	/// @brief Pipeline stage.
+	enum class PipelineStage : std::uint8_t
+	{
+		VertexShading,
+		PixelShading,
+		RenderTarget,
+		DepthStencil,
+		ComputeShading,
+		Copy,
+		Resolve,
+		UnorderedAccessClearing
+	};
+
+	/// @brief Pipeline stage mask.
+	enum class PipelineStageMask : std::uint8_t
 	{
 		None = 0,
 		VertexShading = 1 << 0,
@@ -31,5 +45,26 @@ export namespace PonyEngine::RenderDevice
 		All = (1 << 8) - 1
 	};
 
-	PONY_ENUM_MASK_FEATURES(PipelineStage)
+	PONY_ENUM_VALUE_MASK_FEATURES(PipelineStage, PipelineStageMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Pipeline stage names.
+	constexpr std::array<std::string_view, 8> PipelineStageNames
+	{
+		"VertexShading",
+		"PixelShading",
+		"RenderTarget",
+		"DepthStencil",
+		"ComputeShading",
+		"Copy",
+		"Resolve",
+		"UnorderedAccessClearing"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::PipelineStage, PonyEngine::RenderDevice::PipelineStageMask, PonyEngine::RenderDevice::PipelineStageNames)
 }

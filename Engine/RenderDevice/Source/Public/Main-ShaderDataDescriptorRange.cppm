@@ -15,10 +15,11 @@ import :ShaderDataDescriptorType;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Shader data descriptor range.
 	struct ShaderDataDescriptorRange final
 	{
-		ShaderDataDescriptorType type = ShaderDataDescriptorType::ConstantBuffer;
-		std::uint32_t baseShaderRegister = 0u;
-		std::uint32_t count = 1u;
+		ShaderDataDescriptorType type = ShaderDataDescriptorType::ConstantBuffer; ///< Descriptor type.
+		std::uint32_t firstShaderRegister = 0u; ///< First shader register.
+		std::uint32_t shaderRegisterCount = 1u; ///< Shader register count.
 	};
 }

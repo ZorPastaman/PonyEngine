@@ -13,8 +13,9 @@ import :CBVRequirement;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief View support.
 	struct ViewSupport final
 	{
-		CBVRequirement cbvRequirement;
+		CBVRequirement cbvRequirement; ///< Constant buffer view requirement.
 	};
 }

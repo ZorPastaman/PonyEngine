@@ -24,8 +24,8 @@ export namespace PonyEngine::RenderDevice
 	/// @brief Depth stencil view to a texture meta.
 	struct DSVTextureMeta final
 	{
-		const ITexture* texture = nullptr; ///< Target texture of a view.
-		DSVParams params; ///< View parameters.
+		const ITexture* texture = nullptr; ///< Target texture. May be nullptr.
+		DSVParams params; ///< Depth stencil view parameters.
 	};
 
 	using DSVMeta = std::variant<EmptyDSVMeta, DSVTextureMeta>; ///< Depth stencil view meta.
