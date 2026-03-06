@@ -17,12 +17,14 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Swap chain effect.
 	enum class SwapChainEffect : std::uint8_t
 	{
 		FlipDiscard,
 		FlipSequential
 	};
 
+	/// @brief Swap chain effect mask.
 	enum class SwapChainEffectMask : std::uint8_t
 	{
 		None = 0,
@@ -32,4 +34,19 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(SwapChainEffect, SwapChainEffectMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Swap chain effect names.
+	constexpr std::array<std::string_view, 2> SwapChainEffectNames
+	{
+		"FlipDiscard",
+		"FlipSequential"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::SwapChainEffect, PonyEngine::RenderDevice::SwapChainEffectMask, PonyEngine::RenderDevice::SwapChainEffectNames)
 }

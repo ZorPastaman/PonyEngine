@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Swap chain flag.
 	enum class SwapChainFlag : std::uint8_t
 	{
 		None = 0,
@@ -25,4 +26,18 @@ export namespace PonyEngine::RenderDevice
 	};
 
 	PONY_ENUM_MASK_FEATURES(SwapChainFlag)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Swap chain flag names.
+	constexpr std::array<std::string_view, 1> SwapChainFlagNames
+	{
+		"SRGB"
+	};
+}
+
+export
+{
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::SwapChainFlag, PonyEngine::RenderDevice::SwapChainFlagNames)
 }

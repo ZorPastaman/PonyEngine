@@ -31,8 +31,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~Waiter() noexcept;
 
-		[[nodiscard("Pure function")]]
-		virtual std::size_t MaxFences() const noexcept override;
 		virtual void Wait(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, std::chrono::nanoseconds timeout) override;
 
 		[[nodiscard("Pure function")]]
@@ -47,7 +45,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		std::size_t SetEvents(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const;
 		void WaitEvents(std::size_t count, std::chrono::milliseconds timeout);
 
-		void ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const;
+		static void ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues);
 
 		std::vector<HANDLE> waitEvents;
 
@@ -63,11 +61,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			CloseHandle(waitEvents[i]);
 		}
-	}
-
-	std::size_t Waiter::MaxFences() const noexcept
-	{
-		return MAXIMUM_WAIT_OBJECTS;
 	}
 
 	void Waiter::Wait(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, const std::chrono::nanoseconds timeout)
@@ -142,10 +135,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	void Waiter::ValidateFences(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const
+	void Waiter::ValidateFences(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues)
 	{
 #ifndef NDEBUG
-		if (fenceValues.size() > MaxFences()) [[unlikely]]
+		if (fenceValues.size() > MAXIMUM_WAIT_OBJECTS) [[unlikely]]
 		{
 			throw std::invalid_argument("Too many fences");
 		}

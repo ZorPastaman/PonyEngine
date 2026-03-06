@@ -15,29 +15,25 @@ export module PonyEngine.RenderDevice:ISamplerContainer;
 
 import std;
 
-import :SamplerParams;
+import :IContainer;
+import :SamplerMeta;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct EmptySamplerParams final
-	{
-	};
-	using SamplerMeta = std::variant<EmptySamplerParams, SamplerParams>;
-
-	class ISamplerContainer
+	/// @brief Container of samplers.
+	class ISamplerContainer : public IContainer
 	{
 		PONY_INTERFACE_BODY(ISamplerContainer)
 
-		[[nodiscard("Pure function")]]
-		virtual std::uint32_t Size() const noexcept = 0;
+		/// @brief Checks if the container is shader visible.
+		/// @return @a True if it's shader visible; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsShaderVisible() const noexcept = 0;
 
+		/// @brief Gets the meta at the @p index.
+		/// @param index Container element index.
+		/// @return Container element meta.
 		[[nodiscard("Pure function")]]
 		virtual const SamplerMeta& Meta(std::uint32_t index) const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-		virtual void Name(std::string_view name) = 0;
 	};
 }

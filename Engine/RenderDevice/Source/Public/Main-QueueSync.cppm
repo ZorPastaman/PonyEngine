@@ -15,9 +15,10 @@ import :IFence;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Command queue sync.
 	struct QueueSync final
 	{
-		std::span<const std::pair<const IFence*, std::uint64_t>> before;
-		std::span<const std::pair<IFence*, std::uint64_t>> after;
+		std::span<const std::pair<const IFence*, std::uint64_t>> before; ///< What fence values a command queue should wait for till it starts an execution. All the fences must be valid.
+		std::span<const std::pair<IFence*, std::uint64_t>> after; ///< What fence values a command queue should signal after it finishes an execution. All the fences must be valid.
 	};
 }

@@ -7,19 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:TextureSupportRequest;
+export module PonyEngine.RenderDevice:FenceSupport;
 
-import :TextureFormatId;
-import :TextureDimension;
-import :TextureUsage;
+import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	/// @brief Texture support request.
-	struct TextureSupportRequest final
+	/// @brief Fence support.
+	struct FenceSupport final
 	{
-		TextureFormatId format; ///< Texture format.
-		TextureDimension dimension = TextureDimension::Texture2D; ///< Texture dimension.
-		TextureUsage usage = TextureUsage::None; ///< Texture usages.
+		std::uint32_t simultaneousWaitedFences; ///< How many fences may one waiter wait for in one execution?
 	};
 }

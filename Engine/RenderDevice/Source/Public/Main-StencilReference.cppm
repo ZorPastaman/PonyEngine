@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Stencil reference.
 	struct StencilReference final
 	{
-		std::uint32_t front = 0u;
-		std::uint32_t back = 0u;
+		std::uint32_t front = 0u; ///< Front faced reference.
+		std::uint32_t back = 0u; ///< Back faced reference.
 	};
 }

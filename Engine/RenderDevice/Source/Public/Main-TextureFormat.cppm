@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Default names of texture formats.
 	struct TextureFormat final
 	{
 		PONY_NON_CONSTRUCTIBLE_BODY(TextureFormat)

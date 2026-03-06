@@ -15,9 +15,10 @@ import :SamplerParams;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Static sampler parameters.
 	struct StaticSamplerParams final
 	{
-		SamplerParams samplerParams;
-		std::uint32_t shaderRegister = 0u;
+		SamplerParams samplerParams; ///< Sampler parameters.
+		std::uint32_t shaderRegister = 0u; ///< Shader register.
 	};
 }

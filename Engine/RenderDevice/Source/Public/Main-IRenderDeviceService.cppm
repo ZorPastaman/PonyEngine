@@ -53,7 +53,6 @@ import :ShaderDataContainerParams;
 import :SRVParams;
 import :SubTextureRange;
 import :SwapChainParams;
-import :TextureFormatFeature;
 import :TextureFormatId;
 import :TextureFormatSupport;
 import :TextureParams;
@@ -207,7 +206,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) = 0;
 		/// @brief Creates a constant buffer view.
-		/// @param buffer Target buffer. May be nullptr.
+		/// @param buffer Target buffer. May be nullptr. If not nullptr, the buffer must have a shader resource usage.
 		/// @param container Shader data container where a view will be created.
 		/// @param index Container view index.
 		/// @param params Constant buffer view parameters.
@@ -215,7 +214,7 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) = 0;
 		/// @brief Creates a shader resource view.
-		/// @param buffer Target buffer. May be nullptr.
+		/// @param buffer Target buffer. May be nullptr. If not nullptr, the buffer must have a shader resource usage.
 		/// @param container Shader data container where a view will be created.
 		/// @param index Container view index.
 		/// @param params Shader resource view parameters.
@@ -223,7 +222,7 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) = 0;
 		/// @brief Creates a shader resource view.
-		/// @param texture Target texture. May be nullptr.
+		/// @param texture Target texture. May be nullptr. If not nullptr, the texture must have a shader resource usage.
 		/// @param container Shader data container where a view will be created.
 		/// @param index Container view index.
 		/// @param params Shader resource view parameters.
@@ -231,7 +230,7 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params) = 0;
 		/// @brief Creates an unordered access view.
-		/// @param buffer Target buffer. May be nullptr.
+		/// @param buffer Target buffer. May be nullptr. If not nullptr, the buffer must have an unordered access usage.
 		/// @param container Shader data container where a view will be created.
 		/// @param index Container view index.
 		/// @param params Unordered access view parameters.
@@ -239,7 +238,7 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params) = 0;
 		/// @brief Creates an unordered access view.
-		/// @param texture Target texture. May be nullptr.
+		/// @param texture Target texture. May be nullptr. If not nullptr, the texture must have an unordered access usage.
 		/// @param container Shader data container where a view will be created.
 		/// @param index Container view index.
 		/// @param params Unordered access view parameters.
@@ -261,7 +260,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) = 0;
 		/// @brief Creates a render target view.
-		/// @param texture Target texture. May be nullptr.
+		/// @param texture Target texture. May be nullptr. If not nullptr, the texture must have a render target usage.
 		/// @param container Render target container where a view will be created.
 		/// @param index Container view index.
 		/// @param params Render target view parameters.
@@ -283,7 +282,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params) = 0;
 		/// @brief Creates a depth stencil view.
-		/// @param texture Target texture. May be nullptr.
+		/// @param texture Target texture. May be nullptr. If not nullptr, the texture must have a depth stencil usage.
 		/// @param container Depth stencil container where a view will be created.
 		/// @param index Container view index.
 		/// @param params Depth stencil view parameters.

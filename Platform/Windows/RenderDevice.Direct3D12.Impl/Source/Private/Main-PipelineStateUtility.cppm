@@ -127,11 +127,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		std::visit(Type::Overload
 		{
-			[&](const BlendGroupParams& p) noexcept
+			[&](const ArithmeticBlendGroupParams& p) noexcept
 			{
 				for (std::size_t i = 0uz; i < std::min(std::size(blend.RenderTarget), p.renderTargetBlend.size()); ++i)
 				{
-					const RenderTargetBlendParams& rtBlend = p.renderTargetBlend[i];
+					const ArithmeticRenderTargetBlendParams& rtBlend = p.renderTargetBlend[i];
 					if (rtBlend.blend)
 					{
 						const ColorBlendParams& blendParams = *rtBlend.blend;

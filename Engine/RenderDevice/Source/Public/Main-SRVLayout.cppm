@@ -13,21 +13,29 @@ import :SubTextureRange;
 
 export namespace PonyEngine::RenderDevice
 {
-	struct TextureSingleSRVLayout final
+	/// @brief Layout of a shader resource view that points to a non-array non-ms texture.
+	struct SingleSRVLayout final
 	{
 		MipRange mipRange;
 	};
-	struct TextureArraySRVLayout final
+
+	/// @brief Layout of a shader resource view that points to an array non-ms texture.
+	struct ArraySRVLayout final
 	{
 		ArrayRange arrayRange;
 		MipRange mipRange;
 	};
-	struct TextureMSSRVLayout final
+
+	/// @brief Layout of a shader resource view that points to a non-array ms texture.
+	struct MultiSampleSRVLayout final
 	{
 	};
-	struct TextureMSArraySRVLayout final
+
+	/// @brief Layout of a shader resource view that points to an array ms texture.
+	struct MultiSampleArraySRVLayout final
 	{
 		ArrayRange arrayRange;
 	};
-	using TextureSRVLayout = std::variant<TextureSingleSRVLayout, TextureArraySRVLayout, TextureMSSRVLayout, TextureMSArraySRVLayout>;
+
+	using SRVLayout = std::variant<SingleSRVLayout, ArraySRVLayout, MultiSampleSRVLayout, MultiSampleArraySRVLayout>; ///< Shader resource view layout.
 }

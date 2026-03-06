@@ -15,10 +15,11 @@ import :Aspect;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Sub-texture index.
 	struct SubTextureIndex final
 	{
-		std::uint16_t arrayIndex = 0u;
-		std::uint8_t mipIndex = 0u;
-		Aspect aspect = Aspect::Color;
+		std::uint16_t arrayIndex = 0u; ///< Array element index.
+		std::uint8_t mipIndex = 0u; ///< Mip index.
+		Aspect aspect = Aspect::Color; ///< Aspect.
 	};
 }

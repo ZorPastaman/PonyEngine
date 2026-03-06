@@ -17,7 +17,23 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
-	enum class ResourceAccess : std::uint16_t
+	/// @brief Resource access.
+	enum class ResourceAccess : std::uint8_t
+	{
+		ConstantBuffer,
+		ShaderResource,
+		UnorderedAccess,
+		RenderTarget,
+		DepthStencilRead,
+		DepthStencilWrite,
+		CopySource,
+		CopyDestination,
+		ResolveSource,
+		ResolveDestination
+	};
+
+	/// @brief Resource access mask.
+	enum class ResourceAccessMask : std::uint16_t
 	{
 		None = 0,
 		ConstantBuffer = 1 << 0,
@@ -33,5 +49,28 @@ export namespace PonyEngine::RenderDevice
 		All = (1 << 10) - 1
 	};
 
-	PONY_ENUM_MASK_FEATURES(ResourceAccess)
+	PONY_ENUM_VALUE_MASK_FEATURES(ResourceAccess, ResourceAccessMask)
+}
+
+namespace PonyEngine::RenderDevice
+{
+	/// @brief Resource access names.
+	constexpr std::array<std::string_view, 10> ResourceAccessNames
+	{
+		"ConstantBuffer",
+		"ShaderResource",
+		"UnorderedAccess",
+		"RenderTarget",
+		"DepthStencilRead",
+		"DepthStencilWrite",
+		"CopySource",
+		"CopyDestination",
+		"ResolveSource",
+		"ResolveDestination"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::ResourceAccess, PonyEngine::RenderDevice::ResourceAccessMask, PonyEngine::RenderDevice::ResourceAccessNames)
 }

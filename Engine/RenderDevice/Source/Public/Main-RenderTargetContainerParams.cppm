@@ -13,8 +13,9 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Render target container parameters.
 	struct RenderTargetContainerParams final
 	{
-		std::uint32_t size = 1u;
+		std::uint32_t size = 1u; ///< Container size.
 	};
 }

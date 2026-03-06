@@ -157,7 +157,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		std::uint32_t requiredDescriptorCount = 0uz;
 		for (const ShaderDataDescriptorRange& range : set.shaderDataRanges)
 		{
-			requiredDescriptorCount += range.count;
+			requiredDescriptorCount += range.shaderRegisterCount;
 		}
 		if (requiredDescriptorCount == 0uz) [[unlikely]]
 		{
@@ -170,7 +170,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		for (std::uint32_t containerIndex = shaderDataIndex; const ShaderDataDescriptorRange& range : set.shaderDataRanges)
 		{
-			for (std::uint32_t i = 0u; i < range.count; ++i, ++containerIndex)
+			for (std::uint32_t i = 0u; i < range.shaderRegisterCount; ++i, ++containerIndex)
 			{
 				switch (range.type)
 				{
@@ -228,7 +228,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		std::uint32_t requiredDescriptorCount = 0uz;
 		for (const SamplerDescriptorRange& range : set.samplerRanges)
 		{
-			requiredDescriptorCount += range.count;
+			requiredDescriptorCount += range.shaderRegisterCount;
 		}
 		if (requiredDescriptorCount == 0uz) [[unlikely]]
 		{
@@ -241,7 +241,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		for (std::uint32_t containerIndex = samplerIndex; const ShaderDataDescriptorRange& range : set.shaderDataRanges)
 		{
-			for (std::uint32_t i = 0u; i < range.count; ++i, ++containerIndex)
+			for (std::uint32_t i = 0u; i < range.shaderRegisterCount; ++i, ++containerIndex)
 			{
 				if (std::holds_alternative<EmptySamplerParams>(samplerContainer->Meta(containerIndex))) [[unlikely]]
 				{

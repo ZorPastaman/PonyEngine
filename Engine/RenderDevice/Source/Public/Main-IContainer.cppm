@@ -11,24 +11,28 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.RenderDevice:IRenderTargetContainer;
+export module PonyEngine.RenderDevice:IContainer;
 
 import std;
 
-import :IContainer;
-import :RTVMeta;
-
 export namespace PonyEngine::RenderDevice
 {
-	/// @brief Container of RTVs.
-	class IRenderTargetContainer : public IContainer
+	/// @brief Container of views.
+	class IContainer
 	{
-		PONY_INTERFACE_BODY(IRenderTargetContainer)
+		PONY_INTERFACE_BODY(IContainer)
 
-		/// @brief Gets the meta at the @p index.
-		/// @param index Container element index.
-		/// @return Container element meta.
+		/// @brief Gets the container size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
-		virtual const RenderTargetMeta& Meta(std::uint32_t index) const noexcept = 0;
+		virtual std::uint32_t Size() const noexcept = 0;
+
+		/// @brief Gets the container name.
+		/// @return Container name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
+		/// @brief Sets the container name.
+		/// @param name Container name to set.
+		virtual void Name(std::string_view name) = 0;
 	};
 }

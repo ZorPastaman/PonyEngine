@@ -18,18 +18,20 @@ import :UAVLayout;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Buffer unordered access view parameters.
 	struct BufferUAVParams final
 	{
-		std::uint64_t firstElementIndex = 0ull;
-		std::uint32_t elementCount = 0u;
-		std::uint32_t stride = 0u;
+		std::uint64_t firstElementIndex = 0ull; ///< First element index.
+		std::uint32_t elementCount = 0u; ///< Element count.
+		std::uint32_t stride = 0u; ///< Element stride in bytes.
 	};
 
+	/// @brief Texture unordered access view parameters.
 	struct TextureUAVParams final
 	{
-		TextureFormatId format;
-		TextureDimension dimension = TextureDimension::Texture2D;
-		Aspect aspect = Aspect::Color;
-		TextureUAVLayout layout;
+		TextureFormatId format; ///< Texture format.
+		TextureDimension dimension = TextureDimension::Texture2D; ///< Texture dimension.
+		Aspect aspect = Aspect::Color; ///< Aspect.
+		UAVLayout layout; ///< Layout.
 	};
 }

@@ -51,6 +51,5 @@ namespace PonyEngine::RenderDevice
 
 export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::RenderDevice::Aspect, PonyEngine::RenderDevice::AspectNames)
-	PONY_ENUM_MASK_FORMATTER(PonyEngine::RenderDevice::AspectMask, PonyEngine::RenderDevice::AspectNames)
+	PONY_ENUM_VALUE_MASK_FORMATTER(PonyEngine::RenderDevice::Aspect, PonyEngine::RenderDevice::AspectMask, PonyEngine::RenderDevice::AspectNames)
 }

@@ -17,10 +17,11 @@ import :DepthRange;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Raster region.
 	struct RasterRegion final
 	{
-		Math::CornerRect<float> viewport;
-		DepthRange depthRange;
-		Math::CornerRect<std::uint32_t> scissor;
+		Math::CornerRect<float> viewport; ///< Viewport position.
+		DepthRange depthRange; ///< Viewport depth range.
+		Math::CornerRect<std::uint32_t> scissors; ///< Scissors.
 	};
 }

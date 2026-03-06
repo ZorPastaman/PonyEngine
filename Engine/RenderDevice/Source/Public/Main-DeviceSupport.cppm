@@ -9,6 +9,7 @@
 
 export module PonyEngine.RenderDevice:DeviceSupport;
 
+import :FenceSupport;
 import :RasterizerSupport;
 import :ResourceSupport;
 import :SamplerSupport;
@@ -27,5 +28,6 @@ export namespace PonyEngine::RenderDevice
 		RasterizerSupport rasterizerSupport; ///< Rasterizer support.
 		SwapChainSupport swapChainSupport; ///< Swap chain support.
 		ResourceSupport resourceSupport; ///< Resource support.
+		FenceSupport fenceSupport; ///< Fence support.
 	};
 }

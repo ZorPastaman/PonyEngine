@@ -29,8 +29,8 @@ export namespace PonyEngine::RenderDevice
 		BlendOperation alphaBlendOperation = BlendOperation::Add; ///< Alpha blend operation.
 	};
 
-	/// @brief Render target blend parameters.
-	struct RenderTargetBlendParams final
+	/// @brief Arithmetic render target blend parameters.
+	struct ArithmeticRenderTargetBlendParams final
 	{
 		std::optional<ColorBlendParams> blend; ///< Blend parameters. If nullopt, no blending is done.
 		ColorComponentMask colorComponentWriteMask = ColorComponentMask::All; ///< Color component write mask.
@@ -42,10 +42,10 @@ export namespace PonyEngine::RenderDevice
 		ColorComponentMask colorComponentWriteMask = ColorComponentMask::All; ///< Color component write mask.
 	};
 
-	/// @brief Blend group parameters.
-	struct BlendGroupParams final
+	/// @brief Arithmetic blend group parameters.
+	struct ArithmeticBlendGroupParams final
 	{
-		std::span<const RenderTargetBlendParams> renderTargetBlend; ///< Render target blends. Its count must be synced with the render target format count.
+		std::span<const ArithmeticRenderTargetBlendParams> renderTargetBlend; ///< Render target blends. Its count must be synced with the render target format count.
 	};
 
 	/// @brief Logic blend group parameters.
@@ -58,6 +58,6 @@ export namespace PonyEngine::RenderDevice
 	/// @brief Blend parameters.
 	struct BlendParams final
 	{
-		std::variant<BlendGroupParams, LogicBlendGroupParams> blendGroup; ///< Blend group.
+		std::variant<ArithmeticBlendGroupParams, LogicBlendGroupParams> blendGroup; ///< Blend group.
 	};
 }

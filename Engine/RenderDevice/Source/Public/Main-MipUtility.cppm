@@ -15,8 +15,19 @@ import PonyEngine.Math;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Computes a mip size.
+	/// @tparam T Value type.
+	/// @param size Original size.
+	/// @param mipIndex Mip index.
+	/// @return Mip size.
 	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
 	constexpr T MipSize(T size, std::uint8_t mipIndex) noexcept;
+	/// @brief Computes a mip size.
+	/// @tparam T Value type.
+	/// @tparam Size Vector size.
+	/// @param size Original size.
+	/// @param mipIndex Mip index.
+	/// @return Mip size.
 	template<std::unsigned_integral T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Math::Vector<T, Size> MipSize(const Math::Vector<T, Size>& size, std::uint8_t mipIndex) noexcept;
 }

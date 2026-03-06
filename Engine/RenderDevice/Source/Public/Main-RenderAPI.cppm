@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Default names for render APIs.
 	struct RenderAPI final
 	{
 		PONY_NON_CONSTRUCTIBLE_BODY(RenderAPI)

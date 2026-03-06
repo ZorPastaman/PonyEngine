@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Texture format id.
 	struct TextureFormatId final
 	{
-		std::uint64_t hash = 0u;
+		std::uint64_t hash = 0u; ///< Hash.
 
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const TextureFormatId& other) const noexcept = default;
