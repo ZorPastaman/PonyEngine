@@ -65,8 +65,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	class Engine final
 	{
 	public:
-		static constexpr std::string_view ApiName = Device::ApiName;
-		static constexpr auto ApiVersion = Device::ApiVersion;
+		static constexpr std::string_view APIName = Device::APIName;
+		static constexpr auto APIVersion = Device::APIVersion;
 
 		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL;
 		static constexpr std::uint8_t SimultaneousTargetCount = std::uint8_t{D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT};

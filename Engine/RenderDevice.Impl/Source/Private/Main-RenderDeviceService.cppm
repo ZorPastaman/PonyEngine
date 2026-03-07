@@ -51,9 +51,9 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual std::size_t BackendCount() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::string_view RenderApiName(std::size_t backendIndex) const override;
+		virtual std::string_view RenderAPIName(std::size_t backendIndex) const override;
 		[[nodiscard("Pure function")]]
-		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const override;
+		virtual Meta::Version RenderAPIVersion(std::size_t backendIndex) const override;
 		[[nodiscard("Pure function")]]
 		virtual std::optional<std::size_t> ActiveBackend() const noexcept override;
 		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) override;
@@ -287,14 +287,14 @@ namespace PonyEngine::RenderDevice
 		return backends.Size();
 	}
 
-	std::string_view RenderDeviceService::RenderApiName(const std::size_t backendIndex) const
+	std::string_view RenderDeviceService::RenderAPIName(const std::size_t backendIndex) const
 	{
-		return GetBackend(backendIndex).RenderApiName();
+		return GetBackend(backendIndex).RenderAPIName();
 	}
 
-	Meta::Version RenderDeviceService::RenderApiVersion(const std::size_t backendIndex) const
+	Meta::Version RenderDeviceService::RenderAPIVersion(const std::size_t backendIndex) const
 	{
-		return GetBackend(backendIndex).RenderApiVersion();
+		return GetBackend(backendIndex).RenderAPIVersion();
 	}
 
 	std::optional<std::size_t> RenderDeviceService::ActiveBackend() const noexcept

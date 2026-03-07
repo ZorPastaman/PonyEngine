@@ -29,8 +29,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	class Device final
 	{
 	public:
-		static constexpr std::string_view ApiName = RenderAPI::Direct3D;
-		static constexpr auto ApiVersion = Meta::Version(12, 2);
+		static constexpr std::string_view APIName = RenderAPI::Direct3D;
+		static constexpr auto APIVersion = Meta::Version(12, 2);
 		static constexpr D3D_FEATURE_LEVEL FeatureLevel = D3D_FEATURE_LEVEL_12_2;
 
 		static constexpr bool Int64BitSupport = true; ///< Are 64 bit int operations supported? On fl 12.2 they are mandatory.

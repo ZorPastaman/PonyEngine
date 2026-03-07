@@ -13,6 +13,7 @@ import std;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Backend handle.
 	struct BackendHandle final
 	{
 		std::uint32_t id = 0u; ///< ID. It's used only by the owner.
