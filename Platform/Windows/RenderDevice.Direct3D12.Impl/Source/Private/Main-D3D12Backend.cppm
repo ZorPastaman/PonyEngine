@@ -29,9 +29,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		~D3D12Backend() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view RenderApiName() const noexcept override;
+		virtual std::string_view RenderAPIName() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual Meta::Version RenderApiVersion() const noexcept override;
+		virtual Meta::Version RenderAPIVersion() const noexcept override;
 
 		virtual void Activate() override;
 		virtual void Deactivate() override;
@@ -137,14 +137,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 	}
 
-	std::string_view D3D12Backend::RenderApiName() const noexcept
+	std::string_view D3D12Backend::RenderAPIName() const noexcept
 	{
-		return Engine::ApiName;
+		return Engine::APIName;
 	}
 
-	Meta::Version D3D12Backend::RenderApiVersion() const noexcept
+	Meta::Version D3D12Backend::RenderAPIVersion() const noexcept
 	{
-		return Engine::ApiVersion;
+		return Engine::APIVersion;
 	}
 
 	void D3D12Backend::Activate()

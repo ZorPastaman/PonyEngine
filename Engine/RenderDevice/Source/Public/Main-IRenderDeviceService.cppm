@@ -78,13 +78,13 @@ export namespace PonyEngine::RenderDevice
 		/// @return Render API name.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view RenderApiName(std::size_t backendIndex) const = 0;
+		virtual std::string_view RenderAPIName(std::size_t backendIndex) const = 0;
 		/// @brief Gets a render API version.
 		/// @param backendIndex Backend index. Must be less than the @p BackendCount().
 		/// @return Render API version.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual Meta::Version RenderApiVersion(std::size_t backendIndex) const = 0;
+		virtual Meta::Version RenderAPIVersion(std::size_t backendIndex) const = 0;
 		/// @brief Gets an active backend index.
 		/// @return Active backend index; nullopt if no backend is active.
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
