@@ -19,6 +19,7 @@ import PonyEngine.RenderDevice.Ext;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Backend container.
 	class BackendContainer final
 	{
 	public:
@@ -31,29 +32,49 @@ export namespace PonyEngine::RenderDevice
 
 		~BackendContainer() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Gets a backend handle.
+		/// @param index Backend index.
+		/// @return Backend handle.
 		[[nodiscard("Pure function")]]
 		BackendHandle Handle(std::size_t index) const noexcept;
+		/// @brief Gets a backend.
+		/// @param index Backend index.
+		/// @return Backend.
 		[[nodiscard("Pure function")]]
 		IBackend& Backend(std::size_t index) const noexcept;
 
+		/// @brief Gets the index of the @p handle.
+		/// @param handle Handle.
+		/// @return Index of the handle if found; size otherwise.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(BackendHandle handle) const noexcept;
+		/// @brief Gets the index of the @p backend.
+		/// @param backend Backend.
+		/// @return Index of the backend if found; size otherwise.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(const IBackend& backend) const noexcept;
 
+		/// @brief Adds a backend.
+		/// @param handle Backend handle.
+		/// @param backend Backend.
 		void Add(BackendHandle handle, const std::shared_ptr<IBackend>& backend);
+		/// @brief Removes a backend.
+		/// @param index Backend index.
 		void Remove(std::size_t index) noexcept;
+		/// @brief Clears the container.
 		void Clear() noexcept;
 
 		BackendContainer& operator =(const BackendContainer&) = delete;
 		BackendContainer& operator =(BackendContainer&& other) noexcept = default;
 
 	private:
-		std::vector<BackendHandle> handles;
-		std::vector<std::shared_ptr<IBackend>> backends;
+		std::vector<BackendHandle> handles; ///< Backend handles.
+		std::vector<std::shared_ptr<IBackend>> backends; ///< Backends.
 	};
 }
 

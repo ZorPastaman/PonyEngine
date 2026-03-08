@@ -25,9 +25,12 @@ import :BackendContainer;
 
 export namespace PonyEngine::RenderDevice
 {
+	/// @brief Render device service.
 	class RenderDeviceService final : public Application::IService, public IRenderDeviceModuleContext, private IRenderDeviceService, private IRenderDeviceContext
 	{
 	public:
+		/// @brief Creates a render device service.
+		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
 		explicit RenderDeviceService(Application::IApplicationContext& application) noexcept;
 		RenderDeviceService(const RenderDeviceService&) = delete;
@@ -160,28 +163,42 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept override;
 
+		/// @brief Activates a backend.
+		/// @param index Backend index. Must be valid non-active backend.
 		void ActivateBackend(std::size_t index);
+		/// @brief Deactivates a backend.
+		/// @param index Backend index. Must be valid active backend.
 		void DeactivateBackend(std::size_t index);
 
+		/// @brief Gets a current backend.
+		/// @return Current backend.
 		[[nodiscard("Pure function")]]
 		IBackend& GetCurrentBackend();
+		/// @brief Gets a current backend.
+		/// @return Current backend.
 		[[nodiscard("Pure function")]]
 		const IBackend& GetCurrentBackend() const;
+		/// @brief Gets a backend.
+		/// @param index Backend index.
+		/// @return Backend.
 		[[nodiscard("Pure function")]]
 		IBackend& GetBackend(std::size_t index);
+		/// @brief Gets a backend.
+		/// @param index Backend index.
+		/// @return Backend.
 		[[nodiscard("Pure function")]]
 		const IBackend& GetBackend(std::size_t index) const;
 
-		Application::IApplicationContext* application;
+		Application::IApplicationContext* application; ///< Application context.
 
-		BackendContainer backends;
-		std::optional<std::size_t> activeBackendIndex;
+		BackendContainer backends; ///< Backends.
+		std::optional<std::size_t> activeBackendIndex; ///< Active backend index.
 
-		std::unordered_map<struct TextureFormatId, std::string> textureFormatHashMap;
+		std::unordered_map<struct TextureFormatId, std::string> textureFormatHashMap; ///< Texture format hash map.
 
-		std::vector<IRenderDeviceServiceObserver*> observers;
+		std::vector<IRenderDeviceServiceObserver*> observers; ///< Render device service observers.
 
-		BackendHandle nextBackendHandle;
+		BackendHandle nextBackendHandle; ///< Next backend handle.
 	};
 }
 
@@ -305,7 +322,7 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::SwitchBackend(const std::optional<std::size_t> backendIndex)
 	{
 #ifndef NDEBUG
-		if (backendIndex && backendIndex >= backends.Size()) [[unlikely]]
+		if (backendIndex && *backendIndex >= backends.Size()) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
 		}
@@ -323,6 +340,7 @@ namespace PonyEngine::RenderDevice
 			}
 		}
 
+		const std::optional<std::size_t> prevActiveBackendIndex = activeBackendIndex;
 		if (activeBackendIndex)
 		{
 			try
@@ -335,9 +353,8 @@ namespace PonyEngine::RenderDevice
 				throw;
 			}
 		}
-
-		const std::optional<std::size_t> prevActiveBackendIndex = activeBackendIndex;
 		activeBackendIndex = std::nullopt;
+
 		if (backendIndex)
 		{
 			try
