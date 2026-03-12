@@ -25,19 +25,32 @@ import :Utility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Makes a sampler description.
+	/// @param params Sampler parameters.
+	/// @return Sampler description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_SAMPLER_DESC2 ToSamplerDesc(const SamplerParams& params) noexcept;
+	constexpr D3D12_SAMPLER_DESC2 MakeSamplerDesc(const SamplerParams& params) noexcept;
+	/// @brief Casts the engine filter to a native filter.
+	/// @param filter Engine filter.
+	/// @return Native filter.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_FILTER_TYPE ToFilterType(Filter filter) noexcept;
+	/// @brief Casts the engine sampler address mode to a native sampler address mode.
+	/// @param mode Engine sampler address mode.
+	/// @return Native sampler address mode.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_TEXTURE_ADDRESS_MODE ToAddressMode(SamplerAddressMode mode) noexcept;
+	/// @brief Casts the engine reduction to a native reduction.
+	/// @param reduction Engine reduction.
+	/// @param comparisonFunc Comparison function. It's set if the reduction type is comparison.
+	/// @return Native reduction.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_FILTER_REDUCTION_TYPE ToReduction(const Reduction& reduction, D3D12_COMPARISON_FUNC& comparisonFunc) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	constexpr D3D12_SAMPLER_DESC2 ToSamplerDesc(const SamplerParams& params) noexcept
+	constexpr D3D12_SAMPLER_DESC2 MakeSamplerDesc(const SamplerParams& params) noexcept
 	{
 		auto desc = D3D12_SAMPLER_DESC2
 		{

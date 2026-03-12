@@ -24,24 +24,39 @@ import :SamplerUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Root signature description counts.
 	struct RootSignatureDescCounts final
 	{
-		UINT tableCount = 0u;
-		UINT rangeCount = 0u;
-		UINT staticSamplerCount = 0u;
+		UINT tableCount = 0u; ///< Table count.
+		UINT rangeCount = 0u; ///< Range count across all the tables.
+		UINT staticSamplerCount = 0u; ///< Static sampler count across all the tables.
 	};
 
+	/// @brief Gets root signature counts.
+	/// @param descriptorSets Descriptor sets.
+	/// @return Root signature counts.
 	[[nodiscard("Pure function")]]
 	constexpr RootSignatureDescCounts GetRootSignatureCounts(std::span<const DescriptorSet> descriptorSets) noexcept;
-
+	/// @brief Gets a range count.
+	/// @param range Range.
+	/// @return Range count.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_ROOT_SIGNATURE_DESC1 ToRootSignatureDesc(const PipelineLayoutParams& params, std::span<D3D12_ROOT_PARAMETER1> parameters,
+	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& range) noexcept;
+
+	/// @brief Makes a root signature description.
+	/// @param params Pipeline layout parameters.
+	/// @param parameters Parameters output. Must have enough size.
+	/// @param ranges Ranges output. Must have enough size.
+	/// @param staticSamplers Static samplers output. Must have enough size.
+	/// @return Root signature description.
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_ROOT_SIGNATURE_DESC1 MakeRootSignatureDesc(const PipelineLayoutParams& params, std::span<D3D12_ROOT_PARAMETER1> parameters,
 		std::span<D3D12_DESCRIPTOR_RANGE1> ranges, std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplers) noexcept;
+	/// @brief Casts the engine descriptor type to a native descriptor type.
+	/// @param descriptorType Engine descriptor type.
+	/// @return Native descriptor type.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_DESCRIPTOR_RANGE_TYPE ToDescriptorRangeType(ShaderDataDescriptorType descriptorType) noexcept;
-
-	[[nodiscard("Pure function")]]
-	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& ranges) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -60,7 +75,22 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return counts;
 	}
 
-	constexpr D3D12_ROOT_SIGNATURE_DESC1 ToRootSignatureDesc(const PipelineLayoutParams& params, const std::span<D3D12_ROOT_PARAMETER1> parameters, 
+	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& range) noexcept
+	{
+		return std::visit(Type::Overload
+		{
+			[](const std::span<const ShaderDataDescriptorRange> r) noexcept
+			{
+				return r.size();
+			},
+			[](const std::span<const SamplerDescriptorRange> r) noexcept
+			{
+				return r.size();
+			},
+		}, range);
+	}
+
+	constexpr D3D12_ROOT_SIGNATURE_DESC1 MakeRootSignatureDesc(const PipelineLayoutParams& params, const std::span<D3D12_ROOT_PARAMETER1> parameters, 
 		const std::span<D3D12_DESCRIPTOR_RANGE1> ranges, const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplers) noexcept
 	{
 		for (std::size_t setIndex = 0uz, parameterIndex = 0uz, rangeIndex = 0uz, staticSamplerIndex = 0uz; 
@@ -119,7 +149,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 			for (const StaticSamplerParams& staticSamplerParams : set.staticSamplers)
 			{
-				const D3D12_SAMPLER_DESC2 samplerDesc = ToSamplerDesc(staticSamplerParams.samplerParams);
+				const D3D12_SAMPLER_DESC2 samplerDesc = MakeSamplerDesc(staticSamplerParams.samplerParams);
 				staticSamplers[staticSamplerIndex++] = D3D12_STATIC_SAMPLER_DESC
 				{
 					.Filter = samplerDesc.Filter,
@@ -165,20 +195,5 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			assert(false && "Invalid descriptor type.");
 			return D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
 		}
-	}
-
-	constexpr std::size_t GetRangeCount(const std::variant<std::span<const ShaderDataDescriptorRange>, std::span<const SamplerDescriptorRange>>& ranges) noexcept
-	{
-		return std::visit(Type::Overload
-		{
-			[](const std::span<const ShaderDataDescriptorRange> r) noexcept
-			{
-				return r.size();
-			},
-			[](const std::span<const SamplerDescriptorRange> r) noexcept
-			{
-				return r.size();
-			},
-		}, ranges);
 	}
 }

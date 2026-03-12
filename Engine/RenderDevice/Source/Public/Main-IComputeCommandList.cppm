@@ -48,6 +48,14 @@ export namespace PonyEngine::RenderDevice
 		/// @param textureBarriers Texture barriers.
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) = 0;
 
+		/// @brief Unbinds all the containers.
+		void BindContainers();
+		/// @brief Binds the shader data container and unbinds a sampler container.
+		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
+		void BindContainers(const IShaderDataContainer& shaderDataContainer);
+		/// @brief Binds the sampler container and unbinds a shader data container.
+		/// @param samplerContainer Sampler container to bind. Must be shader visible.
+		void BindContainers(const ISamplerContainer& samplerContainer);
 		/// @brief Binds the containers.
 		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
 		/// @param samplerContainer Sampler container to bind. Must be shader visible.
@@ -135,10 +143,8 @@ export namespace PonyEngine::RenderDevice
 		/// @brief Copies from the buffer region to the other buffer.
 		/// @param source Source buffer.
 		/// @param destination Destination buffer.
-		/// @param sourceOffset Source offset in bytes.
-		/// @param destinationOffset Destination offset in bytes.
-		/// @param size Region size in bytes.
-		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) = 0;
+		/// @param ranges Copy ranges.
+		virtual void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges) = 0;
 		/// @brief Copies from the texture to the other texture.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
@@ -203,6 +209,21 @@ namespace PonyEngine::RenderDevice
 	void IComputeCommandList::Barrier(const std::span<const TextureBarrier> textureBarriers)
 	{
 		Barrier(std::span<const BufferBarrier>(), textureBarriers);
+	}
+
+	void IComputeCommandList::BindContainers()
+	{
+		BindContainers(nullptr, nullptr);
+	}
+
+	void IComputeCommandList::BindContainers(const IShaderDataContainer& shaderDataContainer)
+	{
+		BindContainers(&shaderDataContainer, nullptr);
+	}
+
+	void IComputeCommandList::BindContainers(const ISamplerContainer& samplerContainer)
+	{
+		BindContainers(nullptr, &samplerContainer);
 	}
 
 	void IComputeCommandList::BindCompute(const ShaderDataBinding& shaderDataBinding)

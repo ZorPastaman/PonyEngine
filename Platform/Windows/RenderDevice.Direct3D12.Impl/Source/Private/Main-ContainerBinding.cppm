@@ -26,6 +26,7 @@ import :ShaderDataContainer;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Shader data and sampler container binding helper.
 	class ContainerBinding final
 	{
 	public:
@@ -36,36 +37,73 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~ContainerBinding() noexcept = default;
 
+		/// @brief Resets the containers.
 		void Reset() noexcept;
 
+		/// @brief Checks if it has a shader data container bound.
+		/// @return @a True if it's bound; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasShaderDataContainer() const noexcept;
+		/// @brief Checks if it has a sampler container bound.
+		/// @return @a True if it's bound; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasSamplerContainer() const noexcept;
 
+		/// @brief Gets the bound shader data container.
+		/// @return Shader data container.
 		[[nodiscard("Pure function")]]
 		const ShaderDataContainer* GetShaderDataContainer() const noexcept;
+		/// @brief Gets the bound sampler container.
+		/// @return Sampler container.
 		[[nodiscard("Pure function")]]
 		const SamplerContainer* GetSamplerContainer() const noexcept;
 
+		/// @brief Sets containers to the command list and to the helper.
+		/// @param shaderDataContainer Shader data container.
+		/// @param samplerContainer Sampler container.
+		/// @param commandList Command list.
 		void SetContainers(const ShaderDataContainer* shaderDataContainer, const SamplerContainer* samplerContainer, CommandList& commandList);
+		/// @brief Binds the shader data to a graphics binding point.
+		/// @param shaderDataBindings Shader data bindings.
+		/// @param commandList Command list.
 		void BindGraphicsShaderData(std::span<const ShaderDataBinding> shaderDataBindings, CommandList& commandList) const;
+		/// @brief Binds the samplers to a graphics binding point.
+		/// @param samplerBindings Sampler bindings.
+		/// @param commandList Command list.
 		void BindGraphicsSampler(std::span<const SamplerBinding> samplerBindings, CommandList& commandList) const;
+		/// @brief Binds the shader data to a compute binding point.
+		/// @param shaderDataBindings Shader data bindings.
+		/// @param commandList Command list.
 		void BindComputeShaderData(std::span<const ShaderDataBinding> shaderDataBindings, CommandList& commandList) const;
+		/// @brief Binds the samplers to a compute binding point.
+		/// @param samplerBindings Sampler bindings.
+		/// @param commandList Command list.
 		void BindComputeSampler(std::span<const SamplerBinding> samplerBindings, CommandList& commandList) const;
 
+		/// @brief Validates the shader data that is about to be bound.
+		/// @param rootSig Root signature.
+		/// @param tableIndex Root signature table index.
+		/// @param shaderDataIndex Shader data container index.
 		void ValidateShaderData(const RootSignature& rootSig, std::uint32_t tableIndex, std::uint32_t shaderDataIndex) const;
+		/// @brief Validates the sampler that is about to be bound.
+		/// @param rootSig Root signature.
+		/// @param tableIndex Root signature table index.
+		/// @param samplerIndex Sampler container index.
 		void ValidateSamplerData(const RootSignature& rootSig, std::uint32_t tableIndex, std::uint32_t samplerIndex) const;
 
 		ContainerBinding& operator =(const ContainerBinding&) = delete;
 		ContainerBinding& operator =(ContainerBinding&&) = delete;
 
 	private:
+		/// @brief Validates if the bound shader data container is valid and has enough elements.
+		/// @param index Target index.
 		void ValidateShaderDataIndex(std::uint32_t index) const;
+		/// @brief Validates if the bound sampler container is valid and has enough elements.
+		/// @param index Target index.
 		void ValidateSamplerIndex(std::uint32_t index) const;
 
-		const ShaderDataContainer* shaderDataContainer;
-		const SamplerContainer* samplerContainer;
+		const ShaderDataContainer* shaderDataContainer; ///< Bound shader data container.
+		const SamplerContainer* samplerContainer; ///< Bound sampler container.
 	};
 }
 
@@ -112,6 +150,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ContainerBinding::BindGraphicsShaderData(const std::span<const ShaderDataBinding> shaderDataBindings, CommandList& commandList) const
 	{
+		assert((shaderDataBindings.empty() || shaderDataContainer) && "The shader data container is nullptr.");
+
 		for (const ShaderDataBinding& binding : shaderDataBindings)
 		{
 			commandList.SetGraphicsDescriptorTable(binding.layoutSetIndex, shaderDataContainer->GpuHandle(binding.containerIndex));
@@ -120,6 +160,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ContainerBinding::BindGraphicsSampler(const std::span<const SamplerBinding> samplerBindings, CommandList& commandList) const
 	{
+		assert((samplerBindings.empty() || samplerContainer) && "The sampler container is nullptr.");
+
 		for (const SamplerBinding& binding : samplerBindings)
 		{
 			commandList.SetGraphicsDescriptorTable(binding.layoutSetIndex, samplerContainer->GpuHandle(binding.containerIndex));
@@ -128,6 +170,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ContainerBinding::BindComputeShaderData(const std::span<const ShaderDataBinding> shaderDataBindings, CommandList& commandList) const
 	{
+		assert((shaderDataBindings.empty() || shaderDataContainer) && "The shader data container is nullptr.");
+
 		for (const ShaderDataBinding& binding : shaderDataBindings)
 		{
 			commandList.SetComputeDescriptorTable(binding.layoutSetIndex, shaderDataContainer->GpuHandle(binding.containerIndex));
@@ -136,6 +180,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ContainerBinding::BindComputeSampler(const std::span<const SamplerBinding> samplerBindings, CommandList& commandList) const
 	{
+		assert((samplerBindings.empty() || samplerContainer) && "The sampler container is nullptr.");
+
 		for (const SamplerBinding& binding : samplerBindings)
 		{
 			commandList.SetComputeDescriptorTable(binding.layoutSetIndex, samplerContainer->GpuHandle(binding.containerIndex));
@@ -243,7 +289,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			for (std::uint32_t i = 0u; i < range.shaderRegisterCount; ++i, ++containerIndex)
 			{
-				if (std::holds_alternative<EmptySamplerParams>(samplerContainer->Meta(containerIndex))) [[unlikely]]
+				if (!std::holds_alternative<SamplerParams>(samplerContainer->Meta(containerIndex))) [[unlikely]]
 				{
 					throw std::invalid_argument("View type mismatch");
 				}

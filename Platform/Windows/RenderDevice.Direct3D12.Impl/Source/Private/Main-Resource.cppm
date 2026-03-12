@@ -23,11 +23,16 @@ import :ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Resource wrapper.
 	class Resource final
 	{
 	public:
+		/// @brief Creates a resource wrapper.
+		/// @param resource Resource.
 		[[nodiscard("Pure constructor")]]
 		explicit Resource(ID3D12Resource2& resource) noexcept;
+		/// @brief Creates a resource wrapper.
+		/// @param resource Resource.
 		[[nodiscard("Pure constructor")]]
 		explicit Resource(Platform::Windows::ComPtr<ID3D12Resource2>&& resource) noexcept;
 		Resource(const Resource&) = delete;
@@ -35,26 +40,53 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~Resource() noexcept = default;
 
+		/// @brief Gets the resource.
+		/// @return Resource.
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& GetResource() const noexcept;
 
+		/// @brief Maps the resource.
+		/// @param subresourceIndex Subresource index.
+		/// @return Mapped pointer.
 		void* Map(UINT subresourceIndex);
+		/// @brief Maps the resource range.
+		/// @param subresourceIndex Subresource index.
+		/// @param offset Mapped offset.
+		/// @param length Mapped length.
+		/// @return Mapped pointer.
 		void* Map(UINT subresourceIndex, SIZE_T offset, SIZE_T length);
+		/// @brief Maps the resource range.
+		/// @param subresourceIndex Subresource index.
+		/// @param range Mapped range. If nullptr, the whole subresource will be mapped.
+		/// @return Mapped pointer.
 		void* Map(UINT subresourceIndex, const D3D12_RANGE* range);
+		/// @brief Unmaps the resource.
+		/// @param subresourceIndex Subresource index.
 		void Unmap(UINT subresourceIndex) noexcept;
+		/// @brief Unmaps the resource range.
+		/// @param subresourceIndex Subresource index.
+		/// @param offset Mapped offset.
+		/// @param length Mapped length.
 		void Unmap(UINT subresourceIndex, SIZE_T offset, SIZE_T length) noexcept;
+		/// @brief Unmaps the resource range.
+		/// @param subresourceIndex Subresource index.
+		/// @param range Mapped range. If nullptr, the whole subresource will be unmapped.
 		void Unmap(UINT subresourceIndex, const D3D12_RANGE* range) noexcept;
 
+		/// @brief Gets the name.
+		/// @return Name.
 		std::string_view Name() const noexcept;
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void Name(std::string_view name);
 
 		Resource& operator =(const Resource&) = delete;
 		Resource& operator =(Resource&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12Resource2> resource;
+		Platform::Windows::ComPtr<ID3D12Resource2> resource; ///< Resource.
 
-		std::string name;
+		std::string name; ///< Name.
 	};
 }
 

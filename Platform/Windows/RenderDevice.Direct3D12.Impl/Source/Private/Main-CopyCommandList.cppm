@@ -42,7 +42,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) override;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
-		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) override;
+		virtual void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges) override;
 		virtual void Copy(const ITexture& source, ITexture& destination) override;
 		virtual void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range) override;
 		virtual void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range) override;
@@ -106,9 +106,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination);
 	}
 
-	void CopyCommandList::Copy(const IBuffer& source, IBuffer& destination, const std::uint64_t sourceOffset, const std::uint64_t destinationOffset, const std::uint64_t size)
+	void CopyCommandList::Copy(const IBuffer& source, IBuffer& destination, const std::span<const CopyBufferRange> ranges)
 	{
-		commandList.Copy(source, destination, sourceOffset, destinationOffset, size);
+		commandList.Copy(source, destination, ranges);
 	}
 
 	void CopyCommandList::Copy(const ITexture& source, ITexture& destination)

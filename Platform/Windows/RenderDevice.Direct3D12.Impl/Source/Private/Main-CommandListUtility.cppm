@@ -21,12 +21,25 @@ import :TextureUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Casts the engine pipeline stages to a native barrier sync.
+	/// @param stages Engine pipeline stages.
+	/// @return Native barrier sync.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BARRIER_SYNC ToSync(PipelineStageMask stages) noexcept;
+	/// @brief Casts the engine resource accesses to a native barrier access.
+	/// @param accesses Engine resource accesses.
+	/// @return Native barrier access.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BARRIER_ACCESS ToAccess(std::optional<ResourceAccessMask> accesses) noexcept;
+	/// @brief Calculates a subresource range.
+	/// @param mipRange Mip range.
+	/// @param arrayRange Array range.
+	/// @param aspects Aspects.
+	/// @param resourceMipCount Resource mip count.
+	/// @param resourceArraySize Resource array size.
+	/// @return Subresource range.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE ToSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, AspectMask aspects,
+	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE CalculateSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, AspectMask aspects,
 		std::uint8_t resourceMipCount, std::uint16_t resourceArraySize) noexcept;
 }
 
@@ -123,7 +136,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return access;
 	}
 
-	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE ToSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, const AspectMask aspects,
+	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE CalculateSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, const AspectMask aspects,
 		const std::uint8_t resourceMipCount, const std::uint16_t resourceArraySize) noexcept
 	{
 		return D3D12_BARRIER_SUBRESOURCE_RANGE

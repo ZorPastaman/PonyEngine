@@ -48,6 +48,14 @@ export namespace PonyEngine::RenderDevice
 		/// @param factor Blend factor.
 		virtual void SetBlendFactor(const Math::ColorRGBA<float>& factor) = 0;
 
+		/// @brief Unbinds all the containers.
+		void BindContainers();
+		/// @brief Binds the shader data container and unbinds a sampler container.
+		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
+		void BindContainers(const IShaderDataContainer& shaderDataContainer);
+		/// @brief Binds the sampler container and unbinds a shader data container.
+		/// @param samplerContainer Sampler container to bind. Must be shader visible.
+		void BindContainers(const ISamplerContainer& samplerContainer);
 		/// @brief Binds the containers.
 		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
 		/// @param samplerContainer Sampler container to bind. Must be shader visible.
@@ -135,6 +143,21 @@ export namespace PonyEngine::RenderDevice
 
 namespace PonyEngine::RenderDevice
 {
+	void ISecondaryGraphicsCommandList::BindContainers()
+	{
+		BindContainers(nullptr, nullptr);
+	}
+
+	void ISecondaryGraphicsCommandList::BindContainers(const IShaderDataContainer& shaderDataContainer)
+	{
+		BindContainers(&shaderDataContainer, nullptr);
+	}
+
+	void ISecondaryGraphicsCommandList::BindContainers(const ISamplerContainer& samplerContainer)
+	{
+		BindContainers(nullptr, &samplerContainer);
+	}
+
 	void ISecondaryGraphicsCommandList::BindGraphics(const ShaderDataBinding& shaderDataBinding)
 	{
 		BindGraphics(std::span(&shaderDataBinding, 1uz));

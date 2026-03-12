@@ -21,11 +21,16 @@ import PonyEngine.Platform.Windows;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Swap chain wrapper.
 	class SwapChain final
 	{
 	public:
+		/// @brief Creates a swap chain wrapper.
+		/// @param swapChain Swap chain.
 		[[nodiscard("Pure constructor")]]
 		explicit SwapChain(IDXGISwapChain4& swapChain) noexcept;
+		/// @brief Creates a swap chain wrapper.
+		/// @param swapChain Swap chain.
 		[[nodiscard("Pure constructor")]]
 		explicit SwapChain(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -35,20 +40,31 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~SwapChain() noexcept = default;
 
+		/// @brief Gets a current buffer index.
+		/// @return Current buffer index.
 		[[nodiscard("Pure function")]]
 		UINT GetCurrentBufferIndex() const noexcept;
+		/// @brief Gets a buffer.
+		/// @tparam T Buffer type.
+		/// @param index Buffer index.
+		/// @return Buffer.
 		template<std::derived_from<IUnknown> T> [[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<T> GetBuffer(UINT index) const;
 
+		/// @brief Sets the fullscreen state.
+		/// @param fullscreen Fullscreen state.
 		void SetFullscreenState(BOOL fullscreen);
 
+		/// @brief Presents a next buffer.
+		/// @param syncInterval Sync interval.
+		/// @param flags Preset flags.
 		void Present(UINT syncInterval, UINT flags);
 
 		SwapChain& operator =(const SwapChain&) = delete;
 		SwapChain& operator =(SwapChain&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<IDXGISwapChain4> swapChain;
+		Platform::Windows::ComPtr<IDXGISwapChain4> swapChain; ///< Swap chain.
 	};
 }
 

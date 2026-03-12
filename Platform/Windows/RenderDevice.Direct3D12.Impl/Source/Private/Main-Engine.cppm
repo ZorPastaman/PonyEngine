@@ -336,14 +336,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		IRenderDeviceContext* renderDevice;
 
-		TextureFormatMap textureFormatMap;
-
 		Factory factory;
 		Device device;
 
 		CommandQueue graphicsCommandQueue;
 		CommandQueue computeCommandQueue;
 		CommandQueue copyCommandQueue;
+
+		TextureFormatMap textureFormatMap;
 
 		std::unique_ptr<SwapChainWrapper> swapChain;
 	};
@@ -353,12 +353,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	Engine::Engine(IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice},
-		textureFormatMap(*this->renderDevice),
 		factory(*this->renderDevice),
 		device(*this->renderDevice, *factory.GetMostPerformantAdapter()),
 		graphicsCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_DIRECT), CreatorId)),
 		computeCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COMPUTE), CreatorId)),
-		copyCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COPY), CreatorId))
+		copyCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COPY), CreatorId)),
+		textureFormatMap(*this->renderDevice)
 	{
 	}
 
@@ -366,9 +366,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		ValidateSize(params);
 
-		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapParams.heapType);
-		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage, heapParams.notZeroed);
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params);
+		const D3D12_HEAP_PROPERTIES heapProperties = MakeHeapProperties(heapParams.heapType);
+		const D3D12_HEAP_FLAGS heapFlags = GetHeapFlags(params.usage, heapParams.notZeroed);
+		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params);
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
 
 		return std::make_shared<Buffer>(std::move(resource), resourceDesc.Width, params.usage);
@@ -382,14 +382,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 			auto support = RenderDevice::TextureFormatSupport{.supported = true};
 			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
-			support.dimensions = ToTextureDimensions(formatSupport);
-			support.viewDimensions = ToTextureViewDimensions(formatSupport);
+			support.dimensions = GetTextureDimensions(formatSupport);
+			support.viewDimensions = GetTextureViewDimensions(formatSupport);
 			support.aspects = GetAspects(format);
-			support.usage = ToTextureUsage(formatSupport);
+			support.usage = GetTextureUsage(formatSupport);
 			support.srgb = IsSRGBCompatibleFormat(format);
 			support.swapChain = IsSwapChainCompatible(formatSupport);
-			support.shaderOperations = ToShaderOperations(formatSupport);
-			support.blendModes = ToBlendModes(formatSupport);
+			support.shaderOperations = GetShaderOperations(formatSupport);
+			support.blendModes = GetBlendModes(formatSupport);
 
 			return support;
 		}
@@ -483,9 +483,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			}
 		}
 
-		const D3D12_HEAP_PROPERTIES heapProperties = ToHeapProperties(heapParams.heapType);
-		const D3D12_HEAP_FLAGS heapFlags = ToHeapFlags(params.usage, heapParams.notZeroed);
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
+		const D3D12_HEAP_PROPERTIES heapProperties = MakeHeapProperties(heapParams.heapType);
+		const D3D12_HEAP_FLAGS heapFlags = MakeHeapFlags(params.usage, heapParams.notZeroed);
+		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params, format);
 		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(params.initialLayout);
 		const D3D12_CLEAR_VALUE clearValue = ToClearValue(params.clearValue, format);
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
@@ -518,7 +518,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		const DXGI_FORMAT format = GetFormat(params.format);
 		ValidateRange(params, format, range);
-		const D3D12_RESOURCE_DESC1 resourceDesc = ToResourceDesc(params, format);
+		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params, format);
 		return GetCopyableFootprints(resourceDesc, offset, range, footprints);
 	}
 
@@ -533,7 +533,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::shared_ptr<IShaderDataContainer> Engine::CreateShaderDataContainer(const ShaderDataContainerParams& params)
 	{
-		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = ToDescriptorHeapDesc(params);
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
 		return std::make_shared<ShaderDataContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type),
 			params.size, params.shaderVisible);
 	}
@@ -553,7 +553,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (nativeBuffer)
 		{
 			const D3D12_GPU_VIRTUAL_ADDRESS address = nativeBuffer->Resource().GetGPUVirtualAddress();
-			const D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = ToCBVDesc(address, params);
+			const D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = MakeCBVDesc(address, params);
 			device.CreateCBV(&cbvDesc, handle);
 		}
 		else
@@ -561,7 +561,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			device.CreateCBV(nullptr, handle);
 		}
 
-		nativeContainer.Set(index, CBVMeta{.resource = nativeBuffer, .params = params});
+		nativeContainer.Meta(index) = CBVMeta{.resource = nativeBuffer, .params = params};
 	}
 
 	void Engine::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
@@ -576,10 +576,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params);
+		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = MakeSRVDesc(params);
 		device.CreateSRV(nativeBuffer ? &nativeBuffer->Resource() : nullptr, srvDesc, handle);
 
-		nativeContainer.Set(index, BufferSRVMeta{.resource = nativeBuffer, .params = params});
+		nativeContainer.Meta(index) = BufferSRVMeta{.resource = nativeBuffer, .params = params};
 	}
 
 	void Engine::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
@@ -602,10 +602,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.srgb, params.aspect);
-		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = ToSRVDesc(params, viewFormat, mipCount, arraySize);
+		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = MakeSRVDesc(params, viewFormat, mipCount, arraySize);
 		device.CreateSRV(nativeTexture ? &nativeTexture->Resource() : nullptr, srvDesc, handle);
 
-		nativeContainer.Set(index, TextureSRVMeta{.resource = nativeTexture, .params = params});
+		nativeContainer.Meta(index) = TextureSRVMeta{.resource = nativeTexture, .params = params};
 	}
 
 	void Engine::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
@@ -620,10 +620,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = ToUAVDesc(params);
+		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = MakeUAVDesc(params);
 		device.CreateUAV(nativeBuffer ? &nativeBuffer->Resource() : nullptr, uavDesc, handle);
 
-		nativeContainer.Set(index, BufferUAVMeta{.resource = nativeBuffer, .params = params});
+		nativeContainer.Meta(index) = BufferUAVMeta{.resource = nativeBuffer, .params = params};
 	}
 
 	void Engine::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
@@ -645,10 +645,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const DXGI_FORMAT viewFormat = GetViewFormat(format, false, params.aspect);
-		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = ToUAVDesc(params, viewFormat, arraySize);
+		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = MakeUAVDesc(params, viewFormat, arraySize);
 		device.CreateUAV(nativeTexture ? &nativeTexture->Resource() : nullptr, uavDesc, handle);
 
-		nativeContainer.Set(index, TextureUAVMeta{.resource = nativeTexture, .params = params});
+		nativeContainer.Meta(index) = TextureUAVMeta{.resource = nativeTexture, .params = params};
 	}
 
 	void Engine::CopyViews(const std::span<const ShaderDataCopyRange> ranges)
@@ -658,7 +658,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::shared_ptr<IRenderTargetContainer> Engine::CreateRenderTargetContainer(const RenderTargetContainerParams& params)
 	{
-		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = ToDescriptorHeapDesc(params);
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
 		return std::make_shared<RenderTargetContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type), params.size);
 	}
 
@@ -680,10 +680,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = ToRTVDesc(params, GetViewFormat(format, params.srgb, Aspect::Color), arraySize);
+		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = MakeRTVDesc(params, GetViewFormat(format, params.srgb, Aspect::Color), arraySize);
 		device.CreateRTV(nativeTexture ? &nativeTexture->Resource() : nullptr, rtvDesc, handle);
 
-		nativeContainer.Set(index, RenderTargetTextureMeta{.texture = nativeTexture, .params = params});
+		nativeContainer.Meta(index) = TextureRTVMeta{.texture = nativeTexture, .params = params};
 	}
 
 	void Engine::CopyViews(const std::span<const RenderTargetCopyRange> ranges)
@@ -693,7 +693,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::shared_ptr<IDepthStencilContainer> Engine::CreateDepthStencilContainer(const DepthStencilContainerParams& params)
 	{
-		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = ToDescriptorHeapDesc(params);
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
 		return std::make_shared<DepthStencilContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type), params.size);
 	}
 
@@ -715,10 +715,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = ToDSVDesc(params, format, arraySize);
+		const D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = MakeDSVDesc(params, format, arraySize);
 		device.CreateDSV(nativeTexture ? &nativeTexture->Resource() : nullptr, dsvDesc, handle);
 
-		nativeContainer.Set(index, DSVTextureMeta{.texture = nativeTexture, .params = params});
+		nativeContainer.Meta(index) = TextureDSVMeta{.texture = nativeTexture, .params = params};
 	}
 
 	void Engine::CopyViews(const std::span<const DepthStencilCopyRange> ranges)
@@ -728,7 +728,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::shared_ptr<ISamplerContainer> Engine::CreateSamplerContainer(const SamplerContainerParams& params)
 	{
-		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = ToDescriptorHeapDesc(params);
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
 		return std::make_shared<SamplerContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type), 
 			params.size, params.shaderVisible);
 	}
@@ -739,10 +739,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateContainer(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const D3D12_SAMPLER_DESC2 samplerDesc = ToSamplerDesc(params);
+		const D3D12_SAMPLER_DESC2 samplerDesc = MakeSamplerDesc(params);
 		device.CreateSampler(samplerDesc, handle);
 
-		nativeContainer.Set(index, params);
+		nativeContainer.Meta(index) = params;
 	}
 
 	void Engine::CopySamplers(const std::span<const SamplerCopyRange> ranges)
@@ -763,7 +763,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			answer |= ShaderScalarTypeMask::Int16 | ShaderScalarTypeMask::Float16;
 		}
-		if constexpr (Device::Int64BitSupport)
+		if (device.IsInt64Supported())
 		{
 			answer |= ShaderScalarTypeMask::Int64;
 		}
@@ -829,7 +829,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.simultaneousTargetCount = SimultaneousTargetCount,
 			.maxRasterRegionCount = ViewportScissorCount,
 			.lineRasterizationModes = LineRasterizationSupport(),
-			.conservativeRasterization = Device::ConservativeRasterizationSupport
+			.conservativeRasterization = device.IsConservativeRasterizationSupported()
 		};
 	}
 
@@ -847,7 +847,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
 		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplersSpan = arena.Span(staticSamplers);
 
-		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = ToRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
+		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = MakeRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
 		return std::make_shared<RootSignature>(device.CreateRootSignature(rootSigDesc), params);
 	}
 
@@ -880,12 +880,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		const Memory::Arena::Slice<PipelineStateSubobjectRasterizer> rasterizer = arena.Allocate<PipelineStateSubobjectRasterizer>(1u);
-		arena.Span(rasterizer)[0] = ToRasterizerDesc(params.rasterizer);
+		arena.Span(rasterizer)[0] = MakeRasterizerDesc(params.rasterizer);
 
 		if (!params.attachment.renderTargetFormats.empty())
 		{
 			const Memory::Arena::Slice<PipelineStateSubobjectBlend> blend = arena.Allocate<PipelineStateSubobjectBlend>(1u);
-			arena.Span(blend)[0] = ToBlendDesc(params);
+			arena.Span(blend)[0] = MakeBlendDesc(params);
 			const Memory::Arena::Slice<PipelineStateSubobjectRenderTargetFormats> rtFormats = arena.Allocate<PipelineStateSubobjectRenderTargetFormats>(1u);
 			arena.Span(rtFormats)[0] = D3D12_RT_FORMAT_ARRAY{.NumRenderTargets = static_cast<UINT>(params.attachment.renderTargetFormats.size())};
 			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Span(rtFormats)[0].Data();
@@ -898,7 +898,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (params.attachment.depthStencilFormat)
 		{
 			const Memory::Arena::Slice<PipelineStateSubobjectDepthStencil> depthStencil = arena.Allocate<PipelineStateSubobjectDepthStencil>(1u);
-			arena.Span(depthStencil)[0] = ToDepthStencilDesc(params.depthStencil);
+			arena.Span(depthStencil)[0] = MakeDepthStencilDesc(params.depthStencil);
 			const Memory::Arena::Slice<PipelineStateSubobjectDepthStencilFormat> dsFormat = arena.Allocate<PipelineStateSubobjectDepthStencilFormat>(1u);
 			arena.Span(dsFormat)[0] = GetFormat(*params.attachment.depthStencilFormat);
 		}
@@ -1032,10 +1032,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 
 		const HWND windowHandle = renderDevice->Application().GetService<Surface::Windows::ISurfaceService>().Handle();
-		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = ToSwapChainDesc(params, format);
+		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = MakeSwapChainDesc(params, format);
 
 		auto dxgiSwapChain = SwapChain(factory.CreateSwapChain(graphicsCommandQueue.GetCommandQueue(), windowHandle, swapChainDesc));
-		factory.MakeWindowAssociation(windowHandle);
+		factory.MakeWindowAssociation(windowHandle, DXGI_MWA_NO_WINDOW_CHANGES);
 		dxgiSwapChain.SetFullscreenState(false);
 
 		auto buffers = std::vector<std::shared_ptr<Texture>>(params.bufferCount);
@@ -2606,7 +2606,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				throw std::invalid_argument("Invalid depth stencil format");
 			}
-			if (params.depthStencil.stencil && HasStencil(depthStencilFormat)) [[unlikely]]
+			if (params.depthStencil.stencil && !HasStencil(depthStencilFormat)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid depth stencil format");
 			}

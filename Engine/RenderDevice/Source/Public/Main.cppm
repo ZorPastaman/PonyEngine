@@ -16,6 +16,7 @@ export import :BlendMode;
 export import :BlendOperation;
 export import :BlendParams;
 export import :BufferParams;
+export import :BufferRange;
 export import :BufferBarrier;
 export import :BufferUsage;
 export import :CBVParams;

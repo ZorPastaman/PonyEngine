@@ -24,9 +24,12 @@ import :SwapChain;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief DXGI factor wrapper.
 	class Factory final
 	{
 	public:
+		/// @brief Creates a DXGI factory wrapper.
+		/// @param renderDevice Render device context.
 		[[nodiscard("Pure constructor")]]
 		explicit Factory(IRenderDeviceContext& renderDevice);
 		Factory(const Factory&) = delete;
@@ -34,21 +37,33 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~Factory() noexcept;
 
+		/// @brief Gets the most performant adapter.
+		/// @return Most performant adapter.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<IDXGIAdapter4> GetMostPerformantAdapter() const;
 
+		/// @brief Checks if tearing is supported.
+		/// @return @a True if it's supported; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		BOOL GetTearingSupport() const;
 
+		/// @brief Creates a swap chain.
+		/// @param device Device. For D3D12, it must be a graphics command queue.
+		/// @param windowHandle Window handle.
+		/// @param swapChainDesc Swap chain description.
+		/// @return Swap chain.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<IDXGISwapChain4> CreateSwapChain(IUnknown& device, HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc);
-		void MakeWindowAssociation(HWND windowHandle);
+		/// @brief Makes a window association.
+		/// @param windowHandle Window handle.
+		/// @param flags Association flags.
+		void MakeWindowAssociation(HWND windowHandle, UINT flags);
 
 		Factory& operator =(const Factory&) = delete;
 		Factory& operator =(Factory&&) = delete;
 
 	private:
-		IRenderDeviceContext* renderDevice;
+		IRenderDeviceContext* renderDevice; ///< Render device context.
 
 #ifndef NDEBUG
 		Platform::Windows::ComPtr<IDXGIDebug1> debug; ///< DXGI debug.
@@ -132,8 +147,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	Platform::Windows::ComPtr<IDXGISwapChain4> Factory::CreateSwapChain(IUnknown& device, const HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc)
 	{
 		Platform::Windows::ComPtr<IDXGISwapChain1> swapChain;
-		if (const HRESULT result = factory->CreateSwapChainForHwnd(&device, windowHandle, &swapChainDesc, nullptr, nullptr,
-			swapChain.GetAddress()); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = factory->CreateSwapChainForHwnd(&device, windowHandle, &swapChainDesc, nullptr, nullptr, swapChain.GetAddress()); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to acquire DXGI swap chain: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -146,9 +160,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return modernSwapChain;
 	}
 
-	void Factory::MakeWindowAssociation(const HWND windowHandle)
+	void Factory::MakeWindowAssociation(const HWND windowHandle, const UINT flags)
 	{
-		if (const HRESULT result = factory->MakeWindowAssociation(windowHandle, DXGI_MWA_NO_WINDOW_CHANGES); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = factory->MakeWindowAssociation(windowHandle, flags); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to make window association: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

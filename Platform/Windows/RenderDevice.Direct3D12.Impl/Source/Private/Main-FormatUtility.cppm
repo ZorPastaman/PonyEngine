@@ -19,15 +19,18 @@ import PonyEngine.RenderDevice;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Format info.
 	struct FormatInfo final
 	{
-		std::string_view engineFormat;
-		DXGI_FORMAT format;
-		DXGI_FORMAT typelessFormat;
-		DXGI_FORMAT srgbFormat;
-		DXGI_FORMAT depthViewFormat;
-		DXGI_FORMAT stencilViewFormat;
+		std::string_view engineFormat; ///< Engine format.
+		DXGI_FORMAT format; ///< Native format.
+		DXGI_FORMAT typelessFormat; ///< Typeless format in the same group. The same native format if there's only one format in a group.
+		DXGI_FORMAT srgbFormat; ///< SRGB format variant. UNKNOWN if there's no SRGB variant.
+		DXGI_FORMAT depthViewFormat; ///< Depth view format. UNKNOWN if the native format is not a depth format.
+		DXGI_FORMAT stencilViewFormat; ///< Stencil view format. UNKNOWN if the native format doesn't have a stencil aspect.
 	};
+
+	/// @brief Format infos.
 	constexpr std::array<FormatInfo, 62> FormatInfos
 	{
 		FormatInfo
@@ -590,13 +593,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	};
 
+	/// @brief Main format map. Contains data that any format has.
 	class MainFormatMap final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
 		constexpr MainFormatMap() noexcept
 		{
-			auto getAspect = [](const FormatInfo& info) noexcept
+			constexpr auto getAspect = [](const FormatInfo& info) noexcept
 			{
 				auto aspect = AspectMask::None;
 				if (info.depthViewFormat != DXGI_FORMAT_UNKNOWN)
@@ -635,35 +639,49 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		constexpr ~MainFormatMap() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Map size.
 		[[nodiscard("Pure function")]]
 		static constexpr std::size_t MapSize() noexcept
 		{
 			return FormatInfos.size();
 		}
+		/// @brief Gets an index of the @p format.
+		/// @param format Format.
+		/// @return Format index. It's always safe to use. If the format is not found the index to default data is returned.
 		[[nodiscard("Pure function")]]
 		constexpr std::size_t IndexOf(const DXGI_FORMAT format) const noexcept
 		{
 			return std::ranges::find(formats.cbegin(), formats.cbegin() + MapSize(), format) - formats.cbegin();
 		}
 
+		/// @brief Gets a native format.
+		/// @param index Format index. Must be less than @p MapSize().
+		/// @return Native format.
 		[[nodiscard("Pure function")]]
 		constexpr DXGI_FORMAT GetFormat(const std::size_t index) const noexcept
 		{
 			return formats[index];
 		}
-
+		/// @brief Gets a format aspect.
+		/// @param index Format index. Must be less than @p MapSize().
+		/// @return Format aspect.
 		[[nodiscard("Pure function")]]
 		constexpr AspectMask GetAspect(const std::size_t index) const noexcept
 		{
 			return aspects[index];
 		}
-
+		/// @brief Gets a typeless format.
+		/// @param index Format index. Must be less than @p MapSize().
+		/// @return Typeless format.
 		[[nodiscard("Pure function")]]
 		constexpr DXGI_FORMAT GetTypelessFormat(const std::size_t index) const noexcept
 		{
 			return typelessFormats[index];
 		}
-
+		/// @brief Gets an engine format.
+		/// @param index Format index. Must be less than @p MapSize().
+		/// @return Engine format.
 		[[nodiscard("Pure function")]]
 		constexpr std::string_view GetEngineFormat(const std::size_t index) const noexcept
 		{
@@ -674,13 +692,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		constexpr MainFormatMap& operator =(MainFormatMap&& other) noexcept = default;
 
 	private:
-		std::array<DXGI_FORMAT, FormatInfos.size() + 1> formats;
-		std::array<AspectMask, FormatInfos.size() + 1> aspects;
-		std::array<DXGI_FORMAT, FormatInfos.size() + 1> typelessFormats;
-		std::array<std::string_view, FormatInfos.size() + 1> engineFormats;
+		std::array<DXGI_FORMAT, FormatInfos.size() + 1> formats; ///< Native formats.
+		std::array<AspectMask, FormatInfos.size() + 1> aspects; ///< Format aspects.
+		std::array<DXGI_FORMAT, FormatInfos.size() + 1> typelessFormats; ///< Typeless formats.
+		std::array<std::string_view, FormatInfos.size() + 1> engineFormats; ///< Engine formats.
 	};
-	constexpr MainFormatMap MainFormatMap;
+	constexpr MainFormatMap MainFormatMap; ///< Main format map.
 
+	/// @brief Format map that contains specific format details.
+	/// @tparam T Value type.
+	/// @tparam Size Map size. The actual size is incremented by 1 to add a default set.
 	template<typename T, std::size_t Size>
 	class FormatMap final
 	{
@@ -694,27 +715,42 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		constexpr ~FormatMap() noexcept = default;
 
+		/// @brief Gets a map size.
+		/// @return Map size.
 		[[nodiscard("Pure function")]]
 		static constexpr std::size_t MapSize() noexcept
 		{
 			return Size;
 		}
+		/// @brief Gets an index of the format.
+		/// @param format Format.
+		/// @return Index of the format. It's always safe to use.
 		[[nodiscard("Pure function")]]
 		constexpr std::size_t IndexOf(const DXGI_FORMAT format) const noexcept
 		{
 			return std::ranges::find(formats.cbegin(), formats.cbegin() + Size, format) - formats.cbegin();
 		}
 
+		/// @brief Gets a format.
+		/// @param index Format index.
+		/// @return Format.
 		[[nodiscard("Pure function")]]
 		constexpr DXGI_FORMAT GetFormat(const std::size_t index) const noexcept
 		{
 			return formats[index];
 		}
+		/// @brief Gets a value.
+		/// @param index Format index.
+		/// @return Value.
 		[[nodiscard("Pure function")]]
 		constexpr const T& GetValue(const std::size_t index) const noexcept
 		{
 			return values[index];
 		}
+		/// @brief Sets a format-value pair.
+		/// @param index Format index.
+		/// @param format Format.
+		/// @param value Value.
 		constexpr void SetValue(const std::size_t index, const DXGI_FORMAT format, const T& value) noexcept
 		{
 			formats[index] = format;
@@ -725,10 +761,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		constexpr FormatMap& operator =(FormatMap& other) noexcept = default;
 
 	private:
-		std::array<DXGI_FORMAT, Size + 1> formats;
-		std::array<T, Size + 1> values;
+		std::array<DXGI_FORMAT, Size + 1> formats; ///< Formats.
+		std::array<T, Size + 1> values; ///< Values.
 	};
 
+	/// @brief Gets SRGB compatible format count.
+	/// @return SRGB compatible format count.
 	[[nodiscard("Pure function")]]
 	constexpr std::size_t GetSRGBFormatCount() noexcept
 	{
@@ -740,7 +778,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		return count;
 	}
-	constexpr std::size_t SRGBFormatCount = GetSRGBFormatCount();
+	constexpr std::size_t SRGBFormatCount = GetSRGBFormatCount(); ///< SRGB compatible format count.
+	/// @brief Gets an SRGB format map.
+	/// @return SRGB format map.
 	[[nodiscard("Pure function")]]
 	constexpr FormatMap<DXGI_FORMAT, SRGBFormatCount> GetSRGBFormatMap()
 	{
@@ -758,8 +798,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		return map;
 	}
-	constexpr FormatMap<DXGI_FORMAT, SRGBFormatCount> SRGBFormatMap = GetSRGBFormatMap();
+	constexpr FormatMap<DXGI_FORMAT, SRGBFormatCount> SRGBFormatMap = GetSRGBFormatMap(); ///< SRGB format map.
 
+	/// @brief Gets depth format count.
+	/// @return Depth format count.
 	[[nodiscard("Pure function")]]
 	constexpr std::size_t GetDepthFormatCount() noexcept
 	{
@@ -771,7 +813,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		return count;
 	}
-	constexpr std::size_t DepthFormatCount = GetDepthFormatCount();
+	constexpr std::size_t DepthFormatCount = GetDepthFormatCount(); ///< Depth format count.
+	/// @brief Gets a depth format map.
+	/// @return Depth format map.
 	[[nodiscard("Pure function")]]
 	constexpr FormatMap<DXGI_FORMAT, DepthFormatCount> GetDepthFormatMap()
 	{
@@ -789,8 +833,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		return map;
 	}
-	constexpr FormatMap<DXGI_FORMAT, DepthFormatCount> DepthFormatMap = GetDepthFormatMap();
+	constexpr FormatMap<DXGI_FORMAT, DepthFormatCount> DepthFormatMap = GetDepthFormatMap(); ///< Depth format map.
 
+	/// @brief Gets a stencil format count.
+	/// @return Stencil format count.
 	[[nodiscard("Pure function")]]
 	constexpr std::size_t GetStencilFormatCount() noexcept
 	{
@@ -802,7 +848,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		return count;
 	}
-	constexpr std::size_t StencilFormatCount = GetStencilFormatCount();
+	constexpr std::size_t StencilFormatCount = GetStencilFormatCount(); ///< Stencil format count.
+	/// @brief Gets a stencil format map.
+	/// @return Stencil format map.
 	[[nodiscard("Pure function")]]
 	constexpr FormatMap<DXGI_FORMAT, StencilFormatCount> GetStencilFormatMap()
 	{
@@ -820,38 +868,80 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		return map;
 	}
-	constexpr FormatMap<DXGI_FORMAT, StencilFormatCount> StencilFormatMap = GetStencilFormatMap();
+	constexpr FormatMap<DXGI_FORMAT, StencilFormatCount> StencilFormatMap = GetStencilFormatMap(); ///< Stencil format map.
 
+	/// @brief Gets a typeless format of the native format.
+	/// @param format Native format.
+	/// @return Typeless format or UNKNOWN if invalid.
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_FORMAT GetTypelessFormat(DXGI_FORMAT format) noexcept;
 
+	/// @brief Checks if the format is SRGB-compatible.
+	/// @param format Native format. Must be one of the @p FormatInfos.
+	/// @return @a True if it's SRGB-compatible; @a false otherwise.
 	[[nodiscard("Pure function")]]
 	constexpr bool IsSRGBCompatibleFormat(DXGI_FORMAT format) noexcept;
+	/// @brief Gets a SRGB format variant.
+	/// @param format Original format.
+	/// @return SRGB format variant or UNKNOWN if invalid.
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_FORMAT GetSRGBFormat(DXGI_FORMAT format) noexcept;
 
+	/// @brief Checks if the format is a depth stencil format.
+	/// @param format Native format. Must be one of the @p FormatInfos.
+	/// @return @a True if it's a depth stencil format; @a false otherwise.
 	[[nodiscard("Pure function")]]
 	constexpr bool IsDepthStencilFormat(DXGI_FORMAT format) noexcept;
+	/// @brief Gets a depth view format.
+	/// @param depthStencilFormat Depth stencil format.
+	/// @return Depth view format or UNKNOWN if invalid.
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_FORMAT GetDepthViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
+	/// @brief Checks if the format has a stencil.
+	/// @param format Native format. Must be one of the @p FormatInfos.
+	/// @return @a True if the format has a stencil; @a false otherwise.
 	[[nodiscard("Pure function")]]
 	constexpr bool HasStencil(DXGI_FORMAT format) noexcept;
+	/// @brief Gets a stencil view format.
+	/// @param depthStencilFormat Depth stencil format.
+	/// @return Stencil view format or UNKNOWN if invalid.
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_FORMAT GetStencilViewFormat(DXGI_FORMAT depthStencilFormat) noexcept;
 
+	/// @brief Gets the format aspects.
+	/// @param format Native format.
+	/// @return Format aspects.
 	[[nodiscard("Pure function")]]
 	constexpr AspectMask GetAspects(DXGI_FORMAT format) noexcept;
 
+	/// @brief Gets texture dimensions from the support.
+	/// @param support Texture format support.
+	/// @return Texture dimensions.
 	[[nodiscard("Pure function")]]
-	constexpr TextureDimensionMask ToTextureDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr TextureDimensionMask GetTextureDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	/// @brief Gets texture view dimensions from the support.
+	/// @param support Texture format support.
+	/// @return Texture view dimensions.
 	[[nodiscard("Pure function")]]
-	constexpr TextureViewDimensionMask ToTextureViewDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr TextureViewDimensionMask GetTextureViewDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	/// @brief Gets a texture usage from the support.
+	/// @param support Texture format support.
+	/// @return Texture usage.
 	[[nodiscard("Pure function")]]
-	constexpr TextureUsage ToTextureUsage(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr TextureUsage GetTextureUsage(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	/// @brief Gets shader operations from the support.
+	/// @param support Texture format support.
+	/// @return Shader operations.
 	[[nodiscard("Pure function")]]
-	constexpr ShaderOperationMask ToShaderOperations(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr ShaderOperationMask GetShaderOperations(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	/// @brief Gets blend modes from the support.
+	/// @param support Texture format support.
+	/// @return Blend modes.
 	[[nodiscard("Pure function")]]
-	constexpr BlendModeMask ToBlendModes(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	constexpr BlendModeMask GetBlendModes(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	/// @brief Checks if the format is swap chain compatible.
+	/// @param support Texture format support.
+	/// @return @a True if it's swap chain compatible; @a false otherwise.
 	[[nodiscard("Pure function")]]
 	constexpr bool IsSwapChainCompatible(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 }
@@ -885,7 +975,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	constexpr bool HasStencil(const DXGI_FORMAT format) noexcept
 	{
-		return StencilFormatMap.GetValue(StencilFormatMap.IndexOf(format)) < StencilFormatMap.MapSize();
+		return StencilFormatMap.IndexOf(format) < StencilFormatMap.MapSize();
 	}
 
 	constexpr DXGI_FORMAT GetStencilViewFormat(const DXGI_FORMAT depthStencilFormat) noexcept
@@ -898,7 +988,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return MainFormatMap.GetAspect(MainFormatMap.IndexOf(format));
 	}
 
-	constexpr TextureDimensionMask ToTextureDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr TextureDimensionMask GetTextureDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		auto dimensions = TextureDimensionMask::None;
 		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE1D)
@@ -917,7 +1007,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return dimensions;
 	}
 
-	constexpr TextureViewDimensionMask ToTextureViewDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr TextureViewDimensionMask GetTextureViewDimensions(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		auto dimensions = TextureViewDimensionMask::None;
 		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TEXTURE1D)
@@ -940,7 +1030,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return dimensions;
 	}
 
-	constexpr TextureUsage ToTextureUsage(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr TextureUsage GetTextureUsage(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		auto usage = TextureUsage::ShaderResource;
 		if (support.Support1 & D3D12_FORMAT_SUPPORT1_TYPED_UNORDERED_ACCESS_VIEW)
@@ -959,7 +1049,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return usage;
 	}
 
-	constexpr ShaderOperationMask ToShaderOperations(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr ShaderOperationMask GetShaderOperations(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		auto operations = ShaderOperationMask::None;
 		if (support.Support1 & D3D12_FORMAT_SUPPORT1_SHADER_LOAD)
@@ -1018,7 +1108,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return operations;
 	}
 
-	constexpr BlendModeMask ToBlendModes(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
+	constexpr BlendModeMask GetBlendModes(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		auto modes = BlendModeMask::None;
 		if (support.Support1 & D3D12_FORMAT_SUPPORT1_BLENDABLE)

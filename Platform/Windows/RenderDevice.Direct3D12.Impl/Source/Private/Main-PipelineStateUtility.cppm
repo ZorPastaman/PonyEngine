@@ -24,35 +24,68 @@ import :Utility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Makes a rasterizer description.
+	/// @param params Rasterizer parameters.
+	/// @return Rasterizer description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_RASTERIZER_DESC2 ToRasterizerDesc(const RasterizerParams& params) noexcept;
+	constexpr D3D12_RASTERIZER_DESC2 MakeRasterizerDesc(const RasterizerParams& params) noexcept;
+	/// @brief Casts the engine fill mode to a native fill mode.
+	/// @param fillMode Engine fill mode.
+	/// @return Native fill mode.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_FILL_MODE ToFillMode(FillMode fillMode) noexcept;
+	/// @brief Casts the engine cull mode to a native cull mode.
+	/// @param cullMode Engine cull mode.
+	/// @return Native cull mode.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_CULL_MODE ToCullMode(CullMode cullMode) noexcept;
+	/// @brief Casts the engine line rasterization mode to a native line rasterization mode.
+	/// @param lineRasterizationMode Engine line rasterization mode.
+	/// @return Native line rasterization mode.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_LINE_RASTERIZATION_MODE ToLineRasterizationMode(LineRasterizationMode lineRasterizationMode) noexcept;
 
+	/// @brief Makes a blend description.
+	/// @param params Graphics pipeline state parameters.
+	/// @return Blend description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_BLEND_DESC ToBlendDesc(const GraphicsPipelineStateParams& params) noexcept;
+	constexpr D3D12_BLEND_DESC MakeBlendDesc(const GraphicsPipelineStateParams& params) noexcept;
+	/// @brief Casts the engine blend factor to a native blend factor.
+	/// @param blend Engine blend factor.
+	/// @return Native blend factor.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BLEND ToBlend(BlendFactor blend) noexcept;
+	/// @brief Casts the engine blend operation to a native blend operation.
+	/// @param operation Engine blend operation.
+	/// @return Native blend operation.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BLEND_OP ToBlendOp(BlendOperation operation) noexcept;
+	/// @brief Casts the engine color component mask to a native write mask.
+	/// @param colorComponents Engine color components.
+	/// @return Native write mask.
 	[[nodiscard("Pure function")]]
 	constexpr UINT8 ToWriteMask(ColorComponentMask colorComponents) noexcept;
+	/// @brief Casts the engine logic operation to a native logic operation.
+	/// @param operation Engine logic operation.
+	/// @return Native logic operation.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_LOGIC_OP ToLogicOp(LogicOperation operation) noexcept;
 
+	/// @brief Makes a depth stencil description.
+	/// @param params Depth stencil parameters.
+	/// @return Depth stencil description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_DEPTH_STENCIL_DESC2 ToDepthStencilDesc(const DepthStencilParams& params) noexcept;
+	constexpr D3D12_DEPTH_STENCIL_DESC2 MakeDepthStencilDesc(const DepthStencilParams& params) noexcept;
+	/// @brief Casts the engine stencil operation to a native stencil operation.
+	/// @param operation Engine stencil operation.
+	/// @return Native stencil operation.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_STENCIL_OP ToStencilOp(StencilOperation operation) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	constexpr D3D12_RASTERIZER_DESC2 ToRasterizerDesc(const RasterizerParams& params) noexcept
+	constexpr D3D12_RASTERIZER_DESC2 MakeRasterizerDesc(const RasterizerParams& params) noexcept
 	{
 		return D3D12_RASTERIZER_DESC2
 		{
@@ -117,7 +150,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	constexpr D3D12_BLEND_DESC ToBlendDesc(const GraphicsPipelineStateParams& params) noexcept
+	constexpr D3D12_BLEND_DESC MakeBlendDesc(const GraphicsPipelineStateParams& params) noexcept
 	{
 		auto blend = D3D12_BLEND_DESC
 		{
@@ -322,7 +355,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	constexpr D3D12_DEPTH_STENCIL_DESC2 ToDepthStencilDesc(const DepthStencilParams& params) noexcept
+	constexpr D3D12_DEPTH_STENCIL_DESC2 MakeDepthStencilDesc(const DepthStencilParams& params) noexcept
 	{
 		auto depthStencil = D3D12_DEPTH_STENCIL_DESC2{};
 

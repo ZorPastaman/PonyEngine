@@ -24,11 +24,20 @@ import :PipelineState;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Graphics pipeline state wrapper.
 	class GraphicsPipelineState final : public IGraphicsPipelineState
 	{
 	public:
+		/// @brief Creates a graphics pipeline state wrapper.
+		/// @param pipelineState Pipeline state.
+		/// @param layout Pipeline layout.
+		/// @param params Graphics pipeline state parameters.
 		[[nodiscard("Pure constructor")]]
 		GraphicsPipelineState(ID3D12PipelineState& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params);
+		/// @brief Creates a graphics pipeline state wrapper.
+		/// @param pipelineState Pipeline state.
+		/// @param layout Pipeline layout.
+		/// @param params Graphics pipeline state parameters.
 		[[nodiscard("Pure constructor")]]
 		GraphicsPipelineState(Platform::Windows::ComPtr<ID3D12PipelineState>&& pipelineState, 
 			const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params);
@@ -57,6 +66,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the pipeline state.
+		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
 		ID3D12PipelineState& PipelineState() const noexcept;
 
@@ -64,30 +75,34 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		GraphicsPipelineState& operator =(GraphicsPipelineState&&) = delete;
 
 	private:
+		/// @brief Sets data that uses the @p data field.
+		/// @param params Graphics pipeline state parameters.
 		void SetComplexData(const GraphicsPipelineStateParams& params);
 
+		/// @brief Gets shader stages from the parameters.
+		/// @param params Graphics pipeline state parameters.
+		/// @return Shader stages.
 		[[nodiscard("Pure function")]]
 		static GraphicsShaderTypeMask GetShaderStages(const GraphicsPipelineStateParams& params) noexcept;
 
-		class PipelineState pipelineState;
-		std::shared_ptr<const IPipelineLayout> layout;
+		class PipelineState pipelineState; ///< Pipeline state.
+		std::shared_ptr<const IPipelineLayout> layout; ///< Pipeline layout.
 
-		std::unique_ptr<std::byte[]> data;
+		std::unique_ptr<std::byte[]> data; ///< Complex data container.
 
-		BlendParams blend;
-		AttachmentParams attachment;
-		SampleParams sample;
-		RasterizerParams rasterizer;
-		DepthStencilParams depthStencil;
+		BlendParams blend; ///< Blend parameters.
+		AttachmentParams attachment; ///< Attachment parameters.
+		SampleParams sample; ///< Sample parameters.
+		RasterizerParams rasterizer; ///< Rasterizer parameters.
+		DepthStencilParams depthStencil; ///< Depth stencil parameters.
 
-		GraphicsShaderTypeMask shaderStages;
+		GraphicsShaderTypeMask shaderStages; ///< Shader stages.
 	};
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	GraphicsPipelineState::GraphicsPipelineState(ID3D12PipelineState& pipelineState,
-		const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) :
+	GraphicsPipelineState::GraphicsPipelineState(ID3D12PipelineState& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) :
 		pipelineState(pipelineState),
 		layout(layout),
 		sample(params.sample),
@@ -98,9 +113,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		SetComplexData(params);
 	}
 
-	GraphicsPipelineState::GraphicsPipelineState(
-		Platform::Windows::ComPtr<ID3D12PipelineState>&& pipelineState,
-		const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) :
+	GraphicsPipelineState::GraphicsPipelineState(Platform::Windows::ComPtr<ID3D12PipelineState>&& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout, 
+		const GraphicsPipelineStateParams& params) :
 		pipelineState(std::move(pipelineState)),
 		layout(layout),
 		sample(params.sample),
@@ -168,32 +182,34 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			[](const ArithmeticBlendGroupParams& p) noexcept
 			{
-				return std::pair(p.renderTargetBlend.size_bytes(), alignof(ArithmeticRenderTargetBlendParams));
+				return std::pair<std::size_t, std::size_t>(p.renderTargetBlend.size_bytes(), alignof(ArithmeticRenderTargetBlendParams));
 			},
 			[](const LogicBlendGroupParams& p) noexcept
 			{
-				return std::pair(p.renderTargetBlend.size_bytes(), alignof(LogicRenderTargetBlendParams));
+				return std::pair<std::size_t, std::size_t>(p.renderTargetBlend.size_bytes(), alignof(LogicRenderTargetBlendParams));
 			}
 		}, params.blend.blendGroup);
 		const std::size_t rtBlendByteOffset = Math::Align(rtFormatByteSize, rtBlendAlignment);
 		const std::size_t rtBlendByteEnd = rtBlendByteOffset + rtBlendByteSize;
 
-		if (rtBlendByteEnd > 0uz)
+		if (rtBlendByteEnd == 0uz)
 		{
-			data = std::make_unique<std::byte[]>(rtBlendByteEnd);
-			std::memcpy(data.get(), params.attachment.renderTargetFormats.data(), params.attachment.renderTargetFormats.size_bytes());
-			std::visit(Type::Overload
-			{
-				[&](const ArithmeticBlendGroupParams& p) noexcept
-				{
-					std::memcpy(data.get() + rtBlendByteOffset, p.renderTargetBlend.data(), p.renderTargetBlend.size_bytes());
-				},
-				[&](const LogicBlendGroupParams& p) noexcept
-				{
-					std::memcpy(data.get() + rtBlendByteOffset, p.renderTargetBlend.data(), p.renderTargetBlend.size_bytes());
-				}
-			}, params.blend.blendGroup);
+			return;
 		}
+
+		data = std::make_unique<std::byte[]>(rtBlendByteEnd);
+		std::memcpy(data.get(), params.attachment.renderTargetFormats.data(), params.attachment.renderTargetFormats.size_bytes());
+		std::visit(Type::Overload
+		{
+			[&](const ArithmeticBlendGroupParams& p) noexcept
+			{
+				std::memcpy(data.get() + rtBlendByteOffset, p.renderTargetBlend.data(), p.renderTargetBlend.size_bytes());
+			},
+			[&](const LogicBlendGroupParams& p) noexcept
+			{
+				std::memcpy(data.get() + rtBlendByteOffset, p.renderTargetBlend.data(), p.renderTargetBlend.size_bytes());
+			}
+		}, params.blend.blendGroup);
 
 		attachment.renderTargetFormats = !params.attachment.renderTargetFormats.empty() 
 			? std::span<const RenderTargetAttachmentFormat>(reinterpret_cast<const RenderTargetAttachmentFormat*>(data.get()), params.attachment.renderTargetFormats.size())

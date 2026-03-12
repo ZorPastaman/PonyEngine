@@ -22,62 +22,145 @@ import PonyEngine.Type;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Checks if the request for a color texture is valid.
+	/// @param request Texture support request.
+	/// @param support Texture format support.
+	/// @return @a True if it's valid; @a false otherwise.
 	[[nodiscard("Pure function")]]
 	constexpr bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
+	/// @brief Checks if the request for a depth texture is valid.
+	/// @param request Texture support request.
+	/// @param support Texture format support.
+	/// @return @a True if it's valid; @a false otherwise.
 	[[nodiscard("Pure function")]]
 	constexpr bool CheckDepthSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 
+	/// @brief Gets a required format support.
+	/// @param dimension Texture dimension.
+	/// @return Required format support.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureDimension dimension) noexcept;
+	constexpr D3D12_FORMAT_SUPPORT1 GetFormatSupport(TextureDimension dimension) noexcept;
+	/// @brief Gets a required format support.
+	/// @param usage Texture usage.
+	/// @return Required format support.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(TextureUsage usage) noexcept;
+	constexpr D3D12_FORMAT_SUPPORT1 GetFormatSupport(TextureUsage usage) noexcept;
 
+	/// @brief Casts the engine aspect to a plane index.
+	/// @param aspect Engine aspect.
+	/// @return Plane index.
 	[[nodiscard("Pure function")]]
 	constexpr UINT8 ToPlaneIndex(Aspect aspect) noexcept;
+	/// @brief Casts the engine aspect mask to a first plane index.
+	/// @param aspects Engine aspect mask.
+	/// @return First plane index.
 	[[nodiscard("Pure function")]]
 	constexpr UINT8 ToFirstPlaneIndex(AspectMask aspects) noexcept;
+	/// @brief Casts the engine aspect mask to a plane count.
+	/// @param aspects Engine aspect mask.
+	/// @return Plane count.
 	[[nodiscard("Pure function")]]
 	constexpr UINT8 ToPlaneCount(AspectMask aspects) noexcept;
 
+	/// @brief Casts the engine resource layout to a native resource layout.
+	/// @param layout Engine resource layout.
+	/// @return Native resource layout.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_BARRIER_LAYOUT ToLayout(ResourceLayout layout) noexcept;
 
+	/// @brief Casts the engine clear value to a native clear value.
+	/// @param clearValue Engine clear value.
+	/// @param format Format.
+	/// @return Native clear value.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_CLEAR_VALUE ToClearValue(const ClearValue& clearValue, DXGI_FORMAT format) noexcept;
 
+	/// @brief Gets an array size from the resource description.
+	/// @param resourceDesc Resource description.
+	/// @return Array size.
 	[[nodiscard("Pure function")]]
 	constexpr UINT16 GetArraySize(const D3D12_RESOURCE_DESC1& resourceDesc) noexcept;
+	/// @brief Calculates a subresource index.
+	/// @param mipIndex Mip index.
+	/// @param arrayIndex Array element index.
+	/// @param planeIndex Plane index.
+	/// @param mipCount Resource mip count.
+	/// @param arraySize Resource array size.
+	/// @return Subresource index.
 	[[nodiscard("Pure function")]]
 	constexpr UINT CalculateSubresource(UINT16 mipIndex, UINT16 arrayIndex, UINT8 planeIndex, UINT16 mipCount, UINT16 arraySize) noexcept;
 
+	/// @brief Makes a texture resource description.
+	/// @param params Texture parameters.
+	/// @param format Native format.
+	/// @return Texture resource description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(TextureUsage usage, bool notZeroed) noexcept;
-
-	[[nodiscard("Pure function")]]
-	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, DXGI_FORMAT format) noexcept;
+	constexpr D3D12_RESOURCE_DESC1 MakeResourceDesc(const TextureParams& params, DXGI_FORMAT format) noexcept;
+	/// @brief Casts the engine texture dimension to a native texture dimension.
+	/// @param dimension Engine texture dimension.
+	/// @return Native texture dimension.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_RESOURCE_DIMENSION ToResourceDimension(TextureDimension dimension) noexcept;
+	/// @brief Gets a depth or array size from the texture parameters.
+	/// @param params Texture parameters.
+	/// @return Depth or array size.
 	[[nodiscard("Pure function")]]
-	constexpr UINT16 ToDepthArraySize(const TextureParams& params) noexcept;
+	constexpr UINT16 GetDepthOrArraySize(const TextureParams& params) noexcept;
+	/// @brief Makes resource flags.
+	/// @param usage Texture usage.
+	/// @return Resource flags.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(TextureUsage usage) noexcept;
+	constexpr D3D12_RESOURCE_FLAGS MakeResourceFlags(TextureUsage usage) noexcept;
 
+	/// @brief Makes a shader resource view description.
+	/// @param params Texture shader resource view parameters.
+	/// @param format Native format.
+	/// @param resourceMipCount Resource mip count.
+	/// @param resourceArraySize Resource array size.
+	/// @return Shader resource view description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureSRVParams& params, DXGI_FORMAT format, std::uint8_t resourceMipCount, std::uint16_t resourceArraySize) noexcept;
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC MakeSRVDesc(const TextureSRVParams& params, DXGI_FORMAT format, std::uint8_t resourceMipCount, std::uint16_t resourceArraySize) noexcept;
+	/// @brief Makes an unordered access view description.
+	/// @param params Texture unordered access view parameters.
+	/// @param format Native format.
+	/// @param resourceArraySize Resource array size.
+	/// @return Unordered access view description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC MakeUAVDesc(const TextureUAVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
+	/// @brief Makes a render target view description.
+	/// @param params Render target view parameters.
+	/// @param format Native format.
+	/// @param resourceArraySize Resource array size.
+	/// @return Render target view description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
+	constexpr D3D12_RENDER_TARGET_VIEW_DESC MakeRTVDesc(const RTVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
+	/// @brief Makes a depth stencil view description.
+	/// @param params Depth stencil view parameters.
+	/// @param format Native format.
+	/// @param resourceArraySize Resource array size.
+	/// @return Depth stencil view description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
+	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC MakeDSVDesc(const DSVParams& params, DXGI_FORMAT format, std::uint16_t resourceArraySize) noexcept;
+	/// @brief Casts the engine dsv flags to native dsv flags.
+	/// @param flags Engine dsv flags.
+	/// @return Native dsv flags.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_DSV_FLAGS ToDSVFlags(DSVFlag flags) noexcept;
 
+	/// @brief Casts the engine component swizzle to a native component mapping type.
+	/// @param swizzle Engine component swizzle.
+	/// @return Native component mapping type.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_SHADER_COMPONENT_MAPPING ToShaderMapping(ComponentSwizzle swizzle) noexcept;
+	/// @brief Casts the engine component mapping to a native component mapping.
+	/// @param mapping Engine component mapping.
+	/// @return Native component mapping.
 	[[nodiscard("Pure function")]]
 	constexpr UINT ToShaderMapping(ComponentMapping mapping) noexcept;
 
+	/// @brief Casts the engine resolve mode to a native resolve mode.
+	/// @param mode Engine resolve mode.
+	/// @return Native resolve mode.
 	[[nodiscard("Pure function")]]
 	constexpr D3D12_RESOLVE_MODE ToResolveMode(ResolveMode mode) noexcept;
 }
@@ -90,7 +173,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			return false;
 		}
-		const D3D12_FORMAT_SUPPORT1 requiredSupport = ToFormatSupport(request.dimension) | ToFormatSupport(request.usage);
+		const D3D12_FORMAT_SUPPORT1 requiredSupport = GetFormatSupport(request.dimension) | GetFormatSupport(request.usage);
 		if ((requiredSupport & support.Support1) != requiredSupport)
 		{
 			return false;
@@ -105,7 +188,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			return false;
 		}
-		const D3D12_FORMAT_SUPPORT1 requiredSupport = ToFormatSupport(request.dimension) | ToFormatSupport(request.usage);
+		const D3D12_FORMAT_SUPPORT1 requiredSupport = GetFormatSupport(request.dimension) | GetFormatSupport(request.usage);
 		if ((requiredSupport & support.Support1) != requiredSupport)
 		{
 			return false;
@@ -114,7 +197,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return true;
 	}
 
-	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureDimension dimension) noexcept
+	constexpr D3D12_FORMAT_SUPPORT1 GetFormatSupport(const TextureDimension dimension) noexcept
 	{
 		switch (dimension)
 		{
@@ -129,7 +212,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	constexpr D3D12_FORMAT_SUPPORT1 ToFormatSupport(const TextureUsage usage) noexcept
+	constexpr D3D12_FORMAT_SUPPORT1 GetFormatSupport(const TextureUsage usage) noexcept
 	{
 		D3D12_FORMAT_SUPPORT1 support = D3D12_FORMAT_SUPPORT1_NONE;
 		if (Any(TextureUsage::UnorderedAccess, usage))
@@ -155,12 +238,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	constexpr UINT8 ToFirstPlaneIndex(const AspectMask aspects) noexcept
 	{
-		return All(AspectMask::Stencil, aspects);
+		return aspects == AspectMask::Stencil;
 	}
 
 	constexpr UINT8 ToPlaneCount(const AspectMask aspects) noexcept
 	{
-		return (aspects != AspectMask::None) + (Any(AspectMask::Stencil, aspects) && Any(AspectMask::Color | AspectMask::Depth, aspects));
+		return Any(AspectMask::Color | AspectMask::Depth, aspects) + Any(AspectMask::Stencil, aspects);
 	}
 
 	constexpr D3D12_BARRIER_LAYOUT ToLayout(const ResourceLayout layout) noexcept
@@ -236,22 +319,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return mipIndex + arrayIndex * mipCount + planeIndex * mipCount * arraySize;
 	}
 
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const TextureUsage usage, const bool notZeroed) noexcept
-	{
-		auto flags = D3D12_HEAP_FLAG_NONE;
-		if (notZeroed)
-		{
-			flags |= D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
-		}
-		if (Any(TextureUsage::UnorderedAccess, usage))
-		{
-			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;
-		}
-
-		return flags;
-	}
-
-	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const TextureParams& params, const DXGI_FORMAT format) noexcept
+	constexpr D3D12_RESOURCE_DESC1 MakeResourceDesc(const TextureParams& params, const DXGI_FORMAT format) noexcept
 	{
 		return D3D12_RESOURCE_DESC1
 		{
@@ -259,12 +327,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.Alignment = 0ull,
 			.Width = params.size.X(),
 			.Height = params.size.Y(),
-			.DepthOrArraySize = ToDepthArraySize(params),
+			.DepthOrArraySize = GetDepthOrArraySize(params),
 			.MipLevels = params.mipCount,
 			.Format = format,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = ToNumber(params.sampleCount), .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
-			.Flags = ToResourceFlags(params.usage),
+			.Flags = MakeResourceFlags(params.usage),
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
 	}
@@ -285,14 +353,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	constexpr UINT16 ToDepthArraySize(const TextureParams& params) noexcept
+	constexpr UINT16 GetDepthOrArraySize(const TextureParams& params) noexcept
 	{
 		return params.dimension == TextureDimension::Texture3D
 			? static_cast<UINT16>(params.size.Z())
 			: static_cast<UINT16>(params.arraySize);
 	}
 
-	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(const TextureUsage usage) noexcept
+	constexpr D3D12_RESOURCE_FLAGS MakeResourceFlags(const TextureUsage usage) noexcept
 	{
 		auto flags = D3D12_RESOURCE_FLAG_NONE;
 		if (usage == TextureUsage::DepthStencil)
@@ -318,7 +386,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return flags;
 	}
 
-	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const TextureSRVParams& params, const DXGI_FORMAT format, 
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC MakeSRVDesc(const TextureSRVParams& params, const DXGI_FORMAT format, 
 		const std::uint8_t resourceMipCount, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
@@ -448,7 +516,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return viewDesc;
 	}
 
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC MakeUAVDesc(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_UNORDERED_ACCESS_VIEW_DESC
 		{
@@ -532,7 +600,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return viewDesc;
 	}
 
-	constexpr D3D12_RENDER_TARGET_VIEW_DESC ToRTVDesc(const RTVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
+	constexpr D3D12_RENDER_TARGET_VIEW_DESC MakeRTVDesc(const RTVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_RENDER_TARGET_VIEW_DESC
 		{
@@ -632,7 +700,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return viewDesc;
 	}
 
-	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC ToDSVDesc(const DSVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
+	constexpr D3D12_DEPTH_STENCIL_VIEW_DESC MakeDSVDesc(const DSVParams& params, const DXGI_FORMAT format, const std::uint16_t resourceArraySize) noexcept
 	{
 		auto viewDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
 		{

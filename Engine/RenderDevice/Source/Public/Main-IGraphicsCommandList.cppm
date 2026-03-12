@@ -106,6 +106,14 @@ export namespace PonyEngine::RenderDevice
 		/// @param renderTargetCount How many RTVs to bind?
 		/// @param depthStencilBinding DSV to bind.
 		virtual void BindTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount, const DepthStencilBinding* depthStencilBinding) = 0;
+		/// @brief Unbinds all the containers.
+		void BindContainers();
+		/// @brief Binds the shader data container and unbinds a sampler container.
+		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
+		void BindContainers(const IShaderDataContainer& shaderDataContainer);
+		/// @brief Binds the sampler container and unbinds a shader data container.
+		/// @param samplerContainer Sampler container to bind. Must be shader visible.
+		void BindContainers(const ISamplerContainer& samplerContainer);
 		/// @brief Binds the containers.
 		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
 		/// @param samplerContainer Sampler container to bind. Must be shader visible.
@@ -246,10 +254,8 @@ export namespace PonyEngine::RenderDevice
 		/// @brief Copies from the buffer region to the other buffer.
 		/// @param source Source buffer.
 		/// @param destination Destination buffer.
-		/// @param sourceOffset Source offset in bytes.
-		/// @param destinationOffset Destination offset in bytes.
-		/// @param size Region size in bytes.
-		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) = 0;
+		/// @param ranges Copy ranges.
+		virtual void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges) = 0;
 		/// @brief Copies from the texture to the other texture.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
@@ -374,6 +380,21 @@ namespace PonyEngine::RenderDevice
 	void IGraphicsCommandList::BindTargets(const RenderTargetBinding& renderTargetBinding, const std::uint8_t renderTargetCount)
 	{
 		BindTargets(&renderTargetBinding, renderTargetCount, nullptr);
+	}
+
+	void IGraphicsCommandList::BindContainers()
+	{
+		BindContainers(nullptr, nullptr);
+	}
+
+	void IGraphicsCommandList::BindContainers(const IShaderDataContainer& shaderDataContainer)
+	{
+		BindContainers(&shaderDataContainer, nullptr);
+	}
+
+	void IGraphicsCommandList::BindContainers(const ISamplerContainer& samplerContainer)
+	{
+		BindContainers(nullptr, &samplerContainer);
 	}
 
 	void IGraphicsCommandList::BindGraphics(const ShaderDataBinding& shaderDataBinding)
