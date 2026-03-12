@@ -26,16 +26,17 @@ import :ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Device wrapper.
 	class Device final
 	{
 	public:
-		static constexpr std::string_view APIName = RenderAPI::Direct3D;
-		static constexpr auto APIVersion = Meta::Version(12, 2);
-		static constexpr D3D_FEATURE_LEVEL FeatureLevel = D3D_FEATURE_LEVEL_12_2;
+		static constexpr std::string_view APIName = RenderAPI::Direct3D; ///< Direct3D API name.
+		static constexpr auto APIVersion = Meta::Version(12, 2); ///< Direct3D12 FL 12.2 version.
+		static constexpr D3D_FEATURE_LEVEL FeatureLevel = D3D_FEATURE_LEVEL_12_2; ///< Feature level.
 
-		static constexpr bool Int64BitSupport = true; ///< Are 64 bit int operations supported? On fl 12.2 they are mandatory.
-		static constexpr bool ConservativeRasterizationSupport = true;
-
+		/// @brief Creates a device wrapper.
+		/// @param renderDevice Render device context.
+		/// @param adapter Adapter.
 		[[nodiscard("Pure constructor")]]
 		Device(IRenderDeviceContext& renderDevice, IUnknown& adapter);
 		Device(const Device&) = delete;
@@ -43,72 +44,170 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~Device() noexcept;
 
+		/// @brief Checks if int16 and float16 are supported.
+		/// @return @a True if they are supported; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsIntFloat16Supported() const;
+		/// @brief Checks if int64 is supported.
+		/// @return @a True if it's supported; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsInt64Supported() const;
+		/// @brief Checks if float64 is supported.
+		/// @return @a True if it's supported; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFloat64Supported() const;
+		/// @brief Gets an atomic support info.
+		/// @return Atomic support info.
 		[[nodiscard("Pure function")]]
 		struct AtomicSupport AtomicSupport() const;
 
+		/// @brief Gets a supported shader model.
+		/// @return Supported shader model.
 		[[nodiscard("Pure function")]]
 		D3D_SHADER_MODEL GetShaderModel() const;
+		/// @brief Gets a format support.
+		/// @param format Format.
+		/// @return Format support.
 		[[nodiscard("Pure function")]]
 		D3D12_FEATURE_DATA_FORMAT_SUPPORT GetFormatSupport(DXGI_FORMAT format) const;
+		/// @brief Gets a format plane count.
+		/// @param format Format.
+		/// @return Plane count.
 		[[nodiscard("Pure function")]]
 		UINT8 GetPlaneCount(DXGI_FORMAT format) const;
+		/// @brief Gets a format sample quality count.
+		/// @param format Format.
+		/// @param sampleCount Sample count.
+		/// @return Sample quality count.
 		[[nodiscard("Pure function")]]
 		UINT GetSampleQualityCount(DXGI_FORMAT format, UINT sampleCount) const;
 
+		/// @brief Checks if the conservative rasterization is supported.
+		/// @return @a True if it's supported; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsConservativeRasterizationSupported() const;
+		/// @brief Checks if the quadrilateral narrow line is supported.
+		/// @return @a True if it's supported; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsQuadrilateralNarrowLineSupported() const;
 
+		/// @brief Gets copyable footprints.
+		/// @param resourceDesc Resource description.
+		/// @param subresourceOffset Subresource index offset.
+		/// @param subresourceCount Subresource count.
+		/// @param baseOffset Byte array offset.
+		/// @param footprints Footprints. Must be nullptr or an array of @p subresourceCount elements.
+		/// @param rowCounts Row counts. Must be nullptr or an array of @p subresourceCount elements.
+		/// @param rowSizes Row sizes. Must be nullptr or an array of @p subresourceCount elements.
+		/// @return Total size.
 		UINT64 GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, UINT subresourceOffset, UINT subresourceCount,
 			UINT64 baseOffset, D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprints, UINT* rowCounts, UINT64* rowSizes) const;
 
+		/// @brief Gets a descriptor handle increment.
+		/// @param descriptorHeapType Descriptor heap type.
+		/// @return Descriptor handle increment.
 		[[nodiscard("Pure function")]]
 		UINT GetDescriptorHandleIncrement(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) const noexcept;
 
+		/// @brief Creates a command queue.
+		/// @param queueDesc Command queue description.
+		/// @param creatorId Creator ID.
+		/// @return Command queue.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12CommandQueue> CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId);
+		/// @brief Creates a command allocator.
+		/// @param commandListType Command list type.
+		/// @return Command allocator.
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
+		/// @brief Creates a command list.
+		/// @param commandListType Command list type.
+		/// @return Command list.
+		[[nodiscard("Pure function")]]
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
 
+		/// @brief Creates a committed resource.
+		/// @param heapProperties Heap properties.
+		/// @param heapFlags Heap flags.
+		/// @param resourceDesc Resource description.
+		/// @param initialLayout Initial layout.
+		/// @param clearValue Clear value.
+		/// @param castableFormats Castable formats.
+		/// @return Resource.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12Resource2> CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, D3D12_HEAP_FLAGS heapFlags, 
 			const D3D12_RESOURCE_DESC1& resourceDesc, D3D12_BARRIER_LAYOUT initialLayout = D3D12_BARRIER_LAYOUT_UNDEFINED,
 			const D3D12_CLEAR_VALUE& clearValue = D3D12_CLEAR_VALUE{.Format = DXGI_FORMAT_UNKNOWN}, 
 			std::span<const DXGI_FORMAT> castableFormats = std::span<const DXGI_FORMAT>());
 
+		/// @brief Creates a descriptor heap.
+		/// @param descriptorHeapDesc Descriptor heap description.
+		/// @return Descriptor heap.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc);
+		/// @brief Creates a constant buffer view.
+		/// @param cbvDesc Constant buffer view description.
+		/// @param handle Descriptor handle.
 		void CreateCBV(const D3D12_CONSTANT_BUFFER_VIEW_DESC* cbvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		/// @brief Creates a shader resource view.
+		/// @param resource Resource.
+		/// @param srvDesc Shader resource view description.
+		/// @param handle Descriptor handle.
 		void CreateSRV(ID3D12Resource2* resource, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		/// @brief Creates an unordered access view.
+		/// @param resource Resource.
+		/// @param uavDesc Unordered access view description.
+		/// @param handle Descriptor handle.
 		void CreateUAV(ID3D12Resource2* resource, const D3D12_UNORDERED_ACCESS_VIEW_DESC& uavDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		/// @brief Creates a render target view.
+		/// @param resource Resource.
+		/// @param rtvDesc Render target view description.
+		/// @param handle Descriptor handle.
 		void CreateRTV(ID3D12Resource2* resource, const D3D12_RENDER_TARGET_VIEW_DESC& rtvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		/// @brief Creates a depth stencil view.
+		/// @param resource Resource.
+		/// @param dsvDesc Depth stencil view description.
+		/// @param handle Descriptor handle.
 		void CreateDSV(ID3D12Resource2* resource, const D3D12_DEPTH_STENCIL_VIEW_DESC& dsvDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		/// @brief Creates a sampler.
+		/// @param samplerDesc Sampler description.
+		/// @param handle Descriptor handle.
 		void CreateSampler(const D3D12_SAMPLER_DESC2& samplerDesc, D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+		/// @brief Copies descriptors.
+		/// @param rangeCount How many descriptor ranges to copy?
+		/// @param rangeSizes Descriptor range sizes. Must be an array of @p rangeCount elements.
+		/// @param sourceHandles Source descriptor handles. Must be an array of @p rangeCount elements.
+		/// @param destinationHandles Destination descriptor handles. Must be an array of @p rangeCount elements.
+		/// @param descriptorHeapType Descriptor heap type.
 		void CopyDescriptors(UINT rangeCount, const UINT* rangeSizes, 
 			const D3D12_CPU_DESCRIPTOR_HANDLE* sourceHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* destinationHandles,
 			D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept;
 
+		/// @brief Creates a root signature.
+		/// @param rootSigDesc Root signature description.
+		/// @return Root signature.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12RootSignature> CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc);
+		/// @brief Creates a pipeline state.
+		/// @param pipelineStateStream Pipeline state stream.
+		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12PipelineState> CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream);
 
-		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
-		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
-
+		/// @brief Creates a fence.
+		/// @return Fence.
 		[[nodiscard("Pure function")]]
 		Platform::Windows::ComPtr<ID3D12Fence1> CreateFence();
 
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void SetName(std::string_view name);
 
 		Device& operator =(const Device&) = delete;
 		Device& operator =(Device&&) = delete;
 
 	private:
-		IRenderDeviceContext* renderDevice;
+		IRenderDeviceContext* renderDevice; ///< Render device context.
 
 #ifndef NDEBUG
 		Platform::Windows::ComPtr<ID3D12Debug6> debug; ///< Debug interface.
@@ -218,6 +317,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return options.Native16BitShaderOpsSupported;
 	}
 
+	bool Device::IsInt64Supported() const
+	{
+		return true; // It's mandatory on fl 12.2
+	}
+
 	bool Device::IsFloat64Supported() const
 	{
 		auto options = D3D12_FEATURE_DATA_D3D12_OPTIONS{};
@@ -294,6 +398,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return levels.NumQualityLevels;
 	}
 
+	bool Device::IsConservativeRasterizationSupported() const
+	{
+		return true; // It's mandatory on fl 12.2
+	}
+
 	bool Device::IsQuadrilateralNarrowLineSupported() const
 	{
 		auto options19 = D3D12_FEATURE_DATA_D3D12_OPTIONS19{};
@@ -332,6 +441,29 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		return commandQueue;
+	}
+
+	Platform::Windows::ComPtr<ID3D12CommandAllocator> Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)
+	{
+		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator;
+		if (const HRESULT result = device->CreateCommandAllocator(commandListType, IID_PPV_ARGS(allocator.GetAddress())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 command allocator: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return allocator;
+	}
+
+	Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> Device::CreateCommandList(const D3D12_COMMAND_LIST_TYPE commandListType)
+	{
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList;
+		if (const HRESULT result = device->CreateCommandList1(0u, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddress()));
+			FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create D3D12 graphics command list: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return commandList;
 	}
 
 	Platform::Windows::ComPtr<ID3D12Resource2> Device::CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, const D3D12_HEAP_FLAGS heapFlags, 
@@ -402,8 +534,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const D3D12_CPU_DESCRIPTOR_HANDLE* const destinationHandles,
 		const D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) noexcept
 	{
-		device->CopyDescriptors(rangeCount, destinationHandles, rangeSizes, 
-			rangeCount, sourceHandles, rangeSizes, descriptorHeapType);
+		device->CopyDescriptors(rangeCount, destinationHandles, rangeSizes, rangeCount, sourceHandles, rangeSizes, descriptorHeapType);
 	}
 
 	Platform::Windows::ComPtr<ID3D12RootSignature> Device::CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc)
@@ -446,29 +577,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		return pipelineState;
-	}
-
-	Platform::Windows::ComPtr<ID3D12CommandAllocator> Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)
-	{
-		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator;
-		if (const HRESULT result = device->CreateCommandAllocator(commandListType, IID_PPV_ARGS(allocator.GetAddress())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to create D3D12 command allocator: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		return allocator;
-	}
-
-	Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> Device::CreateCommandList(const D3D12_COMMAND_LIST_TYPE commandListType)
-	{
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList;
-		if (const HRESULT result = device->CreateCommandList1(0u, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddress())); 
-			FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to create D3D12 graphics command list: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		return commandList;
 	}
 
 	Platform::Windows::ComPtr<ID3D12Fence1> Device::CreateFence()

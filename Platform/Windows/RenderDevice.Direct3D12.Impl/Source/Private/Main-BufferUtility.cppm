@@ -17,42 +17,111 @@ import std;
 
 import PonyEngine.RenderDevice;
 
+import :Buffer;
+
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Casts to a native buffer.
+	/// @param buffer Engine buffer.
+	/// @return Native buffer.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(BufferUsage usage, bool notZeroed) noexcept;
+	Buffer& ToNativeBuffer(IBuffer& buffer);
+	/// @brief Casts to a native buffer.
+	/// @param buffer Engine buffer.
+	/// @return Native buffer.
+	[[nodiscard("Pure function")]]
+	const Buffer& ToNativeBuffer(const IBuffer& buffer);
+	/// @brief Casts to a native buffer.
+	/// @param buffer Engine buffer.
+	/// @return Native buffer.
+	[[nodiscard("Pure function")]]
+	Buffer* ToNativeBuffer(IBuffer* buffer);
+	/// @brief Casts to a native buffer.
+	/// @param buffer Engine buffer.
+	/// @return Native buffer.
+	[[nodiscard("Pure function")]]
+	const Buffer* ToNativeBuffer(const IBuffer* buffer);
 
+	/// @brief Makes a resource description.
+	/// @param params Buffer parameters.
+	/// @return Resource description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept;
+	constexpr D3D12_RESOURCE_DESC1 MakeResourceDesc(const BufferParams& params) noexcept;
+	/// @brief Gets resource flags.
+	/// @param usage Buffer usage.
+	/// @return Resource flags.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(BufferUsage usage) noexcept;
+	constexpr D3D12_RESOURCE_FLAGS GetResourceFlags(BufferUsage usage) noexcept;
 
+	/// @brief Makes a constants buffer view description.
+	/// @param address Basic address.
+	/// @param params Constant buffer view parameters.
+	/// @return Constants buffer view description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC ToCBVDesc(D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept;
+	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC MakeCBVDesc(D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept;
+	/// @brief Makes a shader resource view description.
+	/// @param params Buffer shader resource view parameters.
+	/// @return Shader resource view description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const BufferSRVParams& params) noexcept;
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC MakeSRVDesc(const BufferSRVParams& params) noexcept;
+	/// @brief Makes an unordered access view description.
+	/// @param params Buffer unordered access view parameters.
+	/// @return Unordered access view description.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const BufferUAVParams& params) noexcept;
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC MakeUAVDesc(const BufferUAVParams& params) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	constexpr D3D12_HEAP_FLAGS ToHeapFlags(const BufferUsage usage, const bool notZeroed) noexcept
+	Buffer& ToNativeBuffer(IBuffer& buffer)
 	{
-		auto flags = D3D12_HEAP_FLAG_NONE;
-		if (notZeroed)
+#ifndef NDEBUG
+		if (typeid(buffer) != typeid(Buffer)) [[unlikely]]
 		{
-			flags |= D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
+			throw std::invalid_argument("Invalid buffer");
 		}
-		if (Any(BufferUsage::UnorderedAccess, usage))
-		{
-			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;
-		}
+#endif
 
-		return flags;
+		return static_cast<Buffer&>(buffer);
 	}
 
-	constexpr D3D12_RESOURCE_DESC1 ToResourceDesc(const BufferParams& params) noexcept
+	const Buffer& ToNativeBuffer(const IBuffer& buffer)
+	{
+#ifndef NDEBUG
+		if (typeid(buffer) != typeid(Buffer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer");
+		}
+#endif
+
+		return static_cast<const Buffer&>(buffer);
+	}
+
+	Buffer* ToNativeBuffer(IBuffer* const buffer)
+	{
+#ifndef NDEBUG
+		if (buffer && typeid(*buffer) != typeid(Buffer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer");
+		}
+#endif
+
+		return static_cast<Buffer*>(buffer);
+	}
+
+	const Buffer* ToNativeBuffer(const IBuffer* buffer)
+	{
+#ifndef NDEBUG
+		if (buffer && typeid(*buffer) != typeid(Buffer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer");
+		}
+#endif
+
+		return static_cast<const Buffer*>(buffer);
+	}
+
+	constexpr D3D12_RESOURCE_DESC1 MakeResourceDesc(const BufferParams& params) noexcept
 	{
 		return D3D12_RESOURCE_DESC1
 		{
@@ -65,17 +134,23 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.Format = DXGI_FORMAT_UNKNOWN,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = ToResourceFlags(params.usage),
+			.Flags = GetResourceFlags(params.usage),
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
 	}
 
-	constexpr D3D12_RESOURCE_FLAGS ToResourceFlags(const BufferUsage usage) noexcept
+	constexpr D3D12_RESOURCE_FLAGS GetResourceFlags(const BufferUsage usage) noexcept
 	{
-		return Any(BufferUsage::UnorderedAccess, usage) ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE;
+		auto flags = D3D12_RESOURCE_FLAG_NONE;
+		if (Any(BufferUsage::UnorderedAccess, usage))
+		{
+			flags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
+
+		return flags;
 	}
 
-	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC ToCBVDesc(const D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept
+	constexpr D3D12_CONSTANT_BUFFER_VIEW_DESC MakeCBVDesc(const D3D12_GPU_VIRTUAL_ADDRESS address, const CBVParams& params) noexcept
 	{
 		return D3D12_CONSTANT_BUFFER_VIEW_DESC
 		{
@@ -84,7 +159,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC ToSRVDesc(const BufferSRVParams& params) noexcept
+	constexpr D3D12_SHADER_RESOURCE_VIEW_DESC MakeSRVDesc(const BufferSRVParams& params) noexcept
 	{
 		return D3D12_SHADER_RESOURCE_VIEW_DESC
 		{
@@ -101,7 +176,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC ToUAVDesc(const BufferUAVParams& params) noexcept
+	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC MakeUAVDesc(const BufferUAVParams& params) noexcept
 	{
 		return D3D12_UNORDERED_ACCESS_VIEW_DESC
 		{

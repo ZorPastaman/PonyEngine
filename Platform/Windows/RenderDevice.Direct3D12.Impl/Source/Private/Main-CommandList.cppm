@@ -37,11 +37,18 @@ import :TextureUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Command list wrapper.
 	class CommandList final
 	{
 	public:
+		/// @brief Creates a command list wrapper.
+		/// @param allocator Command allocator.
+		/// @param commandList Command list.
 		[[nodiscard("Pure constructor")]]
 		CommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		/// @brief Creates a command list wrapper.
+		/// @param allocator Command allocator.
+		/// @param commandList Command list.
 		[[nodiscard("Pure constructor")]]
 		CommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		CommandList(const CommandList&) = delete;
@@ -49,137 +56,415 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~CommandList() noexcept = default;
 
+		/// @brief Gets the command list.
+		/// @return Command list.
 		[[nodiscard("Pure function")]]
 		ID3D12GraphicsCommandList10& GetCommandList() const noexcept;
 
+		/// @brief Resets the command allocator and command list.
 		void Reset();
+		/// @brief Closes the command list.
 		void Close();
+		/// @brief Checks if the command list is open.
+		/// @return @a True if it's open; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsOpen() const noexcept;
 
+		/// @brief Adds barriers to the command list.
+		/// @param bufferBarriers Buffer barriers.
+		/// @param textureBarriers Texture barriers.
 		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers);
 
+		/// @brief Sets the raster regions.
+		/// @param regions Raster regions.
 		void SetRasterRegions(std::span<const RasterRegion> regions);
-		void SetDepthBias(const DepthBias& bias) noexcept;
-		void SetDepthBounds(const DepthRange& range) noexcept;
-		void SetStencilReference(const StencilReference& reference) noexcept;
-		void SetBlendFactor(const Math::ColorRGBA<float>& factor) noexcept;
+		/// @brief Sets the depth bias.
+		/// @param bias Depth bias.
+		void SetDepthBias(const DepthBias& bias);
+		/// @brief Sets the depth range.
+		/// @param range Depth range.
+		void SetDepthBounds(const DepthRange& range);
+		/// @brief Sets the stencil reference.
+		/// @param reference Stencil reference.
+		void SetStencilReference(const StencilReference& reference);
+		/// @brief Sets the blend factor.
+		/// @param factor Blend factor.
+		void SetBlendFactor(const Math::ColorRGBA<float>& factor);
 
+		/// @brief Sets the render targets and depth stencil.
+		/// @param renderTargetBindings Render targets.
+		/// @param depthStencilBinding Depth stencil.
 		void SetTargets(std::span<const RenderTargetBinding> renderTargetBindings, const DepthStencilBinding* depthStencilBinding);
+		/// @brief Sets the render targets and depth stencil
+		/// @param renderTargetBinding Render targets.
+		/// @param renderTargetCount Render target count.
+		/// @param depthStencilBinding Depth stencil.
 		void SetTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount, const DepthStencilBinding* depthStencilBinding);
+		/// @brief Sets the shader data and sampler containers.
+		/// @param shaderDataContainer Shader data container.
+		/// @param samplerContainer Sampler container.
+		/// @note The call is not validated.
 		void SetContainers(const ShaderDataContainer* shaderDataContainer, const SamplerContainer* samplerContainer);
+		/// @brief Sets the graphics root signature.
+		/// @param rootSig Root signature.
+		/// @note The call is not validated.
 		void SetGraphicsRootSignature(ID3D12RootSignature* rootSig);
+		/// @brief Sets the compute root signature.
+		/// @param rootSig Root signature.
+		/// @note The call is not validated.
 		void SetComputeRootSignature(ID3D12RootSignature* rootSig);
+		/// @brief Sets the pipeline state object.
+		/// @param pso Pipeline state object.
+		/// @note The call is not validated.
 		void SetPipelineState(ID3D12PipelineState& pso);
+		/// @brief Binds the graphics descriptor table.
+		/// @param tableIndex Bound graphics root signature table index.
+		/// @param handle Descriptor handle to bind.
+		/// @note The call is not validated.
 		void SetGraphicsDescriptorTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		/// @brief Binds the compute descriptor table.
+		/// @param tableIndex Bound compute root signature table index.
+		/// @param handle Descriptor handle to bind.
+		/// @note The call is not validated.
 		void SetComputeDescriptorTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
-		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
-		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept;
+		/// @brief Dispatches a graphics command.
+		/// @param threadGroupCounts X, Y and Z thread group counts.
+		/// @note The call is not validated.
+		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts);
+		/// @brief Dispatches a compute command.
+		/// @param threadGroupCounts X, Y and Z thread group counts.
+		/// @note The call is not validated.
+		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts);
 
+		/// @brief Clears the render target view.
+		/// @param container RTV container.
+		/// @param viewIndex RTV index.
+		/// @param color Clear color.
+		/// @param rects Clear rectangles.
 		void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, std::span<const Math::CornerRect<std::uint32_t>> rects);
+		/// @brief Clears the depth stencil view.
+		/// @param container DSV container.
+		/// @param viewIndex DSV index.
+		/// @param depth Clear depth. Nullopt means no depth clearing.
+		/// @param stencil Clear stencil. Nullopt means no stencil clearing.
+		/// @param rects Clear rectangles.
 		void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
 			std::span<const Math::CornerRect<std::uint32_t>> rects);
+		/// @brief Clears the unordered access view.
+		/// @param buffer Target buffer.
+		/// @param gpuContainer GPU shader data container. Must be bound.
+		/// @param gpuViewIndex GPU shader data container index.
+		/// @param cpuContainer CPU shader data container.
+		/// @param cpuViewIndex CPU shader data container index.
+		/// @param values Clear values.
 		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
 			const Math::Vector4<std::uint32_t>& values);
+		/// @brief Clears the unordered access view.
+		/// @param texture Target texture.
+		/// @param gpuContainer GPU shader data container. Must be bound.
+		/// @param gpuViewIndex GPU shader data container index.
+		/// @param cpuContainer CPU shader data container.
+		/// @param cpuViewIndex CPU shader data container index.
+		/// @param values Clear values.
+		/// @param rects Clear rectangles.
 		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
 			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects);
+		/// @brief Clears the unordered access view.
+		/// @param buffer Target buffer.
+		/// @param gpuContainer GPU shader data container. Must be bound.
+		/// @param gpuViewIndex GPU shader data container index.
+		/// @param cpuContainer CPU shader data container.
+		/// @param cpuViewIndex CPU shader data container index.
+		/// @param values Clear values.
 		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
 			const Math::Vector4<float>& values);
+		/// @brief Clears the unordered access view.
+		/// @param texture Target texture.
+		/// @param gpuContainer GPU shader data container. Must be bound.
+		/// @param gpuViewIndex GPU shader data container index.
+		/// @param cpuContainer CPU shader data container.
+		/// @param cpuViewIndex CPU shader data container index.
+		/// @param values Clear values.
+		/// @param rects Clear rectangles.
 		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
 			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects);
 
+		/// @brief Copies from the buffer to the buffer.
+		/// @param source Source buffer.
+		/// @param destination Destination buffer.
 		void Copy(const IBuffer& source, IBuffer& destination);
-		void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
+		/// @brief Copes from the buffer range to the buffer range.
+		/// @param source Source buffer.
+		/// @param destination Destination buffer.
+		/// @param ranges Copy ranges.
+		void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges);
+		/// @brief Copies from the texture to the texture.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
 		void Copy(const ITexture& source, ITexture& destination);
+		/// @brief Copies from the texture range to the texture range.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Copy range.
 		void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range);
+		/// @brief Copies from the texture range to the texture range with the box limits.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Copy range with the box limits.
 		void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range);
+		/// @brief Copies from the buffer to the texture.
+		/// @param source Source buffer.
+		/// @param destination Destination texture.
+		/// @param footprints Copyable footprints.
 		void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints);
+		/// @brief Copies from the buffer range to the texture range.
+		/// @param source Source buffer.
+		/// @param destination Destination texture.
+		/// @param footprints Copyable footprints.
+		/// @param range Copy range.
 		void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range);
+		/// @brief Copies from the buffer range to the texture range with the box limits.
+		/// @param source Source buffer.
+		/// @param destination Destination texture.
+		/// @param footprints Copyable footprints.
+		/// @param range Copy range with the box limits.
 		void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range);
+		/// @brief Copies from the texture to the buffer.
+		/// @param source Source texture.
+		/// @param destination Destination buffer.
+		/// @param footprints Copyable footprints.
 		void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints);
+		/// @brief Copies from the texture range to the buffer range.
+		/// @param source Source texture.
+		/// @param destination Destination buffer.
+		/// @param footprints Copyable footprints.
+		/// @param range Copy range.
 		void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range);
+		/// @brief Copies from the texture range to the buffer range with the box limits.
+		/// @param source Source texture.
+		/// @param destination Destination buffer.
+		/// @param footprints Copyable footprints.
+		/// @param range Copy range with the box limits.
 		void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range);
 
+		/// @brief Resolves the texture to the texture.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param mode Resolve mode.
 		void Resolve(const ITexture& source, ITexture& destination, ResolveMode mode);
-		void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode = ResolveMode::Average);
-		void Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, ResolveMode mode = ResolveMode::Average);
+		/// @brief Resolves the texture range to the texture range.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Resolve range.
+		/// @param mode Resolve mode.
+		void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode);
+		/// @brief Resolves the texture range to the texture range with the rectangle limits.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Resolve range with the rectangle limits.
+		/// @param mode Resolve mode.
+		void Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, ResolveMode mode);
 
-		void ExecuteBundle(ID3D12GraphicsCommandList10& bundle) noexcept;
+		/// @brief Executes the bundle.
+		/// @param bundle Bundle to execute.
+		void ExecuteBundle(ID3D12GraphicsCommandList10& bundle);
 
+		/// @brief Validates if the command list is in a correct state for new commands.
 		void ValidateState() const;
+		/// @brief Validates the containers if they're valid for setting.
+		/// @param shaderDataContainer Shader data container. May be nullptr.
+		/// @param samplerContainer Sampler container. May be nullptr.
 		void ValidateContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer) const;
+		/// @brief Validates the graphics pipeline state if it's valid to set.
+		/// @param pipelineState Graphics pipeline state.
 		void ValidatePipelineState(const IGraphicsPipelineState& pipelineState) const;
+		/// @brief Validates the compute pipeline state if it's valid to set.
+		/// @param pipelineState Compute pipeline state.
 		void ValidatePipelineState(const IComputePipelineState& pipelineState) const;
 
+		/// @brief Gets the name.
+		/// @return Name.
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void Name(std::string_view name);
 
 		CommandList& operator =(const CommandList&) = delete;
 		CommandList& operator =(CommandList&&) = delete;
 
 	private:
+		/// @brief Casts the engine buffer barrier to native buffer barriers.
+		/// @param bufferBarriers Engine buffer barriers.
+		/// @param nativeBufferBarriers Native buffer barriers.
 		static void ToNativeBarriers(std::span<const BufferBarrier> bufferBarriers, std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriers) noexcept;
+		/// @brief Casts the engine texture barriers to native texture barriers.
+		/// @param textureBarriers Engine texture barriers.
+		/// @param nativeTextureBarriers Native texture barriers.
 		static void ToNativeBarriers(std::span<const TextureBarrier> textureBarriers, std::span<D3D12_TEXTURE_BARRIER> nativeTextureBarriers) noexcept;
 
-		static void ToViewports(std::span<const RasterRegion> regions, std::span<D3D12_VIEWPORT> viewports) noexcept;
-		static void ToScissors(std::span<const RasterRegion> regions, std::span<D3D12_RECT> rects) noexcept;
-
+		/// @brief Makes a copy location.
+		/// @param buffer Target buffer.
+		/// @param footprint Copyable footprint.
+		/// @param format Texture format.
+		/// @return Copy location.
 		[[nodiscard("Pure function")]]
-		static D3D12_TEXTURE_COPY_LOCATION ToCopyLocation(const Buffer& buffer, const CopyableFootprint& footprint, DXGI_FORMAT format) noexcept;
+		static D3D12_TEXTURE_COPY_LOCATION MakeCopyLocation(const Buffer& buffer, const CopyableFootprint& footprint, DXGI_FORMAT format) noexcept;
+		/// @brief Makes a copy location.
+		/// @param texture Target texture.
+		/// @param mipIndex Mip index.
+		/// @param arrayIndex Array element index.
+		/// @param aspect Aspect.
+		/// @return Copy location.
 		[[nodiscard("Pure function")]]
-		static D3D12_TEXTURE_COPY_LOCATION ToCopyLocation(const Texture& texture, UINT16 mipIndex, UINT16 arrayIndex, Aspect aspect) noexcept;
+		static D3D12_TEXTURE_COPY_LOCATION MakeCopyLocation(const Texture& texture, UINT16 mipIndex, UINT16 arrayIndex, Aspect aspect) noexcept;
+		/// @brief Makes a copy location.
+		/// @param texture Target texture.
+		/// @param subresourceIndex Subresource index.
+		/// @return Copy location.
 		[[nodiscard("Pure function")]]
-		static D3D12_TEXTURE_COPY_LOCATION ToCopyLocation(const Texture& texture, UINT subresourceIndex) noexcept;
+		static D3D12_TEXTURE_COPY_LOCATION MakeCopyLocation(const Texture& texture, UINT subresourceIndex) noexcept;
+		/// @brief Casts the engine corner rectangle to a native rectangle.
+		/// @param rect Engine corner rectangle.
+		/// @return Native rectangle.
 		[[nodiscard("Pure function")]]
 		static D3D12_RECT ToRect(const Math::CornerRect<std::uint32_t>& rect) noexcept;
+		/// @brief Casts the engine rectangle parameters to a native rectangle.
+		/// @param offset Engine rectangle offset.
+		/// @param size Engine rectangle size.
+		/// @return Native rectangle.
 		[[nodiscard("Pure function")]]
 		static D3D12_RECT ToRect(const Math::Vector2<std::uint32_t>& offset, const Math::Vector2<std::uint32_t>& size) noexcept;
+		/// @brief Casts the engine box parameters to a native box.
+		/// @param offset Engine box offset.
+		/// @param size Engine box size.
+		/// @return Native box.
 		[[nodiscard("Pure function")]]
 		static D3D12_BOX ToBox(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
 
+		/// @brief Validates the buffer barriers.
+		/// @param bufferBarriers Buffer barriers to validate.
 		static void ValidateBarriers(std::span<const BufferBarrier> bufferBarriers);
+		/// @brief Validates the texture barriers.
+		/// @param textureBarriers Texture barriers to validate.
 		static void ValidateBarriers(std::span<const TextureBarrier> textureBarriers);
 
-		static void ValidateRasterRegion(std::span<const RasterRegion> regions);
-
+		/// @brief Validates the render target bindings.
+		/// @param renderTargetBindings Render target bindings to validate.
 		static void ValidateRenderTargets(std::span<const RenderTargetBinding> renderTargetBindings);
+		/// @brief Validates the render target bindings.
+		/// @param renderTargetBinding Render target bindings to validate.
+		/// @param renderTargetCount Binding count.
 		static void ValidateRenderTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount);
+		/// @brief Validates the depth stencil binding.
+		/// @param binding Depth stencil binding to validate.
 		static void ValidateDepthTarget(const DepthStencilBinding* binding);
 
+		/// @brief Validates the render target container.
+		/// @param container Render target container.
+		/// @param viewIndex View index.
 		void ValidateRenderTarget(const IRenderTargetContainer& container, std::uint32_t viewIndex);
+		/// @brief Validates the depth stencil container.
+		/// @param container Depth stencil container.
+		/// @param viewIndex View index.
 		void ValidateDepthStencil(const IDepthStencilContainer& container, std::uint32_t viewIndex);
+		/// @brief Validates the unordered access view.
+		/// @tparam UAVMeta Unordered access view meta type.
+		/// @tparam NativeResource Native resource type.
+		/// @tparam Resource Engine resource type.
+		/// @param resource Engine resource.
+		/// @param gpuContainer GPU shader data container.
+		/// @param gpuViewIndex GPU UAV index.
+		/// @param cpuContainer CPU shader data container.
+		/// @param cpuViewIndex CPU UAV index.
 		template<typename UAVMeta, typename NativeResource, typename Resource>
 		void ValidateUnorderedAccess(const Resource& resource, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, 
 			const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex);
 
+		/// @brief Validates the buffers for copying.
+		/// @param source Source buffer.
+		/// @param destination Destination buffer.
 		static void ValidateCopy(const IBuffer& source, const IBuffer& destination);
-		static void ValidateCopy(const IBuffer& source, const IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size);
+		/// @brief Validates the buffers for copying.
+		/// @param source Source buffer.
+		/// @param destination Destination buffer.
+		/// @param ranges Copy ranges
+		static void ValidateCopy(const IBuffer& source, const IBuffer& destination, std::span<const CopyBufferRange> ranges);
+		/// @brief Validates the buffers for copying.
+		/// @param source Source buffer.
+		/// @param destination Destination buffer.
 		static void ValidateCopyBase(const IBuffer& source, const IBuffer& destination);
+		/// @brief Validates the textures for copying.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
 		static void ValidateCopy(const ITexture& source, const ITexture& destination);
+		/// @brief Validates the textures for copying.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Copy range.
 		static void ValidateCopy(const ITexture& source, const ITexture& destination, const CopySubTextureRange& range);
+		/// @brief Validates the textures for copying.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Copy range.
 		static void ValidateCopy(const ITexture& source, const ITexture& destination, const BoxCopySubTextureRange& range);
+		/// @brief Validates the textures for copying.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
 		static void ValidateCopyBase(const ITexture& source, const ITexture& destination);
+		/// @brief Validates the buffer and texture for copying.
+		/// @param buffer Source buffer.
+		/// @param texture Destination texture.
+		/// @param footprints Copyable footprints.
 		static void ValidateCopy(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints);
+		/// @brief Validates the buffer and texture for copying.
+		/// @param buffer Source buffer.
+		/// @param texture Destination texture.
+		/// @param footprints Copyable footprints.
+		/// @param range Copy range.
 		static void ValidateCopy(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range);
+		/// @brief Validates the buffer and texture for copying.
+		/// @param buffer Source buffer.
+		/// @param texture Destination texture.
+		/// @param footprints Copyable footprints.
+		/// @param range Copy range.
+		/// @param textureSource Is the texture a source?
 		static void ValidateCopy(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range, 
 			bool textureSource);
+		/// @brief Validates the buffer and texture for copying.
+		/// @param buffer Source buffer.
+		/// @param texture Destination texture.
+		/// @param footprints Copyable footprints.
 		static void ValidateCopyBase(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints);
 
+		/// @brief Validates the textures for resolving.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
 		static void ValidateResolve(const ITexture& source, const ITexture& destination);
+		/// @brief Validates the textures for resolving.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Copy range.
 		static void ValidateResolve(const ITexture& source, const ITexture& destination, const CopySubTextureRange& range);
+		/// @brief Validates the textures for resolving.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param range Copy range.
 		static void ValidateResolve(const ITexture& source, const ITexture& destination, const RectCopySubTextureRange& range);
+		/// @brief Validates the textures for resolving.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
 		static void ValidateResolveBase(const ITexture& source, const ITexture& destination);
 
-		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator;
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList;
+		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator; ///< Command allocator.
+		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList; ///< Command list.
 
-		Memory::Arena arena;
+		Memory::Arena arena; ///< Arena memory.
 
-		bool isOpen;
+		bool isOpen; ///< Is the command list open?
 
-		std::string name;
+		std::string name; ///< Name.
 	};
 }
 
@@ -188,7 +473,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	CommandList::CommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		allocator(&allocator),
 		commandList(&commandList),
-		arena(0uz, 2048uz),
+		arena(0uz, 1024uz),
 		isOpen{true}
 	{
 		Reset();
@@ -198,7 +483,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		allocator(std::move(allocator)),
 		commandList(std::move(commandList)),
-		arena(0uz, 2048uz),
+		arena(0uz, 1024uz),
 		isOpen{true}
 	{
 		assert(this->allocator && "The allocator is nullptr.");
@@ -285,40 +570,62 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void CommandList::SetRasterRegions(const std::span<const RasterRegion> regions)
 	{
 		ValidateState();
-		ValidateRasterRegion(regions);
 
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_VIEWPORT> viewports = arena.Allocate<D3D12_VIEWPORT>(regions.size());
-		const std::span<D3D12_VIEWPORT> viewportsSpan = arena.Span(viewports);
-		ToViewports(regions, viewportsSpan);
-		commandList->RSSetViewports(static_cast<UINT>(viewportsSpan.size()), viewportsSpan.data());
+#ifndef NDEBUG
+		if (regions.size() > D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE) [[unlikely]]
+		{
+			throw std::invalid_argument("Region count is too great");
+		}
+#endif
 
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_RECT> scissors = arena.Allocate<D3D12_RECT>(regions.size());
-		const std::span<D3D12_RECT> scissorsSpan = arena.Span(scissors);
-		ToScissors(regions, scissorsSpan);
-		commandList->RSSetScissorRects(static_cast<UINT>(scissorsSpan.size()), scissorsSpan.data());
+		const std::size_t regionCount = std::min(std::size_t{D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE}, regions.size());
+
+		std::array<D3D12_VIEWPORT, D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE> viewports;
+		std::array<D3D12_RECT, D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE> scissors;
+		for (std::size_t i = 0uz; i < regionCount; ++i)
+		{
+			const RasterRegion& region = regions[i];
+			viewports[i] = D3D12_VIEWPORT
+			{
+				.TopLeftX = region.viewport.Position().X(),
+				.TopLeftY = region.viewport.Position().Y(),
+				.Width = region.viewport.Size().X(),
+				.Height = region.viewport.Size().Y(),
+				.MinDepth = region.depthRange.min,
+				.MaxDepth = region.depthRange.max
+			};
+			scissors[i] = D3D12_RECT
+			{
+				.left = static_cast<LONG>(region.scissors.Position().X()),
+				.top = static_cast<LONG>(region.scissors.Position().Y()),
+				.right = static_cast<LONG>(region.scissors.Position().X() + region.scissors.Size().X()),
+				.bottom = static_cast<LONG>(region.scissors.Position().Y() + region.scissors.Size().Y())
+			};
+		}
+
+		commandList->RSSetViewports(static_cast<UINT>(regionCount), viewports.data());
+		commandList->RSSetScissorRects(static_cast<UINT>(regionCount), scissors.data());
 	}
 
-	void CommandList::SetDepthBias(const DepthBias& bias) noexcept
+	void CommandList::SetDepthBias(const DepthBias& bias)
 	{
 		ValidateState();
 		commandList->RSSetDepthBias(bias.depthBias, bias.depthBiasClamp, bias.slopeScaledDepthBias);
 	}
 
-	void CommandList::SetDepthBounds(const DepthRange& range) noexcept
+	void CommandList::SetDepthBounds(const DepthRange& range)
 	{
 		ValidateState();
 		commandList->OMSetDepthBounds(range.min, range.max);
 	}
 
-	void CommandList::SetStencilReference(const StencilReference& reference) noexcept
+	void CommandList::SetStencilReference(const StencilReference& reference)
 	{
 		ValidateState();
 		commandList->OMSetFrontAndBackStencilRef(reference.front, reference.back);
 	}
 
-	void CommandList::SetBlendFactor(const Math::ColorRGBA<float>& factor) noexcept
+	void CommandList::SetBlendFactor(const Math::ColorRGBA<float>& factor)
 	{
 		ValidateState();
 		const FLOAT blendFactor[4] = { factor.R(), factor.G(), factor.B(), factor.A() };
@@ -402,12 +709,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->SetComputeRootDescriptorTable(tableIndex, handle);
 	}
 
-	void CommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
+	void CommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
 		commandList->DispatchMesh(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
-	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts) noexcept
+	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
 		commandList->Dispatch(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
@@ -519,12 +826,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->CopyResource(&static_cast<Buffer&>(destination).Resource(), &static_cast<const Buffer&>(source).Resource());
 	}
 
-	void CommandList::Copy(const IBuffer& source, IBuffer& destination, const std::uint64_t sourceOffset, const std::uint64_t destinationOffset, const std::uint64_t size)
+	void CommandList::Copy(const IBuffer& source, IBuffer& destination, const std::span<const CopyBufferRange> ranges)
 	{
 		ValidateState();
-		ValidateCopy(source, destination, sourceOffset, destinationOffset, size);
+		ValidateCopy(source, destination, ranges);
 
-		commandList->CopyBufferRegion(&static_cast<Buffer&>(destination).Resource(), destinationOffset, &static_cast<const Buffer&>(source).Resource(), sourceOffset, size);
+		for (const CopyBufferRange& range : ranges)
+		{
+			commandList->CopyBufferRegion(&static_cast<Buffer&>(destination).Resource(), range.destinationOffset, 
+				&static_cast<const Buffer&>(source).Resource(), range.sourceOffset, range.size);
+		}
 	}
 
 	void CommandList::Copy(const ITexture& source, ITexture& destination)
@@ -554,9 +865,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
 				{
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = ToCopyLocation(sourceTexture, static_cast<UINT16>(range.sourceMipIndex + mipIndex),
+					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, static_cast<UINT16>(range.sourceMipIndex + mipIndex),
 						static_cast<UINT16>(range.sourceArrayIndex + arrayIndex), aspect);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = ToCopyLocation(destinationTexture, static_cast<UINT16>(range.destinationMipIndex + mipIndex),
+					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, static_cast<UINT16>(range.destinationMipIndex + mipIndex),
 						static_cast<UINT16>(range.destinationArrayIndex + arrayIndex), aspect);
 					commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 				}
@@ -583,9 +894,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
 				{
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = ToCopyLocation(sourceTexture, static_cast<UINT16>(range.sourceMipIndex + mipIndex),
+					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, static_cast<UINT16>(range.sourceMipIndex + mipIndex),
 						static_cast<UINT16>(range.sourceArrayIndex + arrayIndex), aspect);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = ToCopyLocation(destinationTexture, static_cast<UINT16>(range.destinationMipIndex + mipIndex),
+					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, static_cast<UINT16>(range.destinationMipIndex + mipIndex),
 						static_cast<UINT16>(range.destinationArrayIndex + arrayIndex), aspect);
 					const Math::Vector3<std::uint32_t> destinationOffset = range.destinationOffsets[mipIndex];
 					const D3D12_BOX sourceBox = ToBox(range.sourceOffsets[mipIndex], range.sourceSizes[mipIndex]);
@@ -605,8 +916,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		for (std::size_t i = 0uz; i < footprints.size(); ++i)
 		{
-			const D3D12_TEXTURE_COPY_LOCATION sourceLocation = ToCopyLocation(sourceBuffer, footprints[i], destinationTexture.NativeFormat());
-			const D3D12_TEXTURE_COPY_LOCATION destinationLocation = ToCopyLocation(destinationTexture, static_cast<UINT>(i));
+			const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprints[i], destinationTexture.NativeFormat());
+			const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, static_cast<UINT>(i));
 			commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 		}
 	}
@@ -626,8 +937,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
 				{
 					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, destinationTexture.MipCount(), destinationTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = ToCopyLocation(sourceBuffer, footprints[subresource], destinationTexture.NativeFormat());
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = ToCopyLocation(destinationTexture, subresource);
+					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprints[subresource], destinationTexture.NativeFormat());
+					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, subresource);
 					commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 				}
 			}
@@ -649,8 +960,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
 				{
 					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, destinationTexture.MipCount(), destinationTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = ToCopyLocation(sourceBuffer, footprints[subresource], destinationTexture.NativeFormat());
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = ToCopyLocation(destinationTexture, subresource);
+					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprints[subresource], destinationTexture.NativeFormat());
+					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, subresource);
 					const Math::Vector3<std::uint32_t> destinationOffset = range.destinationOffsets[mipIndex];
 					const D3D12_BOX sourceBox = ToBox(range.sourceOffsets[mipIndex], range.sourceSizes[mipIndex]);
 					commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
@@ -669,8 +980,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		for (std::size_t i = 0uz; i < footprints.size(); ++i)
 		{
-			const auto sourceLocation = ToCopyLocation(sourceTexture, static_cast<UINT>(i));
-			const auto destinationLocation = ToCopyLocation(destinationBuffer, footprints[i], sourceTexture.NativeFormat());
+			const auto sourceLocation = MakeCopyLocation(sourceTexture, static_cast<UINT>(i));
+			const auto destinationLocation = MakeCopyLocation(destinationBuffer, footprints[i], sourceTexture.NativeFormat());
 			commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 		}
 	}
@@ -690,8 +1001,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
 				{
 					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = ToCopyLocation(sourceTexture, subresource);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = ToCopyLocation(destinationBuffer, footprints[subresource], sourceTexture.NativeFormat());
+					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, subresource);
+					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationBuffer, footprints[subresource], sourceTexture.NativeFormat());
 					commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 				}
 			}
@@ -713,8 +1024,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
 				{
 					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = ToCopyLocation(sourceTexture, subresource);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = ToCopyLocation(destinationBuffer, footprints[subresource], sourceTexture.NativeFormat());
+					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, subresource);
+					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationBuffer, footprints[subresource], sourceTexture.NativeFormat());
 					const Math::Vector3<std::uint32_t> destinationOffset = range.destinationOffsets[mipIndex];
 					const D3D12_BOX sourceBox = ToBox(range.sourceOffsets[mipIndex], range.sourceSizes[mipIndex]);
 					commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
@@ -801,7 +1112,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	void CommandList::ExecuteBundle(ID3D12GraphicsCommandList10& bundle) noexcept
+	void CommandList::ExecuteBundle(ID3D12GraphicsCommandList10& bundle)
 	{
 		ValidateState();
 		commandList->ExecuteBundle(&bundle);
@@ -906,6 +1217,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::ToNativeBarriers(const std::span<const BufferBarrier> bufferBarriers, const std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriers) noexcept
 	{
+		assert(bufferBarriers.size() == nativeBufferBarriers.size() && "Invalid buffer barrier count.");
+
 		for (std::size_t i = 0uz; i < bufferBarriers.size(); ++i)
 		{
 			const BufferBarrier& barrier = bufferBarriers[i];
@@ -924,6 +1237,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CommandList::ToNativeBarriers(const std::span<const TextureBarrier> textureBarriers, const std::span<D3D12_TEXTURE_BARRIER> nativeTextureBarriers) noexcept
 	{
+		assert(textureBarriers.size() == nativeTextureBarriers.size() && "Invalid texture barrier count.");
+
 		for (std::size_t i = 0uz; i < textureBarriers.size(); ++i)
 		{
 			const TextureBarrier& barrier = textureBarriers[i];
@@ -938,46 +1253,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				.LayoutAfter = ToLayout(barrier.afterLayout),
 				.pResource = &texture->Resource(),
 				.Subresources = barrier.range 
-					? ToSubresourceRange(barrier.range->mipRange, barrier.range->arrayRange, barrier.range->aspects, texture->MipCount(), texture->ArraySize())
+					? CalculateSubresourceRange(barrier.range->mipRange, barrier.range->arrayRange, barrier.range->aspects, texture->MipCount(), texture->ArraySize())
 					: static_cast<D3D12_BARRIER_SUBRESOURCE_RANGE>(D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES),
 				.Flags = barrier.discard ? D3D12_TEXTURE_BARRIER_FLAG_DISCARD : D3D12_TEXTURE_BARRIER_FLAG_NONE
 			};
 		}
 	}
 
-	void CommandList::ToViewports(const std::span<const RasterRegion> regions, const std::span<D3D12_VIEWPORT> viewports) noexcept
-	{
-		for (std::size_t i = 0uz; i < regions.size(); ++i)
-		{
-			const RasterRegion& region = regions[i];
-			viewports[i] = D3D12_VIEWPORT
-			{
-				.TopLeftX = region.viewport.Position().X(),
-				.TopLeftY = region.viewport.Position().Y(),
-				.Width = region.viewport.Size().X(),
-				.Height = region.viewport.Size().Y(),
-				.MinDepth = region.depthRange.min,
-				.MaxDepth = region.depthRange.max
-			};
-		}
-	}
-
-	void CommandList::ToScissors(const std::span<const RasterRegion> regions, const std::span<D3D12_RECT> rects) noexcept
-	{
-		for (std::size_t i = 0uz; i < regions.size(); ++i)
-		{
-			const RasterRegion& region = regions[i];
-			rects[i] = D3D12_RECT
-			{
-				.left = static_cast<LONG>(region.scissors.Position().X()),
-				.top = static_cast<LONG>(region.scissors.Position().Y()),
-				.right = static_cast<LONG>(region.scissors.Position().X() + region.scissors.Size().X()),
-				.bottom = static_cast<LONG>(region.scissors.Position().Y() + region.scissors.Size().Y())
-			};
-		}
-	}
-
-	D3D12_TEXTURE_COPY_LOCATION CommandList::ToCopyLocation(const Buffer& buffer, const CopyableFootprint& footprint, const DXGI_FORMAT format) noexcept
+	D3D12_TEXTURE_COPY_LOCATION CommandList::MakeCopyLocation(const Buffer& buffer, const CopyableFootprint& footprint, const DXGI_FORMAT format) noexcept
 	{
 		return D3D12_TEXTURE_COPY_LOCATION
 		{
@@ -998,7 +1281,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	D3D12_TEXTURE_COPY_LOCATION CommandList::ToCopyLocation(const Texture& texture, const UINT16 mipIndex, const UINT16 arrayIndex, const Aspect aspect) noexcept
+	D3D12_TEXTURE_COPY_LOCATION CommandList::MakeCopyLocation(const Texture& texture, const UINT16 mipIndex, const UINT16 arrayIndex, const Aspect aspect) noexcept
 	{
 		return D3D12_TEXTURE_COPY_LOCATION
 		{
@@ -1008,7 +1291,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	D3D12_TEXTURE_COPY_LOCATION CommandList::ToCopyLocation(const Texture& texture, const UINT subresourceIndex) noexcept
+	D3D12_TEXTURE_COPY_LOCATION CommandList::MakeCopyLocation(const Texture& texture, const UINT subresourceIndex) noexcept
 	{
 		return D3D12_TEXTURE_COPY_LOCATION
 		{
@@ -1020,13 +1303,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	D3D12_RECT CommandList::ToRect(const Math::CornerRect<std::uint32_t>& rect) noexcept
 	{
-		return D3D12_RECT
-		{
-			.left = static_cast<LONG>(rect.Position().X()),
-			.top = static_cast<LONG>(rect.Position().Y()),
-			.right = static_cast<LONG>(rect.Position().X() + rect.Size().X()),
-			.bottom = static_cast<LONG>(rect.Position().Y() + rect.Size().Y()),
-		};
+		return ToRect(rect.Position(), rect.Size());
 	}
 
 	D3D12_RECT CommandList::ToRect(const Math::Vector2<std::uint32_t>& offset, const Math::Vector2<std::uint32_t>& size) noexcept
@@ -1109,16 +1386,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void CommandList::ValidateRasterRegion(const std::span<const RasterRegion> regions)
-	{
-#ifndef NDEBUG
-		if (regions.size() > D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE) [[unlikely]]
-		{
-			throw std::invalid_argument("Region count is too great");
-		}
-#endif
-	}
-
 	void CommandList::ValidateRenderTargets(const std::span<const RenderTargetBinding> renderTargetBindings)
 	{
 #ifndef NDEBUG
@@ -1139,7 +1406,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			{
 				throw std::invalid_argument("Index is too great");
 			}
-			if (std::holds_alternative<EmptyRenderTargetMeta>(container->Meta(binding.index))) [[unlikely]]
+			if (!std::holds_alternative<TextureRTVMeta>(container->Meta(binding.index))) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid render target view");
 			}
@@ -1177,7 +1444,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		for (std::uint8_t i = 0u; i < renderTargetCount; ++i)
 		{
-			if (std::holds_alternative<EmptyRenderTargetMeta>(container->Meta(renderTargetBinding->index + i))) [[unlikely]]
+			if (!std::holds_alternative<TextureRTVMeta>(container->Meta(renderTargetBinding->index + i))) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid render target view");
 			}
@@ -1203,7 +1470,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			throw std::invalid_argument("Index is too great");
 		}
-		if (std::holds_alternative<EmptyDSVMeta>(container->Meta(binding->index))) [[unlikely]]
+		if (!std::holds_alternative<TextureDSVMeta>(container->Meta(binding->index))) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid depth stencil view");
 		}
@@ -1221,7 +1488,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		const auto& nativeContainer = static_cast<const RenderTargetContainer&>(container);
-		if (viewIndex >= nativeContainer.Size() || std::holds_alternative<EmptyRenderTargetMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
+		if (viewIndex >= nativeContainer.Size() || !std::holds_alternative<TextureRTVMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid view index");
 		}
@@ -1239,7 +1506,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		const auto& nativeContainer = static_cast<const DepthStencilContainer&>(container);
-		if (viewIndex >= nativeContainer.Size() || std::holds_alternative<EmptyDSVMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
+		if (viewIndex >= nativeContainer.Size() || !std::holds_alternative<TextureDSVMeta>(nativeContainer.Meta(viewIndex))) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid view index");
 		}
@@ -1306,24 +1573,26 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void CommandList::ValidateCopy(const IBuffer& source, const IBuffer& destination, const std::uint64_t sourceOffset, const std::uint64_t destinationOffset, 
-		const std::uint64_t size)
+	void CommandList::ValidateCopy(const IBuffer& source, const IBuffer& destination, const std::span<const CopyBufferRange> ranges)
 	{
 		ValidateCopyBase(source, destination);
 
 #ifndef NDEBUG
-		if (std::numeric_limits<std::uint64_t>::max() - sourceOffset < size || std::numeric_limits<std::uint64_t>::max() - destinationOffset < size) [[unlikely]]
+		for (const CopyBufferRange& range : ranges)
 		{
-			throw std::invalid_argument("Invalid size");
-		}
+			if (std::numeric_limits<std::uint64_t>::max() - range.sourceOffset < range.size || std::numeric_limits<std::uint64_t>::max() - range.destinationOffset < range.size) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
 
-		if (static_cast<const Buffer&>(source).Size() < sourceOffset + size) [[unlikely]]
-		{
-			throw std::invalid_argument("Source buffer is too small");
-		}
-		if (static_cast<const Buffer&>(destination).Size() < destinationOffset + size) [[unlikely]]
-		{
-			throw std::invalid_argument("Destination buffer is too small");
+			if (static_cast<const Buffer&>(source).Size() < range.sourceOffset + range.size) [[unlikely]]
+			{
+				throw std::invalid_argument("Source buffer is too small");
+			}
+			if (static_cast<const Buffer&>(destination).Size() < range.destinationOffset + range.size) [[unlikely]]
+			{
+				throw std::invalid_argument("Destination buffer is too small");
+			}
 		}
 #endif
 	}

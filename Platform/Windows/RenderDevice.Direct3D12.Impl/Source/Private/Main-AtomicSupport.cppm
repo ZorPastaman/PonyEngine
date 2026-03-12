@@ -11,10 +11,11 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:AtomicSupport;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Atomic operation support.
 	struct AtomicSupport final
 	{
-		bool atomicInt64 = false;
-		bool groupSharedAtomicInt64 = false;
-		bool atomicInt64OnDescriptorHeap = false;
+		bool atomicInt64 = false; ///< Are atomic operations on int64 supported?
+		bool groupSharedAtomicInt64 = false; ///< Are atomic operations on group shared int64 supported?
+		bool atomicInt64OnDescriptorHeap = false; ///< Are atomic operations on int64 from descriptor heaps supported?
 	};
 }

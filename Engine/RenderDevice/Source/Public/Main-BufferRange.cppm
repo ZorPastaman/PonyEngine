@@ -7,26 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:DSVMeta;
+export module PonyEngine.RenderDevice:BufferRange;
 
 import std;
 
-import :DSVParams;
-import :ITexture;
-
 export namespace PonyEngine::RenderDevice
 {
-	/// @brief Empty depth stencil view meta. It means that no view was created.
-	struct EmptyDSVMeta final
+	/// @brief Buffer range.
+	struct BufferRange final
 	{
+		std::uint64_t offset = 0ull; ///< Buffer data offset in bytes.
+		std::uint64_t size = 0ull; ///< Buffer data size in bytes.
 	};
 
-	/// @brief Depth stencil view to a texture meta.
-	struct TextureDSVMeta final
+	/// @brief Copy buffer range.
+	struct CopyBufferRange final
 	{
-		const ITexture* texture = nullptr; ///< Target texture. May be nullptr.
-		DSVParams params; ///< Depth stencil view parameters.
+		std::uint64_t sourceOffset = 0ull; ///< Source buffer offset in bytes.
+		std::uint64_t destinationOffset = 0ull; ///< Destination buffer offset in bytes.
+		std::uint64_t size = 0ull; ///< Copy size in bytes.
 	};
-
-	using DSVMeta = std::variant<EmptyDSVMeta, TextureDSVMeta>; ///< Depth stencil view meta.
 }

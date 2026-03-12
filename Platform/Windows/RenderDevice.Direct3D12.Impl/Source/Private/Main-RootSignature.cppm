@@ -18,7 +18,6 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:RootSignature;
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 import PonyEngine.Type;
@@ -27,11 +26,18 @@ import :ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Root signature wrapper.
 	class RootSignature final : public IPipelineLayout
 	{
 	public:
+		/// @brief Creates a root signature wrapper.
+		/// @param rootSignature Root signature.
+		/// @param params Pipeline layout parameters.
 		[[nodiscard("Pure constructor")]]
 		RootSignature(ID3D12RootSignature& rootSignature, const PipelineLayoutParams& params);
+		/// @brief Creates a root signature wrapper.
+		/// @param rootSignature Root signature.
+		/// @param params Pipeline layout parameters.
 		[[nodiscard("Pure constructor")]]
 		RootSignature(Platform::Windows::ComPtr<ID3D12RootSignature>&& rootSignature, const PipelineLayoutParams& params);
 		RootSignature(const RootSignature&) = delete;
@@ -46,6 +52,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the root signature.
+		/// @return Root signature.
 		[[nodiscard("Pure function")]]
 		ID3D12RootSignature& GetRootSignature() const noexcept;
 
@@ -53,14 +61,17 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		RootSignature& operator =(RootSignature&&) = delete;
 
 	private:
+		/// @brief Creates metas.
+		/// @param descriptorSets Descriptor sets.
+		/// @return Metas.
 		static std::unique_ptr<std::byte[]> CreateMetas(std::span<const DescriptorSet> descriptorSets);
 
-		Platform::Windows::ComPtr<ID3D12RootSignature> rootSignature;
+		Platform::Windows::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
 		
-		std::size_t setCount;
-		std::unique_ptr<std::byte[]> metas;
+		std::size_t setCount; ///< Descriptor set count.
+		std::unique_ptr<std::byte[]> metas; ///< Descriptor set metas.
 
-		std::string name;
+		std::string name; ///< Name.
 	};
 }
 

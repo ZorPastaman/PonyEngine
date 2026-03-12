@@ -13,11 +13,14 @@ import std;
 
 import PonyEngine.RenderDevice;
 
+import :CommandList;
 import :ComputePipelineBinding;
 import :GraphicsPipelineBinding;
+import :RootSignature;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Graphics and compute pipeline binding helper.
 	class GraphicsComputePipelineBinding final
 	{
 	public:
@@ -28,33 +31,60 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~GraphicsComputePipelineBinding() noexcept = default;
 
+		/// @brief Checks if a graphics pipeline state is bound.
+		/// @return @a True if its bound; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasGraphicsPSO() const noexcept;
+		/// @brief Checks if a compute pipeline state is bound.
+		/// @return @a True if its bound; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasComputePSO() const noexcept;
+		/// @brief Checks if the last set pipeline state is graphics.
+		/// @return @a True if it's graphics; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsLastPSOGraphics() const noexcept;
+		/// @brief Checks if the last set pipeline state is compute.
+		/// @return @a True if it's compute; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsLastPSOCompute() const noexcept;
+		/// @brief Gets a root signature of a currently bound graphics pipeline state.
+		/// @return Root signature or nullptr if there's no graphics pso bound or it doesn't have a root signature.
 		[[nodiscard("Pure function")]]
 		const RootSignature* GraphicsRootSignature() const noexcept;
+		/// @brief Gets a root signature of a currently bound compute pipeline state.
+		/// @return Root signature or nullptr if there's no compute pso bound or it doesn't have a root signature.
 		[[nodiscard("Pure function")]]
 		const RootSignature* ComputeRootSignature() const noexcept;
+		/// @brief Resets binding.
 		void Reset() noexcept;
 
+		/// @brief Binds the root signature of the @p pipeline state and binds it to the helper.
+		/// @param pipelineState Pipeline state to bind.
+		/// @param commandList Target command list.
+		/// @remark Call the @p SetPipelineState() to set a pipeline state to the command list.
 		void BindPipelineState(const GraphicsPipelineState& pipelineState, CommandList& commandList);
+		/// @brief Binds the root signature of the @p pipeline state and binds it to the helper.
+		/// @param pipelineState Pipeline state to bind.
+		/// @param commandList Target command list.
+		/// @remark Call the @p SetPipelineState() to set a pipeline state to the command list.
 		void BindPipelineState(const ComputePipelineState& pipelineState, CommandList& commandList);
 
+		/// @brief Sets a current graphics pipeline state to the command list.
+		/// @param commandList Target command list.
+		/// @note Must have a valid graphics pso.
 		void SetGraphicsPipelineState(CommandList& commandList);
+		/// @brief Sets a current compute pipeline state to the command list.
+		/// @param commandList Target command list.
+		/// @note Must have a valid compute pso.
 		void SetComputePipelineState(CommandList& commandList);
 
 		GraphicsComputePipelineBinding& operator =(const GraphicsComputePipelineBinding&) = delete;
 		GraphicsComputePipelineBinding& operator =(GraphicsComputePipelineBinding&&) = delete;
 
 	private:
-		GraphicsPipelineBinding graphicsBinding;
-		ComputePipelineBinding computeBinding;
-		std::optional<bool> isLastBindingGraphics;
+		GraphicsPipelineBinding graphicsBinding; ///< Graphics pipeline binding helper.
+		ComputePipelineBinding computeBinding; ///< Compute pipeline binding helper.
+		std::optional<bool> isLastBindingGraphics; ///< @a True if the last bound pso is graphics; @a false if the last bound pso is compute; nullopt if no pso is bound.
 	};
 }
 
@@ -82,7 +112,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	const RootSignature* GraphicsComputePipelineBinding::GraphicsRootSignature() const noexcept
 	{
-		return graphicsBinding.BoundRootSignature();
+		return graphicsBinding.GetRootSignature();
 	}
 
 	const RootSignature* GraphicsComputePipelineBinding::ComputeRootSignature() const noexcept
@@ -119,7 +149,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsComputePipelineBinding::SetGraphicsPipelineState(CommandList& commandList)
 	{
-		if (IsLastPSOGraphics()) [[likely]]
+		if (IsLastPSOGraphics())
 		{
 			return;
 		}
@@ -130,7 +160,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsComputePipelineBinding::SetComputePipelineState(CommandList& commandList)
 	{
-		if (IsLastPSOCompute()) [[likely]]
+		if (IsLastPSOCompute())
 		{
 			return;
 		}

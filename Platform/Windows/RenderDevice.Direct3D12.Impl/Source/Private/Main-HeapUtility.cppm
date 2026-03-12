@@ -19,38 +19,88 @@ import PonyEngine.RenderDevice;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Makes heap properties.
+	/// @param heapType Heap type.
+	/// @return Heap properties.
 	[[nodiscard("Pure function")]]
-	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(HeapType heapType) noexcept;
+	constexpr D3D12_HEAP_PROPERTIES MakeHeapProperties(HeapType heapType) noexcept;
+	/// @brief Casts the engine heap type to a native heap type.
+	/// @param heapType Engine heap type.
+	/// @return Native heap type.
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_HEAP_TYPE ToHeapType(HeapType heapType) noexcept;
+
+	/// @brief Gets heap flags.
+	/// @param usage Buffer usage.
+	/// @param notZeroed Is the heap not zeroed?
+	/// @return Heap flags.
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_HEAP_FLAGS GetHeapFlags(BufferUsage usage, bool notZeroed) noexcept;
+	/// @brief Gets heap flags.
+	/// @param usage Texture usage.
+	/// @param notZeroed Is the heap not zeroed?
+	/// @return Heap flags.
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_HEAP_FLAGS MakeHeapFlags(TextureUsage usage, bool notZeroed) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	constexpr D3D12_HEAP_PROPERTIES ToHeapProperties(const HeapType heapType) noexcept
+	constexpr D3D12_HEAP_PROPERTIES MakeHeapProperties(const HeapType heapType) noexcept
 	{
-		auto properties = D3D12_HEAP_PROPERTIES
+		return D3D12_HEAP_PROPERTIES
 		{
+			.Type = ToHeapType(heapType),
 			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
 			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
 			.CreationNodeMask = 0u,
 			.VisibleNodeMask = 0u
 		};
+	}
 
+	constexpr D3D12_HEAP_TYPE ToHeapType(const HeapType heapType) noexcept
+	{
 		switch (heapType)
 		{
 		case HeapType::Default:
-			properties.Type = D3D12_HEAP_TYPE_DEFAULT;
-			break;
+			return D3D12_HEAP_TYPE_DEFAULT;
 		case HeapType::Upload:
-			properties.Type = D3D12_HEAP_TYPE_UPLOAD;
-			break;
+			return D3D12_HEAP_TYPE_UPLOAD;
 		case HeapType::Download:
-			properties.Type = D3D12_HEAP_TYPE_READBACK;
-			break;
+			return D3D12_HEAP_TYPE_READBACK;
 		default: [[unlikely]]
 			assert(false && "Invalid heap type.");
-			properties.Type = D3D12_HEAP_TYPE_CUSTOM;
+			return D3D12_HEAP_TYPE_DEFAULT;
+		}
+	}
+
+	constexpr D3D12_HEAP_FLAGS GetHeapFlags(const BufferUsage usage, const bool notZeroed) noexcept
+	{
+		auto flags = D3D12_HEAP_FLAG_NONE;
+		if (notZeroed)
+		{
+			flags |= D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
+		}
+		if (Any(BufferUsage::UnorderedAccess, usage))
+		{
+			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;
 		}
 
-		return properties;
+		return flags;
+	}
+
+	constexpr D3D12_HEAP_FLAGS MakeHeapFlags(const TextureUsage usage, const bool notZeroed) noexcept
+	{
+		auto flags = D3D12_HEAP_FLAG_NONE;
+		if (notZeroed)
+		{
+			flags |= D3D12_HEAP_FLAG_CREATE_NOT_ZEROED;
+		}
+		if (Any(TextureUsage::UnorderedAccess, usage))
+		{
+			flags |= D3D12_HEAP_FLAG_ALLOW_SHADER_ATOMICS;
+		}
+
+		return flags;
 	}
 }

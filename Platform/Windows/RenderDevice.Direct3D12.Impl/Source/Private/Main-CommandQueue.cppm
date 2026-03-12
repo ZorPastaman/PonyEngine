@@ -23,11 +23,16 @@ import :ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Command queue.
 	class CommandQueue final
 	{
 	public:
+		/// @brief Creates a command queue.
+		/// @param commandQueue Command queue.
 		[[nodiscard("Pure constructor")]]
 		explicit CommandQueue(ID3D12CommandQueue& commandQueue) noexcept;
+		/// @brief Creates a command queue.
+		/// @param commandQueue Command queue.
 		[[nodiscard("Pure constructor")]]
 		explicit CommandQueue(Platform::Windows::ComPtr<ID3D12CommandQueue>&& commandQueue) noexcept;
 		CommandQueue(const CommandQueue&) = delete;
@@ -35,21 +40,31 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~CommandQueue() noexcept = default;
 
+		/// @brief Gets the command queue.
+		/// @return Command queue.
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue& GetCommandQueue() noexcept;
+		/// @brief Gets the command queue.
+		/// @return Command queue.
 		[[nodiscard("Pure function")]]
 		const ID3D12CommandQueue& GetCommandQueue() const noexcept;
 
+		/// @brief Executes command lists.
+		/// @param commandLists Command lists to execute.
+		/// @param beforeFences Fences that are waited for.
+		/// @param afterFences Fences that are signaled.
 		void Execute(std::span<ID3D12CommandList* const> commandLists, 
 			std::span<const std::pair<ID3D12Fence*, UINT64>> beforeFences, std::span<const std::pair<ID3D12Fence*, UINT64>> afterFences);
 
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void SetName(std::string_view name);
 
 		CommandQueue& operator =(const CommandQueue&) = delete;
 		CommandQueue& operator =(CommandQueue&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12CommandQueue> commandQueue;
+		Platform::Windows::ComPtr<ID3D12CommandQueue> commandQueue; ///< Command queue.
 	};
 }
 

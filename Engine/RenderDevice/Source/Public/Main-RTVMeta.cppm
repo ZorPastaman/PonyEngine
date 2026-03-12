@@ -17,16 +17,16 @@ import :RTVParams;
 export namespace PonyEngine::RenderDevice
 {
 	/// @brief Empty render target meta. It means no view was created.
-	struct EmptyRenderTargetMeta final
+	struct EmptyRTVMeta final
 	{
 	};
 
 	/// @brief Render target view to a texture meta.
-	struct RenderTargetTextureMeta final
+	struct TextureRTVMeta final
 	{
 		const ITexture* texture = nullptr; ///< Target texture. May be nullptr.
 		RTVParams params; ///< Render target view parameters.
 	};
 
-	using RenderTargetMeta = std::variant<EmptyRenderTargetMeta, RenderTargetTextureMeta>; ///< Render target view meta.
+	using RTVMeta = std::variant<EmptyRTVMeta, TextureRTVMeta>; ///< Render target view meta.
 }

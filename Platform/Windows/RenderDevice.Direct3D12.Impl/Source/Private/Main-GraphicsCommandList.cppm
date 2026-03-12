@@ -80,7 +80,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects) override;
 
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
-		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) override;
+		virtual void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges) override;
 		virtual void Copy(const ITexture& source, ITexture& destination) override;
 		virtual void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range) override;
 		virtual void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range) override;
@@ -316,9 +316,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination);
 	}
 
-	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination, const std::uint64_t sourceOffset, const std::uint64_t destinationOffset, const std::uint64_t size)
+	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination, const std::span<const CopyBufferRange> ranges)
 	{
-		commandList.Copy(source, destination, sourceOffset, destinationOffset, size);
+		commandList.Copy(source, destination, ranges);
 	}
 
 	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination)

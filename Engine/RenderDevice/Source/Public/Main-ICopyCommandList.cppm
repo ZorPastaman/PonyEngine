@@ -49,10 +49,8 @@ export namespace PonyEngine::RenderDevice
 		/// @brief Copies from the buffer region to the other buffer.
 		/// @param source Source buffer.
 		/// @param destination Destination buffer.
-		/// @param sourceOffset Source offset in bytes.
-		/// @param destinationOffset Destination offset in bytes.
-		/// @param size Region size in bytes.
-		virtual void Copy(const IBuffer& source, IBuffer& destination, std::uint64_t sourceOffset, std::uint64_t destinationOffset, std::uint64_t size) = 0;
+		/// @param ranges Copy ranges.
+		virtual void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges) = 0;
 		/// @brief Copies from the texture to the other texture.
 		/// @param source Source texture.
 		/// @param destination Destination texture.

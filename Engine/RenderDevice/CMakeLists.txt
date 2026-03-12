@@ -14,6 +14,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-BlendParams.cppm"
 	"Source/Public/Main-BufferBarrier.cppm"
 	"Source/Public/Main-BufferParams.cppm"
+	"Source/Public/Main-BufferRange.cppm"
 	"Source/Public/Main-BufferUsage.cppm"
 	"Source/Public/Main-CBVParams.cppm"
 	"Source/Public/Main-CBVRequirement.cppm"

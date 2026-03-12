@@ -29,6 +29,6 @@ export namespace PonyEngine::RenderDevice
 		/// @param index Container element index.
 		/// @return Container element meta.
 		[[nodiscard("Pure function")]]
-		virtual const RenderTargetMeta& Meta(std::uint32_t index) const noexcept = 0;
+		virtual const RTVMeta& Meta(std::uint32_t index) const noexcept = 0;
 	};
 }

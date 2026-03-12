@@ -22,43 +22,72 @@ import :Texture;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Swap chain wrapper with the sync logic.
 	class SwapChainWrapper final
 	{
 	public:
+		/// @brief Creates a swap chain wrapper.
+		/// @param swapChain Swap chain.
+		/// @param buffers Swap chain buffers.
+		/// @param syncInterval Sync interval.
+		/// @param presentFlags Present flags.
 		[[nodiscard("Pure constructor")]]
 		SwapChainWrapper(IDXGISwapChain4& swapChain, std::span<const std::shared_ptr<Texture>> buffers, UINT syncInterval, UINT presentFlags);
+		/// @brief Creates a swap chain wrapper.
+		/// @param swapChain Swap chain.
+		/// @param buffers Swap chain buffers.
+		/// @param syncInterval Sync interval.
+		/// @param presentFlags Present flags.
 		[[nodiscard("Pure constructor")]]
-		SwapChainWrapper(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers, 
-			UINT syncInterval, UINT presentFlags) noexcept;
+		SwapChainWrapper(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers, UINT syncInterval, UINT presentFlags) noexcept;
+		/// @brief Creates a swap chain wrapper.
+		/// @param swapChain Swap chain.
+		/// @param buffers Swap chain buffers.
+		/// @param syncInterval Sync interval.
+		/// @param presentFlags Present flags.
 		[[nodiscard("Pure constructor")]]
 		SwapChainWrapper(const SwapChain& swapChain, std::span<const std::shared_ptr<Texture>> buffers, UINT syncInterval, UINT presentFlags);
+		/// @brief Creates a swap chain wrapper.
+		/// @param swapChain Swap chain.
+		/// @param buffers Swap chain buffers.
+		/// @param syncInterval Sync interval.
+		/// @param presentFlags Present flags.
 		[[nodiscard("Pure constructor")]]
-		SwapChainWrapper(SwapChain&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers,
-			UINT syncInterval, UINT presentFlags) noexcept;
+		SwapChainWrapper(SwapChain&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers, UINT syncInterval, UINT presentFlags) noexcept;
 		SwapChainWrapper(const SwapChainWrapper&) = delete;
 		SwapChainWrapper(SwapChainWrapper&&) = delete;
 
 		~SwapChainWrapper() noexcept = default;
 
+		/// @brief Gets the buffer count.
+		/// @return Buffer count.
 		[[nodiscard("Pure function")]]
 		UINT BufferCount() const noexcept;
+		/// @brief Gets a current buffer index.
+		/// @return Current buffer index.
 		[[nodiscard("Pure function")]]
 		UINT GetCurrentBufferIndex() const noexcept;
+		/// @brief Gets a buffer.
+		/// @param index Buffer index.
+		/// @return Buffer.
 		[[nodiscard("Pure function")]]
 		const std::shared_ptr<Texture>& GetBuffer(UINT index) const;
 
+		/// @brief Sets the fullscreen state.
+		/// @param fullscreen Fullscreen state.
 		void SetFullscreenState(BOOL fullscreen);
 
+		/// @brief Presents a next buffer.
 		void Present();
 
 		SwapChainWrapper& operator =(const SwapChainWrapper&) = delete;
 		SwapChainWrapper& operator =(SwapChainWrapper&&) = delete;
 
 	private:
-		SwapChain swapChain;
-		std::vector<std::shared_ptr<Texture>> buffers;
-		UINT syncInterval;
-		UINT presentFlags;
+		SwapChain swapChain; ///< Swap chain.
+		std::vector<std::shared_ptr<Texture>> buffers; ///< Swap chain buffers.
+		UINT syncInterval; ///< Sync interval.
+		UINT presentFlags; ///< Present flags.
 	};
 }
 

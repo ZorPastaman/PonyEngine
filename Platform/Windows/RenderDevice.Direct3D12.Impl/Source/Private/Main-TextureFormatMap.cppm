@@ -21,9 +21,12 @@ import :FormatUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Texture format map.
 	class TextureFormatMap final
 	{
 	public:
+		/// @brief Creates a texture format map.
+		/// @param renderDevice Render device context.
 		[[nodiscard("Pure constructor")]]
 		explicit TextureFormatMap(IRenderDeviceContext& renderDevice);
 		TextureFormatMap(const TextureFormatMap&) = delete;
@@ -31,16 +34,30 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~TextureFormatMap() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Finds an index of the texture format ID.
+		/// @param textureFormatId Texture format ID.
+		/// @return Index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(TextureFormatId textureFormatId) const noexcept;
+		/// @brief Find an index of the DXGI format.
+		/// @param dxgiFormat DXGI format.
+		/// @return Index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(DXGI_FORMAT dxgiFormat) const noexcept;
 
+		/// @brief Gets a texture format.
+		/// @param index Texture format index.
+		/// @return Texture format.
 		[[nodiscard("Pure function")]]
 		TextureFormatId TextureFormat(std::size_t index) const noexcept;
+		/// @brief Gets a DXGI format.
+		/// @param index DXGI format index.
+		/// @return DXGI format.
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT DXGIFormat(std::size_t index) const noexcept;
 
@@ -48,10 +65,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		TextureFormatMap& operator =(TextureFormatMap&&) = delete;
 
 	private:
-		void Bind(std::string_view textureFormat, DXGI_FORMAT dxgiFormat, IRenderDeviceContext& renderDevice);
-
-		std::vector<TextureFormatId> textureFormatIds;
-		std::vector<DXGI_FORMAT> dxgiFormats;
+		std::array<TextureFormatId, MainFormatMap.MapSize()> textureFormatIds; ///< Texture format IDs.
+		std::array<DXGI_FORMAT, MainFormatMap.MapSize()> dxgiFormats; ///< DXGI formats.
 	};
 }
 
@@ -61,7 +76,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		for (std::size_t i = 0uz; i < MainFormatMap.MapSize(); ++i)
 		{
-			Bind(MainFormatMap.GetEngineFormat(i), MainFormatMap.GetFormat(i), renderDevice);
+			textureFormatIds[i] = renderDevice.TextureFormatId(MainFormatMap.GetEngineFormat(i));
+			dxgiFormats[i] = MainFormatMap.GetFormat(i);
 		}
 	}
 
@@ -88,19 +104,5 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	DXGI_FORMAT TextureFormatMap::DXGIFormat(const std::size_t index) const noexcept
 	{
 		return dxgiFormats[index];
-	}
-
-	void TextureFormatMap::Bind(const std::string_view textureFormat, const DXGI_FORMAT dxgiFormat, IRenderDeviceContext& renderDevice)
-	{
-		textureFormatIds.push_back(renderDevice.TextureFormatId(textureFormat));
-		try
-		{
-			dxgiFormats.push_back(dxgiFormat);
-		}
-		catch (...)
-		{
-			textureFormatIds.pop_back();
-			throw;
-		}
 	}
 }

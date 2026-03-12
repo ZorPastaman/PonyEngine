@@ -21,30 +21,58 @@ import PonyEngine.RenderDevice;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Makes a swap chain description.
+	/// @param params Swap chain parameters.
+	/// @param format Native format.
+	/// @return Swap chain description.
 	[[nodiscard("Pure function")]]
-	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, DXGI_FORMAT format) noexcept;
+	constexpr DXGI_SWAP_CHAIN_DESC1 MakeSwapChainDesc(const SwapChainParams& params, DXGI_FORMAT format) noexcept;
+	/// @brief Makes a DXGI usage.
+	/// @param usage Texture usage.
+	/// @return DXGI usage.
 	[[nodiscard("Pure function")]]
-	constexpr DXGI_USAGE ToDXGIUsage(TextureUsage usage) noexcept;
+	constexpr DXGI_USAGE MakeDXGIUsage(TextureUsage usage) noexcept;
+	/// @brief Casts the engine scaling to a native scaling.
+	/// @param scaling Engine scaling.
+	/// @return Native scaling.
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_SCALING ToScaling(SwapChainScaling scaling) noexcept;
+	/// @brief Casts the engine swap effect to a native swap effect.
+	/// @param effect Engine swap effect.
+	/// @return Native swap effect.
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_SWAP_EFFECT ToSwapEffect(SwapChainEffect effect) noexcept;
+	/// @brief Casts the engine alpha mode to a native alpha mode.
+	/// @param alphaMode Engine alpha mode.
+	/// @return Native alpha mode.
 	[[nodiscard("Pure function")]]
 	constexpr DXGI_ALPHA_MODE ToAlphaMode(SwapChainAlphaMode alphaMode) noexcept;
+	/// @brief Casts the engine sync mode to native swap chain flags.
+	/// @param syncMode Engine sync mode.
+	/// @return Native swap chain flags.
 	[[nodiscard("Pure function")]]
 	constexpr UINT ToSwapChainFlags(SwapChainSync syncMode) noexcept;
+	/// @brief Casts the engine sync mode to a native sync interval.
+	/// @param syncMode Engine sync mode.
+	/// @return Native sync interval.
 	[[nodiscard("Pure function")]]
 	constexpr UINT ToSyncInterval(SwapChainSync syncMode) noexcept;
+	/// @brief Casts the engine sync mode to native present flags.
+	/// @param syncMode Engine sync mode.
+	/// @return Native present flags.
 	[[nodiscard("Pure function")]]
 	constexpr UINT ToPresentFlags(SwapChainSync syncMode) noexcept;
 
+	/// @brief Casts the native tearing support to engine sync modes.
+	/// @param tearingSupported Is tearing supported?
+	/// @return Engine sync modes.
 	[[nodiscard("Pure function")]]
 	constexpr SwapChainSyncMask ToSyncMode(BOOL tearingSupported) noexcept;
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	constexpr DXGI_SWAP_CHAIN_DESC1 ToSwapChainDesc(const SwapChainParams& params, const DXGI_FORMAT format) noexcept
+	constexpr DXGI_SWAP_CHAIN_DESC1 MakeSwapChainDesc(const SwapChainParams& params, const DXGI_FORMAT format) noexcept
 	{
 		return DXGI_SWAP_CHAIN_DESC1
 		{
@@ -53,7 +81,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.Format = format,
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.BufferUsage = ToDXGIUsage(params.usage),
+			.BufferUsage = MakeDXGIUsage(params.usage),
 			.BufferCount = params.bufferCount,
 			.Scaling = ToScaling(params.scalingMode),
 			.SwapEffect = ToSwapEffect(params.swapEffect),
@@ -62,7 +90,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	constexpr DXGI_USAGE ToDXGIUsage(const TextureUsage usage) noexcept
+	constexpr DXGI_USAGE MakeDXGIUsage(const TextureUsage usage) noexcept
 	{
 		DXGI_USAGE answer = 0;
 		if (Any(TextureUsage::ShaderResource, usage))

@@ -42,6 +42,7 @@ target_sources(PonyEngine.RenderDevice.Direct3D12.Impl PUBLIC FILE_SET CXX_MODUL
 	"Source/Private/Main-Engine.cppm"
 	"Source/Private/Main-Factory.cppm"
 	"Source/Private/Main-Fence.cppm"
+	"Source/Private/Main-FenceUtility.cppm"
 	"Source/Private/Main-FormatUtility.cppm"
 	"Source/Private/Main-GraphicsCommandList.cppm"
 	"Source/Private/Main-GraphicsComputePipelineBinding.cppm"
@@ -89,8 +90,6 @@ target_link_libraries(PonyEngine.RenderDevice.Direct3D12.Impl PUBLIC
 	PonyEngine.Application.Ext
 )
 target_link_libraries(PonyEngine.RenderDevice.Direct3D12.Impl PRIVATE
-	PonyEngine.RenderDevice
-	PonyEngine.RenderDevice.Ext
 	PonyEngine.Core
 	PonyEngine.Log
 	PonyEngine.Surface

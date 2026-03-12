@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:Waiter;
@@ -18,9 +20,11 @@ import std;
 import PonyEngine.RenderDevice;
 
 import :Fence;
+import :FenceUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Waiter.
 	class Waiter final : public IWaiter
 	{
 	public:
@@ -41,15 +45,21 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Waiter& operator =(Waiter&&) = delete;
 
 	private:
+		/// @brief Creates events if needed.
+		/// @param count Event count.
 		void CreateEvents(std::size_t count);
+		/// @brief Sets events to the fences.
+		/// @param fenceValues Fences and their waited values.
+		/// @return Waited event count.
 		std::size_t SetEvents(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const;
+		/// @brief Waits for waited events.
+		/// @param count Waited event count. 
+		/// @param timeout Timeout.
 		void WaitEvents(std::size_t count, std::chrono::milliseconds timeout);
 
-		static void ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues);
+		std::vector<HANDLE> waitEvents; ///< Wait events.
 
-		std::vector<HANDLE> waitEvents;
-
-		std::string name;
+		std::string name; ///< Name.
 	};
 }
 
@@ -65,7 +75,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Waiter::Wait(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, const std::chrono::nanoseconds timeout)
 	{
-		ValidateFences(fenceValues);
+#ifndef NDEBUG
+		if (fenceValues.size() > MAXIMUM_WAIT_OBJECTS) [[unlikely]]
+		{
+			throw std::invalid_argument("Too many fences");
+		}
+#endif
 
 		CreateEvents(fenceValues.size());
 		const std::size_t waitCount = SetEvents(fenceValues);
@@ -100,12 +115,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::size_t Waiter::SetEvents(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues) const
 	{
+		assert(waitEvents.size() >= fenceValues.size() && "Too few wait events.");
+
 		std::size_t waitCount = 0uz;
 		for (const auto [fence, fenceValue] : fenceValues)
 		{
-			if (const auto nativeFence = static_cast<const Fence*>(fence); nativeFence->CompletedValue() < fenceValue)
+			if (const Fence& nativeFence = ToNativeFenceNotNullptr(fence); nativeFence.CompletedValue() < fenceValue)
 			{
-				nativeFence->SetEventOnCompletion(fenceValue, waitEvents[waitCount++]);
+				nativeFence.SetEventOnCompletion(fenceValue, waitEvents[waitCount++]);
 			}
 		}
 
@@ -114,6 +131,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Waiter::WaitEvents(const std::size_t count, const std::chrono::milliseconds timeout)
 	{
+		assert(count <= waitEvents.size() && "Too great count.");
+
 		if (count == 0uz)
 		{
 			return;
@@ -133,23 +152,5 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 			throw std::runtime_error(std::format("Failed to set wait for fence event: Result = '0x{:X}", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-	}
-
-	void Waiter::ValidateFences(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues)
-	{
-#ifndef NDEBUG
-		if (fenceValues.size() > MAXIMUM_WAIT_OBJECTS) [[unlikely]]
-		{
-			throw std::invalid_argument("Too many fences");
-		}
-
-		for (const IFence* const fence : std::views::keys(fenceValues))
-		{
-			if (!fence || typeid(*fence) != typeid(Fence)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid fence");
-			}
-		}
-#endif
 	}
 }

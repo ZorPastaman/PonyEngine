@@ -24,11 +24,16 @@ import :ObjectUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Fence wrapper.
 	class Fence final : public IFence
 	{
 	public:
+		/// @brief Creates a fence wrapper.
+		/// @param fence Fence.
 		[[nodiscard("Pure constructor")]]
 		explicit Fence(ID3D12Fence1& fence) noexcept;
+		/// @brief Creates a fence wrapper.
+		/// @param fence Fence.
 		[[nodiscard("Pure constructor")]]
 		explicit Fence(Platform::Windows::ComPtr<ID3D12Fence1>&& fence) noexcept;
 		Fence(const Fence&) = delete;
@@ -44,18 +49,23 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the fence.
+		/// @return Fence.
 		[[nodiscard("Pure function")]]
 		ID3D12Fence1& GetFence() const noexcept;
 
+		/// @brief Sets the event on completion.
+		/// @param value Waited fence value.
+		/// @param event Event to trigger.
 		void SetEventOnCompletion(std::uint64_t value, HANDLE event) const;
 
 		Fence& operator =(const Fence&) = delete;
 		Fence& operator =(Fence&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12Fence1> fence;
+		Platform::Windows::ComPtr<ID3D12Fence1> fence; ///< Fence.
 
-		std::string name;
+		std::string name; ///< Name.
 	};
 }
 
@@ -69,6 +79,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	Fence::Fence(Platform::Windows::ComPtr<ID3D12Fence1>&& fence) noexcept :
 		fence(std::move(fence))
 	{
+		assert(this->fence && "The fence is nullptr.");
 	}
 
 	std::uint64_t Fence::CompletedValue() const noexcept

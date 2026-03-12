@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:GraphicsPipelineBinding;
@@ -23,6 +25,7 @@ import :RootSignature;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Graphics pipeline binding helper.
 	class GraphicsPipelineBinding final
 	{
 	public:
@@ -33,20 +36,32 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~GraphicsPipelineBinding() noexcept = default;
 
+		/// @brief Checks if a graphics pipeline state is bound.
+		/// @return @a True if its bound; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasPSO() const noexcept;
+		/// @brief Gets a root signature of a currently bound pipeline state.
+		/// @return Root signature or nullptr if there's no pso bound or it doesn't have a root signature.
 		[[nodiscard("Pure function")]]
-		const RootSignature* BoundRootSignature() const noexcept;
+		const RootSignature* GetRootSignature() const noexcept;
+		/// @brief Resets binding.
 		void Reset() noexcept;
 
+		/// @brief Binds the root signature of the @p pipeline state and binds it to the helper.
+		/// @param pipelineState Pipeline state to bind.
+		/// @param commandList Target command list.
+		/// @remark Call the @p SetPipelineState() to set a pipeline state to the command list.
 		void BindPipelineState(const GraphicsPipelineState& pipelineState, CommandList& commandList);
-		void SetPipelineState(CommandList& commandList);
+		/// @brief Sets a current pipeline state to the command list.
+		/// @param commandList Target command list.
+		/// @note Must have a valid pso.
+		void SetPipelineState(CommandList& commandList) const;
 
 		GraphicsPipelineBinding& operator =(const GraphicsPipelineBinding&) = delete;
 		GraphicsPipelineBinding& operator =(GraphicsPipelineBinding&&) = delete;
 
 	private:
-		const GraphicsPipelineState* boundPSO;
+		const GraphicsPipelineState* boundPSO; ///< Bound pso.
 	};
 }
 
@@ -62,7 +77,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return boundPSO;
 	}
 
-	const RootSignature* GraphicsPipelineBinding::BoundRootSignature() const noexcept
+	const RootSignature* GraphicsPipelineBinding::GetRootSignature() const noexcept
 	{
 		return boundPSO ? static_cast<const RootSignature*>(boundPSO->Layout().get()) : nullptr;
 	}
@@ -83,8 +98,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		boundPSO = &pipelineState;
 	}
 
-	void GraphicsPipelineBinding::SetPipelineState(CommandList& commandList)
+	void GraphicsPipelineBinding::SetPipelineState(CommandList& commandList) const
 	{
+		assert(boundPSO && "No pso is bound.");
 		commandList.SetPipelineState(boundPSO->PipelineState());
 	}
 }

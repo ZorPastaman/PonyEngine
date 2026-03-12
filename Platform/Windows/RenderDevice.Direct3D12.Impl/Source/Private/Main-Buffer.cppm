@@ -22,11 +22,20 @@ import :Resource;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Buffer wrapper.
 	class Buffer final : public IBuffer
 	{
 	public:
+		/// @brief Creates a buffer wrapper.
+		/// @param resource Buffer resource.
+		/// @param size Buffer size.
+		/// @param usage Buffer usage.
 		[[nodiscard("Pure constructor")]]
 		Buffer(ID3D12Resource2& resource, std::uint64_t size, BufferUsage usage) noexcept;
+		/// @brief Creates a buffer wrapper.
+		/// @param resource Buffer resource.
+		/// @param size Buffer size.
+		/// @param usage Buffer usage.
 		[[nodiscard("Pure constructor")]]
 		Buffer(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, std::uint64_t size, BufferUsage usage) noexcept;
 		Buffer(const Buffer&) = delete;
@@ -40,14 +49,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual BufferUsage Usage() const noexcept override;
 
 		virtual void* Map() override;
-		virtual void* Map(std::uint64_t offset, std::uint64_t length) override;
+		virtual void* Map(const BufferRange& range) override;
 		virtual void Unmap() override;
-		virtual void Unmap(std::uint64_t offset, std::uint64_t length) override;
+		virtual void Unmap(const BufferRange& range) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the buffer resource.
+		/// @return Buffer resource.
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& Resource() const noexcept;
 
@@ -55,12 +66,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Buffer& operator =(Buffer&&) = delete;
 
 	private:
-		void ValidateRange(std::uint64_t offset, std::uint64_t length) const;
+		/// @brief Validates a range.
+		/// @param range Range
+		void ValidateRange(const BufferRange& range) const;
 
-		class Resource resource;
+		class Resource resource; ///< Buffer resource.
 
-		std::uint64_t size;
-		BufferUsage usage;
+		std::uint64_t size; ///< Buffer size.
+		BufferUsage usage; ///< Buffer usage.
 	};
 }
 
@@ -95,11 +108,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return resource.Map(0u);
 	}
 
-	void* Buffer::Map(const std::uint64_t offset, const std::uint64_t length)
+	void* Buffer::Map(const BufferRange& range)
 	{
-		ValidateRange(offset, length);
-
-		return resource.Map(0u, static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		ValidateRange(range);
+		return resource.Map(0u, static_cast<SIZE_T>(range.offset), static_cast<SIZE_T>(range.size));
 	}
 
 	void Buffer::Unmap()
@@ -107,11 +119,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		resource.Unmap(0u);
 	}
 
-	void Buffer::Unmap(const std::uint64_t offset, const std::uint64_t length)
+	void Buffer::Unmap(const BufferRange& range)
 	{
-		ValidateRange(offset, length);
-
-		resource.Unmap(0u, static_cast<SIZE_T>(offset), static_cast<SIZE_T>(length));
+		ValidateRange(range);
+		resource.Unmap(0u, static_cast<SIZE_T>(range.offset), static_cast<SIZE_T>(range.size));
 	}
 
 	std::string_view Buffer::Name() const noexcept
@@ -129,10 +140,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return resource.GetResource();
 	}
 
-	void Buffer::ValidateRange(const std::uint64_t offset, const std::uint64_t length) const
+	void Buffer::ValidateRange(const BufferRange& range) const
 	{
 #ifndef NDEBUG
-		if (offset + length > size) [[unlikely]]
+		if (range.offset + range.size > size) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
 		}
