@@ -143,6 +143,24 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ContainerBinding::SetContainers(const ShaderDataContainer* const shaderDataContainer, const SamplerContainer* const samplerContainer, CommandList& commandList)
 	{
+#ifndef NDEBUG
+		if (shaderDataContainer)
+		{
+			if (!shaderDataContainer->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Shader data container is not shader visible");
+			}
+		}
+
+		if (samplerContainer)
+		{
+			if (!samplerContainer->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Sampler container is not shader visible");
+			}
+		}
+#endif
+
 		commandList.SetContainers(shaderDataContainer, samplerContainer);
 		this->shaderDataContainer = shaderDataContainer;
 		this->samplerContainer = samplerContainer;

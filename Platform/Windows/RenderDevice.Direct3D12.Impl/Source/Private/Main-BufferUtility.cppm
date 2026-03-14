@@ -41,6 +41,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	/// @return Native buffer.
 	[[nodiscard("Pure function")]]
 	const Buffer* ToNativeBuffer(const IBuffer* buffer);
+	/// @brief Casts to a native buffer.
+	/// @param buffer Engine buffer.
+	/// @return Native buffer.
+	[[nodiscard("Pure function")]]
+	Buffer* ToNativeBufferNotNullptr(IBuffer* buffer);
+	/// @brief Casts to a native buffer.
+	/// @param buffer Engine buffer.
+	/// @return Native buffer.
+	[[nodiscard("Pure function")]]
+	const Buffer* ToNativeBufferNotNullptr(const IBuffer* buffer);
 
 	/// @brief Makes a resource description.
 	/// @param params Buffer parameters.
@@ -113,6 +123,30 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 #ifndef NDEBUG
 		if (buffer && typeid(*buffer) != typeid(Buffer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer");
+		}
+#endif
+
+		return static_cast<const Buffer*>(buffer);
+	}
+
+	Buffer* ToNativeBufferNotNullptr(IBuffer* const buffer)
+	{
+#ifndef NDEBUG
+		if (!buffer || typeid(*buffer) != typeid(Buffer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer");
+		}
+#endif
+
+		return static_cast<Buffer*>(buffer);
+	}
+
+	const Buffer* ToNativeBufferNotNullptr(const IBuffer* const buffer)
+	{
+#ifndef NDEBUG
+		if (!buffer || typeid(*buffer) != typeid(Buffer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid buffer");
 		}

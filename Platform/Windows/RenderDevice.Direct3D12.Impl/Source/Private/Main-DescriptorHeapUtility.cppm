@@ -44,6 +44,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	/// @return Native depth stencil container.
 	[[nodiscard("Pure function")]]
 	const DepthStencilContainer* ToNativeContainer(const IDepthStencilContainer* container);
+	/// @brief Casts to a native depth stencil container.
+	/// @param container Depth stencil container.
+	/// @return Native depth stencil container.
+	[[nodiscard("Pure function")]]
+	DepthStencilContainer* ToNativeContainerNotNullptr(IDepthStencilContainer* container);
+	/// @brief Casts to a native depth stencil container.
+	/// @param container Depth stencil container.
+	/// @return Native depth stencil container.
+	[[nodiscard("Pure function")]]
+	const DepthStencilContainer* ToNativeContainerNotNullptr(const IDepthStencilContainer* container);
 	/// @brief Casts to a native render target container.
 	/// @param container Render target container.
 	/// @return Native render target container.
@@ -64,6 +74,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	/// @return Native render target container.
 	[[nodiscard("Pure function")]]
 	const RenderTargetContainer* ToNativeContainer(const IRenderTargetContainer* container);
+	/// @brief Casts to a native render target container.
+	/// @param container Render target container.
+	/// @return Native render target container.
+	[[nodiscard("Pure function")]]
+	RenderTargetContainer* ToNativeContainerNotNullptr(IRenderTargetContainer* container);
+	/// @brief Casts to a native render target container.
+	/// @param container Render target container.
+	/// @return Native render target container.
+	[[nodiscard("Pure function")]]
+	const RenderTargetContainer* ToNativeContainerNotNullptr(const IRenderTargetContainer* container);
 	/// @brief Casts to a native shader data container.
 	/// @param container Shader data container.
 	/// @return Native shader data container.
@@ -84,6 +104,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	/// @return Native shader data container.
 	[[nodiscard("Pure function")]]
 	const ShaderDataContainer* ToNativeContainer(const IShaderDataContainer* container);
+	/// @brief Casts to a native shader data container.
+	/// @param container Shader data container.
+	/// @return Native shader data container.
+	[[nodiscard("Pure function")]]
+	ShaderDataContainer* ToNativeContainerNotNullptr(IShaderDataContainer* container);
+	/// @brief Casts to a native shader data container.
+	/// @param container Shader data container.
+	/// @return Native shader data container.
+	[[nodiscard("Pure function")]]
+	const ShaderDataContainer* ToNativeContainerNotNullptr(const IShaderDataContainer* container);
 	/// @brief Casts to a native sampler container.
 	/// @param container Sampler container.
 	/// @return Native sampler container.
@@ -104,6 +134,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	/// @return Native sampler container.
 	[[nodiscard("Pure function")]]
 	const SamplerContainer* ToNativeContainer(const ISamplerContainer* container);
+	/// @brief Casts to a native sampler container.
+	/// @param container Sampler container.
+	/// @return Native sampler container.
+	[[nodiscard("Pure function")]]
+	SamplerContainer* ToNativeContainerNotNullptr(ISamplerContainer* container);
+	/// @brief Casts to a native sampler container.
+	/// @param container Sampler container.
+	/// @return Native sampler container.
+	[[nodiscard("Pure function")]]
+	const SamplerContainer* ToNativeContainerNotNullptr(const ISamplerContainer* container);
 
 	/// @brief Makes a descriptor heap description.
 	/// @param params Shader data container parameters.
@@ -177,6 +217,30 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return static_cast<const DepthStencilContainer*>(container);
 	}
 
+	DepthStencilContainer* ToNativeContainerNotNullptr(IDepthStencilContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(DepthStencilContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<DepthStencilContainer*>(container);
+	}
+
+	const DepthStencilContainer* ToNativeContainerNotNullptr(const IDepthStencilContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(DepthStencilContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<const DepthStencilContainer*>(container);
+	}
+
 	RenderTargetContainer& ToNativeContainer(IRenderTargetContainer& container)
 	{
 #ifndef NDEBUG
@@ -217,6 +281,30 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 #ifndef NDEBUG
 		if (container && typeid(*container) != typeid(RenderTargetContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<const RenderTargetContainer*>(container);
+	}
+
+	RenderTargetContainer* ToNativeContainerNotNullptr(IRenderTargetContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(RenderTargetContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<RenderTargetContainer*>(container);
+	}
+
+	const RenderTargetContainer* ToNativeContainerNotNullptr(const IRenderTargetContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(RenderTargetContainer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid container");
 		}
@@ -273,6 +361,30 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return static_cast<const ShaderDataContainer*>(container);
 	}
 
+	ShaderDataContainer* ToNativeContainerNotNullptr(IShaderDataContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(ShaderDataContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<ShaderDataContainer*>(container);
+	}
+
+	const ShaderDataContainer* ToNativeContainerNotNullptr(const IShaderDataContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(ShaderDataContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<const ShaderDataContainer*>(container);
+	}
+
 	SamplerContainer& ToNativeContainer(ISamplerContainer& container)
 	{
 #ifndef NDEBUG
@@ -313,6 +425,30 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 #ifndef NDEBUG
 		if (container && typeid(*container) != typeid(SamplerContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<const SamplerContainer*>(container);
+	}
+
+	SamplerContainer* ToNativeContainerNotNullptr(ISamplerContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(SamplerContainer)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container");
+		}
+#endif
+
+		return static_cast<SamplerContainer*>(container);
+	}
+
+	const SamplerContainer* ToNativeContainerNotNullptr(const ISamplerContainer* container)
+	{
+#ifndef NDEBUG
+		if (!container || typeid(*container) != typeid(SamplerContainer)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid container");
 		}
