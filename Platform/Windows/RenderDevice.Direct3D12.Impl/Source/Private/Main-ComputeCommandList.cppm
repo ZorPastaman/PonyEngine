@@ -62,14 +62,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
 		virtual void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges) override;
 		virtual void Copy(const ITexture& source, ITexture& destination) override;
-		virtual void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range) override;
-		virtual void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes) override;
 		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints) override;
-		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
-		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes) override;
 		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints) override;
-		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
-		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -225,14 +223,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination);
 	}
 
-	void ComputeCommandList::Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range)
+	void ComputeCommandList::Copy(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures)
 	{
-		commandList.Copy(source, destination, range);
+		commandList.Copy(source, destination, subTextures);
 	}
 
-	void ComputeCommandList::Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range)
+	void ComputeCommandList::Copy(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, const std::span<const CopySubTextureBox> boxes)
 	{
-		commandList.Copy(source, destination, range);
+		commandList.Copy(source, destination, subTextures, boxes);
 	}
 
 	void ComputeCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints)
@@ -240,14 +238,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination, footprints);
 	}
 
-	void ComputeCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	void ComputeCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
 	{
-		commandList.Copy(source, destination, footprints, range);
-	}
-
-	void ComputeCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
-	{
-		commandList.Copy(source, destination, footprints, range);
+		commandList.Copy(source, destination, footprints, boxes);
 	}
 
 	void ComputeCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints)
@@ -255,14 +248,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination, footprints);
 	}
 
-	void ComputeCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	void ComputeCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
 	{
-		commandList.Copy(source, destination, footprints, range);
-	}
-
-	void ComputeCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
-	{
-		commandList.Copy(source, destination, footprints, range);
+		commandList.Copy(source, destination, footprints, boxes);
 	}
 
 	std::string_view ComputeCommandList::Name() const noexcept

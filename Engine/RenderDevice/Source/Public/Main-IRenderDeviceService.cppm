@@ -51,6 +51,7 @@ import :SamplerContainerParams;
 import :SamplerParams;
 import :ShaderDataContainerParams;
 import :SRVParams;
+import :SubTextureIndex;
 import :SubTextureRange;
 import :SwapChainParams;
 import :TextureFormatId;
@@ -158,6 +159,15 @@ export namespace PonyEngine::RenderDevice
 
 		/// @brief Gets a copyable footprint count for a texture created with the @p params.
 		/// @param params Texture parameters.
+		/// @param subTexture Sub-texture index.
+		/// @return Copyable footprint count.
+		/// @remark The service must have an active backend.
+		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
+		/// @note The result becomes invalid on a backend switch.
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureIndex& subTexture) const;
+		/// @brief Gets a copyable footprint count for a texture created with the @p params.
+		/// @param params Texture parameters.
 		/// @param range Sub-texture range.
 		/// @return Copyable footprint count.
 		/// @remark The service must have an active backend.
@@ -167,6 +177,15 @@ export namespace PonyEngine::RenderDevice
 		virtual std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const = 0;
 		/// @brief Gets a copyable footprint count for the texture.
 		/// @param texture Texture.
+		/// @param subTexture Sub-texture index.
+		/// @return Copyable footprint count.
+		/// @remark The service must have an active backend.
+		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
+		/// @note The result becomes invalid on a backend switch.
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureIndex& subTexture) const;
+		/// @brief Gets a copyable footprint count for the texture.
+		/// @param texture Texture.
 		/// @param range Sub-texture range.
 		/// @return Copyable footprint count.
 		/// @remark The service must have an active backend.
@@ -174,6 +193,16 @@ export namespace PonyEngine::RenderDevice
 		/// @note The result becomes invalid on a backend switch.
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const = 0;
+		/// @brief Gets copyable footprint for a texture created with the @p params.
+		/// @param params Texture parameters.
+		/// @param offset Texture buffer data offset.
+		/// @param subTexture Sub-texture index.
+		/// @param footprint Footprint.
+		/// @return Copyable footprint size.
+		/// @remark The service must have an active backend.
+		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
+		/// @note The result becomes invalid on a backend switch.
+		CopyableFootprintSize GetCopyableFootprint(const TextureParams& params, std::uint64_t offset, const SubTextureIndex& subTexture, CopyableFootprint* footprint = nullptr) const;
 		/// @brief Gets copyable footprints for a texture created with the @p params.
 		/// @param params Texture parameters.
 		/// @param offset Texture buffer data offset.
@@ -184,7 +213,17 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		/// @note The result becomes invalid on a backend switch.
 		virtual CopyableFootprintSize GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
-			std::span<CopyableFootprint> footprints) const = 0;
+			std::span<CopyableFootprint> footprints = std::span<CopyableFootprint>()) const = 0;
+		/// @brief Gets copyable footprint for the texture.
+		/// @param texture Texture.
+		/// @param offset Texture buffer data offset.
+		/// @param subTexture Sub-texture index.
+		/// @param footprint Footprint.
+		/// @return Copyable footprint size.
+		/// @remark The service must have an active backend.
+		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
+		/// @note The result becomes invalid on a backend switch.
+		CopyableFootprintSize GetCopyableFootprint(const ITexture& texture, std::uint64_t offset, const SubTextureIndex& subTexture, CopyableFootprint* footprint = nullptr) const;
 		/// @brief Gets copyable footprints for the texture.
 		/// @param texture Texture.
 		/// @param offset Texture buffer data offset.
@@ -195,7 +234,7 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		/// @note The result becomes invalid on a backend switch.
 		virtual CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
-			std::span<CopyableFootprint> footprints) const = 0;
+			std::span<CopyableFootprint> footprints = std::span<CopyableFootprint>()) const = 0;
 
 		/// @brief Creates a shader data container.
 		/// @param params Container parameters.
@@ -364,20 +403,56 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() = 0;
+		/// @brief Syncs the graphics command queue.
+		/// @param sync Queue sync.
+		/// @remark The service must have an active backend.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
+		void SyncGraphics(const QueueSync& sync);
+		/// @brief Executes the graphics command list.
+		/// @param commandList Graphics command list to execute.
+		/// @param sync Queue sync.
+		/// @remark The service must have an active backend.
+		/// @note All the resources used by the command lists must be kept alive till the finish of the execution.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
+		void Execute(const IGraphicsCommandList& commandList, const QueueSync& sync = QueueSync{});
 		/// @brief Executes the graphics command lists.
 		/// @param commandLists Graphics command lists to execute. May be empty.
 		/// @param sync Queue sync.
 		/// @remark The service must have an active backend.
 		/// @note All the resources used by the command lists must be kept alive till the finish of the execution.
-		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() functions but can be used concurrently with the other functions.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
 		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync = QueueSync{}) = 0;
+		/// @brief Syncs the compute command queue.
+		/// @param sync Queue sync.
+		/// @remark The service must have an active backend.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
+		void SyncCompute(const QueueSync& sync);
+		/// @brief Executes the compute command list.
+		/// @param commandList Compute command list to execute.
+		/// @param sync Queue sync.
+		/// @remark The service must have an active backend.
+		/// @note All the resources used by the command lists must be kept alive till the finish of the execution.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
+		void Execute(const IComputeCommandList& commandList, const QueueSync& sync = QueueSync{});
 		/// @brief Executes the compute command lists.
 		/// @param commandLists Compute command lists to execute. May be empty.
 		/// @param sync Queue sync.
 		/// @remark The service must have an active backend.
 		/// @note All the resources used by the command lists must be kept alive till the finish of the execution.
-		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() functions but can be used concurrently with the other functions.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync = QueueSync{}) = 0;
+		/// @brief Syncs the copy command queue.
+		/// @param sync Queue sync.
+		/// @remark The service must have an active backend.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
+		void SyncCopy(const QueueSync& sync);
+		/// @brief Executes the copy command list.
+		/// @param commandList Copy command list to execute.
+		/// @param sync Queue sync.
+		/// @remark The service must have an active backend.
+		/// @note All the resources used by the command lists must be kept alive till the finish of the execution.
+		/// @note The function can't be used concurrently with the @p SwitchBackend() and other @p Execute() and Sync*() functions but can be used concurrently with the other functions.
+		void Execute(const ICopyCommandList& commandList, const QueueSync& sync = QueueSync{});
 		/// @brief Executes the copy command lists.
 		/// @param commandLists Copy command lists to execute. May be empty.
 		/// @param sync Queue sync.
@@ -462,4 +537,62 @@ export namespace PonyEngine::RenderDevice
 		/// @note The function isn't thread safe and mustn't be called concurrently with the @p SwitchBackend() and @p AddObserver().
 		virtual void RemoveObserver(IRenderDeviceServiceObserver& observer) noexcept = 0;
 	};
+}
+
+namespace PonyEngine::RenderDevice
+{
+	std::uint32_t IRenderDeviceService::GetCopyableFootprintCount(const TextureParams& params, const SubTextureIndex& subTexture) const
+	{
+		return GetCopyableFootprintCount(params, ToRange(subTexture));
+	}
+
+	std::uint32_t IRenderDeviceService::GetCopyableFootprintCount(const ITexture& texture, const SubTextureIndex& subTexture) const
+	{
+		return GetCopyableFootprintCount(texture, ToRange(subTexture));
+	}
+
+	CopyableFootprintSize IRenderDeviceService::GetCopyableFootprint(const TextureParams& params, const std::uint64_t offset, const SubTextureIndex& subTexture, 
+		CopyableFootprint* const footprint) const
+	{
+		return GetCopyableFootprints(params, offset, ToRange(subTexture), std::span(footprint, footprint));
+	}
+
+	CopyableFootprintSize IRenderDeviceService::GetCopyableFootprint(const ITexture& texture, const std::uint64_t offset, const SubTextureIndex& subTexture, 
+		CopyableFootprint* const footprint) const
+	{
+		return GetCopyableFootprints(texture, offset, ToRange(subTexture), std::span(footprint, footprint));
+	}
+
+	void IRenderDeviceService::SyncGraphics(const QueueSync& sync)
+	{
+		Execute(std::span<const IGraphicsCommandList* const>(), sync);
+	}
+
+	void IRenderDeviceService::Execute(const IGraphicsCommandList& commandList, const QueueSync& sync)
+	{
+		const IGraphicsCommandList* const command = &commandList;
+		Execute(std::span(&command, 1uz), sync);
+	}
+
+	void IRenderDeviceService::SyncCompute(const QueueSync& sync)
+	{
+		Execute(std::span<const IComputeCommandList* const>(), sync);
+	}
+
+	void IRenderDeviceService::Execute(const IComputeCommandList& commandList, const QueueSync& sync)
+	{
+		const IComputeCommandList* const command = &commandList;
+		Execute(std::span(&command, 1uz), sync);
+	}
+
+	void IRenderDeviceService::SyncCopy(const QueueSync& sync)
+	{
+		Execute(std::span<const ICopyCommandList* const>(), sync);
+	}
+
+	void IRenderDeviceService::Execute(const ICopyCommandList& commandList, const QueueSync& sync)
+	{
+		const ICopyCommandList* const command = &commandList;
+		Execute(std::span(&command, 1uz), sync);
+	}
 }

@@ -1192,6 +1192,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				subresourceFootprintsSpan.data(), rowCountsSpan.data(), rowSizesSpan.data());
 		}
 
+		UINT16 mipIndex = 0u;
+		UINT16 arrayIndex = 0u;
+		UINT8 planeIndex = 0u;
 		for (std::size_t i = 0uz; i < footprints.size(); ++i)
 		{
 			footprints[i] = CopyableFootprint
@@ -1202,8 +1205,19 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				.rowCount = rowCountsSpan[i],
 				.width = subresourceFootprintsSpan[i].Footprint.Width,
 				.height = subresourceFootprintsSpan[i].Footprint.Height,
-				.sliceCount = subresourceFootprintsSpan[i].Footprint.Depth
+				.depth = subresourceFootprintsSpan[i].Footprint.Depth,
+				.arrayIndex = static_cast<std::uint16_t>(range.arrayRange.firstArrayIndex + arrayIndex),
+				.mipIndex = static_cast<std::uint8_t>(range.mipRange.mostDetailedMipIndex + mipIndex),
+				.aspect = ToValue(static_cast<AspectMask>(1u << std::countr_zero(std::to_underlying(range.aspects)) << planeIndex))
 			};
+
+			++mipIndex;
+			const bool finalMip = mipIndex >= mipCount;
+			arrayIndex += finalMip;
+			mipIndex = finalMip ? 0u : mipIndex;
+			const bool finalArray = arrayIndex >= arrayCount;
+			planeIndex += finalArray;
+			arrayIndex = finalArray ? 0u : arrayIndex;
 		}
 
 		UINT64 totalRowSizes = 0ull;

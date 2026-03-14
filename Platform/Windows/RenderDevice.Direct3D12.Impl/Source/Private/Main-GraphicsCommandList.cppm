@@ -82,18 +82,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual void Copy(const IBuffer& source, IBuffer& destination) override;
 		virtual void Copy(const IBuffer& source, IBuffer& destination, std::span<const CopyBufferRange> ranges) override;
 		virtual void Copy(const ITexture& source, ITexture& destination) override;
-		virtual void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range) override;
-		virtual void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures) override;
+		virtual void Copy(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes) override;
 		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints) override;
-		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
-		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
+		virtual void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes) override;
 		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints) override;
-		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range) override;
-		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range) override;
+		virtual void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes) override;
 
 		virtual void Resolve(const ITexture& source, ITexture& destination, ResolveMode mode) override;
-		virtual void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode) override;
-		virtual void Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, ResolveMode mode) override;
+		virtual void Resolve(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures, ResolveMode mode) override;
+		virtual void Resolve(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes, ResolveMode mode) override;
 
 		virtual void Execute(const ISecondaryGraphicsCommandList& secondary) override;
 
@@ -326,14 +324,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination);
 	}
 
-	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range)
+	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures)
 	{
-		commandList.Copy(source, destination, range);
+		commandList.Copy(source, destination, subTextures);
 	}
 
-	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range)
+	void GraphicsCommandList::Copy(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, const std::span<const CopySubTextureBox> boxes)
 	{
-		commandList.Copy(source, destination, range);
+		commandList.Copy(source, destination, subTextures, boxes);
 	}
 
 	void GraphicsCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints)
@@ -341,14 +339,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination, footprints);
 	}
 
-	void GraphicsCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	void GraphicsCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
 	{
-		commandList.Copy(source, destination, footprints, range);
-	}
-
-	void GraphicsCommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
-	{
-		commandList.Copy(source, destination, footprints, range);
+		commandList.Copy(source, destination, footprints, boxes);
 	}
 
 	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints)
@@ -356,14 +349,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Copy(source, destination, footprints);
 	}
 
-	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
 	{
-		commandList.Copy(source, destination, footprints, range);
-	}
-
-	void GraphicsCommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
-	{
-		commandList.Copy(source, destination, footprints, range);
+		commandList.Copy(source, destination, footprints, boxes);
 	}
 
 	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const ResolveMode mode)
@@ -371,14 +359,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.Resolve(source, destination, mode);
 	}
 
-	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, const ResolveMode mode)
+	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, const ResolveMode mode)
 	{
-		commandList.Resolve(source, destination, range, mode);
+		commandList.Resolve(source, destination, subTextures, mode);
 	}
 
-	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, const ResolveMode mode)
+	void GraphicsCommandList::Resolve(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, 
+		const std::span<const CopySubTextureBox> boxes, const ResolveMode mode)
 	{
-		commandList.Resolve(source, destination, range, mode);
+		commandList.Resolve(source, destination, subTextures, boxes, mode);
 	}
 
 	void GraphicsCommandList::Execute(const ISecondaryGraphicsCommandList& secondary)

@@ -206,13 +206,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Copies from the texture range to the texture range.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Copy range.
-		void Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range);
+		/// @param subTextures Sub-textures to copy.
+		void Copy(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures);
 		/// @brief Copies from the texture range to the texture range with the box limits.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Copy range with the box limits.
-		void Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range);
+		/// @param subTextures Sub-textures to copy.
+		/// @param boxes Copy boxes.
+		void Copy(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes);
 		/// @brief Copies from the buffer to the texture.
 		/// @param source Source buffer.
 		/// @param destination Destination texture.
@@ -222,14 +223,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param source Source buffer.
 		/// @param destination Destination texture.
 		/// @param footprints Copyable footprints.
-		/// @param range Copy range.
-		void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range);
-		/// @brief Copies from the buffer range to the texture range with the box limits.
-		/// @param source Source buffer.
-		/// @param destination Destination texture.
-		/// @param footprints Copyable footprints.
-		/// @param range Copy range with the box limits.
-		void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range);
+		/// @param boxes Copy boxes.
+		void Copy(const IBuffer& source, ITexture& destination, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes);
 		/// @brief Copies from the texture to the buffer.
 		/// @param source Source texture.
 		/// @param destination Destination buffer.
@@ -239,14 +234,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param source Source texture.
 		/// @param destination Destination buffer.
 		/// @param footprints Copyable footprints.
-		/// @param range Copy range.
-		void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range);
-		/// @brief Copies from the texture range to the buffer range with the box limits.
-		/// @param source Source texture.
-		/// @param destination Destination buffer.
-		/// @param footprints Copyable footprints.
-		/// @param range Copy range with the box limits.
-		void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range);
+		/// @param boxes Copy boxes.
+		void Copy(const ITexture& source, IBuffer& destination, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes);
 
 		/// @brief Resolves the texture to the texture.
 		/// @param source Source texture.
@@ -256,15 +245,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Resolves the texture range to the texture range.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Resolve range.
+		/// @param subTextures Sub-textures to resolve.
 		/// @param mode Resolve mode.
-		void Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, ResolveMode mode);
-		/// @brief Resolves the texture range to the texture range with the rectangle limits.
+		void Resolve(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures, ResolveMode mode);
+		/// @brief Resolves the texture range to the texture range with the box limits.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Resolve range with the rectangle limits.
+		/// @param subTextures Sub-textures to resolve.
+		/// @param boxes Resolve boxes.
 		/// @param mode Resolve mode.
-		void Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, ResolveMode mode);
+		void Resolve(const ITexture& source, ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes, ResolveMode mode);
 
 		/// @brief Executes the bundle.
 		/// @param bundle Bundle to execute.
@@ -321,10 +311,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		static D3D12_TEXTURE_COPY_LOCATION MakeCopyLocation(const Texture& texture, UINT16 mipIndex, UINT16 arrayIndex, Aspect aspect) noexcept;
 		/// @brief Makes a copy location.
 		/// @param texture Target texture.
-		/// @param subresourceIndex Subresource index.
+		/// @param footprint Footprint.
 		/// @return Copy location.
 		[[nodiscard("Pure function")]]
-		static D3D12_TEXTURE_COPY_LOCATION MakeCopyLocation(const Texture& texture, UINT subresourceIndex) noexcept;
+		static D3D12_TEXTURE_COPY_LOCATION MakeCopyLocation(const Texture& texture, const CopyableFootprint& footprint) noexcept;
 		/// @brief Casts the engine corner rectangle to a native rectangle.
 		/// @param rect Engine corner rectangle.
 		/// @return Native rectangle.
@@ -336,6 +326,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @return Native rectangle.
 		[[nodiscard("Pure function")]]
 		static D3D12_RECT ToRect(const Math::Vector2<std::uint32_t>& offset, const Math::Vector2<std::uint32_t>& size) noexcept;
+		/// @brief Casts the engine rectangle parameters to a native rectangle.
+		/// @param offset Engine rectangle offset.
+		/// @param size Engine rectangle size.
+		/// @return Native rectangle.
+		[[nodiscard("Pure function")]]
+		static D3D12_RECT ToRect(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept;
 		/// @brief Casts the engine box parameters to a native box.
 		/// @param offset Engine box offset.
 		/// @param size Engine box size.
@@ -402,17 +398,32 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Validates the textures for copying.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Copy range.
-		static void ValidateCopy(const ITexture& source, const ITexture& destination, const CopySubTextureRange& range);
+		/// @param subTextures Sub-textures to copy.
+		static void ValidateCopy(const ITexture& source, const ITexture& destination, std::span<const CopySubTextureIndex> subTextures);
 		/// @brief Validates the textures for copying.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Copy range.
-		static void ValidateCopy(const ITexture& source, const ITexture& destination, const BoxCopySubTextureRange& range);
+		/// @param subTextures Sub-textures to copy.
+		/// @param boxes Copy boxes.
+		static void ValidateCopy(const ITexture& source, const ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes);
 		/// @brief Validates the textures for copying.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
 		static void ValidateCopyBase(const ITexture& source, const ITexture& destination);
+		/// @brief Validates the sub-textures for copying.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param subTextures Sub-textures to copy.
+		static void ValidateSubTextures(const ITexture& source, const ITexture& destination, std::span<const CopySubTextureIndex> subTextures);
+		/// @brief Validates the sub-textures for copying.
+		/// @param subTextures Sub-textures to copy.
+		static void ValidateSubTextures(std::span<const CopySubTextureIndex> subTextures);
+		/// @brief Validates the boxes for copying.
+		/// @param source Source texture.
+		/// @param destination Destination texture.
+		/// @param subTextures Sub-textures to copy.
+		/// @param boxes Copy boxes.
+		static void ValidateBoxes(const ITexture& source, const ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes);
 		/// @brief Validates the buffer and texture for copying.
 		/// @param buffer Source buffer.
 		/// @param texture Destination texture.
@@ -422,21 +433,25 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param buffer Source buffer.
 		/// @param texture Destination texture.
 		/// @param footprints Copyable footprints.
-		/// @param range Copy range.
-		static void ValidateCopy(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range);
-		/// @brief Validates the buffer and texture for copying.
-		/// @param buffer Source buffer.
-		/// @param texture Destination texture.
-		/// @param footprints Copyable footprints.
-		/// @param range Copy range.
+		/// @param boxes Copy boxes.
 		/// @param textureSource Is the texture a source?
-		static void ValidateCopy(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range, 
+		static void ValidateCopy(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes, 
 			bool textureSource);
 		/// @brief Validates the buffer and texture for copying.
 		/// @param buffer Source buffer.
 		/// @param texture Destination texture.
 		/// @param footprints Copyable footprints.
 		static void ValidateCopyBase(const IBuffer& buffer, const ITexture& texture, std::span<const CopyableFootprint> footprints);
+		/// @brief Validates the boxes for copying.
+		/// @param texture Source texture.
+		/// @param footprints Copyable footprints.
+		/// @param boxes Copy boxes.
+		static void ValidateBoxesForSource(const ITexture& texture, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes);
+		/// @brief Validates the boxes for copying.
+		/// @param texture Destination texture.
+		/// @param footprints Copyable footprints.
+		/// @param boxes Copy boxes.
+		static void ValidateBoxesForDestination(const ITexture& texture, std::span<const CopyableFootprint> footprints, std::span<const CopySubTextureBox> boxes);
 
 		/// @brief Validates the textures for resolving.
 		/// @param source Source texture.
@@ -445,13 +460,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Validates the textures for resolving.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Copy range.
-		static void ValidateResolve(const ITexture& source, const ITexture& destination, const CopySubTextureRange& range);
+		/// @param subTextures Sub-textures to resolve.
+		static void ValidateResolve(const ITexture& source, const ITexture& destination, std::span<const CopySubTextureIndex> subTextures);
 		/// @brief Validates the textures for resolving.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
-		/// @param range Copy range.
-		static void ValidateResolve(const ITexture& source, const ITexture& destination, const RectCopySubTextureRange& range);
+		/// @param subTextures Sub-textures to resolve.
+		/// @param boxes Resolve boxes.
+		static void ValidateResolve(const ITexture& source, const ITexture& destination, std::span<const CopySubTextureIndex> subTextures, std::span<const CopySubTextureBox> boxes);
 		/// @brief Validates the textures for resolving.
 		/// @param source Source texture.
 		/// @param destination Destination texture.
@@ -603,8 +619,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			};
 		}
 
-		commandList->RSSetViewports(static_cast<UINT>(regionCount), viewports.data());
-		commandList->RSSetScissorRects(static_cast<UINT>(regionCount), scissors.data());
+		commandList->RSSetViewports(static_cast<UINT>(regionCount), regionCount > 0u ? viewports.data() : nullptr);
+		commandList->RSSetScissorRects(static_cast<UINT>(regionCount), regionCount > 0u ? scissors.data() : nullptr);
 	}
 
 	void CommandList::SetDepthBias(const DepthBias& bias)
@@ -786,7 +802,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		const UINT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
 		commandList->ClearUnorderedAccessViewUint(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
-			&static_cast<const Texture&>(texture).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
+			&static_cast<const Texture&>(texture).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
 	}
 
 	void CommandList::ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
@@ -815,7 +831,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		const FLOAT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
 		commandList->ClearUnorderedAccessViewFloat(gpuContainer.GpuHandle(gpuViewIndex), static_cast<const ShaderDataContainer&>(cpuContainer).CpuHandle(cpuViewIndex),
-			&static_cast<const Texture&>(texture).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.data());
+			&static_cast<const Texture&>(texture).Resource(), clearValue, static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
 	}
 
 	void CommandList::Copy(const IBuffer& source, IBuffer& destination)
@@ -831,10 +847,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateState();
 		ValidateCopy(source, destination, ranges);
 
+		auto& sourceResource = static_cast<const Buffer&>(source).Resource();
+		auto& destinationResource = static_cast<Buffer&>(destination).Resource();
+
 		for (const CopyBufferRange& range : ranges)
 		{
-			commandList->CopyBufferRegion(&static_cast<Buffer&>(destination).Resource(), range.destinationOffset, 
-				&static_cast<const Buffer&>(source).Resource(), range.sourceOffset, range.size);
+			commandList->CopyBufferRegion(&destinationResource, range.destinationOffset, &sourceResource, range.sourceOffset, range.size);
 		}
 	}
 
@@ -846,63 +864,39 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->CopyResource(&static_cast<Texture&>(destination).Resource(), &static_cast<const Texture&>(source).Resource());
 	}
 
-	void CommandList::Copy(const ITexture& source, ITexture& destination, const CopySubTextureRange& range)
+	void CommandList::Copy(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures)
 	{
 		ValidateState();
-		ValidateCopy(source, destination, range);
+		ValidateCopy(source, destination, subTextures);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
 		auto& destinationTexture = static_cast<Texture&>(destination);
 
-		static constexpr std::size_t AspectCount = std::countr_one(std::to_underlying(AspectMask::All));
-		auto aspects = std::array<Aspect, AspectCount>();
-		const std::size_t aspectCount = ToValues(range.aspects, aspects);
-
-		for (std::size_t aspectIndex = 0uz; aspectIndex < aspectCount; ++aspectIndex)
+		for (const CopySubTextureIndex& subTexture : subTextures)
 		{
-			const Aspect aspect = aspects[aspectIndex];
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, static_cast<UINT16>(range.sourceMipIndex + mipIndex),
-						static_cast<UINT16>(range.sourceArrayIndex + arrayIndex), aspect);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, static_cast<UINT16>(range.destinationMipIndex + mipIndex),
-						static_cast<UINT16>(range.destinationArrayIndex + arrayIndex), aspect);
-					commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
-				}
-			}
+			const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, subTexture.sourceMipIndex, subTexture.sourceArrayIndex, subTexture.aspect);
+			const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, subTexture.destinationMipIndex, subTexture.destinationArrayIndex, subTexture.aspect);
+			commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 		}
 	}
 
-	void CommandList::Copy(const ITexture& source, ITexture& destination, const BoxCopySubTextureRange& range)
+	void CommandList::Copy(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, const std::span<const CopySubTextureBox> boxes)
 	{
 		ValidateState();
-		ValidateCopy(source, destination, range);
+		ValidateCopy(source, destination, subTextures, boxes);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
 		auto& destinationTexture = static_cast<Texture&>(destination);
 
-		static constexpr std::size_t AspectCount = std::countr_one(std::to_underlying(AspectMask::All));
-		auto aspects = std::array<Aspect, AspectCount>();
-		const std::size_t aspectCount = ToValues(range.aspects, aspects);
-
-		for (std::size_t aspectIndex = 0uz; aspectIndex < aspectCount; ++aspectIndex)
+		for (std::size_t i = 0uz; i < subTextures.size(); ++i)
 		{
-			const Aspect aspect = aspects[aspectIndex];
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, static_cast<UINT16>(range.sourceMipIndex + mipIndex),
-						static_cast<UINT16>(range.sourceArrayIndex + arrayIndex), aspect);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, static_cast<UINT16>(range.destinationMipIndex + mipIndex),
-						static_cast<UINT16>(range.destinationArrayIndex + arrayIndex), aspect);
-					const Math::Vector3<std::uint32_t> destinationOffset = range.destinationOffsets[mipIndex];
-					const D3D12_BOX sourceBox = ToBox(range.sourceOffsets[mipIndex], range.sourceSizes[mipIndex]);
-					commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
-				}
-			}
+			const CopySubTextureIndex& subTexture = subTextures[i];
+			const CopySubTextureBox& box = boxes[i];
+			const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, subTexture.sourceMipIndex, subTexture.sourceArrayIndex, subTexture.aspect);
+			const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, subTexture.destinationMipIndex, subTexture.destinationArrayIndex, subTexture.aspect);
+			const Math::Vector3<std::uint32_t>& destinationOffset = box.destinationOffset;
+			const D3D12_BOX sourceBox = ToBox(box.sourceOffset, box.sourceSize);
+			commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
 		}
 	}
 
@@ -914,59 +908,31 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const auto& sourceBuffer = static_cast<const Buffer&>(source);
 		auto& destinationTexture = static_cast<Texture&>(destination);
 
-		for (std::size_t i = 0uz; i < footprints.size(); ++i)
+		for (const CopyableFootprint& footprint : footprints)
 		{
-			const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprints[i], destinationTexture.NativeFormat());
-			const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, static_cast<UINT>(i));
+			const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprint, destinationTexture.NativeFormat());
+			const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, footprint);
 			commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 		}
 	}
 
-	void CommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	void CommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
 	{
 		ValidateState();
-		ValidateCopy(source, destination, footprints, range);
+		ValidateCopy(source, destination, footprints, boxes, false);
 
 		const auto& sourceBuffer = static_cast<const Buffer&>(source);
 		auto& destinationTexture = static_cast<Texture&>(destination);
 
-		for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < ToPlaneCount(range.aspects); ++planeIndex)
+		for (std::size_t i = 0uz; i < footprints.size(); ++i)
 		{
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, destinationTexture.MipCount(), destinationTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprints[subresource], destinationTexture.NativeFormat());
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, subresource);
-					commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
-				}
-			}
-		}
-	}
-
-	void CommandList::Copy(const IBuffer& source, ITexture& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
-	{
-		ValidateState();
-		ValidateCopy(source, destination, footprints, range, false);
-
-		const auto& sourceBuffer = static_cast<const Buffer&>(source);
-		auto& destinationTexture = static_cast<Texture&>(destination);
-
-		for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < ToPlaneCount(range.aspects); ++planeIndex)
-		{
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, destinationTexture.MipCount(), destinationTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprints[subresource], destinationTexture.NativeFormat());
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, subresource);
-					const Math::Vector3<std::uint32_t> destinationOffset = range.destinationOffsets[mipIndex];
-					const D3D12_BOX sourceBox = ToBox(range.sourceOffsets[mipIndex], range.sourceSizes[mipIndex]);
-					commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
-				}
-			}
+			const CopyableFootprint& footprint = footprints[i];
+			const CopySubTextureBox& box = boxes[i];
+			const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceBuffer, footprint, destinationTexture.NativeFormat());
+			const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationTexture, footprint);
+			const Math::Vector3<std::uint32_t>& destinationOffset = box.destinationOffset;
+			const D3D12_BOX sourceBox = ToBox(box.sourceOffset, box.sourceSize);
+			commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
 		}
 	}
 
@@ -978,59 +944,31 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const auto& sourceTexture = static_cast<const Texture&>(source);
 		auto& destinationBuffer = static_cast<Buffer&>(destination);
 
-		for (std::size_t i = 0uz; i < footprints.size(); ++i)
+		for (const CopyableFootprint& footprint : footprints)
 		{
-			const auto sourceLocation = MakeCopyLocation(sourceTexture, static_cast<UINT>(i));
-			const auto destinationLocation = MakeCopyLocation(destinationBuffer, footprints[i], sourceTexture.NativeFormat());
+			const auto sourceLocation = MakeCopyLocation(sourceTexture, footprint);
+			const auto destinationLocation = MakeCopyLocation(destinationBuffer, footprint, sourceTexture.NativeFormat());
 			commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
 		}
 	}
 
-	void CommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
+	void CommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
 	{
 		ValidateState();
-		ValidateCopy(destination, source, footprints, range);
+		ValidateCopy(destination, source, footprints, boxes, true);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
 		auto& destinationBuffer = static_cast<Buffer&>(destination);
 
-		for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < ToPlaneCount(range.aspects); ++planeIndex)
+		for (std::size_t i = 0uz; i < footprints.size(); ++i)
 		{
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, subresource);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationBuffer, footprints[subresource], sourceTexture.NativeFormat());
-					commandList->CopyTextureRegion(&destinationLocation, 0u, 0u, 0u, &sourceLocation, nullptr);
-				}
-			}
-		}
-	}
-
-	void CommandList::Copy(const ITexture& source, IBuffer& destination, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range)
-	{
-		ValidateState();
-		ValidateCopy(destination, source, footprints, range, true);
-
-		const auto& sourceTexture = static_cast<const Texture&>(source);
-		auto& destinationBuffer = static_cast<Buffer&>(destination);
-
-		for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < ToPlaneCount(range.aspects); ++planeIndex)
-		{
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const UINT subresource = CalculateSubresource(mipIndex, arrayIndex, planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					const D3D12_TEXTURE_COPY_LOCATION sourceLocation = MakeCopyLocation(sourceTexture, subresource);
-					const D3D12_TEXTURE_COPY_LOCATION destinationLocation = MakeCopyLocation(destinationBuffer, footprints[subresource], sourceTexture.NativeFormat());
-					const Math::Vector3<std::uint32_t> destinationOffset = range.destinationOffsets[mipIndex];
-					const D3D12_BOX sourceBox = ToBox(range.sourceOffsets[mipIndex], range.sourceSizes[mipIndex]);
-					commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
-				}
-			}
+			const CopyableFootprint& footprint = footprints[i];
+			const CopySubTextureBox& box = boxes[i];
+			const auto sourceLocation = MakeCopyLocation(sourceTexture, footprint);
+			const auto destinationLocation = MakeCopyLocation(destinationBuffer, footprint, sourceTexture.NativeFormat());
+			const Math::Vector3<std::uint32_t>& destinationOffset = box.destinationOffset;
+			const D3D12_BOX sourceBox = ToBox(box.sourceOffset, box.sourceSize);
+			commandList->CopyTextureRegion(&destinationLocation, destinationOffset.X(), destinationOffset.Y(), destinationOffset.Z(), &sourceLocation, &sourceBox);
 		}
 	}
 
@@ -1058,57 +996,48 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	void CommandList::Resolve(const ITexture& source, ITexture& destination, const CopySubTextureRange& range, const ResolveMode mode)
+	void CommandList::Resolve(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, const ResolveMode mode)
 	{
 		ValidateState();
-		ValidateResolve(source, destination, range);
+		ValidateResolve(source, destination, subTextures);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
 		auto& destinationTexture = static_cast<Texture&>(destination);
 		const D3D12_RESOLVE_MODE resolveMode = ToResolveMode(mode);
 
-		for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < ToPlaneCount(range.aspects); ++planeIndex)
+		for (const CopySubTextureIndex& subTexture : subTextures)
 		{
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const UINT sourceSubresource = CalculateSubresource(static_cast<UINT16>(range.sourceMipIndex + mipIndex), static_cast<UINT16>(range.sourceArrayIndex + arrayIndex),
-						planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					const UINT destinationSubresource = CalculateSubresource(static_cast<UINT16>(range.destinationMipIndex + mipIndex), 
-						static_cast<UINT16>(range.destinationArrayIndex + arrayIndex), planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					commandList->ResolveSubresourceRegion(&destinationTexture.Resource(), destinationSubresource, 0u, 0u, &sourceTexture.Resource(), sourceSubresource,
-						nullptr, sourceTexture.NativeFormat(), resolveMode);
-				}
-			}
+			const UINT sourceSubresource = CalculateSubresource(subTexture.sourceMipIndex, subTexture.sourceArrayIndex, ToPlaneIndex(subTexture.aspect), 
+				sourceTexture.MipCount(), sourceTexture.ArraySize());
+			const UINT destinationSubresource = CalculateSubresource(subTexture.destinationMipIndex, subTexture.destinationArrayIndex, ToPlaneIndex(subTexture.aspect), 
+				destinationTexture.MipCount(), destinationTexture.ArraySize());
+			commandList->ResolveSubresourceRegion(&destinationTexture.Resource(), destinationSubresource, 0u, 0u, &sourceTexture.Resource(), sourceSubresource,
+				nullptr, sourceTexture.NativeFormat(), resolveMode);
 		}
 	}
 
-	void CommandList::Resolve(const ITexture& source, ITexture& destination, const RectCopySubTextureRange& range, const ResolveMode mode)
+	void CommandList::Resolve(const ITexture& source, ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, const std::span<const CopySubTextureBox> boxes, 
+		const ResolveMode mode)
 	{
 		ValidateState();
-		ValidateResolve(source, destination, range);
+		ValidateResolve(source, destination, subTextures, boxes);
 
 		const auto& sourceTexture = static_cast<const Texture&>(source);
 		auto& destinationTexture = static_cast<Texture&>(destination);
 		const D3D12_RESOLVE_MODE resolveMode = ToResolveMode(mode);
 
-		for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < ToPlaneCount(range.aspects); ++planeIndex)
+		for (std::size_t i = 0uz; i < subTextures.size(); ++i)
 		{
-			for (std::uint16_t arrayIndex = 0u; arrayIndex < range.arrayCount; ++arrayIndex)
-			{
-				for (std::uint8_t mipIndex = 0u; mipIndex < range.mipCount; ++mipIndex)
-				{
-					const UINT sourceSubresource = CalculateSubresource(static_cast<UINT16>(range.sourceMipIndex + mipIndex), static_cast<UINT16>(range.sourceArrayIndex + arrayIndex),
-						planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					const UINT destinationSubresource = CalculateSubresource(static_cast<UINT16>(range.destinationMipIndex + mipIndex),
-						static_cast<UINT16>(range.destinationArrayIndex + arrayIndex), planeIndex, sourceTexture.MipCount(), sourceTexture.ArraySize());
-					const auto destinationOffset = Math::Vector2<std::uint32_t>(range.destinationOffsets[mipIndex].X(), range.destinationOffsets[mipIndex].Y());
-					D3D12_RECT sourceRect = ToRect(range.sourceOffsets[mipIndex], range.sourceSizes[mipIndex]);
-					commandList->ResolveSubresourceRegion(&destinationTexture.Resource(), destinationSubresource, destinationOffset.X(), destinationOffset.Y(), 
-						&sourceTexture.Resource(), sourceSubresource, &sourceRect, sourceTexture.NativeFormat(), resolveMode);
-				}
-			}
+			const CopySubTextureIndex& subTexture = subTextures[i];
+			const CopySubTextureBox& box = boxes[i];
+			const UINT sourceSubresource = CalculateSubresource(subTexture.sourceMipIndex, subTexture.sourceArrayIndex, ToPlaneIndex(subTexture.aspect),
+				sourceTexture.MipCount(), sourceTexture.ArraySize());
+			const UINT destinationSubresource = CalculateSubresource(subTexture.destinationMipIndex, subTexture.destinationArrayIndex, ToPlaneIndex(subTexture.aspect),
+				destinationTexture.MipCount(), destinationTexture.ArraySize());
+			const Math::Vector3<std::uint32_t>& destinationOffset = box.destinationOffset;
+			D3D12_RECT sourceRect = ToRect(box.sourceOffset, box.sourceSize);
+			commandList->ResolveSubresourceRegion(&destinationTexture.Resource(), destinationSubresource, destinationOffset.X(), destinationOffset.Y(),
+				&sourceTexture.Resource(), sourceSubresource, &sourceRect, sourceTexture.NativeFormat(), resolveMode);
 		}
 	}
 
@@ -1274,7 +1203,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 					.Format = format,
 					.Width = footprint.width,
 					.Height = footprint.height,
-					.Depth = footprint.sliceCount,
+					.Depth = footprint.depth,
 					.RowPitch = static_cast<UINT>(footprint.rowPitch)
 				}
 			}
@@ -1291,13 +1220,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	D3D12_TEXTURE_COPY_LOCATION CommandList::MakeCopyLocation(const Texture& texture, const UINT subresourceIndex) noexcept
+	D3D12_TEXTURE_COPY_LOCATION CommandList::MakeCopyLocation(const Texture& texture, const CopyableFootprint& footprint) noexcept
 	{
 		return D3D12_TEXTURE_COPY_LOCATION
 		{
 			.pResource = &texture.Resource(),
 			.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX,
-			.SubresourceIndex = subresourceIndex
+			.SubresourceIndex = CalculateSubresource(footprint.mipIndex, footprint.arrayIndex, ToPlaneIndex(footprint.aspect), texture.MipCount(), texture.ArraySize())
 		};
 	}
 
@@ -1307,6 +1236,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	D3D12_RECT CommandList::ToRect(const Math::Vector2<std::uint32_t>& offset, const Math::Vector2<std::uint32_t>& size) noexcept
+	{
+		return D3D12_RECT
+		{
+			.left = static_cast<LONG>(offset.X()),
+			.top = static_cast<LONG>(offset.Y()),
+			.right = static_cast<LONG>(offset.X() + size.X()),
+			.bottom = static_cast<LONG>(offset.Y() + size.Y()),
+		};
+	}
+
+	D3D12_RECT CommandList::ToRect(const Math::Vector3<std::uint32_t>& offset, const Math::Vector3<std::uint32_t>& size) noexcept
 	{
 		return D3D12_RECT
 		{
@@ -1345,6 +1285,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				throw std::invalid_argument("Invalid buffer");
 			}
 		}
+
+		for (std::size_t i = 1uz; i < bufferBarriers.size(); ++i)
+		{
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				if (bufferBarriers[i].buffer == bufferBarriers[j].buffer) [[unlikely]]
+				{
+					throw std::invalid_argument("Same buffer is found twice");
+				}
+			}
+		}
 #endif
 	}
 
@@ -1381,6 +1332,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			if (barrier.discard && barrier.beforeLayout != ResourceLayout::Undefined) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid discard flag");
+			}
+		}
+
+		for (std::size_t i = 1uz; i < textureBarriers.size(); ++i)
+		{
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				if (textureBarriers[i].texture == textureBarriers[j].texture) [[unlikely]]
+				{
+					throw std::invalid_argument("Same texture is found twice");
+				}
 			}
 		}
 #endif
@@ -1582,7 +1544,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			if (std::numeric_limits<std::uint64_t>::max() - range.sourceOffset < range.size || std::numeric_limits<std::uint64_t>::max() - range.destinationOffset < range.size) [[unlikely]]
 			{
-				throw std::invalid_argument("Invalid size");
+				throw std::invalid_argument("Invalid range");
 			}
 
 			if (static_cast<const Buffer&>(source).Size() < range.sourceOffset + range.size) [[unlikely]]
@@ -1592,6 +1554,19 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			if (static_cast<const Buffer&>(destination).Size() < range.destinationOffset + range.size) [[unlikely]]
 			{
 				throw std::invalid_argument("Destination buffer is too small");
+			}
+		}
+
+		for (std::size_t i = 1uz; i < ranges.size(); ++i)
+		{
+			const CopyBufferRange& iRange = ranges[i];
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				const CopyBufferRange& jRange = ranges[j];
+				if (!(iRange.destinationOffset + iRange.size <= jRange.destinationOffset || iRange.destinationOffset >= jRange.destinationOffset + jRange.size)) [[unlikely]]
+				{
+					throw std::invalid_argument("Ranges overlap");
+				}
 			}
 		}
 #endif
@@ -1621,8 +1596,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ValidateCopyBase(source, destination);
 
 #ifndef NDEBUG
-		const Texture& sourceTexture = static_cast<const Texture&>(source);
-		const Texture& destinationTexture = static_cast<const Texture&>(destination);
+		const auto& sourceTexture = static_cast<const Texture&>(source);
+		const auto& destinationTexture = static_cast<const Texture&>(destination);
 
 		if (sourceTexture.MipCount() != destinationTexture.MipCount()) [[unlikely]]
 		{
@@ -1640,85 +1615,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void CommandList::ValidateCopy(const ITexture& source, const ITexture& destination, const CopySubTextureRange& range)
+	void CommandList::ValidateCopy(const ITexture& source, const ITexture& destination, const std::span<const CopySubTextureIndex> subTextures)
 	{
 		ValidateCopyBase(source, destination);
-
-#ifndef NDEBUG
-		const auto& sourceTexture = static_cast<const Texture&>(source);
-		const auto& destinationTexture = static_cast<const Texture&>(destination);
-
-		if (range.sourceMipIndex + range.mipCount > sourceTexture.MipCount() || range.destinationMipIndex + range.mipCount > destinationTexture.MipCount()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid mip range");
-		}
-		if (range.sourceArrayIndex + range.arrayCount > sourceTexture.ArraySize() || range.destinationArrayIndex + range.arrayCount > destinationTexture.ArraySize()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid array range");
-		}
-		
-		if (!All(range.aspects, GetAspects(sourceTexture.NativeFormat())) || !All(range.aspects, GetAspects(destinationTexture.NativeFormat()))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
-		}
-#endif
+		ValidateSubTextures(source, destination, subTextures);
+		ValidateSubTextures(subTextures);
 	}
 
-	void CommandList::ValidateCopy(const ITexture& source, const ITexture& destination, const BoxCopySubTextureRange& range)
+	void CommandList::ValidateCopy(const ITexture& source, const ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, 
+		const std::span<const CopySubTextureBox> boxes)
 	{
 		ValidateCopyBase(source, destination);
-
-#ifndef NDEBUG
-		const auto& sourceTexture = static_cast<const Texture&>(source);
-		const auto& destinationTexture = static_cast<const Texture&>(destination);
-
-		if (range.sourceMipIndex + range.mipCount > sourceTexture.MipCount() || range.destinationMipIndex + range.mipCount > destinationTexture.MipCount()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid mip range");
-		}
-		if (range.sourceArrayIndex + range.arrayCount > sourceTexture.ArraySize() || range.destinationArrayIndex + range.arrayCount > destinationTexture.ArraySize()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid array range");
-		}
-
-		if (!All(range.aspects, GetAspects(sourceTexture.NativeFormat())) || !All(range.aspects, GetAspects(destinationTexture.NativeFormat()))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
-		}
-
-		if (range.sourceOffsets.size() != range.mipCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid source offsets");
-		}
-		if (range.destinationOffsets.size() != range.mipCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid destination offsets");
-		}
-		if (range.sourceSizes.size() != range.mipCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid source sizes");
-		}
-
-		const Math::Vector3<std::uint32_t> sourceSize = sourceTexture.Size();
-		const Math::Vector3<std::uint32_t> destinationSize = destinationTexture.Size();
-		for (std::uint8_t i = 0u; i < range.mipCount; ++i)
-		{
-			const Math::Vector3<std::uint32_t> sourceMipSize = MipSize(sourceSize, range.sourceMipIndex + i);
-			const Math::Vector3<std::uint32_t> destinationMipSize = MipSize(destinationSize, range.destinationMipIndex + i);
-
-			const Math::Vector3<std::uint32_t> sourceRequiredSize = range.sourceOffsets[i] + range.sourceSizes[i];
-			if (sourceRequiredSize.X() > sourceMipSize.X() || sourceRequiredSize.Y() > sourceMipSize.Y() || sourceRequiredSize.Z() > sourceMipSize.Z()) [[unlikely]]
-			{
-				throw std::invalid_argument("Source box is too great");
-			}
-
-			const Math::Vector3<std::uint32_t> destinationRequiredSize = range.destinationOffsets[i];
-			if (destinationRequiredSize.X() >= destinationMipSize.X() || destinationRequiredSize.Y() >= destinationMipSize.Y() || destinationRequiredSize.Z() >= destinationMipSize.Z()) [[unlikely]]
-			{
-				throw std::invalid_argument("Destination size is too little");
-			}
-		}
-#endif
+		ValidateSubTextures(source, destination, subTextures);
+		ValidateSubTextures(subTextures);
+		ValidateBoxes(source, destination, subTextures, boxes);
 	}
 
 	void CommandList::ValidateCopyBase(const ITexture& source, const ITexture& destination)
@@ -1752,103 +1662,99 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
+	void CommandList::ValidateSubTextures(const ITexture& source, const ITexture& destination, const std::span<const CopySubTextureIndex> subTextures)
+	{
+#ifndef NDEBUG
+		const auto& sourceTexture = static_cast<const Texture&>(source);
+		const auto& destinationTexture = static_cast<const Texture&>(destination);
+
+		for (const CopySubTextureIndex& subTexture : subTextures)
+		{
+			if (subTexture.sourceMipIndex >= sourceTexture.MipCount() || subTexture.destinationMipIndex >= destinationTexture.MipCount()) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid mip range");
+			}
+			if (subTexture.sourceArrayIndex >= sourceTexture.ArraySize() || subTexture.destinationArrayIndex >= destinationTexture.ArraySize()) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid array range");
+			}
+
+			if (!IsInMask(subTexture.aspect, GetAspects(sourceTexture.NativeFormat())) || !IsInMask(subTexture.aspect, GetAspects(destinationTexture.NativeFormat()))) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid aspect");
+			}
+		}
+#endif
+	}
+
+	void CommandList::ValidateSubTextures(const std::span<const CopySubTextureIndex> subTextures)
+	{
+#ifndef NDEBUG
+		for (std::size_t i = 1uz; i < subTextures.size(); ++i)
+		{
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				if (subTextures[i].destinationMipIndex == subTextures[j].destinationMipIndex && subTextures[i].destinationArrayIndex == subTextures[j].destinationMipIndex &&
+					subTextures[i].aspect == subTextures[j].aspect) [[unlikely]]
+				{
+					throw std::invalid_argument("Sub-textures overlap");
+				}
+			}
+		}
+#endif
+	}
+
+	void CommandList::ValidateBoxes(const ITexture& source, const ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, 
+		const std::span<const CopySubTextureBox> boxes)
+	{
+#ifndef NDEBUG
+		if (subTextures.size() != boxes.size())
+		{
+			throw std::invalid_argument("Invalid box count");
+		}
+
+		const auto& sourceTexture = static_cast<const Texture&>(source);
+		const auto& destinationTexture = static_cast<const Texture&>(destination);
+		const Math::Vector3<std::uint32_t> sourceSize = sourceTexture.Size();
+		const Math::Vector3<std::uint32_t> destinationSize = destinationTexture.Size();
+
+		for (std::size_t i = 0uz; i < subTextures.size(); ++i)
+		{
+			const Math::Vector3<std::uint32_t> sourceMipSize = MipSize(sourceSize, subTextures[i].sourceMipIndex);
+			const Math::Vector3<std::uint32_t> destinationMipSize = MipSize(destinationSize, subTextures[i].destinationMipIndex);
+
+			const Math::Vector3<std::uint32_t> sourceRequiredSize = boxes[i].sourceOffset + boxes[i].sourceSize;
+			if (sourceRequiredSize.X() > sourceMipSize.X() || sourceRequiredSize.Y() > sourceMipSize.Y() || sourceRequiredSize.Z() > sourceMipSize.Z()) [[unlikely]]
+			{
+				throw std::invalid_argument("Source box is too great");
+			}
+
+			const Math::Vector3<std::uint32_t> destinationRequiredSize = boxes[i].destinationOffset;
+			if (destinationRequiredSize.X() >= destinationMipSize.X() || destinationRequiredSize.Y() >= destinationMipSize.Y() || destinationRequiredSize.Z() >= destinationMipSize.Z()) [[unlikely]]
+			{
+				throw std::invalid_argument("Destination size is too little");
+			}
+		}
+#endif
+	}
+
 	void CommandList::ValidateCopy(const IBuffer& buffer, const ITexture& texture, const std::span<const CopyableFootprint> footprints)
 	{
 		ValidateCopyBase(buffer, texture, footprints);
 	}
 
-	void CommandList::ValidateCopy(const IBuffer& buffer, const ITexture& texture, const std::span<const CopyableFootprint> footprints, const FootprintedCopySubTextureRange& range)
-	{
-		ValidateCopyBase(buffer, texture, footprints);
-
-#ifndef NDEBUG
-		const auto& destinationTexture = static_cast<const Texture&>(texture);
-
-		if ((range.mipIndex + range.mipCount) * (range.arrayIndex + range.arrayCount) * ToPlaneCount(range.aspects) > footprints.size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid range");
-		}
-		if (range.mipIndex + range.mipCount > destinationTexture.MipCount()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid mip range");
-		}
-		if (range.arrayIndex + range.arrayCount > destinationTexture.ArraySize()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid array range");
-		}
-		if (!All(range.aspects, GetAspects(destinationTexture.NativeFormat()))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect range");
-		}
-#endif
-	}
-
-	void CommandList::ValidateCopy(const IBuffer& buffer, const ITexture& texture, const std::span<const CopyableFootprint> footprints, const FootprintedBoxCopySubTextureRange& range,
+	void CommandList::ValidateCopy(const IBuffer& buffer, const ITexture& texture, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes,
 		const bool textureSource)
 	{
 		ValidateCopyBase(buffer, texture, footprints);
-
-#ifndef NDEBUG
-		const auto& nativeTexture = static_cast<const Texture&>(texture);
-
-		if ((range.mipIndex + range.mipCount) * (range.arrayIndex + range.arrayCount) * ToPlaneCount(range.aspects) > footprints.size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid range");
-		}
-		if (range.mipIndex + range.mipCount > nativeTexture.MipCount()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid mip range");
-		}
-		if (range.arrayIndex + range.arrayCount > nativeTexture.ArraySize()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid array range");
-		}
-		if (!All(range.aspects, GetAspects(nativeTexture.NativeFormat()))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect range");
-		}
-
-		if (range.sourceOffsets.size() != range.mipCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid source offsets");
-		}
-		if (range.destinationOffsets.size() != range.mipCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid destination offsets");
-		}
-		if (range.sourceSizes.size() != range.mipCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid source sizes");
-		}
-
-		const Math::Vector3<std::uint32_t> textureSize = nativeTexture.Size();
 		if (textureSource)
 		{
-			for (std::uint8_t i = 0u; i < range.mipCount; ++i)
-			{
-				const Math::Vector3<std::uint32_t> mipSize = MipSize(textureSize, range.mipIndex + i);
-				const Math::Vector3<std::uint32_t> requiredSize = range.sourceOffsets[i] + range.sourceSizes[i];
-
-				if (requiredSize.X() > mipSize.X() || requiredSize.Y() > mipSize.Y() || requiredSize.Z() > mipSize.Z()) [[unlikely]]
-				{
-					throw std::invalid_argument("Source box is too great");
-				}
-			}
+			ValidateBoxesForSource(texture, footprints, boxes);
 		}
 		else
 		{
-			for (std::uint8_t i = 0u; i < range.mipCount; ++i)
-			{
-				const Math::Vector3<std::uint32_t> mipSize = MipSize(textureSize, range.mipIndex + i);
-				const Math::Vector3<std::uint32_t> requiredSize = range.destinationOffsets[i];
-
-				if (requiredSize.X() >= mipSize.X() || requiredSize.Y() >= mipSize.Y() || requiredSize.Z() >= mipSize.Z()) [[unlikely]]
-				{
-					throw std::invalid_argument("Destination size is too little");
-				}
-			}
+			ValidateBoxesForDestination(texture, footprints, boxes);
 		}
-#endif
 	}
 
 	void CommandList::ValidateCopyBase(const IBuffer& buffer, const ITexture& texture, const std::span<const CopyableFootprint> footprints)
@@ -1863,11 +1769,65 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			throw std::invalid_argument("Invalid texture");
 		}
 
+		const auto& nativeBuffer = static_cast<const Buffer&>(buffer);
+		const auto& nativeTexture = static_cast<const Texture&>(texture);
+
 		for (const CopyableFootprint& footprint : footprints)
 		{
-			if (footprint.rowPitch > std::numeric_limits<UINT>::max()) [[unlikely]]
+			if (footprint.rowPitch > std::numeric_limits<UINT>::max() ||
+				footprint.offset + footprint.rowPitch * footprint.rowCount > nativeBuffer.Size() ||
+				footprint.mipIndex >= nativeTexture.MipCount() ||
+				Math::Vector3<std::uint32_t>(footprint.width, footprint.height, footprint.depth) != MipSize(nativeTexture.Size(), footprint.mipIndex) ||
+				footprint.arrayIndex >= nativeTexture.ArraySize() ||
+				!IsInMask(footprint.aspect, GetAspects(nativeTexture.NativeFormat()))) [[unlikely]]
 			{
-				throw std::invalid_argument("Invalid row pitch");
+				throw std::invalid_argument("Invalid footprint");
+			}
+		}
+#endif
+	}
+
+	void CommandList::ValidateBoxesForSource(const ITexture& texture, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
+	{
+#ifndef NDEBUG
+		if (footprints.size() != boxes.size())
+		{
+			throw std::invalid_argument("Invalid box count");
+		}
+
+		const auto& nativeTexture = static_cast<const Texture&>(texture);
+		const Math::Vector3<std::uint32_t> textureSize = nativeTexture.Size();
+
+		for (std::size_t i = 0uz; i < footprints.size(); ++i)
+		{
+			const Math::Vector3<std::uint32_t> mipSize = MipSize(textureSize, footprints[i].mipIndex);
+			const Math::Vector3<std::uint32_t> sourceRequiredSize = boxes[i].sourceOffset + boxes[i].sourceSize;
+			if (sourceRequiredSize.X() > mipSize.X() || sourceRequiredSize.Y() > mipSize.Y() || sourceRequiredSize.Z() > mipSize.Z()) [[unlikely]]
+			{
+				throw std::invalid_argument("Source box is too great");
+			}
+		}
+#endif
+	}
+
+	void CommandList::ValidateBoxesForDestination(const ITexture& texture, const std::span<const CopyableFootprint> footprints, const std::span<const CopySubTextureBox> boxes)
+	{
+#ifndef NDEBUG
+		if (footprints.size() != boxes.size())
+		{
+			throw std::invalid_argument("Invalid box count");
+		}
+
+		const auto& nativeTexture = static_cast<const Texture&>(texture);
+		const Math::Vector3<std::uint32_t> textureSize = nativeTexture.Size();
+
+		for (std::size_t i = 0uz; i < footprints.size(); ++i)
+		{
+			const Math::Vector3<std::uint32_t> mipSize = MipSize(textureSize, footprints[i].mipIndex);
+			const Math::Vector3<std::uint32_t>& destinationRequiredSize = boxes[i].destinationOffset;
+			if (destinationRequiredSize.X() >= mipSize.X() || destinationRequiredSize.Y() >= mipSize.Y() || destinationRequiredSize.Z() >= mipSize.Z()) [[unlikely]]
+			{
+				throw std::invalid_argument("Destination size is too little");
 			}
 		}
 #endif
@@ -1896,77 +1856,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void CommandList::ValidateResolve(const ITexture& source, const ITexture& destination, const CopySubTextureRange& range)
+	void CommandList::ValidateResolve(const ITexture& source, const ITexture& destination, const std::span<const CopySubTextureIndex> subTextures)
 	{
 		ValidateResolveBase(source, destination);
-
-#ifndef NDEBUG
-		const auto& sourceTexture = static_cast<const Texture&>(source);
-		const auto& destinationTexture = static_cast<const Texture&>(destination);
-
-		if (range.sourceMipIndex + range.mipCount > sourceTexture.MipCount() || range.destinationMipIndex + range.mipCount > destinationTexture.MipCount()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid mip range");
-		}
-		if (range.sourceArrayIndex + range.arrayCount > sourceTexture.ArraySize() || range.destinationArrayIndex + range.arrayCount > destinationTexture.ArraySize()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid array range");
-		}
-
-		if (!All(range.aspects, GetAspects(sourceTexture.NativeFormat())) || !All(range.aspects, GetAspects(destinationTexture.NativeFormat()))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
-		}
-
-		if (MipSize(sourceTexture.Size(), range.sourceMipIndex) != MipSize(destinationTexture.Size(), range.destinationMipIndex)) [[unlikely]]
-		{
-			throw std::invalid_argument("Texture mipped sizes don't match");
-		}
-#endif
+		ValidateSubTextures(source, destination, subTextures);
+		ValidateSubTextures(subTextures);
 	}
 
-	void CommandList::ValidateResolve(const ITexture& source, const ITexture& destination, const RectCopySubTextureRange& range)
+	void CommandList::ValidateResolve(const ITexture& source, const ITexture& destination, const std::span<const CopySubTextureIndex> subTextures, 
+		const std::span<const CopySubTextureBox> boxes)
 	{
 		ValidateResolveBase(source, destination);
-
-#ifndef NDEBUG
-		const auto& sourceTexture = static_cast<const Texture&>(source);
-		const auto& destinationTexture = static_cast<const Texture&>(destination);
-
-		if (range.sourceMipIndex + range.mipCount > sourceTexture.MipCount() || range.destinationMipIndex + range.mipCount > destinationTexture.MipCount()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid mip range");
-		}
-		if (range.sourceArrayIndex + range.arrayCount > sourceTexture.ArraySize() || range.destinationArrayIndex + range.arrayCount > destinationTexture.ArraySize()) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid array range");
-		}
-
-		if (!All(range.aspects, GetAspects(sourceTexture.NativeFormat())) || !All(range.aspects, GetAspects(destinationTexture.NativeFormat()))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
-		}
-
-		const Math::Vector3<std::uint32_t> sourceSize = sourceTexture.Size();
-		const Math::Vector3<std::uint32_t> destinationSize = destinationTexture.Size();
-		for (std::uint8_t i = 0u; i < range.mipCount; ++i)
-		{
-			const Math::Vector3<std::uint32_t> sourceMipSize = MipSize(sourceSize, range.sourceMipIndex + i);
-			const Math::Vector3<std::uint32_t> destinationMipSize = MipSize(destinationSize, range.destinationMipIndex + i);
-
-			const Math::Vector2<std::uint32_t> sourceRequiredSize = range.sourceOffsets[i] + range.sourceSizes[i];
-			if (sourceRequiredSize.X() > sourceMipSize.X() || sourceRequiredSize.Y() > sourceMipSize.Y()) [[unlikely]]
-			{
-				throw std::invalid_argument("Source box is too great");
-			}
-
-			const Math::Vector2<std::uint32_t> destinationRequiredSize = range.destinationOffsets[i];
-			if (destinationRequiredSize.X() >= destinationMipSize.X() || destinationRequiredSize.Y() >= destinationMipSize.Y()) [[unlikely]]
-			{
-				throw std::invalid_argument("Destination size is too little");
-			}
-		}
-#endif
+		ValidateSubTextures(source, destination, subTextures);
+		ValidateSubTextures(subTextures);
+		ValidateBoxes(source, destination, subTextures, boxes);
 	}
 
 	void CommandList::ValidateResolveBase(const ITexture& source, const ITexture& destination)
