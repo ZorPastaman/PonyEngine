@@ -22,6 +22,8 @@ import PonyEngine.RenderDevice;
 import :CommandList;
 import :ComputePipelineBinding;
 import :ContainerBinding;
+import :DescriptorHeapUtility;
+import :PipelineStateUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
@@ -127,16 +129,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ComputeCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)
 	{
-		commandList.ValidateContainers(shaderDataContainer, samplerContainer);
-		containerBinding.SetContainers(static_cast<const ShaderDataContainer*>(shaderDataContainer), static_cast<const SamplerContainer*>(samplerContainer), commandList);
+		commandList.ValidateState();
+		containerBinding.SetContainers(ToNativeContainer(shaderDataContainer), ToNativeContainer(samplerContainer), commandList);
 	}
 
 	void ComputeCommandList::BindPipelineState(const IComputePipelineState& pipelineState)
 	{
-		commandList.ValidatePipelineState(pipelineState);
-
-		pipelineBinding.BindPipelineState(static_cast<const ComputePipelineState&>(pipelineState), commandList);
-		pipelineBinding.SetPipelineState(commandList);
+		commandList.ValidateState();
+		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
 	}
 
 	void ComputeCommandList::BindCompute(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)

@@ -20,10 +20,53 @@ import std;
 import PonyEngine.RenderDevice;
 import PonyEngine.Type;
 
+import :ComputePipelineState;
+import :GraphicsPipelineState;
 import :Utility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	GraphicsPipelineState& ToNativePipelineState(IGraphicsPipelineState& pipelineState);
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	const GraphicsPipelineState& ToNativePipelineState(const IGraphicsPipelineState& pipelineState);
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	GraphicsPipelineState* ToNativePipelineState(IGraphicsPipelineState* pipelineState);
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	const GraphicsPipelineState* ToNativePipelineState(const IGraphicsPipelineState* pipelineState);
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	ComputePipelineState& ToNativePipelineState(IComputePipelineState& pipelineState);
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	const ComputePipelineState& ToNativePipelineState(const IComputePipelineState& pipelineState);
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	ComputePipelineState* ToNativePipelineState(IComputePipelineState* pipelineState);
+	/// @brief Casts the pipeline state to a native pipeline state.
+	/// @param pipelineState Pipeline state.
+	/// @return Native pipeline state.
+	[[nodiscard("Pure function")]]
+	const ComputePipelineState* ToNativePipelineState(const IComputePipelineState* pipelineState);
+
 	/// @brief Makes a rasterizer description.
 	/// @param params Rasterizer parameters.
 	/// @return Rasterizer description.
@@ -85,6 +128,102 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	GraphicsPipelineState& ToNativePipelineState(IGraphicsPipelineState& pipelineState)
+	{
+#ifndef NDEBUG
+		if (typeid(pipelineState) != typeid(GraphicsPipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<GraphicsPipelineState&>(pipelineState);
+	}
+
+	const GraphicsPipelineState& ToNativePipelineState(const IGraphicsPipelineState& pipelineState)
+	{
+#ifndef NDEBUG
+		if (typeid(pipelineState) != typeid(GraphicsPipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<const GraphicsPipelineState&>(pipelineState);
+	}
+
+	GraphicsPipelineState* ToNativePipelineState(IGraphicsPipelineState* const pipelineState)
+	{
+#ifndef NDEBUG
+		if (pipelineState && typeid(*pipelineState) != typeid(GraphicsPipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<GraphicsPipelineState*>(pipelineState);
+	}
+
+	const GraphicsPipelineState* ToNativePipelineState(const IGraphicsPipelineState* const pipelineState)
+	{
+#ifndef NDEBUG
+		if (pipelineState && typeid(*pipelineState) != typeid(GraphicsPipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<const GraphicsPipelineState*>(pipelineState);
+	}
+
+	ComputePipelineState& ToNativePipelineState(IComputePipelineState& pipelineState)
+	{
+#ifndef NDEBUG
+		if (typeid(pipelineState) != typeid(ComputePipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<ComputePipelineState&>(pipelineState);
+	}
+
+	const ComputePipelineState& ToNativePipelineState(const IComputePipelineState& pipelineState)
+	{
+#ifndef NDEBUG
+		if (typeid(pipelineState) != typeid(ComputePipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<const ComputePipelineState&>(pipelineState);
+	}
+
+	ComputePipelineState* ToNativePipelineState(IComputePipelineState* const pipelineState)
+	{
+#ifndef NDEBUG
+		if (pipelineState && typeid(*pipelineState) != typeid(ComputePipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<ComputePipelineState*>(pipelineState);
+	}
+
+	const ComputePipelineState* ToNativePipelineState(const IComputePipelineState* const pipelineState)
+	{
+#ifndef NDEBUG
+		if (pipelineState && typeid(*pipelineState) != typeid(ComputePipelineState)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline state");
+		}
+#endif
+
+		return static_cast<const ComputePipelineState*>(pipelineState);
+	}
+
 	constexpr D3D12_RASTERIZER_DESC2 MakeRasterizerDesc(const RasterizerParams& params) noexcept
 	{
 		return D3D12_RASTERIZER_DESC2

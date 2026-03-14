@@ -21,7 +21,11 @@ import PonyEngine.RenderDevice;
 
 import :CommandList;
 import :ContainerBinding;
+import :DescriptorHeapUtility;
 import :GraphicsComputePipelineBinding;
+import :PipelineStateUtility;
+import :SamplerContainer;
+import :ShaderDataContainer;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
@@ -129,22 +133,22 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList.SetBlendFactor(factor);
 	}
 
-	void BundleCommandList::BindContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer)
+	void BundleCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)
 	{
-		commandList.ValidateContainers(shaderDataContainer, samplerContainer);
-		containerBinding.SetContainers(static_cast<const ShaderDataContainer*>(shaderDataContainer), static_cast<const SamplerContainer*>(samplerContainer), commandList);
+		commandList.ValidateState();
+		containerBinding.SetContainers(ToNativeContainer(shaderDataContainer), ToNativeContainer(samplerContainer), commandList);
 	}
 
 	void BundleCommandList::BindPipelineState(const IGraphicsPipelineState& pipelineState)
 	{
-		commandList.ValidatePipelineState(pipelineState);
-		pipelineBinding.BindPipelineState(static_cast<const GraphicsPipelineState&>(pipelineState), commandList);
+		commandList.ValidateState();
+		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
 	}
 
 	void BundleCommandList::BindPipelineState(const IComputePipelineState& pipelineState)
 	{
-		commandList.ValidatePipelineState(pipelineState);
-		pipelineBinding.BindPipelineState(static_cast<const ComputePipelineState&>(pipelineState), commandList);
+		commandList.ValidateState();
+		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
 	}
 
 	void BundleCommandList::BindGraphics(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)

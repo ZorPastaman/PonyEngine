@@ -23,7 +23,9 @@ import :BundleCommandList;
 import :CommandList;
 import :ContainerBinding;
 import :DepthStencilContainer;
+import :DescriptorHeapUtility;
 import :GraphicsComputePipelineBinding;
+import :PipelineStateUtility;
 import :RenderTargetContainer;
 import :SamplerContainer;
 import :ShaderDataContainer;
@@ -193,20 +195,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)
 	{
-		commandList.ValidateContainers(shaderDataContainer, samplerContainer);
-		containerBinding.SetContainers(static_cast<const ShaderDataContainer*>(shaderDataContainer), static_cast<const SamplerContainer*>(samplerContainer), commandList);
+		commandList.ValidateState();
+		containerBinding.SetContainers(ToNativeContainer(shaderDataContainer), ToNativeContainer(samplerContainer), commandList);
 	}
 
 	void GraphicsCommandList::BindPipelineState(const IGraphicsPipelineState& pipelineState)
 	{
-		commandList.ValidatePipelineState(pipelineState);
-		pipelineBinding.BindPipelineState(static_cast<const GraphicsPipelineState&>(pipelineState), commandList);
+		commandList.ValidateState();
+		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
 	}
 
 	void GraphicsCommandList::BindPipelineState(const IComputePipelineState& pipelineState)
 	{
-		commandList.ValidatePipelineState(pipelineState);
-		pipelineBinding.BindPipelineState(static_cast<const ComputePipelineState&>(pipelineState), commandList);
+		commandList.ValidateState();
+		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
 	}
 
 	void GraphicsCommandList::BindGraphics(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)

@@ -20,8 +20,41 @@ import std;
 import PonyEngine.RenderDevice;
 import PonyEngine.Type;
 
+import :Texture;
+
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Casts to a native texture.
+	/// @param texture Engine texture.
+	/// @return Native texture.
+	[[nodiscard("Pure function")]]
+	Texture& ToNativeTexture(ITexture& texture);
+	/// @brief Casts to a native texture.
+	/// @param texture Engine texture.
+	/// @return Native texture.
+	[[nodiscard("Pure function")]]
+	const Texture& ToNativeTexture(const ITexture& texture);
+	/// @brief Casts to a native texture.
+	/// @param texture Engine texture.
+	/// @return Native texture.
+	[[nodiscard("Pure function")]]
+	Texture* ToNativeTexture(ITexture* texture);
+	/// @brief Casts to a native texture.
+	/// @param texture Engine texture.
+	/// @return Native texture.
+	[[nodiscard("Pure function")]]
+	const Texture* ToNativeTexture(const ITexture* texture);
+	/// @brief Casts to a native texture.
+	/// @param texture Engine texture.
+	/// @return Native texture.
+	[[nodiscard("Pure function")]]
+	Texture* ToNativeTextureNotNullptr(ITexture* texture);
+	/// @brief Casts to a native texture.
+	/// @param texture Engine texture.
+	/// @return Native texture.
+	[[nodiscard("Pure function")]]
+	const Texture* ToNativeTextureNotNullptr(const ITexture* texture);
+
 	/// @brief Checks if the request for a color texture is valid.
 	/// @param request Texture support request.
 	/// @param support Texture format support.
@@ -167,6 +200,78 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	Texture& ToNativeTexture(ITexture& texture)
+	{
+#ifndef NDEBUG
+		if (typeid(texture) != typeid(Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+#endif
+
+		return static_cast<Texture&>(texture);
+	}
+
+	const Texture& ToNativeTexture(const ITexture& texture)
+	{
+#ifndef NDEBUG
+		if (typeid(texture) != typeid(Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+#endif
+
+		return static_cast<const Texture&>(texture);
+	}
+
+	Texture* ToNativeTexture(ITexture* const texture)
+	{
+#ifndef NDEBUG
+		if (texture && typeid(*texture) != typeid(Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+#endif
+
+		return static_cast<Texture*>(texture);
+	}
+
+	const Texture* ToNativeTexture(const ITexture* const texture)
+	{
+#ifndef NDEBUG
+		if (texture && typeid(*texture) != typeid(Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+#endif
+
+		return static_cast<const Texture*>(texture);
+	}
+
+	Texture* ToNativeTextureNotNullptr(ITexture* texture)
+	{
+#ifndef NDEBUG
+		if (!texture || typeid(*texture) != typeid(Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+#endif
+
+		return static_cast<Texture*>(texture);
+	}
+
+	const Texture* ToNativeTextureNotNullptr(const ITexture* texture)
+	{
+#ifndef NDEBUG
+		if (!texture || typeid(*texture) != typeid(Texture)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture");
+		}
+#endif
+
+		return static_cast<const Texture*>(texture);
+	}
+
 	constexpr bool CheckColorSupport(const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept
 	{
 		if (Any(TextureUsage::DepthStencil, request.usage))
