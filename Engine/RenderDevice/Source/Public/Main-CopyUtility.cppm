@@ -15,6 +15,7 @@ export module PonyEngine.RenderDevice:CopyUtility;
 
 import std;
 
+import :BufferRange;
 import :CopyableFootprint;
 
 export namespace PonyEngine::RenderDevice
@@ -31,6 +32,16 @@ export namespace PonyEngine::RenderDevice
 	/// @param destinationOffset Destination offset in bytes.
 	/// @param size Copied data size in bytes.
 	void Copy(const void* source, std::uint64_t sourceOffset, void* destination, std::uint64_t destinationOffset, std::uint64_t size);
+	/// @brief Copies data.
+	/// @param source Source.
+	/// @param destination Destination.
+	/// @param range Copy range.
+	void Copy(const void* source, void* destination, const CopyBufferRange& range);
+	/// @brief Copies data.
+	/// @param source Source.
+	/// @param destination Destination.
+	/// @param ranges Copy ranges.
+	void Copy(const void* source, void* destination, std::span<const CopyBufferRange> ranges);
 	/// @brief Copies data from a byte array to a texture buffer.
 	/// @param source Source byte array.
 	/// @param destination Destination texture buffer.
@@ -76,6 +87,19 @@ namespace PonyEngine::RenderDevice
 		std::memcpy(static_cast<std::byte*>(destination) + destinationOffset, static_cast<const std::byte*>(source) + sourceOffset, static_cast<std::size_t>(size));
 	}
 
+	void Copy(const void* const source, void* const destination, const CopyBufferRange& range)
+	{
+		Copy(source, range.sourceOffset, destination, range.destinationOffset, range.size);
+	}
+
+	void Copy(const void* const source, void* const destination, const std::span<const CopyBufferRange> ranges)
+	{
+		for (const CopyBufferRange& range : ranges)
+		{
+			Copy(source, destination, range);
+		}
+	}
+
 	void CopyToTextureBuffer(const void* const source, void* const destination, const std::span<const CopyableFootprint> footprints)
 	{
 		CopyToTextureBuffer(source, 0ull, destination, 0ull, footprints);
@@ -93,7 +117,7 @@ namespace PonyEngine::RenderDevice
 
 			std::byte* dst = offsetDestination + footprint.offset;
 
-			for (std::uint32_t slice = 0u; slice < footprint.sliceCount; ++slice)
+			for (std::uint32_t slice = 0u; slice < footprint.depth; ++slice)
 			{
 				for (std::uint32_t row = 0u; row < footprint.rowCount; ++row, src += footprint.rowSize, dst += footprint.rowPitch)
 				{
@@ -120,7 +144,7 @@ namespace PonyEngine::RenderDevice
 
 			const std::byte* src = offsetSource + footprint.offset;
 
-			for (std::uint32_t slice = 0u; slice < footprint.sliceCount; ++slice)
+			for (std::uint32_t slice = 0u; slice < footprint.depth; ++slice)
 			{
 				for (std::uint32_t row = 0u; row < footprint.rowCount; ++row, src += footprint.rowPitch, dst += footprint.rowSize)
 				{

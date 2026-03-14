@@ -799,7 +799,6 @@ namespace Game
 
 		const std::uint8_t currentBackBufferIndex = renderDevice->CurrentSwapChainBufferIndex();
 		graphicsCommandList->Reset();
-		graphicsCommandList->BindContainers(nullptr, nullptr);
 		graphicsCommandList->BindContainers(srvContainer.get(), nullptr);
 		graphicsCommandList->SetRasterRegion(PonyEngine::RenderDevice::RasterRegion
 		{

@@ -37,7 +37,7 @@ export namespace PonyEngine::RenderDevice
 		/// @tparam T Timeout type.
 		/// @param fence Fence. Must be valid.
 		/// @param value Fence target value.
-		/// @param timeout Timeout.
+		/// @param timeout Timeout in seconds.
 		template<std::floating_point T>
 		void WaitSeconds(const IFence& fence, std::uint64_t value, T timeout);
 		/// @brief Puts a cpu thread the function is called on into a sleep till all the fences reach their target values.
