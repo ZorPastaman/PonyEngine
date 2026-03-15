@@ -21,6 +21,7 @@ import PonyEngine.RenderDevice;
 import PonyEngine.Type;
 
 import :PipelineState;
+import :RootSignature;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
@@ -70,6 +71,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
 		ID3D12PipelineState& PipelineState() const noexcept;
+		/// @brief Gets the root signature.
+		/// @return Root signature.
+		[[nodiscard("Pure function")]]
+		const RootSignature* RootSignature() const noexcept;
 
 		GraphicsPipelineState& operator =(const GraphicsPipelineState&) = delete;
 		GraphicsPipelineState& operator =(GraphicsPipelineState&&) = delete;
@@ -173,6 +178,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ID3D12PipelineState& GraphicsPipelineState::PipelineState() const noexcept
 	{
 		return pipelineState.GetPipelineState();
+	}
+
+	const RootSignature* GraphicsPipelineState::RootSignature() const noexcept
+	{
+		return layout ? static_cast<const class RootSignature*>(layout.get()) : nullptr;
 	}
 
 	void GraphicsPipelineState::SetComplexData(const GraphicsPipelineStateParams& params)

@@ -26,6 +26,7 @@ import :TextureBarrier;
 export namespace PonyEngine::RenderDevice
 {
 	/// @brief Copy command list.
+	/// @note All the resources bound to the command list must be kept alive till the finish of the command list execution.
 	class ICopyCommandList : public ICommandList
 	{
 		PONY_INTERFACE_BODY(ICopyCommandList)

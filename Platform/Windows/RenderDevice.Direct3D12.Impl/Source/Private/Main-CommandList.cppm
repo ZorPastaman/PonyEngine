@@ -25,13 +25,19 @@ import PonyEngine.RenderDevice;
 import :Buffer;
 import :BufferUtility;
 import :CommandListUtility;
+import :ComputePipelineBinding;
 import :ComputePipelineState;
+import :ContainerBinding;
 import :DepthStencilContainer;
 import :DescriptorHeapUtility;
 import :FormatUtility;
+import :GraphicsComputePipelineBinding;
+import :GraphicsPipelineBinding;
 import :GraphicsPipelineState;
 import :ObjectUtility;
+import :PipelineStateUtility;
 import :RenderTargetContainer;
+import :RootSignature;
 import :SamplerContainer;
 import :ShaderDataContainer;
 import :Texture;
@@ -65,6 +71,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		/// @brief Resets the command allocator and command list.
 		void Reset();
+		/// @brief Resets the command allocator and command list.
+		/// @param containerBinding Container binding.
+		/// @param pipelineBinding Pipeline binding.
+		void Reset(ContainerBinding& containerBinding, GraphicsComputePipelineBinding& pipelineBinding);
+		/// @brief Resets the command allocator and command list.
+		/// @param containerBinding Container binding.
+		/// @param pipelineBinding Pipeline binding.
+		void Reset(ContainerBinding& containerBinding, ComputePipelineBinding& pipelineBinding);
 		/// @brief Closes the command list.
 		void Close();
 		/// @brief Checks if the command list is open.
@@ -105,39 +119,54 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Sets the shader data and sampler containers.
 		/// @param shaderDataContainer Shader data container.
 		/// @param samplerContainer Sampler container.
-		/// @note The call is not validated.
-		void SetContainers(const ShaderDataContainer* shaderDataContainer, const SamplerContainer* samplerContainer);
-		/// @brief Sets the graphics root signature.
-		/// @param rootSig Root signature.
-		/// @note The call is not validated.
-		void SetGraphicsRootSignature(ID3D12RootSignature* rootSig);
-		/// @brief Sets the compute root signature.
-		/// @param rootSig Root signature.
-		/// @note The call is not validated.
-		void SetComputeRootSignature(ID3D12RootSignature* rootSig);
-		/// @brief Sets the pipeline state object.
-		/// @param pso Pipeline state object.
-		/// @note The call is not validated.
-		void SetPipelineState(ID3D12PipelineState& pso);
-		/// @brief Binds the graphics descriptor table.
-		/// @param tableIndex Bound graphics root signature table index.
-		/// @param handle Descriptor handle to bind.
-		/// @note The call is not validated.
-		void SetGraphicsDescriptorTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
-		/// @brief Binds the compute descriptor table.
-		/// @param tableIndex Bound compute root signature table index.
-		/// @param handle Descriptor handle to bind.
-		/// @note The call is not validated.
-		void SetComputeDescriptorTable(std::uint32_t tableIndex, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+		/// @param containerBinding Container binding.
+		void SetContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer, ContainerBinding& containerBinding);
+		/// @brief Sets the graphics pipeline state in a command list that has both graphics and compute pipeline state binding slots.
+		/// @param pipelineState Pipeline state.
+		/// @param pipelineBinding Pipeline binding.
+		void SetPipelineState(const IGraphicsPipelineState& pipelineState, GraphicsComputePipelineBinding& pipelineBinding);
+		/// @brief Sets the compute pipeline state in a command list that has both graphics and compute pipeline state binding slots.
+		/// @param pipelineState Pipeline state.
+		/// @param pipelineBinding Pipeline binding.
+		void SetPipelineState(const IComputePipelineState& pipelineState, GraphicsComputePipelineBinding& pipelineBinding);
+		/// @brief Sets the compute pipeline state in a command list that has only compute pipeline state binding slot.
+		/// @param pipelineState Pipeline state.
+		/// @param pipelineBinding Pipeline binding.
+		void SetPipelineState(const IComputePipelineState& pipelineState, ComputePipelineBinding& pipelineBinding);
+		/// @brief Sets the bindings.
+		/// @param shaderDataBindings Shader data bindings.
+		/// @param samplerBindings Sampler bindings.
+		/// @param containerBinding Container bindings.
+		/// @param pipelineBinding Pipeline binding.
+		void SetGraphicsBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings,
+			const ContainerBinding& containerBinding, const GraphicsComputePipelineBinding& pipelineBinding);
+		/// @brief Sets the bindings.
+		/// @param shaderDataBindings Shader data bindings.
+		/// @param samplerBindings Sampler bindings.
+		/// @param containerBinding Container bindings.
+		/// @param pipelineBinding Pipeline binding.
+		void SetComputeBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings,
+			const ContainerBinding& containerBinding, const GraphicsComputePipelineBinding& pipelineBinding);
+		/// @brief Sets the bindings.
+		/// @param shaderDataBindings Shader data bindings.
+		/// @param samplerBindings Sampler bindings.
+		/// @param containerBinding Container bindings.
+		/// @param pipelineBinding Pipeline binding.
+		void SetComputeBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings,
+			const ContainerBinding& containerBinding, const ComputePipelineBinding& pipelineBinding);
 
 		/// @brief Dispatches a graphics command.
 		/// @param threadGroupCounts X, Y and Z thread group counts.
-		/// @note The call is not validated.
-		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts);
+		/// @param pipelineBinding Pipeline binding.
+		void DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts, GraphicsComputePipelineBinding& pipelineBinding);
 		/// @brief Dispatches a compute command.
 		/// @param threadGroupCounts X, Y and Z thread group counts.
-		/// @note The call is not validated.
-		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts);
+		/// @param pipelineBinding Pipeline binding.
+		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts, GraphicsComputePipelineBinding& pipelineBinding);
+		/// @brief Dispatches a compute command.
+		/// @param threadGroupCounts X, Y and Z thread group counts.
+		/// @param pipelineBinding Pipeline binding.
+		void DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts, const ComputePipelineBinding& pipelineBinding);
 
 		/// @brief Clears the render target view.
 		/// @param container RTV container.
@@ -155,42 +184,42 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			std::span<const Math::CornerRect<std::uint32_t>> rects);
 		/// @brief Clears the unordered access view.
 		/// @param buffer Target buffer.
-		/// @param gpuContainer GPU shader data container. Must be bound.
 		/// @param gpuViewIndex GPU shader data container index.
 		/// @param cpuContainer CPU shader data container.
 		/// @param cpuViewIndex CPU shader data container index.
 		/// @param values Clear values.
-		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<std::uint32_t>& values);
+		/// @param containerBinding Container bindings.
+		void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, const ContainerBinding& containerBinding);
 		/// @brief Clears the unordered access view.
 		/// @param texture Target texture.
-		/// @param gpuContainer GPU shader data container. Must be bound.
 		/// @param gpuViewIndex GPU shader data container index.
 		/// @param cpuContainer CPU shader data container.
 		/// @param cpuViewIndex CPU shader data container index.
 		/// @param values Clear values.
 		/// @param rects Clear rectangles.
-		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects);
+		/// @param containerBinding Container bindings.
+		void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding);
 		/// @brief Clears the unordered access view.
 		/// @param buffer Target buffer.
-		/// @param gpuContainer GPU shader data container. Must be bound.
 		/// @param gpuViewIndex GPU shader data container index.
 		/// @param cpuContainer CPU shader data container.
 		/// @param cpuViewIndex CPU shader data container index.
 		/// @param values Clear values.
-		void ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<float>& values);
+		/// @param containerBinding Container bindings.
+		void ClearUAV(const IBuffer& buffer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, const ContainerBinding& containerBinding);
 		/// @brief Clears the unordered access view.
 		/// @param texture Target texture.
-		/// @param gpuContainer GPU shader data container. Must be bound.
 		/// @param gpuViewIndex GPU shader data container index.
 		/// @param cpuContainer CPU shader data container.
 		/// @param cpuViewIndex CPU shader data container index.
 		/// @param values Clear values.
 		/// @param rects Clear rectangles.
-		void ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects);
+		/// @param containerBinding Container bindings.
+		void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding);
 
 		/// @brief Copies from the buffer to the buffer.
 		/// @param source Source buffer.
@@ -261,9 +290,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Executes the bundle.
 		/// @param bundle Bundle to execute.
 		void ExecuteBundle(ID3D12GraphicsCommandList10& bundle);
-
-		/// @brief Validates if the command list is in a correct state for new commands.
-		void ValidateState() const;
 
 		/// @brief Gets the name.
 		/// @return Name.
@@ -358,15 +384,26 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @tparam Resource Resource type.
 		/// @tparam Value Clear value type.
 		/// @param resource Resource.
-		/// @param gpuContainer GPU shader data container.
+		/// @param containerBinding containerBinding.
 		/// @param gpuViewIndex GPU container view index.
 		/// @param cpuContainer CPU shader data container.
 		/// @param cpuViewIndex CPU container view index.
 		/// @param clearValue Clear value.
 		/// @param rects Clear rectangles.
 		template<typename UAVMeta, typename Resource, typename Value>
-		void ClearUAV(const Resource& resource, const ShaderDataContainer& gpuContainer, std::uint32_t gpuViewIndex, 
+		void ClearUAV(const Resource& resource, const ContainerBinding& containerBinding, std::uint32_t gpuViewIndex,
 			const ShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex, std::span<const Value, 4> clearValue, std::span<const D3D12_RECT> rects);
+
+		/// @brief Validates if the command list is in a correct state for new commands.
+		void ValidateState() const;
+
+		/// @brief Validates bindings.
+		/// @param rootSig Target root signature.
+		/// @param containerBinding Container binding.
+		/// @param shaderDataBindings Shader data bindings.
+		/// @param samplerBindings Sampler bindings.
+		static void ValidateBindings(const RootSignature& rootSig, const ContainerBinding& containerBinding, 
+			std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings);
 
 		/// @brief Validates the buffers for copying.
 		/// @param source Source buffer.
@@ -460,6 +497,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		isOpen = true;
+	}
+
+	void CommandList::Reset(ContainerBinding& containerBinding, GraphicsComputePipelineBinding& pipelineBinding)
+	{
+		Reset();
+		containerBinding.Reset();
+		pipelineBinding.Reset();
+	}
+
+	void CommandList::Reset(ContainerBinding& containerBinding, ComputePipelineBinding& pipelineBinding)
+	{
+		Reset();
+		containerBinding.Reset();
+		pipelineBinding.Reset();
 	}
 
 	void CommandList::Close()
@@ -599,57 +650,234 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		commandList->OMSetRenderTargets(renderTargetCount, renderTargetCount > 0uz ? &renderTarget : nullptr, true, depthStencil ? &*depthStencil : nullptr);
 	}
 
-	void CommandList::SetContainers(const ShaderDataContainer* const shaderDataContainer, const SamplerContainer* const samplerContainer)
+	void CommandList::SetContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer, ContainerBinding& containerBinding)
 	{
+		ValidateState();
+
+		const ShaderDataContainer* const nativeShaderDataContainer = ToNativeContainer(shaderDataContainer);
+		const SamplerContainer* const nativeSamplerContainer = ToNativeContainer(samplerContainer);
+
+		const ShaderDataContainer* const shaderDataContainerToSet = nativeShaderDataContainer ? nativeShaderDataContainer : containerBinding.GetShaderDataContainer();
+		const SamplerContainer* const samplerContainerToSet = nativeSamplerContainer ? nativeSamplerContainer : containerBinding.GetSamplerContainer();
+
 		std::array<ID3D12DescriptorHeap*, 2> heaps;
 		UINT heapCount = 0u;
-		if (shaderDataContainer)
+		if (shaderDataContainerToSet)
 		{
-			heaps[heapCount++] = &shaderDataContainer->DescriptorHeap();
+			heaps[heapCount++] = &shaderDataContainerToSet->DescriptorHeap();
 		}
-		if (samplerContainer)
+		if (samplerContainerToSet)
 		{
-			heaps[heapCount++] = &samplerContainer->DescriptorHeap();
+			heaps[heapCount++] = &samplerContainerToSet->DescriptorHeap();
 		}
 
 		if (heapCount > 0u) [[likely]]
 		{
 			commandList->SetDescriptorHeaps(heapCount, heaps.data());
 		}
+
+		containerBinding.SetContainers(shaderDataContainerToSet, samplerContainerToSet);
 	}
 
-	void CommandList::SetGraphicsRootSignature(ID3D12RootSignature* const rootSig)
+	void CommandList::SetPipelineState(const IGraphicsPipelineState& pipelineState, GraphicsComputePipelineBinding& pipelineBinding)
 	{
-		commandList->SetGraphicsRootSignature(rootSig);
+		ValidateState();
+
+		const GraphicsPipelineState& nativePipelineState = ToNativePipelineState(pipelineState);
+		const RootSignature* const rootSig = nativePipelineState.RootSignature();
+		const RootSignature* const currentRootSig = pipelineBinding.HasGraphicsPSO() ? pipelineBinding.GetGraphicsPSO()->RootSignature() : nullptr;
+
+		if (rootSig != currentRootSig)
+		{
+			commandList->SetGraphicsRootSignature(rootSig ? &rootSig->GetRootSignature() : nullptr);
+		}
+
+		pipelineBinding.SetGraphicsPSO(&nativePipelineState);
+		if (pipelineBinding.IsLastPSOGraphics())
+		{
+			pipelineBinding.SetLastPSONone();
+		}
 	}
 
-	void CommandList::SetComputeRootSignature(ID3D12RootSignature* const rootSig)
+	void CommandList::SetPipelineState(const IComputePipelineState& pipelineState, GraphicsComputePipelineBinding& pipelineBinding)
 	{
-		commandList->SetComputeRootSignature(rootSig);
+		ValidateState();
+
+		const ComputePipelineState& nativePipelineState = ToNativePipelineState(pipelineState);
+		const RootSignature* const rootSig = nativePipelineState.RootSignature();
+		const RootSignature* const currentRootSig = pipelineBinding.HasComputePSO() ? pipelineBinding.GetComputePSO()->RootSignature() : nullptr;
+
+		if (rootSig != currentRootSig)
+		{
+			commandList->SetComputeRootSignature(rootSig ? &rootSig->GetRootSignature() : nullptr);
+		}
+
+		pipelineBinding.SetComputePSO(&nativePipelineState);
+		if (pipelineBinding.IsLastPSOCompute())
+		{
+			pipelineBinding.SetLastPSONone();
+		}
 	}
 
-	void CommandList::SetPipelineState(ID3D12PipelineState& pso)
+	void CommandList::SetPipelineState(const IComputePipelineState& pipelineState, ComputePipelineBinding& pipelineBinding)
 	{
-		commandList->SetPipelineState(&pso);
+		ValidateState();
+
+		const ComputePipelineState& nativePipelineState = ToNativePipelineState(pipelineState);
+		const RootSignature* const rootSig = nativePipelineState.RootSignature();
+		const RootSignature* const currentRootSig = pipelineBinding.HasPSO() ? pipelineBinding.GetPSO()->RootSignature() : nullptr;
+
+		if (rootSig != currentRootSig)
+		{
+			commandList->SetComputeRootSignature(rootSig ? &rootSig->GetRootSignature() : nullptr);
+		}
+		commandList->SetPipelineState(&nativePipelineState.PipelineState());
+
+		pipelineBinding.SetPSO(&nativePipelineState);
 	}
 
-	void CommandList::SetGraphicsDescriptorTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	void CommandList::SetGraphicsBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings,
+		const ContainerBinding& containerBinding, const GraphicsComputePipelineBinding& pipelineBinding)
 	{
-		commandList->SetGraphicsRootDescriptorTable(tableIndex, handle);
+		ValidateState();
+
+#ifndef NDEBUG
+		if (!pipelineBinding.HasGraphicsPSO()) [[unlikely]]
+		{
+			throw std::logic_error("No graphics pipeline state is bound");
+		}
+
+		const RootSignature* const rootSig = pipelineBinding.GetGraphicsPSO()->RootSignature();
+		if (!rootSig) [[unlikely]]
+		{
+			throw std::logic_error("Bound graphics pipeline doesn't support binding");
+		}
+
+		ValidateBindings(*rootSig, containerBinding, shaderDataBindings, samplerBindings);
+#endif
+
+		for (const ShaderDataBinding& binding : shaderDataBindings)
+		{
+			commandList->SetGraphicsRootDescriptorTable(binding.layoutSetIndex, containerBinding.GetShaderDataContainer()->GpuHandle(binding.containerIndex));
+		}
+
+		for (const SamplerBinding& binding : samplerBindings)
+		{
+			commandList->SetGraphicsRootDescriptorTable(binding.layoutSetIndex, containerBinding.GetSamplerContainer()->GpuHandle(binding.containerIndex));
+		}
 	}
 
-	void CommandList::SetComputeDescriptorTable(const std::uint32_t tableIndex, const D3D12_GPU_DESCRIPTOR_HANDLE handle)
+	void CommandList::SetComputeBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings, 
+		const ContainerBinding& containerBinding, const GraphicsComputePipelineBinding& pipelineBinding)
 	{
-		commandList->SetComputeRootDescriptorTable(tableIndex, handle);
+		ValidateState();
+
+#ifndef NDEBUG
+		if (!pipelineBinding.HasComputePSO()) [[unlikely]]
+		{
+			throw std::logic_error("No compute pipeline state is bound");
+		}
+
+		const RootSignature* const rootSig = pipelineBinding.GetComputePSO()->RootSignature();
+		if (!rootSig) [[unlikely]]
+		{
+			throw std::logic_error("Bound compute pipeline doesn't support binding");
+		}
+
+		ValidateBindings(*rootSig, containerBinding, shaderDataBindings, samplerBindings);
+#endif
+
+		for (const ShaderDataBinding& binding : shaderDataBindings)
+		{
+			commandList->SetComputeRootDescriptorTable(binding.layoutSetIndex, containerBinding.GetShaderDataContainer()->GpuHandle(binding.containerIndex));
+		}
+
+		for (const SamplerBinding& binding : samplerBindings)
+		{
+			commandList->SetComputeRootDescriptorTable(binding.layoutSetIndex, containerBinding.GetSamplerContainer()->GpuHandle(binding.containerIndex));
+		}
 	}
 
-	void CommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	void CommandList::SetComputeBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings, 
+		const ContainerBinding& containerBinding, const ComputePipelineBinding& pipelineBinding)
 	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (!pipelineBinding.HasPSO()) [[unlikely]]
+		{
+			throw std::logic_error("No compute pipeline state is bound");
+		}
+
+		const RootSignature* const rootSig = pipelineBinding.GetPSO()->RootSignature();
+		if (!rootSig) [[unlikely]]
+		{
+			throw std::logic_error("Bound compute pipeline doesn't support binding");
+		}
+
+		ValidateBindings(*rootSig, containerBinding, shaderDataBindings, samplerBindings);
+#endif
+
+		for (const ShaderDataBinding& binding : shaderDataBindings)
+		{
+			commandList->SetComputeRootDescriptorTable(binding.layoutSetIndex, containerBinding.GetShaderDataContainer()->GpuHandle(binding.containerIndex));
+		}
+
+		for (const SamplerBinding& binding : samplerBindings)
+		{
+			commandList->SetComputeRootDescriptorTable(binding.layoutSetIndex, containerBinding.GetSamplerContainer()->GpuHandle(binding.containerIndex));
+		}
+	}
+
+	void CommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts, GraphicsComputePipelineBinding& pipelineBinding)
+	{
+		ValidateState();
+
+		if (!pipelineBinding.IsLastPSOGraphics())
+		{
+#ifndef NDEBUG
+			if (!pipelineBinding.HasGraphicsPSO()) [[unlikely]]
+			{
+				throw std::invalid_argument("No graphics pipeline state is bound");
+			}
+#endif
+			commandList->SetPipelineState(&pipelineBinding.GetGraphicsPSO()->PipelineState());
+			pipelineBinding.SetLastPSOGraphics();
+		}
+
 		commandList->DispatchMesh(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
-	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
+	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts, GraphicsComputePipelineBinding& pipelineBinding)
 	{
+		ValidateState();
+
+		if (!pipelineBinding.IsLastPSOCompute())
+		{
+#ifndef NDEBUG
+			if (!pipelineBinding.HasComputePSO()) [[unlikely]]
+			{
+				throw std::invalid_argument("No compute pipeline state is bound");
+			}
+#endif
+			commandList->SetPipelineState(&pipelineBinding.GetComputePSO()->PipelineState());
+			pipelineBinding.SetLastPSOCompute();
+		}
+
+		commandList->Dispatch(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
+	}
+
+	void CommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts, const ComputePipelineBinding& pipelineBinding)
+	{
+		ValidateState();
+
+#ifndef NDEBUG
+		if (!pipelineBinding.HasPSO()) [[unlikely]]
+		{
+			throw std::invalid_argument("No compute pipeline state is bound");
+		}
+#endif
+
 		commandList->Dispatch(threadGroupCounts.X(), threadGroupCounts.Y(), threadGroupCounts.Z());
 	}
 
@@ -722,18 +950,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
 	}
 
-	void CommandList::ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
-		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, const Math::Vector4<std::uint32_t>& values)
+	void CommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<std::uint32_t>& values, const ContainerBinding& containerBinding)
 	{
 		ValidateState();
 
 		const UINT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
-		ClearUAV<BufferUAVMeta>(ToNativeBuffer(buffer), gpuContainer, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), std::span<const D3D12_RECT>());
+		ClearUAV<BufferUAVMeta>(ToNativeBuffer(buffer), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), std::span<const D3D12_RECT>());
 	}
 
-	void CommandList::ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
-		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	void CommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding)
 	{
 		ValidateState();
 
@@ -746,21 +973,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		const UINT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
-		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), gpuContainer, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRectsSpan);
+		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRectsSpan);
 	}
 
-	void CommandList::ClearUAV(const IBuffer& buffer, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
-		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, const Math::Vector4<float>& values)
+	void CommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
+		const Math::Vector4<float>& values, const ContainerBinding& containerBinding)
 	{
 		ValidateState();
 
 		const FLOAT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
-		ClearUAV<BufferUAVMeta>(ToNativeBuffer(buffer), gpuContainer, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), std::span<const D3D12_RECT>());
+		ClearUAV<BufferUAVMeta>(ToNativeBuffer(buffer), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), std::span<const D3D12_RECT>());
 	}
 
-	void CommandList::ClearUAV(const ITexture& texture, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex, 
-		const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
+	void CommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding)
 	{
 		ValidateState();
 
@@ -773,7 +999,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		const FLOAT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
-		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), gpuContainer, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRectsSpan);
+		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRectsSpan);
 	}
 
 	void CommandList::Copy(const IBuffer& source, IBuffer& destination)
@@ -1059,16 +1285,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		ValidateState();
 		commandList->ExecuteBundle(&bundle);
-	}
-
-	void CommandList::ValidateState() const
-	{
-#ifndef NDEBUG
-		if (!isOpen) [[unlikely]]
-		{
-			throw std::logic_error("Command list is closed");
-		}
-#endif
 	}
 
 	std::string_view CommandList::Name() const noexcept
@@ -1377,11 +1593,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	template<typename UAVMeta, typename Resource, typename Value>
-	void CommandList::ClearUAV(const Resource& resource, const ShaderDataContainer& gpuContainer, const std::uint32_t gpuViewIndex,
+	void CommandList::ClearUAV(const Resource& resource, const ContainerBinding& containerBinding, const std::uint32_t gpuViewIndex,
 		const ShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, const std::span<const Value, 4> clearValue, const std::span<const D3D12_RECT> rects)
 	{
 		static_assert(std::is_same_v<Resource, Buffer> || std::is_same_v<Resource, Texture>, "Invalid resource type.");
 		static_assert(std::is_same_v<Value, UINT> || std::is_same_v<Value, FLOAT>, "Invalid clear type.");
+
+#ifndef NDEBUG
+		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+		{
+			throw std::logic_error("No shader data container is bound");
+		}
+#endif
+
+		const ShaderDataContainer& gpuContainer = *containerBinding.GetShaderDataContainer();
 
 #ifndef NDEBUG
 		if (gpuViewIndex >= gpuContainer.Size()) [[unlikely]]
@@ -1427,6 +1652,146 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			commandList->ClearUnorderedAccessViewFloat(gpuHandle, cpuHandle, &resource.Resource(), clearValue.data(),
 				static_cast<UINT>(rects.size()), rects.empty() ? nullptr : rects.data());
 		}
+	}
+
+	void CommandList::ValidateState() const
+	{
+#ifndef NDEBUG
+		if (!isOpen) [[unlikely]]
+		{
+			throw std::logic_error("Command list is closed");
+		}
+#endif
+	}
+
+	void CommandList::ValidateBindings(const RootSignature& rootSig, const ContainerBinding& containerBinding,
+		const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)
+	{
+#ifndef NDEBUG
+		const std::span<const DescriptorSetMeta> descriptorSets = rootSig.DescriptorSets();
+
+		if (!shaderDataBindings.empty())
+		{
+			if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
+			{
+				throw std::logic_error("No shader data container is bound");
+			}
+
+			const ShaderDataContainer* const shaderDataContainer = containerBinding.GetShaderDataContainer();
+
+			for (const ShaderDataBinding& binding : shaderDataBindings)
+			{
+				if (binding.layoutSetIndex >= descriptorSets.size()) [[unlikely]]
+				{
+					throw std::invalid_argument("Layout set index is invalid");
+				}
+
+				const DescriptorSetMeta& set = descriptorSets[binding.layoutSetIndex];
+
+				std::uint32_t requiredDescriptorCount = 0uz;
+				for (const ShaderDataDescriptorRange& range : set.shaderDataRanges)
+				{
+					requiredDescriptorCount += range.shaderRegisterCount;
+				}
+				if (requiredDescriptorCount == 0uz) [[unlikely]]
+				{
+					throw std::invalid_argument("Pipeline layout set doesn't have shader data slots");
+				}
+				if (shaderDataContainer->Size() - binding.containerIndex < requiredDescriptorCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Unexpected shader data container end");
+				}
+
+				for (std::uint32_t containerIndex = binding.containerIndex; const ShaderDataDescriptorRange& range : set.shaderDataRanges)
+				{
+					for (std::uint32_t i = 0u; i < range.shaderRegisterCount; ++i, ++containerIndex)
+					{
+						switch (range.type)
+						{
+						case ShaderDataDescriptorType::ConstantBuffer:
+							if (!std::holds_alternative<CBVMeta>(shaderDataContainer->Meta(containerIndex))) [[unlikely]]
+							{
+								throw std::invalid_argument("View type mismatch");
+							}
+							break;
+						case ShaderDataDescriptorType::BufferShaderResource:
+							if (!std::holds_alternative<BufferSRVMeta>(shaderDataContainer->Meta(containerIndex))) [[unlikely]]
+							{
+								throw std::invalid_argument("View type mismatch");
+							}
+							break;
+						case ShaderDataDescriptorType::TextureShaderResource:
+							if (!std::holds_alternative<TextureSRVMeta>(shaderDataContainer->Meta(containerIndex))) [[unlikely]]
+							{
+								throw std::invalid_argument("View type mismatch");
+							}
+							break;
+						case ShaderDataDescriptorType::BufferUnorderedAccess:
+							if (!std::holds_alternative<BufferUAVMeta>(shaderDataContainer->Meta(containerIndex))) [[unlikely]]
+							{
+								throw std::invalid_argument("View type mismatch");
+							}
+							break;
+						case ShaderDataDescriptorType::TextureUnorderedAccess:
+							if (!std::holds_alternative<TextureUAVMeta>(shaderDataContainer->Meta(containerIndex))) [[unlikely]]
+							{
+								throw std::invalid_argument("View type mismatch");
+							}
+							break;
+						default: [[unlikely]]
+							assert(false && "Invalid range type.");
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if (!samplerBindings.empty())
+		{
+			if (!containerBinding.HasSamplerContainer()) [[unlikely]]
+			{
+				throw std::logic_error("No sampler container is bound");
+			}
+
+			const SamplerContainer* const samplerContainer = containerBinding.GetSamplerContainer();
+
+			for (const SamplerBinding& binding : samplerBindings)
+			{
+				if (binding.layoutSetIndex >= descriptorSets.size()) [[unlikely]]
+				{
+					throw std::invalid_argument("Layout set index is invalid");
+				}
+
+				const DescriptorSetMeta& set = descriptorSets[binding.layoutSetIndex];
+
+				std::uint32_t requiredDescriptorCount = 0uz;
+				for (const SamplerDescriptorRange& range : set.samplerRanges)
+				{
+					requiredDescriptorCount += range.shaderRegisterCount;
+				}
+				if (requiredDescriptorCount == 0uz) [[unlikely]]
+				{
+					throw std::invalid_argument("Pipeline layout set doesn't have sampler slots");
+				}
+				if (samplerContainer->Size() - binding.containerIndex < requiredDescriptorCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Unexpected sampler container end");
+				}
+
+				for (std::uint32_t containerIndex = binding.containerIndex; const ShaderDataDescriptorRange& range : set.shaderDataRanges)
+				{
+					for (std::uint32_t i = 0u; i < range.shaderRegisterCount; ++i, ++containerIndex)
+					{
+						if (!std::holds_alternative<SamplerParams>(samplerContainer->Meta(containerIndex))) [[unlikely]]
+						{
+							throw std::invalid_argument("View type mismatch");
+						}
+					}
+				}
+			}
+		}
+#endif
 	}
 
 	void CommandList::ValidateCopy(const Buffer& source, const Buffer& destination)

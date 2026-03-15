@@ -71,12 +71,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		BundleCommandList& operator =(BundleCommandList&&) = delete;
 
 	private:
-		void ValidatePipelineStateForGraphics() const;
-		void ValidatePipelineStateForCompute() const;
-		void ValidateGraphicsBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-		void ValidateComputeBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-		void ValidateBindings(const RootSignature* rootSig, std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-
 		class CommandList commandList;
 		GraphicsComputePipelineBinding pipelineBinding;
 		ContainerBinding containerBinding;
@@ -98,9 +92,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void BundleCommandList::Reset()
 	{
-		commandList.Reset();
-		pipelineBinding.Reset();
-		containerBinding.Reset();
+		commandList.Reset(containerBinding, pipelineBinding);
 	}
 
 	void BundleCommandList::Close()
@@ -135,56 +127,37 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void BundleCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)
 	{
-		commandList.ValidateState();
-		containerBinding.SetContainers(ToNativeContainer(shaderDataContainer), ToNativeContainer(samplerContainer), commandList);
+		commandList.SetContainers(shaderDataContainer, samplerContainer, containerBinding);
 	}
 
 	void BundleCommandList::BindPipelineState(const IGraphicsPipelineState& pipelineState)
 	{
-		commandList.ValidateState();
-		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
+		commandList.SetPipelineState(pipelineState, pipelineBinding);
 	}
 
 	void BundleCommandList::BindPipelineState(const IComputePipelineState& pipelineState)
 	{
-		commandList.ValidateState();
-		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
+		commandList.SetPipelineState(pipelineState, pipelineBinding);
 	}
 
 	void BundleCommandList::BindGraphics(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)
 	{
-		commandList.ValidateState();
-		ValidateGraphicsBindings(shaderDataBindings, samplerBindings);
-
-		containerBinding.BindGraphicsShaderData(shaderDataBindings, commandList);
-		containerBinding.BindGraphicsSampler(samplerBindings, commandList);
+		commandList.SetGraphicsBindings(shaderDataBindings, samplerBindings, containerBinding, pipelineBinding);
 	}
 
 	void BundleCommandList::BindCompute(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)
 	{
-		commandList.ValidateState();
-		ValidateComputeBindings(shaderDataBindings, samplerBindings);
-
-		containerBinding.BindComputeShaderData(shaderDataBindings, commandList);
-		containerBinding.BindComputeSampler(samplerBindings, commandList);
+		commandList.SetComputeBindings(shaderDataBindings, samplerBindings, containerBinding, pipelineBinding);
 	}
 
 	void BundleCommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
-		commandList.ValidateState();
-		ValidatePipelineStateForGraphics();
-
-		pipelineBinding.SetGraphicsPipelineState(commandList);
-		commandList.DispatchGraphics(threadGroupCounts);
+		commandList.DispatchGraphics(threadGroupCounts, pipelineBinding);
 	}
 
 	void BundleCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
-		commandList.ValidateState();
-		ValidatePipelineStateForCompute();
-
-		pipelineBinding.SetComputePipelineState(commandList);
-		commandList.DispatchCompute(threadGroupCounts);
+		commandList.DispatchCompute(threadGroupCounts, pipelineBinding);
 	}
 
 	std::string_view BundleCommandList::Name() const noexcept
@@ -200,60 +173,5 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ID3D12GraphicsCommandList10& BundleCommandList::CommandList() const noexcept
 	{
 		return commandList.GetCommandList();
-	}
-
-	void BundleCommandList::ValidatePipelineStateForGraphics() const
-	{
-#ifndef NDEBUG
-		if (!pipelineBinding.HasGraphicsPSO())
-		{
-			throw std::logic_error("No graphics pipeline state bound");
-		}
-#endif
-	}
-
-	void BundleCommandList::ValidatePipelineStateForCompute() const
-	{
-#ifndef NDEBUG
-		if (!pipelineBinding.HasComputePSO())
-		{
-			throw std::logic_error("Nn compute pipeline state bound");
-		}
-#endif
-	}
-
-	void BundleCommandList::ValidateGraphicsBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		ValidateBindings(pipelineBinding.GraphicsRootSignature(), shaderDataBindings, samplerBindings);
-#endif
-	}
-
-	void BundleCommandList::ValidateComputeBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		ValidateBindings(pipelineBinding.ComputeRootSignature(), shaderDataBindings, samplerBindings);
-#endif
-	}
-
-	void BundleCommandList::ValidateBindings(const RootSignature* const rootSig,
-		const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		if (!rootSig) [[unlikely]]
-		{
-			throw std::logic_error("Empty pipeline layout");
-		}
-
-		for (const ShaderDataBinding& binding : shaderDataBindings)
-		{
-			containerBinding.ValidateShaderData(*rootSig, binding.layoutSetIndex, binding.containerIndex);
-		}
-
-		for (const SamplerBinding& binding : samplerBindings)
-		{
-			containerBinding.ValidateSamplerData(*rootSig, binding.layoutSetIndex, binding.containerIndex);
-		}
-#endif
 	}
 }

@@ -44,6 +44,7 @@ import :TextureBarrier;
 export namespace PonyEngine::RenderDevice
 {
 	/// @brief Graphics command list.
+	/// @note All the resources bound to the command list must be kept alive till the finish of the command list execution.
 	class IGraphicsCommandList : public ICommandList
 	{
 		PONY_INTERFACE_BODY(IGraphicsCommandList)
@@ -121,17 +122,15 @@ export namespace PonyEngine::RenderDevice
 		/// @param renderTargetCount How many RTVs to bind?
 		/// @param depthStencilBinding DSV to bind.
 		virtual void BindTargets(const RenderTargetBinding* renderTargetBinding, std::uint8_t renderTargetCount, const DepthStencilBinding* depthStencilBinding) = 0;
-		/// @brief Unbinds all the containers.
-		void BindContainers();
-		/// @brief Binds the shader data container and unbinds a sampler container.
+		/// @brief Binds the shader data container and keeps a sampler container.
 		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
 		void BindContainers(const IShaderDataContainer& shaderDataContainer);
-		/// @brief Binds the sampler container and unbinds a shader data container.
+		/// @brief Binds the sampler container and keeps a shader data container.
 		/// @param samplerContainer Sampler container to bind. Must be shader visible.
 		void BindContainers(const ISamplerContainer& samplerContainer);
 		/// @brief Binds the containers.
-		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
-		/// @param samplerContainer Sampler container to bind. Must be shader visible.
+		/// @param shaderDataContainer Shader data container to bind. Must be shader visible. If nullptr, a current container is kept.
+		/// @param samplerContainer Sampler container to bind. Must be shader visible. If nullptr, a current container is kept.
 		virtual void BindContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer) = 0;
 		/// @brief Binds the graphics pipeline state.
 		/// @param pipelineState 
@@ -462,11 +461,6 @@ namespace PonyEngine::RenderDevice
 	void IGraphicsCommandList::BindTargets(const RenderTargetBinding& renderTargetBinding, const std::uint8_t renderTargetCount)
 	{
 		BindTargets(&renderTargetBinding, renderTargetCount, nullptr);
-	}
-
-	void IGraphicsCommandList::BindContainers()
-	{
-		BindContainers(nullptr, nullptr);
 	}
 
 	void IGraphicsCommandList::BindContainers(const IShaderDataContainer& shaderDataContainer)
