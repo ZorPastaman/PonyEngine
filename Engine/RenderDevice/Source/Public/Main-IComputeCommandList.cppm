@@ -33,6 +33,7 @@ import :TextureBarrier;
 export namespace PonyEngine::RenderDevice
 {
 	/// @brief Compute command list.
+	/// @note All the resources bound to the command list must be kept alive till the finish of the command list execution.
 	class IComputeCommandList : public ICommandList
 	{
 		PONY_INTERFACE_BODY(IComputeCommandList)
@@ -62,17 +63,15 @@ export namespace PonyEngine::RenderDevice
 		/// @param textureBarriers Texture barriers.
 		virtual void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers) = 0;
 
-		/// @brief Unbinds all the containers.
-		void BindContainers();
-		/// @brief Binds the shader data container and unbinds a sampler container.
+		/// @brief Binds the shader data container and keeps a sampler container.
 		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
 		void BindContainers(const IShaderDataContainer& shaderDataContainer);
-		/// @brief Binds the sampler container and unbinds a shader data container.
+		/// @brief Binds the sampler container and keeps a shader data container.
 		/// @param samplerContainer Sampler container to bind. Must be shader visible.
 		void BindContainers(const ISamplerContainer& samplerContainer);
 		/// @brief Binds the containers.
-		/// @param shaderDataContainer Shader data container to bind. Must be shader visible.
-		/// @param samplerContainer Sampler container to bind. Must be shader visible.
+		/// @param shaderDataContainer Shader data container to bind. Must be shader visible. If nullptr, a current container is kept.
+		/// @param samplerContainer Sampler container to bind. Must be shader visible. If nullptr, a current container is kept.
 		virtual void BindContainers(const IShaderDataContainer* shaderDataContainer, const ISamplerContainer* samplerContainer) = 0;
 		/// @brief Binds the compute pipeline state.
 		/// @param pipelineState Compute pipeline state to bind.
@@ -272,11 +271,6 @@ namespace PonyEngine::RenderDevice
 	void IComputeCommandList::Barrier(const BufferBarrier& bufferBarrier, const std::span<const TextureBarrier> textureBarriers)
 	{
 		Barrier(std::span(&bufferBarrier, 1uz), textureBarriers);
-	}
-
-	void IComputeCommandList::BindContainers()
-	{
-		BindContainers(nullptr, nullptr);
 	}
 
 	void IComputeCommandList::BindContainers(const IShaderDataContainer& shaderDataContainer)

@@ -108,14 +108,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		GraphicsCommandList& operator =(GraphicsCommandList&&) = delete;
 
 	private:
-		void ValidatePipelineStateForGraphics() const;
-		void ValidatePipelineStateForCompute() const;
-		void ValidateGraphicsBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-		void ValidateComputeBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-		void ValidateBindings(const RootSignature* rootSig, std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-
-		static void ValidateBundle(const ISecondaryGraphicsCommandList& secondary);
-
 		class CommandList commandList;
 		GraphicsComputePipelineBinding pipelineBinding;
 		ContainerBinding containerBinding;
@@ -137,9 +129,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsCommandList::Reset()
 	{
-		commandList.Reset();
-		pipelineBinding.Reset();
-		containerBinding.Reset();
+		commandList.Reset(containerBinding, pipelineBinding);
 	}
 
 	void GraphicsCommandList::Close()
@@ -195,56 +185,37 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)
 	{
-		commandList.ValidateState();
-		containerBinding.SetContainers(ToNativeContainer(shaderDataContainer), ToNativeContainer(samplerContainer), commandList);
+		commandList.SetContainers(shaderDataContainer, samplerContainer, containerBinding);
 	}
 
 	void GraphicsCommandList::BindPipelineState(const IGraphicsPipelineState& pipelineState)
 	{
-		commandList.ValidateState();
-		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
+		commandList.SetPipelineState(pipelineState, pipelineBinding);
 	}
 
 	void GraphicsCommandList::BindPipelineState(const IComputePipelineState& pipelineState)
 	{
-		commandList.ValidateState();
-		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
+		commandList.SetPipelineState(pipelineState, pipelineBinding);
 	}
 
 	void GraphicsCommandList::BindGraphics(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)
 	{
-		commandList.ValidateState();
-		ValidateGraphicsBindings(shaderDataBindings, samplerBindings);
-
-		containerBinding.BindGraphicsShaderData(shaderDataBindings, commandList);
-		containerBinding.BindGraphicsSampler(samplerBindings, commandList);
+		commandList.SetGraphicsBindings(shaderDataBindings, samplerBindings, containerBinding, pipelineBinding);
 	}
 
 	void GraphicsCommandList::BindCompute(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)
 	{
-		commandList.ValidateState();
-		ValidateComputeBindings(shaderDataBindings, samplerBindings);
-
-		containerBinding.BindComputeShaderData(shaderDataBindings, commandList);
-		containerBinding.BindComputeSampler(samplerBindings, commandList);
+		commandList.SetComputeBindings(shaderDataBindings, samplerBindings, containerBinding, pipelineBinding);
 	}
 
 	void GraphicsCommandList::DispatchGraphics(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
-		commandList.ValidateState();
-		ValidatePipelineStateForGraphics();
-
-		pipelineBinding.SetGraphicsPipelineState(commandList);
-		commandList.DispatchGraphics(threadGroupCounts);
+		commandList.DispatchGraphics(threadGroupCounts, pipelineBinding);
 	}
 
 	void GraphicsCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
-		commandList.ValidateState();
-		ValidatePipelineStateForCompute();
-
-		pipelineBinding.SetComputePipelineState(commandList);
-		commandList.DispatchCompute(threadGroupCounts);
+		commandList.DispatchCompute(threadGroupCounts, pipelineBinding);
 	}
 
 	void GraphicsCommandList::ClearRTV(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color,
@@ -262,53 +233,25 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
 		const Math::Vector4<std::uint32_t>& values)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values);
+		commandList.ClearUAV(buffer, gpuViewIndex, cpuContainer, cpuViewIndex, values, containerBinding);
 	}
 
 	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
 		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
 	}
 
 	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
 		const Math::Vector4<float>& values)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values);
+		commandList.ClearUAV(buffer, gpuViewIndex, cpuContainer, cpuViewIndex, values, containerBinding);
 	}
 
 	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
 		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
 	}
 
 	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination)
@@ -374,9 +317,22 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsCommandList::Execute(const ISecondaryGraphicsCommandList& secondary)
 	{
-		ValidateBundle(secondary);
+#ifndef NDEBUG
+		if (typeid(secondary) != typeid(BundleCommandList)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid secondary graphics command list");
+		}
+#endif
 
 		const auto& bundle = static_cast<const BundleCommandList&>(secondary);
+
+#ifndef NDEBUG
+		if (bundle.IsOpen()) [[unlikely]]
+		{
+			throw std::invalid_argument("Secondary graphics command list is open");
+		}
+#endif
+
 		commandList.ExecuteBundle(bundle.CommandList());
 	}
 
@@ -393,76 +349,5 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ID3D12GraphicsCommandList10& GraphicsCommandList::CommandList() const noexcept
 	{
 		return commandList.GetCommandList();
-	}
-
-	void GraphicsCommandList::ValidatePipelineStateForGraphics() const
-	{
-#ifndef NDEBUG
-		if (!pipelineBinding.HasGraphicsPSO())
-		{
-			throw std::logic_error("No graphics pipeline state bound");
-		}
-#endif
-	}
-
-	void GraphicsCommandList::ValidatePipelineStateForCompute() const
-	{
-#ifndef NDEBUG
-		if (!pipelineBinding.HasComputePSO())
-		{
-			throw std::logic_error("No compute pipeline state bound");
-		}
-#endif
-	}
-
-	void GraphicsCommandList::ValidateGraphicsBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		ValidateBindings(pipelineBinding.GraphicsRootSignature(), shaderDataBindings, samplerBindings);
-#endif
-	}
-
-	void GraphicsCommandList::ValidateComputeBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		ValidateBindings(pipelineBinding.ComputeRootSignature(), shaderDataBindings, samplerBindings);
-#endif
-	}
-
-	void GraphicsCommandList::ValidateBindings(const RootSignature* const rootSig, 
-		const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		if (!rootSig) [[unlikely]]
-		{
-			throw std::logic_error("Empty pipeline layout");
-		}
-
-		for (const ShaderDataBinding& binding : shaderDataBindings)
-		{
-			containerBinding.ValidateShaderData(*rootSig, binding.layoutSetIndex, binding.containerIndex);
-		}
-
-		for (const SamplerBinding& binding : samplerBindings)
-		{
-			containerBinding.ValidateSamplerData(*rootSig, binding.layoutSetIndex, binding.containerIndex);
-		}
-#endif
-	}
-
-	void GraphicsCommandList::ValidateBundle(const ISecondaryGraphicsCommandList& secondary)
-	{
-#ifndef NDEBUG
-		if (typeid(secondary) != typeid(BundleCommandList)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid secondary graphics command list");
-		}
-
-		const auto& bundle = static_cast<const BundleCommandList&>(secondary);
-		if (bundle.IsOpen()) [[unlikely]]
-		{
-			throw std::invalid_argument("Secondary graphics command list is open");
-		}
-#endif
 	}
 }

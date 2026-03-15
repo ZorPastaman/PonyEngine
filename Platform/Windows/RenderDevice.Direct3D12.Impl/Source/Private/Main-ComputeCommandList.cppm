@@ -82,10 +82,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		ComputeCommandList& operator =(ComputeCommandList&&) = delete;
 
 	private:
-		void ValidatePipelineStateForCompute() const;
-		void ValidateComputeBindings(std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-		void ValidateBindings(const RootSignature* rootSig, std::span<const ShaderDataBinding> shaderDataBindings, std::span<const SamplerBinding> samplerBindings) const;
-
 		class CommandList commandList;
 		ComputePipelineBinding pipelineBinding;
 		ContainerBinding containerBinding;
@@ -107,9 +103,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ComputeCommandList::Reset()
 	{
-		commandList.Reset();
-		pipelineBinding.Reset();
-		containerBinding.Reset();
+		commandList.Reset(containerBinding, pipelineBinding);
 	}
 
 	void ComputeCommandList::Close()
@@ -129,83 +123,46 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ComputeCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)
 	{
-		commandList.ValidateState();
-		containerBinding.SetContainers(ToNativeContainer(shaderDataContainer), ToNativeContainer(samplerContainer), commandList);
+		commandList.SetContainers(shaderDataContainer, samplerContainer, containerBinding);
 	}
 
 	void ComputeCommandList::BindPipelineState(const IComputePipelineState& pipelineState)
 	{
-		commandList.ValidateState();
-		pipelineBinding.BindPipelineState(ToNativePipelineState(pipelineState), commandList);
+		commandList.SetPipelineState(pipelineState, pipelineBinding);
 	}
 
 	void ComputeCommandList::BindCompute(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings)
 	{
-		commandList.ValidateState();
-		ValidateComputeBindings(shaderDataBindings, samplerBindings);
-
-		containerBinding.BindComputeShaderData(shaderDataBindings, commandList);
-		containerBinding.BindComputeSampler(samplerBindings, commandList);
+		commandList.SetComputeBindings(shaderDataBindings, samplerBindings, containerBinding, pipelineBinding);
 	}
 
 	void ComputeCommandList::DispatchCompute(const Math::Vector3<std::uint32_t>& threadGroupCounts)
 	{
-		commandList.ValidateState();
-		ValidatePipelineStateForCompute();
-
-		commandList.DispatchCompute(threadGroupCounts);
+		commandList.DispatchCompute(threadGroupCounts, pipelineBinding);
 	}
 
 	void ComputeCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
 		const Math::Vector4<std::uint32_t>& values)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values);
+		commandList.ClearUAV(buffer, gpuViewIndex, cpuContainer, cpuViewIndex, values, containerBinding);
 	}
 
 	void ComputeCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
 		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
 	}
 
 	void ComputeCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
 		const Math::Vector4<float>& values)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(buffer, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values);
+		commandList.ClearUAV(buffer, gpuViewIndex, cpuContainer, cpuViewIndex, values, containerBinding);
 	}
 
-	void ComputeCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
+	void ComputeCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
 		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-#ifndef NDEBUG
-		if (!containerBinding.HasShaderDataContainer()) [[unlikely]]
-		{
-			throw std::logic_error("No shader data container bound");
-		}
-#endif
-
-		commandList.ClearUAV(texture, *containerBinding.GetShaderDataContainer(), gpuViewIndex, cpuContainer, cpuViewIndex, values, rects);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
 	}
 
 	void ComputeCommandList::Copy(const IBuffer& source, IBuffer& destination)
@@ -266,43 +223,5 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	ID3D12GraphicsCommandList10& ComputeCommandList::CommandList() const noexcept
 	{
 		return commandList.GetCommandList();
-	}
-
-	void ComputeCommandList::ValidatePipelineStateForCompute() const
-	{
-#ifndef NDEBUG
-		if (!pipelineBinding.HasPSO())
-		{
-			throw std::logic_error("No compute pipeline state bound");
-		}
-#endif
-	}
-
-	void ComputeCommandList::ValidateComputeBindings(const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		ValidateBindings(pipelineBinding.GetRootSignature(), shaderDataBindings, samplerBindings);
-#endif
-	}
-
-	void ComputeCommandList::ValidateBindings(const RootSignature* const rootSig, 
-		const std::span<const ShaderDataBinding> shaderDataBindings, const std::span<const SamplerBinding> samplerBindings) const
-	{
-#ifndef NDEBUG
-		if (!rootSig) [[unlikely]]
-		{
-			throw std::logic_error("Empty pipeline layout");
-		}
-
-		for (const ShaderDataBinding& binding : shaderDataBindings)
-		{
-			containerBinding.ValidateShaderData(*rootSig, binding.layoutSetIndex, binding.containerIndex);
-		}
-
-		for (const SamplerBinding& binding : samplerBindings)
-		{
-			containerBinding.ValidateSamplerData(*rootSig, binding.layoutSetIndex, binding.containerIndex);
-		}
-#endif
 	}
 }
