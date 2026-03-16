@@ -122,6 +122,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	/// @return Subresource index.
 	[[nodiscard("Pure function")]]
 	constexpr UINT CalculateSubresource(UINT16 mipIndex, UINT16 arrayIndex, UINT8 planeIndex, UINT16 mipCount, UINT16 arraySize) noexcept;
+	/// @brief Calculates a subresource range.
+	/// @param mipRange Mip range.
+	/// @param arrayRange Array range.
+	/// @param aspects Aspects.
+	/// @param resourceMipCount Resource mip count.
+	/// @param resourceArraySize Resource array size.
+	/// @return Subresource range.
+	[[nodiscard("Pure function")]]
+	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE CalculateSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, AspectMask aspects,
+		std::uint8_t resourceMipCount, std::uint16_t resourceArraySize) noexcept;
 
 	/// @brief Makes a texture resource description.
 	/// @param params Texture parameters.
@@ -422,6 +432,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	constexpr UINT CalculateSubresource(const UINT16 mipIndex, const UINT16 arrayIndex, const UINT8 planeIndex, const UINT16 mipCount, const UINT16 arraySize) noexcept
 	{
 		return mipIndex + arrayIndex * mipCount + planeIndex * mipCount * arraySize;
+	}
+
+	constexpr D3D12_BARRIER_SUBRESOURCE_RANGE CalculateSubresourceRange(const MipRange& mipRange, const ArrayRange& arrayRange, const AspectMask aspects,
+		const std::uint8_t resourceMipCount, const std::uint16_t resourceArraySize) noexcept
+	{
+		return D3D12_BARRIER_SUBRESOURCE_RANGE
+		{
+			.IndexOrFirstMipLevel = mipRange.mostDetailedMipIndex,
+			.NumMipLevels = mipRange.mipCount.value_or(resourceMipCount - mipRange.mostDetailedMipIndex),
+			.FirstArraySlice = arrayRange.firstArrayIndex,
+			.NumArraySlices = arrayRange.arrayCount.value_or(resourceArraySize - arrayRange.firstArrayIndex),
+			.FirstPlane = ToFirstPlaneIndex(aspects),
+			.NumPlanes = ToPlaneCount(aspects)
+		};
 	}
 
 	constexpr D3D12_RESOURCE_DESC1 MakeResourceDesc(const TextureParams& params, const DXGI_FORMAT format) noexcept

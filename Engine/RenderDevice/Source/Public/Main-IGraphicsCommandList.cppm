@@ -450,12 +450,12 @@ namespace PonyEngine::RenderDevice
 
 	void IGraphicsCommandList::BindTargets(const DepthStencilBinding& depthStencilBinding)
 	{
-		BindTargets(nullptr, 0, &depthStencilBinding);
+		BindTargets(nullptr, 0u, &depthStencilBinding);
 	}
 
 	void IGraphicsCommandList::BindTargets(const RenderTargetBinding& renderTargetBinding, const DepthStencilBinding& depthStencilBinding)
 	{
-		BindTargets(std::span<const RenderTargetBinding>(&renderTargetBinding, 1uz), &depthStencilBinding);
+		BindTargets(&renderTargetBinding, 1u, &depthStencilBinding);
 	}
 
 	void IGraphicsCommandList::BindTargets(const RenderTargetBinding& renderTargetBinding, const std::uint8_t renderTargetCount)

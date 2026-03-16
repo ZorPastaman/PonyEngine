@@ -662,9 +662,8 @@ namespace Game
 		graphicsCommandList->Close();
 		copyCommandList->Close();
 
-		const PonyEngine::RenderDevice::ICopyCommandList* const copyCommand = copyCommandList.get();
 		const auto copyFenceValueSync = std::pair(copyFence.get(), ++copyFenceValue);
-		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::ICopyCommandList* const>(&copyCommand, 1uz), PonyEngine::RenderDevice::QueueSync
+		renderDevice->Execute(*copyCommandList, PonyEngine::RenderDevice::QueueSync
 		{
 			.after = std::span(&copyFenceValueSync, 1uz)
 		});
@@ -675,12 +674,12 @@ namespace Game
 	void GameService::End()
 	{
 		const auto graphicsFenceValueSync = std::pair(graphicsFence.get(), ++graphicsFenceValue);
-		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::IGraphicsCommandList* const>(), PonyEngine::RenderDevice::QueueSync
+		renderDevice->SyncGraphics(PonyEngine::RenderDevice::QueueSync
 		{
 			.after = std::span(&graphicsFenceValueSync, 1uz)
 		});
 		const auto copyFenceValueSync = std::pair(copyFence.get(), ++copyFenceValue);
-		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::ICopyCommandList* const>(), PonyEngine::RenderDevice::QueueSync
+		renderDevice->SyncCopy(PonyEngine::RenderDevice::QueueSync
 		{
 			.after = std::span(&copyFenceValueSync, 1uz)
 		});
@@ -790,16 +789,15 @@ namespace Game
 
 		copyCommandList->Close();
 
-		const PonyEngine::RenderDevice::ICopyCommandList* const copyCommand = copyCommandList.get();
 		const auto copyFenceValueSync = std::pair(copyFence.get(), ++copyFenceValue);
-		renderDevice->Execute(std::span<const PonyEngine::RenderDevice::ICopyCommandList* const>(&copyCommand, 1uz), PonyEngine::RenderDevice::QueueSync
+		renderDevice->Execute(*copyCommandList, PonyEngine::RenderDevice::QueueSync
 		{
 			.after = std::span(&copyFenceValueSync, 1uz)
 		});
 
 		const std::uint8_t currentBackBufferIndex = renderDevice->CurrentSwapChainBufferIndex();
 		graphicsCommandList->Reset();
-		graphicsCommandList->BindContainers(srvContainer.get(), nullptr);
+		graphicsCommandList->BindContainers(*srvContainer);
 		graphicsCommandList->SetRasterRegion(PonyEngine::RenderDevice::RasterRegion
 		{
 			.viewport = PonyEngine::Math::CornerRect<float>(static_cast<PonyEngine::Math::Vector2<float>>(resolution)),
@@ -955,7 +953,7 @@ namespace Game
 		};
 		graphicsCommandList->Barrier(outputBarriers);
 		const auto outputTargetBinding = PonyEngine::RenderDevice::RenderTargetBinding{.container = rtvContainer.get(), .index = backBufferContainerOffset + renderDevice->CurrentSwapChainBufferIndex()};
-		graphicsCommandList->BindTargets(std::span(&outputTargetBinding, 1uz), nullptr);
+		graphicsCommandList->BindTargets(outputTargetBinding);
 		graphicsCommandList->BindPipelineState(*outputPipelineState);
 		graphicsCommandList->BindGraphics(PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 0u, .containerIndex = resolvedTextureContainerIndex});
 		graphicsCommandList->DispatchGraphics(1u);
@@ -988,8 +986,7 @@ namespace Game
 
 		const auto copyWait = std::pair<const PonyEngine::RenderDevice::IFence*, std::uint64_t>(copyFence.get(), copyFenceValue);
 		const auto finishSync = std::pair(graphicsFence.get(), ++graphicsFenceValue);
-		const PonyEngine::RenderDevice::IGraphicsCommandList* const commandList = graphicsCommandList.get();
-		renderDevice->Execute(std::span(&commandList, 1uz), PonyEngine::RenderDevice::QueueSync
+		renderDevice->Execute(*graphicsCommandList, PonyEngine::RenderDevice::QueueSync
 		{
 			.before = std::span(&copyWait, 1uz),
 			.after = std::span(&finishSync, 1uz)
