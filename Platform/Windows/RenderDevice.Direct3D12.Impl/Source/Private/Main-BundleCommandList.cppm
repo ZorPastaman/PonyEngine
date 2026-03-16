@@ -21,19 +21,22 @@ import PonyEngine.RenderDevice;
 
 import :CommandList;
 import :ContainerBinding;
-import :DescriptorHeapUtility;
 import :GraphicsComputePipelineBinding;
-import :PipelineStateUtility;
-import :SamplerContainer;
-import :ShaderDataContainer;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Bundle command list wrapper.
 	class BundleCommandList final : public ISecondaryGraphicsCommandList
 	{
 	public:
+		/// @brief Creates a bundle command list wrapper.
+		/// @param allocator Bundle command allocator.
+		/// @param commandList Bundle command list.
 		[[nodiscard("Pure constructor")]]
 		BundleCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		/// @brief Creates a bundle command list wrapper.
+		/// @param allocator Bundle command allocator.
+		/// @param commandList Bundle command list.
 		[[nodiscard("Pure constructor")]]
 		BundleCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		BundleCommandList(const BundleCommandList&) = delete;
@@ -64,6 +67,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the command list.
+		/// @return Command list.
 		[[nodiscard("Pure function")]]
 		ID3D12GraphicsCommandList10& CommandList() const noexcept;
 
@@ -71,9 +76,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		BundleCommandList& operator =(BundleCommandList&&) = delete;
 
 	private:
-		class CommandList commandList;
-		GraphicsComputePipelineBinding pipelineBinding;
-		ContainerBinding containerBinding;
+		class CommandList commandList; ///< Command list.
+		GraphicsComputePipelineBinding pipelineBinding; ///< Pipeline binding.
+		ContainerBinding containerBinding; ///< Container binding.
 	};
 }
 

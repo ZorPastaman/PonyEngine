@@ -16,27 +16,29 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:GraphicsCommandLis
 import std;
 
 import PonyEngine.Math;
+import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
 import :BundleCommandList;
 import :CommandList;
 import :ContainerBinding;
-import :DepthStencilContainer;
-import :DescriptorHeapUtility;
 import :GraphicsComputePipelineBinding;
-import :PipelineStateUtility;
-import :RenderTargetContainer;
-import :SamplerContainer;
-import :ShaderDataContainer;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Graphics command list wrapper.
 	class GraphicsCommandList final : public IGraphicsCommandList
 	{
 	public:
+		/// @brief Creates a graphics command list wrapper.
+		/// @param allocator Graphics command list allocator.
+		/// @param commandList Graphics command list.
 		[[nodiscard("Pure constructor")]]
 		GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		/// @brief Creates a graphics command list wrapper.
+		/// @param allocator Graphics command list allocator.
+		/// @param commandList Graphics command list.
 		[[nodiscard("Pure constructor")]]
 		GraphicsCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		GraphicsCommandList(const GraphicsCommandList&) = delete;
@@ -101,6 +103,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the command list.
+		/// @return Command list.
 		[[nodiscard("Pure function")]]
 		ID3D12GraphicsCommandList10& CommandList() const noexcept;
 
@@ -108,22 +112,25 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		GraphicsCommandList& operator =(GraphicsCommandList&&) = delete;
 
 	private:
-		class CommandList commandList;
-		GraphicsComputePipelineBinding pipelineBinding;
-		ContainerBinding containerBinding;
+		class CommandList commandList; ///< Command list.
+		GraphicsComputePipelineBinding pipelineBinding; ///< Pipeline binding.
+		ContainerBinding containerBinding; ///< Container binding.
+		Memory::Arena arena; ///< Arena.
 	};
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	GraphicsCommandList::GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
-		commandList(allocator, commandList)
+		commandList(allocator, commandList),
+		arena(0uz, 128uz)
 	{
 	}
 
 	GraphicsCommandList::GraphicsCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, 
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
-		commandList(std::move(allocator), std::move(commandList))
+		commandList(std::move(allocator), std::move(commandList)),
+		arena(0uz, 128uz)
 	{
 	}
 
@@ -144,7 +151,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void GraphicsCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
-		commandList.Barrier(bufferBarriers, textureBarriers);
+		commandList.Barrier(bufferBarriers, textureBarriers, arena);
 	}
 
 	void GraphicsCommandList::SetRasterRegions(const std::span<const RasterRegion> regions)
@@ -221,13 +228,13 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::ClearRTV(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color,
 		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.ClearRTV(container, viewIndex, color, rects);
+		commandList.ClearRTV(container, viewIndex, color, rects, arena);
 	}
 
 	void GraphicsCommandList::ClearDSV(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
 		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.ClearDSV(container, viewIndex, depth, stencil, rects);
+		commandList.ClearDSV(container, viewIndex, depth, stencil, rects, arena);
 	}
 
 	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
@@ -239,7 +246,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
 		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding, arena);
 	}
 
 	void GraphicsCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
@@ -251,7 +258,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void GraphicsCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
 		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding, arena);
 	}
 
 	void GraphicsCommandList::Copy(const IBuffer& source, IBuffer& destination)

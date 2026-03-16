@@ -24,7 +24,6 @@ import PonyEngine.RenderDevice;
 
 import :Buffer;
 import :BufferUtility;
-import :CommandListUtility;
 import :ComputePipelineBinding;
 import :ComputePipelineState;
 import :ContainerBinding;
@@ -89,7 +88,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Adds barriers to the command list.
 		/// @param bufferBarriers Buffer barriers.
 		/// @param textureBarriers Texture barriers.
-		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers);
+		/// @param arena Arena.
+		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers, Memory::Arena& arena);
 
 		/// @brief Sets the raster regions.
 		/// @param regions Raster regions.
@@ -173,15 +173,18 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param viewIndex RTV index.
 		/// @param color Clear color.
 		/// @param rects Clear rectangles.
-		void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, std::span<const Math::CornerRect<std::uint32_t>> rects);
+		/// @param arena Arena.
+		void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, std::span<const Math::CornerRect<std::uint32_t>> rects,
+			Memory::Arena& arena);
 		/// @brief Clears the depth stencil view.
 		/// @param container DSV container.
 		/// @param viewIndex DSV index.
 		/// @param depth Clear depth. Nullopt means no depth clearing.
 		/// @param stencil Clear stencil. Nullopt means no stencil clearing.
 		/// @param rects Clear rectangles.
+		/// @param arena Arena.
 		void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
-			std::span<const Math::CornerRect<std::uint32_t>> rects);
+			std::span<const Math::CornerRect<std::uint32_t>> rects, Memory::Arena& arena);
 		/// @brief Clears the unordered access view.
 		/// @param buffer Target buffer.
 		/// @param gpuViewIndex GPU shader data container index.
@@ -199,8 +202,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param values Clear values.
 		/// @param rects Clear rectangles.
 		/// @param containerBinding Container bindings.
+		/// @param arena Arena.
 		void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding);
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena);
 		/// @brief Clears the unordered access view.
 		/// @param buffer Target buffer.
 		/// @param gpuViewIndex GPU shader data container index.
@@ -218,8 +222,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param values Clear values.
 		/// @param rects Clear rectangles.
 		/// @param containerBinding Container bindings.
+		/// @param arena Arena.
 		void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding);
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena);
 
 		/// @brief Copies from the buffer to the buffer.
 		/// @param source Source buffer.
@@ -311,6 +316,17 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param textureBarriers Engine texture barriers.
 		/// @param nativeTextureBarriers Native texture barriers.
 		static void ToNativeBarriers(std::span<const TextureBarrier> textureBarriers, std::span<D3D12_TEXTURE_BARRIER> nativeTextureBarriers);
+
+		/// @brief Casts the engine pipeline stages to a native barrier sync.
+		/// @param stages Engine pipeline stages.
+		/// @return Native barrier sync.
+		[[nodiscard("Pure function")]]
+		static D3D12_BARRIER_SYNC ToSync(PipelineStageMask stages) noexcept;
+		/// @brief Casts the engine resource accesses to a native barrier access.
+		/// @param accesses Engine resource accesses.
+		/// @return Native barrier access.
+		[[nodiscard("Pure function")]]
+		static D3D12_BARRIER_ACCESS ToAccess(std::optional<ResourceAccessMask> accesses) noexcept;
 
 		/// @brief Makes a copy location.
 		/// @param buffer Target buffer.
@@ -448,8 +464,6 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator; ///< Command allocator.
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList; ///< Command list.
 
-		Memory::Arena arena; ///< Arena memory.
-
 		bool isOpen; ///< Is the command list open?
 
 		std::string name; ///< Name.
@@ -461,7 +475,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	CommandList::CommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		allocator(&allocator),
 		commandList(&commandList),
-		arena(0uz, 1024uz),
 		isOpen{true}
 	{
 		Reset();
@@ -471,7 +484,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		allocator(std::move(allocator)),
 		commandList(std::move(commandList)),
-		arena(0uz, 1024uz),
 		isOpen{true}
 	{
 		assert(this->allocator && "The allocator is nullptr.");
@@ -528,7 +540,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return isOpen;
 	}
 
-	void CommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
+	void CommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers, Memory::Arena& arena)
 	{
 		ValidateState();
 
@@ -882,7 +894,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearRTV(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
-		const std::span<const Math::CornerRect<std::uint32_t>> rects)
+		const std::span<const Math::CornerRect<std::uint32_t>> rects, Memory::Arena& arena)
 	{
 		ValidateState();
 
@@ -914,7 +926,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearDSV(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
-		const std::span<const Math::CornerRect<std::uint32_t>> rects)
+		const std::span<const Math::CornerRect<std::uint32_t>> rects, Memory::Arena& arena)
 	{
 		ValidateState();
 
@@ -960,7 +972,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding)
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena)
 	{
 		ValidateState();
 
@@ -986,7 +998,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding)
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena)
 	{
 		ValidateState();
 
@@ -1417,6 +1429,97 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				.Flags = barrier.discard ? D3D12_TEXTURE_BARRIER_FLAG_DISCARD : D3D12_TEXTURE_BARRIER_FLAG_NONE
 			};
 		}
+	}
+
+	D3D12_BARRIER_SYNC CommandList::ToSync(const PipelineStageMask stages) noexcept
+	{
+		auto sync = D3D12_BARRIER_SYNC_NONE;
+		if (Any(PipelineStageMask::VertexShading, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_VERTEX_SHADING;
+		}
+		if (Any(PipelineStageMask::PixelShading, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_PIXEL_SHADING;
+		}
+		if (Any(PipelineStageMask::RenderTarget, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_RENDER_TARGET;
+		}
+		if (Any(PipelineStageMask::DepthStencil, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_DEPTH_STENCIL;
+		}
+		if (Any(PipelineStageMask::ComputeShading, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_COMPUTE_SHADING;
+		}
+		if (Any(PipelineStageMask::Copy, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_COPY;
+		}
+		if (Any(PipelineStageMask::Resolve, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_RESOLVE;
+		}
+		if (Any(PipelineStageMask::UnorderedAccessClearing, stages))
+		{
+			sync |= D3D12_BARRIER_SYNC_CLEAR_UNORDERED_ACCESS_VIEW;
+		}
+
+		return sync;
+	}
+
+	D3D12_BARRIER_ACCESS CommandList::ToAccess(const std::optional<ResourceAccessMask> accesses) noexcept
+	{
+		if (!accesses)
+		{
+			return D3D12_BARRIER_ACCESS_NO_ACCESS;
+		}
+
+		auto access = D3D12_BARRIER_ACCESS_COMMON;
+		if (Any(ResourceAccessMask::ConstantBuffer, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_CONSTANT_BUFFER;
+		}
+		if (Any(ResourceAccessMask::ShaderResource, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_SHADER_RESOURCE;
+		}
+		if (Any(ResourceAccessMask::UnorderedAccess, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_UNORDERED_ACCESS;
+		}
+		if (Any(ResourceAccessMask::RenderTarget, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_RENDER_TARGET;
+		}
+		if (Any(ResourceAccessMask::DepthStencilRead, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_DEPTH_STENCIL_READ;
+		}
+		if (Any(ResourceAccessMask::DepthStencilWrite, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE;
+		}
+		if (Any(ResourceAccessMask::CopySource, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_COPY_SOURCE;
+		}
+		if (Any(ResourceAccessMask::CopyDestination, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_COPY_DEST;
+		}
+		if (Any(ResourceAccessMask::ResolveSource, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_RESOLVE_SOURCE;
+		}
+		if (Any(ResourceAccessMask::ResolveDestination, *accesses))
+		{
+			access |= D3D12_BARRIER_ACCESS_RESOLVE_DEST;
+		}
+
+		return access;
 	}
 
 	D3D12_TEXTURE_COPY_LOCATION CommandList::MakeCopyLocation(const Buffer& buffer, const CopyableFootprint& footprint, const DXGI_FORMAT format) noexcept

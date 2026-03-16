@@ -15,6 +15,7 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:CopyCommandList;
 
 import std;
 
+import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
@@ -22,11 +23,18 @@ import :CommandList;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Copy command list wrapper.
 	class CopyCommandList final : public ICopyCommandList
 	{
 	public:
+		/// @brief Creates a copy command list wrapper.
+		/// @param allocator Copy command list allocator.
+		/// @param commandList Copy command list.
 		[[nodiscard("Pure constructor")]]
 		CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		/// @brief Creates a copy command list wrapper.
+		/// @param allocator Copy command list allocator.
+		/// @param commandList Copy command list.
 		[[nodiscard("Pure constructor")]]
 		CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		CopyCommandList(const CopyCommandList&) = delete;
@@ -55,6 +63,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the command list.
+		/// @return Command list.
 		[[nodiscard("Pure function")]]
 		ID3D12GraphicsCommandList10& CommandList() const noexcept;
 
@@ -62,20 +72,23 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		CopyCommandList& operator =(CopyCommandList&&) = delete;
 
 	private:
-		class CommandList commandList;
+		class CommandList commandList; ///< Command list.
+		Memory::Arena arena; ///< Arena.
 	};
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	CopyCommandList::CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
-		commandList(allocator, commandList)
+		commandList(allocator, commandList),
+		arena(0uz, 128uz)
 	{
 	}
 
 	CopyCommandList::CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
-		commandList(std::move(allocator), std::move(commandList))
+		commandList(std::move(allocator), std::move(commandList)),
+		arena(0uz, 128uz)
 	{
 	}
 
@@ -96,7 +109,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CopyCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
-		commandList.Barrier(bufferBarriers, textureBarriers);
+		commandList.Barrier(bufferBarriers, textureBarriers, arena);
 	}
 
 	void CopyCommandList::Copy(const IBuffer& source, IBuffer& destination)
