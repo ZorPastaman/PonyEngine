@@ -40,7 +40,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure constructor")]]
 		Device(IRenderDeviceContext& renderDevice, IUnknown& adapter);
 		Device(const Device&) = delete;
-		Device(Device&&) = delete;
+		Device(Device&& other) noexcept = default;
 
 		~Device() noexcept;
 

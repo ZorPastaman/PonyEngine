@@ -364,7 +364,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) = 0;
 		/// @brief Creates a graphics pipeline state.
-		/// @param layout Pipeline layout.
+		/// @param layout Pipeline layout. May be nullptr.
 		/// @param params Pipeline state parameters.
 		/// @return Graphics pipeline state.
 		/// @remark The service must have an active backend.
@@ -373,7 +373,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Wierd call")]]
 		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) = 0;
 		/// @brief Creates a compute pipeline state.
-		/// @param layout Pipeline layout.
+		/// @param layout Pipeline layout. May be nullptr.
 		/// @param params Pipeline state parameters.
 		/// @return Compute pipeline state.
 		/// @remark The service must have an active backend.

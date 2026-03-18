@@ -120,9 +120,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		std::size_t waitCount = 0uz;
 		for (const auto [fence, fenceValue] : fenceValues)
 		{
-			if (const Fence& nativeFence = ToNativeFenceNotNullptr(fence); nativeFence.CompletedValue() < fenceValue)
+			if (const Fence* nativeFence = ToNativeFenceNotNullptr(fence); nativeFence->CompletedValue() < fenceValue)
 			{
-				nativeFence.SetEventOnCompletion(fenceValue, waitEvents[waitCount++]);
+				nativeFence->SetEventOnCompletion(fenceValue, waitEvents[waitCount++]);
 			}
 		}
 
