@@ -7,10 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyEngine/Log/Log.h"
+
 export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:D3D12Backend;
 
 import std;
 
+import PonyEngine.Log;
 import PonyEngine.Meta;
 import PonyEngine.RenderDevice.Ext;
 
@@ -18,9 +23,12 @@ import :Engine;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Direct3D12 backend.
 	class D3D12Backend final : public IBackend
 	{
 	public:
+		/// @brief Creates a Direct3D12 backend.
+		/// @param renderDevice Render device container.
 		[[nodiscard("Pure constructor")]]
 		explicit D3D12Backend(IRenderDeviceContext& renderDevice) noexcept;
 		D3D12Backend(const D3D12Backend&) = delete;
@@ -124,9 +132,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		D3D12Backend& operator =(D3D12Backend&&) = delete;
 
 	private:
-		IRenderDeviceContext* renderDevice;
+		IRenderDeviceContext* renderDevice; ///< Render device context.
 
-		std::unique_ptr<Engine> engine;
+		std::unique_ptr<Engine> engine; ///< Direct3D12 engine. It's alive only if the backend is active.
 	};
 }
 
@@ -149,12 +157,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void D3D12Backend::Activate()
 	{
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Creating D3D12 engine...");
 		engine = std::make_unique<Engine>(*renderDevice);
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Creating D3D12 engine done.");
 	}
 
 	void D3D12Backend::Deactivate()
 	{
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Destroying D3D12 engine...");
 		engine.reset();
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Destroying D3D12 engine done.");
 	}
 
 	struct DeviceSupport D3D12Backend::DeviceSupport() const

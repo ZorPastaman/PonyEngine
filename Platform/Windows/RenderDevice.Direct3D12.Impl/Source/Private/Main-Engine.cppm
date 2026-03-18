@@ -31,6 +31,7 @@ import :AtomicSupport;
 import :Buffer;
 import :BufferUtility;
 import :BundleCommandList;
+import :CommandListUtility;
 import :CommandQueue;
 import :ComputeCommandList;
 import :ComputePipelineState;
@@ -62,25 +63,28 @@ import :Waiter;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	/// @brief Direct3D12 engine.
 	class Engine final
 	{
 	public:
-		static constexpr std::string_view APIName = Device::APIName;
-		static constexpr auto APIVersion = Device::APIVersion;
+		static constexpr std::string_view APIName = Device::APIName; ///< Direct3D API name.
+		static constexpr auto APIVersion = Device::APIVersion; ///< Direct3D FL.
 
-		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL;
-		static constexpr std::uint8_t SimultaneousTargetCount = std::uint8_t{D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT};
-		static constexpr std::uint8_t ViewportScissorCount = std::uint8_t{D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE};
+		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL; ///< Direct3D IR name.
+		static constexpr std::uint8_t SimultaneousTargetCount = std::uint8_t{D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT}; ///< Supported simultaneous target count.
+		static constexpr std::uint8_t ViewportScissorCount = std::uint8_t{D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE}; ///< Supported viewport and scissor count.
 
-		static constexpr auto BufferHeapTypeSupport = HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download;
-		static constexpr auto TextureHeapTypeSupport = HeapTypeMask::Default;
+		static constexpr auto BufferHeapTypeSupport = HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download; ///< Supported buffer heap types.
+		static constexpr auto TextureHeapTypeSupport = HeapTypeMask::Default; ///< Supported texture heap types.
 
-		static constexpr std::uint32_t CBVAlignment = std::uint32_t{D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT};
+		static constexpr std::uint32_t CBVAlignment = std::uint32_t{D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT}; ///< Constant buffer view alignment requirement.
 
-		static constexpr float MaxAnisotropy = float{D3D12_DEFAULT_MAX_ANISOTROPY};
+		static constexpr float MaxAnisotropy = float{D3D12_DEFAULT_MAX_ANISOTROPY}; ///< Max supported anisotropy.
 
-		static constexpr std::uint32_t MaxSimultaneousFences = std::uint32_t{MAXIMUM_WAIT_OBJECTS};
+		static constexpr std::uint32_t MaxSimultaneousFences = std::uint32_t{MAXIMUM_WAIT_OBJECTS}; ///< Max simultaneous fence count in one wait.
 
+		/// @brief Creates a Direct3D12 engine.
+		/// @param renderDevice 
 		[[nodiscard("Pure constructor")]]
 		explicit Engine(IRenderDeviceContext& renderDevice);
 		Engine(const Engine&) = delete;
@@ -88,264 +92,619 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~Engine() noexcept = default;
 
+		/// @brief Creates a buffer.
+		/// @param heapParams Heap parameters.
+		/// @param params Buffer parameters.
+		/// @return Buffer.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params);
 
+		/// @brief Gets a texture format support.
+		/// @param textureFormatId Texture format ID.
+		/// @return Texture format support.
 		[[nodiscard("Pure function")]]
 		struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const;
+		/// @brief Gets a texture support.
+		/// @param request Texture support request.
+		/// @return Texture support response.
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
+		/// @brief Creates a texture.
+		/// @param heapParams Heap parameters.
+		/// @param params Texture parameters.
+		/// @return Texture.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ITexture> CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params);
 
+		/// @brief Gets a copyable footprint count.
+		/// @param params Texture parameters.
+		/// @param range Sub-texture range.
+		/// @return Copyable footprint count.
 		[[nodiscard("Pure function")]]
 		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const;
+		/// @brief Gets a copyable footprint count.
+		/// @param texture Texture.
+		/// @param range Sub-texture range.
+		/// @return Copyable footprint count.
 		[[nodiscard("Pure function")]]
 		std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const;
+		/// @brief Gets copyable footprints.
+		/// @param params Texture parameters.
+		/// @param offset Byte array offset.
+		/// @param range Sub-texture range.
+		/// @param footprints Footprints. May be empty.
+		/// @return Footprint size.
 		CopyableFootprintSize GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const;
+		/// @brief Gets copyable footprints.
+		/// @param texture Texture.
+		/// @param offset Byte array offset.
+		/// @param range Sub-texture range.
+		/// @param footprints Footprints. May be empty.
+		/// @return Footprint size.
 		CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const;
 
+		/// @brief Creates a shader data container.
+		/// @param params Shader data container parameters.
+		/// @return Shader data container.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params);
+		/// @brief Creates a constant buffer view.
+		/// @param buffer Target buffer. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Constant buffer view parameters.
 		void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params);
+		/// @brief Creates a shader resource view.
+		/// @param buffer Target buffer. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Shader resource view parameters.
 		void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params);
+		/// @brief Creates a shader resource view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Shader resource view parameters.
 		void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params);
+		/// @brief Creates an unordered access view.
+		/// @param buffer Target buffer. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Unordered access view parameters.
 		void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params);
+		/// @brief Creates an unordered access view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Unordered access view parameters.
 		void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params);
+		/// @brief Copies view.
+		/// @param ranges Copy ranges.
 		void CopyViews(std::span<const ShaderDataCopyRange> ranges);
 
+		/// @brief Creates a render target container.
+		/// @param params Render target container parameters.
+		/// @return Render target container.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params);
+		/// @brief Creates a render target view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Render target container.
+		/// @param index View index.
+		/// @param params Render target view parameters.
 		void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params);
+		/// @brief Copies view.
+		/// @param ranges Copy ranges.
 		void CopyViews(std::span<const RenderTargetCopyRange> ranges);
 
-		[[nodiscard("Wierd call")]]
+		/// @brief Creates a depth stencil container.
+		/// @param params Depth stencil container parameters.
+		/// @return Depth stencil container.
+		[[nodiscard("Pure function")]]
 		std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params);
+		/// @brief Creates a depth stencil view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Depth stencil container.
+		/// @param index View index.
+		/// @param params Depth stencil view parameters.
 		void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params);
+		/// @brief Copies view.
+		/// @param ranges Copy ranges.
 		void CopyViews(std::span<const DepthStencilCopyRange> ranges);
 
-		[[nodiscard("Wierd call")]]
+		/// @brief Creates a sampler container.
+		/// @param params Sampler container parameters.
+		/// @return Sampler container.
+		[[nodiscard("Pure function")]]
 		std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params);
+		/// @brief Creates a sampler.
+		/// @param container Sampler container.
+		/// @param index Sampler index.
+		/// @param params Sampler parameters.
 		void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params);
+		/// @brief Copies samplers.
+		/// @param ranges Copy ranges.
 		void CopySamplers(std::span<const SamplerCopyRange> ranges);
 
-		[[nodiscard("Pure function")]]
-		Meta::Version ShaderIRVersion() const;
-		[[nodiscard("Pure function")]]
-		ShaderScalarTypeMask ScalarTypeSupport() const;
-		[[nodiscard("Pure function")]]
-		static ShaderScalarTypeMask ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
-		[[nodiscard("Pure function")]]
-		static ShaderScalarTypeMask ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
-		[[nodiscard("Pure function")]]
-		struct ShaderSupport ShaderSupport() const;
-
-		[[nodiscard("Pure function")]]
-		LineRasterizationModeMask LineRasterizationSupport() const;
-		[[nodiscard("Pure function")]]
-		struct RasterizerSupport RasterizerSupport() const;
-
+		/// @brief Creates a pipeline layout.
+		/// @param params Pipeline layout parameters.
+		/// @return Pipeline layout.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params);
+
+		/// @brief Gets a shader support.
+		/// @return Shader support.
+		[[nodiscard("Pure function")]]
+		struct ShaderSupport ShaderSupport() const;
+		/// @brief Gets a rasterizer support.
+		/// @return Rasterizer support.
+		[[nodiscard("Pure function")]]
+		struct RasterizerSupport RasterizerSupport() const;
+		/// @brief Creates a graphics pipeline state.
+		/// @param layout Pipeline layout. May be nullptr.
+		/// @param params Graphics pipeline state parameters.
+		/// @return Graphics pipeline state.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout,
 			const GraphicsPipelineStateParams& params);
+		/// @brief Creates a compute pipeline state.
+		/// @param layout Pipeline layout. May be nullptr.
+		/// @param params Compute pipeline state parameters.
+		/// @return Compute pipeline state.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params);
 
+		/// @brief Creates a graphics command list.
+		/// @return Graphics command list.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
+		/// @brief Creates a compute command list.
+		/// @return Compute command list.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IComputeCommandList> CreateComputeCommandList();
+		/// @brief Creates a copy command list.
+		/// @return Copy command list.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ICopyCommandList> CreateCopyCommandList();
+		/// @brief Executes the graphics command list.
+		/// @param commandLists Graphics command lists.
+		/// @param sync Queue sync.
 		void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync);
+		/// @brief Executes the compute command list.
+		/// @param commandLists Compute command lists.
+		/// @param sync Queue sync.
 		void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync);
+		/// @brief Executes the copy command list.
+		/// @param commandLists Copy command lists.
+		/// @param sync Queue sync.
 		void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync);
+		/// @brief Creates a secondary graphics command list.
+		/// @return Secondary graphics command list.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList();
 
+		/// @brief Creates a fence.
+		/// @return Fence.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IFence> CreateFence();
+		/// @brief Creates a waiter.
+		/// @return Waiter.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<IWaiter> CreateWaiter();
 
+		/// @brief Gets a swap chain support.
+		/// @return Swap chain support.
 		[[nodiscard("Pure function")]]
 		struct SwapChainSupport SwapChainSupport() const;
+		/// @brief Checks if the swap chain is alive.
+		/// @return @a True if it's alive; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsSwapChainAlive() const;
+		/// @brief Creates a swap chain.
+		/// @param params Swap chain parameters.
 		[[nodiscard("Pure function")]]
 		void CreateSwapChain(const SwapChainParams& params);
+		/// @brief Destroys the swap chain.
 		void DestroySwapChain();
+		/// @brief Gets a current swap chain buffer count.
+		/// @return Buffer count.
 		[[nodiscard("Pure function")]]
 		std::uint8_t SwapChainBufferCount() const;
+		/// @brief Gets a current swap chain buffer index.
+		/// @return Buffer index.
 		[[nodiscard("Pure function")]]
 		std::uint8_t CurrentSwapChainBufferIndex() const;
+		/// @brief Gets a current swap chain buffer.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const;
+		/// @brief Presents a next swap chain buffer.
 		void PresentNextSwapChainBuffer();
 
 		Engine& operator =(const Engine&) = delete;
 		Engine& operator =(Engine&&) = delete;
 
 	private:
+		/// @brief Makes a texture support response.
+		/// @param format Format.
+		/// @param request Texture support request.
+		/// @param formatSupport Format support.
+		/// @return Texture support response.
 		[[nodiscard("Pure function")]]
 		TextureSupportResponse MakeResponse(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
+		/// @brief Gets a sample count mask.
+		/// @param format Format.
+		/// @param request Texture support request.
+		/// @param formatSupport Format support.
+		/// @return Sample count mask.
 		[[nodiscard("Pure function")]]
 		SampleCountMask GetSampleCountMask(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
 
+		/// @brief Gets copyable footprints.
+		/// @param resourceDesc Texture resource description.
+		/// @param offset Byte array offset.
+		/// @param range Sub-texture range.
+		/// @param footprints Footprints. May be empty.
+		/// @return Copyable footprint size.
 		CopyableFootprintSize GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, std::uint64_t offset, const SubTextureRange& range,
 			std::span<CopyableFootprint> footprints) const;
 
+		/// @brief Gets a shader IR version.
+		/// @return Shader IR version.
+		[[nodiscard("Pure function")]]
+		Meta::Version ShaderIRVersion() const;
+		/// @brief Gets a scalar type support.
+		/// @return Scalar type support.
+		[[nodiscard("Pure function")]]
+		ShaderScalarTypeMask ScalarTypeSupport() const;
+		/// @brief Casts the native atomic support to an engine atomic scalar type support.
+		/// @param support Native atomic support.
+		/// @return Engine atomic scalar type support.
+		[[nodiscard("Pure function")]]
+		static ShaderScalarTypeMask ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
+		/// @brief Casts the native atomic support to an engine group shared scalar type support.
+		/// @param support Native atomic support.
+		/// @return Engine group shared scalar type support.
+		[[nodiscard("Pure function")]]
+		static ShaderScalarTypeMask ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
+
+		/// @brief Gets a line rasterization support.
+		/// @return Line rasterization support.
+		[[nodiscard("Pure function")]]
+		LineRasterizationModeMask LineRasterizationSupport() const;
+
+		/// @brief Casts to a native format.
+		/// @param format Engine format.
+		/// @return Native format.
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetFormat(TextureFormatId format) const;
+		/// @brief Casts to a native format.
+		/// @param format Engine format.
+		/// @param srgb SRGB variant?
+		/// @return Native format.
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT GetFormat(TextureFormatId format, bool srgb) const;
+		/// @brief Gets an SRGB variant.
+		/// @param format Format.
+		/// @return SRGB variant.
 		[[nodiscard("Pure function")]]
-		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, bool srgb, Aspect aspect) noexcept;
+		static DXGI_FORMAT GetSRGBVariant(DXGI_FORMAT format);
+		/// @brief Gets a color view format.
+		/// @param format Color format.
+		/// @param srgb SRGB variant?
+		/// @return Color view format.
 		[[nodiscard("Pure function")]]
-		DXGI_FORMAT GetViewFormat(TextureFormatId format, bool srgb, Aspect aspect) const;
+		static DXGI_FORMAT GetColorViewVariant(DXGI_FORMAT format, bool srgb);
+		/// @brief Gets a depth view format.
+		/// @param format Depth format.
+		/// @return Depth view format.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetDepthViewVariant(DXGI_FORMAT format);
+		/// @brief Gets a stencil view format.
+		/// @param format Depth format.
+		/// @return Stencil view format.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetStencilViewVariant(DXGI_FORMAT format);
+		/// @brief Gets a view format.
+		/// @param format Format.
+		/// @param srgb SRGB variant?
+		/// @param aspect Aspect.
+		/// @return View format.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, bool srgb, Aspect aspect);
+		/// @brief Gets a max array size.
+		/// @param dimension Texture dimension.
+		/// @return Max array size.
 		[[nodiscard("Pure function")]]
 		static std::uint16_t GetMaxArraySize(TextureDimension dimension) noexcept;
+		/// @brief Gets a max array size.
+		/// @param dimension Texture view dimension.
+		/// @return Max array size.
 		[[nodiscard("Pure function")]]
 		static std::uint16_t GetMaxArraySize(TextureViewDimension dimension) noexcept;
 
-		[[nodiscard("Pure function")]]
-		static Buffer& ToNativeBuffer(IBuffer& buffer);
-		[[nodiscard("Pure function")]]
-		static const Buffer& ToNativeBuffer(const IBuffer& buffer);
-		[[nodiscard("Pure function")]]
-		static Buffer* ToNativeBuffer(IBuffer* buffer);
-		[[nodiscard("Pure function")]]
-		static const Buffer* ToNativeBuffer(const IBuffer* buffer);
-		[[nodiscard("Pure function")]]
-		static Texture& ToNativeTexture(ITexture& texture);
-		[[nodiscard("Pure function")]]
-		static const Texture& ToNativeTexture(const ITexture& texture);
-		[[nodiscard("Pure function")]]
-		static Texture* ToNativeTexture(ITexture* texture);
-		[[nodiscard("Pure function")]]
-		static const Texture* ToNativeTexture(const ITexture* texture);
-
-		[[nodiscard("Pure function")]]
-		static ShaderDataContainer& ToNativeContainer(IShaderDataContainer& container);
-		[[nodiscard("Pure function")]]
-		static const ShaderDataContainer& ToNativeContainer(const IShaderDataContainer& container);
-		[[nodiscard("Pure function")]]
-		static RenderTargetContainer& ToNativeContainer(IRenderTargetContainer& container);
-		[[nodiscard("Pure function")]]
-		static const RenderTargetContainer& ToNativeContainer(const IRenderTargetContainer& container);
-		[[nodiscard("Pure function")]]
-		static DepthStencilContainer& ToNativeContainer(IDepthStencilContainer& container);
-		[[nodiscard("Pure function")]]
-		static const DepthStencilContainer& ToNativeContainer(const IDepthStencilContainer& container);
-		[[nodiscard("Pure function")]]
-		static SamplerContainer& ToNativeContainer(ISamplerContainer& container);
-		[[nodiscard("Pure function")]]
-		static const SamplerContainer& ToNativeContainer(const ISamplerContainer& container);
-
+		/// @brief Casts to a native shader byte-code.
+		/// @param byteCode Engine shader byte-code.
+		/// @return Native shader byte-code.
 		[[nodiscard("Pure function")]]
 		static D3D12_SHADER_BYTECODE ToByteCode(std::span<const std::byte> byteCode) noexcept;
 
-		template<typename Container, typename Range>
+		/// @brief Copies views.
+		/// @tparam Range Range type.
+		/// @param ranges Copy ranges.
+		/// @param type Descriptor heap type.
+		template<typename Range>
 		void CopyViews(std::span<const Range> ranges, D3D12_DESCRIPTOR_HEAP_TYPE type);
 
+		/// @brief Creates a command list.
+		/// @tparam T Command list type.
+		/// @param type Command list type.
+		/// @return Command list.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::shared_ptr<T> CreateCommandList(D3D12_COMMAND_LIST_TYPE type);
-		template<typename CommandList, typename CommandListInterface>
+		/// @brief Executes the command lists.
+		/// @tparam CommandListInterface Command list interface type.
+		/// @param commandLists Command lists.
+		/// @param sync Queue sync.
+		/// @param commandQueue Command queue.
+		template<typename CommandListInterface>
 		void Execute(std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, CommandQueue& commandQueue);
-		template<typename CommandList, typename CommandListInterface>
-		static void GetCommandLists(std::span<const CommandListInterface* const> commandLists, std::span<ID3D12CommandList*> lists) noexcept;
-		static void GetFences(std::span<const std::pair<IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept;
-		static void GetFences(std::span<const std::pair<const IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept;
+		/// @brief Casts to native fences.
+		/// @param input Engine fences.
+		/// @param output Native fences.
+		static void GetFences(std::span<const std::pair<IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output);
+		/// @brief Casts to native fences.
+		/// @param input Engine fences.
+		/// @param output Native fences.
+		static void GetFences(std::span<const std::pair<const IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output);
 
+		/// @brief Makes a command queue description.
+		/// @param type Command list type.
+		/// @return Command queue description.
 		[[nodiscard("Pure function")]]
-		static D3D12_COMMAND_QUEUE_DESC GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE type) noexcept;
+		static D3D12_COMMAND_QUEUE_DESC MakeCommandQueueDesc(D3D12_COMMAND_LIST_TYPE type) noexcept;
 
+		/// @brief Gets a current swap chain.
+		/// @return Swap chain.
 		[[nodiscard("Pure function")]]
 		SwapChainWrapper& GetSwapChain() const;
 
+		/// @brief Gets a current thread arena.
+		/// @return Arena.
 		[[nodiscard("Pure function")]]
 		static Memory::Arena& Arena();
 
-		static void ValidateSize(const BufferParams& params);
-		static void ValidateDimension(const TextureParams& params);
-		static void ValidateColorTexture(const TextureParams& params);
-		static void ValidateDepthTexture(const TextureParams& params);
-		static void ValidateSRGBFlag(bool srgb, DXGI_FORMAT format);
-		static void ValidateAspect(Aspect aspect, DXGI_FORMAT format);
-		static void ValidateAspect(AspectMask aspects, DXGI_FORMAT format);
-		static void ValidateCBVParams(const Buffer& buffer, const CBVParams& params);
-		static void ValidateSRVParams(const Buffer& buffer, const BufferSRVParams& params);
-		static void ValidateSRVParams(const Texture& texture, const TextureSRVParams& params);
-		static void ValidateSRVParams(const TextureSRVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateUAVParams(const Buffer& buffer, const BufferUAVParams& params);
-		static void ValidateUAVParams(const Texture& texture, const TextureUAVParams& params);
-		static void ValidateUAVParams(const TextureUAVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateRTVParams(const Texture& texture, const RTVParams& params);
-		static void ValidateRTVParams(const RTVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateDSVParams(const Texture& texture, const DSVParams& params);
-		static void ValidateDSVParams(const DSVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateSize(const Buffer& buffer, std::uint64_t firstElementIndex, std::uint32_t elementCount, std::uint32_t stride);
-		static void ValidateViewFormat(const Texture& texture, TextureFormatId viewFormat, bool srgb);
-		static void ValidateDimension(const Texture& texture, TextureViewDimension dimension);
-		static void ValidateDimension(const Texture& texture, TextureDimension dimension);
-		static void ValidateLayout(const Texture& texture, const SRVLayout& layout, TextureViewDimension dimension);
-		static void ValidateLayout(const SRVLayout& layout, TextureViewDimension dimension, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateLayout(const Texture& texture, const UAVLayout& layout);
-		static void ValidateLayout(const UAVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateLayout(const Texture& texture, const RTVLayout& layout);
-		static void ValidateLayout(const RTVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateLayout(const Texture& texture, const DSVLayout& layout);
-		static void ValidateLayout(const DSVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
-		static void ValidateRange(const TextureParams& params, DXGI_FORMAT format, const SubTextureRange& range);
-		static void ValidateRange(const Texture& texture, const SubTextureRange& range);
-		static void ValidateMipRange(const Texture& texture, const MipRange& range);
-		static void ValidateMipRange(const MipRange& range, std::uint8_t maxMipCount);
-		static void ValidateArrayRange(const Texture& texture, const ArrayRange& range);
-		static void ValidateArrayRange(const ArrayRange& range, std::uint16_t maxArraySize);
-		static void ValidateSampleCount(const Texture& texture, bool shouldBeMS);
-		static void ValidateSwapChainParams(const SwapChainParams& params);
+		/// @brief Creates a device.
+		/// @return Device.
+		[[nodiscard("Pure function")]]
+		Device CreateDevice() const;
+		/// @brief Creates a command queue.
+		/// @param commandListType Command list type.
+		/// @return Command queue.
+		[[nodiscard("Pure function")]]
+		CommandQueue CreateCommandQueue(D3D12_COMMAND_LIST_TYPE commandListType);
 
-		static void ValidateContainer(const ShaderDataContainer& container, std::uint32_t index);
+		/// @brief Validate the buffer parameters.
+		/// @param params Buffer parameters.
+		static void ValidateBufferParams(const BufferParams& params);
+		/// @brief Validates the texture parameters dimension.
+		/// @param params Texture parameters.
+		static void ValidateDimension(const TextureParams& params);
+		/// @brief Validates the texture parameters for a color texture.
+		/// @param params Texture parameters.
+		static void ValidateColorTexture(const TextureParams& params);
+		/// @brief Validates the texture parameters for a depth texture.
+		/// @param params Texture parameters.
+		static void ValidateDepthTexture(const TextureParams& params);
+		/// @brief Validates if the format supports the aspects.
+		/// @param aspects Aspects.
+		/// @param format Format.
+		static void ValidateAspect(AspectMask aspects, DXGI_FORMAT format);
+		/// @brief Validates the constant buffer view parameters.
+		/// @param buffer Target buffer.
+		/// @param params Constant buffer view parameters.
+		static void ValidateCBVParams(const Buffer& buffer, const CBVParams& params);
+		/// @brief Validates the shader resource view parameters.
+		/// @param buffer Target buffer.
+		/// @param params Shader resource view parameters.
+		static void ValidateSRVParams(const Buffer& buffer, const BufferSRVParams& params);
+		/// @brief Validates the shader resource view parameters.
+		/// @param texture Target texture.
+		/// @param params Shader resource view parameters.
+		static void ValidateSRVParams(const Texture& texture, const TextureSRVParams& params);
+		/// @brief Validates the shader resource view parameters.
+		/// @param params Shader resource view parameters.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateSRVParams(const TextureSRVParams& params, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the unordered access view parameters.
+		/// @param buffer Target buffer.
+		/// @param params Unordered access view parameters.
+		static void ValidateUAVParams(const Buffer& buffer, const BufferUAVParams& params);
+		/// @brief Validates the unordered access view.
+		/// @param texture Target texture.
+		/// @param params Unordered access view parameters.
+		static void ValidateUAVParams(const Texture& texture, const TextureUAVParams& params);
+		/// @brief Validates the unordered access view parameters.
+		/// @param params Unordered access view parameters.
+		/// @param format Format.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateUAVParams(const TextureUAVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the render target view parameters.
+		/// @param texture Target texture.
+		/// @param params Render target view parameters.
+		static void ValidateRTVParams(const Texture& texture, const RTVParams& params);
+		/// @brief Validates the render target view parameters.
+		/// @param params Render target view parameters.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateRTVParams(const RTVParams& params, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the depth stencil view parameters.
+		/// @param texture Target texture.
+		/// @param params Depth stencil view parameters.
+		static void ValidateDSVParams(const Texture& texture, const DSVParams& params);
+		/// @brief Validates the depth stencil view parameters.
+		/// @param params Depth stencil view parameters.
+		/// @param format Format.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateDSVParams(const DSVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the buffer size for SRV.
+		/// @param buffer Target buffer.
+		/// @param firstElementIndex First element index.
+		/// @param elementCount Element count.
+		/// @param stride Element stride.
+		static void ValidateSize(const Buffer& buffer, std::uint64_t firstElementIndex, std::uint32_t elementCount, std::uint32_t stride);
+		/// @brief Validates the view format.
+		/// @param texture Target texture.
+		/// @param viewFormat View format.
+		/// @param srgb Is the view SRGB?
+		static void ValidateViewFormat(const Texture& texture, TextureFormatId viewFormat, bool srgb);
+		/// @brief Validates the view dimension.
+		/// @param texture Target texture.
+		/// @param dimension View dimension.
+		static void ValidateDimension(const Texture& texture, TextureViewDimension dimension);
+		/// @brief Validates the view dimension.
+		/// @param texture Target texture.
+		/// @param dimension View dimension.
+		static void ValidateDimension(const Texture& texture, TextureDimension dimension);
+		/// @brief Validates the shader resource view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		/// @param dimension View dimension.
+		static void ValidateLayout(const Texture& texture, const SRVLayout& layout, TextureViewDimension dimension);
+		/// @brief Validates the shader resource view layout.
+		/// @param layout Layout.
+		/// @param dimension View dimension.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const SRVLayout& layout, TextureViewDimension dimension, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the unordered access view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		static void ValidateLayout(const Texture& texture, const UAVLayout& layout);
+		/// @brief Validates the unordered access view layout.
+		/// @param layout Layout.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const UAVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the render target view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		static void ValidateLayout(const Texture& texture, const RTVLayout& layout);
+		/// @brief Validates the render target view layout.
+		/// @param layout Layout.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const RTVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the depth stenvil view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		static void ValidateLayout(const Texture& texture, const DSVLayout& layout);
+		/// @brief Validates the depth stencil view layout.
+		/// @param layout Layout.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const DSVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the sub-texture range.
+		/// @param params Texture parameters.
+		/// @param format Format.
+		/// @param range Sub-texture range.
+		static void ValidateRange(const TextureParams& params, DXGI_FORMAT format, const SubTextureRange& range);
+		/// @brief Validates the sub-texture range.
+		/// @param texture Texture.
+		/// @param range Sub-texture range.
+		static void ValidateRange(const Texture& texture, const SubTextureRange& range);
+		/// @brief Validates the mip range.
+		/// @param texture Texture.
+		/// @param range Mip range.
+		static void ValidateMipRange(const Texture& texture, const MipRange& range);
+		/// @brief Validates the mip range.
+		/// @param range Mip range.
+		/// @param maxMipCount Max mip count.
+		static void ValidateMipRange(const MipRange& range, std::uint8_t maxMipCount);
+		/// @brief Validates the array range.
+		/// @param texture Texture.
+		/// @param range Array range.
+		static void ValidateArrayRange(const Texture& texture, const ArrayRange& range);
+		/// @brief Validates the array range.
+		/// @param range Array range.
+		/// @param maxArraySize Max array size.
+		static void ValidateArrayRange(const ArrayRange& range, std::uint16_t maxArraySize);
+		/// @brief Validates the sample count.
+		/// @param texture Texture.
+		/// @param shouldBeMS Should be multi-sampled?
+		static void ValidateSampleCount(const Texture& texture, bool shouldBeMS);
+
+		/// @brief Validates the swap chain parameters.
+		/// @param params Swap chain parameters.
+		/// @param format Format.
+		static void ValidateSwapChainParams(const SwapChainParams& params, DXGI_FORMAT format);
+
+		/// @brief Validates the shader data container for creating a view.
+		/// @param container Shader data container.
+		/// @param index View index.
+		static void ValidateContainerForCreatingView(const ShaderDataContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
 		static void ValidateCopyRange(std::span<const ShaderDataCopyRange> ranges);
-		static void ValidateContainer(const RenderTargetContainer& container, std::uint32_t index);
+		/// @brief Validates the render target container for creating a view.
+		/// @param container Render target container.
+		/// @param index View index.
+		static void ValidateContainerForCreatingView(const RenderTargetContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
 		static void ValidateCopyRange(std::span<const RenderTargetCopyRange> ranges);
-		static void ValidateContainer(const DepthStencilContainer& container, std::uint32_t index);
+		/// @brief Validates the depth stencil container for creating a view.
+		/// @param container Depth stencil container.
+		/// @param index View index.
+		static void ValidateContainerForCreatingView(const DepthStencilContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
 		static void ValidateCopyRange(std::span<const DepthStencilCopyRange> ranges);
-		static void ValidateContainer(const SamplerContainer& container, std::uint32_t index);
+		/// @brief Validates the sampler container for creating a sampler.
+		/// @param container Sampler container.
+		/// @param index Sampler index.
+		static void ValidateContainerForCreatingSampler(const SamplerContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
 		static void ValidateCopyRange(std::span<const SamplerCopyRange> ranges);
 
+		/// @brief Validates the pipeline layout parameters.
+		/// @param params Pipeline layout parameters.
 		static void ValidatePipelineLayoutParams(const PipelineLayoutParams& params);
+		/// @brief Validates the pipeline layout set sizes.
+		/// @param params Pipeline layout parameters.
 		static void ValidatePipelineLayoutSizes(const PipelineLayoutParams& params);
+		/// @brief Checks if the pipeline layout descriptor sets overlap.
+		/// @param descriptorSets Descriptor sets.
 		static void ValidatePipelineLayoutOverlaps(std::span<const DescriptorSet> descriptorSets);
 
-		static void ValidatePipelineLayout(const IPipelineLayout* layout);
+		/// @brief Validates the graphics pipeline state parameters.
+		/// @param params Graphics pipeline state parameters.
 		void ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const;
+		/// @brief Validates the compute pipeline state parameters.
+		/// @param params Compute pipeline state parameters.
 		static void ValidatePipelineStateParams(const ComputePipelineStateParams& params);
 
-		template<typename CommandList, typename CommandListInterface>
-		static void ValidateCommandLists(std::span<const CommandListInterface* const> commandLists);
-		static void ValidateFences(std::span<const std::pair<IFence*, std::uint64_t>> fences);
-		static void ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fences);
+		static constexpr GUID CreatorId = { 0x132d4628, 0x84f4, 0x40f4, { 0xb7, 0x2f, 0x8a, 0x7b, 0x8, 0xc3, 0xc5, 0x66 } }; ///< Creator ID. {132D4628-84F4-40F4-B72F-8A7B08C3C566}
 
-		// {132D4628-84F4-40F4-B72F-8A7B08C3C566}
-		static constexpr GUID CreatorId = { 0x132d4628, 0x84f4, 0x40f4, { 0xb7, 0x2f, 0x8a, 0x7b, 0x8, 0xc3, 0xc5, 0x66 } };
+		IRenderDeviceContext* renderDevice; ///< Render device context.
 
-		IRenderDeviceContext* renderDevice;
+		Factory factory; ///< DXGI factory.
+		Device device; ///< D3D12 device.
 
-		Factory factory;
-		Device device;
+		CommandQueue graphicsCommandQueue; ///< Graphics command queue.
+		CommandQueue computeCommandQueue; ///< Compute command queue.
+		CommandQueue copyCommandQueue; ///< Copy command queue.
 
-		CommandQueue graphicsCommandQueue;
-		CommandQueue computeCommandQueue;
-		CommandQueue copyCommandQueue;
+		TextureFormatMap textureFormatMap; ///< Texture format map.
 
-		TextureFormatMap textureFormatMap;
-
-		std::unique_ptr<SwapChainWrapper> swapChain;
+		std::unique_ptr<SwapChainWrapper> swapChain; ///< Swap chain.
 	};
 }
 
@@ -354,17 +713,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	Engine::Engine(IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice},
 		factory(*this->renderDevice),
-		device(*this->renderDevice, *factory.GetMostPerformantAdapter()),
-		graphicsCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_DIRECT), CreatorId)),
-		computeCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COMPUTE), CreatorId)),
-		copyCommandQueue(this->device.CreateCommandQueue(GetCommandQueueDesc(D3D12_COMMAND_LIST_TYPE_COPY), CreatorId)),
+		device(CreateDevice()),
+		graphicsCommandQueue(CreateCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT)),
+		computeCommandQueue(CreateCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE)),
+		copyCommandQueue(CreateCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY)),
 		textureFormatMap(*this->renderDevice)
 	{
 	}
 
 	std::shared_ptr<IBuffer> Engine::CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params)
 	{
-		ValidateSize(params);
+		ValidateBufferParams(params);
 
 		const D3D12_HEAP_PROPERTIES heapProperties = MakeHeapProperties(heapParams.heapType);
 		const D3D12_HEAP_FLAGS heapFlags = GetHeapFlags(params.usage, heapParams.notZeroed);
@@ -379,9 +738,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (const std::size_t index = textureFormatMap.IndexOf(textureFormatId); index < textureFormatMap.Size())
 		{
 			const DXGI_FORMAT format = textureFormatMap.DXGIFormat(index);
+			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
 
 			auto support = RenderDevice::TextureFormatSupport{.supported = true};
-			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
 			support.dimensions = GetTextureDimensions(formatSupport);
 			support.viewDimensions = GetTextureViewDimensions(formatSupport);
 			support.aspects = GetAspects(format);
@@ -446,18 +805,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				}
 				else
 				{
-					castableFormats = arena.Allocate<DXGI_FORMAT>(1uz);
-					const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
-					formats[0] = GetDepthViewFormat(format);
+					const DXGI_FORMAT depthViewFormat = GetDepthViewFormat(format);
+					castableFormats = arena.Push(std::span(&depthViewFormat, 1uz));
 				}
 			}
-
-#ifndef NDEBUG
-			if (srgb) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid srgb flag");
-			}
-#endif
 		}
 		else
 		{
@@ -472,14 +823,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 			if (srgb)
 			{
-				const DXGI_FORMAT srgbFormat = GetSRGBFormat(format);
-#ifndef NDEBUG
-				if (srgbFormat == DXGI_FORMAT_UNKNOWN) [[unlikely]]
-				{
-					throw std::invalid_argument("Invalid srgb flag");
-				}
-#endif
-				formats[formats.size() - 1] = srgbFormat;
+				formats[formats.size() - 1] = GetSRGBVariant(format);
 			}
 		}
 
@@ -547,7 +891,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingView(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		if (nativeBuffer)
@@ -573,7 +917,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingView(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = MakeSRVDesc(params);
@@ -594,11 +938,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 		else
 		{
-			ValidateSRVParams(params, format, mipCount, arraySize);
+			ValidateSRVParams(params, mipCount, arraySize);
 		}
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingView(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.srgb, params.aspect);
@@ -617,7 +961,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingView(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = MakeUAVDesc(params);
@@ -641,7 +985,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingView(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const DXGI_FORMAT viewFormat = GetViewFormat(format, false, params.aspect);
@@ -653,7 +997,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::CopyViews(const std::span<const ShaderDataCopyRange> ranges)
 	{
-		CopyViews<ShaderDataContainer>(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	std::shared_ptr<IRenderTargetContainer> Engine::CreateRenderTargetContainer(const RenderTargetContainerParams& params)
@@ -673,14 +1017,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 		else
 		{
-			ValidateRTVParams(params, format, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
+			ValidateRTVParams(params, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
 		}
 
 		RenderTargetContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingView(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
-		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = MakeRTVDesc(params, GetViewFormat(format, params.srgb, Aspect::Color), arraySize);
+		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = MakeRTVDesc(params, GetColorViewVariant(format, params.srgb), arraySize);
 		device.CreateRTV(nativeTexture ? &nativeTexture->Resource() : nullptr, rtvDesc, handle);
 
 		nativeContainer.Meta(index) = TextureRTVMeta{.texture = nativeTexture, .params = params};
@@ -688,7 +1032,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::CopyViews(const std::span<const RenderTargetCopyRange> ranges)
 	{
-		CopyViews<RenderTargetContainer>(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	}
 
 	std::shared_ptr<IDepthStencilContainer> Engine::CreateDepthStencilContainer(const DepthStencilContainerParams& params)
@@ -712,7 +1056,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 
 		DepthStencilContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingView(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = MakeDSVDesc(params, format, arraySize);
@@ -723,7 +1067,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::CopyViews(const std::span<const DepthStencilCopyRange> ranges)
 	{
-		CopyViews<DepthStencilContainer>(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	}
 
 	std::shared_ptr<ISamplerContainer> Engine::CreateSamplerContainer(const SamplerContainerParams& params)
@@ -736,7 +1080,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void Engine::CreateSampler(ISamplerContainer& container, const std::uint32_t index, const SamplerParams& params)
 	{
 		SamplerContainer& nativeContainer = ToNativeContainer(container);
-		ValidateContainer(nativeContainer, index);
+		ValidateContainerForCreatingSampler(nativeContainer, index);
 		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
 
 		const D3D12_SAMPLER_DESC2 samplerDesc = MakeSamplerDesc(params);
@@ -747,65 +1091,25 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::CopySamplers(const std::span<const SamplerCopyRange> ranges)
 	{
-		CopyViews<SamplerContainer>(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 	}
 
-	Meta::Version Engine::ShaderIRVersion() const
+	std::shared_ptr<IPipelineLayout> Engine::CreatePipelineLayout(const PipelineLayoutParams& params)
 	{
-		const auto shaderModel = std::to_underlying(device.GetShaderModel());
-		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
-	}
+		ValidatePipelineLayoutParams(params);
 
-	ShaderScalarTypeMask Engine::ScalarTypeSupport() const
-	{
-		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
-		if (device.IsIntFloat16Supported())
-		{
-			answer |= ShaderScalarTypeMask::Int16 | ShaderScalarTypeMask::Float16;
-		}
-		if (device.IsInt64Supported())
-		{
-			answer |= ShaderScalarTypeMask::Int64;
-		}
-		if (device.IsFloat64Supported())
-		{
-			answer |= ShaderScalarTypeMask::Float64;
-		}
+		Memory::Arena& arena = Arena();
+		arena.Free();
+		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
+		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(rootSigDescCounts.tableCount);
+		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(rootSigDescCounts.rangeCount);
+		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC>(rootSigDescCounts.staticSamplerCount);
+		const std::span<D3D12_ROOT_PARAMETER1> parametersSpan = arena.Span(parameters);
+		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
+		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplersSpan = arena.Span(staticSamplers);
 
-		return answer;
-	}
-
-	ShaderScalarTypeMask Engine::ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
-	{
-		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
-		if (support.atomicInt64 && support.atomicInt64OnDescriptorHeap) // The engine doesn't support direct views.
-		{
-			answer |= ShaderScalarTypeMask::Int64;
-		}
-
-		return answer;
-	}
-
-	ShaderScalarTypeMask Engine::ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
-	{
-		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
-		if (support.groupSharedAtomicInt64)
-		{
-			answer |= ShaderScalarTypeMask::Int64;
-		}
-
-		return answer;
-	}
-
-	LineRasterizationModeMask Engine::LineRasterizationSupport() const
-	{
-		auto answer = LineRasterizationModeMask::Aliased | LineRasterizationModeMask::AlphaAntialiased | LineRasterizationModeMask::QuadrilateralWide;
-		if (device.IsQuadrilateralNarrowLineSupported())
-		{
-			answer |= LineRasterizationModeMask::QuadrilateralNarrow;
-		}
-
-		return answer;
+		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = MakeRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
+		return std::make_shared<RootSignature>(device.CreateRootSignature(rootSigDesc), params);
 	}
 
 	struct ShaderSupport Engine::ShaderSupport() const
@@ -833,28 +1137,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		};
 	}
 
-	std::shared_ptr<IPipelineLayout> Engine::CreatePipelineLayout(const PipelineLayoutParams& params)
-	{
-		ValidatePipelineLayoutParams(params);
-
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
-		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(rootSigDescCounts.tableCount);
-		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(rootSigDescCounts.rangeCount);
-		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC>(rootSigDescCounts.staticSamplerCount);
-		const std::span<D3D12_ROOT_PARAMETER1> parametersSpan = arena.Span(parameters);
-		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
-		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplersSpan = arena.Span(staticSamplers);
-
-		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = MakeRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
-		return std::make_shared<RootSignature>(device.CreateRootSignature(rootSigDesc), params);
-	}
-
 	std::shared_ptr<IGraphicsPipelineState> Engine::CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
 		const GraphicsPipelineStateParams& params)
 	{
-		ValidatePipelineLayout(layout.get());
 		ValidatePipelineStateParams(params);
 
 		Memory::Arena& arena = Arena();
@@ -862,33 +1147,29 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		if (layout)
 		{
-			const Memory::Arena::Slice<PipelineStateSubobjectRootSignature> rootSignature = arena.Allocate<PipelineStateSubobjectRootSignature>(1u);
-			arena.Span(rootSignature)[0] = &static_cast<const RootSignature&>(*layout).GetRootSignature();
+			arena.Push(PipelineStateSubobjectRootSignature(&ToNativeRootSignature(*layout).GetRootSignature()));
 		}
 
 		if (!params.amplificationShader.empty())
 		{
-			const Memory::Arena::Slice<PipelineStateSubobjectAmplificationShader> amplificationShader = arena.Allocate<PipelineStateSubobjectAmplificationShader>(1u);
-			arena.Span(amplificationShader)[0] = ToByteCode(params.amplificationShader);
+			arena.Push(PipelineStateSubobjectAmplificationShader(ToByteCode(params.amplificationShader)));
 		}
-		const Memory::Arena::Slice<PipelineStateSubobjectMeshShader> meshShader = arena.Allocate<PipelineStateSubobjectMeshShader>(1u);
-		arena.Span(meshShader)[0] = ToByteCode(params.meshShader);
+		arena.Push(PipelineStateSubobjectMeshShader(ToByteCode(params.meshShader)));
 		if (!params.pixelShader.empty())
 		{
-			const Memory::Arena::Slice<PipelineStateSubobjectPixelShader> pixelShader = arena.Allocate<PipelineStateSubobjectPixelShader>(1u);
-			arena.Span(pixelShader)[0] = ToByteCode(params.pixelShader);
+			arena.Push(PipelineStateSubobjectPixelShader(ToByteCode(params.pixelShader)));
 		}
 
-		const Memory::Arena::Slice<PipelineStateSubobjectRasterizer> rasterizer = arena.Allocate<PipelineStateSubobjectRasterizer>(1u);
-		arena.Span(rasterizer)[0] = MakeRasterizerDesc(params.rasterizer);
+		arena.Push(PipelineStateSubobjectRasterizer(MakeRasterizerDesc(params.rasterizer)));
 
 		if (!params.attachment.renderTargetFormats.empty())
 		{
-			const Memory::Arena::Slice<PipelineStateSubobjectBlend> blend = arena.Allocate<PipelineStateSubobjectBlend>(1u);
-			arena.Span(blend)[0] = MakeBlendDesc(params);
-			const Memory::Arena::Slice<PipelineStateSubobjectRenderTargetFormats> rtFormats = arena.Allocate<PipelineStateSubobjectRenderTargetFormats>(1u);
-			arena.Span(rtFormats)[0] = D3D12_RT_FORMAT_ARRAY{.NumRenderTargets = static_cast<UINT>(params.attachment.renderTargetFormats.size())};
-			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Span(rtFormats)[0].Data();
+			arena.Push(PipelineStateSubobjectBlend(MakeBlendDesc(params)));
+			const Memory::Arena::Pointer<PipelineStateSubobjectRenderTargetFormats> rtFormats = arena.Push(PipelineStateSubobjectRenderTargetFormats(D3D12_RT_FORMAT_ARRAY
+			{
+				.NumRenderTargets = static_cast<UINT>(params.attachment.renderTargetFormats.size())
+			}));
+			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Object(rtFormats)->Data();
 			for (std::size_t i = 0uz; i < std::min(std::size(rtArray.RTFormats), params.attachment.renderTargetFormats.size()); ++i)
 			{
 				rtArray.RTFormats[i] = GetFormat(params.attachment.renderTargetFormats[i].format, params.attachment.renderTargetFormats[i].srgb);
@@ -897,19 +1178,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		if (params.attachment.depthStencilFormat)
 		{
-			const Memory::Arena::Slice<PipelineStateSubobjectDepthStencil> depthStencil = arena.Allocate<PipelineStateSubobjectDepthStencil>(1u);
-			arena.Span(depthStencil)[0] = MakeDepthStencilDesc(params.depthStencil);
-			const Memory::Arena::Slice<PipelineStateSubobjectDepthStencilFormat> dsFormat = arena.Allocate<PipelineStateSubobjectDepthStencilFormat>(1u);
-			arena.Span(dsFormat)[0] = GetFormat(*params.attachment.depthStencilFormat);
+			arena.Push(PipelineStateSubobjectDepthStencil(MakeDepthStencilDesc(params.depthStencil)));
+			arena.Push(PipelineStateSubobjectDepthStencilFormat(GetFormat(*params.attachment.depthStencilFormat)));
 		}
 
-		const Memory::Arena::Slice<PipelineStateSubobjectSampleDesc> sampleDesc = arena.Allocate<PipelineStateSubobjectSampleDesc>(1u);
-		arena.Span(sampleDesc)[0] = DXGI_SAMPLE_DESC{.Count = ToNumber(params.sample.sampleCount), .Quality = 0u};
-		const Memory::Arena::Slice<PipelineStateSubobjectSampleMask> sampleMask = arena.Allocate<PipelineStateSubobjectSampleMask>(1u);
-		arena.Span(sampleMask)[0] = params.sample.sampleMask;
+		arena.Push(PipelineStateSubobjectSampleDesc(DXGI_SAMPLE_DESC{.Count = ToNumber(params.sample.sampleCount), .Quality = 0u}));
+		arena.Push(PipelineStateSubobjectSampleMask(params.sample.sampleMask));
 
-		const Memory::Arena::Slice<PipelineStateSubobjectFlags> flags = arena.Allocate<PipelineStateSubobjectFlags>(1u);
-		arena.Span(flags)[0] = D3D12_PIPELINE_STATE_FLAG_DYNAMIC_DEPTH_BIAS;
+		arena.Push(PipelineStateSubobjectFlags(D3D12_PIPELINE_STATE_FLAG_DYNAMIC_DEPTH_BIAS));
 
 		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
@@ -921,7 +1197,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::shared_ptr<IComputePipelineState> Engine::CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params)
 	{
-		ValidatePipelineLayout(layout.get());
 		ValidatePipelineStateParams(params);
 
 		Memory::Arena& arena = Arena();
@@ -929,12 +1204,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		if (layout)
 		{
-			const Memory::Arena::Slice<PipelineStateSubobjectRootSignature> rootSignature = arena.Allocate<PipelineStateSubobjectRootSignature>(1u);
-			arena.Span(rootSignature)[0] = &static_cast<const RootSignature&>(*layout).GetRootSignature();
+			arena.Push(PipelineStateSubobjectRootSignature(&ToNativeRootSignature(*layout).GetRootSignature()));
 		}
 
-		const Memory::Arena::Slice<PipelineStateSubobjectComputeShader> computeShader = arena.Allocate<PipelineStateSubobjectComputeShader>(1u);
-		arena.Span(computeShader)[0] = ToByteCode(params.computeShader);
+		arena.Push(PipelineStateSubobjectComputeShader(ToByteCode(params.computeShader)));
 
 		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
@@ -961,17 +1234,17 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::Execute(const std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync)
 	{
-		Execute<GraphicsCommandList>(commandLists, sync, graphicsCommandQueue);
+		Execute(commandLists, sync, graphicsCommandQueue);
 	}
 
 	void Engine::Execute(const std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync)
 	{
-		Execute<ComputeCommandList>(commandLists, sync, computeCommandQueue);
+		Execute(commandLists, sync, computeCommandQueue);
 	}
 
 	void Engine::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
 	{
-		Execute<CopyCommandList>(commandLists, sync, copyCommandQueue);
+		Execute(commandLists, sync, copyCommandQueue);
 	}
 
 	std::shared_ptr<ISecondaryGraphicsCommandList> Engine::CreateSecondaryGraphicsCommandList()
@@ -991,8 +1264,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	struct SwapChainSupport Engine::SwapChainSupport() const
 	{
-		const BOOL isTearingSupported = factory.GetTearingSupport();
-
 		return RenderDevice::SwapChainSupport
 		{
 			.maxSize = Math::Vector2<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}),
@@ -1001,7 +1272,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			.alphaModes = SwapChainAlphaModeMask::Ignore | SwapChainAlphaModeMask::Straight | SwapChainAlphaModeMask::Premultiplied,
 			.scalingModes = SwapChainScalingMask::NoScaling | SwapChainScalingMask::Stretch | SwapChainScalingMask::StretchAspectRatio,
 			.swapEffects = SwapChainEffectMask::FlipDiscard | SwapChainEffectMask::FlipSequential,
-			.syncModes = SwapChainSyncMask::FastSync | SwapChainSyncMask::FullSync | (isTearingSupported ? SwapChainSyncMask::NoSync : SwapChainSyncMask::None),
+			.syncModes = ToSyncMode(factory.GetTearingSupport()),
 			.usage = TextureUsage::ShaderResource | TextureUsage::RenderTarget | TextureUsage::UnorderedAccess
 		};
 	}
@@ -1020,20 +1291,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		ValidateSwapChainParams(params);
-
 		const DXGI_FORMAT format = GetFormat(params.format);
-		const bool srgb = Any(SwapChainFlag::SRGB, params.flags);
-#ifndef NDEBUG
-		if (srgb && !IsSRGBCompatibleFormat(format)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid srgb flag");
-		}
-#endif
+		ValidateSwapChainParams(params, format);
 
 		const HWND windowHandle = renderDevice->Application().GetService<Surface::Windows::ISurfaceService>().Handle();
 		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = MakeSwapChainDesc(params, format);
-
 		auto dxgiSwapChain = SwapChain(factory.CreateSwapChain(graphicsCommandQueue.GetCommandQueue(), windowHandle, swapChainDesc));
 		factory.MakeWindowAssociation(windowHandle, DXGI_MWA_NO_WINDOW_CHANGES);
 		dxgiSwapChain.SetFullscreenState(false);
@@ -1045,7 +1307,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			const D3D12_RESOURCE_DESC1 resourceDesc = resource->GetDesc1();
 			buffers[i] = std::make_shared<Texture>(std::move(resource), params.format, format, std::span<const TextureFormatId>(),
 				static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), 1u, 1u,
-				TextureDimension::Texture2D, SampleCount::X1, params.usage, srgb);
+				TextureDimension::Texture2D, SampleCount::X1, params.usage, Any(SwapChainFlag::SRGB, params.flags));
 		}
 
 		swapChain = std::make_unique<SwapChainWrapper>(std::move(dxgiSwapChain), std::move(buffers), ToSyncInterval(params.syncMode), ToPresentFlags(params.syncMode));
@@ -1080,26 +1342,22 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const
 	{
 		auto response = TextureSupportResponse{.supported = true};
+		response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
+		response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 
 		switch (request.dimension)
 		{
 		case TextureDimension::Texture1D:
 			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE1D_U_DIMENSION}, 1u, 1u);
-			response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
 			response.maxArraySize = std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
-			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
 		case TextureDimension::Texture2D:
 			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, 1u);
-			response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
 			response.maxArraySize = std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
-			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
 		case TextureDimension::Texture3D:
 			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION});
-			response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
 			response.maxArraySize = 1u;
-			response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
 			break;
 		default:
 			break;
@@ -1229,6 +1487,64 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return CopyableFootprintSize{.sourceTotalSize = totalRowSizes, .destinationTotalSize = totalSize};
 	}
 
+	Meta::Version Engine::ShaderIRVersion() const
+	{
+		const auto shaderModel = std::to_underlying(device.GetShaderModel());
+		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
+	}
+
+	ShaderScalarTypeMask Engine::ScalarTypeSupport() const
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (device.IsIntFloat16Supported())
+		{
+			answer |= ShaderScalarTypeMask::Int16 | ShaderScalarTypeMask::Float16;
+		}
+		if (device.IsInt64Supported())
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+		if (device.IsFloat64Supported())
+		{
+			answer |= ShaderScalarTypeMask::Float64;
+		}
+
+		return answer;
+	}
+
+	ShaderScalarTypeMask Engine::ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (support.atomicInt64 && support.atomicInt64OnDescriptorHeap) // The engine doesn't support direct views.
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+
+		return answer;
+	}
+
+	ShaderScalarTypeMask Engine::ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (support.groupSharedAtomicInt64)
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+
+		return answer;
+	}
+
+	LineRasterizationModeMask Engine::LineRasterizationSupport() const
+	{
+		auto answer = LineRasterizationModeMask::Aliased | LineRasterizationModeMask::AlphaAntialiased | LineRasterizationModeMask::QuadrilateralWide;
+		if (device.IsQuadrilateralNarrowLineSupported())
+		{
+			answer |= LineRasterizationModeMask::QuadrilateralNarrow;
+		}
+
+		return answer;
+	}
+
 	DXGI_FORMAT Engine::GetFormat(const TextureFormatId format) const
 	{
 		const std::size_t formatIndex = textureFormatMap.IndexOf(format);
@@ -1245,28 +1561,89 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	DXGI_FORMAT Engine::GetFormat(const TextureFormatId format, const bool srgb) const
 	{
 		const DXGI_FORMAT nativeFormat = GetFormat(format);
-		return srgb ? GetSRGBFormat(nativeFormat) : nativeFormat;
+		return srgb ? GetSRGBVariant(nativeFormat) : nativeFormat;
 	}
 
-	DXGI_FORMAT Engine::GetViewFormat(const DXGI_FORMAT format, const bool srgb, const Aspect aspect) noexcept
+	DXGI_FORMAT Engine::GetSRGBVariant(const DXGI_FORMAT format)
+	{
+		const DXGI_FORMAT srgb = GetSRGBFormat(format);
+
+#ifndef NDEBUG
+		if (srgb == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		{
+			throw std::invalid_argument("Not SRGB-compatible format");
+		}
+#endif
+
+		return srgb;
+	}
+
+	DXGI_FORMAT Engine::GetColorViewVariant(const DXGI_FORMAT format, const bool srgb)
+	{
+#ifndef NDEBUG
+		if (IsDepthStencilFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Not color format");
+		}
+#endif
+
+		return srgb ? GetSRGBVariant(format) : format;
+	}
+
+	DXGI_FORMAT Engine::GetDepthViewVariant(const DXGI_FORMAT format)
+	{
+		const DXGI_FORMAT depth = GetDepthViewFormat(format);
+
+#ifndef NDEBUG
+		if (depth == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		{
+			throw std::invalid_argument("Not depth-compatible format");
+		}
+#endif
+
+		return depth;
+	}
+
+	DXGI_FORMAT Engine::GetStencilViewVariant(const DXGI_FORMAT format)
+	{
+		const DXGI_FORMAT stencil = GetStencilViewFormat(format);
+
+#ifndef NDEBUG
+		if (stencil == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		{
+			throw std::invalid_argument("Not stencil-compatible format");
+		}
+#endif
+
+		return stencil;
+	}
+
+	DXGI_FORMAT Engine::GetViewFormat(const DXGI_FORMAT format, const bool srgb, const Aspect aspect)
 	{
 		switch (aspect)
 		{
 		case Aspect::Color:
-			return srgb ? GetSRGBFormat(format) : format;
+			return GetColorViewVariant(format, srgb);
 		case Aspect::Depth:
-			return GetDepthViewFormat(format);
+#ifndef NDEBUG
+			if (srgb) [[unlikely]]
+			{
+				throw std::invalid_argument("Depth view and SRGB aren't compatible");
+			}
+#endif
+			return GetDepthViewVariant(format);
 		case Aspect::Stencil:
-			return GetStencilViewFormat(format);
+#ifndef NDEBUG
+			if (srgb) [[unlikely]]
+			{
+				throw std::invalid_argument("Stencil view and SRGB aren't compatible");
+			}
+#endif
+			return GetStencilViewVariant(format);
 		default: [[unlikely]]
 			assert(false && "Invalid aspect.");
 			return DXGI_FORMAT_UNKNOWN;
 		}
-	}
-
-	DXGI_FORMAT Engine::GetViewFormat(const TextureFormatId format, const bool srgb, const Aspect aspect) const
-	{
-		return GetViewFormat(GetFormat(format), srgb, aspect);
 	}
 
 	std::uint16_t Engine::GetMaxArraySize(const TextureDimension dimension) noexcept
@@ -1302,204 +1679,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	Buffer& Engine::ToNativeBuffer(IBuffer& buffer)
-	{
-#ifndef NDEBUG
-		if (typeid(buffer) != typeid(Buffer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid buffer");
-		}
-#endif
-
-		return static_cast<Buffer&>(buffer);
-	}
-
-	const Buffer& Engine::ToNativeBuffer(const IBuffer& buffer)
-	{
-#ifndef NDEBUG
-		if (typeid(buffer) != typeid(Buffer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid buffer");
-		}
-#endif
-
-		return static_cast<const Buffer&>(buffer);
-	}
-
-	Buffer* Engine::ToNativeBuffer(IBuffer* const buffer)
-	{
-#ifndef NDEBUG
-		if (buffer != nullptr && typeid(*buffer) != typeid(Buffer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid buffer");
-		}
-#endif
-
-		return static_cast<Buffer*>(buffer);
-	}
-
-	const Buffer* Engine::ToNativeBuffer(const IBuffer* const buffer)
-	{
-#ifndef NDEBUG
-		if (buffer != nullptr && typeid(*buffer) != typeid(Buffer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid buffer");
-		}
-#endif
-
-		return static_cast<const Buffer*>(buffer);
-	}
-
-	Texture& Engine::ToNativeTexture(ITexture& texture)
-	{
-#ifndef NDEBUG
-		if (typeid(texture) != typeid(Texture)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid texture");
-		}
-#endif
-
-		return static_cast<Texture&>(texture);
-	}
-
-	const Texture& Engine::ToNativeTexture(const ITexture& texture)
-	{
-#ifndef NDEBUG
-		if (typeid(texture) != typeid(Texture)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid texture");
-		}
-#endif
-
-		return static_cast<const Texture&>(texture);
-	}
-
-	Texture* Engine::ToNativeTexture(ITexture* const texture)
-	{
-#ifndef NDEBUG
-		if (texture != nullptr && typeid(*texture) != typeid(Texture)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid texture");
-		}
-#endif
-
-		return static_cast<Texture*>(texture);
-	}
-
-	const Texture* Engine::ToNativeTexture(const ITexture* const texture)
-	{
-#ifndef NDEBUG
-		if (texture != nullptr && typeid(*texture) != typeid(Texture)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid texture");
-		}
-#endif
-
-		return static_cast<const Texture*>(texture);
-	}
-
-	ShaderDataContainer& Engine::ToNativeContainer(IShaderDataContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(ShaderDataContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<ShaderDataContainer&>(container);
-	}
-
-	const ShaderDataContainer& Engine::ToNativeContainer(const IShaderDataContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(ShaderDataContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<const ShaderDataContainer&>(container);
-	}
-
-	RenderTargetContainer& Engine::ToNativeContainer(IRenderTargetContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(RenderTargetContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<RenderTargetContainer&>(container);
-	}
-
-	const RenderTargetContainer& Engine::ToNativeContainer(const IRenderTargetContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(RenderTargetContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<const RenderTargetContainer&>(container);
-	}
-
-	DepthStencilContainer& Engine::ToNativeContainer(IDepthStencilContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(DepthStencilContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<DepthStencilContainer&>(container);
-	}
-
-	const DepthStencilContainer& Engine::ToNativeContainer(const IDepthStencilContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(DepthStencilContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<const DepthStencilContainer&>(container);
-	}
-
-	SamplerContainer& Engine::ToNativeContainer(ISamplerContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(SamplerContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<SamplerContainer&>(container);
-	}
-
-	const SamplerContainer& Engine::ToNativeContainer(const ISamplerContainer& container)
-	{
-#ifndef NDEBUG
-		if (typeid(container) != typeid(SamplerContainer)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid container");
-		}
-#endif
-
-		return static_cast<const SamplerContainer&>(container);
-	}
-
 	D3D12_SHADER_BYTECODE Engine::ToByteCode(const std::span<const std::byte> byteCode) noexcept
 	{
 		return D3D12_SHADER_BYTECODE{.pShaderBytecode = byteCode.data(), .BytecodeLength = static_cast<SIZE_T>(byteCode.size())};
 	}
 
-	template<typename Container, typename Range>
+	template<typename Range>
 	void Engine::CopyViews(const std::span<const Range> ranges, const D3D12_DESCRIPTOR_HEAP_TYPE type)
 	{
 		ValidateCopyRange(ranges);
@@ -1516,8 +1701,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		for (std::size_t i = 0uz; i < ranges.size(); ++i)
 		{
 			const Range& range = ranges[i];
-			sourcesSpan[i] = static_cast<const Container*>(range.source)->CpuHandle(range.sourceOffset);
-			destinationsSpan[i] = static_cast<const Container*>(range.destination)->CpuHandle(range.destinationOffset);
+			sourcesSpan[i] = ToNativeContainerNotNullptr(range.source)->CpuHandle(range.sourceOffset);
+			destinationsSpan[i] = ToNativeContainerNotNullptr(range.destination)->CpuHandle(range.destinationOffset);
 			rangesSizesSpan[i] = range.count;
 		}
 
@@ -1527,8 +1712,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		for (std::size_t i = 0uz; i < ranges.size(); ++i)
 		{
 			const Range& range = ranges[i];
-			const auto source = static_cast<const Container*>(range.source);
-			const auto destination = static_cast<Container*>(range.destination);
+			const auto source = ToNativeContainerNotNullptr(range.source);
+			const auto destination = ToNativeContainerNotNullptr(range.destination);
 			std::ranges::copy(&source->Meta(range.sourceOffset), &source->Meta(range.sourceOffset) + range.count, &destination->Meta(range.destinationOffset));
 		}
 	}
@@ -1539,13 +1724,9 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return std::make_shared<T>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
 	}
 
-	template<typename CommandList, typename CommandListInterface>
+	template<typename CommandListInterface>
 	void Engine::Execute(const std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, CommandQueue& commandQueue)
 	{
-		ValidateCommandLists<CommandList, CommandListInterface>(commandLists);
-		ValidateFences(sync.before);
-		ValidateFences(sync.after);
-
 		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
@@ -1555,41 +1736,35 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		const std::span<std::pair<ID3D12Fence*, UINT64>> beforeFencesSpan = arena.Span(beforeFences);
 		const std::span<std::pair<ID3D12Fence*, UINT64>> afterFencesSpan = arena.Span(afterFences);
 
-		GetCommandLists<CommandList, CommandListInterface>(commandLists, listsSpan);
+		for (std::size_t i = 0uz; i < listsSpan.size(); ++i)
+		{
+			listsSpan[i] = &ToNativeCommandListNotNullptr(commandLists[i])->CommandList();
+		}
 		GetFences(sync.before, beforeFencesSpan);
 		GetFences(sync.after, afterFencesSpan);
+
 		commandQueue.Execute(listsSpan, beforeFencesSpan, afterFencesSpan);
 	}
 
-	template<typename CommandList, typename CommandListInterface>
-	void Engine::GetCommandLists(const std::span<const CommandListInterface* const> commandLists, const std::span<ID3D12CommandList*> lists) noexcept
-	{
-		assert(commandLists.size() == lists.size() && "Input and output sizes are not the same.");
-		for (std::size_t i = 0uz; i < commandLists.size(); ++i)
-		{
-			lists[i] = &static_cast<const CommandList*>(commandLists[i])->CommandList();
-		}
-	}
-
-	void Engine::GetFences(const std::span<const std::pair<IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept
+	void Engine::GetFences(const std::span<const std::pair<IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output)
 	{
 		assert(input.size() == output.size() && "Input and output sizes are not the same.");
 		for (std::size_t i = 0uz; i < input.size(); ++i)
 		{
-			output[i] = std::pair(&static_cast<const Fence*>(input[i].first)->GetFence(), input[i].second);
+			output[i] = std::pair(&ToNativeFenceNotNullptr(input[i].first)->GetFence(), input[i].second);
 		}
 	}
 
-	void Engine::GetFences(const std::span<const std::pair<const IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output) noexcept
+	void Engine::GetFences(const std::span<const std::pair<const IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output)
 	{
 		assert(input.size() == output.size() && "Input and output sizes are not the same.");
 		for (std::size_t i = 0uz; i < input.size(); ++i)
 		{
-			output[i] = std::pair(&static_cast<const Fence*>(input[i].first)->GetFence(), input[i].second);
+			output[i] = std::pair(&ToNativeFenceNotNullptr(input[i].first)->GetFence(), input[i].second);
 		}
 	}
 
-	D3D12_COMMAND_QUEUE_DESC Engine::GetCommandQueueDesc(const D3D12_COMMAND_LIST_TYPE type) noexcept
+	D3D12_COMMAND_QUEUE_DESC Engine::MakeCommandQueueDesc(const D3D12_COMMAND_LIST_TYPE type) noexcept
 	{
 		return D3D12_COMMAND_QUEUE_DESC
 		{
@@ -1614,11 +1789,47 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	Memory::Arena& Engine::Arena()
 	{
-		thread_local auto arena = Memory::Arena(0uz, 1024uz);
+		thread_local auto arena = Memory::Arena(0uz, 128uz);
 		return arena;
 	}
 
-	void Engine::ValidateSize(const BufferParams& params)
+	Device Engine::CreateDevice() const
+	{
+		auto device = Device(*renderDevice, *factory.GetMostPerformantAdapter());
+
+		try
+		{
+			device.SetName("PonyEngineMain");
+		}
+		catch (...)
+		{
+			PONY_LOG_X(renderDevice->Logger(), std::current_exception(), "On setting device name.");
+		}
+
+		return device;
+	}
+
+	CommandQueue Engine::CreateCommandQueue(const D3D12_COMMAND_LIST_TYPE commandListType)
+	{
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Creating D3D12 command queue... Type: '{}'.", std::to_underlying(commandListType));
+
+		auto commandQueue = CommandQueue(device.CreateCommandQueue(MakeCommandQueueDesc(commandListType), CreatorId));
+
+		try
+		{
+			commandQueue.SetName("PonyEngineMain");
+		}
+		catch (...)
+		{
+			PONY_LOG_X(renderDevice->Logger(), std::current_exception(), "On setting command queue name. Type: '{}'.", std::to_underlying(commandListType));
+		}
+
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Creating D3D12 command queue done. Type: '{}'.", std::to_underlying(commandListType));
+
+		return commandQueue;
+	}
+
+	void Engine::ValidateBufferParams(const BufferParams& params)
 	{
 #ifndef NDEBUG
 		if (params.size == 0uz) [[unlikely]]
@@ -1724,26 +1935,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateSRGBFlag(const bool srgb, const DXGI_FORMAT format)
-	{
-#ifndef NDEBUG
-		if (srgb && !IsSRGBCompatibleFormat(format))
-		{
-			throw std::invalid_argument("Invalid srgb flag");
-		}
-#endif
-	}
-
-	void Engine::ValidateAspect(const Aspect aspect, const DXGI_FORMAT format)
-	{
-#ifndef NDEBUG
-		if (!IsInMask(aspect, GetAspects(format))) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid aspect");
-		}
-#endif
-	}
-
 	void Engine::ValidateAspect(const AspectMask aspects, const DXGI_FORMAT format)
 	{
 #ifndef NDEBUG
@@ -1793,7 +1984,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		ValidateViewFormat(texture, params.format, params.srgb);
 		ValidateDimension(texture, params.dimension);
-		ValidateAspect(params.aspect, texture.NativeFormat());
 		ValidateLayout(texture, params.layout, params.dimension);
 
 #ifndef NDEBUG
@@ -1804,10 +1994,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateSRVParams(const TextureSRVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	void Engine::ValidateSRVParams(const TextureSRVParams& params, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
-		ValidateSRGBFlag(params.srgb, format);
-		ValidateAspect(params.aspect, format);
 		ValidateLayout(params.layout, params.dimension, maxMipCount, maxArraySize);
 	}
 
@@ -1827,7 +2015,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		ValidateViewFormat(texture, params.format, false);
 		ValidateDimension(texture, params.dimension);
-		ValidateAspect(params.aspect, texture.NativeFormat());
 		ValidateLayout(texture, params.layout);
 
 #ifndef NDEBUG
@@ -1840,15 +2027,20 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::ValidateUAVParams(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
-		ValidateAspect(params.aspect, format);
 		ValidateLayout(params.layout, maxMipCount, maxArraySize);
+
+#ifndef NDEBUG
+		if (IsDepthStencilFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Depth stencil formats aren't compatible with UAV");
+		}
+#endif
 	}
 
 	void Engine::ValidateRTVParams(const Texture& texture, const RTVParams& params)
 	{
 		ValidateViewFormat(texture, params.format, params.srgb);
 		ValidateDimension(texture, params.dimension);
-		ValidateAspect(Aspect::Color, texture.NativeFormat());
 		ValidateLayout(texture, params.layout);
 
 #ifndef NDEBUG
@@ -1859,10 +2051,8 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateRTVParams(const RTVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	void Engine::ValidateRTVParams(const RTVParams& params, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
-		ValidateSRGBFlag(params.srgb, format);
-		ValidateAspect(Aspect::Color, format);
 		ValidateLayout(params.layout, maxMipCount, maxArraySize);
 	}
 
@@ -1870,7 +2060,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		ValidateViewFormat(texture, params.format, false);
 		ValidateDimension(texture, params.dimension);
-		ValidateAspect(Aspect::Depth, texture.NativeFormat());
 		ValidateLayout(texture, params.layout);
 
 #ifndef NDEBUG
@@ -1883,8 +2072,14 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::ValidateDSVParams(const DSVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
-		ValidateAspect(Aspect::Depth, format);
 		ValidateLayout(params.layout, maxMipCount, maxArraySize);
+
+#ifndef NDEBUG
+		if (!IsDepthStencilFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Depth stencil formats aren't compatible with UAV");
+		}
+#endif
 	}
 
 	void Engine::ValidateSize(const Buffer& buffer, const std::uint64_t firstElementIndex, const std::uint32_t elementCount, const std::uint32_t stride)
@@ -1906,7 +2101,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #ifndef NDEBUG
 		if (srgb)
 		{
-			if (texture.Format() != viewFormat || !texture.SRGBCompatible())
+			if (texture.Format() != viewFormat || !texture.SRGBCompatible()) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid format");
 			}
@@ -1961,6 +2156,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void Engine::ValidateLayout(const Texture& texture, const SRVLayout& layout, const TextureViewDimension dimension)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleSRVLayout& l)
@@ -2013,10 +2209,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				}
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateLayout(const SRVLayout& layout, const TextureViewDimension dimension, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleSRVLayout& l)
@@ -2065,10 +2263,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				}
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateLayout(const Texture& texture, const UAVLayout& layout)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleUAVLayout& l)
@@ -2083,10 +2283,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateArrayRange(texture, l.arrayRange);
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateLayout(const UAVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleUAVLayout& l)
@@ -2099,10 +2301,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateLayout(const Texture& texture, const RTVLayout& layout)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleRTVLayout& l)
@@ -2126,10 +2330,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateArrayRange(texture, l.arrayRange);
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateLayout(const RTVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleRTVLayout& l)
@@ -2149,10 +2355,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateLayout(const Texture& texture, const DSVLayout& layout)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleDSVLayout& l)
@@ -2176,10 +2384,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateArrayRange(texture, l.arrayRange);
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateLayout(const DSVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
 	{
+#ifndef NDEBUG
 		std::visit(Type::Overload
 		{
 			[&](const SingleDSVLayout& l)
@@ -2199,6 +2409,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				ValidateArrayRange(l.arrayRange, maxArraySize);
 			}
 		}, layout);
+#endif
 	}
 
 	void Engine::ValidateRange(const TextureParams& params, const DXGI_FORMAT format, const SubTextureRange& range)
@@ -2255,7 +2466,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateSwapChainParams(const SwapChainParams& params)
+	void Engine::ValidateSwapChainParams(const SwapChainParams& params, DXGI_FORMAT format)
 	{
 #ifndef NDEBUG
 		if (params.size)
@@ -2280,10 +2491,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			throw std::invalid_argument("Invalid usage");
 		}
+
+		if (Any(SwapChainFlag::SRGB, params.flags) && !IsSRGBCompatibleFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid srgb flag");
+		}
 #endif
 	}
 
-	void Engine::ValidateContainer(const ShaderDataContainer& container, const std::uint32_t index)
+	void Engine::ValidateContainerForCreatingView(const ShaderDataContainer& container, const std::uint32_t index)
 	{
 #ifndef NDEBUG
 		if (index >= container.Size()) [[unlikely]]
@@ -2306,11 +2522,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 		for (const ShaderDataCopyRange& range : ranges)
 		{
-			if (!range.source || typeid(*range.source) != typeid(ShaderDataContainer)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid source");
-			}
-			const ShaderDataContainer* const source = static_cast<const ShaderDataContainer*>(range.source);
+			const ShaderDataContainer* const source = ToNativeContainerNotNullptr(range.source);
 			if (source->Size() < range.sourceOffset + range.count) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid source range");
@@ -2320,11 +2532,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 				throw std::invalid_argument("Source is shader visible");
 			}
 
-			if (!range.destination || typeid(*range.destination) != typeid(ShaderDataContainer)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid destination");
-			}
-			if (static_cast<const ShaderDataContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
+			if (ToNativeContainerNotNullptr(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid destination range");
 			}
@@ -2332,7 +2540,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateContainer(const RenderTargetContainer& container, const std::uint32_t index)
+	void Engine::ValidateContainerForCreatingView(const RenderTargetContainer& container, const std::uint32_t index)
 	{
 #ifndef NDEBUG
 		if (index >= container.Size()) [[unlikely]]
@@ -2373,7 +2581,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateContainer(const DepthStencilContainer& container, const std::uint32_t index)
+	void Engine::ValidateContainerForCreatingView(const DepthStencilContainer& container, const std::uint32_t index)
 	{
 #ifndef NDEBUG
 		if (index >= container.Size()) [[unlikely]]
@@ -2414,7 +2622,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateContainer(const SamplerContainer& container, const std::uint32_t index)
+	void Engine::ValidateContainerForCreatingSampler(const SamplerContainer& container, const std::uint32_t index)
 	{
 #ifndef NDEBUG
 		if (index >= container.Size()) [[unlikely]]
@@ -2558,16 +2766,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidatePipelineLayout(const IPipelineLayout* const layout)
-	{
-#ifndef NDEBUG
-		if (layout && typeid(*layout) != typeid(RootSignature)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid pipeline layout");
-		}
-#endif
-	}
-
 	void Engine::ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const
 	{
 #ifndef NDEBUG
@@ -2634,51 +2832,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		if (params.computeShader.empty()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid mesh shader");
-		}
-#endif
-	}
-
-	template<typename CommandList, typename CommandListInterface>
-	void Engine::ValidateCommandLists(const std::span<const CommandListInterface* const> commandLists)
-	{
-#ifndef NDEBUG
-		for (const CommandListInterface* const commandList : commandLists)
-		{
-			if (!commandList || typeid(*commandList) != typeid(CommandList)) [[unlikely]]
-			{
-				throw std::invalid_argument("Invalid command list");
-			}
-
-			if (static_cast<const CommandList*>(commandList)->IsOpen()) [[unlikely]]
-			{
-				throw std::invalid_argument("Command list is open");
-			}
-		}
-#endif
-	}
-
-	void Engine::ValidateFences(std::span<const std::pair<IFence*, std::uint64_t>> fences)
-	{
-#ifndef NDEBUG
-		for (const IFence* const fence : std::views::keys(fences))
-		{
-			if (!fence || typeid(*fence) != typeid(Fence))
-			{
-				throw std::invalid_argument("Invalid fence");
-			}
-		}
-#endif
-	}
-
-	void Engine::ValidateFences(std::span<const std::pair<const IFence*, std::uint64_t>> fences)
-	{
-#ifndef NDEBUG
-		for (const IFence* const fence: std::views::keys(fences))
-		{
-			if (!fence || typeid(*fence) != typeid(Fence))
-			{
-				throw std::invalid_argument("Invalid fence");
-			}
 		}
 #endif
 	}

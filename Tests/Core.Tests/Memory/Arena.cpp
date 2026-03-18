@@ -131,6 +131,12 @@ TEST_CASE("Arena: allocate", "[Memory][Arena]")
 	REQUIRE(arena.GetMarker().index == 192uz);
 	REQUIRE(slice.byteOffset == 160uz);
 	REQUIRE(slice.objectCount == 32uz);
+
+	const PonyEngine::Memory::Arena::Pointer<std::byte> pointer = arena.Allocate(32uz, 64uz);
+	REQUIRE(arena.Size() == 256uz);
+	REQUIRE(arena.Capacity() == 256uz);
+	REQUIRE(arena.GetMarker().index == 256uz);
+	REQUIRE(pointer.byteOffset == 192uz);
 }
 
 TEST_CASE("Arena: allocate T", "[Memory][Arena]")
@@ -174,9 +180,15 @@ TEST_CASE("Arena: allocate T", "[Memory][Arena]")
 	REQUIRE(arena.GetMarker().index == 192uz);
 	REQUIRE(slice16.byteOffset == 160uz);
 	REQUIRE(slice16.objectCount == 2uz);
+
+	const PonyEngine::Memory::Arena::Pointer<Data32> pointer32 = arena.Allocate<Data32>();
+	REQUIRE(arena.Size() == 224uz);
+	REQUIRE(arena.Capacity() == 256uz);
+	REQUIRE(arena.GetMarker().index == 224uz);
+	REQUIRE(pointer32.byteOffset == 192uz);
 }
 
-TEST_CASE("Arena: span", "[Memory][Arena]")
+TEST_CASE("Arena: object/span", "[Memory][Arena]")
 {
 	struct alignas(32) Data32 final
 	{
@@ -208,6 +220,42 @@ TEST_CASE("Arena: span", "[Memory][Arena]")
 	const std::span<Data4> span4 = arena.Span(slice4);
 	REQUIRE(reinterpret_cast<std::byte*>(span4.data()) == arena.Data() + slice4.byteOffset);
 	REQUIRE(span4.size() == slice4.objectCount);
+
+	const PonyEngine::Memory::Arena::Pointer<Data32> pointer32 = arena.Allocate<Data32>();
+	Data32* const object32 = arena.Object(pointer32);
+	REQUIRE(reinterpret_cast<std::byte*>(object32) == arena.Data() + pointer32.byteOffset);
+}
+
+TEST_CASE("Arena: push", "[Memory][Arena]")
+{
+	struct alignas(32) Data32 final
+	{
+		std::uint64_t data;
+	};
+	struct alignas(4) Data4 final
+	{
+		std::uint32_t data;
+	};
+
+	auto arena = PonyEngine::Memory::Arena(32uz);
+	constexpr auto data32Array = std::array<Data32, 4>{6u, 10u, 22u, 30u};
+	const PonyEngine::Memory::Arena::Slice<std::byte> slice = arena.Push(std::span(reinterpret_cast<const std::byte*>(data32Array.data()), data32Array.size() * sizeof(Data32)), 32uz);
+	const std::span<std::byte> span = arena.Span(slice);
+	REQUIRE(span.data() == arena.Data() + slice.byteOffset);
+	REQUIRE(span.size() == slice.objectCount);
+	REQUIRE(std::memcmp(span.data(), data32Array.data(), span.size_bytes()) == 0);
+
+	const PonyEngine::Memory::Arena::Slice<Data32> slice32 = arena.Push(std::span<const Data32>(data32Array));
+	const std::span<Data32> span32 = arena.Span(slice32);
+	REQUIRE(reinterpret_cast<std::byte*>(span32.data()) == arena.Data() + slice32.byteOffset);
+	REQUIRE(span32.size() == slice32.objectCount);
+	REQUIRE(std::memcmp(span32.data(), data32Array.data(), span32.size_bytes()) == 0);
+
+	constexpr auto data4 = Data4{32};
+	const PonyEngine::Memory::Arena::Pointer<Data4> pointer4 = arena.Push(data4);
+	Data4* const object4 = arena.Object(pointer4);
+	REQUIRE(reinterpret_cast<std::byte*>(object4) == arena.Data() + pointer4.byteOffset);
+	REQUIRE(std::memcmp(object4, &data4, sizeof(data4)) == 0);
 }
 
 TEST_CASE("Arena: free", "[Memory][Arena]")

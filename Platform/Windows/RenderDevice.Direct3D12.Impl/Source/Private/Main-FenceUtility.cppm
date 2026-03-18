@@ -41,12 +41,12 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	/// @param fence Engine fence.
 	/// @return Native fence.
 	[[nodiscard("Pure function")]]
-	Fence& ToNativeFenceNotNullptr(IFence* fence);
+	Fence* ToNativeFenceNotNullptr(IFence* fence);
 	/// @brief Casts the engine fence to a native fence.
 	/// @param fence Engine fence.
 	/// @return Native fence.
 	[[nodiscard("Pure function")]]
-	const Fence& ToNativeFenceNotNullptr(const IFence* fence);
+	const Fence* ToNativeFenceNotNullptr(const IFence* fence);
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -99,7 +99,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return static_cast<const Fence*>(fence);
 	}
 
-	Fence& ToNativeFenceNotNullptr(IFence* fence)
+	Fence* ToNativeFenceNotNullptr(IFence* fence)
 	{
 #ifndef NDEBUG
 		if (!fence || typeid(*fence) != typeid(Fence)) [[unlikely]]
@@ -108,10 +108,10 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		return *static_cast<Fence*>(fence);
+		return static_cast<Fence*>(fence);
 	}
 
-	const Fence& ToNativeFenceNotNullptr(const IFence* fence)
+	const Fence* ToNativeFenceNotNullptr(const IFence* fence)
 	{
 #ifndef NDEBUG
 		if (!fence || typeid(*fence) != typeid(Fence)) [[unlikely]]
@@ -120,6 +120,6 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
-		return *static_cast<const Fence*>(fence);
+		return static_cast<const Fence*>(fence);
 	}
 }

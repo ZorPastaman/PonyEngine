@@ -36,7 +36,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure constructor")]]
 		explicit CommandQueue(Platform::Windows::ComPtr<ID3D12CommandQueue>&& commandQueue) noexcept;
 		CommandQueue(const CommandQueue&) = delete;
-		CommandQueue(CommandQueue&&) = delete;
+		CommandQueue(CommandQueue&& other) noexcept = default;
 
 		~CommandQueue() noexcept = default;
 

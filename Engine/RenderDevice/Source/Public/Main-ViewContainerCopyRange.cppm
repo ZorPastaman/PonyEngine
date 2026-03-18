@@ -24,7 +24,7 @@ export namespace PonyEngine::RenderDevice
 	template<std::derived_from<IContainer> T>
 	struct ViewContainerCopyRange final
 	{
-		const T* source = nullptr; ///< Source container. Must be a valid container.
+		const T* source = nullptr; ///< Source container. Must be a valid container. Mustn't be shader visible.
 		T* destination = nullptr; ///< Destination container. Must be a valid container.
 		std::uint32_t sourceOffset = 0u; ///< Source offset.
 		std::uint32_t destinationOffset = 0u; ///< Destination offset.

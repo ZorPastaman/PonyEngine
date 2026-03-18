@@ -20,6 +20,7 @@ import std;
 import PonyEngine.RenderDevice;
 import PonyEngine.Type;
 
+import :RootSignature;
 import :SamplerUtility;
 
 export namespace PonyEngine::RenderDevice::Direct3D12::Windows
@@ -31,6 +32,37 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		UINT rangeCount = 0u; ///< Range count across all the tables.
 		UINT staticSamplerCount = 0u; ///< Static sampler count across all the tables.
 	};
+
+	/// @brief Casts the engine pipeline layout to a native root signature.
+	/// @param layout Engine pipeline layout.
+	/// @return Native root signature.
+	[[nodiscard("Pure function")]]
+	RootSignature& ToNativeRootSignature(IPipelineLayout& layout);
+	/// @brief Casts the engine pipeline layout to a native root signature.
+	/// @param layout Engine pipeline layout.
+	/// @return Native root signature.
+	[[nodiscard("Pure function")]]
+	const RootSignature& ToNativeRootSignature(const IPipelineLayout& layout);
+	/// @brief Casts the engine pipeline layout to a native root signature.
+	/// @param layout Engine pipeline layout.
+	/// @return Native root signature.
+	[[nodiscard("Pure function")]]
+	RootSignature* ToNativeRootSignature(IPipelineLayout* layout);
+	/// @brief Casts the engine pipeline layout to a native root signature.
+	/// @param layout Engine pipeline layout.
+	/// @return Native root signature.
+	[[nodiscard("Pure function")]]
+	const RootSignature* ToNativeRootSignature(const IPipelineLayout* layout);
+	/// @brief Casts the engine pipeline layout to a native root signature.
+	/// @param layout Engine pipeline layout.
+	/// @return Native root signature.
+	[[nodiscard("Pure function")]]
+	RootSignature* ToNativeRootSignatureNotNullptr(IPipelineLayout* layout);
+	/// @brief Casts the engine pipeline layout to a native root signature.
+	/// @param layout Engine pipeline layout.
+	/// @return Native root signature.
+	[[nodiscard("Pure function")]]
+	const RootSignature* ToNativeRootSignatureNotNullptr(const IPipelineLayout* layout);
 
 	/// @brief Gets root signature counts.
 	/// @param descriptorSets Descriptor sets.
@@ -61,6 +93,78 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	RootSignature& ToNativeRootSignature(IPipelineLayout& layout)
+	{
+#ifndef NDEBUG
+		if (typeid(layout) != typeid(RootSignature)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline layout");
+		}
+#endif
+
+		return static_cast<RootSignature&>(layout);
+	}
+
+	const RootSignature& ToNativeRootSignature(const IPipelineLayout& layout)
+	{
+#ifndef NDEBUG
+		if (typeid(layout) != typeid(RootSignature)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline layout");
+		}
+#endif
+
+		return static_cast<const RootSignature&>(layout);
+	}
+
+	RootSignature* ToNativeRootSignature(IPipelineLayout* const layout)
+	{
+#ifndef NDEBUG
+		if (layout && typeid(*layout) != typeid(RootSignature)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline layout");
+		}
+#endif
+
+		return static_cast<RootSignature*>(layout);
+	}
+
+	const RootSignature* ToNativeRootSignature(const IPipelineLayout* const layout)
+	{
+#ifndef NDEBUG
+		if (layout && typeid(*layout) != typeid(RootSignature)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline layout");
+		}
+#endif
+
+		return static_cast<const RootSignature*>(layout);
+	}
+
+	RootSignature* ToNativeRootSignatureNotNullptr(IPipelineLayout* const layout)
+	{
+#ifndef NDEBUG
+		if (!layout || typeid(*layout) != typeid(RootSignature)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline layout");
+		}
+#endif
+
+		return static_cast<RootSignature*>(layout);
+	}
+
+	const RootSignature* ToNativeRootSignatureNotNullptr(const IPipelineLayout* const layout)
+	{
+#ifndef NDEBUG
+		if (!layout || typeid(*layout) != typeid(RootSignature)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pipeline layout");
+		}
+#endif
+
+		return static_cast<const RootSignature*>(layout);
+	}
+
 	constexpr RootSignatureDescCounts GetRootSignatureCounts(const std::span<const DescriptorSet> descriptorSets) noexcept
 	{
 		auto counts = RootSignatureDescCounts{};
