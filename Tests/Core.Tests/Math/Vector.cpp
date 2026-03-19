@@ -517,6 +517,23 @@ TEST_CASE("Vector normalize fallback", "[Math][Vector]")
 #endif
 }
 
+TEST_CASE("Vector normalize magnitude", "[Math][Vector]")
+{
+	REQUIRE(PonyEngine::Math::Vector3<float>().Normalized(3.f, 6.f) == PonyEngine::Math::Vector3<float>::Zero());
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector2<float>(3.f, 4.f).Normalized(5.f, 10.f), PonyEngine::Math::Vector2<float>::Zero()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector2<float>(3.f, 4.f).Normalized(0.f, 5.f), PonyEngine::Math::Vector2<float>(0.6f, 0.8f)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized(1.f, 2.f), PonyEngine::Math::Vector3<float>(0.422f, 0.422f, 0.422f), PonyEngine::Math::Tolerance<float>{.absolute = 0.001f}));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector2<float>(1.f, 0.f).Normalized(5.f, 10.f), PonyEngine::Math::Vector2<float>::Zero()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector2<float>(3.f, 4.f).Normalized(1.f, 2.f), PonyEngine::Math::Vector2<float>(0.6f, 0.8f)));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized(1.f, 2.f);
+	};
+#endif
+}
+
 TEST_CASE("Vector min this", "[Math][Vector]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::Vector3<std::int32_t>(-2, 4, 5).Min() == -2);

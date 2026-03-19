@@ -9,7 +9,7 @@ add_library(PonyEngine.Time.Impl STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Time.Impl PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")
@@ -20,9 +20,9 @@ target_sources(PonyEngine.Time.Impl PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.Time.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Time.Impl.cppm"
-	"Source/Private/Time.Impl-TimeService.cppm"
-	"Source/Private/Time.Impl-TimeServiceModule.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-TimeService.cppm"
+	"Source/Private/Main-TimeServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

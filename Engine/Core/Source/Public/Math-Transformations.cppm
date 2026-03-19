@@ -178,14 +178,14 @@ export namespace PonyEngine::Math
 	/// @param scaling Component-wise scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix2x2<T> RsMatrix(T angle, const Vector2<T>& scaling) noexcept;
+	Matrix2x2<T> RSMatrix(T angle, const Vector2<T>& scaling) noexcept;
 	/// @brief Creates a 3D rotation-scaling matrix from the rotation quaternion and scaling.
 	/// @tparam T Value type.
 	/// @param quaternion Rotation quaternion.
 	/// @param scaling Scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Matrix3x3<T> RsMatrix(const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
+	constexpr Matrix3x3<T> RSMatrix(const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a rotation-scaling matrix from the rotation matrix and scaling.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
@@ -193,14 +193,14 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size, Size> RsMatrix(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept;
+	constexpr Matrix<T, Size, Size> RSMatrix(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept;
 	/// @brief Creates a 3D rotation-scaling matrix from the Euler angles and scaling.
 	/// @tparam T Value type.
 	/// @param euler Euler angles in radians.
 	/// @param scaling Scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix3x3<T> RsMatrix(const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
+	Matrix3x3<T> RSMatrix(const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a 3D rotation-scaling matrix from the axis-angle rotation and scaling.
 	/// @tparam T Value type.
 	/// @param axis Rotation axis.
@@ -208,7 +208,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix3x3<T> RsMatrix(const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
+	Matrix3x3<T> RSMatrix(const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
 
 	/// @brief Creates a 2D translation-rotation-scaling matrix from the 2D translation, rotation angle and scaling.
 	/// @tparam T Value type.
@@ -217,7 +217,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix3x3<T> TrsMatrix(const Vector2<T>& translation, T angle, const Vector2<T>& scaling) noexcept;
+	Matrix3x3<T> TRSMatrix(const Vector2<T>& translation, T angle, const Vector2<T>& scaling) noexcept;
 	/// @brief Creates a compact 2D translation-rotation-scaling matrix from the 2D translation, rotation angle and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
@@ -225,7 +225,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix2x3<T> TrsMatrixCompact(const Vector2<T>& translation, T angle, const Vector2<T>& scaling) noexcept;
+	Matrix2x3<T> TRSMatrixCompact(const Vector2<T>& translation, T angle, const Vector2<T>& scaling) noexcept;
 	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation, rotation quaternion and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
@@ -233,7 +233,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
+	constexpr Matrix4x4<T> TRSMatrix(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a compact 3D translation-rotation-scaling matrix from the translation, rotation quaternion and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
@@ -241,7 +241,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Matrix3x4<T> TrsMatrixCompact(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
+	constexpr Matrix3x4<T> TRSMatrixCompact(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a translation-rotation-scaling matrix from the translation, rotation matrix and scaling.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
@@ -250,7 +250,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept;
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept;
 	/// @brief Creates a compact translation-rotation-scaling matrix from the translation, rotation matrix and scaling.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
@@ -259,7 +259,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept;
+	constexpr Matrix<T, Size, Size + 1> TRSMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept;
 	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation, Euler angles and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
@@ -267,7 +267,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
+	Matrix4x4<T> TRSMatrix(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a compact 3D translation-rotation-scaling matrix from the translation, Euler angles and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
@@ -275,7 +275,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix3x4<T> TrsMatrixCompact(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
+	Matrix3x4<T> TRSMatrixCompact(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation, axis-angle rotation and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
@@ -284,7 +284,7 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
+	Matrix4x4<T> TRSMatrix(const Vector3<T>& translation, const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a compact 3D translation-rotation-scaling matrix from the translation, axis-angle rotation and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
@@ -293,21 +293,21 @@ export namespace PonyEngine::Math
 	/// @param scaling Scaling.
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Matrix3x4<T> TrsMatrixCompact(const Vector3<T>& translation, const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
+	Matrix3x4<T> TRSMatrixCompact(const Vector3<T>& translation, const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
 	/// @brief Creates a translation-rotation-scaling matrix from the rotation-scaling matrix. The translation part will be zero.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Matrix<T, Size, Size>& rsMatrix) noexcept;
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Matrix<T, Size, Size>& rsMatrix) noexcept;
 	/// @brief Creates a compact translation-rotation-scaling matrix from the rotation-scaling matrix. The translation part will be zero.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Matrix<T, Size, Size>& rsMatrix) noexcept;
+	constexpr Matrix<T, Size, Size + 1> TRSMatrixCompact(const Matrix<T, Size, Size>& rsMatrix) noexcept;
 	/// @brief Creates a translation-rotation-scaling matrix from the translation and rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
@@ -315,7 +315,7 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept;
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept;
 	/// @brief Creates a compact translation-rotation-scaling matrix from the translation and rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
@@ -323,14 +323,14 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept;
+	constexpr Matrix<T, Size, Size + 1> TRSMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept;
 	/// @brief Converts the compact translation-rotation-scaling matrix to a full translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
 	/// @param trsMatrixCompact Compact translation-rotation-scaling matrix. 
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Matrix<T, Size, Size + 1>& trsMatrixCompact) noexcept;
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Matrix<T, Size, Size + 1>& trsMatrixCompact) noexcept;
 
 	/// @brief Creates a 3D perspective projection matrix.
 	/// @tparam T Value type.
@@ -357,14 +357,14 @@ export namespace PonyEngine::Math
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Translation.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Vector<T, Size - 1> ExtractTranslationFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
+	constexpr Vector<T, Size - 1> ExtractTranslationFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
 	/// @brief Extracts a translation from the compact translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Translation.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Vector<T, Size> ExtractTranslationFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
+	constexpr Vector<T, Size> ExtractTranslationFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
 
 	/// @brief Attempts to extract a rotation angle from the 2D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
@@ -372,21 +372,21 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	T ExtractAngleFromRs(const Matrix2x2<T>& rsMatrix) noexcept;
+	T ExtractAngleFromRS(const Matrix2x2<T>& rsMatrix) noexcept;
 	/// @brief Attempts to extract a rotation angle from the 2D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	T ExtractAngleFromTrs(const Matrix3x3<T>& trsMatrix) noexcept;
+	T ExtractAngleFromTRS(const Matrix3x3<T>& trsMatrix) noexcept;
 	/// @brief Attempts to extract a rotation angle from the compact 2D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	T ExtractAngleFromTrs(const Matrix2x3<T>& trsMatrix) noexcept;
+	T ExtractAngleFromTRS(const Matrix2x3<T>& trsMatrix) noexcept;
 
 	/// @brief Attempts to extract a rotation quaternion from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
@@ -394,21 +394,21 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> ExtractRotationQuaternionFromRs(const Matrix3x3<T>& rsMatrix) noexcept;
+	Quaternion<T> ExtractRotationQuaternionFromRS(const Matrix3x3<T>& rsMatrix) noexcept;
 	/// @brief Attempts to extract a rotation quaternion from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> ExtractRotationQuaternionFromTrs(const Matrix4x4<T>& trsMatrix) noexcept;
+	Quaternion<T> ExtractRotationQuaternionFromTRS(const Matrix4x4<T>& trsMatrix) noexcept;
 	/// @brief Attempts to extract a rotation quaternion from the compact 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> ExtractRotationQuaternionFromTrs(const Matrix3x4<T>& trsMatrix) noexcept;
+	Quaternion<T> ExtractRotationQuaternionFromTRS(const Matrix3x4<T>& trsMatrix) noexcept;
 
 	/// @brief Attempts to extract a rotation matrix from the rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
@@ -418,7 +418,7 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Matrix<T, Size, Size> ExtractRotationMatrixFromRs(const Matrix<T, Size, Size>& rsMatrix) noexcept;
+	Matrix<T, Size, Size> ExtractRotationMatrixFromRS(const Matrix<T, Size, Size>& rsMatrix) noexcept;
 	/// @brief Attempts to extract a rotation matrix from the translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @note If the rotation-scaling part of the matrix has a zero column, the result is undefined.
@@ -427,7 +427,7 @@ export namespace PonyEngine::Math
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Rotation matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Matrix<T, Size - 1, Size - 1> ExtractRotationMatrixFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
+	Matrix<T, Size - 1, Size - 1> ExtractRotationMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
 	/// @brief Attempts to extract a rotation matrix from the compact translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @note If the rotation-scaling part of the matrix has a zero column, the result is undefined.
@@ -436,7 +436,7 @@ export namespace PonyEngine::Math
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Rotation matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Matrix<T, Size, Size> ExtractRotationMatrixFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
+	Matrix<T, Size, Size> ExtractRotationMatrixFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
 
 	/// @brief Attempts to extract Euler angles from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
@@ -444,21 +444,21 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Vector3<T> ExtractEulerFromRs(const Matrix3x3<T>& rsMatrix) noexcept;
+	Vector3<T> ExtractEulerFromRS(const Matrix3x3<T>& rsMatrix) noexcept;
 	/// @brief Attempts to extract Euler angles from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Vector3<T> ExtractEulerFromTrs(const Matrix4x4<T>& trsMatrix) noexcept;
+	Vector3<T> ExtractEulerFromTRS(const Matrix4x4<T>& trsMatrix) noexcept;
 	/// @brief Attempts to extract Euler angles from the compact 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Vector3<T> ExtractEulerFromTrs(const Matrix3x4<T>& trsMatrix) noexcept;
+	Vector3<T> ExtractEulerFromTRS(const Matrix3x4<T>& trsMatrix) noexcept;
 
 	/// @brief Attempts to extract an axis-angle rotation from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
@@ -466,21 +466,21 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	std::pair<Vector3<T>, T> ExtractAxisAngleFromRs(const Matrix3x3<T>& rsMatrix) noexcept;
+	std::pair<Vector3<T>, T> ExtractAxisAngleFromRS(const Matrix3x3<T>& rsMatrix) noexcept;
 	/// @brief Attempts to extract an axis-angle rotation from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	std::pair<Vector3<T>, T> ExtractAxisAngleFromTrs(const Matrix4x4<T>& trsMatrix) noexcept;
+	std::pair<Vector3<T>, T> ExtractAxisAngleFromTRS(const Matrix4x4<T>& trsMatrix) noexcept;
 	/// @brief Attempts to extract an axis-angle rotation from the compact 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	std::pair<Vector3<T>, T> ExtractAxisAngleFromTrs(const Matrix3x4<T>& trsMatrix) noexcept;
+	std::pair<Vector3<T>, T> ExtractAxisAngleFromTRS(const Matrix3x4<T>& trsMatrix) noexcept;
 
 	/// @brief Attempts to extract a scaling from the rotation-scaling matrix.
 	/// @note It works correctly if the scaling is non-negative.
@@ -489,7 +489,7 @@ export namespace PonyEngine::Math
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Scaling.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Vector<T, Size> ExtractScalingFromRs(const Matrix<T, Size, Size>& rsMatrix) noexcept;
+	Vector<T, Size> ExtractScalingFromRS(const Matrix<T, Size, Size>& rsMatrix) noexcept;
 	/// @brief Attempts to extract a scaling from the translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is non-negative.
 	/// @tparam T Value type.
@@ -497,7 +497,7 @@ export namespace PonyEngine::Math
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Scaling.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Vector<T, Size - 1> ExtractScalingFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
+	Vector<T, Size - 1> ExtractScalingFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
 	/// @brief Attempts to extract a scaling from the compact translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is non-negative.
 	/// @tparam T Value type.
@@ -505,7 +505,7 @@ export namespace PonyEngine::Math
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Scaling.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Vector<T, Size> ExtractScalingFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
+	Vector<T, Size> ExtractScalingFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
 
 	/// @brief Extracts a rotation-scaling matrix from the translation-rotation-scaling matrix.
 	/// @tparam T Value type.
@@ -513,21 +513,21 @@ export namespace PonyEngine::Math
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size - 1, Size - 1> ExtractRsMatrixFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
+	constexpr Matrix<T, Size - 1, Size - 1> ExtractRSMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
 	/// @brief Extracts a rotation-scaling matrix from the compact translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
 	/// @param trsMatrix Compact translation-rotation-scaling matrix.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size, Size> ExtractRsMatrixFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
+	constexpr Matrix<T, Size, Size> ExtractRSMatrixFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept;
 	/// @brief Extracts a compact translation-rotation-scaling matrix from the full translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
 	/// @param trsMatrix Translation-rotation-scaling matrix. 
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size - 1, Size> ExtractTrsMatrixFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
+	constexpr Matrix<T, Size - 1, Size> ExtractTRSMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
 
 	/// @brief Extracts a field of view from the perspective projection matrix.
 	/// @tparam T Value type.
@@ -1064,19 +1064,19 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Matrix2x2<T> RsMatrix(const T angle, const Vector2<T>& scaling) noexcept
+	Matrix2x2<T> RSMatrix(const T angle, const Vector2<T>& scaling) noexcept
 	{
-		return RsMatrix(RotationMatrix(angle), scaling);
+		return RSMatrix(RotationMatrix(angle), scaling);
 	}
 
 	template<std::floating_point T>
-	constexpr Matrix3x3<T> RsMatrix(const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept
+	constexpr Matrix3x3<T> RSMatrix(const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept
 	{
-		return RsMatrix(RotationMatrix(quaternion), scaling);
+		return RSMatrix(RotationMatrix(quaternion), scaling);
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size, Size> RsMatrix(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept
+	constexpr Matrix<T, Size, Size> RSMatrix(const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept
 	{
 		Matrix<T, Size, Size> rsMatrix;
 		for (std::size_t i = 0; i < Size; ++i)
@@ -1088,79 +1088,79 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Matrix3x3<T> RsMatrix(const Vector3<T>& euler, const Vector3<T>& scaling) noexcept
+	Matrix3x3<T> RSMatrix(const Vector3<T>& euler, const Vector3<T>& scaling) noexcept
 	{
-		return RsMatrix(RotationMatrix(euler), scaling);
+		return RSMatrix(RotationMatrix(euler), scaling);
 	}
 
 	template<std::floating_point T>
-	Matrix3x3<T> RsMatrix(const Vector3<T>& axis, const T angle, const Vector3<T>& scaling) noexcept
+	Matrix3x3<T> RSMatrix(const Vector3<T>& axis, const T angle, const Vector3<T>& scaling) noexcept
 	{
-		return RsMatrix(RotationMatrix(axis, angle), scaling);
+		return RSMatrix(RotationMatrix(axis, angle), scaling);
 	}
 
 	template<std::floating_point T>
-	Matrix3x3<T> TrsMatrix(const Vector2<T>& translation, const T angle, const Vector2<T>& scaling) noexcept
+	Matrix3x3<T> TRSMatrix(const Vector2<T>& translation, const T angle, const Vector2<T>& scaling) noexcept
 	{
-		return TrsMatrix(translation, RsMatrix(angle, scaling));
+		return TRSMatrix(translation, RSMatrix(angle, scaling));
 	}
 
 	template<std::floating_point T>
-	Matrix2x3<T> TrsMatrixCompact(const Vector2<T>& translation, const T angle, const Vector2<T>& scaling) noexcept
+	Matrix2x3<T> TRSMatrixCompact(const Vector2<T>& translation, const T angle, const Vector2<T>& scaling) noexcept
 	{
-		return TrsMatrixCompact(translation, RsMatrix(angle, scaling));
+		return TRSMatrixCompact(translation, RSMatrix(angle, scaling));
 	}
 
 	template<std::floating_point T>
-	constexpr Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept
+	constexpr Matrix4x4<T> TRSMatrix(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept
 	{
-		return TrsMatrix(translation, RsMatrix(quaternion, scaling));
+		return TRSMatrix(translation, RSMatrix(quaternion, scaling));
 	}
 
 	template<std::floating_point T>
-	constexpr Matrix3x4<T> TrsMatrixCompact(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept
+	constexpr Matrix3x4<T> TRSMatrixCompact(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept
 	{
-		return TrsMatrixCompact(translation, RsMatrix(quaternion, scaling));
+		return TRSMatrixCompact(translation, RSMatrix(quaternion, scaling));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept
 	{
-		return TrsMatrix(translation, RsMatrix(rotationMatrix, scaling));
+		return TRSMatrix(translation, RSMatrix(rotationMatrix, scaling));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept
+	constexpr Matrix<T, Size, Size + 1> TRSMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rotationMatrix, const Vector<T, Size>& scaling) noexcept
 	{
-		return TrsMatrixCompact(translation, RsMatrix(rotationMatrix, scaling));
+		return TRSMatrixCompact(translation, RSMatrix(rotationMatrix, scaling));
 	}
 
 	template<std::floating_point T>
-	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept
+	Matrix4x4<T> TRSMatrix(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept
 	{
-		return TrsMatrix(translation, RsMatrix(euler, scaling));
+		return TRSMatrix(translation, RSMatrix(euler, scaling));
 	}
 
 	template<std::floating_point T>
-	Matrix3x4<T> TrsMatrixCompact(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept
+	Matrix3x4<T> TRSMatrixCompact(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept
 	{
-		return TrsMatrixCompact(translation, RsMatrix(euler, scaling));
+		return TRSMatrixCompact(translation, RSMatrix(euler, scaling));
 	}
 
 	template<std::floating_point T>
-	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& axis, const T angle, const Vector3<T>& scaling) noexcept
+	Matrix4x4<T> TRSMatrix(const Vector3<T>& translation, const Vector3<T>& axis, const T angle, const Vector3<T>& scaling) noexcept
 	{
-		return TrsMatrix(translation, RsMatrix(axis, angle, scaling));
+		return TRSMatrix(translation, RSMatrix(axis, angle, scaling));
 	}
 
 	template<std::floating_point T>
-	Matrix3x4<T> TrsMatrixCompact(const Vector3<T>& translation, const Vector3<T>& axis, const T angle, const Vector3<T>& scaling) noexcept
+	Matrix3x4<T> TRSMatrixCompact(const Vector3<T>& translation, const Vector3<T>& axis, const T angle, const Vector3<T>& scaling) noexcept
 	{
-		return TrsMatrixCompact(translation, RsMatrix(axis, angle, scaling));
+		return TRSMatrixCompact(translation, RSMatrix(axis, angle, scaling));
 	}
 
 	template<std::floating_point T, std::size_t Size> 
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Matrix<T, Size, Size>& rsMatrix) noexcept
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
 		Matrix<T, Size + 1, Size + 1> trsMatrix = Matrix<T, Size + 1, Size + 1>::Identity();
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1179,7 +1179,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Matrix<T, Size, Size>& rsMatrix) noexcept
+	constexpr Matrix<T, Size, Size + 1> TRSMatrixCompact(const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
 		Matrix<T, Size, Size + 1> trsMatrix = Matrix<T, Size, Size + 1>::Zero();
 		if consteval
@@ -1198,9 +1198,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
-		Matrix<T, Size + 1, Size + 1> trsMatrix = TrsMatrix(rsMatrix);
+		Matrix<T, Size + 1, Size + 1> trsMatrix = TRSMatrix(rsMatrix);
 		if consteval
 		{
 			std::ranges::copy(translation.Span(), trsMatrix.Column(Size).Span().begin());
@@ -1214,16 +1214,16 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size, Size + 1> TrsMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept
+	constexpr Matrix<T, Size, Size + 1> TRSMatrixCompact(const Vector<T, Size>& translation, const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
-		Matrix<T, Size, Size + 1> trsMatrix = TrsMatrixCompact(rsMatrix);
+		Matrix<T, Size, Size + 1> trsMatrix = TRSMatrixCompact(rsMatrix);
 		trsMatrix.Column(Size, translation);
 
 		return trsMatrix;
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size + 1, Size + 1> TrsMatrix(const Matrix<T, Size, Size + 1>& trsMatrixCompact) noexcept
+	constexpr Matrix<T, Size + 1, Size + 1> TRSMatrix(const Matrix<T, Size, Size + 1>& trsMatrixCompact) noexcept
 	{
 		auto trsMatrix = Matrix<T, Size + 1, Size + 1>::Identity();
 		for (std::size_t i = 0uz; i < Size + 1; ++i)
@@ -1272,19 +1272,19 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Vector<T, Size - 1> ExtractTranslationFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
+	constexpr Vector<T, Size - 1> ExtractTranslationFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
 	{
 		return Vector<T, Size - 1>(trsMatrix.Column(Size - 1).Span().subspan<0, Size - 1>());
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Vector<T, Size> ExtractTranslationFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
+	constexpr Vector<T, Size> ExtractTranslationFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
 	{
 		return trsMatrix.Column(Size);
 	}
 
 	template<std::floating_point T>
-	T ExtractAngleFromRs(const Matrix2x2<T>& rsMatrix) noexcept
+	T ExtractAngleFromRS(const Matrix2x2<T>& rsMatrix) noexcept
 	{
 		return rsMatrix.Column(0).IsAlmostZero()
 			? std::atan2(-rsMatrix[0, 1], rsMatrix[1, 1])
@@ -1292,39 +1292,39 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	T ExtractAngleFromTrs(const Matrix3x3<T>& trsMatrix) noexcept
+	T ExtractAngleFromTRS(const Matrix3x3<T>& trsMatrix) noexcept
 	{
-		return ExtractAngleFromRs(ExtractRsMatrixFromTrs(trsMatrix));
+		return ExtractAngleFromRS(ExtractRSMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T>
-	T ExtractAngleFromTrs(const Matrix2x3<T>& trsMatrix) noexcept
+	T ExtractAngleFromTRS(const Matrix2x3<T>& trsMatrix) noexcept
 	{
-		return ExtractAngleFromRs(ExtractRsMatrixFromTrs(trsMatrix));
+		return ExtractAngleFromRS(ExtractRSMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> ExtractRotationQuaternionFromRs(const Matrix3x3<T>& rsMatrix) noexcept
+	Quaternion<T> ExtractRotationQuaternionFromRS(const Matrix3x3<T>& rsMatrix) noexcept
 	{
-		return RotationQuaternion(ExtractRotationMatrixFromRs(rsMatrix));
+		return RotationQuaternion(ExtractRotationMatrixFromRS(rsMatrix));
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> ExtractRotationQuaternionFromTrs(const Matrix4x4<T>& trsMatrix) noexcept
+	Quaternion<T> ExtractRotationQuaternionFromTRS(const Matrix4x4<T>& trsMatrix) noexcept
 	{
-		return RotationQuaternion(ExtractRotationMatrixFromTrs(trsMatrix));
+		return RotationQuaternion(ExtractRotationMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> ExtractRotationQuaternionFromTrs(const Matrix3x4<T>& trsMatrix) noexcept
+	Quaternion<T> ExtractRotationQuaternionFromTRS(const Matrix3x4<T>& trsMatrix) noexcept
 	{
-		return RotationQuaternion(ExtractRotationMatrixFromTrs(trsMatrix));
+		return RotationQuaternion(ExtractRotationMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	Matrix<T, Size, Size> ExtractRotationMatrixFromRs(const Matrix<T, Size, Size>& rsMatrix) noexcept
+	Matrix<T, Size, Size> ExtractRotationMatrixFromRS(const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
-		const Vector<T, Size> scaling = ExtractScalingFromRs(rsMatrix);
+		const Vector<T, Size> scaling = ExtractScalingFromRS(rsMatrix);
 
 		Matrix<T, Size, Size> rotationMatrix;
 		for (std::size_t i = 0; i < Size; ++i)
@@ -1337,55 +1337,55 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	Matrix<T, Size - 1, Size - 1> ExtractRotationMatrixFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
+	Matrix<T, Size - 1, Size - 1> ExtractRotationMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
 	{
-		return ExtractRotationMatrixFromRs(ExtractRsMatrixFromTrs(trsMatrix));
+		return ExtractRotationMatrixFromRS(ExtractRSMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	Matrix<T, Size, Size> ExtractRotationMatrixFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
+	Matrix<T, Size, Size> ExtractRotationMatrixFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
 	{
-		return ExtractRotationMatrixFromRs(ExtractRsMatrixFromTrs(trsMatrix));
+		return ExtractRotationMatrixFromRS(ExtractRSMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T>
-	Vector3<T> ExtractEulerFromRs(const Matrix3x3<T>& rsMatrix) noexcept
+	Vector3<T> ExtractEulerFromRS(const Matrix3x3<T>& rsMatrix) noexcept
 	{
-		return Euler(ExtractRotationMatrixFromRs(rsMatrix));
+		return Euler(ExtractRotationMatrixFromRS(rsMatrix));
 	}
 
 	template<std::floating_point T>
-	Vector3<T> ExtractEulerFromTrs(const Matrix4x4<T>& trsMatrix) noexcept
+	Vector3<T> ExtractEulerFromTRS(const Matrix4x4<T>& trsMatrix) noexcept
 	{
-		return Euler(ExtractRotationMatrixFromTrs(trsMatrix));
+		return Euler(ExtractRotationMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T>
-	Vector3<T> ExtractEulerFromTrs(const Matrix3x4<T>& trsMatrix) noexcept
+	Vector3<T> ExtractEulerFromTRS(const Matrix3x4<T>& trsMatrix) noexcept
 	{
-		return Euler(ExtractRotationMatrixFromTrs(trsMatrix));
+		return Euler(ExtractRotationMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T>
-	std::pair<Vector3<T>, T> ExtractAxisAngleFromRs(const Matrix3x3<T>& rsMatrix) noexcept
+	std::pair<Vector3<T>, T> ExtractAxisAngleFromRS(const Matrix3x3<T>& rsMatrix) noexcept
 	{
-		return AxisAngle(ExtractRotationMatrixFromRs(rsMatrix));
+		return AxisAngle(ExtractRotationMatrixFromRS(rsMatrix));
 	}
 
 	template<std::floating_point T>
-	std::pair<Vector3<T>, T> ExtractAxisAngleFromTrs(const Matrix4x4<T>& trsMatrix) noexcept
+	std::pair<Vector3<T>, T> ExtractAxisAngleFromTRS(const Matrix4x4<T>& trsMatrix) noexcept
 	{
-		return AxisAngle(ExtractRotationMatrixFromTrs(trsMatrix));
+		return AxisAngle(ExtractRotationMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T>
-	std::pair<Vector3<T>, T> ExtractAxisAngleFromTrs(const Matrix3x4<T>& trsMatrix) noexcept
+	std::pair<Vector3<T>, T> ExtractAxisAngleFromTRS(const Matrix3x4<T>& trsMatrix) noexcept
 	{
-		return AxisAngle(ExtractRotationMatrixFromTrs(trsMatrix));
+		return AxisAngle(ExtractRotationMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	Vector<T, Size> ExtractScalingFromRs(const Matrix<T, Size, Size>& rsMatrix) noexcept
+	Vector<T, Size> ExtractScalingFromRS(const Matrix<T, Size, Size>& rsMatrix) noexcept
 	{
 		Vector<T, Size> scaling;
 		for (std::size_t i = 0; i < Size; ++i)
@@ -1397,19 +1397,19 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	Vector<T, Size - 1> ExtractScalingFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
+	Vector<T, Size - 1> ExtractScalingFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
 	{
-		return ExtractScalingFromRs(ExtractRsMatrixFromTrs(trsMatrix));
+		return ExtractScalingFromRS(ExtractRSMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	Vector<T, Size> ExtractScalingFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
+	Vector<T, Size> ExtractScalingFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
 	{
-		return ExtractScalingFromRs(ExtractRsMatrixFromTrs(trsMatrix));
+		return ExtractScalingFromRS(ExtractRSMatrixFromTRS(trsMatrix));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size - 1, Size - 1> ExtractRsMatrixFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
+	constexpr Matrix<T, Size - 1, Size - 1> ExtractRSMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
 	{
 		Matrix<T, Size - 1, Size - 1> rsMatrix;
 		for (std::size_t i = 0uz; i < Size - 1; ++i)
@@ -1422,7 +1422,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size, Size> ExtractRsMatrixFromTrs(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
+	constexpr Matrix<T, Size, Size> ExtractRSMatrixFromTRS(const Matrix<T, Size, Size + 1>& trsMatrix) noexcept
 	{
 		if consteval
 		{
@@ -1441,7 +1441,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size - 1, Size> ExtractTrsMatrixFromTrs(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
+	constexpr Matrix<T, Size - 1, Size> ExtractTRSMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
 	{
 		Matrix<T, Size - 1, Size> trsMatrixCompact;
 		for (std::size_t i = 0uz; i < Size; ++i)

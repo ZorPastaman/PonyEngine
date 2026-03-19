@@ -9,7 +9,7 @@ add_library(PonyEngine.Log.File.Impl STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Log.File.Impl PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")
@@ -20,9 +20,9 @@ target_sources(PonyEngine.Log.File.Impl PRIVATE
 	"Source/Main.Impl.cpp"
 )
 target_sources(PonyEngine.Log.File.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Log.File.Impl.cppm"
-	"Source/Private/Log.File.Impl-FileSubLogger.cppm"
-	"Source/Private/Log.File.Impl-FileSubLoggerModule.cppm"
+	"Source/Private/Main.cppm"
+	"Source/Private/Main-FileSubLogger.cppm"
+	"Source/Private/Main-FileSubLoggerModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

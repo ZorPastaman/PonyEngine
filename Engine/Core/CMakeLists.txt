@@ -8,7 +8,7 @@ add_library(PonyEngine.Core STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Core PUBLIC 
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")
@@ -36,7 +36,8 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Memory.cppm"
 	"Source/Public/Memory-Arena.cppm"
 	"Source/Public/Memory-Pool.cppm"
-	"Source/Public/Platform.cppm"
+	"Source/Public/Meta.cppm"
+	"Source/Public/Meta-Version.cppm"
 	"Source/Public/Serialization.cppm"
 	"Source/Public/Serialization-Array.cppm"
 	"Source/Public/Serialization-Basic.cppm"
@@ -46,30 +47,9 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Type-Variant.cppm"
 )
 
-if(PONY_WINDOWS)
-	message(VERBOSE "Configuring headers for Windows")
-	target_include_directories(PonyEngine.Core PUBLIC 
-		"Include/Public/Windows"
-	)
-
-	message(VERBOSE "Configuring sources")
-	target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Platform-Windows.Cursor.cppm"
-		"Source/Public/Platform-Windows.Device.cppm"
-		"Source/Public/Platform-Windows.File.cppm"
-		"Source/Public/Platform-Windows.GUID.cppm"
-		"Source/Public/Platform-Windows.Text.cppm"
-	)
-endif()
-
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES 
 	CXX_STANDARD 23
 	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
-)
-
-message(VERBOSE "Configuring defines")
-target_compile_definitions(PonyEngine.Core PUBLIC
-	$<$<BOOL:${PONY_WINDOWS}>:PONY_WINDOWS>
 )

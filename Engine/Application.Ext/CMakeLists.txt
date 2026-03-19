@@ -8,34 +8,27 @@ add_library(PonyEngine.Application.Ext STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Application.Ext PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Ext PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Public/Application.Ext.cppm"
-	"Source/Public/Application.Ext-FlowState.cppm"
-	"Source/Public/Application.Ext-IApplicationContext.cppm"
-	"Source/Public/Application.Ext-ILoggerContext.cppm"
-	"Source/Public/Application.Ext-ILoggerModuleContext.cppm"
-	"Source/Public/Application.Ext-IModule.cppm"
-	"Source/Public/Application.Ext-IModuleContext.cppm"
-	"Source/Public/Application.Ext-IService.cppm"
-	"Source/Public/Application.Ext-IServiceInterfaceAdder.cppm"
-	"Source/Public/Application.Ext-IServiceModuleContext.cppm"
-	"Source/Public/Application.Ext-ITickableService.cppm"
-	"Source/Public/Application.Ext-ITickableServiceAdder.cppm"
-	"Source/Public/Application.Ext-LoggerHandle.cppm"
-	"Source/Public/Application.Ext-ModuleDataHandle.cppm"
-	"Source/Public/Application.Ext-ServiceHandle.cppm"
+	"Source/Public/Main.cppm"
+	"Source/Public/Main-FlowState.cppm"
+	"Source/Public/Main-IApplicationContext.cppm"
+	"Source/Public/Main-ILoggerContext.cppm"
+	"Source/Public/Main-ILoggerModuleContext.cppm"
+	"Source/Public/Main-IModule.cppm"
+	"Source/Public/Main-IModuleContext.cppm"
+	"Source/Public/Main-IService.cppm"
+	"Source/Public/Main-IServiceInterfaceAdder.cppm"
+	"Source/Public/Main-IServiceModuleContext.cppm"
+	"Source/Public/Main-ITickableService.cppm"
+	"Source/Public/Main-ITickableServiceAdder.cppm"
+	"Source/Public/Main-LoggerHandle.cppm"
+	"Source/Public/Main-ModuleDataHandle.cppm"
+	"Source/Public/Main-ServiceHandle.cppm"
 )
-
-if(PONY_WINDOWS)
-	message(VERBOSE "Configuring sources for Windows")
-	target_sources(PonyEngine.Application.Ext PUBLIC FILE_SET CXX_MODULES FILES
-		"Source/Public/Application.Ext-Windows.IApplicationContext.cppm"
-	)
-endif()
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Application.Ext PROPERTIES 

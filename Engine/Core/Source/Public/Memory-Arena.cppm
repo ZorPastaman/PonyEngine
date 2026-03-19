@@ -32,7 +32,14 @@ export namespace PonyEngine::Memory
 		/// @brief Size marker that can be used to free an arena to this point.
 		struct Marker final
 		{
-			std::size_t index; ///< Marker index. Only an arena may use it.
+			std::size_t index = 0uz; ///< Marker index. Only an arena may use it.
+		};
+		/// @brief Data pointer.
+		/// @tparam T Data type.
+		template<ArenaCompatible T>
+		struct Pointer final
+		{
+			std::size_t byteOffset = 0uz; ///< Offset in bytes.
 		};
 		/// @brief Data slice.
 		/// @tparam T Data type.
@@ -41,8 +48,8 @@ export namespace PonyEngine::Memory
 		template<ArenaCompatible T>
 		struct Slice final
 		{
-			std::size_t byteOffset; ///< Offset in bytes.
-			std::size_t objectCount; ///< Count of objects of type @p T.
+			std::size_t byteOffset = 0uz; ///< Offset in bytes.
+			std::size_t objectCount = 0uz; ///< Count of objects of type @p T.
 		};
 
 		/// @brief Creates an arena.
@@ -85,6 +92,18 @@ export namespace PonyEngine::Memory
 		[[nodiscard("Pure function")]]
 		Marker GetMarker() const noexcept;
 
+		/// @brief Gets an object.
+		/// @tparam T Object type.
+		/// @param pointer Data pointer.
+		/// @return Object.
+		template<ArenaCompatible T> [[nodiscard("Pure function")]]
+		T* Object(const Pointer<T>& pointer) noexcept;
+		/// @brief Gets an object.
+		/// @tparam T Object type.
+		/// @param pointer Data pointer.
+		/// @return Object.
+		template<ArenaCompatible T> [[nodiscard("Pure function")]]
+		const T* Object(const Pointer<T>& pointer) const noexcept;
 		/// @brief Gets a data span.
 		/// @tparam T Data type.
 		/// @param slice Data slice.
@@ -110,16 +129,45 @@ export namespace PonyEngine::Memory
 		/// @brief Allocates new data.
 		/// @param alignment Data alignment. It must be power of two and can't be more than the arena alignment.
 		/// @param size Data size.
+		/// @return Data pointer.
+		[[nodiscard("Weird call")]]
+		Pointer<std::byte> Allocate(std::size_t alignment, std::size_t size);
+		/// @brief Allocates new data.
+		/// @param alignment Data alignment. It must be power of two and can't be more than the arena alignment.
+		/// @param size Data size.
 		/// @param count Data count.
 		/// @return Data slice.
 		[[nodiscard("Weird call")]]
 		Slice<std::byte> Allocate(std::size_t alignment, std::size_t size, std::size_t count);
 		/// @brief Allocates new data.
 		/// @tparam T Data type.
+		/// @return Data pointer.
+		template<ArenaCompatible T> [[nodiscard("Weird call")]]
+		Pointer<T> Allocate();
+		/// @brief Allocates new data.
+		/// @tparam T Data type.
 		/// @param count Data count.
 		/// @return Data slice.
 		template<ArenaCompatible T> [[nodiscard("Weird call")]]
 		Slice<T> Allocate(std::size_t count);
+
+		/// @brief Pushes the data to the arena.
+		/// @param data Data.
+		/// @param alignment Data alignment. It must be power of two and can't be more than the arena alignment.
+		/// @return Data slice.
+		Slice<std::byte> Push(std::span<const std::byte> data, std::size_t alignment);
+		/// @brief Pushes the data to the arena.
+		/// @tparam T Data type.
+		/// @param data Data object.
+		/// @return Data pointer.
+		template<ArenaCompatible T>
+		Pointer<T> Push(const T& data);
+		/// @brief Pushes the data to the arena.
+		/// @tparam T Data type.
+		/// @param data Data span.
+		/// @return Data slice.
+		template<ArenaCompatible T>
+		Slice<T> Push(std::span<const T> data);
 
 		/// @brief Frees all the data.
 		void Free() noexcept;
@@ -222,17 +270,35 @@ namespace PonyEngine::Memory
 	}
 
 	template<ArenaCompatible T>
+	T* Arena::Object(const Pointer<T>& pointer) noexcept
+	{
+		assert((pointer.byteOffset + sizeof(T) <= size) && "Out of range");
+		return reinterpret_cast<T*>(&data[pointer.byteOffset]);
+	}
+
+	template<ArenaCompatible T>
+	const T* Arena::Object(const Pointer<T>& pointer) const noexcept
+	{
+		assert((pointer.byteOffset + sizeof(T) <= size) && "Out of range");
+		return reinterpret_cast<const T*>(&data[pointer.byteOffset]);
+	}
+
+	template<ArenaCompatible T>
 	std::span<T> Arena::Span(const Slice<T>& slice) noexcept
 	{
 		assert((slice.byteOffset + sizeof(T) * slice.objectCount <= size) && "Out of range.");
-		return std::span<T>(reinterpret_cast<T*>(&data[slice.byteOffset]), slice.objectCount);
+		return slice.objectCount > 0uz 
+			? std::span<T>(reinterpret_cast<T*>(&data[slice.byteOffset]), slice.objectCount)
+			: std::span<T>();
 	}
 
 	template<ArenaCompatible T>
 	std::span<const T> Arena::Span(const Slice<T>& slice) const noexcept
 	{
 		assert((slice.byteOffset + sizeof(T) * slice.objectCount <= size) && "Out of range.");
-		return std::span<const T>(reinterpret_cast<const T*>(&data[slice.byteOffset]), slice.objectCount);
+		return slice.objectCount > 0uz
+			? std::span<const T>(reinterpret_cast<const T*>(&data[slice.byteOffset]), slice.objectCount)
+			: std::span<const T>();
 	}
 
 	std::byte* Arena::Data() noexcept
@@ -243,6 +309,12 @@ namespace PonyEngine::Memory
 	const std::byte* Arena::Data() const noexcept
 	{
 		return data.get();
+	}
+
+	Arena::Pointer<std::byte> Arena::Allocate(const std::size_t alignment, const std::size_t size)
+	{
+		const Slice<std::byte> data = Allocate(alignment, size, 1uz);
+		return Pointer<std::byte>{.byteOffset = data.byteOffset};
 	}
 
 	Arena::Slice<std::byte> Arena::Allocate(const std::size_t alignment, const std::size_t size, const std::size_t count)
@@ -264,6 +336,13 @@ namespace PonyEngine::Memory
 	}
 
 	template<ArenaCompatible T>
+	Arena::Pointer<T> Arena::Allocate()
+	{
+		const Slice<T> data = Allocate<T>(1uz);
+		return Pointer<T>{.byteOffset = data.byteOffset};
+	}
+
+	template<ArenaCompatible T>
 	Arena::Slice<T> Arena::Allocate(const std::size_t count)
 	{
 		if (alignof(T) > Alignment()) [[unlikely]]
@@ -273,6 +352,29 @@ namespace PonyEngine::Memory
 
 		const Slice<std::byte> byteSlice = AllocateRaw(alignof(T), sizeof(T), count);
 		return Slice<T>{.byteOffset = byteSlice.byteOffset, .objectCount = count};
+	}
+
+	Arena::Slice<std::byte> Arena::Push(const std::span<const std::byte> data, const std::size_t alignment)
+	{
+		const Slice<std::byte> slice = Allocate(alignment, data.size(), 1uz);
+		std::memcpy(Span(slice).data(), data.data(), data.size_bytes());
+		return slice;
+	}
+
+	template<ArenaCompatible T>
+	Arena::Pointer<T> Arena::Push(const T& data)
+	{
+		const Pointer<T> pointer = Allocate<T>();
+		std::memcpy(Object(pointer), &data, sizeof(T));
+		return pointer;
+	}
+
+	template<ArenaCompatible T>
+	Arena::Slice<T> Arena::Push(const std::span<const T> data)
+	{
+		const Slice<T> slice = Allocate<T>(data.size());
+		std::memcpy(Span(slice).data(), data.data(), data.size_bytes());
+		return slice;
 	}
 
 	void Arena::Free() noexcept
@@ -304,10 +406,14 @@ namespace PonyEngine::Memory
 
 	Arena::Slice<std::byte> Arena::AllocateRaw(const std::size_t alignment, const std::size_t size, const std::size_t count)
 	{
-		const std::size_t offset = Math::Align(this->size, alignment);
 		const std::size_t byteCount = size * count;
-		const std::size_t newSize = offset + byteCount;
+		if (byteCount == 0uz)
+		{
+			return Slice<std::byte>{};
+		}
 
+		const std::size_t offset = Math::Align(this->size, alignment);
+		const std::size_t newSize = offset + byteCount;
 		if (newSize > capacity)
 		{
 			Reserve(std::bit_ceil(newSize));

@@ -218,12 +218,12 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	OrientedBox<T, Size> OrientedBoundingBox(const Box<T, Size>& box, const Matrix<T, Size, Size + 1>& trs) noexcept requires (Size >= 1)
 	{
-		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.Extents(), ExtractRsMatrixFromTrs(trs));
+		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.Extents(), ExtractRSMatrixFromTRS(trs));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	OrientedBox<T, Size> OrientedBoundingBox(const Box<T, Size>& box, const Matrix<T, Size + 1, Size + 1>& trs) noexcept requires (Size >= 1)
 	{
-		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.Extents(), ExtractRsMatrixFromTrs(trs));
+		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.Extents(), ExtractRSMatrixFromTRS(trs));
 	}
 }

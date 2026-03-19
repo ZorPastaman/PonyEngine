@@ -27,7 +27,6 @@ namespace Name
 		"Green",
 		"Blue",
 	};
-	ENUM_VALUE_TO_STRING(Color, ColorNames)
 
 	enum class Permission : uint8_t
 	{
@@ -43,38 +42,33 @@ namespace Name
 		"Write",
 		"Execute"
 	};
-	ENUM_MASK_TO_STRING(Permission, PermissionNames)
-	ENUM_MASK_OPERATORS(Permission)
-	ENUM_MASK_CHECKS(Permission)
+	PONY_ENUM_MASK_OPERATORS(Permission)
+	PONY_ENUM_MASK_CHECKS(Permission)
 
-	ENUM_VALUE_MASK(Color, Permission)
+	PONY_ENUM_VALUE_MASK(Color, Permission)
 }
 
-ENUM_VALUE_FORMATTER(Name, Color)
-ENUM_MASK_FORMATTER(Name, Permission)
+PONY_ENUM_VALUE_FORMATTER(Name::Color, Name::ColorNames)
+PONY_ENUM_MASK_FORMATTER(Name::Permission, Name::PermissionNames)
 
 TEST_CASE("ENUM_VALUE_TO_STRING works for valid and invalid values", "[Utility][Enum]")
 {
-	STATIC_REQUIRE(Name::ToString(Name::Color::Red) == Name::ColorNames[0]);
-	STATIC_REQUIRE(Name::ToString(Name::Color::Green) == Name::ColorNames[1]);
-	STATIC_REQUIRE(Name::ToString(Name::Color::Blue) == Name::ColorNames[2]);
-	STATIC_REQUIRE(Name::ToString(static_cast<Name::Color>(99)) == "Unknown");
-	std::string formatted = std::format("{}", Name::Color::Green);
-	REQUIRE(Name::ToString(Name::Color::Green) == formatted);
+	REQUIRE(std::format("{}", Name::Color::Red) == Name::ColorNames[0]);
+	REQUIRE(std::format("{}", Name::Color::Green) == Name::ColorNames[1]);
+	REQUIRE(std::format("{}", Name::Color::Blue) == Name::ColorNames[2]);
+	REQUIRE(std::format("{}", static_cast<Name::Color>(99)) == "Unknown");
 }
 
 TEST_CASE("ENUM_MASK_TO_STRING works for masks", "[Utility][Enum]")
 {
-	REQUIRE(Name::ToString(Name::Permission::None) == "None");
-	REQUIRE(Name::ToString(Name::Permission::All) == "All");
-	REQUIRE(Name::ToString(Name::Permission::Read) == Name::PermissionNames[0]);
-	REQUIRE(Name::ToString(Name::Permission::Write) == Name::PermissionNames[1]);
-	REQUIRE(Name::ToString(Name::Permission::Execute) == Name::PermissionNames[2]);
-	REQUIRE(Name::ToString(Name::Permission::Read | Name::Permission::Write) == "Read | Write");
-	REQUIRE(Name::ToString(Name::Permission::Read | Name::Permission::Execute) == "Read | Execute");
-	REQUIRE(Name::ToString(static_cast<Name::Permission>(99)) == "Unknown");
-	std::string formatted = std::format("{}", Name::Permission::Read | Name::Permission::Write);
-	REQUIRE(Name::ToString(Name::Permission::Read | Name::Permission::Write) == formatted);
+	REQUIRE(std::format("{}", Name::Permission::None) == "None");
+	REQUIRE(std::format("{}", Name::Permission::All) == "All");
+	REQUIRE(std::format("{}", Name::Permission::Read) == Name::PermissionNames[0]);
+	REQUIRE(std::format("{}", Name::Permission::Write) == Name::PermissionNames[1]);
+	REQUIRE(std::format("{}", Name::Permission::Execute) == Name::PermissionNames[2]);
+	REQUIRE(std::format("{}", Name::Permission::Read | Name::Permission::Write) == "Read | Write");
+	REQUIRE(std::format("{}", Name::Permission::Read | Name::Permission::Execute) == "Read | Execute");
+	REQUIRE(std::format("{}", static_cast<Name::Permission>(99)) == "Unknown");
 }
 
 TEST_CASE("ENUM_MASK_OPERATORS work as expected", "[Utility][Enum]")
