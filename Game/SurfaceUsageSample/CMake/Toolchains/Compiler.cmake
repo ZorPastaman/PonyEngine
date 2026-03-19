@@ -1,5 +1,4 @@
 # They are needed to compile std module correctly
-message(VERBOSE "Configuring default build flags")
 if(PONY_ENGINE_OPTIMIZATION STREQUAL "Debug")
 	add_compile_options(${PONY_COMPILE_FLAGS_DEBUG})
 	add_link_options(${PONY_LINK_FLAGS_DEBUG})

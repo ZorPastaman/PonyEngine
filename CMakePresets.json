@@ -128,10 +128,6 @@
 		{
 			"name": "Windows",
 			"hidden": true,
-			"toolset": {
-				"value": "v143",
-				"strategy": "external"
-			},
 			"cacheVariables": {
 				"PONY_ENGINE_MESSAGE_PUMP": true,
 				"PONY_ENGINE_MESSAGE_PUMP_IMPL": true,
@@ -149,104 +145,89 @@
 			}
 		},
 		{
-			"name": "Windows-x64",
+			"name": "Windows-MSVC",
 			"inherits": "Windows",
 			"hidden": true,
-			"architecture": {
-				"value": "x64",
-				"strategy": "external"
-			}
+			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
 		},
 		{
-			"name": "Windows-x64-msvc",
-			"inherits": "Windows-x64",
-			"hidden": true,
-			"generator": "Ninja",
-			"toolchainFile": "CMake/Toolchains/Windows-x64-msvc.cmake",
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Windows"
-			}
+			"name": "Windows-MSVC-Debug",
+			"displayName": "Windows MSVC - Debug",
+			"inherits": [ "Debug", "Windows-MSVC" ]
 		},
 		{
-			"name": "Windows-x64-msvc-Debug",
-			"displayName": "Windows x64 MSVC - Debug",
-			"inherits": [ "Debug", "Windows-x64-msvc" ]
+			"name": "Windows-MSVC-Development",
+			"displayName": "Windows MSVC - Development",
+			"inherits": [ "Development", "Windows-MSVC" ]
 		},
 		{
-			"name": "Windows-x64-msvc-Development",
-			"displayName": "Windows x64 MSVC - Development",
-			"inherits": [ "Development", "Windows-x64-msvc" ]
+			"name": "Windows-MSVC-Optimized",
+			"displayName": "Windows MSVC - Optimized",
+			"inherits": [ "Optimized", "Windows-MSVC" ]
 		},
 		{
-			"name": "Windows-x64-msvc-Optimized",
-			"displayName": "Windows x64 MSVC - Optimized",
-			"inherits": [ "Optimized", "Windows-x64-msvc" ]
+			"name": "Windows-MSVC-Release",
+			"displayName": "Windows MSVC - Release",
+			"inherits": [ "Release", "Windows-MSVC" ]
 		},
 		{
-			"name": "Windows-x64-msvc-Release",
-			"displayName": "Windows x64 MSVC - Release",
-			"inherits": [ "Release", "Windows-x64-msvc" ]
-		},
-		{
-			"name": "Windows-x64-msvc-Shipping",
-			"displayName": "Windows x64 MSVC - Shipping",
-			"inherits": [ "Shipping", "Windows-x64-msvc" ]
+			"name": "Windows-MSVC-Shipping",
+			"displayName": "Windows MSVC - Shipping",
+			"inherits": [ "Shipping", "Windows-MSVC" ]
 		}
 	],
 	"buildPresets": [
 		{
-			"name": "Windows-x64-msvc-Debug",
-			"displayName": "Windows x64 MSVC - Debug",
-			"configurePreset": "Windows-x64-msvc-Debug"
+			"name": "Windows-MSVC-Debug",
+			"displayName": "Windows MSVC - Debug",
+			"configurePreset": "Windows-MSVC-Debug"
 		},
 		{
-			"name": "Windows-x64-msvc-Development",
-			"displayName": "Windows x64 MSVC - Development",
-			"configurePreset": "Windows-x64-msvc-Development"
+			"name": "Windows-MSVC-Development",
+			"displayName": "Windows MSVC - Development",
+			"configurePreset": "Windows-MSVC-Development"
 		},
 		{
-			"name": "Windows-x64-msvc-Optimized",
-			"displayName": "Windows x64 MSVC - Optimized",
-			"configurePreset": "Windows-x64-msvc-Optimized"
+			"name": "Windows-MSVC-Optimized",
+			"displayName": "Windows MSVC - Optimized",
+			"configurePreset": "Windows-MSVC-Optimized"
 		},
 		{
-			"name": "Windows-x64-msvc-Release",
-			"displayName": "Windows x64 MSVC - Release",
-			"configurePreset": "Windows-x64-msvc-Release"
+			"name": "Windows-MSVC-Release",
+			"displayName": "Windows MSVC - Release",
+			"configurePreset": "Windows-MSVC-Release"
 		},
 		{
-			"name": "Windows-x64-msvc-Shipping",
-			"displayName": "Windows x64 MSVC - Shipping",
-			"configurePreset": "Windows-x64-msvc-Shipping"
+			"name": "Windows-MSVC-Shipping",
+			"displayName": "Windows MSVC - Shipping",
+			"configurePreset": "Windows-MSVC-Shipping"
 		}
 	],
 	"testPresets": [
 		{
-			"name": "Windows-x64-msvc-Debug",
-			"displayName": "Windows x64 MSVC - Debug",
-			"configurePreset": "Windows-x64-msvc-Debug"
+			"name": "Windows-MSVC-Debug",
+			"displayName": "Windows MSVC - Debug",
+			"configurePreset": "Windows-MSVC-Debug"
 		},
 		{
-			"name": "Windows-x64-msvc-Development",
-			"displayName": "Windows x64 MSVC - Development",
-			"configurePreset": "Windows-x64-msvc-Development"
+			"name": "Windows-MSVC-Development",
+			"displayName": "Windows MSVC - Development",
+			"configurePreset": "Windows-MSVC-Development"
 		},
 		{
-			"name": "Windows-x64-msvc-Optimized",
-			"displayName": "Windows x64 MSVC - Optimized",
-			"configurePreset": "Windows-x64-msvc-Optimized"
+			"name": "Windows-MSVC-Optimized",
+			"displayName": "Windows MSVC - Optimized",
+			"configurePreset": "Windows-MSVC-Optimized"
 		},
 		{
-			"name": "Windows-x64-msvc-Release",
-			"displayName": "Windows x64 MSVC - Release",
-			"configurePreset": "Windows-x64-msvc-Release"
+			"name": "Windows-MSVC-Release",
+			"displayName": "Windows MSVC - Release",
+			"configurePreset": "Windows-MSVC-Release"
 		},
 		{
-			"name": "Windows-x64-msvc-Shipping",
-			"displayName": "Windows x64 MSVC - Shipping",
-			"configurePreset": "Windows-x64-msvc-Shipping"
+			"name": "Windows-MSVC-Shipping",
+			"displayName": "Windows MSVC - Shipping",
+			"configurePreset": "Windows-MSVC-Shipping"
 		}
 	]
 }
