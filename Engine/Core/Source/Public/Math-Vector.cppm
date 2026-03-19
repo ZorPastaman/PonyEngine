@@ -169,6 +169,15 @@ export namespace PonyEngine::Math
 		/// @param fallback Fallback vector. This vector is set if the magnitude of the vector is 0.
 		void Normalize(const Vector& fallback) noexcept requires (std::is_floating_point_v<T>);
 
+		/// @brief Returns a vector whose direction matches this vector, 
+		///        and whose magnitude represents the normalized magnitude of this vector
+		///        relative to the range [minMagnitude, maxMagnitude].
+		/// @param minMagnitude Lower bound for magnitude normalization. Must be non-negative.
+		/// @param maxMagnitude Upper bound for magnitude normalization. Must be non-negative.
+		/// @return A vector with magnitude in [0, 1] encoding the normalized magnitude.
+		[[nodiscard("Pure function")]]
+		Vector Normalized(T minMagnitude, T maxMagnitude) const noexcept requires (std::is_floating_point_v<T>);
+
 		/// @brief Gets a minimum among the components.
 		/// @return Minimum component.
 		[[nodiscard("Pure function")]]
@@ -885,6 +894,20 @@ namespace PonyEngine::Math
 	void Vector<T, Size>::Normalize(const Vector& fallback) noexcept requires (std::is_floating_point_v<T>)
 	{
 		*this = Normalized(fallback);
+	}
+
+	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	Vector<T, Size> Vector<T, Size>::Normalized(const T minMagnitude, const T maxMagnitude) const noexcept requires (std::is_floating_point_v<T>)
+	{
+		const T magnitudeSqr = MagnitudeSquared();
+		if (AreAlmostEqual(magnitudeSqr, T{0})) [[unlikely]]
+		{
+			return Zero();
+		}
+
+		const T magnitude = std::sqrt(magnitudeSqr);
+		const T normalizedMagnitude = (magnitude - minMagnitude) / (maxMagnitude - minMagnitude);
+		return std::clamp(normalizedMagnitude, 0.f, 1.f) / magnitude * *this;
 	}
 
 	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)

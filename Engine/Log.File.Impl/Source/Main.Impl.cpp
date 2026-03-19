@@ -12,7 +12,7 @@
 import PonyEngine.Application.Ext;
 import PonyEngine.Log.File.Impl;
 
-namespace PonyEngine::Log
+namespace PonyEngine::Log::File
 {
 	Application::IModule* GetFileSubLoggerModule()
 	{

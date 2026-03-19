@@ -30,8 +30,8 @@ export namespace PonyEngine::Math
 		using PositionType = Vector<T, Size>; ///< Position type.
 		using RotationType = std::conditional_t<Size == 3, Quaternion<T>, T>; ///< Rotation type.
 		using ScaleType = Vector<T, Size>; ///< Scale type.
-		using TrsMatrixType = std::conditional_t<Size == 3, Matrix4x4<T>, Matrix3x3<T>>; ///< TRS matrix type.
-		using TrsMatrixCompactType = std::conditional_t<Size == 3, Matrix3x4<T>, Matrix2x3<T>>; ///< Compact TRS matrix type.
+		using TRSMatrixType = std::conditional_t<Size == 3, Matrix4x4<T>, Matrix3x3<T>>; ///< TRS matrix type.
+		using TRSMatrixCompactType = std::conditional_t<Size == 3, Matrix3x4<T>, Matrix2x3<T>>; ///< Compact TRS matrix type.
 
 		/// @brief Creates a transform with a zero position, zero rotation and scale of one.
 		[[nodiscard("Pure constructor")]]
@@ -75,11 +75,11 @@ export namespace PonyEngine::Math
 		/// @brief Computes a translation-rotation-scaling matrix.
 		/// @return Translation-rotation-scaling matrix.
 		[[nodiscard("Pure function")]]
-		TrsMatrixType TrsMatrix() const noexcept;
+		TRSMatrixType TRSMatrix() const noexcept;
 		/// @brief Computes a compact translation-rotation-scaling matrix.
 		/// @return Compact translation-rotation-scaling matrix.
 		[[nodiscard("Pure function")]]
-		TrsMatrixCompactType TrsMatrixCompact() const noexcept;
+		TRSMatrixCompactType TRSMatrixCompact() const noexcept;
 
 		/// @brief Check if all the components of the transform are finite.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -245,15 +245,15 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	typename Transform<T, Size>::TrsMatrixType Transform<T, Size>::TrsMatrix() const noexcept
+	typename Transform<T, Size>::TRSMatrixType Transform<T, Size>::TRSMatrix() const noexcept
 	{
-		return Math::TrsMatrix(position, rotation, scale);
+		return Math::TRSMatrix(position, rotation, scale);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-		typename Transform<T, Size>::TrsMatrixCompactType Transform<T, Size>::TrsMatrixCompact() const noexcept
+		typename Transform<T, Size>::TRSMatrixCompactType Transform<T, Size>::TRSMatrixCompact() const noexcept
 	{
-		return Math::TrsMatrixCompact(position, rotation, scale);
+		return Math::TRSMatrixCompact(position, rotation, scale);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)

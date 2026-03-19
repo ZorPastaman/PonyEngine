@@ -607,10 +607,12 @@ public:
 	{
 		auto it = context.begin();
 
+#ifndef NDEBUG
 		if (it == context.end()) [[unlikely]]
 		{
 			throw std::format_error("Unexpected context end");
 		}
+#endif
 
 		for (; *it != '}' && *it != ':'; ++it)
 		{
@@ -623,14 +625,20 @@ public:
 				singleLine = true;
 				break;
 			default: [[unlikely]]
+#ifndef NDEBUG
 				throw std::format_error("Unexpected format specifier");
+#else
+				break;
+#endif
 			}
 		}
 
+#ifndef NDEBUG
 		if (multiline && singleLine) [[unlikely]]
 		{
 			throw std::format_error("Incompatible multiline and single line specifiers");
 		}
+#endif
 
 		it += *it == ':';
 		context.advance_to(it);

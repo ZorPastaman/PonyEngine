@@ -1,0 +1,139 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include <cassert>
+
+#include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
+
+export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:DepthStencilContainer;
+
+import std;
+
+import PonyEngine.Platform.Windows;
+import PonyEngine.RenderDevice;
+
+import :DescriptorHeap;
+
+export namespace PonyEngine::RenderDevice::Direct3D12::Windows
+{
+	/// @brief Container wrapper of DSVs.
+	class DepthStencilContainer final : public IDepthStencilContainer
+	{
+	public:
+		/// @brief Creates a depth stencil container wrapper.
+		/// @param descriptorHeap Descriptor heap.
+		/// @param handleIncrement Descriptor handle increment.
+		/// @param size Descriptor heap size.
+		[[nodiscard("Pure constructor")]]
+		DepthStencilContainer(ID3D12DescriptorHeap& descriptorHeap, UINT handleIncrement, std::uint32_t size);
+		/// @brief Creates a depth stencil container wrapper.
+		/// @param descriptorHeap Descriptor heap.
+		/// @param handleIncrement Descriptor handle increment.
+		/// @param size Descriptor heap size.
+		[[nodiscard("Pure constructor")]]
+		DepthStencilContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size);
+		DepthStencilContainer(const DepthStencilContainer&) = delete;
+		DepthStencilContainer(DepthStencilContainer&&) = delete;
+
+		~DepthStencilContainer() noexcept = default;
+
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t Size() const noexcept override;
+
+		/// @brief Gets a meta at the @p index.
+		/// @param index Container element index.
+		/// @return Container element meta.
+		[[nodiscard("Pure function")]]
+		DSVMeta& Meta(std::uint32_t index) noexcept;
+		[[nodiscard("Pure function")]]
+		virtual const DSVMeta& Meta(std::uint32_t index) const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept override;
+		virtual void Name(std::string_view name) override;
+
+		/// @brief Gets the descriptor heap.
+		/// @return Descriptor heap.
+		[[nodiscard("Pure function")]]
+		ID3D12DescriptorHeap& DescriptorHeap() const noexcept;
+
+		/// @brief Gets a CPU descriptor handle.
+		/// @param index Descriptor index.
+		/// @return CPU descriptor handle.
+		[[nodiscard("Pure function")]]
+		D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle(UINT index) const noexcept;
+
+		DepthStencilContainer& operator =(const DepthStencilContainer&) = delete;
+		DepthStencilContainer& operator =(DepthStencilContainer&&) = delete;
+
+	private:
+		class DescriptorHeap descriptorHeap; ///< Descriptor heap
+		std::uint32_t size; ///< Descriptor heap size.
+		std::unique_ptr<DSVMeta[]> metas; ///< Descriptor heap metas.
+	};
+}
+
+namespace PonyEngine::RenderDevice::Direct3D12::Windows
+{
+	DepthStencilContainer::DepthStencilContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
+		descriptorHeap(descriptorHeap, handleIncrement, false),
+		size{size},
+		metas(std::make_unique<DSVMeta[]>(this->size))
+	{
+		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyDSVMeta{});
+	}
+
+	DepthStencilContainer::DepthStencilContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
+		descriptorHeap(std::move(descriptorHeap), handleIncrement, false),
+		size{size},
+		metas(std::make_unique<DSVMeta[]>(this->size))
+	{
+		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyDSVMeta{});
+	}
+
+	std::uint32_t DepthStencilContainer::Size() const noexcept
+	{
+		return size;
+	}
+
+	DSVMeta& DepthStencilContainer::Meta(const std::uint32_t index) noexcept
+	{
+		assert(index < size && "Out of range.");
+		return metas[index];
+	}
+
+	const DSVMeta& DepthStencilContainer::Meta(const std::uint32_t index) const noexcept
+	{
+		assert(index < size && "Out of range.");
+		return metas[index];
+	}
+
+	std::string_view DepthStencilContainer::Name() const noexcept
+	{
+		return descriptorHeap.Name();
+	}
+
+	void DepthStencilContainer::Name(const std::string_view name)
+	{
+		descriptorHeap.Name(name);
+	}
+
+	ID3D12DescriptorHeap& DepthStencilContainer::DescriptorHeap() const noexcept
+	{
+		return descriptorHeap.GetDescriptorHeap();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilContainer::CpuHandle(const UINT index) const noexcept
+	{
+		assert(index < size && "Out of range.");
+		return descriptorHeap.CpuHandle(index);
+	}
+}

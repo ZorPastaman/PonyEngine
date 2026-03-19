@@ -1,0 +1,82 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include "PonyEngine/Log/Log.h"
+
+export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:D3D12BackendModule;
+
+import std;
+
+import PonyEngine.Application.Ext;
+import PonyEngine.Log;
+import PonyEngine.RenderDevice.Ext;
+
+import :D3D12Backend;
+
+export namespace PonyEngine::RenderDevice::Direct3D12::Windows
+{
+	/// @brief Direct3D12 backend module.
+	class D3D12BackendModule final : public Application::IModule
+	{
+	public:
+		[[nodiscard("Pure constructor")]]
+		D3D12BackendModule() noexcept = default;
+		D3D12BackendModule(const D3D12BackendModule&) = delete;
+		D3D12BackendModule(D3D12BackendModule&&) = delete;
+
+		~D3D12BackendModule() noexcept = default;
+
+		virtual void StartUp(Application::IModuleContext& context) override;
+		virtual void ShutDown(Application::IModuleContext& context) override;
+
+		D3D12BackendModule& operator =(const D3D12BackendModule&) = delete;
+		D3D12BackendModule& operator =(D3D12BackendModule&&) = delete;
+
+	private:
+		BackendHandle d3d12Handle; ///< Direct3D12 backend handle.
+	};
+}
+
+namespace PonyEngine::RenderDevice::Direct3D12::Windows
+{
+	void D3D12BackendModule::StartUp(Application::IModuleContext& context)
+	{
+		IRenderDeviceModuleContext* renderDeviceModuleContext = context.GetData<IRenderDeviceModuleContext>();
+#ifndef NDEBUG
+		if (!renderDeviceModuleContext) [[unlikely]]
+		{
+			throw std::logic_error("Render device module context not found.");
+		}
+#endif
+
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(D3D12Backend).name());
+		d3d12Handle = renderDeviceModuleContext->AddBackend([](IRenderDeviceContext& renderDevice)
+		{
+			return std::make_shared<D3D12Backend>(renderDevice);
+		});
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(D3D12Backend).name());
+	}
+
+	void D3D12BackendModule::ShutDown(Application::IModuleContext& context)
+	{
+		IRenderDeviceModuleContext* renderDeviceModuleContext = context.GetData<IRenderDeviceModuleContext>();
+#ifndef NDEBUG
+		if (!renderDeviceModuleContext) [[unlikely]]
+		{
+			throw std::logic_error("Render device module context not found.");
+		}
+#endif
+
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(D3D12Backend).name());
+		renderDeviceModuleContext->RemoveBackend(d3d12Handle);
+		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(D3D12Backend).name());
+	}
+}

@@ -8,15 +8,15 @@ add_library(PonyEngine.Log STATIC)
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Log PUBLIC
-	"Include/Public/Common"
+	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Public/Log.cppm"
-	"Source/Public/Log-ILogger.cppm"
-	"Source/Public/Log-LogHelper.cppm"
-	"Source/Public/Log-LogType.cppm"
+	"Source/Public/Main.cppm"
+	"Source/Public/Main-ILogger.cppm"
+	"Source/Public/Main-LogHelper.cppm"
+	"Source/Public/Main-LogType.cppm"
 )
 
 message(VERBOSE "Setting properties")
