@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-	<assemblyIdentity type="win32" name="${PONY_COMPANY_NAME}.${PONY_PROJECT_NAME}" version="${PONY_PROJECT_VERSION}" processorArchitecture="${CMAKE_SYSTEM_PROCESSOR}"/>
+	<assemblyIdentity type="win32" name="${PONY_COMPANY_NAME}.${PONY_PROJECT_NAME}" version="${PONY_PROJECT_VERSION}"/>
 	<compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
 		<application>
-			<maxversiontested Id="${CMAKE_SYSTEM_VERSION}"/>
+			<maxversiontested Id="${PONY_WINDOWS_SDK_VERSION}"/>
 			<supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
 		</application>
 	</compatibility>
