@@ -116,6 +116,18 @@ The table of the module-platform compatibility:
 The engine automatically applies platform-specific configuration based on `CMAKE_SYSTEM_NAME`. The value must match one of the supported platforms.
 Users can provide their own platform implementations by setting the CMake flag `PONY_ENGINE_CUSTOM_PLATFORM` to `true`. In this case, the built-in platform configuration is disabled, and users are responsible for configuring the modules themselves.
 
+### Compiler modules
+
+Unfortunately, some functions are not implemented in the C++ standard and require to use compiler specific operations.
+The only module that needs them is [PonyEngine.Core](Engine/Core). See its readme for details.
+
+Supported compilers:
+
+- [MSVC](Compiler/MSVC)
+
+The engine automatically applies compiler-specific configuration based on CMake compiler variables. The compiler must be supported.
+Users can provide their own compiler implementations by setting CMake flag `PONY_ENGINE_CUSTOM_COMPILER` to `true`. In this case, the built-in compiler configuration is disabled, and users are responsible for configuring the modules themselves.
+
 ## Math
 
 The engine uses a left-handed coordinate system where X is right, Y is up, and Z is forward. The rotation order is ZXY (roll-pitch-yaw). The matrices are column-major.
