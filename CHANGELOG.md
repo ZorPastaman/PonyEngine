@@ -10,21 +10,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Core module.
-- Application main module.
-- Path module.
-- Path extension module.
-- Path configurator module.
-- Path main module.
-- Log extension module.
-- Log main module.
-- Log console module.
-- Log platform console module.
+- Application module.
+- Log module.
 - Log file module.
+- Time module.
+- Message pump module.
 - Surface module.
-- Surface extension module.
-- Surface configurator module.
-- Surface main module.
-- Engine extension module.
-- Engine main module.
+- Raw input module.
+- Raw input keyboard module.
+- Raw input mouse module.
+- Raw input XInput module.
+- Shader module.
+- Render device module.
+- Direct3D12 backend module.
 
 [Unreleased]: https://github.com/ZorPastaman/PonyEngine
