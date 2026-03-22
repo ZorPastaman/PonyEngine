@@ -1,12 +1,42 @@
 # Pony Engine
 Pony Engine is a modular game engine with a minimal core. Users can easily add their own modules and even replace the engine modules.
 
+## Key features
+
+- Modular architecture;
+- Replaceable engine modules;
+- Easily extensible;
+- Mesh shader–based render.
+
 ## Prerequisites
 
 - CMake 3.31+;
-- C++ 23 compiler;
+- Ninja generator;
+- C\++ 23 compiler;
 - HLSL SM 6.6+ compiler;
 - Platform SDKs.
+
+## Quick start for game developers
+
+### Simple way
+
+1. Download any sample project from [here](Game);
+2. Follow instructions of the chosen sample.
+
+### Advanced way
+
+1. Build C++ std module;
+2. Add the engine as a dependency to your CMake project. Add this to your project `CMakeLists.txt`:
+```
+FetchContent_Declare(
+	PonyEngine
+	GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine
+	GIT_TAG <Branch_or_Tag>
+)
+FetchContent_MakeAvailable(PonyEngine)
+```
+3. Add your game modules (see [Architecture](#Architecture) and [Modules](#modules) for details);
+4. Build and install the project.
 
 ## Architecture
 
@@ -36,6 +66,8 @@ For example, an input module provides core functionality but does not include su
 Device support is added via extension modules that implement the corresponding extension interfaces.
 
 ## Modules
+
+Each module is a separate CMake target. A module name is its target name in CMake scripts as well.
 
 ### Core modules
 
@@ -128,6 +160,20 @@ Supported compilers:
 The engine automatically applies compiler-specific configuration based on CMake compiler variables. The compiler must be supported.
 Users can provide their own compiler implementations by setting CMake flag `PONY_ENGINE_CUSTOM_COMPILER` to `true`. In this case, the built-in compiler configuration is disabled, and users are responsible for configuring the modules themselves.
 
+### Custom application modules
+
+The engine allows adding custom game modules to the application. These modules are then executed as part of the application lifecycle.
+
+See the [Application.Ext docs](Engine/Application.Ext) for details.
+
+If the modules do not need to be referenced by the engine, no special setup is required - standard CMake scripts are sufficient.
+
+### Modules parameters
+
+By default, the engine modules don't have compile and link flags. Users must set them manually. Example: `target_compile_options(PonyEngine.Core PRIVATE /fp:fast)`, `target_link_options(PonyEngine.Core PRIVATE /LTCG)`
+
+Also, by default, the engine modules don't have log defines. Users must set them manually. Example: `pony_set_log_defines(PonyEngine.Application.Impl "Warning" "Error)`. See the [PonyEngine.Log docs](Engine/Log) for details.
+
 ## Math
 
 The engine uses a left-handed coordinate system where X is right, Y is up, and Z is forward. The rotation order is ZXY (roll-pitch-yaw). The matrices are column-major.
@@ -141,6 +187,33 @@ Only HLSL shaders are currently supported.
 ## Text
 
 The engine exclusively uses char and std::string with UTF-8 encoding, except where platform APIs require different types or encodings.
+
+## Build
+
+The build system is based entirely on CMake. To build a game, simply add the engine as a CMake dependency.
+
+### import std;
+
+The engine requires C\++23 and makes extensive use of C\++ modules, including the `std` module. Therefore, the `std` module must be built before building the engine.
+This can be done either manually or via CMake. However, CMake support for automatically building the `std` module is still experimental. To enable it, set `CMAKE_EXPERIMENTAL_CXX_IMPORT_STD` to the value corresponding to your CMake version.
+Refer to the CMake documentation for the correct value: https://github.com/Kitware/CMake/blob/v3.31.0/Help/dev/experimental.rst - change the version in the link to your CMake version.
+
+The `std` module must be compiled with flags compatible with the rest of the project. When building it via CMake, these flags should be set using `add_compile_options()` **before** the first `project()` call.
+If some targets require different compile options, you can reset them using: `set_directory_properties(PROPERTIES COMPILE_OPTIONS "")`.
+
+### CMake functions
+
+The engine has some useful CMake functions:
+
+| Function name             | Script file                 | Description                                   |
+|:--------------------------|:----------------------------|:----------------------------------------------|
+| `pony_validate_path`      | [File](CMake/Path.cmake)    | Validates if the path variable is correct.    |
+| `pony_validate_name`      | [File](CMake/Project.cmake) | Validates if the name variable is correct.    |
+| `pony_validate_title`     | [File](CMake/Project.cmake) | Validates if the title variable is correct.   |
+| `pony_validate_version`   | [File](CMake/Project.cmake) | Validates if the version variable is correct. |
+| `compile_shader_with_dxc` | [File](CMake/Shader.cmake)  | Compiles a shader using DXC compiler.         |
+
+Some modules may add their own functions. Refer to their documentation to find out.
 
 ## License
 
@@ -158,3 +231,24 @@ List of custom licenses:
 - Third party libraries. Check [ThirdParty](ThirdParty.md) for a full list.
 
 When in doubt, always check for a LICENSE file inside a folder before using its content.
+
+## For Pony Engine developers
+
+This section is intended for Pony Engine developers and developers of its forks. Game developers who just use the engine may stop reading this readme here.
+
+### Presets
+
+The project uses CMake presets to control build pipelines. The presets are chosen based on the target platform, compiler, and engine build type.
+The engine build type determines `CMAKE_BUILD_TYPE`, engine optimization level, game optimization level, engine log level, game log level, and some other flags.
+
+Presets use different toolchains for each platform–compiler combination. The toolchains must set required variables, compile and link flags, and provide functions to control them.
+Each toolchain must define `PONY_COMPILE_FLAGS_DEBUG`, `PONY_COMPILE_FLAGS_RELEASE`, `PONY_LINK_FLAGS_DEBUG`, and `PONY_LINK_FLAGS_RELEASE`, and include [Compiler.cmake](CMake/Toolchains/Compiler.cmake).
+
+#### Windows MSVC toolchain
+
+The toolchain for the Windows–MSVC combination requires presetting some environment variables for a correct build using vcvars*.bat.
+Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170
+
+### Tests
+
+The project uses Catch2 for unit tests with CMake integration. See the [Tests](Tests) section to find the tests.
