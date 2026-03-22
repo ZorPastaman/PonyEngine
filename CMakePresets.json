@@ -107,6 +107,7 @@
 				"PONY_ENGINE_LOG_LEVEL": "Warning",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_CREATE_CONSOLE": false,
 				"PONY_MAKE_GROUPS": false
 			}
 		},
@@ -122,6 +123,7 @@
 				"PONY_ENGINE_LOG_LEVEL": "Error",
 				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
+				"PONY_ENGINE_CREATE_CONSOLE": false,
 				"PONY_MAKE_GROUPS": false
 			}
 		},

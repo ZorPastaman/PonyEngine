@@ -23,5 +23,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Shader module.
 - Render device module.
 - Direct3D12 backend module.
+- Windows platform support.
+- MSVC compiler support.
+- DXC compiler support.
 
 [Unreleased]: https://github.com/ZorPastaman/PonyEngine

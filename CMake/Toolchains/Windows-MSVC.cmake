@@ -1,4 +1,4 @@
-message(STATUS "Configuring Windows x64 MSVC toolchain")
+message(STATUS "Configuring Windows MSVC toolchain")
 
 message(VERBOSE "Configuring platform")
 include("${CMAKE_CURRENT_LIST_DIR}/Windows.cmake")
