@@ -252,3 +252,5 @@ Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/bu
 ### Tests
 
 The project uses Catch2 for unit tests with CMake integration. See the [Tests](Tests) section to find the tests.
+
+The project uses Catch2 benchmark tools as well. The benchmarks are compiled and run only if the `PONY_ENGINE_TESTING_BENCHMARK` define is set to `true`.

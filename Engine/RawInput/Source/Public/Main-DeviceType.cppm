@@ -18,6 +18,7 @@ import std;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Device type.
+	/// @remark The DeviceType class expects that first path element defines a base type.
 	class DeviceType final
 	{
 	public:

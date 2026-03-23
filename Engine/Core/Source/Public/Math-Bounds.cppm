@@ -123,9 +123,9 @@ namespace PonyEngine::Math
 
 		auto bestPair = std::pair<const Vector<T, Size>*, const Vector<T, Size>*>(&points[0], &points[1]);
 		T distance = (points[0] - points[1]).MagnitudeSquared();
-		for (std::size_t i = 0uz; i < points.size(); ++i)
+		for (std::size_t i = 1uz; i < points.size(); ++i)
 		{
-			for (std::size_t j = i + 1uz; j < points.size(); ++j)
+			for (std::size_t j = 0uz; j < i; ++j)
 			{
 				if (const T dist = (points[i] - points[j]).MagnitudeSquared(); dist > distance)
 				{

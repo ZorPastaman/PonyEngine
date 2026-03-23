@@ -18,6 +18,7 @@ import std;
 export namespace PonyEngine::RawInput
 {
 	/// @brief Input axis.
+	/// @remark The Axis class expects that first path element defines a layout.
 	class Axis final
 	{
 	public:
