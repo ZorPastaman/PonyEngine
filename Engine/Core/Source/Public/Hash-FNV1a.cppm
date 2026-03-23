@@ -123,10 +123,16 @@ namespace PonyEngine::Hash
 	/// @return Hash.
 	template<std::unsigned_integral T, FnvData Data> [[nodiscard("Pure function")]]
 	constexpr T FNV1a(std::span<const Data> data) noexcept;
+	/// @brief Computes the FNV-1a hash of the @p data.
+	/// @tparam T Hash type.
+	/// @tparam Data Data type.
+	/// @param data Data.
+	/// @param offset Hash offset.
+	/// @return Hash.
 	template<std::unsigned_integral T, FnvData Data> [[nodiscard("Pure function")]]
 	constexpr T FNV1a(std::span<const Data> data, T offset) noexcept;
 
-	/// @brief Gets an FNV1a offset by the result type.
+	/// @brief Gets an FNV-1a offset by the result type.
 	/// @tparam T Hash result type.
 	/// @return FNV1a offset.
 	template<std::unsigned_integral T>
@@ -135,7 +141,7 @@ namespace PonyEngine::Hash
 		static_assert(sizeof(T) == 4 || sizeof(T) == 8, "Wrong size of return type. Must be either 32 or 64 bit.");
 		return sizeof(T) == 4 ? 2166136261 : 14695981039346656037;
 	}
-	/// @brief Gets an FNV1a prime by the result type.
+	/// @brief Gets an FNV-1a prime by the result type.
 	/// @tparam T Hash result type.
 	/// @return FNV1a prime.
 	template<std::unsigned_integral T>
@@ -144,8 +150,12 @@ namespace PonyEngine::Hash
 		static_assert(sizeof(T) == 4 || sizeof(T) == 8, "Wrong size of return type. Must be either 32 or 64 bit.");
 		return sizeof(T) == 4 ? 16777619 : 1099511628211;
 	}
+	/// @brief FNV-1a offset.
+	/// @tparam T Hash type.
 	template<std::unsigned_integral T>
 	constexpr T FNV1aOffset = GetFNV1aOffset<T>();
+	/// @brief FNV-1a prime.
+	/// @tparam T Hash type.
 	template<std::unsigned_integral T>
 	constexpr T FNV1aPrime = GetFNV1aPrime<T>();
 

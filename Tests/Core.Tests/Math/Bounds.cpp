@@ -157,6 +157,44 @@ TEST_CASE("Bounding oriented box to box", "[Math][Bounds]")
 #endif
 }
 
+TEST_CASE("Bounding ball to oriented box", "[Math][Bounds]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
+	constexpr auto radius = 4.f;
+	constexpr auto sphere = PonyEngine::Math::Sphere<float>(center, radius);
+	constexpr auto cuboid = PonyEngine::Math::OrientedBoundingBox(sphere);
+	STATIC_REQUIRE(cuboid.Center() == center);
+	STATIC_REQUIRE(cuboid.Extents() == PonyEngine::Math::Vector3<float>(radius));
+	STATIC_REQUIRE(cuboid.Contains(center));
+	STATIC_REQUIRE(cuboid.Contains(center + PonyEngine::Math::Vector3<float>(radius)));
+	STATIC_REQUIRE(cuboid.Contains(center - PonyEngine::Math::Vector3<float>(radius)));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		return PonyEngine::Math::OrientedBoundingBox(PonyEngine::Math::Sphere<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), 4.f));
+	};
+#endif
+}
+
+TEST_CASE("Bounding box to oriented box", "[Math][Bounds]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
+	constexpr auto extents = PonyEngine::Math::Vector3<float>(3.f, 2.f, 6.f);
+	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
+	const auto orientedBox = PonyEngine::Math::OrientedBoundingBox(cuboid);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Center(), center));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Extents(), extents));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::Matrix3x3<float>::Identity()));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Bench")
+	{
+		PonyEngine::Math::OrientedBoundingBox(PonyEngine::Math::Cuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(3.f, 2.f, 6.f)));
+	};
+#endif
+}
+
 TEST_CASE("Bounding box to oriented box with rs", "[Math][Bounds]")
 {
 	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);

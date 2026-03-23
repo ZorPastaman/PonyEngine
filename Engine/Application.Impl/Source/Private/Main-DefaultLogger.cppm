@@ -58,7 +58,7 @@ export namespace PonyEngine::Application
 		static constexpr std::string_view UnknownException = "Unknown exception."; ///< Unknown exception without a new line text.
 		static constexpr std::string_view NullptrException = "Nullptr exception."; ///< Nullptr exception text.
 
-		static inline thread_local std::string stringTemp; ///< Temporal string.
+		inline static thread_local std::string stringTemp; ///< Temporal string.
 		mutable std::mutex logMutex; ///< Log mutex.
 	};
 }

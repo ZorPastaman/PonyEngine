@@ -4,10 +4,14 @@ add_executable(PonyEngine.Log.Ext.Tests)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Ext.Tests PRIVATE
 	"Log/ConsoleMacro.cpp"
- "Log/ConsoleMacroStacktrace.cpp")
+	"Log/ConsoleMacroStacktrace.cpp"
+)
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Log.Ext.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+target_compile_definitions(PonyEngine.Log.Ext.Tests PRIVATE 
+	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Log.Ext.Tests PROPERTIES 
@@ -18,9 +22,6 @@ set_target_properties(PonyEngine.Log.Ext.Tests PROPERTIES
 
 message(VERBOSE "Setting build options")
 pony_set_build_options(PonyEngine.Log.Ext.Tests ${PONY_ENGINE_OPTIMIZATION})
-target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
-	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
-)
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Ext.Tests PRIVATE 

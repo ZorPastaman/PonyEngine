@@ -83,8 +83,8 @@ export namespace PonyEngine::Log
 
 		SubLoggerContainer subLoggerContainer; ///< Sub-logger container.
 
-		static inline thread_local std::string logStringTemp; ///< Temporal log string.
-		static inline thread_local std::string consoleStringTemp; ///< Temporal log string that is used in @p LogToString().
+		inline static thread_local std::string logStringTemp; ///< Temporal log string.
+		inline static thread_local std::string consoleStringTemp; ///< Temporal log string that is used in @p LogToString().
 
 		SubLoggerHandle nextSubLoggerHandle; ///< Next sub-logger handle.
 
