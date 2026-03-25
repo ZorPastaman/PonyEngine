@@ -36,7 +36,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(PonyEngine)
 ```
 3. Add your game modules (see [Architecture](#Architecture) and [Modules](#modules) for details);
-4. Build and install the project.
+4. Link the engine and game modules to the engine application module. 
+5. Build and install the project.
 
 ## Architecture
 
@@ -160,13 +161,46 @@ Supported compilers:
 The engine automatically applies compiler-specific configuration based on CMake compiler variables. The compiler must be supported.
 Users can provide their own compiler implementations by setting CMake flag `PONY_ENGINE_CUSTOM_COMPILER` to `true`. In this case, the built-in compiler configuration is disabled, and users are responsible for configuring the modules themselves.
 
+### Application module linking
+
+The engine does not automatically link application modules—including its own. This is intentional, giving the game developers full control over the build configuration.
+
+To link an application module, explicitly add it in your CMake scripts: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)` where `<MyModule>` can be either a game module or an engine module (for example, `PonyEngine.RawInput.Impl`).
+
+Only implementation modules need to be linked.
+
+### Module grouping
+
+By default, all engine modules are built as static libraries. This allows the entire engine and game to be linked into a single executable, which is ideal for release builds.
+
+For debug builds, however, shared libraries are often preferable due to faster iteration and build times. To support this, the engine provides a CMake function `pony_make_module_group`, which combines one or more static libraries into a shared library.
+
+When using this approach, link the resulting shared library to the application instead of the original static modules.
+
+See [PonyEngine.Core docs](Engine/Core) for details.
+
 ### Custom application modules
 
 The engine allows adding custom game modules to the application. These modules are then executed as part of the application lifecycle.
 
-See the [Application.Ext docs](Engine/Application.Ext) for details.
+How to add a custom application module:
 
-If the modules do not need to be referenced by the engine, no special setup is required - standard CMake scripts are sufficient.
+1. Add required engine dependencies to your module target: `target_link_libraries(<MyModule> PUBLIC PonyEngine.Core PonyEngine.Application.Ext)`;
+2. Make a class that inherits `PonyEngine::Application::IModule` from `PonyEngine.Application.Ext` C\++ module;
+3. Make a function that returns a `PonyEngine::Application::IModule*` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h` The instance must live for the lifetime of the application;
+4. Include `PonyEngine/Application/Module.h` and use the macro `PONY_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)`. Module initialization order is defined by letters and follows alphabetical order;
+5. Link your module target to the engine application target: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)`.
+
+See the [PonyEngine.Core docs](Engine/Core), [Application.Ext docs](Engine/Application.Ext) and [Application.Impl docs](Engine/Application.Impl) for details.
+
+If the modules do not need to be referenced by the engine application, no special setup is required.
+
+### Essential examples
+
+These are the main examples of how to configure a project to build a game on Pony Engine with built-in and custom modules:
+
+- [ModuleSample](Game/ModuleSample) - how to build a custom module;
+- [ApplicationServiceSample](Game/ApplicationServiceSample) - how to build a custom module that adds a service.
 
 ### Modules parameters
 
