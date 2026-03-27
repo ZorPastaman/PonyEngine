@@ -74,12 +74,12 @@ Each module is a separate CMake target. A module name is its target name in CMak
 
 These modules are always added to a build.
 
-| Module name                                            | Description                                                                                              |
-|:-------------------------------------------------------|:---------------------------------------------------------------------------------------------------------|
-| [PonyEngine.Core](Engine/Core)                         | Core utilities module: Math, Hash, Meta, Memory, Serialization and Type utilities.                       |
-| [PonyEngine.Log](Engine/Log)                           | Logging API module.                                                                                      |
-| [PonyEngine.Application.Ext](Engine/Application.Ext)   | Application extension API module. Provides access to engine services, logging, and application metadata. |
-| [PonyEngine.Application.Impl](Engine/Application.Impl) | Application implementation module. Contains `main()` and a default logger as well.                       |
+| Module name                                            | Description                                                                                                        |
+|:-------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------|
+| [PonyEngine.Core](Engine/Core)                         | Core utilities module: Math, Hash, Meta, Memory, Serialization and Type utilities.                                 |
+| [PonyEngine.Log](Engine/Log)                           | Logging API module.                                                                                                |
+| [PonyEngine.Application.Ext](Engine/Application.Ext)   | Application extension API module. Provides interfaces access to engine services, logging, and application context. |
+| [PonyEngine.Application.Impl](Engine/Application.Impl) | Application implementation module. Contains `main()` and a default logger as well.                                 |
 
 ### Optional modules
 
@@ -183,15 +183,7 @@ See [PonyEngine.Core docs](Engine/Core) for details.
 
 The engine allows adding custom game modules to the application. These modules are then executed as part of the application lifecycle.
 
-How to add a custom application module:
-
-1. Add required engine dependencies to your module target: `target_link_libraries(<MyModule> PUBLIC PonyEngine.Core PonyEngine.Application.Ext)`;
-2. Make a class that inherits `PonyEngine::Application::IModule` from `PonyEngine.Application.Ext` C\++ module;
-3. Make a function that returns a `PonyEngine::Application::IModule*` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h` The instance must live for the lifetime of the application;
-4. Include `PonyEngine/Application/Module.h` and use the macro `PONY_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)`. Module initialization order is defined by letters and follows alphabetical order;
-5. Link your module target to the engine application target: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)`.
-
-See the [PonyEngine.Core docs](Engine/Core), [Application.Ext docs](Engine/Application.Ext) and [Application.Impl docs](Engine/Application.Impl) for details.
+See the [Application.Ext docs](Engine/Application.Ext) for details.
 
 If the modules do not need to be referenced by the engine application, no special setup is required.
 
@@ -235,6 +227,37 @@ Refer to the CMake documentation for the correct value: https://github.com/Kitwa
 The `std` module must be compiled with flags compatible with the rest of the project. When building it via CMake, these flags should be set using `add_compile_options()` **before** the first `project()` call.
 If some targets require different compile options, you can reset them using: `set_directory_properties(PROPERTIES COMPILE_OPTIONS "")`.
 
+### CMake variables
+
+#### Input
+
+Input parameters for the engine CMake scripts. These variables are initialized with default values in the CMake cache but can be overridden before configuration.
+
+| Variable name                | Default value      | Description                                                                                                                      |
+|:-----------------------------|:------------------:|:---------------------------------------------------------------------------------------------------------------------------------|
+| `PONY_COMPANY_NAME`          | "PonyEngine"       | Company name. It's used to create project folders. So, it must be a valid directory name.                                        |
+| `PONY_PROJECT_NAME`          | "PonyEngineGame"   | Project name. It's used to create project folders. So, it must be a valid directory name. It's also used for an executable name. |
+| `PONY_PROJECT_VERSION_MAJOR` | 0                  | Project major version.                                                                                                           |
+| `PONY_PROJECT_VERSION_MINOR` | 0                  | Project minor version.                                                                                                           |
+| `PONY_PROJECT_VERSION_PATCH` | 0                  | Project patch version.                                                                                                           |
+| `PONY_PROJECT_VERSION_TWEAK` | 0                  | Project tweak version.                                                                                                           |
+| `PONY_COMPANY_TITLE`         | "Pony Engine"      | Company title. It's used in GUI only. May be any non-empty string.                                                               |
+| `PONY_PROJECT_TITLE`         | "Pony Engine Game" | Project title. It's used in GUI only. May be any non-empty string.                                                               |
+
+#### Output
+
+Output parameters are passed via `PARENT_SCOPE` to a CMake script that called the engine CMake script.
+
+| Variable name               | Description                                   |
+|:----------------------------|:----------------------------------------------|
+| `PONY_ENGINE_NAME`          | Pony Engine name. It's always "PonyEngine".   |
+| `PONY_ENGINE_VERSION_MAJOR` | Pony Engine major version.                    |
+| `PONY_ENGINE_VERSION_MINOR` | Pony Engine minor version.                    |
+| `PONY_ENGINE_VERSION_PATCH` | Pony Engine patch version.                    |
+| `PONY_ENGINE_VERSION_TWEAK` | Pony Engine tweak version.                    |
+| `PONY_ENGINE_VERSION`       | Pony Engine version.                          |
+| `PONY_ENGINE_TITLE`         | Pony Engine title. It's always "Pony Engine". |
+
 ### CMake functions
 
 The engine has some useful CMake functions:
@@ -251,7 +274,7 @@ Some modules may add their own functions. Refer to their documentation to find o
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE.md).
+This repo is licensed under the [MIT License](LICENSE.md).
 
 ### Custom licenses
 
@@ -272,7 +295,7 @@ This section is intended for Pony Engine developers and developers of its forks.
 
 ### Presets
 
-The project uses CMake presets to control build pipelines. The presets are chosen based on the target platform, compiler, and engine build type.
+The repo uses CMake presets to control build pipelines. The presets are chosen based on the target platform, compiler, and engine build type.
 The engine build type determines `CMAKE_BUILD_TYPE`, engine optimization level, game optimization level, engine log level, game log level, and some other flags.
 
 Presets use different toolchains for each platform–compiler combination. The toolchains must set required variables, compile and link flags, and provide functions to control them.
@@ -285,6 +308,6 @@ Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/bu
 
 ### Tests
 
-The project uses Catch2 for unit tests with CMake integration. See the [Tests](Tests) section to find the tests.
+The repo uses Catch2 for unit tests with CMake integration. See the [Tests](Tests) section to find the tests.
 
-The project uses Catch2 benchmark tools as well. The benchmarks are compiled and run only if the `PONY_ENGINE_TESTING_BENCHMARK` define is set to `true`.
+The repo uses Catch2 benchmark tools as well. The benchmarks are compiled and run only if the `PONY_ENGINE_TESTING_BENCHMARK` define is set to `true`.

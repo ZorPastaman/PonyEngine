@@ -50,7 +50,7 @@ endif()
 
 message(VERBOSE "Configuring parameters")
 set(PONY_COMPANY_NAME "PonyEngine" CACHE STRING "Company name. It's used to create project folders. So, it must be a valid directory name.")
-set(PONY_PROJECT_NAME "PonyEngineGame" CACHE STRING "Project name. It's used to create project folders. So, it must be a valid directory name.")
+set(PONY_PROJECT_NAME "PonyEngineGame" CACHE STRING "Project name. It's used to create project folders. So, it must be a valid directory name. It's also used for an executable name.")
 set(PONY_PROJECT_VERSION_MAJOR "0" CACHE STRING "Project major version.")
 set(PONY_PROJECT_VERSION_MINOR "0" CACHE STRING "Project minor version.")
 set(PONY_PROJECT_VERSION_PATCH "0" CACHE STRING "Project patch version.")
