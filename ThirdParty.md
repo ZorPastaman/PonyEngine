@@ -1,6 +1,6 @@
 # Third-Party Software
 
-This project uses the following third-party library:
+This repo uses the following third-party library:
 
 ## Catch2
 - Version: v3.8.1
