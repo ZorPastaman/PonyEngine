@@ -20,8 +20,8 @@ export namespace PonyEngine::Log
 	{
 		std::string_view formattedMessage; ///< Pre-formatted log message.
 		std::string_view message; ///< Log message.
-		const std::stacktrace* stacktrace = nullptr; ///< Stacktrace attached to the log entry.
-		std::exception_ptr exceptionPtr; ///< Exception pointer attached to the log entry. It always points the @p exception.
+		const std::stacktrace* stacktrace = nullptr; ///< Stacktrace attached to the log entry. May be nullptr.
+		std::exception_ptr exception; ///< Exception attached to the log entry. May be nullptr.
 		std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
 		std::uint64_t frameCount = 0ull; ///< Frame when the log entry is created.
 		LogType logType = LogType::Verbose; ///< Log type.

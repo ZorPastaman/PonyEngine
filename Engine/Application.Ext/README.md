@@ -38,7 +38,7 @@ See [Service lifecycle](#service-lifecycle) for details.
 
 ## C\++ headers
 
-### [Module.h](Include/Public/PonyEngine/Application/Module.h)
+### [PonyEngine/Application/Module.h](Include/Public/PonyEngine/Application/Module.h)
 
 Application module utilities.
 
@@ -92,9 +92,9 @@ The module must do nothing before its start-up and after its shut-down. Also, du
 
 The module context passed to `IModule.StartUp()` and `IModule.ShutDown()` mustn't be used out of those functions.
 
-## How to add an application service
+## Custom service
 
-On its start-up, a module may add an application service. How to:
+How to add an application service:
 
 1. Call `IModuleContext.ServiceModuleContext().AddService()` in `IModule.StartUp()`. 
 The function takes a factory function `const std::function<std::shared_ptr<IService>(IApplicationContext&)>&` as an argument
@@ -102,11 +102,28 @@ and returns `ServiceHandle`.
 2. Call `IModuleContext.ServiceModuleContext().RemoveService()` in `IModule.ShutDown()`.
 The function takes the `ServiceHandle` that was returned by `AddService()`.
 
+Example:
+
+```
+void ServiceModule::StartUp(Application::IModuleContext& context)
+{
+	serviceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+	{
+		return std::make_shared<Service>(application);
+	});
+}
+
+void ServiceModule::ShutDown(Application::IModuleContext& context)
+{
+	context.ServiceModuleContext().RemoveService(serviceHandle);
+}
+```
+
 The factory function must return a correct newly created service. 
 The application context it takes mustn't be shared and must be used only by the service.
 The module must remove all the services it added.
 
-## Service lifecycle
+### Service lifecycle
 
 1. The service is constructed inside its module start-up. The service must be fully initialized in its constructor.
 2. `IService.AddTickableServices(ITickableServiceAdder&)` is called. The service must add its tick functions via `ITickableServiceAdder.Add(ITickableService& tickable, std::int32_t tickOrder)`.
@@ -118,15 +135,31 @@ Each interface type must be unique. Those interfaces will be available via `IApp
 6. Before the module shut-down functions are called, the `IService.End()` is called on each service in the reverse order.
 7. The service is destructed inside its module shut-down.
 
-## How to add a custom logger
+## Custom logger
 
-On its start-up, a module may add a logger. How to:
+How to add a custom logger:
 
 1. Call `IModuleContext.LoggerModuleContext().SetLogger()` in `IModule.StartUp()`.
 The function takes a factory function `const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>&` as an argument
 and returns `LoggerHandle`.
 2. Call `IModuleContext.LoggerModuleContext().UnsetLogger()` in `IModule.ShutDown()`.
 The function takes the `LoggerHandle` that was return be `SetLogger()`.
+
+Example:
+```
+void LoggerModule::StartUp(Application::IModuleContext& context)
+{
+	loggerHandle = context.LoggerModuleContext().SetLogger([&](Application::ILoggerContext& loggerContext)
+	{
+		return std::make_shared<Logger>(loggerContext);
+	});
+}
+
+void LoggerModule::ShutDown(Application::IModuleContext& context)
+{
+	context.LoggerModuleContext().UnsetLogger(loggerHandle);
+}
+```
 
 The factory function must return a correct newly created logger.
 The logger context it takes mustn't be shared and must be used only by the logger.
@@ -136,7 +169,7 @@ If no custom logger is set, the application uses a default logger.
 
 The default logger just writes to a standard and a platform consoles.
 
-## Logger lifecycle
+### Logger lifecycle
 
 The logger doesn't have a special lifecycle. It's constructed, added to the application, removed from the application and destructed.
 
