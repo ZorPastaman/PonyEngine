@@ -4,6 +4,8 @@ Core utilities module.
 
 The engine uses a left-handed coordinate system where X is right, Y is up, and Z is forward. The rotation order is ZXY (roll-pitch-yaw). The matrices are column-major.
 
+The module requires a compiler specific implementation.
+
 ## C\++ modules
 
 ### [PonyEngine.Hash](Source/Public/Hash.cppm)
@@ -128,3 +130,17 @@ Enum utilities.
 | Function name                    | Script file                 | Description                                     |
 |:---------------------------------|:----------------------------|:------------------------------------------------|
 | `pony_make_module_group modules` | [File](CMake/Target.cmake)  | Makes a shared library out of static libraries. |
+
+## Custom compiler
+
+The module requires a compiler specific implementation. For that, some defines must be implemented by a compiler module.
+
+1. The define `PONY_COMPILER_INCLUDE` must be set and contain a valid path a compiler implementation header file.
+2. The header file must contain and implement these defines:
+
+| Define                        | Description                                   |
+|:------------------------------|:----------------------------------------------|
+| `PONY_DLL_EXPORT_IMPL`        | Sets `dllexport` attribute.                   |
+| `PONY_PRESERVE_IMPL(symbol)`  | Prevents a compiler from removing the symbol. |
+| `PONY_SECTION_IMPL(name)`     | Declares a section with the name.             |
+| `PONY_ALLOCATE_IMPL(segment)` | Allocates the segment.                        |

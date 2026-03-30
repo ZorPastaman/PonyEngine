@@ -593,7 +593,7 @@ namespace PonyEngine::Log
 	{
 		FillTime(targetEntry.timePoint, targetEntry.frameCount, context);
 		targetEntry.logType = LogType::Exception;
-		targetEntry.exceptionPtr = exception;
+		targetEntry.exception = exception;
 
 		try
 		{
@@ -630,7 +630,7 @@ namespace PonyEngine::Log
 	{
 		FillTime(targetEntry.timePoint, targetEntry.frameCount, context);
 		targetEntry.logType = LogType::Exception;
-		targetEntry.exceptionPtr = exception;
+		targetEntry.exception = exception;
 
 		try
 		{
@@ -667,7 +667,7 @@ namespace PonyEngine::Log
 	{
 		FillTime(targetEntry.timePoint, targetEntry.frameCount, context);
 		targetEntry.logType = LogType::Exception;
-		targetEntry.exceptionPtr = exception;
+		targetEntry.exception = exception;
 
 		try
 		{
@@ -704,7 +704,7 @@ namespace PonyEngine::Log
 	{
 		FillTime(targetEntry.timePoint, targetEntry.frameCount, context);
 		targetEntry.logType = LogType::Exception;
-		targetEntry.exceptionPtr = exception;
+		targetEntry.exception = exception;
 		targetEntry.stacktrace = &stacktrace;
 
 		try
@@ -742,7 +742,7 @@ namespace PonyEngine::Log
 	{
 		FillTime(targetEntry.timePoint, targetEntry.frameCount, context);
 		targetEntry.logType = LogType::Exception;
-		targetEntry.exceptionPtr = exception;
+		targetEntry.exception = exception;
 
 		try
 		{
@@ -779,7 +779,7 @@ namespace PonyEngine::Log
 	{
 		FillTime(targetEntry.timePoint, targetEntry.frameCount, context);
 		targetEntry.logType = LogType::Exception;
-		targetEntry.exceptionPtr = exception;
+		targetEntry.exception = exception;
 
 		try
 		{
