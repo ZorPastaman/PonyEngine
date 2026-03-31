@@ -42,7 +42,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param usage Texture usage.
 		/// @param srgbCompatible Is the texture SRGB-compatible?
 		[[nodiscard("Pure constructor")]]
-		Texture(ID3D12Resource2& resource, TextureFormatId format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatId> castableFormats,
+		Texture(ID3D12Resource2& resource, TextureFormatID format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatID> castableFormats,
 			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint8_t mipCount, TextureDimension dimension, 
 			enum SampleCount sampleCount, TextureUsage usage, bool srgbCompatible);
 		/// @brief Creates a texture wrapper.
@@ -59,7 +59,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param usage Texture usage.
 		/// @param srgbCompatible Is the texture SRGB-compatible?
 		[[nodiscard("Pure constructor")]]
-		Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, TextureFormatId format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatId> castableFormats,
+		Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, TextureFormatID format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatID> castableFormats,
 			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint8_t mipCount, TextureDimension dimension,
 			enum SampleCount sampleCount, TextureUsage usage, bool srgbCompatible);
 		Texture(const Texture&) = delete;
@@ -70,9 +70,9 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		[[nodiscard("Pure function")]] 
 		virtual TextureDimension Dimension() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual TextureFormatId Format() const noexcept override;
+		virtual TextureFormatID Format() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::span<const TextureFormatId> CastableFormats() const noexcept override;
+		virtual std::span<const TextureFormatID> CastableFormats() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual Math::Vector3<std::uint32_t> Size() const noexcept override;
 		[[nodiscard("Pure function")]] 
@@ -105,10 +105,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	private:
 		class Resource resource; ///< Resource.
 
-		TextureFormatId format; ///< Engine format.
+		TextureFormatID format; ///< Engine format.
 		DXGI_FORMAT nativeFormat; ///< Native format.
 		std::uint32_t castableFormatCount; ///< Castable format count.
-		std::unique_ptr<TextureFormatId[]> castableFormats; ///< Castable formats.
+		std::unique_ptr<TextureFormatID[]> castableFormats; ///< Castable formats.
 		std::uint32_t width; ///< Width.
 		std::uint32_t height; ///< Height.
 		std::uint16_t depth; ///< Depth.
@@ -122,14 +122,14 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	Texture::Texture(ID3D12Resource2& resource, const TextureFormatId format, const DXGI_FORMAT nativeFormat, const std::span<const TextureFormatId> castableFormats,
+	Texture::Texture(ID3D12Resource2& resource, const TextureFormatID format, const DXGI_FORMAT nativeFormat, const std::span<const TextureFormatID> castableFormats,
 		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint8_t mipCount, const TextureDimension dimension,
 		const enum SampleCount sampleCount, const TextureUsage usage, const bool srgbCompatible) :
 		resource(resource),
 		format(format),
 		nativeFormat{nativeFormat},
 		castableFormatCount{static_cast<std::uint32_t>(castableFormats.size())},
-		castableFormats(this->castableFormatCount > 0u ? std::make_unique<TextureFormatId[]>(this->castableFormatCount) : nullptr),
+		castableFormats(this->castableFormatCount > 0u ? std::make_unique<TextureFormatID[]>(this->castableFormatCount) : nullptr),
 		width{width},
 		height{height},
 		depth{depth},
@@ -147,15 +147,15 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	Texture::Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const TextureFormatId format, const DXGI_FORMAT nativeFormat, 
-		const std::span<const TextureFormatId> castableFormats,
+	Texture::Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const TextureFormatID format, const DXGI_FORMAT nativeFormat, 
+		const std::span<const TextureFormatID> castableFormats,
 		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint8_t mipCount, const TextureDimension dimension,
 		const enum SampleCount sampleCount, const TextureUsage usage, const bool srgbCompatible) :
 		resource(std::move(resource)),
 		format(format),
 		nativeFormat{nativeFormat},
 		castableFormatCount{static_cast<std::uint32_t>(castableFormats.size())},
-		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatId[]>(this->castableFormatCount) : nullptr),
+		castableFormats(this->castableFormatCount > 0uz ? std::make_unique<TextureFormatID[]>(this->castableFormatCount) : nullptr),
 		width{width},
 		height{height},
 		depth{depth},
@@ -178,16 +178,16 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return dimension;
 	}
 
-	TextureFormatId Texture::Format() const noexcept
+	TextureFormatID Texture::Format() const noexcept
 	{
 		return format;
 	}
 
-	std::span<const TextureFormatId> Texture::CastableFormats() const noexcept
+	std::span<const TextureFormatID> Texture::CastableFormats() const noexcept
 	{
 		return castableFormatCount > 0uz
-			? std::span<const TextureFormatId>(castableFormats.get(), castableFormatCount)
-			: std::span<const TextureFormatId>();
+			? std::span<const TextureFormatID>(castableFormats.get(), castableFormatCount)
+			: std::span<const TextureFormatID>();
 	}
 
 	Math::Vector3<std::uint32_t> Texture::Size() const noexcept

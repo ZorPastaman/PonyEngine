@@ -13,7 +13,7 @@ import std;
 
 import :Aspect;
 import :TextureDimension;
-import :TextureFormatId;
+import :TextureFormatID;
 import :UAVLayout;
 
 export namespace PonyEngine::RenderDevice
@@ -29,7 +29,7 @@ export namespace PonyEngine::RenderDevice
 	/// @brief Texture unordered access view parameters.
 	struct TextureUAVParams final
 	{
-		TextureFormatId format; ///< Texture format.
+		TextureFormatID format; ///< Texture format.
 		TextureDimension dimension = TextureDimension::Texture2D; ///< Texture dimension.
 		Aspect aspect = Aspect::Color; ///< Aspect.
 		UAVLayout layout; ///< Layout.

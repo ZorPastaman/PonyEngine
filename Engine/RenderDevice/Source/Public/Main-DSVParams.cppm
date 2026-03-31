@@ -12,14 +12,14 @@ export module PonyEngine.RenderDevice:DSVParams;
 import :DSVFlag;
 import :DSVLayout;
 import :TextureDimension;
-import :TextureFormatId;
+import :TextureFormatID;
 
 export namespace PonyEngine::RenderDevice
 {
 	/// @brief Depth stencil view parameters.
 	struct DSVParams final
 	{
-		TextureFormatId format; ///< Texture format. Must be compatible with a pointed texture format.
+		TextureFormatID format; ///< Texture format. Must be compatible with a pointed texture format.
 		TextureDimension dimension = TextureDimension::Texture2D; ///< Texture view dimension. Must be the same as a texture dimension.
 		DSVFlag flags = DSVFlag::None; ///< Depth stencil view flags.
 		DSVLayout layout; ///< Depth stencil view layout.

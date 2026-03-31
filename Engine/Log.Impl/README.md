@@ -2,7 +2,7 @@
 
 Log implementation module.
 
-### CMake variables
+## CMake variables
 
 These variables are used to configure the build of the module:
 

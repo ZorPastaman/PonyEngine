@@ -95,7 +95,7 @@ namespace PonyEngine::Application
 	LoggerHandle LoggerManager::SetLogger(const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>& factory)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -136,7 +136,7 @@ namespace PonyEngine::Application
 	void LoggerManager::UnsetLogger(const LoggerHandle handle)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}

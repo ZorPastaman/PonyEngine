@@ -69,7 +69,7 @@ export namespace PonyEngine::RawInput
 		virtual const Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Must be used to unregister")]]
-		virtual DeviceHandle RegisterDevice(DeviceTypeId deviceType, std::string_view deviceName, bool isConnected,
+		virtual DeviceHandle RegisterDevice(DeviceTypeID deviceType, std::string_view deviceName, bool isConnected,
 			std::span<const FeatureEntry> features = std::span<const FeatureEntry>()) override;
 		virtual void UnregisterDevice(DeviceHandle deviceHandle) override;
 
@@ -77,9 +77,9 @@ export namespace PonyEngine::RawInput
 		virtual void Connect(DeviceHandle deviceHandle, const ConnectionEvent& connection) override;
 
 		[[nodiscard("Pure function")]]
-		virtual float Value(AxisId axis) const noexcept override;
+		virtual float Value(AxisID axis) const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual float Value(AxisId axis, DeviceHandle deviceHandle) const noexcept override;
+		virtual float Value(AxisID axis, DeviceHandle deviceHandle) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual DeviceHandle LastInputDevice() const noexcept override;
@@ -95,7 +95,7 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]]
 		virtual std::string_view DeviceName(DeviceHandle deviceHandle) const override;
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeId DeviceType(DeviceHandle deviceHandle) const override;
+		virtual DeviceTypeID DeviceType(DeviceHandle deviceHandle) const override;
 		[[nodiscard("Pure function")]]
 		virtual std::span<const std::type_index> FeatureTypes(DeviceHandle deviceHandle) const override;
 		[[nodiscard("Pure function")]]
@@ -104,18 +104,18 @@ export namespace PonyEngine::RawInput
 		virtual const void* FindFeature(DeviceHandle deviceHandle, std::type_index type) const override;
 
 		[[nodiscard("Pure function")]]
-		virtual AxisId Hash(const Axis& axis) override;
+		virtual AxisID Hash(const Axis& axis) override;
 		[[nodiscard("Pure function")]]
-		virtual const Axis& Unhash(AxisId axisId) const override;
+		virtual const Axis& Unhash(AxisID axisId) const override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(AxisId axisId) const noexcept override;
+		virtual bool IsValid(AxisID axisId) const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeId Hash(const class DeviceType& deviceType) override;
+		virtual DeviceTypeID Hash(const class DeviceType& deviceType) override;
 		[[nodiscard("Pure function")]]
-		virtual const class DeviceType& Unhash(DeviceTypeId deviceTypeId) override;
+		virtual const class DeviceType& Unhash(DeviceTypeID deviceTypeId) override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(DeviceTypeId deviceTypeId) const noexcept override;
+		virtual bool IsValid(DeviceTypeID deviceTypeId) const noexcept override;
 
 		virtual void AddObserver(IDeviceObserver& observer) override;
 		virtual void RemoveObserver(IDeviceObserver& observer) noexcept override;
@@ -159,7 +159,7 @@ export namespace PonyEngine::RawInput
 		DeviceHandle lastInputDevice; ///< Last device that sent input.
 
 		std::unordered_map<std::uint32_t, std::vector<Axis>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
-		std::unordered_map<DeviceTypeId, class DeviceType> deviceTypeHashMap; ///< Device type hash map.
+		std::unordered_map<DeviceTypeID, class DeviceType> deviceTypeHashMap; ///< Device type hash map.
 
 		std::vector<IDeviceObserver*> deviceObservers; ///< Device observers.
 		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
@@ -229,7 +229,7 @@ export namespace PonyEngine::RawInput
 	InputProviderHandle RawInputService::AddProvider(const std::function<std::shared_ptr<IInputProvider>(IRawInputContext&)>& factory)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -268,7 +268,7 @@ export namespace PonyEngine::RawInput
 	void RawInputService::RemoveProvider(const InputProviderHandle providerHandle)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -327,11 +327,11 @@ export namespace PonyEngine::RawInput
 		return application->Logger();
 	}
 
-	DeviceHandle RawInputService::RegisterDevice(const DeviceTypeId deviceType, const std::string_view deviceName, const bool isConnected,
+	DeviceHandle RawInputService::RegisterDevice(const DeviceTypeID deviceType, const std::string_view deviceName, const bool isConnected,
 		const std::span<const FeatureEntry> features)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -361,7 +361,7 @@ export namespace PonyEngine::RawInput
 	void RawInputService::UnregisterDevice(const DeviceHandle deviceHandle)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -390,7 +390,7 @@ export namespace PonyEngine::RawInput
 	void RawInputService::AddInput(const DeviceHandle deviceHandle, const RawInputEvent& input)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -407,7 +407,7 @@ export namespace PonyEngine::RawInput
 	void RawInputService::Connect(const DeviceHandle deviceHandle, const ConnectionEvent& connection)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -421,12 +421,12 @@ export namespace PonyEngine::RawInput
 		inputQueue.AddConnection(deviceHandle, connection);
 	}
 
-	float RawInputService::Value(const AxisId axis) const noexcept
+	float RawInputService::Value(const AxisID axis) const noexcept
 	{
 		return devices.Value(axis);
 	}
 
-	float RawInputService::Value(const AxisId axis, const DeviceHandle deviceHandle) const noexcept
+	float RawInputService::Value(const AxisID axis, const DeviceHandle deviceHandle) const noexcept
 	{
 		return devices.Value(axis, deviceHandle);
 	}
@@ -484,7 +484,7 @@ export namespace PonyEngine::RawInput
 		return devices.DeviceName(index);
 	}
 
-	DeviceTypeId RawInputService::DeviceType(const DeviceHandle deviceHandle) const
+	DeviceTypeID RawInputService::DeviceType(const DeviceHandle deviceHandle) const
 	{
 		const std::size_t index = devices.IndexOf(deviceHandle);
 #ifndef NDEBUG
@@ -542,10 +542,10 @@ export namespace PonyEngine::RawInput
 		return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
 	}
 
-	AxisId RawInputService::Hash(const Axis& axis)
+	AxisID RawInputService::Hash(const Axis& axis)
 	{
 		const std::uint32_t hash = Hash::FNV1a32(axis.Path());
-		auto axisId = AxisId{.hash = hash};
+		auto axisId = AxisID{.hash = hash};
 
 		if (const auto position = axisHashMap.find(hash); position != axisHashMap.cend())
 		{
@@ -574,7 +574,7 @@ export namespace PonyEngine::RawInput
 		return axisId;
 	}
 
-	const Axis& RawInputService::Unhash(const AxisId axisId) const
+	const Axis& RawInputService::Unhash(const AxisID axisId) const
 	{
 		const auto position = axisHashMap.find(axisId.hash);
 #ifndef NDEBUG
@@ -587,15 +587,15 @@ export namespace PonyEngine::RawInput
 		return position->second[axisId.index];
 	}
 
-	bool RawInputService::IsValid(const AxisId axisId) const noexcept
+	bool RawInputService::IsValid(const AxisID axisId) const noexcept
 	{
 		const auto position = axisHashMap.find(axisId.hash);
 		return position != axisHashMap.cend() && axisId.index < position->second.size();
 	}
 
-	DeviceTypeId RawInputService::Hash(const class DeviceType& deviceType)
+	DeviceTypeID RawInputService::Hash(const class DeviceType& deviceType)
 	{
-		const auto deviceTypeId = DeviceTypeId{.hash = Hash::FNV1a64(deviceType.Type())};
+		const auto deviceTypeId = DeviceTypeID{.hash = Hash::FNV1a64(deviceType.Type())};
 
 		if (const auto position = deviceTypeHashMap.find(deviceTypeId); position != deviceTypeHashMap.cend())
 		{
@@ -613,7 +613,7 @@ export namespace PonyEngine::RawInput
 		return deviceTypeId;
 	}
 
-	const DeviceType& RawInputService::Unhash(const DeviceTypeId deviceTypeId)
+	const DeviceType& RawInputService::Unhash(const DeviceTypeID deviceTypeId)
 	{
 		const auto position = deviceTypeHashMap.find(deviceTypeId);
 #ifndef NDEBUG
@@ -626,7 +626,7 @@ export namespace PonyEngine::RawInput
 		return position->second;
 	}
 
-	bool RawInputService::IsValid(const DeviceTypeId deviceTypeId) const noexcept
+	bool RawInputService::IsValid(const DeviceTypeID deviceTypeId) const noexcept
 	{
 		return deviceTypeHashMap.contains(deviceTypeId);
 	}

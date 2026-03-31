@@ -54,7 +54,7 @@ import :SRVParams;
 import :SubTextureIndex;
 import :SubTextureRange;
 import :SwapChainParams;
-import :TextureFormatId;
+import :TextureFormatID;
 import :TextureFormatSupport;
 import :TextureParams;
 import :TextureSupportRequest;
@@ -120,26 +120,26 @@ export namespace PonyEngine::RenderDevice
 		/// @note This function mustn't be called on different threads at the same time.
 		/// @note This function mustn't be called while @p TextureFormat(TextureFormatId) or @p IsValid(TextureFormatId) is executing.
 		[[nodiscard("Wierd call")]]
-		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) = 0;
+		virtual struct TextureFormatID TextureFormatId(std::string_view textureFormat) = 0;
 		/// @brief Gets a texture format.
 		/// @param textureFormatId Texture format ID.
 		/// @return Texture format.
 		/// @note The function mustn't be called concurrently with the @p TextureFormatId().
 		[[nodiscard("Pure function")]]
-		virtual std::string_view TextureFormat(struct TextureFormatId textureFormatId) const = 0;
+		virtual std::string_view TextureFormat(struct TextureFormatID textureFormatId) const = 0;
 		/// @brief Checks if the texture format ID is valid.
 		/// @param textureFormatId Texture format ID.
 		/// @return @a True if it's valid; @a false otherwise.
 		/// @note The function mustn't be called concurrently with the @p TextureFormatId().
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept = 0;
+		virtual bool IsValid(struct TextureFormatID textureFormatId) const noexcept = 0;
 		/// @brief Gets a texture format support.
 		/// @param textureFormatId Texture format ID. Must be valid.
 		/// @return Texture format support.
 		/// @remark The service must have an active backend.
 		/// @note The function is thread-safe but can't be used concurrently with the @p SwitchBackend().
 		[[nodiscard("Pure function")]]
-		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatId textureFormatId) const = 0;
+		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatID textureFormatId) const = 0;
 		/// @brief Gets a texture support.
 		/// @param request Texture support request.
 		/// @return Texture support response.

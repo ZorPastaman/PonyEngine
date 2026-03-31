@@ -41,7 +41,7 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		/// @brief Gets a bound axis.
 		/// @param scanCode Scan code.
 		/// @return Axis.
-		AxisId Axis(WORD scanCode);
+		AxisID Axis(WORD scanCode);
 
 		KeyboardAxisMap& operator =(const KeyboardAxisMap&) = delete;
 		KeyboardAxisMap& operator =(KeyboardAxisMap&&) = delete;
@@ -51,11 +51,11 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		/// @param scanCode Scan code.
 		/// @param axisPath Axis path.
 		/// @return Axis.
-		AxisId Bind(WORD scanCode, std::string_view axisPath);
+		AxisID Bind(WORD scanCode, std::string_view axisPath);
 
 		IRawInputContext* input; ///< Raw input context.
 
-		std::unordered_map<WORD, AxisId> axisMap; ///< Axis map.
+		std::unordered_map<WORD, AxisID> axisMap; ///< Axis map.
 	};
 }
 
@@ -207,7 +207,7 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 		return MAKEWORD(base, extension);
 	}
 
-	AxisId KeyboardAxisMap::Axis(const WORD scanCode)
+	AxisID KeyboardAxisMap::Axis(const WORD scanCode)
 	{
 		if (const auto position = axisMap.find(scanCode); position != axisMap.cend()) [[likely]]
 		{
@@ -217,7 +217,7 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 		return Bind(scanCode, std::format("{}/scanCode/0x{:04X}", KeyboardLayout::Layout, scanCode));
 	}
 
-	AxisId KeyboardAxisMap::Bind(const WORD scanCode, const std::string_view axisPath)
+	AxisID KeyboardAxisMap::Bind(const WORD scanCode, const std::string_view axisPath)
 	{
 		return axisMap[scanCode] = input->Hash(RawInput::Axis(axisPath));
 	}

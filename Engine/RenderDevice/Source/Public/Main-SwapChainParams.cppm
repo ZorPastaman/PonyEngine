@@ -18,7 +18,7 @@ import :SwapChainEffect;
 import :SwapChainFlag;
 import :SwapChainScaling;
 import :SwapChainSync;
-import :TextureFormatId;
+import :TextureFormatID;
 import :TextureUsage;
 
 export namespace PonyEngine::RenderDevice
@@ -26,7 +26,7 @@ export namespace PonyEngine::RenderDevice
 	/// @brief Swap chain parameters.
 	struct SwapChainParams final
 	{
-		TextureFormatId format; ///< Texture format.
+		TextureFormatID format; ///< Texture format.
 		std::optional<Math::Vector2<std::uint32_t>> size; ///< Swap chain size. Nullopt means to take a surface size.
 		std::uint8_t bufferCount = 3; ///< Swap chain buffer count.
 		SwapChainAlphaMode alphaMode = SwapChainAlphaMode::Ignore; ///< Alpha mode.

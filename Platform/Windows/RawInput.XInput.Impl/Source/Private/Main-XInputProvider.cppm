@@ -222,7 +222,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 
 	void XInputProvider::CreateDevices(DWORD& count)
 	{
-		const DeviceTypeId type = input->Hash(DeviceType(GamepadDevice::XboxType));
+		const DeviceTypeID type = input->Hash(DeviceType(GamepadDevice::XboxType));
 
 		for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
 		{
@@ -318,10 +318,10 @@ namespace PonyEngine::RawInput::XInput::Windows
 
 			const bool pressed = current;
 			const float value = pressed;
-			const AxisId axis = gamepadAxisMap.Button(button);
+			const AxisID axis = gamepadAxisMap.Button(button);
 			input->AddInput(handle, RawInputEvent
 			{
-				.axes = std::span<const AxisId>(&axis, 1uz),
+				.axes = std::span<const AxisID>(&axis, 1uz),
 				.values = std::span<const float>(&value, 1uz),
 				.eventType = InputEventType::State,
 				.timePoint = now
@@ -340,11 +340,11 @@ namespace PonyEngine::RawInput::XInput::Windows
 			}
 
 			const float value = Math::UnormToNormalized<float>(current, Math::Range<BYTE>{.min = XINPUT_GAMEPAD_TRIGGER_THRESHOLD});
-			const AxisId axis = gamepadAxisMap.Trigger(trigger);
+			const AxisID axis = gamepadAxisMap.Trigger(trigger);
 
 			input->AddInput(handle, RawInputEvent
 			{
-				.axes = std::span<const AxisId>(&axis, 1uz),
+				.axes = std::span<const AxisID>(&axis, 1uz),
 				.values = std::span<const float>(&value, 1uz),
 				.eventType = InputEventType::State,
 				.timePoint = now

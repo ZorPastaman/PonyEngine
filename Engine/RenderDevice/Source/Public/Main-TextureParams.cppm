@@ -17,7 +17,7 @@ import :ClearValue;
 import :ResourceLayout;
 import :SampleCount;
 import :TextureFlag;
-import :TextureFormatId;
+import :TextureFormatID;
 import :TextureDimension;
 import :TextureUsage;
 
@@ -26,8 +26,8 @@ export namespace PonyEngine::RenderDevice
 	/// @brief Texture parameters.
 	struct TextureParams final
 	{
-		TextureFormatId format; ///< Texture format.
-		std::span<const TextureFormatId> castableFormats; ///< Castable formats.
+		TextureFormatID format; ///< Texture format.
+		std::span<const TextureFormatID> castableFormats; ///< Castable formats.
 		Math::Vector3<std::uint32_t> size = Math::Vector3<std::uint32_t>(1u); ///< Texture size.
 		ClearValue clearValue; ///< Clear value.
 		std::uint16_t arraySize = 1u; ///< Array size.

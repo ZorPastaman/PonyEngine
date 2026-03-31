@@ -129,7 +129,7 @@ export import :TextureBarrier;
 export import :TextureDimension;
 export import :TextureFlag;
 export import :TextureFormat;
-export import :TextureFormatId;
+export import :TextureFormatID;
 export import :TextureFormatSupport;
 export import :TextureParams;
 export import :TextureSupportRequest;

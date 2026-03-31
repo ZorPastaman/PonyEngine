@@ -113,7 +113,7 @@ export namespace PonyEngine::Application
 		/// @return Main thread ID.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::thread::id MainThreadId() const noexcept = 0;
+		virtual std::thread::id MainThreadID() const noexcept = 0;
 
 		/// @brief Gets the command line excluding an executable name.
 		/// @return Command line.

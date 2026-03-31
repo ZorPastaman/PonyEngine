@@ -97,7 +97,7 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 		IRawInputContext* input; ///< Raw input context.
 		Surface::Windows::ISurfaceService* surface; ///< Surface service.
 
-		DeviceTypeId deviceType; ///< Mouse device type.
+		DeviceTypeID deviceType; ///< Mouse device type.
 		MouseAxisMap axisMap; ///< Mouse axis map.
 
 		MouseContainer<HANDLE> mouseContainer; ///< Mouse container.
@@ -140,11 +140,11 @@ namespace PonyEngine::RawInput::Mouse::Windows
 			{
 				[&](const MouseButtonEvent& button)
 				{
-					const AxisId axis = axisMap.Axis(button.button);
+					const AxisID axis = axisMap.Axis(button.button);
 					const float value = button.state;
 					input->AddInput(device, RawInputEvent
 					{
-						.axes = std::span<const AxisId>(&axis, 1uz),
+						.axes = std::span<const AxisID>(&axis, 1uz),
 						.values = std::span<const float>(&value, 1uz),
 						.eventType = InputEventType::State,
 						.timePoint = event.timePoint,
@@ -153,10 +153,10 @@ namespace PonyEngine::RawInput::Mouse::Windows
 				},
 				[&](const MouseWheelEvent& wheel)
 				{
-					const AxisId axis = axisMap.Axis(wheel.wheel);
+					const AxisID axis = axisMap.Axis(wheel.wheel);
 					input->AddInput(device, RawInputEvent
 					{
-						.axes = std::span<const AxisId>(&axis, 1uz),
+						.axes = std::span<const AxisID>(&axis, 1uz),
 						.values = std::span<const float>(&wheel.delta, 1uz),
 						.eventType = InputEventType::Delta,
 						.timePoint = event.timePoint,

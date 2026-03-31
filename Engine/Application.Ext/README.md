@@ -53,7 +53,14 @@ Application module utilities.
 | `pony_validate_module_order` | [File](CMake/Module.cmake) | Validates a module order variable.       |
 | `pony_validate_tick_order`   | [File](CMake/Module.cmake) | Validates a service tick order variable. |
 
-## How to add an application module
+## Custom application module
+
+How to get an application module:
+
+The [IApplicationContext](Source/Public/Main-IApplicationContext.cppm) has functions like `FindService<T>()` and `FindService(std::type_index_)` and their alternatives to find services.
+Those functions work with public interfaces of the services.
+
+How to add an application module:
 
 1. Add required engine dependencies to your module target: `target_link_libraries(<MyModule> PUBLIC PonyEngine.Core PonyEngine.Application.Ext)`;
 2. Make a class that inherits `PonyEngine::Application::IModule` from `PonyEngine.Application.Ext` C\++ module;

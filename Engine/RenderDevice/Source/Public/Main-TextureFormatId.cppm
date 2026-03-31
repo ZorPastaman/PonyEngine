@@ -14,20 +14,20 @@ import std;
 export namespace PonyEngine::RenderDevice
 {
 	/// @brief Texture format id.
-	struct TextureFormatId final
+	struct TextureFormatID final
 	{
 		std::uint64_t hash = 0u; ///< Hash.
 
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const TextureFormatId& other) const noexcept = default;
+		constexpr bool operator ==(const TextureFormatID& other) const noexcept = default;
 	};
 }
 
 export template<>
-struct std::hash<PonyEngine::RenderDevice::TextureFormatId> final
+struct std::hash<PonyEngine::RenderDevice::TextureFormatID> final
 {
 	[[nodiscard("Pure operator")]]
-	std::size_t operator ()(const PonyEngine::RenderDevice::TextureFormatId textureFormatId) const noexcept
+	std::size_t operator ()(const PonyEngine::RenderDevice::TextureFormatID textureFormatId) const noexcept
 	{
 		return std::hash<std::uint64_t>()(textureFormatId.hash);
 	}
