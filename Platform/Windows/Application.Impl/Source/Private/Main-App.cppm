@@ -85,7 +85,7 @@ export namespace PonyEngine::Application::Windows
 		virtual const std::filesystem::path& TempDataDirectory() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::thread::id MainThreadId() const noexcept override;
+		virtual std::thread::id MainThreadID() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view CommandLine() const noexcept override;
@@ -228,9 +228,9 @@ namespace PonyEngine::Application::Windows
 		return pathManager.TempDataDirectory();
 	}
 
-	std::thread::id App::MainThreadId() const noexcept
+	std::thread::id App::MainThreadID() const noexcept
 	{
-		return environmentManager.MainThreadId();
+		return environmentManager.MainThreadID();
 	}
 
 	std::string_view App::CommandLine() const noexcept

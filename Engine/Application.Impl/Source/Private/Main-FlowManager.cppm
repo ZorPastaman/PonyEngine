@@ -158,7 +158,7 @@ namespace PonyEngine::Application
 	void FlowManager::Stop(const int exitCode)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}

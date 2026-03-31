@@ -12,11 +12,11 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main.cppm"
 	"Source/Public/Main-Axis.cppm"
-	"Source/Public/Main-AxisId.cppm"
+	"Source/Public/Main-AxisID.cppm"
 	"Source/Public/Main-ConnectionEvent.cppm"
 	"Source/Public/Main-DeviceHandle.cppm"
 	"Source/Public/Main-DeviceType.cppm"
-	"Source/Public/Main-DeviceTypeId.cppm"
+	"Source/Public/Main-DeviceTypeID.cppm"
 	"Source/Public/Main-Gamepad.cppm"
 	"Source/Public/Main-IDeviceObserver.cppm"
 	"Source/Public/Main-InputEventType.cppm"

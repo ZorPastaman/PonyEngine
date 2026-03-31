@@ -225,7 +225,7 @@ namespace PonyEngine::Application
 	ServiceHandle ServiceManager::AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -303,7 +303,7 @@ namespace PonyEngine::Application
 	void ServiceManager::RemoveService(const ServiceHandle handle)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -347,7 +347,7 @@ namespace PonyEngine::Application
 	void ServiceManager::TickableServiceAdder::Add(ITickableService& tickable, const std::int32_t tickOrder)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -368,7 +368,7 @@ namespace PonyEngine::Application
 	void ServiceManager::ServiceInterfaceAdder::AddInterface(const std::type_index type, void* const interface)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}

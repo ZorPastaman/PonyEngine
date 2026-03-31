@@ -53,18 +53,18 @@ export namespace PonyEngine::RenderDevice
 		/// @note This function mustn't be called while @p TextureFormat(TextureFormatId) or @p IsValid(TextureFormatId) is executing.
 		/// @note It's recommended that the backend get all texture format ids on its initialization.
 		[[nodiscard("Wierd call")]]
-		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) = 0;
+		virtual struct TextureFormatID TextureFormatId(std::string_view textureFormat) = 0;
 		/// @brief Gets a texture format.
 		/// @param textureFormatId Texture format ID.
 		/// @return Texture format.
 		/// @note The function mustn't be called concurrently with the @p TextureFormatId().
 		[[nodiscard("Pure function")]]
-		virtual std::string_view TextureFormat(struct TextureFormatId textureFormatId) const = 0;
+		virtual std::string_view TextureFormat(struct TextureFormatID textureFormatId) const = 0;
 		/// @brief Checks if the texture format ID is valid.
 		/// @param textureFormatId Texture format ID.
 		/// @return @a True if it's valid; @a false otherwise.
 		/// @note The function mustn't be called concurrently with the @p TextureFormatId().
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept = 0;
+		virtual bool IsValid(struct TextureFormatID textureFormatId) const noexcept = 0;
 	};
 }

@@ -7,28 +7,28 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput:AxisId;
+export module PonyEngine.RawInput:AxisID;
 
 import std;
 
 export namespace PonyEngine::RawInput
 {
 	/// @brief Axis ID.
-	struct AxisId final
+	struct AxisID final
 	{
 		std::uint32_t hash = 0u; ///< Axis hash.
 		std::uint32_t index = 0u; ///< Axis hash index. It's used when different axes have the same hash.
 
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const AxisId& other) const noexcept = default;
+		constexpr bool operator ==(const AxisID& other) const noexcept = default;
 	};
 }
 
 export template<>
-struct std::hash<PonyEngine::RawInput::AxisId> final
+struct std::hash<PonyEngine::RawInput::AxisID> final
 {
 	[[nodiscard("Pure function")]]
-	std::size_t operator ()(const PonyEngine::RawInput::AxisId axisId) const noexcept
+	std::size_t operator ()(const PonyEngine::RawInput::AxisID axisId) const noexcept
 	{
 		return std::hash<std::uint64_t>()(*reinterpret_cast<const std::uint64_t*>(&axisId));
 	}

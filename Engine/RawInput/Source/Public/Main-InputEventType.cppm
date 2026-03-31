@@ -17,6 +17,6 @@ export namespace PonyEngine::RawInput
 	enum class InputEventType : std::uint8_t
 	{
 		State, ///< A value is kept till set to another value.
-		Delta ///< A value is flushed each tick.
+		Delta ///< A value is zeroed each tick.
 	};
 }

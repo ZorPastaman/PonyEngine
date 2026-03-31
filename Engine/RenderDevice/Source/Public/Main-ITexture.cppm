@@ -21,7 +21,7 @@ import :IResource;
 import :SampleCount;
 import :SubTextureIndex;
 import :TextureDimension;
-import :TextureFormatId;
+import :TextureFormatID;
 import :TextureUsage;
 
 export namespace PonyEngine::RenderDevice
@@ -38,11 +38,11 @@ export namespace PonyEngine::RenderDevice
 		/// @brief Gets the format.
 		/// @return Format.
 		[[nodiscard("Pure function")]]
-		virtual TextureFormatId Format() const noexcept = 0;
+		virtual TextureFormatID Format() const noexcept = 0;
 		/// @brief Gets the castable formats.
 		/// @return Castable formats.
 		[[nodiscard("Pure function")]]
-		virtual std::span<const TextureFormatId> CastableFormats() const noexcept = 0;
+		virtual std::span<const TextureFormatID> CastableFormats() const noexcept = 0;
 		/// @brief Gets the texture size.
 		/// @return Size.
 		[[nodiscard("Pure function")]]

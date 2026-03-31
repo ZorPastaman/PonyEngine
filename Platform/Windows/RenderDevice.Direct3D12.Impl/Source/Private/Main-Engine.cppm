@@ -103,7 +103,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param textureFormatId Texture format ID.
 		/// @return Texture format support.
 		[[nodiscard("Pure function")]]
-		struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const;
+		struct TextureFormatSupport TextureFormatSupport(TextureFormatID textureFormatId) const;
 		/// @brief Gets a texture support.
 		/// @param request Texture support request.
 		/// @return Texture support response.
@@ -380,13 +380,13 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param format Engine format.
 		/// @return Native format.
 		[[nodiscard("Pure function")]]
-		DXGI_FORMAT GetFormat(TextureFormatId format) const;
+		DXGI_FORMAT GetFormat(TextureFormatID format) const;
 		/// @brief Casts to a native format.
 		/// @param format Engine format.
 		/// @param srgb SRGB variant?
 		/// @return Native format.
 		[[nodiscard("Pure function")]]
-		DXGI_FORMAT GetFormat(TextureFormatId format, bool srgb) const;
+		DXGI_FORMAT GetFormat(TextureFormatID format, bool srgb) const;
 		/// @brief Gets an SRGB variant.
 		/// @param format Format.
 		/// @return SRGB variant.
@@ -563,7 +563,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param texture Target texture.
 		/// @param viewFormat View format.
 		/// @param srgb Is the view SRGB?
-		static void ValidateViewFormat(const Texture& texture, TextureFormatId viewFormat, bool srgb);
+		static void ValidateViewFormat(const Texture& texture, TextureFormatID viewFormat, bool srgb);
 		/// @brief Validates the view dimension.
 		/// @param texture Target texture.
 		/// @param dimension View dimension.
@@ -733,7 +733,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return std::make_shared<Buffer>(std::move(resource), resourceDesc.Width, params.usage);
 	}
 
-	struct TextureFormatSupport Engine::TextureFormatSupport(const TextureFormatId textureFormatId) const
+	struct TextureFormatSupport Engine::TextureFormatSupport(const TextureFormatID textureFormatId) const
 	{
 		if (const std::size_t index = textureFormatMap.IndexOf(textureFormatId); index < textureFormatMap.Size())
 		{
@@ -1305,7 +1305,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		{
 			Platform::Windows::ComPtr<ID3D12Resource2> resource = dxgiSwapChain.GetBuffer<ID3D12Resource2>(i);
 			const D3D12_RESOURCE_DESC1 resourceDesc = resource->GetDesc1();
-			buffers[i] = std::make_shared<Texture>(std::move(resource), params.format, format, std::span<const TextureFormatId>(),
+			buffers[i] = std::make_shared<Texture>(std::move(resource), params.format, format, std::span<const TextureFormatID>(),
 				static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), 1u, 1u,
 				TextureDimension::Texture2D, SampleCount::X1, params.usage, Any(SwapChainFlag::SRGB, params.flags));
 		}
@@ -1545,7 +1545,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return answer;
 	}
 
-	DXGI_FORMAT Engine::GetFormat(const TextureFormatId format) const
+	DXGI_FORMAT Engine::GetFormat(const TextureFormatID format) const
 	{
 		const std::size_t formatIndex = textureFormatMap.IndexOf(format);
 #ifndef NDEBUG
@@ -1558,7 +1558,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return textureFormatMap.DXGIFormat(formatIndex);
 	}
 
-	DXGI_FORMAT Engine::GetFormat(const TextureFormatId format, const bool srgb) const
+	DXGI_FORMAT Engine::GetFormat(const TextureFormatID format, const bool srgb) const
 	{
 		const DXGI_FORMAT nativeFormat = GetFormat(format);
 		return srgb ? GetSRGBVariant(nativeFormat) : nativeFormat;
@@ -2096,7 +2096,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 #endif
 	}
 
-	void Engine::ValidateViewFormat(const Texture& texture, const TextureFormatId viewFormat, const bool srgb)
+	void Engine::ValidateViewFormat(const Texture& texture, const TextureFormatID viewFormat, const bool srgb)
 	{
 #ifndef NDEBUG
 		if (srgb)

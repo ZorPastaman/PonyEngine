@@ -7,27 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput:DeviceTypeId;
+export module PonyEngine.RawInput:DeviceTypeID;
 
 import std;
 
 export namespace PonyEngine::RawInput
 {
 	/// @brief Device type ID.
-	struct DeviceTypeId final
+	struct DeviceTypeID final
 	{
 		std::uint64_t hash = 0u; ///< Device type hash.
 
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const DeviceTypeId& other) const noexcept = default;
+		constexpr bool operator ==(const DeviceTypeID& other) const noexcept = default;
 	};
 }
 
 export template<>
-struct std::hash<PonyEngine::RawInput::DeviceTypeId> final
+struct std::hash<PonyEngine::RawInput::DeviceTypeID> final
 {
 	[[nodiscard("Pure operator")]]
-	std::size_t operator ()(const PonyEngine::RawInput::DeviceTypeId deviceTypeId) const noexcept
+	std::size_t operator ()(const PonyEngine::RawInput::DeviceTypeID deviceTypeId) const noexcept
 	{
 		return std::hash<std::uint64_t>()(deviceTypeId.hash);
 	}

@@ -195,7 +195,7 @@ namespace PonyEngine::Log
 	SubLoggerHandle Logger::AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != loggerContext->Application().MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != loggerContext->Application().MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -234,7 +234,7 @@ namespace PonyEngine::Log
 	void Logger::RemoveSubLogger(const SubLoggerHandle handle)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != loggerContext->Application().MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != loggerContext->Application().MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}

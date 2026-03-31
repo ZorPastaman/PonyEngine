@@ -126,7 +126,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main-TextureDimension.cppm"
 	"Source/Public/Main-TextureFlag.cppm"
 	"Source/Public/Main-TextureFormat.cppm"
-	"Source/Public/Main-TextureFormatId.cppm"
+	"Source/Public/Main-TextureFormatID.cppm"
 	"Source/Public/Main-TextureFormatSupport.cppm"
 	"Source/Public/Main-TextureParams.cppm"
 	"Source/Public/Main-TextureSupportRequest.cppm"

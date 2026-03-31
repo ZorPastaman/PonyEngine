@@ -68,13 +68,13 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params) override;
 
 		[[nodiscard("Wierd call")]]
-		virtual struct TextureFormatId TextureFormatId(std::string_view textureFormat) override;
+		virtual struct TextureFormatID TextureFormatId(std::string_view textureFormat) override;
 		[[nodiscard("Pure function")]]
-		virtual std::string_view TextureFormat(struct TextureFormatId textureFormatId) const override;
+		virtual std::string_view TextureFormat(struct TextureFormatID textureFormatId) const override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(struct TextureFormatId textureFormatId) const noexcept override;
+		virtual bool IsValid(struct TextureFormatID textureFormatId) const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatId textureFormatId) const override;
+		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatID textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
 		[[nodiscard("Wierd call")]]
@@ -194,7 +194,7 @@ export namespace PonyEngine::RenderDevice
 		BackendContainer backends; ///< Backends.
 		std::optional<std::size_t> activeBackendIndex; ///< Active backend index.
 
-		std::unordered_map<struct TextureFormatId, std::string> textureFormatHashMap; ///< Texture format hash map.
+		std::unordered_map<struct TextureFormatID, std::string> textureFormatHashMap; ///< Texture format hash map.
 
 		std::vector<IRenderDeviceServiceObserver*> observers; ///< Render device service observers.
 
@@ -392,9 +392,9 @@ namespace PonyEngine::RenderDevice
 		return GetCurrentBackend().CreateBuffer(heapParams, params);
 	}
 
-	struct TextureFormatId RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
+	struct TextureFormatID RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
 	{
-		const auto textureFormatId = RenderDevice::TextureFormatId{.hash = Hash::FNV1a64(textureFormat)};
+		const auto textureFormatId = RenderDevice::TextureFormatID{.hash = Hash::FNV1a64(textureFormat)};
 
 		if (const auto position = textureFormatHashMap.find(textureFormatId); position != textureFormatHashMap.cend())
 		{
@@ -412,7 +412,7 @@ namespace PonyEngine::RenderDevice
 		return textureFormatId;
 	}
 
-	std::string_view RenderDeviceService::TextureFormat(const struct TextureFormatId textureFormatId) const
+	std::string_view RenderDeviceService::TextureFormat(const struct TextureFormatID textureFormatId) const
 	{
 		const auto position = textureFormatHashMap.find(textureFormatId);
 #ifndef NDEBUG
@@ -425,12 +425,12 @@ namespace PonyEngine::RenderDevice
 		return position->second;
 	}
 
-	bool RenderDeviceService::IsValid(const struct TextureFormatId textureFormatId) const noexcept
+	bool RenderDeviceService::IsValid(const struct TextureFormatID textureFormatId) const noexcept
 	{
 		return textureFormatHashMap.contains(textureFormatId);
 	}
 
-	struct TextureFormatSupport RenderDeviceService::TextureFormatSupport(const struct TextureFormatId textureFormatId) const
+	struct TextureFormatSupport RenderDeviceService::TextureFormatSupport(const struct TextureFormatID textureFormatId) const
 	{
 #ifndef NDEBUG
 		if (!IsValid(textureFormatId)) [[unlikely]]

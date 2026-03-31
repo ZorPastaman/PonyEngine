@@ -71,18 +71,18 @@ export namespace Game
 		PonyEngine::RawInput::IRawInputService* rawInput;
 		PonyEngine::Time::ITimeService* time;
 
-		PonyEngine::RawInput::AxisId aAxis;
-		PonyEngine::RawInput::AxisId dAxis;
-		PonyEngine::RawInput::AxisId sAxis;
-		PonyEngine::RawInput::AxisId wAxis;
-		PonyEngine::RawInput::AxisId ctrlAxis;
-		PonyEngine::RawInput::AxisId spaceAxis;
-		PonyEngine::RawInput::AxisId xAxis;
-		PonyEngine::RawInput::AxisId yAxis;
-		PonyEngine::RawInput::AxisId qAxis;
-		PonyEngine::RawInput::AxisId eAxis;
-		PonyEngine::RawInput::AxisId enterAxis;
-		PonyEngine::RawInput::AxisId escapeAxis;
+		PonyEngine::RawInput::AxisID aAxis;
+		PonyEngine::RawInput::AxisID dAxis;
+		PonyEngine::RawInput::AxisID sAxis;
+		PonyEngine::RawInput::AxisID wAxis;
+		PonyEngine::RawInput::AxisID ctrlAxis;
+		PonyEngine::RawInput::AxisID spaceAxis;
+		PonyEngine::RawInput::AxisID xAxis;
+		PonyEngine::RawInput::AxisID yAxis;
+		PonyEngine::RawInput::AxisID qAxis;
+		PonyEngine::RawInput::AxisID eAxis;
+		PonyEngine::RawInput::AxisID enterAxis;
+		PonyEngine::RawInput::AxisID escapeAxis;
 
 		std::shared_ptr<PonyEngine::RenderDevice::IGraphicsCommandList> graphicsCommandList;
 		std::shared_ptr<PonyEngine::RenderDevice::ICopyCommandList> copyCommandList;
@@ -183,7 +183,7 @@ namespace Game
 		waiter = renderDevice->CreateWaiter();
 		waiter->Name("MainWaiter");
 
-		const PonyEngine::RenderDevice::TextureFormatId swapChainTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm);
+		const PonyEngine::RenderDevice::TextureFormatID swapChainTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm);
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{
 			.format = swapChainTextureFormat,
@@ -207,7 +207,7 @@ namespace Game
 		};
 		const PonyEngine::Math::Vector3<std::uint32_t> res = renderDevice->SwapChainBuffer(0u)->Size();
 		resolution = PonyEngine::Math::Vector2<std::uint32_t>(res.X(), res.Y());
-		const PonyEngine::RenderDevice::TextureFormatId depthStencilTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::D32_Float_S8X24_Uint);
+		const PonyEngine::RenderDevice::TextureFormatID depthStencilTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::D32_Float_S8X24_Uint);
 		constexpr auto sampleCount = PonyEngine::RenderDevice::SampleCount::X4;
 		targetTexture = renderDevice->CreateTexture(
 		PonyEngine::RenderDevice::CommittedResourceHeapParams

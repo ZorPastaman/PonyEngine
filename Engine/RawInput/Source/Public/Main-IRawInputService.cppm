@@ -16,10 +16,10 @@ export module PonyEngine.RawInput:IRawInputService;
 import std;
 
 import :Axis;
-import :AxisId;
+import :AxisID;
 import :DeviceHandle;
 import :DeviceType;
-import :DeviceTypeId;
+import :DeviceTypeID;
 import :IDeviceObserver;
 import :IRawInputObserver;
 
@@ -35,14 +35,14 @@ export namespace PonyEngine::RawInput
 		/// @return Input float value.
 		/// @note The function is thread-safe if the raw input service isn't ticking. Otherwise, it mustn't be called.
 		[[nodiscard("Pure function")]]
-		virtual float Value(AxisId axis) const noexcept = 0;
+		virtual float Value(AxisID axis) const noexcept = 0;
 		/// @brief Gets an axis value from a specific device.
 		/// @param axis Axis
 		/// @param deviceHandle Device handle.
 		/// @return Input float value.
 		/// @note The function is thread-safe if the raw input service isn't ticking. Otherwise, it mustn't be called.
 		[[nodiscard("Pure function")]]
-		virtual float Value(AxisId axis, DeviceHandle deviceHandle) const noexcept = 0;
+		virtual float Value(AxisID axis, DeviceHandle deviceHandle) const noexcept = 0;
 
 		/// @brief Gets a last device reported its input.
 		/// @return Last input device.
@@ -85,7 +85,7 @@ export namespace PonyEngine::RawInput
 		/// @return Device type.
 		/// @note The function is thread-safe if the raw input service isn't ticking. Otherwise, it mustn't be called.
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeId DeviceType(DeviceHandle deviceHandle) const = 0;
+		virtual DeviceTypeID DeviceType(DeviceHandle deviceHandle) const = 0;
 		/// @brief Gets device feature types.
 		/// @param deviceHandle Device handle.
 		/// @return Feature types.
@@ -142,19 +142,19 @@ export namespace PonyEngine::RawInput
 		/// @note This function mustn't be called on different threads at the same time.
 		/// @note This function mustn't be called while @p Unhash(AxisId) or @p IsValid(AxisId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual AxisId Hash(const Axis& axis) = 0;
+		virtual AxisID Hash(const Axis& axis) = 0;
 		/// @brief Gets an original axis from the hash value.
 		/// @param axisId Axis hash.
 		/// @return Axis.
 		/// @note This function mustn't be called while @p Hash(AxisId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual const Axis& Unhash(AxisId axisId) const = 0;
+		virtual const Axis& Unhash(AxisID axisId) const = 0;
 		/// @brief Checks if the @p axisId is valid.
 		/// @param axisId Axis id.
 		/// @return @a true if it's valid; @a false otherwise.
 		/// @note This function mustn't be called while @p Hash(AxisId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(AxisId axisId) const noexcept = 0;
+		virtual bool IsValid(AxisID axisId) const noexcept = 0;
 		/// @brief Calculates a hash for the @p deviceType.
 		/// @param deviceType Device type.
 		/// @return Device type hash.
@@ -162,19 +162,19 @@ export namespace PonyEngine::RawInput
 		/// @note This function mustn't be called on different threads at the same time.
 		/// @note This function mustn't be called while @p Unhash(DeviceTypeId) or @p IsValid(DeviceTypeId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeId Hash(const class DeviceType& deviceType) = 0;
+		virtual DeviceTypeID Hash(const class DeviceType& deviceType) = 0;
 		/// @brief Gets an original device type from the hash value.
 		/// @param deviceTypeId Device type hash.
 		/// @return Device type.
 		/// This function mustn't be called while @p Hash(DeviceTypeId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual const class DeviceType& Unhash(DeviceTypeId deviceTypeId) = 0;
+		virtual const class DeviceType& Unhash(DeviceTypeID deviceTypeId) = 0;
 		/// @brief Checks if the @p deviceTypeId is valid.
 		/// @param deviceTypeId Device type id.
 		/// @return @a true if it's valid; @a false otherwise.
 		/// This function mustn't be called while @p Hash(DeviceTypeId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(DeviceTypeId deviceTypeId) const noexcept = 0;
+		virtual bool IsValid(DeviceTypeID deviceTypeId) const noexcept = 0;
 
 		/// @brief Adds the global device observer.
 		/// @param observer Device observer.

@@ -14,7 +14,7 @@ import std;
 import :Aspect;
 import :ComponentMapping;
 import :SRVLayout;
-import :TextureFormatId;
+import :TextureFormatID;
 import :TextureViewDimension;
 
 export namespace PonyEngine::RenderDevice
@@ -30,7 +30,7 @@ export namespace PonyEngine::RenderDevice
 	/// @brief Texture shader resource view parameters.
 	struct TextureSRVParams final
 	{
-		TextureFormatId format; ///< Texture format. Must be compatible with a texture.
+		TextureFormatID format; ///< Texture format. Must be compatible with a texture.
 		bool srgb = false; ///< Is it srgb view? If @a true, a texture must be srgb-compatible.
 		TextureViewDimension dimension = TextureViewDimension::Texture2D; ///< Texture view dimension.
 		Aspect aspect = Aspect::Color; ///< Target aspect. A texture must have this aspect.

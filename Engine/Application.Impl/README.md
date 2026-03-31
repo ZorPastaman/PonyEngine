@@ -6,7 +6,7 @@ The module also has `main()` function.
 
 The module requires a platform specific implementation.
 
-### CMake variables
+## CMake variables
 
 These variables are used to configure the build of the module:
 

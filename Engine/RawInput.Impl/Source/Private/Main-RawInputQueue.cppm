@@ -92,7 +92,7 @@ export namespace PonyEngine::RawInput
 		std::vector<std::variant<InputData, ConnectionData>> events; ///< Input events.
 		std::vector<std::chrono::time_point<std::chrono::steady_clock>> eventTimes; ///< Input event times.
 
-		std::vector<AxisId> axes; ///< Input axes.
+		std::vector<AxisID> axes; ///< Input axes.
 		std::vector<float> values; ///< Input values.
 
 		std::vector<std::size_t> eventIndices; ///< Sorted event indices.
@@ -123,7 +123,7 @@ namespace PonyEngine::RawInput
 			{
 				return RawInputEvent
 				{
-					.axes = std::span<const AxisId>(&axes[inputData.valueIndex], inputData.valueCount),
+					.axes = std::span<const AxisID>(&axes[inputData.valueIndex], inputData.valueCount),
 					.values = std::span<const float>(&values[inputData.valueIndex], inputData.valueCount),
 					.eventType = inputData.eventType,
 					.timePoint = time,

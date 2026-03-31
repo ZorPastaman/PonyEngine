@@ -149,7 +149,7 @@ namespace PonyEngine::Application
 	void* ModuleManager::GetData(const std::type_index type) const
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -166,7 +166,7 @@ namespace PonyEngine::Application
 	ModuleDataHandle ModuleManager::AddData(const std::type_index type, const std::shared_ptr<void>& data)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -199,7 +199,7 @@ namespace PonyEngine::Application
 	void ModuleManager::RemoveData(const ModuleDataHandle handle)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadId()) [[unlikely]]
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}

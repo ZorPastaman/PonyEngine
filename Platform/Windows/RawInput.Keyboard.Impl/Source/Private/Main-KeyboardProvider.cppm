@@ -87,7 +87,7 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		IRawInputContext* input; ///< Raw input context.
 		Surface::Windows::ISurfaceService* surface; ///< Surface service.
 
-		DeviceTypeId deviceType; ///< Keyboard device type.
+		DeviceTypeID deviceType; ///< Keyboard device type.
 		KeyboardAxisMap axisMap; ///< Axis map.
 
 		KeyboardContainer<HANDLE, WORD> keyboardContainer; ///< Keyboard container.
@@ -130,12 +130,12 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 			{
 				[&](const KeyboardInputEvent<WORD>& keyboardInput)
 				{
-					const AxisId axis = axisMap.Axis(keyboardInput.key);
+					const AxisID axis = axisMap.Axis(keyboardInput.key);
 					const float value = keyboardInput.state;
 
 					input->AddInput(device, RawInputEvent
 					{
-						.axes = std::span<const AxisId>(&axis, 1uz),
+						.axes = std::span<const AxisID>(&axis, 1uz),
 						.values = std::span<const float>(&value, 1uz),
 						.eventType = InputEventType::State,
 						.timePoint = event.timePoint,

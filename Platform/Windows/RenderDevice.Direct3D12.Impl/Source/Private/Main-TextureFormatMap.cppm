@@ -43,7 +43,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param textureFormatId Texture format ID.
 		/// @return Index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(TextureFormatId textureFormatId) const noexcept;
+		std::size_t IndexOf(TextureFormatID textureFormatId) const noexcept;
 		/// @brief Find an index of the DXGI format.
 		/// @param dxgiFormat DXGI format.
 		/// @return Index or @p Size() if not found.
@@ -54,7 +54,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param index Texture format index.
 		/// @return Texture format.
 		[[nodiscard("Pure function")]]
-		TextureFormatId TextureFormat(std::size_t index) const noexcept;
+		TextureFormatID TextureFormat(std::size_t index) const noexcept;
 		/// @brief Gets a DXGI format.
 		/// @param index DXGI format index.
 		/// @return DXGI format.
@@ -65,7 +65,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		TextureFormatMap& operator =(TextureFormatMap&&) = delete;
 
 	private:
-		std::array<TextureFormatId, MainFormatMap.MapSize()> textureFormatIds; ///< Texture format IDs.
+		std::array<TextureFormatID, MainFormatMap.MapSize()> textureFormatIds; ///< Texture format IDs.
 		std::array<DXGI_FORMAT, MainFormatMap.MapSize()> dxgiFormats; ///< DXGI formats.
 	};
 }
@@ -86,7 +86,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return textureFormatIds.size();
 	}
 
-	std::size_t TextureFormatMap::IndexOf(const TextureFormatId textureFormatId) const noexcept
+	std::size_t TextureFormatMap::IndexOf(const TextureFormatID textureFormatId) const noexcept
 	{
 		return std::ranges::find(textureFormatIds, textureFormatId) - textureFormatIds.cbegin();
 	}
@@ -96,7 +96,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return std::ranges::find(dxgiFormats, dxgiFormat) - dxgiFormats.cbegin();
 	}
 
-	TextureFormatId TextureFormatMap::TextureFormat(const std::size_t index) const noexcept
+	TextureFormatID TextureFormatMap::TextureFormat(const std::size_t index) const noexcept
 	{
 		return textureFormatIds[index];
 	}

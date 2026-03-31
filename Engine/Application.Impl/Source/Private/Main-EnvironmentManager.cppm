@@ -36,7 +36,7 @@ export namespace PonyEngine::Application
 		/// @brief Gets the main thread ID. It's the thread on which the manager was created.
 		/// @return Main thread ID.
 		[[nodiscard("Pure function")]]
-		std::thread::id MainThreadId() const noexcept;
+		std::thread::id MainThreadID() const noexcept;
 
 		EnvironmentManager& operator =(const EnvironmentManager&) = delete;
 		EnvironmentManager& operator =(EnvironmentManager&&) = delete;
@@ -54,7 +54,7 @@ namespace PonyEngine::Application
 		PONY_LOG(application.Logger(), Log::LogType::Info, "Main thread id: '{}'.", mainThreadId);
 	}
 
-	std::thread::id EnvironmentManager::MainThreadId() const noexcept
+	std::thread::id EnvironmentManager::MainThreadID() const noexcept
 	{
 		return mainThreadId;
 	}

@@ -27,7 +27,7 @@ Sub-loggers may use those functions to log errors, warnings, and other things. I
 
 #### [ILoggerModuleContext](Source/Public/Main-ILoggerModuleContext.cppm)
 
-Interface representing the logger module context. This interfaces is used by modules to add sub-loggers. It may be accessed via module data after the logger module initialization.
+Interface representing the logger module context. This interface is used by modules to add sub-loggers. It may be accessed via module data after the logger module initialization.
 
 ## C\++ headers
 
@@ -77,7 +77,7 @@ How to add a custom sub-logger.
 The module must remove its sub-logger on `ShutDown()`:
 
 1. In the module `ShutDown()` get `PonyEngine::Log::ILoggerModuleContext`;
-2. Remove the sub-logger using a  `SubLoggerHandle` that was returned on adding.
+2. Remove the sub-logger using a `SubLoggerHandle` that was returned on adding.
 
 Example:
 

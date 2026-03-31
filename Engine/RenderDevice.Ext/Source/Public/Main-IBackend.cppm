@@ -62,7 +62,7 @@ export namespace PonyEngine::RenderDevice
 		/// @return Texture format support.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatId textureFormatId) const = 0;
+		virtual struct TextureFormatSupport TextureFormatSupport(TextureFormatID textureFormatId) const = 0;
 		/// @brief Gets a texture support.
 		/// @param request Texture support request.
 		/// @return Texture support response.
