@@ -30,7 +30,7 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 ```
 FetchContent_Declare(
 	PonyEngine
-	GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine
+	GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine.git
 	GIT_TAG <Branch_or_Tag>
 )
 FetchContent_MakeAvailable(PonyEngine)
@@ -226,6 +226,10 @@ Refer to the CMake documentation for the correct value: https://github.com/Kitwa
 
 The `std` module must be compiled with flags compatible with the rest of the project. When building it via CMake, these flags should be set using `add_compile_options()` **before** the first `project()` call.
 If some targets require different compile options, you can reset them using: `set_directory_properties(PROPERTIES COMPILE_OPTIONS "")`.
+
+### Compile flags
+
+The engine modules must be compiled with `RTTI` and exceptions enabled.
 
 ### CMake variables
 

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time:Utility;
+export module PonyEngine.Time:ConversionUtility;
 
 import std;
 
@@ -33,7 +33,7 @@ export namespace PonyEngine::Time
 namespace PonyEngine::Time
 {
 	template<std::floating_point T, typename Rep, typename Period>
-	constexpr T ToSeconds(std::chrono::duration<Rep, Period> duration) noexcept
+	constexpr T ToSeconds(const std::chrono::duration<Rep, Period> duration) noexcept
 	{
 		return std::chrono::duration_cast<std::chrono::duration<T>>(duration).count();
 	}

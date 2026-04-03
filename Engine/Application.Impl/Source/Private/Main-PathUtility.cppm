@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.Impl:Path;
+export module PonyEngine.Application.Impl:PathUtility;
 
 import std;
 
-import :Name;
+import :IdentityUtility;
 
 export namespace PonyEngine::Application
 {

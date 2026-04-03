@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Application.Impl:Console;
+export module PonyEngine.Application.Impl:ConsoleUtility;
 
 import std;
 

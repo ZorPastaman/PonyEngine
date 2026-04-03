@@ -9,7 +9,7 @@
 
 module;
 
-export module PonyEngine.Surface:Utility;
+export module PonyEngine.Surface:MathUtility;
 
 import std;
 

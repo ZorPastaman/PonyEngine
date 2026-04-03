@@ -15,7 +15,7 @@ export module PonyEngine.Time:ITimeService;
 
 import std;
 
-import :Utility;
+import :ConversionUtility;
 
 export namespace PonyEngine::Time
 {
@@ -46,21 +46,21 @@ export namespace PonyEngine::Time
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds UnscaledVirtualTime() const noexcept = 0;
 
-		/// @brief Gets a real frame count elapsed since the start.
-		/// @return Real frame count.
+		/// @brief Gets a real fixed step count elapsed since the start.
+		/// @return Real fixed step count.
 		/// @note The function may be called concurrently but mustn't be called during the time service tick.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealFrameCount() const noexcept = 0;
-		/// @brief Gets a virtual frame count elapsed since the start.
-		/// @return Virtual frame count.
+		virtual std::uint64_t RealFixedStepCount() const noexcept = 0;
+		/// @brief Gets a virtual fixed step count elapsed since the start.
+		/// @return Virtual fixed step count.
 		/// @note The function may be called concurrently but mustn't be called during the time service tick.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualFrameCount() const noexcept = 0;
-		/// @brief Gets an unscaled virtual frame count elapsed since the start.
-		/// @return Unscaled virtual frame count.
+		virtual std::uint64_t VirtualFixedStepCount() const noexcept = 0;
+		/// @brief Gets an unscaled virtual fixed step count elapsed since the start.
+		/// @return Unscaled virtual fixed step count.
 		/// @note The function may be called concurrently but mustn't be called during the time service tick.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualFrameCount() const noexcept = 0;
+		virtual std::uint64_t UnscaledVirtualFixedStepCount() const noexcept = 0;
 
 		/// @brief Gets a real time elapsed since a previous tick.
 		/// @return Real delta time.
@@ -78,21 +78,21 @@ export namespace PonyEngine::Time
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds UnscaledVirtualDeltaTime() const noexcept = 0;
 
-		/// @brief Gets a real frame count elapsed since a previous tick.
-		/// @return Real delta frame.
+		/// @brief Gets a real fixed step count elapsed since a previous tick.
+		/// @return Real delta fixed step count.
 		/// @note The function may be called concurrently but mustn't be called during the time service tick.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealDeltaFrame() const noexcept = 0;
-		/// @brief Gets a virtual frame count elapsed since a previous tick.
-		/// @return Virtual delta frame.
+		virtual std::uint64_t RealDeltaFixedStepCount() const noexcept = 0;
+		/// @brief Gets a virtual fixed step count elapsed since a previous tick.
+		/// @return Virtual delta fixed step count.
 		/// @note The function may be called concurrently but mustn't be called during the time service tick.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualDeltaFrame() const noexcept = 0;
-		/// @brief Gets an unscaled virtual frame count elapsed since a previous tick.
-		/// @return Unscaled virtual delta frame.
+		virtual std::uint64_t VirtualDeltaFixedStepCount() const noexcept = 0;
+		/// @brief Gets an unscaled virtual fixed step count elapsed since a previous tick.
+		/// @return Unscaled virtual delta fixed step count.
 		/// @note The function may be called concurrently but mustn't be called during the time service tick.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualDeltaFrame() const noexcept = 0;
+		virtual std::uint64_t UnscaledVirtualDeltaFixedStepCount() const noexcept = 0;
 
 		/// @brief Gets the delta time cap.
 		/// @details It affects a virtual time only. Its delta can't exceed this value.
@@ -118,17 +118,17 @@ export namespace PonyEngine::Time
 		/// @note The function is not thread-safe.
 		virtual void TimeScale(double scale) noexcept = 0;
 
-		/// @brief Gets the frame period.
-		/// @details Every such period elapsed increments a delta frame.
-		/// @return Frame period.
-		/// @note The function may be called concurrently but mustn't be called concurrently with @p FramePeriod() setter function.
+		/// @brief Gets the fixed step period.
+		/// @details Every such period elapsed increments a delta fixed step count.
+		/// @return Fixed step period.
+		/// @note The function may be called concurrently but mustn't be called concurrently with @p FixedStepPeriod() setter function.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds FramePeriod() const noexcept = 0;
-		/// @brief Sets the frame period.
-		/// @details Every such period elapsed increments a delta frame.
-		/// @param period Frame period to set.
+		virtual std::chrono::nanoseconds FixedStepPeriod() const noexcept = 0;
+		/// @brief Sets the fixed step period.
+		/// @details Every such period elapsed increments a delta fixed step count.
+		/// @param period Fixed step period to set.
 		/// @note The function is not thread-safe.
-		virtual void FramePeriod(std::chrono::nanoseconds period) noexcept = 0;
+		virtual void FixedStepPeriod(std::chrono::nanoseconds period) noexcept = 0;
 
 		/// @brief Gets the target frame time.
 		/// @return Target frame time. 0 or less means no target frame time (it's not restricted).
@@ -138,7 +138,7 @@ export namespace PonyEngine::Time
 		/// @brief Sets the target frame time.
 		/// @param frameTime Target frame time. 0 or less means no target frame time (it's not restricted).
 		/// @note The function is not thread-safe.
-		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) = 0;
+		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) noexcept = 0;
 
 		/// @brief Gets a time point when the service initialized.
 		/// @return Time point when the service initialized.
@@ -230,20 +230,20 @@ export namespace PonyEngine::Time
 		template<std::floating_point T>
 		void TimeScale(T scale);
 
-		/// @brief Gets the frame period.
-		/// @details Every such period elapsed increments a delta frame.
+		/// @brief Gets the fixed step period.
+		/// @details Every such period elapsed increments a delta fixed step count.
 		/// @tparam T Value type.
-		/// @return Frame period in seconds.
-		/// @note The function may be called concurrently but mustn't be called concurrently with @p FramePeriod() setter function.
+		/// @return Fixed step period in seconds.
+		/// @note The function may be called concurrently but mustn't be called concurrently with @p FixedStepPeriod() setter function.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		T FramePeriodSeconds() const noexcept;
-		/// @brief Sets the frame period.
-		/// @details Every such period elapsed increments a delta frame.
+		T FixedStepPeriodSeconds() const noexcept;
+		/// @brief Sets the fixed step period.
+		/// @details Every such period elapsed increments a delta fixed step count.
 		/// @tparam T Value type.
-		/// @param period Frame period in seconds to set.
+		/// @param period Fixed step period in seconds to set.
 		/// @note The function is not thread-safe.
 		template<std::floating_point T>
-		void FramePeriodSeconds(T period);
+		void FixedStepPeriodSeconds(T period);
 
 		/// @brief Gets the target frame time.
 		/// @tparam T Value type.
@@ -329,15 +329,15 @@ namespace PonyEngine::Time
 	}
 
 	template<std::floating_point T>
-	T ITimeService::FramePeriodSeconds() const noexcept
+	T ITimeService::FixedStepPeriodSeconds() const noexcept
 	{
-		return ToSeconds<T>(FramePeriod());
+		return ToSeconds<T>(FixedStepPeriod());
 	}
 
 	template<std::floating_point T>
-	void ITimeService::FramePeriodSeconds(const T period)
+	void ITimeService::FixedStepPeriodSeconds(const T period)
 	{
-		FramePeriod(ToDuration<std::chrono::nanoseconds>(period));
+		FixedStepPeriod(ToDuration<std::chrono::nanoseconds>(period));
 	}
 
 	template<std::floating_point T>

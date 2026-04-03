@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RenderDevice:TextureFormatId;
+export module PonyEngine.RenderDevice:TextureFormatID;
 
 import std;
 

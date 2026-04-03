@@ -1,6 +1,6 @@
-# PonyEngine.RawInput.XInput.Impl module
+# PonyEngine.Surface.Impl module
 
-Raw input XInput provider module. It reads XInput input and pushes it into a raw input service.
+Surface implementation module.
 
 The module requires a platform specific implementation.
 
