@@ -8,9 +8,9 @@ target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Main.cppm"
 	"Source/Public/Main-ISurfaceObserver.cppm"
 	"Source/Public/Main-ISurfaceService.cppm"
+	"Source/Public/Main-MathUtility.cppm"
 	"Source/Public/Main-RectStyle.cppm"
 	"Source/Public/Main-SurfaceFeature.cppm"
-	"Source/Public/Main-Utility.cppm"
 )
 
 message(VERBOSE "Setting properties")

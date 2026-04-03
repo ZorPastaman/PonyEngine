@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Console.h"
 
 export module PonyEngine.Log.Impl:Logger;

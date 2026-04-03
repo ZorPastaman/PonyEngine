@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Macro/Text.h"
 
-export module PonyEngine.Application.Impl:Name;
+export module PonyEngine.Application.Impl:IdentityUtility;
 
 import std;
 

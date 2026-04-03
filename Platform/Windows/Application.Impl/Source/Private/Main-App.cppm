@@ -123,7 +123,7 @@ export namespace PonyEngine::Application::Windows
 
 		FlowManager flowManager; ///< Flow manager.
 		LoggerManager loggerManager; ///< Logger manager.
-		EnvironmentManager environmentManager; ///< Environment manager.
+		ThreadManager threadManager; ///< Thread manager.
 		AppDataManager appDataManager; ///< Application data manager.
 		PathManager pathManager; ///< Path manager.
 		ServiceManager serviceManager; ///< Service manager.
@@ -136,7 +136,7 @@ namespace PonyEngine::Application::Windows
 	App::App(const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand, const std::shared_ptr<Log::ILogger>& defaultLogger) :
 		flowManager(*this),
 		loggerManager(*this, defaultLogger),
-		environmentManager(*this),
+		threadManager(*this),
 		appDataManager(*this, instance, prevInstance, commandLine, showCommand),
 		pathManager(*this),
 		serviceManager(*this),
@@ -230,7 +230,7 @@ namespace PonyEngine::Application::Windows
 
 	std::thread::id App::MainThreadID() const noexcept
 	{
-		return environmentManager.MainThreadID();
+		return threadManager.MainThreadID();
 	}
 
 	std::string_view App::CommandLine() const noexcept

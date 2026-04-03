@@ -37,7 +37,7 @@ export namespace PonyEngine::Surface
 		WindowStyle = 1 << 1, ///< Supports window rectangle style.
 		ClientRect = 1 << 2, ///< Supports client rectangle control (move, resize, etc.).
 		Title = 1 << 3, ///< Supports title control.
-		HardwareCursor = 1 << 4, ///< Supports hardware cursor control. If not, the virtual cursor must be used.
+		HardwareCursor = 1 << 4, ///< Supports hardware cursor control.
 		All = FullscreenStyle | WindowStyle | ClientRect | Title | HardwareCursor
 	};
 

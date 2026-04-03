@@ -9,5 +9,5 @@
 
 export module PonyEngine.Time;
 
+export import :ConversionUtility;
 export import :ITimeService;
-export import :Utility;

@@ -11,6 +11,6 @@ export module PonyEngine.Surface;
 
 export import :ISurfaceObserver;
 export import :ISurfaceService;
+export import :MathUtility;
 export import :RectStyle;
 export import :SurfaceFeature;
-export import :Utility;

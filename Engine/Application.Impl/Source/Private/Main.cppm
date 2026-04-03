@@ -11,17 +11,13 @@ export module PonyEngine.Application.Impl;
 
 export import PonyEngine.Application.Ext;
 
-export import :Console;
+export import :ConsoleUtility;
 export import :DefaultLogger;
-export import :EnvironmentManager;
 export import :ExitCodes;
 export import :FlowManager;
-export import :InterfaceContainer;
+export import :IdentityUtility;
 export import :LoggerManager;
-export import :ModuleDataContainer;
 export import :ModuleManager;
-export import :Name;
-export import :Path;
-export import :ServiceContainer;
+export import :PathUtility;
 export import :ServiceManager;
-export import :TickableServiceInfo;
+export import :ThreadManager;
