@@ -210,6 +210,9 @@ The surfaces like windows and textures use a coordinate system where X is right,
 The engine render modules are mesh-shader based. The traditional render pipeline isn't supported.
 Only HLSL shaders are currently supported.
 
+Because the engine supports different render APIs, some features of HLSL are limited.
+The register types are shared and not divided into `b, t, u, s`. The engine treats spaces as descriptor set indices. The normal indices are treated as indices.
+
 ## Text
 
 The engine exclusively uses char and std::string with UTF-8 encoding, except where platform APIs require different types or encodings.
@@ -275,6 +278,10 @@ The engine has some useful CMake functions:
 | `compile_shader_with_dxc` | [File](CMake/Shader.cmake)  | Compiles a shader using DXC compiler.         |
 
 Some modules may add their own functions. Refer to their documentation to find out.
+
+## Logo
+
+The engine logo can be found [here](Logo). It contains the logo source and logo variants for all the supported platforms.
 
 ## License
 

@@ -68,7 +68,7 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params) override;
 
 		[[nodiscard("Wierd call")]]
-		virtual struct TextureFormatID TextureFormatId(std::string_view textureFormat) override;
+		virtual struct TextureFormatID TextureFormatID(std::string_view textureFormat) override;
 		[[nodiscard("Pure function")]]
 		virtual std::string_view TextureFormat(struct TextureFormatID textureFormatId) const override;
 		[[nodiscard("Pure function")]]
@@ -392,7 +392,7 @@ namespace PonyEngine::RenderDevice
 		return GetCurrentBackend().CreateBuffer(heapParams, params);
 	}
 
-	struct TextureFormatID RenderDeviceService::TextureFormatId(const std::string_view textureFormat)
+	struct TextureFormatID RenderDeviceService::TextureFormatID(const std::string_view textureFormat)
 	{
 		const auto textureFormatId = RenderDevice::TextureFormatID{.hash = Hash::FNV1a64(textureFormat)};
 
