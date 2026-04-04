@@ -76,7 +76,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	{
 		for (std::size_t i = 0uz; i < MainFormatMap.MapSize(); ++i)
 		{
-			textureFormatIds[i] = renderDevice.TextureFormatId(MainFormatMap.GetEngineFormat(i));
+			textureFormatIds[i] = renderDevice.TextureFormatID(MainFormatMap.GetEngineFormat(i));
 			dxgiFormats[i] = MainFormatMap.GetFormat(i);
 		}
 	}

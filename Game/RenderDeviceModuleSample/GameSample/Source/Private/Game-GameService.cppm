@@ -183,7 +183,7 @@ namespace Game
 		waiter = renderDevice->CreateWaiter();
 		waiter->Name("MainWaiter");
 
-		const PonyEngine::RenderDevice::TextureFormatID swapChainTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm);
+		const PonyEngine::RenderDevice::TextureFormatID swapChainTextureFormat = renderDevice->TextureFormatID(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm);
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{
 			.format = swapChainTextureFormat,
@@ -202,12 +202,12 @@ namespace Game
 		}
 		const auto renderTargetTextureFormat = PonyEngine::RenderDevice::RenderTargetAttachmentFormat
 		{
-			.format = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm),
+			.format = renderDevice->TextureFormatID(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm),
 			.srgb = false
 		};
 		const PonyEngine::Math::Vector3<std::uint32_t> res = renderDevice->SwapChainBuffer(0u)->Size();
 		resolution = PonyEngine::Math::Vector2<std::uint32_t>(res.X(), res.Y());
-		const PonyEngine::RenderDevice::TextureFormatID depthStencilTextureFormat = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::D32_Float_S8X24_Uint);
+		const PonyEngine::RenderDevice::TextureFormatID depthStencilTextureFormat = renderDevice->TextureFormatID(PonyEngine::RenderDevice::TextureFormat::D32_Float_S8X24_Uint);
 		constexpr auto sampleCount = PonyEngine::RenderDevice::SampleCount::X4;
 		targetTexture = renderDevice->CreateTexture(
 		PonyEngine::RenderDevice::CommittedResourceHeapParams
@@ -579,7 +579,7 @@ namespace Game
 		const std::vector<std::byte> textureShader = LoadShader(TEXTURE_SHADER);
 		const auto outputTextureFormat = PonyEngine::RenderDevice::RenderTargetAttachmentFormat
 		{
-			.format = renderDevice->TextureFormatId(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm),
+			.format = renderDevice->TextureFormatID(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm),
 			.srgb = true
 		};
 		outputPipelineState = renderDevice->CreateGraphicsPipelineState(outputLayout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
