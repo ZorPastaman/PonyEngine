@@ -10,7 +10,6 @@
 export module PonyEngine.Platform.Windows;
 
 export import :ComPtr;
-export import :Cursor;
 export import :Device;
 export import :File;
 export import :GUID;

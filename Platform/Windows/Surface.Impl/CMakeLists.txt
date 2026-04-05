@@ -17,6 +17,7 @@ target_sources(PonyEngine.Surface.Impl PRIVATE
 )
 target_sources(PonyEngine.Surface.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES 
 	"Source/Private/Main.cppm"
+	"Source/Private/Main-Cursor.cppm"
 	"Source/Private/Main-MemoryManager.cppm"
 	"Source/Private/Main-MessageHandler.cppm"
 	"Source/Private/Main-RawInputDeviceContainer.cppm"

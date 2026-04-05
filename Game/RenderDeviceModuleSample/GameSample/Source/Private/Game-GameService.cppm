@@ -689,6 +689,10 @@ namespace Game
 			copyFenceValueSync
 		};
 		waiter->Wait(waitedFences, std::chrono::seconds(10));
+
+		auto& surface = application->GetService<PonyEngine::Surface::ISurfaceService>();
+		surface.CursorVisibility(true);
+		surface.CursorClippingRect(std::nullopt);
 	}
 
 	void GameService::AddTickableServices(PonyEngine::Application::ITickableServiceAdder& adder)
