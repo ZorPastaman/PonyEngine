@@ -18,6 +18,7 @@ import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.Platform.Windows;
 
+import :Cursor;
 import :MessageHandler;
 import :SurfaceService;
 
@@ -56,7 +57,7 @@ namespace PonyEngine::Surface::Windows
 			auto& nativeApplication = static_cast<Application::Windows::IApplicationContext&>(application);
 			const std::string_view title = application.ProjectTitle();
 			const HICON mainIcon = nativeApplication.AppIcon();
-			const HCURSOR mainCursor = nativeApplication.AppCursor() ? nativeApplication.AppCursor() : Platform::Windows::GetDefaultCursor();
+			const HCURSOR mainCursor = nativeApplication.AppCursor() ? nativeApplication.AppCursor() : GetDefaultCursor();
 
 			PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing Windows window class...");
 			const auto windowClass = std::make_shared<WindowClass>(application, mainIcon, nullptr, mainCursor);

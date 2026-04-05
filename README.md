@@ -322,3 +322,9 @@ Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/bu
 The repo uses Catch2 for unit tests with CMake integration. See the [Tests](Tests) section to find the tests.
 
 The repo uses Catch2 benchmark tools as well. The benchmarks are compiled and run only if the `PONY_ENGINE_TESTING_BENCHMARK` define is set to `true`.
+
+### Games
+
+The engine testing can be easier if you build one of game samples to the engine build.
+To add it, set `PONY_ENGINE_ADD_GAME` CMake variable to `true` and `PONY_ENGINE_GAME_NAME` to a name of game sample.
+The presets already have them.
