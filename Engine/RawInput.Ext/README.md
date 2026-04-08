@@ -4,6 +4,13 @@ Raw input extension API module. Provides interfaces for a raw input providers.
 
 The raw input service doesn't know about specific devices, it's just a middle service that aggregates input from different input providers and exposes it to other services.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../Log)
+- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.RawInput](../RawInput)
+
 ## C\++ modules
 
 ### [PonyEngine.RawInput.Ext](Source/Public/Main.cppm)

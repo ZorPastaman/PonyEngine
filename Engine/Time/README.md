@@ -5,6 +5,10 @@ Log API module. Provides interfaces for a time service.
 The time service provides an engine time including real time, virtual time and fixed time steps.
 The time service controls a frame frequency as well.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+
 ## C\++ modules
 
 ### [PonyEngine.Time](Source/Public/Main.cppm)

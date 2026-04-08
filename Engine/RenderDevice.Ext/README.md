@@ -3,6 +3,13 @@
 Render device extension API module. It provides interfaces for backend implementations.
 The render device service doesn't have a support for any backend by default. They must be added via separate modules.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../Log)
+- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.RenderDevice](../RenderDevice)
+
 ## C\++ modules
 
 ### [PonyEngine.RenderDevice.Ext](Source/Public/Main.cppm)

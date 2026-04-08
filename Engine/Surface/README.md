@@ -5,6 +5,10 @@ Surface API module. Provides interfaces for a surface service.
 The surface service manages an output surface, for example a display and primitive objects on it.
 The surface service always has a display and a main output rectangle.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+
 ## C\++ modules
 
 ### [PonyEngine.Surface](Source/Public/Main.cppm)

@@ -2,7 +2,7 @@
 
 message(VERBOSE "Configuring parameters")
 option(PONY_ENGINE_DEFAULT_LOGGER "Enable default logger. It logs everything to a console." ON)
-option(PONY_ENGINE_CONSOLE_LOG "Enable standard c++ console." ON)
+option(PONY_ENGINE_CONSOLE_LOG "Enable standard C++ console." ON)
 
 message(VERBOSE "Configuring target")
 add_executable(PonyEngine.Application.Impl)

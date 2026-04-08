@@ -4,6 +4,13 @@ Sub-logger implementation module. The sub-logger logs to a log file.
 
 The log file is created in a local data folder. If a file with the same name exists, it will be renamed to `<file_name>_prev.<file_extension>`.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../Log)
+- [PonyEngine.Log.Ext](../Log.Ext)
+- [PonyEngine.Application.Ext](../Application.Ext)
+
 ## CMake variables
 
 These variables are used to configure the build of the module:
