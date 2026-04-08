@@ -1,7 +1,7 @@
 message(STATUS "Configuring PonyEngine.Application.Impl for Windows")
 
 option(PONY_ENGINE_CREATE_CONSOLE "Enable console." OFF)
-option(PONY_ENGINE_PLATFORM_CONSOLE_LOG "Enable platform console." ON)
+option(PONY_ENGINE_PLATFORM_CONSOLE_LOG "Enable logging to the platform console." ON)
 set(PONY_ENGINE_ROOT_PATH "" CACHE STRING "Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid.")
 set(PONY_APP_ICON "" CACHE FILEPATH "Application icon path. Must be .ico file. If it's '<Default>', the engine icon is used.")
 set(PONY_APP_CURSOR "" CACHE FILEPATH "Application cursor path. Must be .cur file. If not set, the Surface module is expected to create a default cursor.")

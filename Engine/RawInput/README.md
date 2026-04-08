@@ -9,6 +9,10 @@ A delta input is added to a current delta input sum, and every tick delta inputs
 
 Devices may have special features like vibration, for example. These features can be found via the raw input service interface.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+
 ## C\++ modules
 
 ### [PonyEngine.RawInput](Source/Public/Main.cppm)

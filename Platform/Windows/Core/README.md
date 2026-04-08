@@ -1,5 +1,7 @@
 # PonyEngine.Core module for Windows
 
+Platform independent module: [PonyEngine.Core](../../../Engine/Core).
+
 ## C\++ modules
 
 ### [PonyEngine.Platform.Windows](Source/Public/Platform.Windows.cppm)

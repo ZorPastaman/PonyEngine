@@ -2,6 +2,10 @@
 
 Render device API module. The render device service provides a low level access to a GPU.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+
 ## C\++ modules
 
 ### [PonyEngine.RenderDevice](Source/Public/Main.cppm)

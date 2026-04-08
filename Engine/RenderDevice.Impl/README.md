@@ -2,6 +2,14 @@
 
 Render device implementation module.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../Log)
+- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.RenderDevice](../RenderDevice)
+- [PonyEngine.RenderDevice.Ext](../RenderDevice.Ext)
+
 ## CMake variables
 
 These variables are used to configure the build of the module:

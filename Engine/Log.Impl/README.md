@@ -2,6 +2,13 @@
 
 Log implementation module.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../Log)
+- [PonyEngine.Log.Ext](../Log.Ext)
+- [PonyEngine.Application.Ext](../Application.Ext)
+
 ## CMake variables
 
 These variables are used to configure the build of the module:

@@ -11,4 +11,4 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows;
 
 export import PonyEngine.RenderDevice.Ext;
 
-export import :D3D12BackendModule;
+export import :BackendModule;

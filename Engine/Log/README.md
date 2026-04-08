@@ -2,6 +2,10 @@
 
 Log API module. Provides interfaces for logging.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+
 ## C\++ modules
 
 ### [PonyEngine.Log](Source/Public/Main.cppm)

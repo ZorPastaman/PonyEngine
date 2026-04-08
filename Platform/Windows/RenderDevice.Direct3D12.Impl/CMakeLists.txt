@@ -22,6 +22,8 @@ target_sources(PonyEngine.RenderDevice.Direct3D12.Impl PRIVATE
 target_sources(PonyEngine.RenderDevice.Direct3D12.Impl PUBLIC FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/Private/Main.cppm"
 	"Source/Private/Main-AtomicSupport.cppm"
+	"Source/Private/Main-Backend.cppm"
+	"Source/Private/Main-BackendModule.cppm"
 	"Source/Private/Main-Buffer.cppm"
 	"Source/Private/Main-BufferUtility.cppm"
 	"Source/Private/Main-BundleCommandList.cppm"
@@ -37,8 +39,6 @@ target_sources(PonyEngine.RenderDevice.Direct3D12.Impl PUBLIC FILE_SET CXX_MODUL
 	"Source/Private/Main-DescriptorHeap.cppm"
 	"Source/Private/Main-DescriptorHeapUtility.cppm"
 	"Source/Private/Main-Device.cppm"
-	"Source/Private/Main-D3D12Backend.cppm"
-	"Source/Private/Main-D3D12BackendModule.cppm"
 	"Source/Private/Main-Engine.cppm"
 	"Source/Private/Main-Factory.cppm"
 	"Source/Private/Main-Fence.cppm"

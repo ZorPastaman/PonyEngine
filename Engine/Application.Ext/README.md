@@ -2,6 +2,11 @@
 
 Application extension API module. Provides interfaces to access to engine services, logging, and application context.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../Log)
+
 ## C\++ modules
 
 ### [PonyEngine.Application.Ext](Source/Public/Main.cppm)

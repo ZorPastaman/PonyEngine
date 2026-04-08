@@ -16,7 +16,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	Application::IModule* GetD3D12BackendModule()
 	{
-		static D3D12BackendModule d3D12BackendModule;
+		static BackendModule d3D12BackendModule;
 		return &d3D12BackendModule;
 	}
 }

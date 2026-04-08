@@ -4,6 +4,12 @@ Log extension API module. Provides interfaces for the logger extensions.
 
 By default, the engine logger logs only to the console. For additional log outputs, modules must add sub-loggers to the logger.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../Log)
+- [PonyEngine.Application.Ext](../Application.Ext)
+
 ## C\++ modules
 
 ### [PonyEngine.Log.Ext](Source/Public/Main.cppm)

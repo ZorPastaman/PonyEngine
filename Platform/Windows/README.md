@@ -21,6 +21,10 @@ The Windows support mutates engine modules, adding code and defines to them.
 | [PonyEngine.Surface](../../Engine/Surface)                                           | [PonyEngine.Surface.Windows](Surface)                                           |
 | [PonyEngine.Surface.Impl](../../Engine/Surface.Impl)                                 | [PonyEngine.Surface.Impl.Windows](Surface.Impl)                                 |
 
+## Long paths
+
+Long paths support is not implemented.
+
 ## For Pony Engine developers
 
 Windows SDK version 10.0.26100.0 is required to ensure compatibility. Other versions will fail the build.

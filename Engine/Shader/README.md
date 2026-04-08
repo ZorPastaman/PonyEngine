@@ -3,6 +3,10 @@
 Shader utility module. Provides utilities for both C\++ and HLSL.
 Includes classes and structs shared between the two languages, with implementations on both sides.
 
+## Dependencies
+
+- [PonyEngine.Core](../Core)
+
 ## Modules
 
 On C\++ side all the utilities are contained in [PonyEngine.Shader](Source/Public/Main.cppm) module.
