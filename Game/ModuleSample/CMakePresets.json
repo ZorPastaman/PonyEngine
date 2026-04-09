@@ -121,7 +121,8 @@
 			}
 		},
 		{
-			"name": "Windows",
+			"name": "Win",
+			"displayName": "Windows",
 			"inherits": "Desktop",
 			"hidden": true,
 			"cacheVariables": {
@@ -129,20 +130,21 @@
 			}
 		},
 		{
-			"name": "Windows-MSVC",
-			"inherits": "Windows",
+			"name": "Win-MSVC",
+			"displayName": "Windows-MSVC",
+			"inherits": "Win",
 			"hidden": true,
 			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
 		},
 		{
-			"name": "Windows-MSVC-Debug",
+			"name": "Win-MSVC-Deb",
 			"displayName": "Windows MSVC - Debug",
-			"inherits": [ "Debug", "Windows-MSVC" ]
+			"inherits": [ "Debug", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Development",
+			"name": "Win-MSVC-Dev",
 			"displayName": "Windows MSVC - Development",
-			"inherits": [ "Development", "Windows-MSVC" ]
+			"inherits": [ "Development", "Win-MSVC" ]
 		},
 		{
 			"name": "Windows-MSVC-Optimized",

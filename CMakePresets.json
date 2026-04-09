@@ -142,7 +142,8 @@
 			}
 		},
 		{
-			"name": "Windows",
+			"name": "Win",
+			"displayName": "Windows",
 			"inherits": "Desktop",
 			"hidden": true,
 			"cacheVariables": {
@@ -154,89 +155,90 @@
 			}
 		},
 		{
-			"name": "Windows-MSVC",
-			"inherits": "Windows",
+			"name": "Win-MSVC",
+			"displayName": "Windows-MSVC",
+			"inherits": "Win",
 			"hidden": true,
 			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
 		},
 		{
-			"name": "Windows-MSVC-Debug",
+			"name": "Win-MSVC-Deb",
 			"displayName": "Windows MSVC - Debug",
-			"inherits": [ "Debug", "Windows-MSVC" ]
+			"inherits": [ "Debug", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Development",
+			"name": "Win-MSVC-Dev",
 			"displayName": "Windows MSVC - Development",
-			"inherits": [ "Development", "Windows-MSVC" ]
+			"inherits": [ "Development", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Optimized",
+			"name": "Win-MSVC-Opt",
 			"displayName": "Windows MSVC - Optimized",
-			"inherits": [ "Optimized", "Windows-MSVC" ]
+			"inherits": [ "Optimized", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Release",
+			"name": "Win-MSVC-Rel",
 			"displayName": "Windows MSVC - Release",
-			"inherits": [ "Release", "Windows-MSVC" ]
+			"inherits": [ "Release", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Shipping",
+			"name": "Win-MSVC-Shi",
 			"displayName": "Windows MSVC - Shipping",
-			"inherits": [ "Shipping", "Windows-MSVC" ]
+			"inherits": [ "Shipping", "Win-MSVC" ]
 		}
 	],
 	"buildPresets": [
 		{
-			"name": "Windows-MSVC-Debug",
+			"name": "Win-MSVC-Deb",
 			"displayName": "Windows MSVC - Debug",
-			"configurePreset": "Windows-MSVC-Debug"
+			"configurePreset": "Win-MSVC-Deb"
 		},
 		{
-			"name": "Windows-MSVC-Development",
+			"name": "Win-MSVC-Dev",
 			"displayName": "Windows MSVC - Development",
-			"configurePreset": "Windows-MSVC-Development"
+			"configurePreset": "Win-MSVC-Dev"
 		},
 		{
-			"name": "Windows-MSVC-Optimized",
+			"name": "Win-MSVC-Opt",
 			"displayName": "Windows MSVC - Optimized",
-			"configurePreset": "Windows-MSVC-Optimized"
+			"configurePreset": "Win-MSVC-Opt"
 		},
 		{
-			"name": "Windows-MSVC-Release",
+			"name": "Win-MSVC-Rel",
 			"displayName": "Windows MSVC - Release",
-			"configurePreset": "Windows-MSVC-Release"
+			"configurePreset": "Win-MSVC-Rel"
 		},
 		{
-			"name": "Windows-MSVC-Shipping",
+			"name": "Win-MSVC-Shi",
 			"displayName": "Windows MSVC - Shipping",
-			"configurePreset": "Windows-MSVC-Shipping"
+			"configurePreset": "Win-MSVC-Shi"
 		}
 	],
 	"testPresets": [
 		{
-			"name": "Windows-MSVC-Debug",
+			"name": "Win-MSVC-Deb",
 			"displayName": "Windows MSVC - Debug",
-			"configurePreset": "Windows-MSVC-Debug"
+			"configurePreset": "Win-MSVC-Deb"
 		},
 		{
-			"name": "Windows-MSVC-Development",
+			"name": "Win-MSVC-Dev",
 			"displayName": "Windows MSVC - Development",
-			"configurePreset": "Windows-MSVC-Development"
+			"configurePreset": "Win-MSVC-Dev"
 		},
 		{
-			"name": "Windows-MSVC-Optimized",
+			"name": "Win-MSVC-Opt",
 			"displayName": "Windows MSVC - Optimized",
-			"configurePreset": "Windows-MSVC-Optimized"
+			"configurePreset": "Win-MSVC-Opt"
 		},
 		{
-			"name": "Windows-MSVC-Release",
+			"name": "Win-MSVC-Rel",
 			"displayName": "Windows MSVC - Release",
-			"configurePreset": "Windows-MSVC-Release"
+			"configurePreset": "Win-MSVC-Rel"
 		},
 		{
-			"name": "Windows-MSVC-Shipping",
+			"name": "Win-MSVC-Shi",
 			"displayName": "Windows MSVC - Shipping",
-			"configurePreset": "Windows-MSVC-Shipping"
+			"configurePreset": "Win-MSVC-Shi"
 		}
 	]
 }
