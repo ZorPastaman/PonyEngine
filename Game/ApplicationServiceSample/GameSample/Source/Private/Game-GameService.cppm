@@ -19,12 +19,12 @@ export namespace Game
 		virtual void Begin() override;
 		virtual void End() override;
 
-		virtual void AddTickableServices(PonyEngine::Application::ITickableServiceAdder& adder) override;
-
 		GameService& operator =(const GameService&) = delete;
 		GameService& operator =(GameService&&) = delete;
 
 	private:
+		virtual void AddTickableServices(PonyEngine::Application::ITickableServiceAdder& adder) override;
+
 		virtual void Tick() override;
 
 		PonyEngine::Application::IApplicationContext* application;

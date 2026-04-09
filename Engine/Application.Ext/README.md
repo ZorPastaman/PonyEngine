@@ -70,7 +70,7 @@ How to add an application module:
 1. Add required engine dependencies to your module target: `target_link_libraries(<MyModule> PUBLIC PonyEngine.Core PonyEngine.Application.Ext)`;
 2. Make a class that inherits `PonyEngine::Application::IModule` from `PonyEngine.Application.Ext` C\++ module;
 3. Make a function that returns a `PonyEngine::Application::IModule*` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h` The instance must live for the lifetime of the application;
-4. Include `PonyEngine/Application/Module.h` and use the macro `PONY_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)`. Module initialization order is defined by letters and follows alphabetical order;
+4. Include `PonyEngine/Application/Module.h` and use the macro `PONY_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)` in a public code file. Module initialization order is defined by letters and follows alphabetical order;
 5. Link your module target to the engine application target: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)`.
 
 Example of `PONY_MODULE` usage in a `.cpp` file:

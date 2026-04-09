@@ -251,6 +251,14 @@ Input parameters for the engine CMake scripts. These variables are initialized w
 | `PONY_COMPANY_TITLE`         | "Pony Engine"      | Company title. It's used in GUI only. May be any non-empty string.                                                               |
 | `PONY_PROJECT_TITLE`         | "Pony Engine Game" | Project title. It's used in GUI only. May be any non-empty string.                                                               |
 
+##### Icon
+
+There are 3 modes to set the application icon:
+
+1. `PONY_APP_ICON_MODE` = any CMake false constant. The application will not have an icon at all;
+2. `PONY_APP_ICON_MODE` = `Default`. The application will use the engine icon.
+3. `PONY_APP_ICON_MODE` = `Custom`. The application will use a custom icon.
+
 #### Output
 
 Output parameters are passed via `PARENT_SCOPE` to a CMake script that called the engine CMake script.
@@ -315,7 +323,7 @@ Each toolchain must define `PONY_COMPILE_FLAGS_DEBUG`, `PONY_COMPILE_FLAGS_RELEA
 #### Windows MSVC toolchain
 
 The toolchain for the Windows–MSVC combination requires presetting some environment variables for a correct build using vcvars*.bat.
-Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170
+Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170 for details.
 
 ### Tests
 

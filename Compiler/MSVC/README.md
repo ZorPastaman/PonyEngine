@@ -21,5 +21,3 @@ Sets public defines to [PonyEngine.Core](../../Engine/Core).
 
 Before building with MSVC using CMake, you must set up the MSVC build environment.
 See details on [Microsoft Learn](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170).
-
-Usually, you just call `vcvarsall.bat`.
