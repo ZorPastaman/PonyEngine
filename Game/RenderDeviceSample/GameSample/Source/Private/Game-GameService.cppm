@@ -509,12 +509,12 @@ namespace Game
 		});
 		layout->Name("BoxLayout");
 
-		const std::vector<std::byte> triangleShader = LoadShader(TRIANGLE_SHADER);
+		const std::vector<std::byte> objectShader = LoadShader(OBJECT_SHADER);
 		const std::vector<std::byte> pixelShader = LoadShader(PIXEL_SHADER);
 		constexpr auto opaqueBlendParams = PonyEngine::RenderDevice::ArithmeticRenderTargetBlendParams{};
 		boxPipelineState = renderDevice->CreateGraphicsPipelineState(layout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
 		{
-			.meshShader = triangleShader,
+			.meshShader = objectShader,
 			.pixelShader = pixelShader,
 			.attachment = PonyEngine::RenderDevice::AttachmentParams
 			{
