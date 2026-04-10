@@ -45,19 +45,19 @@ export namespace Game
 		PonyEngine::RawInput::IRawInputService* input;
 		PonyEngine::Surface::ISurfaceService* surface;
 
-		PonyEngine::RawInput::AxisId fullscreenSwitchAxis;
-		PonyEngine::RawInput::AxisId moveLeftAxis;
-		PonyEngine::RawInput::AxisId moveRightAxis;
-		PonyEngine::RawInput::AxisId moveDownAxis;
-		PonyEngine::RawInput::AxisId moveUpAxis;
-		PonyEngine::RawInput::AxisId sizeLeftAxis;
-		PonyEngine::RawInput::AxisId sizeRightAxis;
-		PonyEngine::RawInput::AxisId sizeDownAxis;
-		PonyEngine::RawInput::AxisId sizeUpAxis;
-		PonyEngine::RawInput::AxisId titleAxis;
-		PonyEngine::RawInput::AxisId cursorVisibilityAxis;
-		PonyEngine::RawInput::AxisId cursorClippingAxis;
-		PonyEngine::RawInput::AxisId reportPositionsAxis;
+		PonyEngine::RawInput::AxisID fullscreenSwitchAxis;
+		PonyEngine::RawInput::AxisID moveLeftAxis;
+		PonyEngine::RawInput::AxisID moveRightAxis;
+		PonyEngine::RawInput::AxisID moveDownAxis;
+		PonyEngine::RawInput::AxisID moveUpAxis;
+		PonyEngine::RawInput::AxisID sizeLeftAxis;
+		PonyEngine::RawInput::AxisID sizeRightAxis;
+		PonyEngine::RawInput::AxisID sizeDownAxis;
+		PonyEngine::RawInput::AxisID sizeUpAxis;
+		PonyEngine::RawInput::AxisID titleAxis;
+		PonyEngine::RawInput::AxisID cursorVisibilityAxis;
+		PonyEngine::RawInput::AxisID cursorClippingAxis;
+		PonyEngine::RawInput::AxisID reportPositionsAxis;
 	};
 }
 
