@@ -11,15 +11,15 @@ target_include_directories(PonyEngine.MessagePump.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.MessagePump.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.MessagePump.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.MessagePump.Impl PUBLIC FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-MessagePumpService.cppm"
-	"Source/Private/Main-MessagePumpServiceModule.cppm"
+	"Source/Main.cppm"
+	"Source/Main-MessagePumpService.cppm"
+	"Source/Main-MessagePumpServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

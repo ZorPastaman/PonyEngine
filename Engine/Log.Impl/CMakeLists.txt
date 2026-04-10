@@ -13,18 +13,18 @@ target_include_directories(PonyEngine.Log.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.Log.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-LogFiller.cppm"
-	"Source/Private/Main-Logger.cppm"
-	"Source/Private/Main-LoggerModule.cppm"
-	"Source/Private/Main-LogTypeSymbol.cppm"
-	"Source/Private/Main-SubLoggerContainer.cppm"
+	"Source/Main.cppm"
+	"Source/Main-LogFiller.cppm"
+	"Source/Main-Logger.cppm"
+	"Source/Main-LoggerModule.cppm"
+	"Source/Main-LogTypeSymbol.cppm"
+	"Source/Main-SubLoggerContainer.cppm"
 )
 
 message(VERBOSE "Configuring defines")

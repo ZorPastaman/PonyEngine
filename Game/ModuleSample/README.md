@@ -71,11 +71,11 @@ Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/bu
 
 ## Main files
 
-### [Game](GameSample/Source/Private/Game.cppm)
+### [Game](GameSample/Source/Game.cppm)
 
 Module sample.
 
-### [Main](GameSample/Source/Main.cpp) & [Main.Impl](GameSample/Source/Main.Impl.cpp)
+### [Launch](GameSample/Source/Launch.cpp) & [Launch.Impl](GameSample/Source/Launch.Impl.cpp)
 
 Creates the game module and adds it to the application.
 

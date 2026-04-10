@@ -14,19 +14,19 @@ target_include_directories(PonyEngine.RawInput.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.RawInput.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-DeviceFeatureContainer.cppm"
-	"Source/Private/Main-InputDeviceContainer.cppm"
-	"Source/Private/Main-InputProviderContainer.cppm"
-	"Source/Private/Main-RawInputQueue.cppm"
-	"Source/Private/Main-RawInputService.cppm"
-	"Source/Private/Main-RawInputServiceModule.cppm"
+	"Source/Main.cppm"
+	"Source/Main-DeviceFeatureContainer.cppm"
+	"Source/Main-InputDeviceContainer.cppm"
+	"Source/Main-InputProviderContainer.cppm"
+	"Source/Main-RawInputQueue.cppm"
+	"Source/Main-RawInputService.cppm"
+	"Source/Main-RawInputServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

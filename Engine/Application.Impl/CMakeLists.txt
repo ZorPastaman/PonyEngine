@@ -9,21 +9,21 @@ add_executable(PonyEngine.Application.Impl)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-ConsoleUtility.cppm"
-	"Source/Private/Main-DefaultLogger.cppm"
-	"Source/Private/Main-ExitCodes.cppm"
-	"Source/Private/Main-FlowManager.cppm"
-	"Source/Private/Main-IdentityUtility.cppm"
-	"Source/Private/Main-InterfaceContainer.cppm"
-	"Source/Private/Main-LoggerManager.cppm"
-	"Source/Private/Main-ModuleDataContainer.cppm"
-	"Source/Private/Main-ModuleManager.cppm"
-	"Source/Private/Main-PathUtility.cppm"
-	"Source/Private/Main-ServiceContainer.cppm"
-	"Source/Private/Main-ServiceManager.cppm"
-	"Source/Private/Main-ThreadManager.cppm"
-	"Source/Private/Main-TickableServiceInfo.cppm"
+	"Source/Main.cppm"
+	"Source/Main-ConsoleUtility.cppm"
+	"Source/Main-DefaultLogger.cppm"
+	"Source/Main-ExitCodes.cppm"
+	"Source/Main-FlowManager.cppm"
+	"Source/Main-IdentityUtility.cppm"
+	"Source/Main-InterfaceContainer.cppm"
+	"Source/Main-LoggerManager.cppm"
+	"Source/Main-ModuleDataContainer.cppm"
+	"Source/Main-ModuleManager.cppm"
+	"Source/Main-PathUtility.cppm"
+	"Source/Main-ServiceContainer.cppm"
+	"Source/Main-ServiceManager.cppm"
+	"Source/Main-ThreadManager.cppm"
+	"Source/Main-TickableServiceInfo.cppm"
 )
 
 message(VERBOSE "Configuring defines")

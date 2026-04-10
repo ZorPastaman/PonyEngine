@@ -24,5 +24,5 @@ These variables are used to configure the build of the module:
 
 The module has a simple implementation:
 
-- [FileSubLogger](Source/Private/Main-FileSubLogger.cppm) - sub-logger;
-- [FileSubLoggerModule](Source/Private/Main-FileSubLoggerModule.cppm) - sub-logger module.
+- [FileSubLogger](Source/Main-FileSubLogger.cppm) - sub-logger;
+- [FileSubLoggerModule](Source/Main-FileSubLoggerModule.cppm) - sub-logger module.

@@ -21,5 +21,5 @@ These variables are used to configure the build of the module:
 
 Main submodules:
 
-- [MessagePumpService](Source/Private/Main-MessagePumpService.cppm) - message pump service;
-- [MessagePumpServiceModule](Source/Private/Main-MessagePumpServiceModule.cppm) - message pump service module.
+- [MessagePumpService](Source/Main-MessagePumpService.cppm) - message pump service;
+- [MessagePumpServiceModule](Source/Main-MessagePumpServiceModule.cppm) - message pump service module.

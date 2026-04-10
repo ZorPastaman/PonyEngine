@@ -9,7 +9,7 @@ Includes classes and structs shared between the two languages, with implementati
 
 ## Modules
 
-On C\++ side all the utilities are contained in [PonyEngine.Shader](Source/Public/Main.cppm) module.
+On C\++ side all the utilities are contained in [PonyEngine.Shader](Source/Main.cppm) module.
 On HLSL side all the utilities are contained in different .hlsli file in [ShaderInclude](ShaderInclude).
 
 The module sets a path to the HLSL include folder in the CMake target property `PONY_ENGINE_SHADER_INCLUDE`.
@@ -18,7 +18,7 @@ Add it to a list of includes to compile a shader.
 
 ## Utilities
 
-### C\++: [Bool](Source/Public/Main-Bool.cppm); HLSL: -
+### C\++: [Bool](Source/Main-Bool.cppm); HLSL: -
 
 4-byte bool. It may be useful for structs that are synced with HLSL 'cause it has 4-byte bool.
 
@@ -33,7 +33,7 @@ These defines are used to declare registers in HLSL. For example, `StructuredBuf
 It's used instead of a classic hlsl `register(t2, space1)` because the shader must be compatible with different render APIs that have a different binding system.
 That's why the engine uses those defines where you set a register type, descriptor set index and an object index in that set. You can't reuse the same set index and object index for different type.
 
-### C\++: [Meshlet](Source/Public/Main-Meshlet.cppm); HLSL: [PonyEngine/Meshlet.hlsli](ShaderInclude/PonyEngine/Meshlet.hlsli)
+### C\++: [Meshlet](Source/Main-Meshlet.cppm); HLSL: [PonyEngine/Meshlet.hlsli](ShaderInclude/PonyEngine/Meshlet.hlsli)
 
 Meshlet implementation. The meshlet is just a simple class that contains 4-byte vertex offset, 4-byte primitive offset, 1-byte vertex count and 1-byte primitive count.
 The size of both C\++ and HLSL implementations is 12 bytes. 

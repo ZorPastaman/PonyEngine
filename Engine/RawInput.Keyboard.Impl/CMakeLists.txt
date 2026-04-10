@@ -5,10 +5,10 @@ add_library(PonyEngine.RawInput.Keyboard.Impl STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-KeyboardContainer.cppm"
-	"Source/Private/Main-KeyboardEvent.cppm"
-	"Source/Private/Main-KeyboardEventQueue.cppm"
+	"Source/Main.cppm"
+	"Source/Main-KeyboardContainer.cppm"
+	"Source/Main-KeyboardEvent.cppm"
+	"Source/Main-KeyboardEventQueue.cppm"
 )
 
 message(VERBOSE "Setting properties")

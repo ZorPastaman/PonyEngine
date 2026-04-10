@@ -21,23 +21,23 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-### [MessageHandler](Source/Private/Main-MessageHandler.cppm)
+### [MessageHandler](Source/Main-MessageHandler.cppm)
 
 Utilities to make Windows message handling object oriented.
 
 A window class must use `WindowProc()` as a window proc function.
 A surface service must inherit `IMessageHandler` and put a pointer to its implementation in `CreateWindowExA()` lpParam.
 
-### [WindowClass](Source/Private/Main-WindowClass.cppm)
+### [WindowClass](Source/Main-WindowClass.cppm)
 
 Window class holder.
 
-### [SurfaceService](Source/Private/Main-SurfaceService.cppm)
+### [SurfaceService](Source/Main-SurfaceService.cppm)
 
 Surface service implementation.
 
 The service creates a window on its constructor but shows it only on `Begin()`.
 
-### [SurfaceServiceModule](Source/Private/Main-SurfaceServiceModule.cppm)
+### [SurfaceServiceModule](Source/Main-SurfaceServiceModule.cppm)
 
 Surface service module.

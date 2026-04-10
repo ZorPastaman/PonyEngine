@@ -18,35 +18,35 @@ These variables are used to configure the build of the module:
 
 ### Main submodules:
 
-#### [App](Source/Private/Main-App.cppm)
+#### [App](Source/Main-App.cppm)
 
 Main application class. Controls the managers and loggers.
 
-#### [AppDataManager](Source/Private/Main-AppDataManager.cppm)
+#### [AppDataManager](Source/Main-AppDataManager.cppm)
 
 Windows specific application data manager.
 
-#### [LoggerManager](Source/Private/Main-LoggerManager.cppm)
+#### [LoggerManager](Source/Main-LoggerManager.cppm)
 
 Windows logger manager. On logging to a console, it logs to both a standard C\++ console and Windows console.
 
-#### [PathManager](Source/Private/Main-PathManager.cppm)
+#### [PathManager](Source/Main-PathManager.cppm)
 
 Gets and provides application paths.
 
-#### [DefaultLogger](Source/Private/Main-DefaultLogger.cppm)
+#### [DefaultLogger](Source/Main-DefaultLogger.cppm)
 
 Default Windows logger.
 
-#### [Console](Source/Private/Main-Console.cppm)
+#### [Console](Source/Main-Console.cppm)
 
 Utilities to control a Windows console.
 
-#### [Process](Source/Private/Main-Process.cppm)
+#### [Process](Source/Main-Process.cppm)
 
 Utilities to control the application process.
 
-### [main()](Source/Main.cpp)
+### [main()](Source/Launch.cpp)
 
 Main function.
 

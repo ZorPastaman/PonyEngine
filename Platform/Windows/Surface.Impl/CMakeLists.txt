@@ -10,21 +10,21 @@ target_include_directories(PonyEngine.Surface.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Surface.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.Surface.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.Surface.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES 
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-Cursor.cppm"
-	"Source/Private/Main-MemoryManager.cppm"
-	"Source/Private/Main-MessageHandler.cppm"
-	"Source/Private/Main-RawInputDeviceContainer.cppm"
-	"Source/Private/Main-RawInputManager.cppm"
-	"Source/Private/Main-SurfaceService.cppm"
-	"Source/Private/Main-SurfaceServiceModule.cppm"
-	"Source/Private/Main-WindowClass.cppm"
+	"Source/Main.cppm"
+	"Source/Main-Cursor.cppm"
+	"Source/Main-MemoryManager.cppm"
+	"Source/Main-MessageHandler.cppm"
+	"Source/Main-RawInputDeviceContainer.cppm"
+	"Source/Main-RawInputManager.cppm"
+	"Source/Main-SurfaceService.cppm"
+	"Source/Main-SurfaceServiceModule.cppm"
+	"Source/Main-WindowClass.cppm"
 )
 
 message(VERBOSE "Configuring defines")

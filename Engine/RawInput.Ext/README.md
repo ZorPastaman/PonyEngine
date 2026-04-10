@@ -13,19 +13,19 @@ The raw input service doesn't know about specific devices, it's just a middle se
 
 ## C\++ modules
 
-### [PonyEngine.RawInput.Ext](Source/Public/Main.cppm)
+### [PonyEngine.RawInput.Ext](Source/Main.cppm)
 
 Main interfaces:
 
-#### [IInputProvider](Source/Public/Main-IInputProvider.cppm)
+#### [IInputProvider](Source/Main-IInputProvider.cppm)
 
 Input provider interface. Each input provider added to the raw input service must implement it.
 
-#### [IRawInputContext](Source/Public/Main-IRawInputContext.cppm)
+#### [IRawInputContext](Source/Main-IRawInputContext.cppm)
 
 Interface representing the raw input service context. Provides access to the application context, logger and input management functions.
 
-#### [IRawInputModuleContext](Source/Public/Main-IRawInputModuleContext.cppm)
+#### [IRawInputModuleContext](Source/Main-IRawInputModuleContext.cppm)
 
 Interface representing the raw input service module context. This interface is used by modules to add input providers. It may be accessed via module data after the raw input service module initialization.
 

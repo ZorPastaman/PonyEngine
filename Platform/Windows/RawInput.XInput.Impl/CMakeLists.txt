@@ -10,17 +10,17 @@ target_include_directories(PonyEngine.RawInput.XInput.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.XInput.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-GamepadAxisMap.cppm"
-	"Source/Private/Main-GamepadContainer.cppm"
-	"Source/Private/Main-XInputProvider.cppm"
-	"Source/Private/Main-XInputProviderModule.cppm"
+	"Source/Main.cppm"
+	"Source/Main-GamepadAxisMap.cppm"
+	"Source/Main-GamepadContainer.cppm"
+	"Source/Main-XInputProvider.cppm"
+	"Source/Main-XInputProviderModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

@@ -8,11 +8,11 @@ Render device API module. The render device service provides a low level access 
 
 ## C\++ modules
 
-### [PonyEngine.RenderDevice](Source/Public/Main.cppm)
+### [PonyEngine.RenderDevice](Source/Main.cppm)
 
 Main sub-modules:
 
-#### [IRenderDeviceService](Source/Public/Main-IRenderDeviceService.cppm)
+#### [IRenderDeviceService](Source/Main-IRenderDeviceService.cppm)
 
 Render device service public interface.
 
@@ -37,87 +37,87 @@ Use `TextureFormatId()` to get a hashed texture format. `TextureFormat()` may be
 Because a texture format support depends on a device, the service has the function `TextureFormatSupport()` that checks a texture format support.
 To find out if a device supports a texture, use `TextureSupport()` before creating a texture.
 
-#### [IRenderDeviceServiceObserver](Source/Public/Main-IRenderDeviceServiceObserver.cppm)
+#### [IRenderDeviceServiceObserver](Source/Main-IRenderDeviceServiceObserver.cppm)
 
-Render device service observer. If it's added to the [IRenderDeviceService](Source/Public/Main-IRenderDeviceService.cppm), it will receive notifications on different events.
+Render device service observer. If it's added to the [IRenderDeviceService](Source/Main-IRenderDeviceService.cppm), it will receive notifications on different events.
 It can be useful to detect backend switching to release resources.
 
-#### [IBuffer](Source/Public/Main-IBuffer.cppm)
+#### [IBuffer](Source/Main-IBuffer.cppm)
 
 Buffer resource.
 
-#### [ITexture](Source/Public/Main-ITexture.cppm)
+#### [ITexture](Source/Main-ITexture.cppm)
 
 Texture resource.
 
-#### [IShaderDataContainer](Source/Public/Main-IShaderDataContainer.cppm)
+#### [IShaderDataContainer](Source/Main-IShaderDataContainer.cppm)
 
 Container of CBV, SRV and UAV.
 
-#### [IRenderTargetContainer](Source/Public/Main-IRenderTargetContainer.cppm)
+#### [IRenderTargetContainer](Source/Main-IRenderTargetContainer.cppm)
 
 Container of RTV.
 
-#### [IDepthStencilContainer](Source/Public/Main-IDepthStencilContainer.cppm)
+#### [IDepthStencilContainer](Source/Main-IDepthStencilContainer.cppm)
 
 Container of DSV.
 
-#### [ISamplerContainer](Source/Public/Main-ISamplerContainer.cppm)
+#### [ISamplerContainer](Source/Main-ISamplerContainer.cppm)
 
 Container of samplers.
 
-#### [IPipelineLayout](Source/Public/Main-IPipelineLayout.cppm)
+#### [IPipelineLayout](Source/Main-IPipelineLayout.cppm)
 
 Describes a pipeline layout. The pipeline layout is an array of descriptor sets.
 Every descriptor set has a unique in its layout index, static samplers and ranges that can be either a range of data views or a range of samplers.
 Every range describes a range in a container of elements that go contiguously.
 
-#### [IGraphicsPipelineState](Source/Public/Main-IGraphicsPipelineState.cppm)
+#### [IGraphicsPipelineState](Source/Main-IGraphicsPipelineState.cppm)
 
 Describes a graphics pipeline state. Uses amplification, mesh and pixel shaders.
 
-#### [IComputePipelineState](Source/Public/Main-IComputePipelineState.cppm)
+#### [IComputePipelineState](Source/Main-IComputePipelineState.cppm)
 
 Describes a Compute pipeline state. Uses compute shaders.
 
-#### [IGraphicsCommandList](Source/Public/Main-IGraphicsCommandList.cppm)
+#### [IGraphicsCommandList](Source/Main-IGraphicsCommandList.cppm)
 
 Graphics command list. Supports all the commands. 
-After finishing writing to a command list, submit it for execution via a function `Execute()` in [IRenderDeviceService](Source/Public/Main-IRenderDeviceService.cppm).
+After finishing writing to a command list, submit it for execution via a function `Execute()` in [IRenderDeviceService](Source/Main-IRenderDeviceService.cppm).
 
-#### [IComputeCommandList](Source/Public/Main-IComputeCommandList.cppm)
+#### [IComputeCommandList](Source/Main-IComputeCommandList.cppm)
 
 Compute command list. Supports compute and copy commands only. 
-After finishing writing to a command list, submit it for execution via a function `Execute()` in [IRenderDeviceService](Source/Public/Main-IRenderDeviceService.cppm).
+After finishing writing to a command list, submit it for execution via a function `Execute()` in [IRenderDeviceService](Source/Main-IRenderDeviceService.cppm).
 
-#### [ICopyCommandList](Source/Public/Main-ICopyCommandList.cppm)
+#### [ICopyCommandList](Source/Main-ICopyCommandList.cppm)
 
 Copy command list. Supports copy commands only. 
-After finishing writing to a command list, submit it for execution via a function `Execute()` in [IRenderDeviceService](Source/Public/Main-IRenderDeviceService.cppm).
+After finishing writing to a command list, submit it for execution via a function `Execute()` in [IRenderDeviceService](Source/Main-IRenderDeviceService.cppm).
 
-#### [ISecondaryGraphicsCommandList](Source/Public/Main-ISecondaryGraphicsCommandList.cppm)
+#### [ISecondaryGraphicsCommandList](Source/Main-ISecondaryGraphicsCommandList.cppm)
 
 Secondary graphics command list. Supports a subset of graphics command list commands. 
-After finishing writing to a command list, submit it for execution via a function `Execute()` in [IGraphicsCommandList](Source/Public/Main-IGraphicsCommandList.cppm).
+After finishing writing to a command list, submit it for execution via a function `Execute()` in [IGraphicsCommandList](Source/Main-IGraphicsCommandList.cppm).
 
 This type is used for optimizations. Instead of repeating the same command in a main command list, you can create a secondary command list and reuse it.
 
-#### [IFence](Source/Public/Main-IFence.cppm)
+#### [IFence](Source/Main-IFence.cppm)
 
 An object that is used to synchronize CPU and different command queues on GPU.
 
-#### [IWaiter](Source/Public/Main-IWaiter.cppm)
+#### [IWaiter](Source/Main-IWaiter.cppm)
 
 An object that can pause a cpu thread till all the submitted fences reach required values.
 
-#### [CopyUtility](Source/Public/Main-CopyUtility.cppm)
+#### [CopyUtility](Source/Main-CopyUtility.cppm)
 
 Utility functions that help to copy data. They're especially useful to copy data between a data array and a buffer using `std::span<CopyableFootprint>`.
 
-#### [RenderAPI](Source/Public/Main-RenderAPI.cppm)
+#### [RenderAPI](Source/Main-RenderAPI.cppm)
 
 Collection of default render API names.
 
-#### [ShaderIR](Source/Public/Main-ShaderIR.cppm)
+#### [ShaderIR](Source/Main-ShaderIR.cppm)
 
 Collection of default shader IR names.

@@ -12,19 +12,19 @@ The render device service doesn't have a support for any backend by default. The
 
 ## C\++ modules
 
-### [PonyEngine.RenderDevice.Ext](Source/Public/Main.cppm)
+### [PonyEngine.RenderDevice.Ext](Source/Main.cppm)
 
 Main interfaces:
 
-#### [IBackend](Source/Public/Main-IBackend.cppm)
+#### [IBackend](Source/Main-IBackend.cppm)
 
 Backend interface. Each backend must implement it.
 
-#### [IRenderDeviceContext](Source/Public/Main-IRenderDeviceContext.cppm)
+#### [IRenderDeviceContext](Source/Main-IRenderDeviceContext.cppm)
 
 Interface representing the render device service context. Provides access to the application context, logger and other functions.
 
-#### [IRenderDeviceModuleContext](Source/Public/Main-IRenderDeviceModuleContext.cppm)
+#### [IRenderDeviceModuleContext](Source/Main-IRenderDeviceModuleContext.cppm)
 
 Interface representing the render device service module context. This interface is used by modules to add backends. It may be accessed via module data after the render device service module initialization.
 

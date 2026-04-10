@@ -22,5 +22,5 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [RenderDeviceService](Source/Private/Main-RenderDeviceService.cppm) - raw input service;
-- [RenderDeviceServiceModule](Source/Private/Main-RenderDeviceServiceModule.cppm) - raw input service module.
+- [RenderDeviceService](Source/Main-RenderDeviceService.cppm) - raw input service;
+- [RenderDeviceServiceModule](Source/Main-RenderDeviceServiceModule.cppm) - raw input service module.
