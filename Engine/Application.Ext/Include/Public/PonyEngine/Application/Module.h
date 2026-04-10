@@ -16,25 +16,33 @@
 
 /// @brief Creates a module section name.
 /// @param order Section order.
+/// @note For internal use only.
 #define PONY_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PonyModule$, order))
 /// @brief Allocates a module segment.
 /// @param order Segment order.
+/// @note For internal use only.
 #define PONY_MODULE_ALLOCATE(order) PONY_ALLOCATE(PONY_MODULE_SECTION_NAME(order))
 /// @brief Creates a module pointer name.
 /// @param moduleName Target module name.
+/// @note For internal use only.
 #define PONY_MODULE_POINTER_NAME(moduleName) PONY_CONCAT_VALUES(PonyPointer, moduleName)
 /// @brief Creates a module interface name.
 /// @param moduleName Target module name.
+/// @note For internal use only.
 #define PONY_MODULE_INTERFACE_NAME(moduleName) PONY_CONCAT_VALUES(PonyInterface, moduleName)
 
-/// @brief Used by the application to find a start point. Don't use in modules.
+/// @brief Used by the application to find a start point.
+/// @note For internal use only.
 #define PONY_MODULE_ORDER_BEGIN a
-/// @brief Used by the application to find an end point. Don't use in modules.
+/// @brief Used by the application to find an end point.
+/// @note For internal use only.
 #define PONY_MODULE_ORDER_END z
 
 /// @brief Begin section declaration.
+/// @note For internal use only.
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
 /// @brief End section declaration.
+/// @note For internal use only.
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 
 /// @brief Adds the module.

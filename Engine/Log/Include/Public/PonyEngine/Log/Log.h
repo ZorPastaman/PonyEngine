@@ -112,7 +112,7 @@
 /// @brief Log stacktrace mask. It contains a mask of all possible log stacktrace types.
 #define PONY_LOG_STACKTRACE_MASK (PONY_LOG_STACKTRACE_VERBOSE_MASK | PONY_LOG_STACKTRACE_DEBUG_MASK | PONY_LOG_STACKTRACE_INFO_MASK | PONY_LOG_STACKTRACE_WARNING_MASK | PONY_LOG_STACKTRACE_ERROR_MASK | PONY_LOG_STACKTRACE_EXCEPTION_MASK)
 
-/// @brief Pushes the log without a level a check.
+/// @brief Pushes the log without a level check.
 /// @param logger PonyEngine::Log::ILogger reference.
 /// @param type PonyEngine::Log::LogType value.
 /// @param message std::string_view as a message or format string.
@@ -129,7 +129,7 @@
 		PonyEngine::Log::LogToLogger(logger, type, message __VA_OPT__(,) __VA_ARGS__); \
 	} \
 
-/// @brief Pushes the exception log without a level a check.
+/// @brief Pushes the exception log without a level check.
 /// @param logger PonyEngine::Log::ILogger reference.
 /// @param exception std::exception_ptr reference.
 /// @param ... Message or format and format arguments.
@@ -176,7 +176,6 @@
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param logger PonyEngine::Log::ILogger reference.
 /// @param exception std::exception reference.
-/// @param logMessage std::string_view as a message or format string.
 /// @param ... Message or format and format arguments.
 /// @note The function is thread-safe.
 #define PONY_LOG_X(logger, exception, ...) \
@@ -189,7 +188,6 @@
 /// @param condition Log condition.
 /// @param logger PonyEngine::Log::ILogger reference.
 /// @param exception std::exception reference.
-/// @param logMessage std::string_view as a message or format string.
 /// @param ... Message or format and format arguments.
 /// @note The function is thread-safe.
 #define PONY_LOG_X_IF(condition, logger, exception, ...) \

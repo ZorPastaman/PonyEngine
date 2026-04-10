@@ -14,15 +14,15 @@ target_include_directories(PonyEngine.Time.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Time.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.Time.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.Time.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-TimeService.cppm"
-	"Source/Private/Main-TimeServiceModule.cppm"
+	"Source/Main.cppm"
+	"Source/Main-TimeService.cppm"
+	"Source/Main-TimeServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

@@ -13,16 +13,16 @@ target_include_directories(PonyEngine.RenderDevice.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RenderDevice.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.RenderDevice.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.RenderDevice.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-BackendContainer.cppm"
-	"Source/Private/Main-RenderDeviceService.cppm"
-	"Source/Private/Main-RenderDeviceServiceModule.cppm"
+	"Source/Main.cppm"
+	"Source/Main-BackendContainer.cppm"
+	"Source/Main-RenderDeviceService.cppm"
+	"Source/Main-RenderDeviceServiceModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

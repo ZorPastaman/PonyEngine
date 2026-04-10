@@ -1,3 +1,16 @@
+# Compiles a shader using DXC compiler.
+# source - Source file path.
+# output - Output file path.
+# profile - Shader profile. Examples: as_6_7, ms_6_6, ps_6_5, etc.
+# SPIRV - flag that enables building for spir-v.
+# PDB - flag that enables creating a .pdb file in debug builds.
+# ENABLE_16_BIT - flag that enables 16-bit values support.
+# ROOT_SIG_VER - root signature version. If not set, a default value is used.
+# OPTIMIZATION - optimation level. -0 is added before this value. If not set, a default value is used.
+# SPIRV_TARGET - spir-v target. Must be set if SPIRV is set.
+# DEFINES - defines.
+# INCLUDES - include folders
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(compile_shader_with_dxc source output profile)
 	set(options SPIRV PDB ENABLE_16_BIT)
 	set(oneValueArgs ROOT_SIG_VER ENTRY OPTIMIZATION SPIRV_TARGET)

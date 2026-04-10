@@ -2,28 +2,28 @@
 
 message(VERBOSE "Configuring parameters")
 option(PONY_ENGINE_DEFAULT_LOGGER "Enable default logger. It logs everything to a console." ON)
-option(PONY_ENGINE_CONSOLE_LOG "Enable standard c++ console." ON)
+option(PONY_ENGINE_CONSOLE_LOG "Enable standard C++ console." ON)
 
 message(VERBOSE "Configuring target")
 add_executable(PonyEngine.Application.Impl)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-Console.cppm"
-	"Source/Private/Main-DefaultLogger.cppm"
-	"Source/Private/Main-EnvironmentManager.cppm"
-	"Source/Private/Main-ExitCodes.cppm"
-	"Source/Private/Main-FlowManager.cppm"
-	"Source/Private/Main-InterfaceContainer.cppm"
-	"Source/Private/Main-LoggerManager.cppm"
-	"Source/Private/Main-ModuleDataContainer.cppm"
-	"Source/Private/Main-ModuleManager.cppm"
-	"Source/Private/Main-Name.cppm"
-	"Source/Private/Main-Path.cppm"
-	"Source/Private/Main-ServiceContainer.cppm"
-	"Source/Private/Main-ServiceManager.cppm"
-	"Source/Private/Main-TickableServiceInfo.cppm"
+	"Source/Main.cppm"
+	"Source/Main-ConsoleUtility.cppm"
+	"Source/Main-DefaultLogger.cppm"
+	"Source/Main-ExitCodes.cppm"
+	"Source/Main-FlowManager.cppm"
+	"Source/Main-IdentityUtility.cppm"
+	"Source/Main-InterfaceContainer.cppm"
+	"Source/Main-LoggerManager.cppm"
+	"Source/Main-ModuleDataContainer.cppm"
+	"Source/Main-ModuleManager.cppm"
+	"Source/Main-PathUtility.cppm"
+	"Source/Main-ServiceContainer.cppm"
+	"Source/Main-ServiceManager.cppm"
+	"Source/Main-ThreadManager.cppm"
+	"Source/Main-TickableServiceInfo.cppm"
 )
 
 message(VERBOSE "Configuring defines")

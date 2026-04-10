@@ -10,13 +10,13 @@ target_include_directories(PonyEngine.Log.Ext PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Ext PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Public/Main.cppm"
-	"Source/Public/Main-ILoggerContext.cppm"
-	"Source/Public/Main-ILoggerModuleContext.cppm"
-	"Source/Public/Main-ISubLogger.cppm"
-	"Source/Public/Main-LogEntry.cppm"
-	"Source/Public/Main-LogHelper.cppm"
-	"Source/Public/Main-SubLoggerHandle.cppm"
+	"Source/Main.cppm"
+	"Source/Main-ILoggerContext.cppm"
+	"Source/Main-ILoggerModuleContext.cppm"
+	"Source/Main-ISubLogger.cppm"
+	"Source/Main-LogEntry.cppm"
+	"Source/Main-LogHelper.cppm"
+	"Source/Main-SubLoggerHandle.cppm"
 )
 
 message(VERBOSE "Setting properties")
