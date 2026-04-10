@@ -34,23 +34,23 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-### [Factory](Source/Private/Main-Factory.cppm)
+### [Factory](Source/Main-Factory.cppm)
 
 DXGI factory wrapper.
 
-### [Device](Source/Private/Main-Device.cppm)
+### [Device](Source/Main-Device.cppm)
 
 D3D12 device wrapper.
 
-### [Engine](Source/Private/Main-Engine.cppm)
+### [Engine](Source/Main-Engine.cppm)
 
 Main class of the Direct3D 12 implementation. It's the actual class that is accessed by the render device service.
 
-### [Backend](Source/Private/Main-Backend.cppm)
+### [Backend](Source/Main-Backend.cppm)
 
 Facade class that is accessed by the render device service directly. It just has a `std::unique_ptr<Engine>` and translates all the calls to it.
 This way, the backend footprint is kept as minimal as possible when it's not active.
 
-### [BackendModule](Source/Private/Main-BackendModule.cppm)
+### [BackendModule](Source/Main-BackendModule.cppm)
 
 Direct3D12 backend module.

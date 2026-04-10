@@ -14,8 +14,8 @@ The module requires a platform specific implementation.
 
 The module contains some utilities that can be useful for mouse implementations on any platform:
 
-- [MouseAxis](Source/Private/Main-MouseAxis.cppm);
-- [MouseAxisMap](Source/Private/Main-MouseAxisMap.cppm);
-- [MouseContainer](Source/Private/Main-MouseContainer.cppm);
-- [MouseEvent](Source/Private/Main-MouseEvent.cppm);
-- [MouseEventQueue](Source/Private/Main-MouseEventQueue.cppm).
+- [MouseAxis](Source/Main-MouseAxis.cppm);
+- [MouseAxisMap](Source/Main-MouseAxisMap.cppm);
+- [MouseContainer](Source/Main-MouseContainer.cppm);
+- [MouseEvent](Source/Main-MouseEvent.cppm);
+- [MouseEventQueue](Source/Main-MouseEventQueue.cppm).

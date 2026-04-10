@@ -10,15 +10,15 @@ target_include_directories(PonyEngine.RawInput.Mouse.Impl PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Mouse.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(PonyEngine.RawInput.Mouse.Impl PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.RawInput.Mouse.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Private/Main.cppm"
-	"Source/Private/Main-MouseProvider.cppm"
-	"Source/Private/Main-MouseProviderModule.cppm"
+	"Source/Main.cppm"
+	"Source/Main-MouseProvider.cppm"
+	"Source/Main-MouseProviderModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")

@@ -15,58 +15,58 @@ Devices may have special features like vibration, for example. These features ca
 
 ## C\++ modules
 
-### [PonyEngine.RawInput](Source/Public/Main.cppm)
+### [PonyEngine.RawInput](Source/Main.cppm)
 
 Main sub-modules:
 
-#### [IRawInputService](Source/Public/Main-IRawInputService.cppm)
+#### [IRawInputService](Source/Main-IRawInputService.cppm)
 
 Raw input service public interface.
 
-#### [Axis](Source/Public/Main-Axis.cppm)
+#### [Axis](Source/Main-Axis.cppm)
 
 Input axis. It's a special string wrapper.
 
-#### [AxisID](Source/Public/Main-AxisID.cppm)
+#### [AxisID](Source/Main-AxisID.cppm)
 
-Input axis ID. It's a hash value of the [Axis](Source/Public/Main-Axis.cppm). The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
+Input axis ID. It's a hash value of the [Axis](Source/Main-Axis.cppm). The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Axes](#axes) for details details.
 
-#### [DeviceHandle](Source/Public/Main-DeviceHandle.cppm)
+#### [DeviceHandle](Source/Main-DeviceHandle.cppm)
 
 Device handle. It's an integer, and it's a special handle that is used to access an input device.
 
-#### [DeviceType](Source/Public/Main-DeviceType.cppm)
+#### [DeviceType](Source/Main-DeviceType.cppm)
 
 Device type. It's a special string wrapper.
 
-#### [DeviceTypeID](Source/Public/Main-DeviceTypeID.cppm)
+#### [DeviceTypeID](Source/Main-DeviceTypeID.cppm)
 
-Device type ID. It's a hash value of the [DeviceType](Source/Public/Main-DeviceType.cppm). The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
+Device type ID. It's a hash value of the [DeviceType](Source/Main-DeviceType.cppm). The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Devices](#devices) for details details.
 
-#### [IDeviceObserver](Source/Public/Main-IDeviceObserver.cppm)
+#### [IDeviceObserver](Source/Main-IDeviceObserver.cppm)
 
-Device observer interface. It can be added (and must be removed before the object destruction) to the [IRawInputService](Source/Public/Main-IRawInputService.cppm).
+Device observer interface. It can be added (and must be removed before the object destruction) to the [IRawInputService](Source/Main-IRawInputService.cppm).
 The added device observers receive different events on a device state change.
 
-#### [IRawInputObserver](Source/Public/Main-IRawInputObserver.cppm)
+#### [IRawInputObserver](Source/Main-IRawInputObserver.cppm)
 
-Raw input observer interface. It can be added (and must be removed before the object destruction) to the [IRawInputService](Source/Public/Main-IRawInputService.cppm).
+Raw input observer interface. It can be added (and must be removed before the object destruction) to the [IRawInputService](Source/Main-IRawInputService.cppm).
 The added raw input observers receive raw input events.
 
-#### [IVibrating](Source/Public/Main-IVibrating.cppm)
+#### [IVibrating](Source/Main-IVibrating.cppm)
 
 Device feature interface for vibration control.
 
 ## Axes
 
 Axes are represented as string paths in the form `<something>/<something>/<something>`. The first segment defines a layout, while the following segments represent subtypes.
-To make them easier to work with, the engine provides a wrapper class, [Axis](Source/Public/Main-Axis.cppm).
-However, working directly with strings is inefficient, so axes are hashed internally. The [AxisID](Source/Public/Main-AxisID.cppm) wrapper simplifies working with these hash values.
-The [IRawInputService](Source/Public/Main-IRawInputService.cppm) exposes functions for hashing axes, retrieving original strings from hash values, and validating those hashes. It also provides additional utility functions for working with axes.
+To make them easier to work with, the engine provides a wrapper class, [Axis](Source/Main-Axis.cppm).
+However, working directly with strings is inefficient, so axes are hashed internally. The [AxisID](Source/Main-AxisID.cppm) wrapper simplifies working with these hash values.
+The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing axes, retrieving original strings from hash values, and validating those hashes. It also provides additional utility functions for working with axes.
 
 Example of usage:
 
@@ -86,9 +86,9 @@ The raw input service provides info about devices via different functions.
 The devices may be enumerated via these functions: `IRawInputService.DeviceCount()` and `IRawInputService.Device(deviceIndex)`.
 
 The devices have types that are represented as string paths in the form `<something>/<something>/<something>`. The first segment defines a base type, while the following segments represent subtypes.
-To make them easier to work with, the engine provides a wrapper class, [DeviceType](Source/Public/Main-DeviceType.cppm).
-However, working directly with strings is inefficient, so device types are hashed internally. The [DeviceTypeID](Source/Public/Main-DeviceTypeID.cppm) wrapper simplifies working with these hash values.
-The [IRawInputService](Source/Public/Main-IRawInputService.cppm) exposes functions for hashing device types, retrieving original strings from hash values, and validating those hashes.
+To make them easier to work with, the engine provides a wrapper class, [DeviceType](Source/Main-DeviceType.cppm).
+However, working directly with strings is inefficient, so device types are hashed internally. The [DeviceTypeID](Source/Main-DeviceTypeID.cppm) wrapper simplifies working with these hash values.
+The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing device types, retrieving original strings from hash values, and validating those hashes.
 
 The devices may have custom features. Those may be accessed via `IRawInputService.FindFeature()` functions.
 
@@ -96,10 +96,10 @@ The devices may have custom features. Those may be accessed via `IRawInputServic
 
 The API provides default string for axes and device types. Use them wherever it's possible:
 
-- [Layout](Source/Public/Main-Layout.cppm) - layout(axis) element names;
-- [KeyboardDevice](Source/Public/Main-Keyboard.cppm) - keyboard device sub-type names;
-- [KeyboardLayout](Source/Public/Main-Keyboard.cppm) - keyboard axis names;
-- [MouseDevice](Source/Public/Main-Mouse.cppm) - mouse device sub-type names;
-- [MouseLayout](Source/Public/Main-Mouse.cppm) - mouse axis names;
-- [GamepadDevice](Source/Public/Main-Gamepad.cppm) - gamepad device sub-type names;
-- [GamepadLayout](Source/Public/Main-Gamepad.cppm) - gamepad axis names;
+- [Layout](Source/Main-Layout.cppm) - layout(axis) element names;
+- [KeyboardDevice](Source/Main-Keyboard.cppm) - keyboard device sub-type names;
+- [KeyboardLayout](Source/Main-Keyboard.cppm) - keyboard axis names;
+- [MouseDevice](Source/Main-Mouse.cppm) - mouse device sub-type names;
+- [MouseLayout](Source/Main-Mouse.cppm) - mouse axis names;
+- [GamepadDevice](Source/Main-Gamepad.cppm) - gamepad device sub-type names;
+- [GamepadLayout](Source/Main-Gamepad.cppm) - gamepad axis names;

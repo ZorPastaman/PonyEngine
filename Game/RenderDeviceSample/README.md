@@ -71,15 +71,15 @@ Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/bu
 
 ## Main files
 
-### [GameService](GameSample/Source/Private/Game-GameService.cppm)
+### [GameService](GameSample/Source/Game-GameService.cppm)
 
 Application service sample.
 
-### [GameServiceModule](GameSample/Source/Private/Game-GameServiceModule.cppm)
+### [GameServiceModule](GameSample/Source/Game-GameServiceModule.cppm)
 
 Application service module sample.
 
-### [Main](GameSample/Source/Main.cpp) & [Main.Impl](GameSample/Source/Main.Impl.cpp)
+### [Launch](GameSample/Source/Launch.cpp) & [Launch.Impl](GameSample/Source/Launch.Impl.cpp)
 
 Creates the game module and adds it to the application.
 

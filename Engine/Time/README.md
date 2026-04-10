@@ -11,11 +11,11 @@ The time service controls a frame frequency as well.
 
 ## C\++ modules
 
-### [PonyEngine.Time](Source/Public/Main.cppm)
+### [PonyEngine.Time](Source/Main.cppm)
 
 Main sub-modules:
 
-#### [ITimeService](Source/Public/Main-ITimeService.cppm)
+#### [ITimeService](Source/Main-ITimeService.cppm)
 
 Time service public interface. It provides different types of time and has function to control their calculations.
 The time service gets a current real time in its tick and calculates all the properties using current parameters.
@@ -41,6 +41,6 @@ The fixed steps are calculated for all the time types in both overall and delta 
 The time service can control a frame pacing. There's a function `TargetFrameTime()` that sets a target frame time. 
 The service will wait in its tick till the frame time is equal or greater than that value.
 
-#### [ConversionUtility](Source/Public/Main-ConversionUtility.cppm)
+#### [ConversionUtility](Source/Main-ConversionUtility.cppm)
 
 Utility functions that convert durations in defferent formats.

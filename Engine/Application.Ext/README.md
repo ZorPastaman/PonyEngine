@@ -9,17 +9,17 @@ Application extension API module. Provides interfaces to access to engine servic
 
 ## C\++ modules
 
-### [PonyEngine.Application.Ext](Source/Public/Main.cppm)
+### [PonyEngine.Application.Ext](Source/Main.cppm)
 
 Main interfaces:
 
-#### [IApplicationContext](Source/Public/Main-IApplicationContext.cppm)
+#### [IApplicationContext](Source/Main-IApplicationContext.cppm)
 
 Interface representing the engine application context. Provides access to application metadata, environment information, and the current application state.
 
 Exposes the application logger and registered services, and allows control over the application lifecycle (e.g., stopping the application).
 
-#### [IModule](Source/Public/Main-IModule.cppm)
+#### [IModule](Source/Main-IModule.cppm)
 
 Base interface for engine application modules. All application modules must implement this interface.
 
@@ -27,14 +27,14 @@ It has `StartUp()` and `ShutDown()` functions, which are called during the corre
 
 See [Module lifecycle](#module-lifecycle) for details.
 
-#### [IModuleContext](Source/Public/Main-IModuleContext.cppm)
+#### [IModuleContext](Source/Main-IModuleContext.cppm)
 
 Interface representing a module context. It's passed as an argument to `IModule.StartUp()` and `IModule.ShuftDown()`.
 
 Exposes the application logger, logger module context, service module context, and allows to get and set application module data.
 That data can be used by other modules which is useful when a module needs to provide a custom initialization interface.
 
-#### [IService](Source/Public/Main-IService.cppm)
+#### [IService](Source/Main-IService.cppm)
 
 Interface representing an engine service. Services are the primary building blocks of the engine, while the application itself provides only minimal functionality.
 Its main responsibility is to tick services, which define the game’s behavior.

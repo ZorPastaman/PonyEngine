@@ -5,12 +5,12 @@ add_library(PonyEngine.Surface STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/Main.cppm"
-	"Source/Public/Main-ISurfaceObserver.cppm"
-	"Source/Public/Main-ISurfaceService.cppm"
-	"Source/Public/Main-MathUtility.cppm"
-	"Source/Public/Main-RectStyle.cppm"
-	"Source/Public/Main-SurfaceFeature.cppm"
+	"Source/Main.cppm"
+	"Source/Main-ISurfaceObserver.cppm"
+	"Source/Main-ISurfaceService.cppm"
+	"Source/Main-MathUtility.cppm"
+	"Source/Main-RectStyle.cppm"
+	"Source/Main-SurfaceFeature.cppm"
 )
 
 message(VERBOSE "Setting properties")

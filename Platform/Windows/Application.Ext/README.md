@@ -4,11 +4,11 @@ Platform independent module: [PonyEngine.Application.Ext](../../../Engine/Applic
 
 ## C\++ modules
 
-### [PonyEngine.Application.Ext.Windows](Source/Public/Main.cppm)
+### [PonyEngine.Application.Ext.Windows](Source/Main.cppm)
 
 Main interfaces:
 
-#### [IApplicationContext](Source/Public/Main-IApplicationContext.cppm)
+#### [IApplicationContext](Source/Main-IApplicationContext.cppm)
 
 Windows specific application context, inherits the platform independent interface. 
 The application context implementation on Windows must implement this interface.

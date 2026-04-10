@@ -12,26 +12,26 @@ By default, the engine logger logs only to the console. For additional log outpu
 
 ## C\++ modules
 
-### [PonyEngine.Log.Ext](Source/Public/Main.cppm)
+### [PonyEngine.Log.Ext](Source/Main.cppm)
 
 Main sub-modules:
 
-#### [ISubLogger](Source/Public/Main-ISubLogger.cppm)
+#### [ISubLogger](Source/Main-ISubLogger.cppm)
 
 Sub-logger interface. Each sub-logger that is added to the logger must implement it.
 
-#### [LogEntry](Source/Public/Main-LogEntry.cppm)
+#### [LogEntry](Source/Main-LogEntry.cppm)
 
 Log info that is passed to each sub-logger on a log event.
 It contains `LogEntry.formattedMessage` - message formatted by the logger. And in the most cases, it's enough to log it.
 But if your sub-logger needs initial info, `LogEntry` contains it as well.
 
-#### [ILoggerContext](Source/Public/Main-ILoggerContext.cppm)
+#### [ILoggerContext](Source/Main-ILoggerContext.cppm)
 
 Interface representing the logger context. Provides access to the application context and functions that allow to log to the console.
 Sub-loggers may use those functions to log errors, warnings, and other things. It's useful because sub-loggers can't throw.
 
-#### [ILoggerModuleContext](Source/Public/Main-ILoggerModuleContext.cppm)
+#### [ILoggerModuleContext](Source/Main-ILoggerModuleContext.cppm)
 
 Interface representing the logger module context. This interface is used by modules to add sub-loggers. It may be accessed via module data after the logger module initialization.
 

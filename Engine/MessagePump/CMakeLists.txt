@@ -5,9 +5,9 @@ add_library(PonyEngine.MessagePump STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.MessagePump PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/Main.cppm"
-	"Source/Public/Main-IMessagePumpService.cppm"
-	"Source/Public/Main-MessagePumpFeature.cppm"
+	"Source/Main.cppm"
+	"Source/Main-IMessagePumpService.cppm"
+	"Source/Main-MessagePumpFeature.cppm"
 )
 
 message(VERBOSE "Setting properties")

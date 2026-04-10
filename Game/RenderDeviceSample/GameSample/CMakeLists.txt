@@ -6,15 +6,15 @@ target_include_directories(GameSample PUBLIC
 	"Include/Public"
 )
 target_sources(GameSample PUBLIC
-	"Source/Main.cpp"
+	"Source/Launch.cpp"
 )
 target_sources(GameSample PRIVATE
-	"Source/Main.Impl.cpp"
+	"Source/Launch.Impl.cpp"
 )
 target_sources(GameSample PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Game.cppm"
-	"Source/Private/Game-GameService.cppm"
-	"Source/Private/Game-GameServiceModule.cppm"
+	"Source/Game.cppm"
+	"Source/Game-GameService.cppm"
+	"Source/Game-GameServiceModule.cppm"
 )
 
 # Set properties. CXX_STANDARD must be at least 23. POSITION_INDEPENDENT_CODE TRUE is required to build shared library groups consisting of this static lib.

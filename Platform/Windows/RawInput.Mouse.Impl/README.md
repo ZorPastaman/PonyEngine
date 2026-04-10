@@ -20,5 +20,5 @@ These variables are used to configure the build of the module:
 
 Main submodules:
 
-- [MouseProvider](Source/Private/Main-MouseProvider.cppm) - mouse provider;
-- [MouseProviderModule](Source/Private/Main-MouseProviderModule.cppm) - mouse provider module.
+- [MouseProvider](Source/Main-MouseProvider.cppm) - mouse provider;
+- [MouseProviderModule](Source/Main-MouseProviderModule.cppm) - mouse provider module.

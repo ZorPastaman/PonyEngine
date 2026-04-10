@@ -22,8 +22,8 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [TimeService](Source/Private/Main-TimeService.cppm) - time service;
-- [TimeServiceModule](Source/Private/Main-TimeServiceModule.cppm) - time service module.
+- [TimeService](Source/Main-TimeService.cppm) - time service;
+- [TimeServiceModule](Source/Main-TimeServiceModule.cppm) - time service module.
 
 In its tick the time service waits for a target frame time first of all. It's done in busy waiting style.
 Then it calculates all its properties based on time differences and current parameters.

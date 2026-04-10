@@ -20,6 +20,6 @@ These variables are used to configure the build of the module:
 
 Main submodules:
 
-- [KeyboardAxisMap](Source/Private/Main-KeyboardAxisMap.cppm) - maps Windows scan codes to engine axes;
-- [KeyboardProvider](Source/Private/Main-KeyboardProvider.cppm) - keyboard provider;
-- [KeyboardProviderModule](Source/Private/Main-KeyboardProviderModule.cppm) - keyboard provider module.
+- [KeyboardAxisMap](Source/Main-KeyboardAxisMap.cppm) - maps Windows scan codes to engine axes;
+- [KeyboardProvider](Source/Main-KeyboardProvider.cppm) - keyboard provider;
+- [KeyboardProviderModule](Source/Main-KeyboardProviderModule.cppm) - keyboard provider module.

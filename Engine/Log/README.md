@@ -8,15 +8,15 @@ Log API module. Provides interfaces for logging.
 
 ## C\++ modules
 
-### [PonyEngine.Log](Source/Public/Main.cppm)
+### [PonyEngine.Log](Source/Main.cppm)
 
 Main sub-modules:
 
-#### [ILogger](Source/Public/Main-ILogger.cppm)
+#### [ILogger](Source/Main-ILogger.cppm)
 
 Logger interface. It has functions to log messages and exceptions.
 
-#### [LogType](Source/Public/Main-LogType.cppm)
+#### [LogType](Source/Main-LogType.cppm)
 
 Log types (from lowest to highest level):
 

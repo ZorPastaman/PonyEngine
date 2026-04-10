@@ -8,74 +8,74 @@ The module requires a compiler specific implementation.
 
 ## C\++ modules
 
-### [PonyEngine.Hash](Source/Public/Hash.cppm)
+### [PonyEngine.Hash](Source/Hash.cppm)
 
 Utilities for calculating hashes.
 
 Hash algorithms:
-- [FNV-1a](Source/Public/Hash-FNV1a.cppm)
+- [FNV-1a](Source/Hash-FNV1a.cppm)
 
-### [PonyEngine.Math](Source/Public/Math.cppm)
+### [PonyEngine.Math](Source/Math.cppm)
 
 Math utilities.
 
 Basic classes:
-- [Vector](Source/Public/Math-Vector.cppm)
-- [Matrix](Source/Public/Math-Matrix.cppm)
-- [Quaternion](Source/Public/Math-Quaternion.cppm)
+- [Vector](Source/Math-Vector.cppm)
+- [Matrix](Source/Math-Matrix.cppm)
+- [Quaternion](Source/Math-Quaternion.cppm)
 
 Utilities:
-- [Common](Source/Public/Math-Common.cppm) - common math utilities;
-- [Transformations](Source/Public/Math-Transformations.cppm) - transformation utilities: functions for transformation matrices, rotation conversions, etc.
+- [Common](Source/Math-Common.cppm) - common math utilities;
+- [Transformations](Source/Math-Transformations.cppm) - transformation utilities: functions for transformation matrices, rotation conversions, etc.
 
 Shapes:
-- [Ball](Source/Public/Math-Ball.cppm)
-- [Box](Source/Public/Math-Box.cppm)
-- [CornerBox](Source/Public/Math-CornerBox.cppm)
-- [Flat](Source/Public/Math-Flat.cppm)
-- [OrientedBox](Source/Public/Math-OrientedBox.cppm)
-- [Ray](Source/Public/Math-Ray.cppm)
+- [Ball](Source/Math-Ball.cppm)
+- [Box](Source/Math-Box.cppm)
+- [CornerBox](Source/Math-CornerBox.cppm)
+- [Flat](Source/Math-Flat.cppm)
+- [OrientedBox](Source/Math-OrientedBox.cppm)
+- [Ray](Source/Math-Ray.cppm)
 
 Shape utilities:
-- [Bounds](Source/Public/Math-Bounds.cppm) - utilities to calculate bounding shapes;
-- [Insides](Source/Public/Math-Insides.cppm) - utilities to find out if a shape is fully inside another shape;
-- [Intersections](Source/Public/Math-Intersections.cppm) - utilities to find out if two shapes are intersecting.
+- [Bounds](Source/Math-Bounds.cppm) - utilities to calculate bounding shapes;
+- [Insides](Source/Math-Insides.cppm) - utilities to find out if a shape is fully inside another shape;
+- [Intersections](Source/Math-Intersections.cppm) - utilities to find out if two shapes are intersecting.
 
 Special:
-- [Color](Source/Public/Math-Color.cppm) - class to work with different color representations;
-- [Transform](Source/Public/Math-Transform.cppm) - class that represents Transform2D and Transform3D.
+- [Color](Source/Math-Color.cppm) - class to work with different color representations;
+- [Transform](Source/Math-Transform.cppm) - class that represents Transform2D and Transform3D.
 
-### [PonyEngine.Meta](Source/Public/Meta.cppm)
+### [PonyEngine.Meta](Source/Meta.cppm)
 
 Utilities for describing different meta info.
 
 Classes:
-- [Version](Source/Public/Meta-Version.cppm) - class that represents a standard 4-value version.
+- [Version](Source/Meta-Version.cppm) - class that represents a standard 4-value version.
 
-### [PonyEngine.Memory](Source/Public/Memory.cppm)
+### [PonyEngine.Memory](Source/Memory.cppm)
 
 Utilities for memory management.
 
 Classes:
-- [Arena](Source/Public/Memory-Arena.cppm) - arena memory allocator;
-- [Pool](Source/Public/Memory-Pool.cppm) - object pool.
+- [Arena](Source/Memory-Arena.cppm) - arena memory allocator;
+- [Pool](Source/Memory-Pool.cppm) - object pool.
 
-### [PonyEngine.Serialization](Source/Public/Serialization.cppm)
+### [PonyEngine.Serialization](Source/Serialization.cppm)
 
 Utilities for serialization/deserialization in binary and text formats.
 
 Utilities:
-- [Basic](Source/Public/Serialization-Basic.cppm) - utilities for serialization/deserialization of unique values;
-- [Array](Source/Public/Serialization-Array.cppm) - utilities for serialization/deserialization of value arrays.
+- [Basic](Source/Serialization-Basic.cppm) - utilities for serialization/deserialization of unique values;
+- [Array](Source/Serialization-Array.cppm) - utilities for serialization/deserialization of value arrays.
 
-### [PonyEngine.Type](Source/Public/Type.cppm)
+### [PonyEngine.Type](Source/Type.cppm)
 
 Utilities for C\++ type system.
 
 Utilities:
-- [Common](Source/Public/Type-Common.cppm) - common type utlities: basic type concepts;
-- [Limits](Source/Public/Type-Limits.cppm) - extension for `std::numeric_limits`;
-- [Variant](Source/Public/Type-Variant.cppm) - utilities for `std::variant`.
+- [Common](Source/Type-Common.cppm) - common type utlities: basic type concepts;
+- [Limits](Source/Type-Limits.cppm) - extension for `std::numeric_limits`;
+- [Variant](Source/Type-Variant.cppm) - utilities for `std::variant`.
 
 ## C\++ headers
 
