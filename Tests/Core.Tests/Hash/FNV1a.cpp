@@ -17,11 +17,11 @@ import PonyEngine.Hash;
 TEST_CASE("FNV1a32", "[Hash][FNV1a]")
 {
 	STATIC_REQUIRE(PonyEngine::Hash::FNV1a32("") == 2166136261);
-	STATIC_REQUIRE(PonyEngine::Hash::FNV1a32("hello") == 1335831723);
+	STATIC_REQUIRE(PonyEngine::Hash::FNV1a32(std::span(std::string_view("hello"))) == 1335831723);
 	STATIC_REQUIRE(PonyEngine::Hash::FNV1a32("Hello, world!") == 3985698964);
 	auto hash = PonyEngine::Hash::FNV1a32Hash();
 	hash.Hash("Hello, ");
-	hash.Hash("world!");
+	hash.Hash(std::span(std::string_view("world!")));
 	REQUIRE(hash.Hash() == 3985698964);
 
 #if PONY_ENGINE_TESTING_BENCHMARK
@@ -35,11 +35,11 @@ TEST_CASE("FNV1a32", "[Hash][FNV1a]")
 TEST_CASE("FNV1a64", "[Hash][FNV1a]")
 {
 	STATIC_REQUIRE(PonyEngine::Hash::FNV1a64("") == 14695981039346656037);
-	STATIC_REQUIRE(PonyEngine::Hash::FNV1a64("hello") == 11831194018420276491);
+	STATIC_REQUIRE(PonyEngine::Hash::FNV1a64(std::span(std::string_view("hello"))) == 11831194018420276491);
 	STATIC_REQUIRE(PonyEngine::Hash::FNV1a64("Hello, world!") == 4094109891673226228);
 	auto hash = PonyEngine::Hash::FNV1a64Hash();
 	hash.Hash("Hello, ");
-	hash.Hash("world!");
+	hash.Hash(std::span(std::string_view("world!")));
 	REQUIRE(hash.Hash() == 4094109891673226228);
 
 #if PONY_ENGINE_TESTING_BENCHMARK

@@ -5,9 +5,9 @@ add_library(PonyEngine.Shader STATIC)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Shader PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/Main.cppm"
-	"Source/Public/Main-Bool.cppm"
-	"Source/Public/Main-Meshlet.cppm"
+	"Source/Main.cppm"
+	"Source/Main-Bool.cppm"
+	"Source/Main-Meshlet.cppm"
 )
 
 message(VERBOSE "Setting properties")

@@ -14,7 +14,7 @@
 #include "PonyEngine/Log/Log.h"
 
 /// @brief Pushes the log to a console without a level a check.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILoggerContext reference.
 /// @param type PonyEngine::Log::LogType value.
 /// @param message std::string_view as a message or format string.
 /// @param ... Format arguments.
@@ -31,7 +31,7 @@
 	} \
 
 /// @brief Pushes the exception log to a console without a level a check.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILoggerContext reference.
 /// @param exception std::exception_ptr reference.
 /// @param ... Message or format and format arguments.
 /// @note The function is thread-safe.
@@ -47,7 +47,7 @@
 	} \
 
 /// @brief Log macro that calls the log to a console function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILoggerContext reference.
 /// @param type PonyEngine::Log::LogType value.
 /// @param message std::string_view as a message or format string.
 /// @param ... Format arguments.
@@ -60,7 +60,7 @@
 
 /// @brief Log macro that conditionally calls the log to a console function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILoggerContext reference.
 /// @param type PonyEngine::Log::LogType value.
 /// @param message std::string_view as a message or format string.
 /// @param ... Format arguments.
@@ -75,7 +75,7 @@
 	} \
 
 /// @brief Log exception macro that calls the log exception to a console function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILoggerContext reference.
 /// @param exception std::exception reference.
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Message or format and format arguments.
@@ -88,7 +88,7 @@
 
 /// @brief Log exception macro that conditionally calls the log exception to a console function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILoggerContext reference.
 /// @param exception std::exception reference.
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Message or format and format arguments.

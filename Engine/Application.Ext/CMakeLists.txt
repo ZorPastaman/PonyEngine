@@ -13,21 +13,21 @@ target_include_directories(PonyEngine.Application.Ext PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Ext PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Public/Main.cppm"
-	"Source/Public/Main-FlowState.cppm"
-	"Source/Public/Main-IApplicationContext.cppm"
-	"Source/Public/Main-ILoggerContext.cppm"
-	"Source/Public/Main-ILoggerModuleContext.cppm"
-	"Source/Public/Main-IModule.cppm"
-	"Source/Public/Main-IModuleContext.cppm"
-	"Source/Public/Main-IService.cppm"
-	"Source/Public/Main-IServiceInterfaceAdder.cppm"
-	"Source/Public/Main-IServiceModuleContext.cppm"
-	"Source/Public/Main-ITickableService.cppm"
-	"Source/Public/Main-ITickableServiceAdder.cppm"
-	"Source/Public/Main-LoggerHandle.cppm"
-	"Source/Public/Main-ModuleDataHandle.cppm"
-	"Source/Public/Main-ServiceHandle.cppm"
+	"Source/Main.cppm"
+	"Source/Main-FlowState.cppm"
+	"Source/Main-IApplicationContext.cppm"
+	"Source/Main-ILoggerContext.cppm"
+	"Source/Main-ILoggerModuleContext.cppm"
+	"Source/Main-IModule.cppm"
+	"Source/Main-IModuleContext.cppm"
+	"Source/Main-IService.cppm"
+	"Source/Main-IServiceInterfaceAdder.cppm"
+	"Source/Main-IServiceModuleContext.cppm"
+	"Source/Main-ITickableService.cppm"
+	"Source/Main-ITickableServiceAdder.cppm"
+	"Source/Main-LoggerHandle.cppm"
+	"Source/Main-ModuleDataHandle.cppm"
+	"Source/Main-ServiceHandle.cppm"
 )
 
 message(VERBOSE "Setting properties")

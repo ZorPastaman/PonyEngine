@@ -279,9 +279,9 @@ TEST_CASE("Unorm to float", "[Math][Common]")
 TEST_CASE("Snorm to float", "[Math][Common]")
 {
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{ 0 }), 0.f));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{ 127 }), 1.f));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{ -127 }), -1.f));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{ -128 }), -1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{127}), 1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{-127}), -1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{-128}), -1.f));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<float>(std::int8_t{-64}), -0.5f, PonyEngine::Math::Tolerance<float>{.absolute = 0.01f}));
 
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::SnormToNormalized<double>(0), 0.));
@@ -295,6 +295,18 @@ TEST_CASE("Snorm to float", "[Math][Common]")
 		return PonyEngine::Math::SnormToNormalized<float>(std::int8_t{64});
 	};
 #endif
+}
+
+TEST_CASE("Sum clamp", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::SumClamp(std::uint8_t{20}, std::uint8_t{7}) == 27u);
+	STATIC_REQUIRE(PonyEngine::Math::SumClamp(std::uint8_t{250}, std::uint8_t{15}) == 255u);
+}
+
+TEST_CASE("Difference clamp", "[Math][Common]")
+{
+	STATIC_REQUIRE(PonyEngine::Math::DifferenceClamp(std::uint8_t{20}, std::uint8_t{ 7 }) == 13u);
+	STATIC_REQUIRE(PonyEngine::Math::DifferenceClamp(std::uint8_t{5}, std::uint8_t{ 15 }) == 0u);
 }
 
 TEST_CASE("DivideCeil", "[Math][Common]") 

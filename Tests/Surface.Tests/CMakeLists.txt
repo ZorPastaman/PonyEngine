@@ -8,6 +8,9 @@ target_sources(PonyEngine.Surface.Tests PRIVATE
 
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Surface.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+target_compile_definitions(PonyEngine.Surface.Tests PRIVATE 
+	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
+)
 
 message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface.Tests PROPERTIES 
@@ -18,9 +21,6 @@ set_target_properties(PonyEngine.Surface.Tests PROPERTIES
 
 message(VERBOSE "Setting build options")
 pony_set_build_options(PonyEngine.Surface.Tests ${PONY_ENGINE_OPTIMIZATION})
-target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
-	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
-)
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Surface.Tests PRIVATE 
