@@ -35,7 +35,8 @@
 			}
 		},
 		{
-			"name": "Debug",
+			"name": "Deb",
+			"displayName": "Debug",
 			"inherits": "Base",
 			"hidden": true,
 			"cacheVariables": {
@@ -51,7 +52,8 @@
 			}
 		},
 		{
-			"name": "Development",
+			"name": "Dev",
+			"displayName": "Development",
 			"inherits": "Base",
 			"hidden": true,
 			"cacheVariables": {
@@ -67,7 +69,8 @@
 			}
 		},
 		{
-			"name": "Optimized",
+			"name": "Opt",
+			"displayName": "Optimized",
 			"inherits": "Base",
 			"hidden": true,
 			"cacheVariables": {
@@ -83,7 +86,8 @@
 			}
 		},
 		{
-			"name": "Release",
+			"name": "Rel",
+			"displayName": "Release",
 			"inherits": "Base",
 			"hidden": true,
 			"cacheVariables": {
@@ -99,7 +103,8 @@
 			}
 		},
 		{
-			"name": "Shipping",
+			"name": "Shi",
+			"displayName": "Shipping",
 			"inherits": "Base",
 			"hidden": true,
 			"cacheVariables": {
@@ -115,7 +120,8 @@
 			}
 		},
 		{
-			"name": "Desktop",
+			"name": "Desk",
+			"displayName": "Desktop",
 			"hidden": true,
 			"cacheVariables": {
 			}
@@ -123,7 +129,7 @@
 		{
 			"name": "Win",
 			"displayName": "Windows",
-			"inherits": "Desktop",
+			"inherits": "Desk",
 			"hidden": true,
 			"cacheVariables": {
 				"PONY_ENGINE_PLATFORM_CONSOLE_LOG": true
@@ -139,54 +145,54 @@
 		{
 			"name": "Win-MSVC-Deb",
 			"displayName": "Windows MSVC - Debug",
-			"inherits": [ "Debug", "Win-MSVC" ]
+			"inherits": [ "Deb", "Win-MSVC" ]
 		},
 		{
 			"name": "Win-MSVC-Dev",
 			"displayName": "Windows MSVC - Development",
-			"inherits": [ "Development", "Win-MSVC" ]
+			"inherits": [ "Dev", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Optimized",
+			"name": "Win-MSVC-Opt",
 			"displayName": "Windows MSVC - Optimized",
-			"inherits": [ "Optimized", "Windows-MSVC" ]
+			"inherits": [ "Opt", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Release",
+			"name": "Win-MSVC-Rel",
 			"displayName": "Windows MSVC - Release",
-			"inherits": [ "Release", "Windows-MSVC" ]
+			"inherits": [ "Rel", "Win-MSVC" ]
 		},
 		{
-			"name": "Windows-MSVC-Shipping",
+			"name": "Win-MSVC-Shi",
 			"displayName": "Windows MSVC - Shipping",
-			"inherits": [ "Shipping", "Windows-MSVC" ]
+			"inherits": [ "Shi", "Win-MSVC" ]
 		}
 	],
 	"buildPresets": [
 		{
-			"name": "Windows-MSVC-Debug",
+			"name": "Win-MSVC-Deb",
 			"displayName": "Windows MSVC - Debug",
-			"configurePreset": "Windows-MSVC-Debug"
+			"configurePreset": "Win-MSVC-Deb"
 		},
 		{
-			"name": "Windows-MSVC-Development",
+			"name": "Win-MSVC-Dev",
 			"displayName": "Windows MSVC - Development",
-			"configurePreset": "Windows-MSVC-Development"
+			"configurePreset": "Win-MSVC-Dev"
 		},
 		{
-			"name": "Windows-MSVC-Optimized",
+			"name": "Win-MSVC-Opt",
 			"displayName": "Windows MSVC - Optimized",
-			"configurePreset": "Windows-MSVC-Optimized"
+			"configurePreset": "Win-MSVC-Opt"
 		},
 		{
-			"name": "Windows-MSVC-Release",
+			"name": "Win-MSVC-Rel",
 			"displayName": "Windows MSVC - Release",
-			"configurePreset": "Windows-MSVC-Release"
+			"configurePreset": "Win-MSVC-Rel"
 		},
 		{
-			"name": "Windows-MSVC-Shipping",
+			"name": "Win-MSVC-Shi",
 			"displayName": "Windows MSVC - Shipping",
-			"configurePreset": "Windows-MSVC-Shipping"
+			"configurePreset": "Win-MSVC-Shi"
 		}
 	]
 }

@@ -24,7 +24,7 @@ FetchContent_MakeAvailable(PonyEngine)
 # Group modules
 set(PONY_BASE_MODULES "")
 set(PONY_LOG_MODULES "")
-set(PONY_SURFACE_MODULES "")
+set(PONY_PLATFORM_MODULES "")
 set(PONY_INPUT_MODULES "")
 set(PONY_RENDER_MODULES "")
 
@@ -69,7 +69,7 @@ endif()
 if(TARGET PonyEngine.MessagePump.Impl)
 	pony_set_log_defines(PonyEngine.MessagePump.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 	pony_set_build_options(PonyEngine.MessagePump.Impl ${PONY_ENGINE_OPTIMIZATION})
-	list(APPEND PONY_SURFACE_MODULES PonyEngine.MessagePump.Impl)
+	list(APPEND PONY_PLATFORM_MODULES PonyEngine.MessagePump.Impl)
 endif()
 
 if(TARGET PonyEngine.Surface)
@@ -79,7 +79,7 @@ endif()
 if(TARGET PonyEngine.Surface.Impl)
 	pony_set_log_defines(PonyEngine.Surface.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 	pony_set_build_options(PonyEngine.Surface.Impl ${PONY_ENGINE_OPTIMIZATION})
-	list(APPEND PONY_SURFACE_MODULES PonyEngine.Surface.Impl)
+	list(APPEND PONY_PLATFORM_MODULES PonyEngine.Surface.Impl)
 endif()
 
 if(TARGET PonyEngine.RawInput)
@@ -104,11 +104,6 @@ if(TARGET PonyEngine.RawInput.Mouse.Impl)
 	pony_set_log_defines(PonyEngine.RawInput.Mouse.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 	pony_set_build_options(PonyEngine.RawInput.Mouse.Impl ${PONY_ENGINE_OPTIMIZATION})
 	list(APPEND PONY_INPUT_MODULES PonyEngine.RawInput.Mouse.Impl)
-endif()
-if(TARGET PonyEngine.RawInput.XInput.Impl)
-	pony_set_log_defines(PonyEngine.RawInput.XInput.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
-	pony_set_build_options(PonyEngine.RawInput.XInput.Impl ${PONY_ENGINE_OPTIMIZATION})
-	list(APPEND PONY_INPUT_MODULES PonyEngine.RawInput.XInput.Impl)
 endif()
 
 if(TARGET PonyEngine.RenderDevice)
@@ -162,8 +157,8 @@ if(PONY_MAKE_GROUPS)
 		list(APPEND PONY_INSTALL_TARGETS PonyModule.Log)
 	endif()
 
-	if(PONY_SURFACE_MODULES)
-		pony_make_module_group(PONY_SURFACE_MODULES PonyModule.Platform "PonyModule.Platform" 23)
+	if(PONY_PLATFORM_MODULES)
+		pony_make_module_group(PONY_PLATFORM_MODULES PonyModule.Platform "PonyModule.Platform" 23)
 		pony_set_log_defines(PonyModule.Platform ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 		pony_set_build_options(PonyModule.Platform ${PONY_ENGINE_OPTIMIZATION})
 		target_link_libraries(PonyEngine.Application.Impl PRIVATE PonyModule.Platform)
@@ -198,7 +193,7 @@ else()
 	target_link_libraries(PonyEngine.Application.Impl PRIVATE
 		${PONY_BASE_MODULES}
 		${PONY_LOG_MODULES}
-		${PONY_SURFACE_MODULES}
+		${PONY_PLATFORM_MODULES}
 		${PONY_INPUT_MODULES}
 		${PONY_RENDER_MODULES}
 		${PONY_GAME_MODULES}
