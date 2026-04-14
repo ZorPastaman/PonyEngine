@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-04-14
+
 ### Added
 
 - Core module.
@@ -27,4 +29,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - MSVC compiler support.
 - DXC compiler support.
 
-[Unreleased]: https://github.com/ZorPastaman/PonyEngine
+[unreleased]: https://github.com/ZorPastaman/PonyEngine/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ZorPastaman/PonyEngine/releases/tag/v0.1.0
