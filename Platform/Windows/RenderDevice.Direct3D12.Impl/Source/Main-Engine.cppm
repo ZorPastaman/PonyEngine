@@ -1,0 +1,2838 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include <cassert>
+
+#include "PonyEngine/Log/Log.h"
+
+#include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
+#include "PonyEngine/RenderDevice/Windows/DXGIFramework.h"
+
+export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:Engine;
+
+import std;
+
+import PonyEngine.Log;
+import PonyEngine.Memory;
+import PonyEngine.Meta;
+import PonyEngine.RenderDevice.Ext;
+import PonyEngine.Surface.Windows;
+import PonyEngine.Type;
+
+import :AtomicSupport;
+import :Buffer;
+import :BufferUtility;
+import :BundleCommandList;
+import :CommandListUtility;
+import :CommandQueue;
+import :ComputeCommandList;
+import :ComputePipelineState;
+import :CopyCommandList;
+import :DepthStencilContainer;
+import :DescriptorHeapUtility;
+import :Device;
+import :Factory;
+import :Fence;
+import :FormatUtility;
+import :GraphicsCommandList;
+import :GraphicsPipelineState;
+import :HeapUtility;
+import :PipelineStateSubobject;
+import :PipelineStateUtility;
+import :RenderTargetContainer;
+import :RootSignature;
+import :RootSignatureUtility;
+import :SamplerContainer;
+import :SamplerUtility;
+import :ShaderDataContainer;
+import :SwapChain;
+import :SwapChainUtility;
+import :SwapChainWrapper;
+import :Texture;
+import :TextureFormatMap;
+import :TextureUtility;
+import :Waiter;
+
+export namespace PonyEngine::RenderDevice::Direct3D12::Windows
+{
+	/// @brief Direct3D12 engine.
+	class Engine final
+	{
+	public:
+		static constexpr std::string_view APIName = Device::APIName; ///< Direct3D API name.
+		static constexpr auto APIVersion = Device::APIVersion; ///< Direct3D FL.
+
+		static constexpr std::string_view ShaderIRName = ShaderIR::DXIL; ///< Direct3D IR name.
+		static constexpr std::uint8_t SimultaneousTargetCount = std::uint8_t{D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT}; ///< Supported simultaneous target count.
+		static constexpr std::uint8_t ViewportScissorCount = std::uint8_t{D3D12_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE}; ///< Supported viewport and scissor count.
+
+		static constexpr auto BufferHeapTypeSupport = HeapTypeMask::Default | HeapTypeMask::Upload | HeapTypeMask::Download; ///< Supported buffer heap types.
+		static constexpr auto TextureHeapTypeSupport = HeapTypeMask::Default; ///< Supported texture heap types.
+
+		static constexpr std::uint32_t CBVAlignment = std::uint32_t{D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT}; ///< Constant buffer view alignment requirement.
+
+		static constexpr float MaxAnisotropy = float{D3D12_DEFAULT_MAX_ANISOTROPY}; ///< Max supported anisotropy.
+
+		static constexpr std::uint32_t MaxSimultaneousFences = std::uint32_t{MAXIMUM_WAIT_OBJECTS}; ///< Max simultaneous fence count in one wait.
+
+		/// @brief Creates a Direct3D12 engine.
+		/// @param renderDevice 
+		[[nodiscard("Pure constructor")]]
+		explicit Engine(IRenderDeviceContext& renderDevice);
+		Engine(const Engine&) = delete;
+		Engine(Engine&&) = delete;
+
+		~Engine() noexcept = default;
+
+		/// @brief Creates a buffer.
+		/// @param heapParams Heap parameters.
+		/// @param params Buffer parameters.
+		/// @return Buffer.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params);
+
+		/// @brief Gets a texture format support.
+		/// @param textureFormatId Texture format ID.
+		/// @return Texture format support.
+		[[nodiscard("Pure function")]]
+		struct TextureFormatSupport TextureFormatSupport(TextureFormatID textureFormatId) const;
+		/// @brief Gets a texture support.
+		/// @param request Texture support request.
+		/// @return Texture support response.
+		[[nodiscard("Pure function")]]
+		TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const;
+		/// @brief Creates a texture.
+		/// @param heapParams Heap parameters.
+		/// @param params Texture parameters.
+		/// @return Texture.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ITexture> CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params);
+
+		/// @brief Gets a copyable footprint count.
+		/// @param params Texture parameters.
+		/// @param range Sub-texture range.
+		/// @return Copyable footprint count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const;
+		/// @brief Gets a copyable footprint count.
+		/// @param texture Texture.
+		/// @param range Sub-texture range.
+		/// @return Copyable footprint count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const;
+		/// @brief Gets copyable footprints.
+		/// @param params Texture parameters.
+		/// @param offset Byte array offset.
+		/// @param range Sub-texture range.
+		/// @param footprints Footprints. May be empty.
+		/// @return Footprint size.
+		CopyableFootprintSize GetCopyableFootprints(const TextureParams& params, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+		/// @brief Gets copyable footprints.
+		/// @param texture Texture.
+		/// @param offset Byte array offset.
+		/// @param range Sub-texture range.
+		/// @param footprints Footprints. May be empty.
+		/// @return Footprint size.
+		CopyableFootprintSize GetCopyableFootprints(const ITexture& texture, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+
+		/// @brief Creates a shader data container.
+		/// @param params Shader data container parameters.
+		/// @return Shader data container.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params);
+		/// @brief Creates a constant buffer view.
+		/// @param buffer Target buffer. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Constant buffer view parameters.
+		void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params);
+		/// @brief Creates a shader resource view.
+		/// @param buffer Target buffer. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Shader resource view parameters.
+		void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params);
+		/// @brief Creates a shader resource view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Shader resource view parameters.
+		void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureSRVParams& params);
+		/// @brief Creates an unordered access view.
+		/// @param buffer Target buffer. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Unordered access view parameters.
+		void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferUAVParams& params);
+		/// @brief Creates an unordered access view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Shader data container.
+		/// @param index View index.
+		/// @param params Unordered access view parameters.
+		void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params);
+		/// @brief Copies view.
+		/// @param ranges Copy ranges.
+		void CopyViews(std::span<const ShaderDataCopyRange> ranges);
+
+		/// @brief Creates a render target container.
+		/// @param params Render target container parameters.
+		/// @return Render target container.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params);
+		/// @brief Creates a render target view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Render target container.
+		/// @param index View index.
+		/// @param params Render target view parameters.
+		void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params);
+		/// @brief Copies view.
+		/// @param ranges Copy ranges.
+		void CopyViews(std::span<const RenderTargetCopyRange> ranges);
+
+		/// @brief Creates a depth stencil container.
+		/// @param params Depth stencil container parameters.
+		/// @return Depth stencil container.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params);
+		/// @brief Creates a depth stencil view.
+		/// @param texture Target texture. May be nullptr.
+		/// @param container Depth stencil container.
+		/// @param index View index.
+		/// @param params Depth stencil view parameters.
+		void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params);
+		/// @brief Copies view.
+		/// @param ranges Copy ranges.
+		void CopyViews(std::span<const DepthStencilCopyRange> ranges);
+
+		/// @brief Creates a sampler container.
+		/// @param params Sampler container parameters.
+		/// @return Sampler container.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params);
+		/// @brief Creates a sampler.
+		/// @param container Sampler container.
+		/// @param index Sampler index.
+		/// @param params Sampler parameters.
+		void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params);
+		/// @brief Copies samplers.
+		/// @param ranges Copy ranges.
+		void CopySamplers(std::span<const SamplerCopyRange> ranges);
+
+		/// @brief Creates a pipeline layout.
+		/// @param params Pipeline layout parameters.
+		/// @return Pipeline layout.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params);
+
+		/// @brief Gets a shader support.
+		/// @return Shader support.
+		[[nodiscard("Pure function")]]
+		struct ShaderSupport ShaderSupport() const;
+		/// @brief Gets a rasterizer support.
+		/// @return Rasterizer support.
+		[[nodiscard("Pure function")]]
+		struct RasterizerSupport RasterizerSupport() const;
+		/// @brief Creates a graphics pipeline state.
+		/// @param layout Pipeline layout. May be nullptr.
+		/// @param params Graphics pipeline state parameters.
+		/// @return Graphics pipeline state.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout,
+			const GraphicsPipelineStateParams& params);
+		/// @brief Creates a compute pipeline state.
+		/// @param layout Pipeline layout. May be nullptr.
+		/// @param params Compute pipeline state parameters.
+		/// @return Compute pipeline state.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params);
+
+		/// @brief Creates a graphics command list.
+		/// @return Graphics command list.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList();
+		/// @brief Creates a compute command list.
+		/// @return Compute command list.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IComputeCommandList> CreateComputeCommandList();
+		/// @brief Creates a copy command list.
+		/// @return Copy command list.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ICopyCommandList> CreateCopyCommandList();
+		/// @brief Executes the graphics command list.
+		/// @param commandLists Graphics command lists.
+		/// @param sync Queue sync.
+		void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync);
+		/// @brief Executes the compute command list.
+		/// @param commandLists Compute command lists.
+		/// @param sync Queue sync.
+		void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync);
+		/// @brief Executes the copy command list.
+		/// @param commandLists Copy command lists.
+		/// @param sync Queue sync.
+		void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync);
+		/// @brief Creates a secondary graphics command list.
+		/// @return Secondary graphics command list.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList();
+
+		/// @brief Creates a fence.
+		/// @return Fence.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IFence> CreateFence();
+		/// @brief Creates a waiter.
+		/// @return Waiter.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IWaiter> CreateWaiter();
+
+		/// @brief Gets a swap chain support.
+		/// @return Swap chain support.
+		[[nodiscard("Pure function")]]
+		struct SwapChainSupport SwapChainSupport() const;
+		/// @brief Checks if the swap chain is alive.
+		/// @return @a True if it's alive; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsSwapChainAlive() const;
+		/// @brief Creates a swap chain.
+		/// @param params Swap chain parameters.
+		[[nodiscard("Pure function")]]
+		void CreateSwapChain(const SwapChainParams& params);
+		/// @brief Destroys the swap chain.
+		void DestroySwapChain();
+		/// @brief Gets a current swap chain buffer count.
+		/// @return Buffer count.
+		[[nodiscard("Pure function")]]
+		std::uint8_t SwapChainBufferCount() const;
+		/// @brief Gets a current swap chain buffer index.
+		/// @return Buffer index.
+		[[nodiscard("Pure function")]]
+		std::uint8_t CurrentSwapChainBufferIndex() const;
+		/// @brief Gets a current swap chain buffer.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const;
+		/// @brief Presents a next swap chain buffer.
+		void PresentNextSwapChainBuffer();
+
+		Engine& operator =(const Engine&) = delete;
+		Engine& operator =(Engine&&) = delete;
+
+	private:
+		/// @brief Makes a texture support response.
+		/// @param format Format.
+		/// @param request Texture support request.
+		/// @param formatSupport Format support.
+		/// @return Texture support response.
+		[[nodiscard("Pure function")]]
+		TextureSupportResponse MakeResponse(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
+		/// @brief Gets a sample count mask.
+		/// @param format Format.
+		/// @param request Texture support request.
+		/// @param formatSupport Format support.
+		/// @return Sample count mask.
+		[[nodiscard("Pure function")]]
+		SampleCountMask GetSampleCountMask(DXGI_FORMAT format, const TextureSupportRequest& request, const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const;
+
+		/// @brief Gets copyable footprints.
+		/// @param resourceDesc Texture resource description.
+		/// @param offset Byte array offset.
+		/// @param range Sub-texture range.
+		/// @param footprints Footprints. May be empty.
+		/// @return Copyable footprint size.
+		CopyableFootprintSize GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, std::uint64_t offset, const SubTextureRange& range,
+			std::span<CopyableFootprint> footprints) const;
+
+		/// @brief Gets a shader IR version.
+		/// @return Shader IR version.
+		[[nodiscard("Pure function")]]
+		Meta::Version ShaderIRVersion() const;
+		/// @brief Gets a scalar type support.
+		/// @return Scalar type support.
+		[[nodiscard("Pure function")]]
+		ShaderScalarTypeMask ScalarTypeSupport() const;
+		/// @brief Casts the native atomic support to an engine atomic scalar type support.
+		/// @param support Native atomic support.
+		/// @return Engine atomic scalar type support.
+		[[nodiscard("Pure function")]]
+		static ShaderScalarTypeMask ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
+		/// @brief Casts the native atomic support to an engine group shared scalar type support.
+		/// @param support Native atomic support.
+		/// @return Engine group shared scalar type support.
+		[[nodiscard("Pure function")]]
+		static ShaderScalarTypeMask ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept;
+
+		/// @brief Gets a line rasterization support.
+		/// @return Line rasterization support.
+		[[nodiscard("Pure function")]]
+		LineRasterizationModeMask LineRasterizationSupport() const;
+
+		/// @brief Casts to a native format.
+		/// @param format Engine format.
+		/// @return Native format.
+		[[nodiscard("Pure function")]]
+		DXGI_FORMAT GetFormat(TextureFormatID format) const;
+		/// @brief Casts to a native format.
+		/// @param format Engine format.
+		/// @param srgb SRGB variant?
+		/// @return Native format.
+		[[nodiscard("Pure function")]]
+		DXGI_FORMAT GetFormat(TextureFormatID format, bool srgb) const;
+		/// @brief Gets an SRGB variant.
+		/// @param format Format.
+		/// @return SRGB variant.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetSRGBVariant(DXGI_FORMAT format);
+		/// @brief Gets a color view format.
+		/// @param format Color format.
+		/// @param srgb SRGB variant?
+		/// @return Color view format.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetColorViewVariant(DXGI_FORMAT format, bool srgb);
+		/// @brief Gets a depth view format.
+		/// @param format Depth format.
+		/// @return Depth view format.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetDepthViewVariant(DXGI_FORMAT format);
+		/// @brief Gets a stencil view format.
+		/// @param format Depth format.
+		/// @return Stencil view format.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetStencilViewVariant(DXGI_FORMAT format);
+		/// @brief Gets a view format.
+		/// @param format Format.
+		/// @param srgb SRGB variant?
+		/// @param aspect Aspect.
+		/// @return View format.
+		[[nodiscard("Pure function")]]
+		static DXGI_FORMAT GetViewFormat(DXGI_FORMAT format, bool srgb, Aspect aspect);
+		/// @brief Gets a max array size.
+		/// @param dimension Texture dimension.
+		/// @return Max array size.
+		[[nodiscard("Pure function")]]
+		static std::uint16_t GetMaxArraySize(TextureDimension dimension) noexcept;
+		/// @brief Gets a max array size.
+		/// @param dimension Texture view dimension.
+		/// @return Max array size.
+		[[nodiscard("Pure function")]]
+		static std::uint16_t GetMaxArraySize(TextureViewDimension dimension) noexcept;
+
+		/// @brief Casts to a native shader byte-code.
+		/// @param byteCode Engine shader byte-code.
+		/// @return Native shader byte-code.
+		[[nodiscard("Pure function")]]
+		static D3D12_SHADER_BYTECODE ToByteCode(std::span<const std::byte> byteCode) noexcept;
+
+		/// @brief Copies views.
+		/// @tparam Range Range type.
+		/// @param ranges Copy ranges.
+		/// @param type Descriptor heap type.
+		template<typename Range>
+		void CopyViews(std::span<const Range> ranges, D3D12_DESCRIPTOR_HEAP_TYPE type);
+
+		/// @brief Creates a command list.
+		/// @tparam T Command list type.
+		/// @param type Command list type.
+		/// @return Command list.
+		template<typename T> [[nodiscard("Pure function")]]
+		std::shared_ptr<T> CreateCommandList(D3D12_COMMAND_LIST_TYPE type);
+		/// @brief Executes the command lists.
+		/// @tparam CommandListInterface Command list interface type.
+		/// @param commandLists Command lists.
+		/// @param sync Queue sync.
+		/// @param commandQueue Command queue.
+		template<typename CommandListInterface>
+		void Execute(std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, CommandQueue& commandQueue);
+		/// @brief Casts to native fences.
+		/// @param input Engine fences.
+		/// @param output Native fences.
+		static void GetFences(std::span<const std::pair<IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output);
+		/// @brief Casts to native fences.
+		/// @param input Engine fences.
+		/// @param output Native fences.
+		static void GetFences(std::span<const std::pair<const IFence*, std::uint64_t>> input, std::span<std::pair<ID3D12Fence*, UINT64>> output);
+
+		/// @brief Makes a command queue description.
+		/// @param type Command list type.
+		/// @return Command queue description.
+		[[nodiscard("Pure function")]]
+		static D3D12_COMMAND_QUEUE_DESC MakeCommandQueueDesc(D3D12_COMMAND_LIST_TYPE type) noexcept;
+
+		/// @brief Gets a current swap chain.
+		/// @return Swap chain.
+		[[nodiscard("Pure function")]]
+		SwapChainWrapper& GetSwapChain() const;
+
+		/// @brief Gets a current thread arena.
+		/// @return Arena.
+		[[nodiscard("Pure function")]]
+		static Memory::Arena& Arena();
+
+		/// @brief Creates a device.
+		/// @return Device.
+		[[nodiscard("Pure function")]]
+		Device CreateDevice() const;
+		/// @brief Creates a command queue.
+		/// @param commandListType Command list type.
+		/// @return Command queue.
+		[[nodiscard("Pure function")]]
+		CommandQueue CreateCommandQueue(D3D12_COMMAND_LIST_TYPE commandListType);
+
+		/// @brief Validate the buffer parameters.
+		/// @param params Buffer parameters.
+		static void ValidateBufferParams(const BufferParams& params);
+		/// @brief Validates the texture parameters dimension.
+		/// @param params Texture parameters.
+		static void ValidateDimension(const TextureParams& params);
+		/// @brief Validates the texture parameters for a color texture.
+		/// @param params Texture parameters.
+		static void ValidateColorTexture(const TextureParams& params);
+		/// @brief Validates the texture parameters for a depth texture.
+		/// @param params Texture parameters.
+		static void ValidateDepthTexture(const TextureParams& params);
+		/// @brief Validates if the format supports the aspects.
+		/// @param aspects Aspects.
+		/// @param format Format.
+		static void ValidateAspect(AspectMask aspects, DXGI_FORMAT format);
+		/// @brief Validates the constant buffer view parameters.
+		/// @param buffer Target buffer.
+		/// @param params Constant buffer view parameters.
+		static void ValidateCBVParams(const Buffer& buffer, const CBVParams& params);
+		/// @brief Validates the shader resource view parameters.
+		/// @param buffer Target buffer.
+		/// @param params Shader resource view parameters.
+		static void ValidateSRVParams(const Buffer& buffer, const BufferSRVParams& params);
+		/// @brief Validates the shader resource view parameters.
+		/// @param texture Target texture.
+		/// @param params Shader resource view parameters.
+		static void ValidateSRVParams(const Texture& texture, const TextureSRVParams& params);
+		/// @brief Validates the shader resource view parameters.
+		/// @param params Shader resource view parameters.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateSRVParams(const TextureSRVParams& params, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the unordered access view parameters.
+		/// @param buffer Target buffer.
+		/// @param params Unordered access view parameters.
+		static void ValidateUAVParams(const Buffer& buffer, const BufferUAVParams& params);
+		/// @brief Validates the unordered access view.
+		/// @param texture Target texture.
+		/// @param params Unordered access view parameters.
+		static void ValidateUAVParams(const Texture& texture, const TextureUAVParams& params);
+		/// @brief Validates the unordered access view parameters.
+		/// @param params Unordered access view parameters.
+		/// @param format Format.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateUAVParams(const TextureUAVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the render target view parameters.
+		/// @param texture Target texture.
+		/// @param params Render target view parameters.
+		static void ValidateRTVParams(const Texture& texture, const RTVParams& params);
+		/// @brief Validates the render target view parameters.
+		/// @param params Render target view parameters.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateRTVParams(const RTVParams& params, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the depth stencil view parameters.
+		/// @param texture Target texture.
+		/// @param params Depth stencil view parameters.
+		static void ValidateDSVParams(const Texture& texture, const DSVParams& params);
+		/// @brief Validates the depth stencil view parameters.
+		/// @param params Depth stencil view parameters.
+		/// @param format Format.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateDSVParams(const DSVParams& params, DXGI_FORMAT format, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the buffer size for SRV.
+		/// @param buffer Target buffer.
+		/// @param firstElementIndex First element index.
+		/// @param elementCount Element count.
+		/// @param stride Element stride.
+		static void ValidateSize(const Buffer& buffer, std::uint64_t firstElementIndex, std::uint32_t elementCount, std::uint32_t stride);
+		/// @brief Validates the view format.
+		/// @param texture Target texture.
+		/// @param viewFormat View format.
+		/// @param srgb Is the view SRGB?
+		static void ValidateViewFormat(const Texture& texture, TextureFormatID viewFormat, bool srgb);
+		/// @brief Validates the view dimension.
+		/// @param texture Target texture.
+		/// @param dimension View dimension.
+		static void ValidateDimension(const Texture& texture, TextureViewDimension dimension);
+		/// @brief Validates the view dimension.
+		/// @param texture Target texture.
+		/// @param dimension View dimension.
+		static void ValidateDimension(const Texture& texture, TextureDimension dimension);
+		/// @brief Validates the shader resource view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		/// @param dimension View dimension.
+		static void ValidateLayout(const Texture& texture, const SRVLayout& layout, TextureViewDimension dimension);
+		/// @brief Validates the shader resource view layout.
+		/// @param layout Layout.
+		/// @param dimension View dimension.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const SRVLayout& layout, TextureViewDimension dimension, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the unordered access view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		static void ValidateLayout(const Texture& texture, const UAVLayout& layout);
+		/// @brief Validates the unordered access view layout.
+		/// @param layout Layout.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const UAVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the render target view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		static void ValidateLayout(const Texture& texture, const RTVLayout& layout);
+		/// @brief Validates the render target view layout.
+		/// @param layout Layout.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const RTVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the depth stenvil view layout.
+		/// @param texture Target texture.
+		/// @param layout Layout.
+		static void ValidateLayout(const Texture& texture, const DSVLayout& layout);
+		/// @brief Validates the depth stencil view layout.
+		/// @param layout Layout.
+		/// @param maxMipCount Max mip count.
+		/// @param maxArraySize Max array size.
+		static void ValidateLayout(const DSVLayout& layout, std::uint8_t maxMipCount, std::uint16_t maxArraySize);
+		/// @brief Validates the sub-texture range.
+		/// @param params Texture parameters.
+		/// @param format Format.
+		/// @param range Sub-texture range.
+		static void ValidateRange(const TextureParams& params, DXGI_FORMAT format, const SubTextureRange& range);
+		/// @brief Validates the sub-texture range.
+		/// @param texture Texture.
+		/// @param range Sub-texture range.
+		static void ValidateRange(const Texture& texture, const SubTextureRange& range);
+		/// @brief Validates the mip range.
+		/// @param texture Texture.
+		/// @param range Mip range.
+		static void ValidateMipRange(const Texture& texture, const MipRange& range);
+		/// @brief Validates the mip range.
+		/// @param range Mip range.
+		/// @param maxMipCount Max mip count.
+		static void ValidateMipRange(const MipRange& range, std::uint8_t maxMipCount);
+		/// @brief Validates the array range.
+		/// @param texture Texture.
+		/// @param range Array range.
+		static void ValidateArrayRange(const Texture& texture, const ArrayRange& range);
+		/// @brief Validates the array range.
+		/// @param range Array range.
+		/// @param maxArraySize Max array size.
+		static void ValidateArrayRange(const ArrayRange& range, std::uint16_t maxArraySize);
+		/// @brief Validates the sample count.
+		/// @param texture Texture.
+		/// @param shouldBeMS Should be multi-sampled?
+		static void ValidateSampleCount(const Texture& texture, bool shouldBeMS);
+
+		/// @brief Validates the swap chain parameters.
+		/// @param params Swap chain parameters.
+		/// @param format Format.
+		static void ValidateSwapChainParams(const SwapChainParams& params, DXGI_FORMAT format);
+
+		/// @brief Validates the shader data container for creating a view.
+		/// @param container Shader data container.
+		/// @param index View index.
+		static void ValidateContainerForCreatingView(const ShaderDataContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
+		static void ValidateCopyRange(std::span<const ShaderDataCopyRange> ranges);
+		/// @brief Validates the render target container for creating a view.
+		/// @param container Render target container.
+		/// @param index View index.
+		static void ValidateContainerForCreatingView(const RenderTargetContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
+		static void ValidateCopyRange(std::span<const RenderTargetCopyRange> ranges);
+		/// @brief Validates the depth stencil container for creating a view.
+		/// @param container Depth stencil container.
+		/// @param index View index.
+		static void ValidateContainerForCreatingView(const DepthStencilContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
+		static void ValidateCopyRange(std::span<const DepthStencilCopyRange> ranges);
+		/// @brief Validates the sampler container for creating a sampler.
+		/// @param container Sampler container.
+		/// @param index Sampler index.
+		static void ValidateContainerForCreatingSampler(const SamplerContainer& container, std::uint32_t index);
+		/// @brief Validates the copy range.
+		/// @param ranges Copy range.
+		static void ValidateCopyRange(std::span<const SamplerCopyRange> ranges);
+
+		/// @brief Validates the pipeline layout parameters.
+		/// @param params Pipeline layout parameters.
+		static void ValidatePipelineLayoutParams(const PipelineLayoutParams& params);
+		/// @brief Validates the pipeline layout set sizes.
+		/// @param params Pipeline layout parameters.
+		static void ValidatePipelineLayoutSizes(const PipelineLayoutParams& params);
+		/// @brief Checks if the pipeline layout descriptor sets overlap.
+		/// @param descriptorSets Descriptor sets.
+		static void ValidatePipelineLayoutOverlaps(std::span<const DescriptorSet> descriptorSets);
+
+		/// @brief Validates the graphics pipeline state parameters.
+		/// @param params Graphics pipeline state parameters.
+		void ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const;
+		/// @brief Validates the compute pipeline state parameters.
+		/// @param params Compute pipeline state parameters.
+		static void ValidatePipelineStateParams(const ComputePipelineStateParams& params);
+
+		static constexpr GUID CreatorId = { 0x132d4628, 0x84f4, 0x40f4, { 0xb7, 0x2f, 0x8a, 0x7b, 0x8, 0xc3, 0xc5, 0x66 } }; ///< Creator ID. {132D4628-84F4-40F4-B72F-8A7B08C3C566}
+
+		IRenderDeviceContext* renderDevice; ///< Render device context.
+
+		Factory factory; ///< DXGI factory.
+		Device device; ///< D3D12 device.
+
+		CommandQueue graphicsCommandQueue; ///< Graphics command queue.
+		CommandQueue computeCommandQueue; ///< Compute command queue.
+		CommandQueue copyCommandQueue; ///< Copy command queue.
+
+		TextureFormatMap textureFormatMap; ///< Texture format map.
+
+		std::unique_ptr<SwapChainWrapper> swapChain; ///< Swap chain.
+	};
+}
+
+namespace PonyEngine::RenderDevice::Direct3D12::Windows
+{
+	Engine::Engine(IRenderDeviceContext& renderDevice) :
+		renderDevice{&renderDevice},
+		factory(*this->renderDevice),
+		device(CreateDevice()),
+		graphicsCommandQueue(CreateCommandQueue(D3D12_COMMAND_LIST_TYPE_DIRECT)),
+		computeCommandQueue(CreateCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE)),
+		copyCommandQueue(CreateCommandQueue(D3D12_COMMAND_LIST_TYPE_COPY)),
+		textureFormatMap(*this->renderDevice)
+	{
+	}
+
+	std::shared_ptr<IBuffer> Engine::CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params)
+	{
+		ValidateBufferParams(params);
+
+		const D3D12_HEAP_PROPERTIES heapProperties = MakeHeapProperties(heapParams.heapType);
+		const D3D12_HEAP_FLAGS heapFlags = GetHeapFlags(params.usage, heapParams.notZeroed);
+		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params);
+		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
+
+		return std::make_shared<Buffer>(std::move(resource), resourceDesc.Width, params.usage);
+	}
+
+	struct TextureFormatSupport Engine::TextureFormatSupport(const TextureFormatID textureFormatId) const
+	{
+		if (const std::size_t index = textureFormatMap.IndexOf(textureFormatId); index < textureFormatMap.Size())
+		{
+			const DXGI_FORMAT format = textureFormatMap.DXGIFormat(index);
+			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
+
+			auto support = RenderDevice::TextureFormatSupport{.supported = true};
+			support.dimensions = GetTextureDimensions(formatSupport);
+			support.viewDimensions = GetTextureViewDimensions(formatSupport);
+			support.aspects = GetAspects(format);
+			support.usage = GetTextureUsage(formatSupport);
+			support.srgb = IsSRGBCompatibleFormat(format);
+			support.swapChain = IsSwapChainCompatible(formatSupport);
+			support.shaderOperations = GetShaderOperations(formatSupport);
+			support.blendModes = GetBlendModes(formatSupport);
+
+			return support;
+		}
+
+		return RenderDevice::TextureFormatSupport{};
+	}
+
+	TextureSupportResponse Engine::TextureSupport(const TextureSupportRequest& request) const
+	{
+		if (const std::size_t index = textureFormatMap.IndexOf(request.format); index < textureFormatMap.Size())
+		{
+			const DXGI_FORMAT format = textureFormatMap.DXGIFormat(index);
+			const D3D12_FEATURE_DATA_FORMAT_SUPPORT formatSupport = device.GetFormatSupport(format);
+
+			if (IsDepthStencilFormat(format))
+			{
+				if (!CheckDepthSupport(request, formatSupport))
+				{
+					return TextureSupportResponse{};
+				}
+			}
+			else
+			{
+				if (!CheckColorSupport(request, formatSupport))
+				{
+					return TextureSupportResponse{};
+				}
+			}
+
+			return MakeResponse(format, request, formatSupport);
+		}
+
+		return TextureSupportResponse{};
+	}
+
+	std::shared_ptr<ITexture> Engine::CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params)
+	{
+		ValidateDimension(params);
+		DXGI_FORMAT format = GetFormat(params.format);
+		const bool srgb = Any(TextureFlag::SRGB, params.flags);
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+		auto castableFormats = Memory::Arena::Slice<DXGI_FORMAT>{};
+		if (IsDepthStencilFormat(format))
+		{
+			ValidateDepthTexture(params);
+
+			if (Any(TextureUsage::ShaderResource, params.usage))
+			{
+				if (HasStencil(format))
+				{
+					format = GetTypelessFormat(format);
+				}
+				else
+				{
+					const DXGI_FORMAT depthViewFormat = GetDepthViewFormat(format);
+					castableFormats = arena.Push(std::span(&depthViewFormat, 1uz));
+				}
+			}
+		}
+		else
+		{
+			ValidateColorTexture(params);
+
+			castableFormats = arena.Allocate<DXGI_FORMAT>(params.castableFormats.size() + srgb);
+			const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
+			for (std::size_t i = 0uz; i < params.castableFormats.size(); ++i)
+			{
+				formats[i] = GetFormat(params.castableFormats[i]);
+			}
+
+			if (srgb)
+			{
+				formats[formats.size() - 1] = GetSRGBVariant(format);
+			}
+		}
+
+		const D3D12_HEAP_PROPERTIES heapProperties = MakeHeapProperties(heapParams.heapType);
+		const D3D12_HEAP_FLAGS heapFlags = MakeHeapFlags(params.usage, heapParams.notZeroed);
+		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params, format);
+		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(params.initialLayout);
+		const D3D12_CLEAR_VALUE clearValue = ToClearValue(params.clearValue, format);
+		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
+			resourceDesc, initialLayout, clearValue, arena.Span(castableFormats));
+
+		return std::make_shared<Texture>(std::move(resource), params.format, format, params.castableFormats, 
+			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), resourceDesc.DepthOrArraySize,
+			static_cast<std::uint8_t>(resourceDesc.MipLevels), params.dimension, params.sampleCount, params.usage, srgb);
+	}
+
+	std::uint32_t Engine::GetCopyableFootprintCount(const TextureParams& params, const SubTextureRange& range) const
+	{
+		ValidateRange(params, GetFormat(params.format), range);
+		return range.mipRange.mipCount.value_or(params.mipCount - range.mipRange.mostDetailedMipIndex) *
+			range.arrayRange.arrayCount.value_or(params.arraySize - range.arrayRange.firstArrayIndex) *
+			ToPlaneCount(range.aspects);
+	}
+
+	std::uint32_t Engine::GetCopyableFootprintCount(const ITexture& texture, const SubTextureRange& range) const
+	{
+		const Texture& nativeTexture = ToNativeTexture(texture);
+		ValidateRange(nativeTexture, range);
+		return range.mipRange.mipCount.value_or(nativeTexture.MipCount() - range.mipRange.mostDetailedMipIndex) *
+			range.arrayRange.arrayCount.value_or(nativeTexture.ArraySize() - range.arrayRange.firstArrayIndex) *
+			ToPlaneCount(range.aspects);
+	}
+
+	CopyableFootprintSize Engine::GetCopyableFootprints(const TextureParams& params, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		const DXGI_FORMAT format = GetFormat(params.format);
+		ValidateRange(params, format, range);
+		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params, format);
+		return GetCopyableFootprints(resourceDesc, offset, range, footprints);
+	}
+
+	CopyableFootprintSize Engine::GetCopyableFootprints(const ITexture& texture, const std::uint64_t offset, const SubTextureRange& range,
+		const std::span<CopyableFootprint> footprints) const
+	{
+		const Texture& nativeTexture = ToNativeTexture(texture);
+		ValidateRange(nativeTexture, range);
+		const D3D12_RESOURCE_DESC1 resourceDesc = nativeTexture.Resource().GetDesc1();
+		return GetCopyableFootprints(resourceDesc, offset, range, footprints);
+	}
+
+	std::shared_ptr<IShaderDataContainer> Engine::CreateShaderDataContainer(const ShaderDataContainerParams& params)
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
+		return std::make_shared<ShaderDataContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type),
+			params.size, params.shaderVisible);
+	}
+
+	void Engine::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const CBVParams& params)
+	{
+		const Buffer* const nativeBuffer = ToNativeBuffer(buffer);
+		if (nativeBuffer)
+		{
+			ValidateCBVParams(*nativeBuffer, params);
+		}
+
+		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingView(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		if (nativeBuffer)
+		{
+			const D3D12_GPU_VIRTUAL_ADDRESS address = nativeBuffer->Resource().GetGPUVirtualAddress();
+			const D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = MakeCBVDesc(address, params);
+			device.CreateCBV(&cbvDesc, handle);
+		}
+		else
+		{
+			device.CreateCBV(nullptr, handle);
+		}
+
+		nativeContainer.Meta(index) = CBVMeta{.resource = nativeBuffer, .params = params};
+	}
+
+	void Engine::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferSRVParams& params)
+	{
+		const Buffer* const nativeBuffer = ToNativeBuffer(buffer);
+		if (nativeBuffer)
+		{
+			ValidateSRVParams(*nativeBuffer, params);
+		}
+
+		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingView(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = MakeSRVDesc(params);
+		device.CreateSRV(nativeBuffer ? &nativeBuffer->Resource() : nullptr, srvDesc, handle);
+
+		nativeContainer.Meta(index) = BufferSRVMeta{.resource = nativeBuffer, .params = params};
+	}
+
+	void Engine::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureSRVParams& params)
+	{
+		const Texture* const nativeTexture = ToNativeTexture(texture);
+		const DXGI_FORMAT format = GetFormat(params.format);
+		const std::uint8_t mipCount = nativeTexture ? nativeTexture->MipCount() : std::uint8_t{D3D12_REQ_MIP_LEVELS};
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		if (nativeTexture)
+		{
+			ValidateSRVParams(*nativeTexture, params);
+		}
+		else
+		{
+			ValidateSRVParams(params, mipCount, arraySize);
+		}
+
+		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingView(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		const DXGI_FORMAT viewFormat = GetViewFormat(format, params.srgb, params.aspect);
+		const D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = MakeSRVDesc(params, viewFormat, mipCount, arraySize);
+		device.CreateSRV(nativeTexture ? &nativeTexture->Resource() : nullptr, srvDesc, handle);
+
+		nativeContainer.Meta(index) = TextureSRVMeta{.resource = nativeTexture, .params = params};
+	}
+
+	void Engine::CreateView(const IBuffer* const buffer, IShaderDataContainer& container, const std::uint32_t index, const BufferUAVParams& params)
+	{
+		const Buffer* const nativeBuffer = ToNativeBuffer(buffer);
+		if (nativeBuffer)
+		{
+			ValidateUAVParams(*nativeBuffer, params);
+		}
+
+		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingView(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = MakeUAVDesc(params);
+		device.CreateUAV(nativeBuffer ? &nativeBuffer->Resource() : nullptr, uavDesc, handle);
+
+		nativeContainer.Meta(index) = BufferUAVMeta{.resource = nativeBuffer, .params = params};
+	}
+
+	void Engine::CreateView(const ITexture* const texture, IShaderDataContainer& container, const std::uint32_t index, const TextureUAVParams& params)
+	{
+		const Texture* const nativeTexture = ToNativeTexture(texture);
+		const DXGI_FORMAT format = GetFormat(params.format);
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		if (nativeTexture)
+		{
+			ValidateUAVParams(*nativeTexture, params);
+		}
+		else
+		{
+			ValidateUAVParams(params, format, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
+		}
+
+		ShaderDataContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingView(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		const DXGI_FORMAT viewFormat = GetViewFormat(format, false, params.aspect);
+		const D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = MakeUAVDesc(params, viewFormat, arraySize);
+		device.CreateUAV(nativeTexture ? &nativeTexture->Resource() : nullptr, uavDesc, handle);
+
+		nativeContainer.Meta(index) = TextureUAVMeta{.resource = nativeTexture, .params = params};
+	}
+
+	void Engine::CopyViews(const std::span<const ShaderDataCopyRange> ranges)
+	{
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	std::shared_ptr<IRenderTargetContainer> Engine::CreateRenderTargetContainer(const RenderTargetContainerParams& params)
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
+		return std::make_shared<RenderTargetContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type), params.size);
+	}
+
+	void Engine::CreateView(const ITexture* texture, IRenderTargetContainer& container, const std::uint32_t index, const RTVParams& params)
+	{
+		const Texture* const nativeTexture = ToNativeTexture(texture);
+		const DXGI_FORMAT format = GetFormat(params.format);
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		if (nativeTexture)
+		{
+			ValidateRTVParams(*nativeTexture, params);
+		}
+		else
+		{
+			ValidateRTVParams(params, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
+		}
+
+		RenderTargetContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingView(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		const D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = MakeRTVDesc(params, GetColorViewVariant(format, params.srgb), arraySize);
+		device.CreateRTV(nativeTexture ? &nativeTexture->Resource() : nullptr, rtvDesc, handle);
+
+		nativeContainer.Meta(index) = TextureRTVMeta{.texture = nativeTexture, .params = params};
+	}
+
+	void Engine::CopyViews(const std::span<const RenderTargetCopyRange> ranges)
+	{
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	}
+
+	std::shared_ptr<IDepthStencilContainer> Engine::CreateDepthStencilContainer(const DepthStencilContainerParams& params)
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
+		return std::make_shared<DepthStencilContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type), params.size);
+	}
+
+	void Engine::CreateView(const ITexture* const texture, IDepthStencilContainer& container, const std::uint32_t index, const DSVParams& params)
+	{
+		const Texture* const nativeTexture = ToNativeTexture(texture);
+		const DXGI_FORMAT format = GetFormat(params.format);
+		const std::uint16_t arraySize = nativeTexture ? nativeTexture->ArraySize() : GetMaxArraySize(params.dimension);
+		if (nativeTexture)
+		{
+			ValidateDSVParams(*nativeTexture, params);
+		}
+		else
+		{
+			ValidateDSVParams(params, format, std::uint8_t{D3D12_REQ_MIP_LEVELS}, arraySize);
+		}
+
+		DepthStencilContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingView(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		const D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = MakeDSVDesc(params, format, arraySize);
+		device.CreateDSV(nativeTexture ? &nativeTexture->Resource() : nullptr, dsvDesc, handle);
+
+		nativeContainer.Meta(index) = TextureDSVMeta{.texture = nativeTexture, .params = params};
+	}
+
+	void Engine::CopyViews(const std::span<const DepthStencilCopyRange> ranges)
+	{
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	}
+
+	std::shared_ptr<ISamplerContainer> Engine::CreateSamplerContainer(const SamplerContainerParams& params)
+	{
+		const D3D12_DESCRIPTOR_HEAP_DESC descriptorHeapDesc = MakeDescriptorHeapDesc(params);
+		return std::make_shared<SamplerContainer>(device.CreateDescriptorHeap(descriptorHeapDesc), device.GetDescriptorHandleIncrement(descriptorHeapDesc.Type), 
+			params.size, params.shaderVisible);
+	}
+
+	void Engine::CreateSampler(ISamplerContainer& container, const std::uint32_t index, const SamplerParams& params)
+	{
+		SamplerContainer& nativeContainer = ToNativeContainer(container);
+		ValidateContainerForCreatingSampler(nativeContainer, index);
+		const D3D12_CPU_DESCRIPTOR_HANDLE handle = nativeContainer.CpuHandle(index);
+
+		const D3D12_SAMPLER_DESC2 samplerDesc = MakeSamplerDesc(params);
+		device.CreateSampler(samplerDesc, handle);
+
+		nativeContainer.Meta(index) = params;
+	}
+
+	void Engine::CopySamplers(const std::span<const SamplerCopyRange> ranges)
+	{
+		CopyViews(ranges, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+	}
+
+	std::shared_ptr<IPipelineLayout> Engine::CreatePipelineLayout(const PipelineLayoutParams& params)
+	{
+		ValidatePipelineLayoutParams(params);
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
+		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(rootSigDescCounts.tableCount);
+		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(rootSigDescCounts.rangeCount);
+		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC>(rootSigDescCounts.staticSamplerCount);
+		const std::span<D3D12_ROOT_PARAMETER1> parametersSpan = arena.Span(parameters);
+		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
+		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplersSpan = arena.Span(staticSamplers);
+
+		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = MakeRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
+		return std::make_shared<RootSignature>(device.CreateRootSignature(rootSigDesc), params);
+	}
+
+	struct ShaderSupport Engine::ShaderSupport() const
+	{
+		const AtomicSupport atomicSupport = device.AtomicSupport();
+
+		return RenderDevice::ShaderSupport
+		{
+			.shaderIRName = ShaderIRName,
+			.shaderIRVersion = ShaderIRVersion(),
+			.scalarTypes = ScalarTypeSupport(),
+			.atomicTypes = ToAtomicScalarTypeSupport(atomicSupport),
+			.groupSharedAtomicTypes = ToGroupSharedAtomicScalarTypeSupport(atomicSupport)
+		};
+	}
+
+	struct RasterizerSupport Engine::RasterizerSupport() const
+	{
+		return RenderDevice::RasterizerSupport
+		{
+			.simultaneousTargetCount = SimultaneousTargetCount,
+			.maxRasterRegionCount = ViewportScissorCount,
+			.lineRasterizationModes = LineRasterizationSupport(),
+			.conservativeRasterization = device.IsConservativeRasterizationSupported()
+		};
+	}
+
+	std::shared_ptr<IGraphicsPipelineState> Engine::CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
+		const GraphicsPipelineStateParams& params)
+	{
+		ValidatePipelineStateParams(params);
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+
+		if (layout)
+		{
+			arena.Push(PipelineStateSubobjectRootSignature(&ToNativeRootSignature(*layout).GetRootSignature()));
+		}
+
+		if (!params.amplificationShader.empty())
+		{
+			arena.Push(PipelineStateSubobjectAmplificationShader(ToByteCode(params.amplificationShader)));
+		}
+		arena.Push(PipelineStateSubobjectMeshShader(ToByteCode(params.meshShader)));
+		if (!params.pixelShader.empty())
+		{
+			arena.Push(PipelineStateSubobjectPixelShader(ToByteCode(params.pixelShader)));
+		}
+
+		arena.Push(PipelineStateSubobjectRasterizer(MakeRasterizerDesc(params.rasterizer)));
+
+		if (!params.attachment.renderTargetFormats.empty())
+		{
+			arena.Push(PipelineStateSubobjectBlend(MakeBlendDesc(params)));
+			const Memory::Arena::Pointer<PipelineStateSubobjectRenderTargetFormats> rtFormats = arena.Push(PipelineStateSubobjectRenderTargetFormats(D3D12_RT_FORMAT_ARRAY
+			{
+				.NumRenderTargets = static_cast<UINT>(params.attachment.renderTargetFormats.size())
+			}));
+			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Object(rtFormats)->Data();
+			for (std::size_t i = 0uz; i < std::min(std::size(rtArray.RTFormats), params.attachment.renderTargetFormats.size()); ++i)
+			{
+				rtArray.RTFormats[i] = GetFormat(params.attachment.renderTargetFormats[i].format, params.attachment.renderTargetFormats[i].srgb);
+			}
+		}
+
+		if (params.attachment.depthStencilFormat)
+		{
+			arena.Push(PipelineStateSubobjectDepthStencil(MakeDepthStencilDesc(params.depthStencil)));
+			arena.Push(PipelineStateSubobjectDepthStencilFormat(GetFormat(*params.attachment.depthStencilFormat)));
+		}
+
+		arena.Push(PipelineStateSubobjectSampleDesc(DXGI_SAMPLE_DESC{.Count = ToNumber(params.sample.sampleCount), .Quality = 0u}));
+		arena.Push(PipelineStateSubobjectSampleMask(params.sample.sampleMask));
+
+		arena.Push(PipelineStateSubobjectFlags(D3D12_PIPELINE_STATE_FLAG_DYNAMIC_DEPTH_BIAS));
+
+		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
+		{
+			.SizeInBytes = arena.Size(),
+			.pPipelineStateSubobjectStream = arena.Data()
+		};
+		return std::make_shared<GraphicsPipelineState>(device.CreatePipelineState(pipelineStateStream), layout, params);
+	}
+
+	std::shared_ptr<IComputePipelineState> Engine::CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params)
+	{
+		ValidatePipelineStateParams(params);
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+
+		if (layout)
+		{
+			arena.Push(PipelineStateSubobjectRootSignature(&ToNativeRootSignature(*layout).GetRootSignature()));
+		}
+
+		arena.Push(PipelineStateSubobjectComputeShader(ToByteCode(params.computeShader)));
+
+		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
+		{
+			.SizeInBytes = arena.Size(),
+			.pPipelineStateSubobjectStream = arena.Data()
+		};
+		return std::make_shared<ComputePipelineState>(device.CreatePipelineState(pipelineStateStream), layout);
+	}
+
+	std::shared_ptr<IGraphicsCommandList> Engine::CreateGraphicsCommandList()
+	{
+		return CreateCommandList<GraphicsCommandList>(D3D12_COMMAND_LIST_TYPE_DIRECT);
+	}
+
+	std::shared_ptr<IComputeCommandList> Engine::CreateComputeCommandList()
+	{
+		return CreateCommandList<ComputeCommandList>(D3D12_COMMAND_LIST_TYPE_COMPUTE);
+	}
+
+	std::shared_ptr<ICopyCommandList> Engine::CreateCopyCommandList()
+	{
+		return CreateCommandList<CopyCommandList>(D3D12_COMMAND_LIST_TYPE_COPY);
+	}
+
+	void Engine::Execute(const std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync)
+	{
+		Execute(commandLists, sync, graphicsCommandQueue);
+	}
+
+	void Engine::Execute(const std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync)
+	{
+		Execute(commandLists, sync, computeCommandQueue);
+	}
+
+	void Engine::Execute(const std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync)
+	{
+		Execute(commandLists, sync, copyCommandQueue);
+	}
+
+	std::shared_ptr<ISecondaryGraphicsCommandList> Engine::CreateSecondaryGraphicsCommandList()
+	{
+		return CreateCommandList<BundleCommandList>(D3D12_COMMAND_LIST_TYPE_BUNDLE);
+	}
+
+	std::shared_ptr<IFence> Engine::CreateFence()
+	{
+		return std::make_shared<Fence>(device.CreateFence());
+	}
+
+	std::shared_ptr<IWaiter> Engine::CreateWaiter()
+	{
+		return std::make_shared<Waiter>();
+	}
+
+	struct SwapChainSupport Engine::SwapChainSupport() const
+	{
+		return RenderDevice::SwapChainSupport
+		{
+			.maxSize = Math::Vector2<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}),
+			.minBufferCount = 2u,
+			.maxBufferCount = std::uint8_t{DXGI_MAX_SWAP_CHAIN_BUFFERS},
+			.alphaModes = SwapChainAlphaModeMask::Ignore | SwapChainAlphaModeMask::Straight | SwapChainAlphaModeMask::Premultiplied,
+			.scalingModes = SwapChainScalingMask::NoScaling | SwapChainScalingMask::Stretch | SwapChainScalingMask::StretchAspectRatio,
+			.swapEffects = SwapChainEffectMask::FlipDiscard | SwapChainEffectMask::FlipSequential,
+			.syncModes = ToSyncMode(factory.GetTearingSupport()),
+			.usage = TextureUsage::ShaderResource | TextureUsage::RenderTarget | TextureUsage::UnorderedAccess
+		};
+	}
+
+	bool Engine::IsSwapChainAlive() const
+	{
+		return static_cast<bool>(swapChain);
+	}
+
+	void Engine::CreateSwapChain(const SwapChainParams& params)
+	{
+#ifndef NDEBUG
+		if (swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is alive");
+		}
+#endif
+
+		const DXGI_FORMAT format = GetFormat(params.format);
+		ValidateSwapChainParams(params, format);
+
+		const HWND windowHandle = renderDevice->Application().GetService<Surface::Windows::ISurfaceService>().Handle();
+		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = MakeSwapChainDesc(params, format);
+		auto dxgiSwapChain = SwapChain(factory.CreateSwapChain(graphicsCommandQueue.GetCommandQueue(), windowHandle, swapChainDesc));
+		factory.MakeWindowAssociation(windowHandle, DXGI_MWA_NO_WINDOW_CHANGES);
+		dxgiSwapChain.SetFullscreenState(false);
+
+		auto buffers = std::vector<std::shared_ptr<Texture>>(params.bufferCount);
+		for (UINT i = 0u; i < params.bufferCount; ++i)
+		{
+			Platform::Windows::ComPtr<ID3D12Resource2> resource = dxgiSwapChain.GetBuffer<ID3D12Resource2>(i);
+			const D3D12_RESOURCE_DESC1 resourceDesc = resource->GetDesc1();
+			buffers[i] = std::make_shared<Texture>(std::move(resource), params.format, format, std::span<const TextureFormatID>(),
+				static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), 1u, 1u,
+				TextureDimension::Texture2D, SampleCount::X1, params.usage, Any(SwapChainFlag::SRGB, params.flags));
+		}
+
+		swapChain = std::make_unique<SwapChainWrapper>(std::move(dxgiSwapChain), std::move(buffers), ToSyncInterval(params.syncMode), ToPresentFlags(params.syncMode));
+	}
+
+	void Engine::DestroySwapChain()
+	{
+		swapChain.reset();
+	}
+
+	std::uint8_t Engine::SwapChainBufferCount() const
+	{
+		return static_cast<std::uint8_t>(GetSwapChain().BufferCount());
+	}
+
+	std::uint8_t Engine::CurrentSwapChainBufferIndex() const
+	{
+		return static_cast<std::uint8_t>(GetSwapChain().GetCurrentBufferIndex());
+	}
+
+	std::shared_ptr<ITexture> Engine::SwapChainBuffer(const std::uint8_t bufferIndex) const
+	{
+		return GetSwapChain().GetBuffer(bufferIndex);
+	}
+
+	void Engine::PresentNextSwapChainBuffer()
+	{
+		GetSwapChain().Present();
+	}
+
+	TextureSupportResponse Engine::MakeResponse(const DXGI_FORMAT format, const TextureSupportRequest& request,
+		const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const
+	{
+		auto response = TextureSupportResponse{.supported = true};
+		response.maxMipCount = std::uint8_t{D3D12_REQ_MIP_LEVELS};
+		response.sampleCounts = GetSampleCountMask(format, request, formatSupport);
+
+		switch (request.dimension)
+		{
+		case TextureDimension::Texture1D:
+			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE1D_U_DIMENSION}, 1u, 1u);
+			response.maxArraySize = std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
+			break;
+		case TextureDimension::Texture2D:
+			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION}, 1u);
+			response.maxArraySize = std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
+			break;
+		case TextureDimension::Texture3D:
+			response.maxSize = Math::Vector3<std::uint32_t>(std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION}, std::uint32_t{D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION});
+			response.maxArraySize = 1u;
+			break;
+		default:
+			break;
+		}
+
+		return response;
+	}
+
+	SampleCountMask Engine::GetSampleCountMask(const DXGI_FORMAT format, const TextureSupportRequest& request, 
+		const D3D12_FEATURE_DATA_FORMAT_SUPPORT& formatSupport) const
+	{
+		if (request.dimension != TextureDimension::Texture2D || Any(TextureUsage::UnorderedAccess, request.usage) || 
+			(formatSupport.Support1 & D3D12_FORMAT_SUPPORT1_MULTISAMPLE_RENDERTARGET) == D3D12_FORMAT_SUPPORT1_NONE)
+		{
+			return SampleCountMask::X1;
+		}
+
+		auto mask = SampleCountMask::None;
+		for (UINT i = 1u; i <= std::min(ToNumber(SampleCount::Max), std::uint8_t{D3D12_MAX_MULTISAMPLE_SAMPLE_COUNT}); i <<= 1u)
+		{
+			if (device.GetSampleQualityCount(format, i) > 0u)
+			{
+				mask |= static_cast<SampleCountMask>(i);
+			}
+		}
+
+		return mask;
+	}
+
+	CopyableFootprintSize Engine::GetCopyableFootprints(const D3D12_RESOURCE_DESC1& resourceDesc, const std::uint64_t offset, const SubTextureRange& range, 
+		const std::span<CopyableFootprint> footprints) const
+	{
+		const UINT16 arraySize = GetArraySize(resourceDesc);
+		const UINT16 mipCount = range.mipRange.mipCount.value_or(resourceDesc.MipLevels - range.mipRange.mostDetailedMipIndex);
+		const UINT16 arrayCount = range.arrayRange.arrayCount.value_or(GetArraySize(resourceDesc) - range.arrayRange.firstArrayIndex);
+		const UINT8 planeCount = ToPlaneCount(range.aspects);
+		const UINT footprintCount = static_cast<UINT>(mipCount) * arrayCount * planeCount;
+#ifndef NDEBUG
+		if (footprints.size() != 0uz && footprints.size() != footprintCount) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid footprints count");
+		}
+#endif
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprints = arena.Allocate<D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount);
+		const Memory::Arena::Slice<UINT> rowCounts = arena.Allocate<UINT>(footprintCount);
+		const Memory::Arena::Slice<UINT64> rowSizes = arena.Allocate<UINT64>(footprintCount);
+		const std::span<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprintsSpan = arena.Span(subresourceFootprints);
+		const std::span<UINT> rowCountsSpan = arena.Span(rowCounts);
+		const std::span<UINT64> rowSizesSpan = arena.Span(rowSizes);
+
+		UINT64 totalSize = 0ull;
+		const bool hasMipGaps = (arrayCount > 1u || planeCount > 1u) && mipCount != resourceDesc.MipLevels;
+		const bool hasArrayGaps = planeCount > 1u && arrayCount != arraySize;
+		if (hasMipGaps)
+		{
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprintsSpan.data();
+			UINT* rowCount = rowCountsSpan.data();
+			UINT64* rowSize = rowSizesSpan.data();
+
+			for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < planeCount; ++planeIndex)
+			{
+				for (UINT16 arrayIndex = range.arrayRange.firstArrayIndex; arrayIndex < arrayCount; ++arrayIndex, footprint += mipCount, rowCount += mipCount, rowSize += mipCount)
+				{
+					const UINT footprintOffset = CalculateSubresource(range.mipRange.mostDetailedMipIndex, arrayIndex, planeIndex, resourceDesc.MipLevels, arraySize);
+					totalSize += device.GetCopyableFootprints(resourceDesc, footprintOffset, mipCount, offset + totalSize, footprint, rowCount, rowSize);
+				}
+			}
+		}
+		else if (hasArrayGaps)
+		{
+			const UINT subresourceCount = mipCount * arrayCount;
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprintsSpan.data();
+			UINT* rowCount = rowCountsSpan.data();
+			UINT64* rowSize = rowSizesSpan.data();
+
+			for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < planeCount; ++planeIndex, footprint += subresourceCount, rowCount += subresourceCount, rowSize += subresourceCount)
+			{
+				const UINT footprintOffset = CalculateSubresource(range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, planeIndex, resourceDesc.MipLevels, arraySize);
+				totalSize += device.GetCopyableFootprints(resourceDesc, footprintOffset, subresourceCount, offset + totalSize, footprint, rowCount, rowSize);
+			}
+		}
+		else
+		{
+			const UINT footprintOffset = CalculateSubresource(range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, ToFirstPlaneIndex(range.aspects), 
+				resourceDesc.MipLevels, arraySize);
+			totalSize = device.GetCopyableFootprints(resourceDesc, footprintOffset, footprintCount, offset, 
+				subresourceFootprintsSpan.data(), rowCountsSpan.data(), rowSizesSpan.data());
+		}
+
+		UINT16 mipIndex = 0u;
+		UINT16 arrayIndex = 0u;
+		UINT8 planeIndex = 0u;
+		for (std::size_t i = 0uz; i < footprints.size(); ++i)
+		{
+			footprints[i] = CopyableFootprint
+			{
+				.offset = subresourceFootprintsSpan[i].Offset,
+				.rowSize = rowSizesSpan[i],
+				.rowPitch = subresourceFootprintsSpan[i].Footprint.RowPitch,
+				.rowCount = rowCountsSpan[i],
+				.width = subresourceFootprintsSpan[i].Footprint.Width,
+				.height = subresourceFootprintsSpan[i].Footprint.Height,
+				.depth = subresourceFootprintsSpan[i].Footprint.Depth,
+				.arrayIndex = static_cast<std::uint16_t>(range.arrayRange.firstArrayIndex + arrayIndex),
+				.mipIndex = static_cast<std::uint8_t>(range.mipRange.mostDetailedMipIndex + mipIndex),
+				.aspect = ToValue(static_cast<AspectMask>(1u << std::countr_zero(std::to_underlying(range.aspects)) << planeIndex))
+			};
+
+			++mipIndex;
+			const bool finalMip = mipIndex >= mipCount;
+			arrayIndex += finalMip;
+			mipIndex = finalMip ? 0u : mipIndex;
+			const bool finalArray = arrayIndex >= arrayCount;
+			planeIndex += finalArray;
+			arrayIndex = finalArray ? 0u : arrayIndex;
+		}
+
+		UINT64 totalRowSizes = 0ull;
+		for (std::size_t i = 0uz; i < footprintCount; ++i)
+		{
+			totalRowSizes += rowSizesSpan[i] * subresourceFootprintsSpan[i].Footprint.Depth * rowCountsSpan[i];
+		}
+
+		return CopyableFootprintSize{.sourceTotalSize = totalRowSizes, .destinationTotalSize = totalSize};
+	}
+
+	Meta::Version Engine::ShaderIRVersion() const
+	{
+		const auto shaderModel = std::to_underlying(device.GetShaderModel());
+		return Meta::Version(shaderModel / 0xF, shaderModel & 0xF);
+	}
+
+	ShaderScalarTypeMask Engine::ScalarTypeSupport() const
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (device.IsIntFloat16Supported())
+		{
+			answer |= ShaderScalarTypeMask::Int16 | ShaderScalarTypeMask::Float16;
+		}
+		if (device.IsInt64Supported())
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+		if (device.IsFloat64Supported())
+		{
+			answer |= ShaderScalarTypeMask::Float64;
+		}
+
+		return answer;
+	}
+
+	ShaderScalarTypeMask Engine::ToAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (support.atomicInt64 && support.atomicInt64OnDescriptorHeap) // The engine doesn't support direct views.
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+
+		return answer;
+	}
+
+	ShaderScalarTypeMask Engine::ToGroupSharedAtomicScalarTypeSupport(const AtomicSupport& support) noexcept
+	{
+		auto answer = ShaderScalarTypeMask::Int32 | ShaderScalarTypeMask::Float32;
+		if (support.groupSharedAtomicInt64)
+		{
+			answer |= ShaderScalarTypeMask::Int64;
+		}
+
+		return answer;
+	}
+
+	LineRasterizationModeMask Engine::LineRasterizationSupport() const
+	{
+		auto answer = LineRasterizationModeMask::Aliased | LineRasterizationModeMask::AlphaAntialiased | LineRasterizationModeMask::QuadrilateralWide;
+		if (device.IsQuadrilateralNarrowLineSupported())
+		{
+			answer |= LineRasterizationModeMask::QuadrilateralNarrow;
+		}
+
+		return answer;
+	}
+
+	DXGI_FORMAT Engine::GetFormat(const TextureFormatID format) const
+	{
+		const std::size_t formatIndex = textureFormatMap.IndexOf(format);
+#ifndef NDEBUG
+		if (formatIndex >= textureFormatMap.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture format");
+		}
+#endif
+
+		return textureFormatMap.DXGIFormat(formatIndex);
+	}
+
+	DXGI_FORMAT Engine::GetFormat(const TextureFormatID format, const bool srgb) const
+	{
+		const DXGI_FORMAT nativeFormat = GetFormat(format);
+		return srgb ? GetSRGBVariant(nativeFormat) : nativeFormat;
+	}
+
+	DXGI_FORMAT Engine::GetSRGBVariant(const DXGI_FORMAT format)
+	{
+		const DXGI_FORMAT srgb = GetSRGBFormat(format);
+
+#ifndef NDEBUG
+		if (srgb == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		{
+			throw std::invalid_argument("Not SRGB-compatible format");
+		}
+#endif
+
+		return srgb;
+	}
+
+	DXGI_FORMAT Engine::GetColorViewVariant(const DXGI_FORMAT format, const bool srgb)
+	{
+#ifndef NDEBUG
+		if (IsDepthStencilFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Not color format");
+		}
+#endif
+
+		return srgb ? GetSRGBVariant(format) : format;
+	}
+
+	DXGI_FORMAT Engine::GetDepthViewVariant(const DXGI_FORMAT format)
+	{
+		const DXGI_FORMAT depth = GetDepthViewFormat(format);
+
+#ifndef NDEBUG
+		if (depth == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		{
+			throw std::invalid_argument("Not depth-compatible format");
+		}
+#endif
+
+		return depth;
+	}
+
+	DXGI_FORMAT Engine::GetStencilViewVariant(const DXGI_FORMAT format)
+	{
+		const DXGI_FORMAT stencil = GetStencilViewFormat(format);
+
+#ifndef NDEBUG
+		if (stencil == DXGI_FORMAT_UNKNOWN) [[unlikely]]
+		{
+			throw std::invalid_argument("Not stencil-compatible format");
+		}
+#endif
+
+		return stencil;
+	}
+
+	DXGI_FORMAT Engine::GetViewFormat(const DXGI_FORMAT format, const bool srgb, const Aspect aspect)
+	{
+		switch (aspect)
+		{
+		case Aspect::Color:
+			return GetColorViewVariant(format, srgb);
+		case Aspect::Depth:
+#ifndef NDEBUG
+			if (srgb) [[unlikely]]
+			{
+				throw std::invalid_argument("Depth view and SRGB aren't compatible");
+			}
+#endif
+			return GetDepthViewVariant(format);
+		case Aspect::Stencil:
+#ifndef NDEBUG
+			if (srgb) [[unlikely]]
+			{
+				throw std::invalid_argument("Stencil view and SRGB aren't compatible");
+			}
+#endif
+			return GetStencilViewVariant(format);
+		default: [[unlikely]]
+			assert(false && "Invalid aspect.");
+			return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+
+	std::uint16_t Engine::GetMaxArraySize(const TextureDimension dimension) noexcept
+	{
+		switch (dimension)
+		{
+		case TextureDimension::Texture1D:
+			return std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
+		case TextureDimension::Texture2D:
+			return std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
+		case TextureDimension::Texture3D:
+			return 1u;
+		default: [[unlikely]]
+			assert(false && "Invalid dimension.");
+			return 1u;
+		}
+	}
+
+	std::uint16_t Engine::GetMaxArraySize(const TextureViewDimension dimension) noexcept
+	{
+		switch (dimension)
+		{
+		case TextureViewDimension::Texture1D:
+			return std::uint16_t{D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION};
+		case TextureViewDimension::Texture2D:
+		case TextureViewDimension::TextureCube:
+			return std::uint16_t{D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION};
+		case TextureViewDimension::Texture3D:
+			return 1u;
+		default: [[unlikely]]
+			assert(false && "Invalid dimension.");
+			return 1u;
+		}
+	}
+
+	D3D12_SHADER_BYTECODE Engine::ToByteCode(const std::span<const std::byte> byteCode) noexcept
+	{
+		return D3D12_SHADER_BYTECODE{.pShaderBytecode = byteCode.data(), .BytecodeLength = static_cast<SIZE_T>(byteCode.size())};
+	}
+
+	template<typename Range>
+	void Engine::CopyViews(const std::span<const Range> ranges, const D3D12_DESCRIPTOR_HEAP_TYPE type)
+	{
+		ValidateCopyRange(ranges);
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> sources = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
+		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> destinations = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
+		const Memory::Arena::Slice<UINT> rangeSizes = arena.Allocate<UINT>(ranges.size());
+		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> sourcesSpan = arena.Span(sources);
+		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> destinationsSpan = arena.Span(destinations);
+		const std::span<UINT> rangesSizesSpan = arena.Span(rangeSizes);
+
+		for (std::size_t i = 0uz; i < ranges.size(); ++i)
+		{
+			const Range& range = ranges[i];
+			sourcesSpan[i] = ToNativeContainerNotNullptr(range.source)->CpuHandle(range.sourceOffset);
+			destinationsSpan[i] = ToNativeContainerNotNullptr(range.destination)->CpuHandle(range.destinationOffset);
+			rangesSizesSpan[i] = range.count;
+		}
+
+		device.CopyDescriptors(static_cast<UINT>(ranges.size()), rangesSizesSpan.data(),
+			sourcesSpan.data(), destinationsSpan.data(), type);
+
+		for (std::size_t i = 0uz; i < ranges.size(); ++i)
+		{
+			const Range& range = ranges[i];
+			const auto source = ToNativeContainerNotNullptr(range.source);
+			const auto destination = ToNativeContainerNotNullptr(range.destination);
+			std::ranges::copy(&source->Meta(range.sourceOffset), &source->Meta(range.sourceOffset) + range.count, &destination->Meta(range.destinationOffset));
+		}
+	}
+
+	template<typename T>
+	std::shared_ptr<T> Engine::CreateCommandList(const D3D12_COMMAND_LIST_TYPE type)
+	{
+		return std::make_shared<T>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+	}
+
+	template<typename CommandListInterface>
+	void Engine::Execute(const std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, CommandQueue& commandQueue)
+	{
+		Memory::Arena& arena = Arena();
+		arena.Free();
+		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
+		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> beforeFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.before.size());
+		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> afterFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.after.size());
+		const std::span<ID3D12CommandList*> listsSpan = arena.Span(lists);
+		const std::span<std::pair<ID3D12Fence*, UINT64>> beforeFencesSpan = arena.Span(beforeFences);
+		const std::span<std::pair<ID3D12Fence*, UINT64>> afterFencesSpan = arena.Span(afterFences);
+
+		for (std::size_t i = 0uz; i < listsSpan.size(); ++i)
+		{
+			listsSpan[i] = &ToNativeCommandListNotNullptr(commandLists[i])->CommandList();
+		}
+		GetFences(sync.before, beforeFencesSpan);
+		GetFences(sync.after, afterFencesSpan);
+
+		commandQueue.Execute(listsSpan, beforeFencesSpan, afterFencesSpan);
+	}
+
+	void Engine::GetFences(const std::span<const std::pair<IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output)
+	{
+		assert(input.size() == output.size() && "Input and output sizes are not the same.");
+		for (std::size_t i = 0uz; i < input.size(); ++i)
+		{
+			output[i] = std::pair(&ToNativeFenceNotNullptr(input[i].first)->GetFence(), input[i].second);
+		}
+	}
+
+	void Engine::GetFences(const std::span<const std::pair<const IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output)
+	{
+		assert(input.size() == output.size() && "Input and output sizes are not the same.");
+		for (std::size_t i = 0uz; i < input.size(); ++i)
+		{
+			output[i] = std::pair(&ToNativeFenceNotNullptr(input[i].first)->GetFence(), input[i].second);
+		}
+	}
+
+	D3D12_COMMAND_QUEUE_DESC Engine::MakeCommandQueueDesc(const D3D12_COMMAND_LIST_TYPE type) noexcept
+	{
+		return D3D12_COMMAND_QUEUE_DESC
+		{
+			.Type = type,
+			.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH,
+			.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
+			.NodeMask = 0u
+		};
+	}
+
+	SwapChainWrapper& Engine::GetSwapChain() const
+	{
+#ifndef NDEBUG
+		if (!swapChain) [[unlikely]]
+		{
+			throw std::logic_error("Swap chain is not created");
+		}
+#endif
+
+		return *swapChain;
+	}
+
+	Memory::Arena& Engine::Arena()
+	{
+		thread_local auto arena = Memory::Arena(0uz, 128uz);
+		return arena;
+	}
+
+	Device Engine::CreateDevice() const
+	{
+		auto device = Device(*renderDevice, *factory.GetMostPerformantAdapter());
+
+		try
+		{
+			device.SetName("PonyEngineMain");
+		}
+		catch (...)
+		{
+			PONY_LOG_X(renderDevice->Logger(), std::current_exception(), "On setting device name.");
+		}
+
+		return device;
+	}
+
+	CommandQueue Engine::CreateCommandQueue(const D3D12_COMMAND_LIST_TYPE commandListType)
+	{
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Creating D3D12 command queue... Type: '{}'.", std::to_underlying(commandListType));
+
+		auto commandQueue = CommandQueue(device.CreateCommandQueue(MakeCommandQueueDesc(commandListType), CreatorId));
+
+		try
+		{
+			commandQueue.SetName("PonyEngineMain");
+		}
+		catch (...)
+		{
+			PONY_LOG_X(renderDevice->Logger(), std::current_exception(), "On setting command queue name. Type: '{}'.", std::to_underlying(commandListType));
+		}
+
+		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Creating D3D12 command queue done. Type: '{}'.", std::to_underlying(commandListType));
+
+		return commandQueue;
+	}
+
+	void Engine::ValidateBufferParams(const BufferParams& params)
+	{
+#ifndef NDEBUG
+		if (params.size == 0uz) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid size");
+		}
+#endif
+	}
+
+	void Engine::ValidateDimension(const TextureParams& params)
+	{
+#ifndef NDEBUG
+		if (params.size.Min() == 0u) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid size");
+		}
+		if (params.mipCount == 0u || params.mipCount > D3D12_REQ_MIP_LEVELS) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid mip count");
+		}
+		if (params.arraySize == 0u) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid array size");
+		}
+		if (params.mipCount > 1u && ToNumber(params.sampleCount) > 1u) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid mip count or sample count");
+		}
+
+		switch (params.dimension)
+		{
+		case TextureDimension::Texture1D:
+			if (params.size.X() > D3D12_REQ_TEXTURE1D_U_DIMENSION || params.size.Y() != 1u || params.size.Z() != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+			if (params.arraySize > D3D12_REQ_TEXTURE1D_ARRAY_AXIS_DIMENSION) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid array size");
+			}
+			if (ToNumber(params.sampleCount) != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid sample count");
+			}
+			break;
+		case TextureDimension::Texture2D:
+			if (params.size.X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size.Z() != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+			if (params.arraySize > D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid array size");
+			}
+			if (ToNumber(params.sampleCount) > D3D12_MAX_MULTISAMPLE_SAMPLE_COUNT) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid sample count");
+			}
+			break;
+		case TextureDimension::Texture3D:
+			if (params.size.X() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION || params.size.Y() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION || params.size.Z() > D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+			if (params.arraySize != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid array size");
+			}
+			if (ToNumber(params.sampleCount) != 1u) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid sample count");
+			}
+			break;
+		}
+#endif
+	}
+
+	void Engine::ValidateColorTexture(const TextureParams& params)
+	{
+#ifndef NDEBUG
+		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateDepthTexture(const TextureParams& params)
+	{
+#ifndef NDEBUG
+		if (!params.castableFormats.empty()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid castable texture format");
+		}
+		if (Any(TextureFlag::SRGB, params.flags)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid srgb flag");
+		}
+		if (Any(TextureUsage::RenderTarget | TextureUsage::UnorderedAccess, params.usage)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateAspect(const AspectMask aspects, const DXGI_FORMAT format)
+	{
+#ifndef NDEBUG
+		if (!All(aspects, GetAspects(format))) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid aspect");
+		}
+#endif
+	}
+
+	void Engine::ValidateCBVParams(const Buffer& buffer, const CBVParams& params)
+	{
+#ifndef NDEBUG
+		if (params.offset % CBVAlignment) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid offset");
+		}
+		if (params.size == 0ull || params.size % CBVAlignment) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid size");
+		}
+		if (params.offset + params.size > buffer.Size() || std::numeric_limits<std::uint64_t>::max() - params.size < params.offset) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid cbv params");
+		}
+
+		if (None(BufferUsage::ShaderResource, buffer.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateSRVParams(const Buffer& buffer, const BufferSRVParams& params)
+	{
+		ValidateSize(buffer, params.firstElementIndex, params.elementCount, params.stride);
+
+#ifndef NDEBUG
+		if (None(BufferUsage::ShaderResource, buffer.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateSRVParams(const Texture& texture, const TextureSRVParams& params)
+	{
+		ValidateViewFormat(texture, params.format, params.srgb);
+		ValidateDimension(texture, params.dimension);
+		ValidateLayout(texture, params.layout, params.dimension);
+
+#ifndef NDEBUG
+		if (None(TextureUsage::ShaderResource, texture.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateSRVParams(const TextureSRVParams& params, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+		ValidateLayout(params.layout, params.dimension, maxMipCount, maxArraySize);
+	}
+
+	void Engine::ValidateUAVParams(const Buffer& buffer, const BufferUAVParams& params)
+	{
+		ValidateSize(buffer, params.firstElementIndex, params.elementCount, params.stride);
+
+#ifndef NDEBUG
+		if (None(BufferUsage::UnorderedAccess, buffer.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateUAVParams(const Texture& texture, const TextureUAVParams& params)
+	{
+		ValidateViewFormat(texture, params.format, false);
+		ValidateDimension(texture, params.dimension);
+		ValidateLayout(texture, params.layout);
+
+#ifndef NDEBUG
+		if (None(TextureUsage::UnorderedAccess, texture.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateUAVParams(const TextureUAVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+		ValidateLayout(params.layout, maxMipCount, maxArraySize);
+
+#ifndef NDEBUG
+		if (IsDepthStencilFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Depth stencil formats aren't compatible with UAV");
+		}
+#endif
+	}
+
+	void Engine::ValidateRTVParams(const Texture& texture, const RTVParams& params)
+	{
+		ValidateViewFormat(texture, params.format, params.srgb);
+		ValidateDimension(texture, params.dimension);
+		ValidateLayout(texture, params.layout);
+
+#ifndef NDEBUG
+		if (None(TextureUsage::RenderTarget, texture.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateRTVParams(const RTVParams& params, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+		ValidateLayout(params.layout, maxMipCount, maxArraySize);
+	}
+
+	void Engine::ValidateDSVParams(const Texture& texture, const DSVParams& params)
+	{
+		ValidateViewFormat(texture, params.format, false);
+		ValidateDimension(texture, params.dimension);
+		ValidateLayout(texture, params.layout);
+
+#ifndef NDEBUG
+		if (None(TextureUsage::DepthStencil, texture.Usage())) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid texture usage");
+		}
+#endif
+	}
+
+	void Engine::ValidateDSVParams(const DSVParams& params, const DXGI_FORMAT format, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+		ValidateLayout(params.layout, maxMipCount, maxArraySize);
+
+#ifndef NDEBUG
+		if (!IsDepthStencilFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Depth stencil formats aren't compatible with UAV");
+		}
+#endif
+	}
+
+	void Engine::ValidateSize(const Buffer& buffer, const std::uint64_t firstElementIndex, const std::uint32_t elementCount, const std::uint32_t stride)
+	{
+#ifndef NDEBUG
+		if (stride == 0u) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid stride");
+		}
+		if ((firstElementIndex + elementCount) * stride > buffer.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid size");
+		}
+#endif
+	}
+
+	void Engine::ValidateViewFormat(const Texture& texture, const TextureFormatID viewFormat, const bool srgb)
+	{
+#ifndef NDEBUG
+		if (srgb)
+		{
+			if (texture.Format() != viewFormat || !texture.SRGBCompatible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid format");
+			}
+		}
+		else if (texture.Format() != viewFormat && std::ranges::find(texture.CastableFormats(), viewFormat) == texture.CastableFormats().cend()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid format");
+		}
+#endif
+	}
+
+	void Engine::ValidateDimension(const Texture& texture, const TextureViewDimension dimension)
+	{
+#ifndef NDEBUG
+		switch (dimension)
+		{
+		case TextureViewDimension::Texture1D:
+			if (texture.Dimension() != TextureDimension::Texture1D) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid dimension");
+			}
+			break;
+		case TextureViewDimension::Texture2D:
+		case TextureViewDimension::TextureCube:
+			if (texture.Dimension() != TextureDimension::Texture2D) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid dimension");
+			}
+			break;
+		case TextureViewDimension::Texture3D:
+			if (texture.Dimension() != TextureDimension::Texture3D) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid dimension");
+			}
+			break;
+		default: [[unlikely]]
+			assert(false && "Invalid dimension");
+			break;
+		}
+#endif
+	}
+
+	void Engine::ValidateDimension(const Texture& texture, const TextureDimension dimension)
+	{
+#ifndef NDEBUG
+		if (texture.Dimension() != dimension) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid dimension");
+		}
+#endif
+	}
+
+	void Engine::ValidateLayout(const Texture& texture, const SRVLayout& layout, const TextureViewDimension dimension)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleSRVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, l.mipRange);
+				if (dimension == TextureViewDimension::TextureCube) [[unlikely]]
+				{
+					ValidateArrayRange(texture, ArrayRange{.firstArrayIndex = 0u, .arrayCount = 6u});
+				}
+			},
+			[&](const ArraySRVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, l.mipRange);
+				if (dimension == TextureViewDimension::TextureCube)
+				{
+					if (l.arrayRange.arrayCount)
+					{
+						if (*l.arrayRange.arrayCount % 6) [[unlikely]]
+						{
+							throw std::invalid_argument("Invalid array range");
+						}
+					}
+					else
+					{
+						if ((texture.ArraySize() - l.arrayRange.firstArrayIndex) % 6) [[unlikely]]
+						{
+							throw std::invalid_argument("Invalid array range");
+						}
+					}
+				}
+				ValidateArrayRange(texture, l.arrayRange);
+			},
+			[&](const MultiSampleSRVLayout&)
+			{
+				ValidateSampleCount(texture, true);
+				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid dimension");
+				}
+			},
+			[&](const MultiSampleArraySRVLayout& l)
+			{
+				ValidateSampleCount(texture, true);
+				ValidateArrayRange(texture, l.arrayRange);
+				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid dimension");
+				}
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateLayout(const SRVLayout& layout, const TextureViewDimension dimension, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleSRVLayout& l)
+			{
+				ValidateMipRange(l.mipRange, maxMipCount);
+				if (dimension == TextureViewDimension::TextureCube) [[unlikely]]
+				{
+					ValidateArrayRange(ArrayRange{.firstArrayIndex = 0u, .arrayCount = 6u}, maxArraySize);
+				}
+			},
+			[&](const ArraySRVLayout& l)
+			{
+				ValidateMipRange(l.mipRange, maxMipCount);
+				if (dimension == TextureViewDimension::TextureCube)
+				{
+					if (l.arrayRange.arrayCount)
+					{
+						if (*l.arrayRange.arrayCount % 6) [[unlikely]]
+						{
+							throw std::invalid_argument("Invalid array range");
+						}
+					}
+					else
+					{
+						if ((maxArraySize - l.arrayRange.firstArrayIndex) % 6) [[unlikely]]
+						{
+							throw std::invalid_argument("Invalid array range");
+						}
+					}
+				}
+				ValidateArrayRange(l.arrayRange, maxArraySize);
+			},
+			[&](const MultiSampleSRVLayout&)
+			{
+				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid dimension");
+				}
+			},
+			[&](const MultiSampleArraySRVLayout& l)
+			{
+				ValidateArrayRange(l.arrayRange, maxArraySize);
+				if (dimension != TextureViewDimension::Texture2D) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid dimension");
+				}
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateLayout(const Texture& texture, const UAVLayout& layout)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleUAVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+			},
+			[&](const ArrayUAVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+				ValidateArrayRange(texture, l.arrayRange);
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateLayout(const UAVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleUAVLayout& l)
+			{
+				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
+			},
+			[&](const ArrayUAVLayout& l)
+			{
+				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
+				ValidateArrayRange(l.arrayRange, maxArraySize);
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateLayout(const Texture& texture, const RTVLayout& layout)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleRTVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+			},
+			[&](const ArrayRTVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{ .mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+				ValidateArrayRange(texture, l.arrayRange);
+			},
+			[&](const MultiSampleRTVLayout&)
+			{
+				ValidateSampleCount(texture, true);
+			},
+			[&](const MultiSampleArrayRTVLayout& l)
+			{
+				ValidateSampleCount(texture, true);
+				ValidateArrayRange(texture, l.arrayRange);
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateLayout(const RTVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleRTVLayout& l)
+			{
+				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
+			},
+			[&](const ArrayRTVLayout& l)
+			{
+				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
+				ValidateArrayRange(l.arrayRange, maxArraySize);
+			},
+			[&](const MultiSampleRTVLayout&)
+			{
+			},
+			[&](const MultiSampleArrayRTVLayout& l)
+			{
+				ValidateArrayRange(l.arrayRange, maxArraySize);
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateLayout(const Texture& texture, const DSVLayout& layout)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleDSVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+			},
+			[&](const ArrayDSVLayout& l)
+			{
+				ValidateSampleCount(texture, false);
+				ValidateMipRange(texture, MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u});
+				ValidateArrayRange(texture, l.arrayRange);
+			},
+			[&](const MultiSampleDSVLayout&)
+			{
+				ValidateSampleCount(texture, true);
+			},
+			[&](const MultiSampleArrayDSVLayout& l)
+			{
+				ValidateSampleCount(texture, true);
+				ValidateArrayRange(texture, l.arrayRange);
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateLayout(const DSVLayout& layout, const std::uint8_t maxMipCount, const std::uint16_t maxArraySize)
+	{
+#ifndef NDEBUG
+		std::visit(Type::Overload
+		{
+			[&](const SingleDSVLayout& l)
+			{
+				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
+			},
+			[&](const ArrayDSVLayout& l)
+			{
+				ValidateMipRange(MipRange{.mostDetailedMipIndex = l.mipIndex, .mipCount = 1u}, maxMipCount);
+				ValidateArrayRange(l.arrayRange, maxArraySize);
+			},
+			[&](const MultiSampleDSVLayout&)
+			{
+			},
+			[&](const MultiSampleArrayDSVLayout& l)
+			{
+				ValidateArrayRange(l.arrayRange, maxArraySize);
+			}
+		}, layout);
+#endif
+	}
+
+	void Engine::ValidateRange(const TextureParams& params, const DXGI_FORMAT format, const SubTextureRange& range)
+	{
+		ValidateMipRange(range.mipRange, params.mipCount);
+		ValidateArrayRange(range.arrayRange, params.arraySize);
+		ValidateAspect(range.aspects, format);
+	}
+
+	void Engine::ValidateRange(const Texture& texture, const SubTextureRange& range)
+	{
+		ValidateMipRange(range.mipRange, texture.MipCount());
+		ValidateArrayRange(range.arrayRange, texture.ArraySize());
+		ValidateAspect(range.aspects, texture.NativeFormat());
+	}
+
+	void Engine::ValidateMipRange(const Texture& texture, const MipRange& range)
+	{
+		ValidateMipRange(range, texture.MipCount());
+	}
+
+	void Engine::ValidateMipRange(const MipRange& range, const std::uint8_t maxMipCount)
+	{
+#ifndef NDEBUG
+		if (range.mostDetailedMipIndex + range.mipCount.value_or(1u) > maxMipCount) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid mip range");
+		}
+#endif
+	}
+
+	void Engine::ValidateArrayRange(const Texture& texture, const ArrayRange& range)
+	{
+		ValidateArrayRange(range, texture.ArraySize());
+	}
+
+	void Engine::ValidateArrayRange(const ArrayRange& range, const std::uint16_t maxArraySize)
+	{
+#ifndef NDEBUG
+		if (range.firstArrayIndex + range.arrayCount.value_or(1u) > maxArraySize) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid array range");
+		}
+#endif
+	}
+
+	void Engine::ValidateSampleCount(const Texture& texture, const bool shouldBeMS)
+	{
+#ifndef NDEBUG
+		if (ToNumber(texture.SampleCount()) > 1u != shouldBeMS) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid sample count");
+		}
+#endif
+	}
+
+	void Engine::ValidateSwapChainParams(const SwapChainParams& params, DXGI_FORMAT format)
+	{
+#ifndef NDEBUG
+		if (params.size)
+		{
+			if (params.size->X() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION || params.size->Y() > D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid size");
+			}
+		}
+
+		if (params.bufferCount < 2u || params.bufferCount > DXGI_MAX_SWAP_CHAIN_BUFFERS) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid buffer count");
+		}
+
+		if (params.alphaMode != SwapChainAlphaMode::Ignore && params.alphaMode != SwapChainAlphaMode::Straight && params.alphaMode != SwapChainAlphaMode::Premultiplied) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid alpha mode");
+		}
+
+		if (Any(TextureUsage::DepthStencil, params.usage)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid usage");
+		}
+
+		if (Any(SwapChainFlag::SRGB, params.flags) && !IsSRGBCompatibleFormat(format)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid srgb flag");
+		}
+#endif
+	}
+
+	void Engine::ValidateContainerForCreatingView(const ShaderDataContainer& container, const std::uint32_t index)
+	{
+#ifndef NDEBUG
+		if (index >= container.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container index");
+		}
+		if (container.IsShaderVisible()) [[unlikely]]
+		{
+			throw std::invalid_argument("Container is shader visible");
+		}
+#endif
+	}
+
+	void Engine::ValidateCopyRange(const std::span<const ShaderDataCopyRange> ranges)
+	{
+#ifndef NDEBUG
+		if (ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Range count is too great");
+		}
+		for (const ShaderDataCopyRange& range : ranges)
+		{
+			const ShaderDataContainer* const source = ToNativeContainerNotNullptr(range.source);
+			if (source->Size() < range.sourceOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source range");
+			}
+			if (source->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Source is shader visible");
+			}
+
+			if (ToNativeContainerNotNullptr(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination range");
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidateContainerForCreatingView(const RenderTargetContainer& container, const std::uint32_t index)
+	{
+#ifndef NDEBUG
+		if (index >= container.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container index");
+		}
+#endif
+	}
+
+	void Engine::ValidateCopyRange(std::span<const RenderTargetCopyRange> ranges)
+	{
+#ifndef NDEBUG
+		if (ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Range count is too great");
+		}
+		for (const RenderTargetCopyRange& range : ranges)
+		{
+			if (!range.source || typeid(*range.source) != typeid(ShaderDataContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source");
+			}
+			const RenderTargetContainer* const source = static_cast<const RenderTargetContainer*>(range.source);
+			if (source->Size() < range.sourceOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source range");
+			}
+
+			if (!range.destination || typeid(*range.destination) != typeid(RenderTargetContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination");
+			}
+			if (static_cast<const RenderTargetContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination range");
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidateContainerForCreatingView(const DepthStencilContainer& container, const std::uint32_t index)
+	{
+#ifndef NDEBUG
+		if (index >= container.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container index");
+		}
+#endif
+	}
+
+	void Engine::ValidateCopyRange(const std::span<const DepthStencilCopyRange> ranges)
+	{
+#ifndef NDEBUG
+		if (ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Range count is too great");
+		}
+		for (const DepthStencilCopyRange& range : ranges)
+		{
+			if (!range.source || typeid(*range.source) != typeid(ShaderDataContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source");
+			}
+			const DepthStencilContainer* const source = static_cast<const DepthStencilContainer*>(range.source);
+			if (source->Size() < range.sourceOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source range");
+			}
+
+			if (!range.destination || typeid(*range.destination) != typeid(DepthStencilContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination");
+			}
+			if (static_cast<const DepthStencilContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination range");
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidateContainerForCreatingSampler(const SamplerContainer& container, const std::uint32_t index)
+	{
+#ifndef NDEBUG
+		if (index >= container.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid container index");
+		}
+		if (container.IsShaderVisible()) [[unlikely]]
+		{
+			throw std::invalid_argument("Container is shader visible");
+		}
+#endif
+	}
+
+	void Engine::ValidateCopyRange(const std::span<const SamplerCopyRange> ranges)
+	{
+#ifndef NDEBUG
+		if (ranges.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Range count is too great");
+		}
+		for (const SamplerCopyRange& range : ranges)
+		{
+			if (!range.source || typeid(*range.source) != typeid(SamplerContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source");
+			}
+			const SamplerContainer* const source = static_cast<const SamplerContainer*>(range.source);
+			if (source->Size() < range.sourceOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid source range");
+			}
+			if (source->IsShaderVisible()) [[unlikely]]
+			{
+				throw std::invalid_argument("Source is shader visible");
+			}
+
+			if (!range.destination || typeid(*range.destination) != typeid(SamplerContainer)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination");
+			}
+			if (static_cast<const SamplerContainer*>(range.destination)->Size() < range.destinationOffset + range.count) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid destination range");
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidatePipelineLayoutParams(const PipelineLayoutParams& params)
+	{
+		ValidatePipelineLayoutSizes(params);
+		ValidatePipelineLayoutOverlaps(params.descriptorSets);
+	}
+
+	void Engine::ValidatePipelineLayoutSizes(const PipelineLayoutParams& params)
+	{
+#ifndef NDEBUG
+		if (params.descriptorSets.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Descriptor set count is too great");
+		}
+
+		for (const DescriptorSet& set : params.descriptorSets)
+		{
+			if (GetRangeCount(set.ranges) > std::numeric_limits<UINT>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Descriptor set range count is too great");
+			}
+			if (set.staticSamplers.size() > std::numeric_limits<UINT>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Descriptor set static sampler count is too great");
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidatePipelineLayoutOverlaps(const std::span<const DescriptorSet> descriptorSets)
+	{
+#ifndef NDEBUG
+		static constexpr auto checkRange = []<typename T>(const std::span<const T> r, const DescriptorSet& set)
+		{
+			for (std::size_t i = 0uz; i < r.size(); ++i)
+			{
+				const T& base = r[i];
+				std::uint32_t baseBegin = base.firstShaderRegister;
+				std::uint32_t baseEnd = base.firstShaderRegister + base.shaderRegisterCount;
+				for (std::size_t j = i + 1uz; j < r.size(); ++j)
+				{
+					const T& compared = r[j];
+					std::uint32_t comparedBegin = compared.firstShaderRegister;
+					std::uint32_t comparedEnd = compared.firstShaderRegister + compared.shaderRegisterCount;
+					if (!(comparedBegin >= baseEnd || comparedEnd <= baseBegin)) [[unlikely]]
+					{
+						throw std::invalid_argument("Overlapping ranges");
+					}
+				}
+				for (const StaticSamplerParams& compared : set.staticSamplers)
+				{
+					if (compared.shaderRegister >= baseBegin && compared.shaderRegister < baseEnd) [[unlikely]]
+					{
+						throw std::invalid_argument("Overlapping ranges");
+					}
+				}
+			}
+		};
+
+		for (std::size_t setIndex = 0uz; setIndex < descriptorSets.size(); ++setIndex)
+		{
+			const DescriptorSet& set = descriptorSets[setIndex];
+			for (std::size_t i = 0uz; i < setIndex; ++i)
+			{
+				if (set.setIndex == descriptorSets[i].setIndex) [[unlikely]]
+				{
+					throw std::invalid_argument("Overlapping set indices");
+				}
+			}
+
+			std::visit(Type::Overload
+			{
+				[&](const std::span<const ShaderDataDescriptorRange> r)
+				{
+					checkRange(r, set);
+				},
+				[&](const std::span<const SamplerDescriptorRange> r)
+				{
+					checkRange(r, set);
+				}
+			}, set.ranges);
+
+			for (std::size_t i = 0uz; i < set.staticSamplers.size(); ++i)
+			{
+				for (std::size_t j = i + 1uz; j < set.staticSamplers.size(); ++j)
+				{
+					if (set.staticSamplers[i].shaderRegister == set.staticSamplers[j].shaderRegister) [[unlikely]]
+					{
+						throw std::invalid_argument("Overlapping ranges");
+					}
+				}
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidatePipelineStateParams(const GraphicsPipelineStateParams& params) const
+	{
+#ifndef NDEBUG
+		if (params.meshShader.empty()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid mesh shader");
+		}
+
+		const std::size_t blendCount = std::visit(Type::Overload
+		{
+			[](const ArithmeticBlendGroupParams& p)
+			{
+				return p.renderTargetBlend.size();
+			},
+			[](const LogicBlendGroupParams& p)
+			{
+				return p.renderTargetBlend.size();
+			}
+		}, params.blend.blendGroup);
+		if (blendCount != params.attachment.renderTargetFormats.size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Blend render target count and attachment render target count don't match");
+		}
+		if (blendCount > SimultaneousTargetCount) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid render target count");
+		}
+		if ((params.depthStencil.depth || params.depthStencil.stencil) != params.attachment.depthStencilFormat.has_value()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid depth stencil format");
+		}
+
+		for (const RenderTargetAttachmentFormat& format : params.attachment.renderTargetFormats)
+		{
+			const DXGI_FORMAT nativeFormat = GetFormat(format.format);
+			if (None(AspectMask::Color, GetAspects(nativeFormat))) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid render target format");
+			}
+			if (format.srgb && !IsSRGBCompatibleFormat(nativeFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Not SRGB-compatible format");
+			}
+		}
+
+		if (params.attachment.depthStencilFormat)
+		{
+			const DXGI_FORMAT depthStencilFormat = GetFormat(*params.attachment.depthStencilFormat);
+			if (!IsDepthStencilFormat(depthStencilFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid depth stencil format");
+			}
+			if (params.depthStencil.stencil && !HasStencil(depthStencilFormat)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid depth stencil format");
+			}
+		}
+#endif
+	}
+
+	void Engine::ValidatePipelineStateParams(const ComputePipelineStateParams& params)
+	{
+#ifndef NDEBUG
+		if (params.computeShader.empty()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid mesh shader");
+		}
+#endif
+	}
+}

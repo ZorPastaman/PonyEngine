@@ -1,0 +1,73 @@
+message(STATUS "Configuring PonyEngine.Core.Tests")
+add_executable(PonyEngine.Core.Tests)
+
+message(VERBOSE "Configuring sources")
+target_sources(PonyEngine.Core.Tests PRIVATE
+	"Hash/FNV1a.cpp"
+	"Math/Ball.cpp"
+	"Math/BallInsides.cpp"
+	"Math/BallIntersections.cpp"
+	"Math/Bounds.cpp"
+	"Math/Box.cpp"
+	"Math/BoxInsides.cpp"
+	"Math/BoxIntersections.cpp"
+	"Math/Color.cpp"
+	"Math/Common.cpp"
+	"Math/CornerBox.cpp"
+	"Math/Flat.cpp"
+	"Math/FlatIntersections.cpp"
+	"Math/Matrix.cpp"
+	"Math/OrientedBox.cpp"
+	"Math/OrientedBoxInsides.cpp"
+	"Math/OrientedBoxIntersections.cpp"
+	"Math/Quaternion.cpp"
+	"Math/Ray.cpp"
+	"Math/RayIntersections.cpp"
+	"Math/Transform2D.cpp"
+	"Math/Transform3D.cpp"
+	"Math/Transformations.cpp"
+	"Math/Vector.cpp"
+	"Memory/Arena.cpp"
+	"Memory/Pool.cpp"
+	"Meta/Version.cpp"
+	"Serialization/Array.cpp"
+	"Serialization/Basic.cpp"
+	"Type/Common.cpp"
+	"Type/Enum.cpp"
+	"Type/Limits.cpp"
+)
+
+if(PONY_WINDOWS)
+	message(VERBOSE "Configuring sources")
+	target_sources(PonyEngine.Core.Tests PRIVATE
+		"Platform/Windows.Cursor.cpp"
+		"Platform/Windows.File.cpp"
+		"Platform/Windows.GUID.cpp"
+		"Platform/Windows.Text.cpp"
+	)
+endif()
+
+message(VERBOSE "Configuring defines")
+pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
+	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
+)
+
+message(VERBOSE "Setting properties")
+set_target_properties(PonyEngine.Core.Tests PROPERTIES 
+	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
+	POSITION_INDEPENDENT_CODE TRUE
+)
+
+message(VERBOSE "Setting build options")
+pony_set_build_options(PonyEngine.Core.Tests ${PONY_ENGINE_OPTIMIZATION})
+
+message(VERBOSE "Configuring dependencies")
+target_link_libraries(PonyEngine.Core.Tests PRIVATE 
+	Catch2::Catch2WithMain
+	PonyEngine.Core
+)
+
+message(VERBOSE "Discovering tests")
+catch_discover_tests(PonyEngine.Core.Tests)

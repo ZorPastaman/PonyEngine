@@ -1,0 +1,20 @@
+enable_testing()
+
+message(STATUS "Fetching Catch2")
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.8.1
+)
+FetchContent_MakeAvailable(Catch2)
+pony_set_build_options(Catch2WithMain ${PONY_ENGINE_OPTIMIZATION})
+
+message(STATUS "Configuring tests")
+include(CTest)
+include(Catch)
+add_subdirectory("Core.Tests")
+add_subdirectory("Log.Tests")
+add_subdirectory("Log.Ext.Tests")
+add_subdirectory("RawInput.Tests")
+add_subdirectory("Surface.Tests")
+add_subdirectory("Time.Tests")
