@@ -85,6 +85,7 @@ export namespace Game
 		PonyEngine::RawInput::AxisID escapeAxis;
 
 		std::shared_ptr<PonyEngine::RenderDevice::IGraphicsCommandList> graphicsCommandList;
+		std::shared_ptr<PonyEngine::RenderDevice::ISecondaryGraphicsCommandList> secondaryGraphicsCommandList;
 		std::shared_ptr<PonyEngine::RenderDevice::ICopyCommandList> copyCommandList;
 
 		std::shared_ptr<PonyEngine::RenderDevice::IFence> graphicsFence;
@@ -172,6 +173,8 @@ namespace Game
 
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
 		graphicsCommandList->Name("MainGraphics");
+		secondaryGraphicsCommandList = renderDevice->CreateSecondaryGraphicsCommandList();
+		secondaryGraphicsCommandList->Name("SecondaryGraphics");
 		copyCommandList = renderDevice->CreateCopyCommandList();
 		copyCommandList->Name("MainCopy");
 		graphicsFence = renderDevice->CreateFence();
@@ -668,6 +671,20 @@ namespace Game
 			.after = std::span(&copyFenceValueSync, 1uz)
 		});
 		const auto copyFenceValueWait = std::pair<const PonyEngine::RenderDevice::IFence*, std::uint64_t>(copyFence.get(), copyFenceValue);
+
+		secondaryGraphicsCommandList->BindContainers(*srvContainer);
+		secondaryGraphicsCommandList->BindPipelineState(*boxPipelineState);
+		const auto bindings = std::array<PonyEngine::RenderDevice::ShaderDataBinding, 4>
+		{
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 0u, .containerIndex = boxTransformContainerIndex},
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 1u, .containerIndex = boxMeshletContainerIndex},
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 2u, .containerIndex = boxPositionContainerIndex},
+			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 3u, .containerIndex = greenBoxMaterialContainerIndex}
+		};
+		secondaryGraphicsCommandList->BindGraphics(bindings);
+		secondaryGraphicsCommandList->DispatchGraphics(2u);
+		secondaryGraphicsCommandList->Close();
+
 		waiter->Wait(std::span(&copyFenceValueWait, 1uz), std::chrono::seconds(10));
 	}
 
@@ -858,16 +875,7 @@ namespace Game
 		const auto renderTargetBinding = PonyEngine::RenderDevice::RenderTargetBinding{.container = rtvContainer.get(), .index = renderTargetContainerIndex};
 		const auto depthTargetBinding = PonyEngine::RenderDevice::DepthStencilBinding{.container = dsvContainer.get(), .index = depthContainerIndex};
 		graphicsCommandList->BindTargets(renderTargetBinding, depthTargetBinding);
-		graphicsCommandList->BindPipelineState(*boxPipelineState);
-		const auto bindings = std::array<PonyEngine::RenderDevice::ShaderDataBinding, 4>
-		{
-			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 0u, .containerIndex = boxTransformContainerIndex},
-			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 1u, .containerIndex = boxMeshletContainerIndex},
-			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 2u, .containerIndex = boxPositionContainerIndex},
-			PonyEngine::RenderDevice::ShaderDataBinding{.layoutSetIndex = 3u, .containerIndex = greenBoxMaterialContainerIndex}
-		};
-		graphicsCommandList->BindGraphics(bindings);
-		graphicsCommandList->DispatchGraphics(2u);
+		graphicsCommandList->Execute(*secondaryGraphicsCommandList);
 		const auto resolveBufferBarriers = std::array<PonyEngine::RenderDevice::BufferBarrier, 2>
 		{
 			PonyEngine::RenderDevice::BufferBarrier
