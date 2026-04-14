@@ -1,8 +1,13 @@
+module;
+
+#include "PonyEngine/Log/Log.h"
+
 export module Game:GameService;
 
 import std;
 
 import PonyEngine.Application.Ext;
+import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput;
 import PonyEngine.RenderDevice;
@@ -167,10 +172,13 @@ namespace Game
 
 	void GameService::Begin()
 	{
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Setting cursor...");
 		auto& surface = application->GetService<PonyEngine::Surface::ISurfaceService>();
 		surface.CursorVisibility(false);
 		surface.CursorClippingRect(PonyEngine::Math::CornerRect<float>(PonyEngine::Math::Vector2<float>(0.5f, 0.5f), PonyEngine::Math::Vector2<float>::Zero()));
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Setting cursor done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating flow objects...");
 		graphicsCommandList = renderDevice->CreateGraphicsCommandList();
 		graphicsCommandList->Name("MainGraphics");
 		secondaryGraphicsCommandList = renderDevice->CreateSecondaryGraphicsCommandList();
@@ -185,7 +193,9 @@ namespace Game
 		copyFenceValue = copyFence->CompletedValue();
 		waiter = renderDevice->CreateWaiter();
 		waiter->Name("MainWaiter");
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating flow objects done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating swap chain...");
 		const PonyEngine::RenderDevice::TextureFormatID swapChainTextureFormat = renderDevice->TextureFormatID(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm);
 		renderDevice->CreateSwapChain(PonyEngine::RenderDevice::SwapChainParams
 		{
@@ -203,6 +213,9 @@ namespace Game
 		{
 			renderDevice->SwapChainBuffer(i)->Name(std::format("BackBuffer_{}", i));
 		}
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating swap chain done.");
+
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating textures...");
 		const auto renderTargetTextureFormat = PonyEngine::RenderDevice::RenderTargetAttachmentFormat
 		{
 			.format = renderDevice->TextureFormatID(PonyEngine::RenderDevice::TextureFormat::R8G8B8A8_Unorm),
@@ -258,7 +271,9 @@ namespace Game
 			.initialLayout = PonyEngine::RenderDevice::ResourceLayout::DepthStencilWrite
 		});
 		depthTexture->Name("MainDepth");
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating textures done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating buffers...");
 		const PonyEngine::RenderDevice::CBVRequirement cbvRequirement = renderDevice->DeviceSupport().viewSupport.cbvRequirement;
 
 		const std::uint32_t transformSize = PonyEngine::Math::Align(static_cast<std::uint32_t>(sizeof(GpuTransform)), cbvRequirement.sizeAlignment);
@@ -345,7 +360,9 @@ namespace Game
 			.usage = PonyEngine::RenderDevice::BufferUsage::ShaderResource
 		});
 		staticGpuDataBuffer->Name("StaticData");
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating buffers done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating containers...");
 		constexpr std::uint32_t srvCount = 8u;
 		std::uint32_t srvIndex = 0u;
 		stagingSrvContainer = renderDevice->CreateShaderDataContainer(PonyEngine::RenderDevice::ShaderDataContainerParams
@@ -454,7 +471,9 @@ namespace Game
 			.flags = PonyEngine::RenderDevice::DSVFlag::None,
 			.layout = PonyEngine::RenderDevice::MultiSampleDSVLayout{}
 		});
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating containers done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating pipeline states...");
 		constexpr auto contextRange = PonyEngine::RenderDevice::ShaderDataDescriptorRange
 		{
 			.type = PonyEngine::RenderDevice::ShaderDataDescriptorType::ConstantBuffer,
@@ -611,7 +630,9 @@ namespace Game
 			}
 		});
 		outputPipelineState->Name("OutputPipelineState");
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Creating pipeline states done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Uploading static data...");
 		void* const data = stagingStaticDataBuffer->Map();
 		PonyEngine::RenderDevice::Copy(&boxMeshlets, 0ull, data, boxMeshletOffset, sizeof(boxMeshlets));
 		PonyEngine::RenderDevice::Copy(&boxVertexIndices, 0ull, data, boxVertexIndexOffset, sizeof(boxVertexIndices));
@@ -671,7 +692,9 @@ namespace Game
 			.after = std::span(&copyFenceValueSync, 1uz)
 		});
 		const auto copyFenceValueWait = std::pair<const PonyEngine::RenderDevice::IFence*, std::uint64_t>(copyFence.get(), copyFenceValue);
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Uploading static data done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Writing to secondary graphics command list...");
 		secondaryGraphicsCommandList->BindContainers(*srvContainer);
 		secondaryGraphicsCommandList->BindPipelineState(*boxPipelineState);
 		const auto bindings = std::array<PonyEngine::RenderDevice::ShaderDataBinding, 4>
@@ -684,12 +707,16 @@ namespace Game
 		secondaryGraphicsCommandList->BindGraphics(bindings);
 		secondaryGraphicsCommandList->DispatchGraphics(2u);
 		secondaryGraphicsCommandList->Close();
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Writing to secondary graphics command list done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Waiting for static data copy finish...");
 		waiter->Wait(std::span(&copyFenceValueWait, 1uz), std::chrono::seconds(10));
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Waiting for static data copy finish done.");
 	}
 
 	void GameService::End()
 	{
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Waiting gpu to finish work...");
 		const auto graphicsFenceValueSync = std::pair(graphicsFence.get(), ++graphicsFenceValue);
 		renderDevice->SyncGraphics(PonyEngine::RenderDevice::QueueSync
 		{
@@ -706,10 +733,13 @@ namespace Game
 			copyFenceValueSync
 		};
 		waiter->Wait(waitedFences, std::chrono::seconds(10));
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Waiting gpu to finish work done.");
 
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Returning default cursor parameters...");
 		auto& surface = application->GetService<PonyEngine::Surface::ISurfaceService>();
 		surface.CursorVisibility(true);
 		surface.CursorClippingRect(std::nullopt);
+		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Returning default cursor parameters done.");
 	}
 
 	void GameService::AddTickableServices(PonyEngine::Application::ITickableServiceAdder& adder)
