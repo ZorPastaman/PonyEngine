@@ -1,6 +1,6 @@
 # Render device sample
 
-Shows how to make an application service and add it to the engine application.
+Shows how to make an application service that uses a render device service to render a simple scene.
 
 ![BuildSample](.readme/BuildSample.png)
 
