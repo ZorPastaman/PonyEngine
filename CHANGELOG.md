@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-04-21
+
+### Fixed
+
+- Incorrect GIT_TAG in samples.
+
 ## [0.1.0] - 2026-04-14
 
 ### Added
@@ -29,5 +35,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - MSVC compiler support.
 - DXC compiler support.
 
-[unreleased]: https://github.com/ZorPastaman/PonyEngine/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/ZorPastaman/PonyEngine/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/ZorPastaman/PonyEngine/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ZorPastaman/PonyEngine/releases/tag/v0.1.0
