@@ -1,6 +1,8 @@
 # Pony Engine
 Pony Engine is a modular game engine with a minimal core. Users can easily add their own modules and even replace the engine modules.
 
+![Logo](Logo/Logo.png)
+
 ## Key features
 
 - Modular architecture;
