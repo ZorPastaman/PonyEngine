@@ -2,6 +2,8 @@
 
 Shows how to make an application service and add it to the engine application.
 
+![BuildSample](.readme/BuildSample.png)
+
 ## Supported platform/compiler
 
 | Compiler \ Platform | Windows |

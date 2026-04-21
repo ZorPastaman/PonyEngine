@@ -2,6 +2,8 @@
 
 Shows how to make an application service that controls a surface service.
 
+![BuildSample](.readme/BuildSample.png)
+
 ## Supported platform/compiler
 
 | Compiler \ Platform | Windows |
@@ -96,3 +98,9 @@ It's divided into two files because CMake doesn't allow to use private C\++ modu
 | V                 | Cursor visibility toggle.                                                                                   |
 | C                 | Cursor clipping toggle.                                                                                     |
 | R                 | Writes the client rect position in screen coordinates and cursor position in client coordinates to the log. |
+
+## Notes
+
+The surface is created in fullscreen mode at the start. So, it doesn't allow anything to modify. Press `Space` to see a normal window that can be controlled.
+
+The fullscreen surface looks like a totally transparent window. It's normal 'cause it's optimized for a game engine - the render module should fill it with data, the surface module doesn't paint the window.

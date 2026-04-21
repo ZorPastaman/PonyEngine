@@ -17,7 +17,7 @@ message(STATUS "Fetching PonyEngine")
 FetchContent_Declare(
 	PonyEngine
 	GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine.git
-	GIT_TAG develop
+	GIT_TAG v0.1.1
 )
 FetchContent_MakeAvailable(PonyEngine)
 
