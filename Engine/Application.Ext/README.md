@@ -37,7 +37,7 @@ That data can be used by other modules which is useful when a module needs to pr
 #### [IService](Source/Main-IService.cppm)
 
 Interface representing an engine service. Services are the primary building blocks of the engine, while the application itself provides only minimal functionality.
-Its main responsibility is to tick services, which define the game’s behavior.
+Its main responsibility is to tick services, which define the gameâ€™s behavior.
 
 See [Service lifecycle](#service-lifecycle) for details.
 
