@@ -8,7 +8,7 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 - Modular architecture;
 - Replaceable engine modules;
 - Easily extensible;
-- Mesh shader–based render.
+- Mesh shaderâ€“based render.
 
 ## Prerequisites
 
@@ -165,7 +165,7 @@ Users can provide their own compiler implementations by setting CMake flag `PONY
 
 ### Application module linking
 
-The engine does not automatically link application modules—including its own. This is intentional, giving the game developers full control over the build configuration.
+The engine does not automatically link application modulesâ€”including its own. This is intentional, giving the game developers full control over the build configuration.
 
 To link an application module, explicitly add it in your CMake scripts: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)` where `<MyModule>` can be either a game module or an engine module (for example, `PonyEngine.RawInput.Impl`).
 
@@ -319,12 +319,12 @@ This section is intended for Pony Engine developers and developers of its forks.
 The repo uses CMake presets to control build pipelines. The presets are chosen based on the target platform, compiler, and engine build type.
 The engine build type determines `CMAKE_BUILD_TYPE`, engine optimization level, game optimization level, engine log level, game log level, and some other flags.
 
-Presets use different toolchains for each platform–compiler combination. The toolchains must set required variables, compile and link flags, and provide functions to control them.
+Presets use different toolchains for each platformâ€“compiler combination. The toolchains must set required variables, compile and link flags, and provide functions to control them.
 Each toolchain must define `PONY_COMPILE_FLAGS_DEBUG`, `PONY_COMPILE_FLAGS_RELEASE`, `PONY_LINK_FLAGS_DEBUG`, and `PONY_LINK_FLAGS_RELEASE`, and include [Compiler.cmake](CMake/Toolchains/Compiler.cmake).
 
 #### Windows MSVC toolchain
 
-The toolchain for the Windows–MSVC combination requires presetting some environment variables for a correct build using vcvars*.bat.
+The toolchain for the Windowsâ€“MSVC combination requires presetting some environment variables for a correct build using vcvars*.bat.
 Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170 for details.
 
 ### Tests

@@ -1,4 +1,4 @@
-﻿# Set module.
+# Set module.
 add_library(GameSample STATIC)
 
 # Set includes and sources.

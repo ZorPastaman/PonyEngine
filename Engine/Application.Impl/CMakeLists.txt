@@ -1,4 +1,4 @@
-﻿message(STATUS "Configuring PonyEngine.Application.Impl")
+message(STATUS "Configuring PonyEngine.Application.Impl")
 
 message(VERBOSE "Configuring parameters")
 option(PONY_ENGINE_DEFAULT_LOGGER "Enable default logger. It logs everything to a console." ON)
