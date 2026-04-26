@@ -49,6 +49,5 @@ target_link_libraries(PonyEngine.Time.Impl PUBLIC
 )
 target_link_libraries(PonyEngine.Time.Impl PRIVATE
 	PonyEngine.Time
-	PonyEngine.Core
 	PonyEngine.Log
 )

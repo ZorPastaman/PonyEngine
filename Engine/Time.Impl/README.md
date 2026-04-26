@@ -4,7 +4,6 @@ Time implementation module.
 
 ## Dependencies
 
-- [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
 - [PonyEngine.Application.Ext](../Application.Ext)
 - [PonyEngine.Time](../Time)
