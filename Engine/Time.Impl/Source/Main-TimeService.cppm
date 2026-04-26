@@ -147,7 +147,7 @@ namespace PonyEngine::Time
 		deltaTimeCap(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_DELTA_TIME_CAP)), std::chrono::nanoseconds(1))),
 		timeScale{std::max(PONY_ENGINE_TIME_SCALE, 0.)},
 		fixedStepPeriod(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_FIXED_STEP_PERIOD)), std::chrono::nanoseconds(1))),
-		targetFrameTime(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_TARGET_FRAME_TIME)), std::chrono::nanoseconds(1))),
+		targetFrameTime(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_TARGET_FRAME_TIME)), std::chrono::nanoseconds(0))),
 		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
@@ -298,7 +298,7 @@ namespace PonyEngine::Time
 
 	void TimeService::TargetFrameTime(const std::chrono::nanoseconds frameTime) noexcept
 	{
-		targetFrameTime = frameTime;
+		targetFrameTime = std::max(frameTime, std::chrono::nanoseconds(0));
 		PONY_LOG(application->Logger(), Log::LogType::Debug, "Target frame time changed to '{}'.", targetFrameTime);
 	}
 
