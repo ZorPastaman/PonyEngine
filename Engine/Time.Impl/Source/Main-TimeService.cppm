@@ -17,7 +17,6 @@ import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
-import PonyEngine.Math;
 import PonyEngine.Time;
 
 export namespace PonyEngine::Time
@@ -336,7 +335,7 @@ namespace PonyEngine::Time
 
 		realDeltaTime = thisFrameTimePoint - prevFrameTimePoint;
 		unscaledVirtualDeltaTime = std::min(realDeltaTime, deltaTimeCap);
-		virtualDeltaTime = std::chrono::nanoseconds(Math::RoundToIntegral<std::chrono::nanoseconds::rep>((unscaledVirtualDeltaTime * timeScale).count()));
+		virtualDeltaTime = std::chrono::round<std::chrono::nanoseconds>(unscaledVirtualDeltaTime * timeScale);
 
 		realTime = thisFrameTimePoint - startTimePoint;
 		unscaledVirtualTime += unscaledVirtualDeltaTime;
