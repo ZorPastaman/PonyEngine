@@ -144,10 +144,10 @@ namespace PonyEngine::Time
 {
 	TimeService::TimeService(Application::IApplicationContext& application) noexcept :
 		application{&application},
-		deltaTimeCap(std::chrono::seconds(1)),
-		timeScale{1.},
-		fixedStepPeriod(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(1. / 60.))),
-		targetFrameTime(0ull),
+		deltaTimeCap(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_DELTA_TIME_CAP)), std::chrono::nanoseconds(1))),
+		timeScale{std::max(PONY_ENGINE_TIME_SCALE, 0.)},
+		fixedStepPeriod(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_FIXED_STEP_PERIOD)), std::chrono::nanoseconds(1))),
+		targetFrameTime(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_TARGET_FRAME_TIME)), std::chrono::nanoseconds(1))),
 		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
