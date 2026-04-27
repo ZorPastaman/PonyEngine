@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Configurable settings for Time module.
+
 ## [0.1.1] - 2026-04-21
 
 ### Fixed
