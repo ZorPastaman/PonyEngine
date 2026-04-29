@@ -91,6 +91,7 @@ option(PONY_ENGINE_RENDER_DEVICE_EXT "Enable PonyEngine.RenderDevice.Ext module.
 option(PONY_ENGINE_RENDER_DEVICE_IMPL "Enable PonyEngine.RenderDevice.Impl module." OFF)
 option(PONY_ENGINE_RENDER_DEVICE_DIRECT3D12_IMPL "Enable PonyEngine.RenderDevice.Direct3D12.Impl module." OFF)
 option(PONY_ENGINE_SHADER "Enable PonyEngine.Shader module" OFF)
+option(PONY_ENGINE_JOB "Enable PonyEngine.Job module" OFF)
 
 option(PONY_ENGINE_CUSTOM_PLATFORM "If OFF, the engine automatically detects and configures supported platforms. If ON, the engine skips platform detection and a custom platform configuration must be provided." OFF)
 option(PONY_ENGINE_CUSTOM_COMPILER "If OFF, the engine automatically detects and configures supported compilers. If ON, the engine skips compiler detection and a custom compiler configuration must be provided." OFF)
@@ -165,6 +166,10 @@ endif()
 
 if(PONY_ENGINE_SHADER)
 	add_subdirectory("Engine/Shader")
+endif()
+
+if(PONY_ENGINE_JOB)
+	add_subdirectory("Engine/Job")
 endif()
 
 if(NOT PONY_ENGINE_CUSTOM_PLATFORM)
@@ -286,6 +291,11 @@ if(NOT PONY_IS_SUBPROJECT)
 	if(TARGET PonyEngine.Shader)
 		pony_set_log_defines(PonyEngine.Shader ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 		pony_set_build_options(PonyEngine.Shader ${PONY_ENGINE_OPTIMIZATION})
+	endif()
+
+	if(TARGET PonyEngine.Job)
+		pony_set_log_defines(PonyEngine.Job ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+		pony_set_build_options(PonyEngine.Job ${PONY_ENGINE_OPTIMIZATION})
 	endif()
 
 	if(PONY_ENGINE_ADD_GAME)
