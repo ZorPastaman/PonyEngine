@@ -24,6 +24,9 @@ export namespace PonyEngine::Job
 	{
 		PONY_INTERFACE_BODY(IJobService)
 
+		[[nodiscard("Pure function")]]
+		virtual std::size_t WorkerCount() const noexcept = 0;
+
 		std::shared_ptr<IJob> Schedule(const std::shared_ptr<ITask>& task, const IJob& dependency);
 		virtual std::shared_ptr<IJob> Schedule(const std::shared_ptr<ITask>& task, std::span<const IJob* const> dependencies = std::span<const IJob* const>()) = 0;
 

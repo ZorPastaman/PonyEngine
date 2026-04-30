@@ -7,24 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/Job/JobServiceModule.h"
 
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.Job:IJob;
-
-import :JobStatus;
-
-export namespace PonyEngine::Job
-{
-	class IJob
-	{
-		PONY_INTERFACE_BODY(IJob)
-
-		[[nodiscard("Pure function")]]
-		virtual JobStatus Status() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual const std::exception_ptr& Exception() const noexcept = 0;
-	};
-}
+PONY_MODULE(PonyEngine::Job::GetJobServiceModule, PonyEngineJobService, PONY_ENGINE_JOB_ORDER);
