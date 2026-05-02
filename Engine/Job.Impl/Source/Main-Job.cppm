@@ -51,10 +51,12 @@ export namespace PonyEngine::Job
 		inline static const std::exception_ptr NullptrException = nullptr;
 
 		std::atomic<JobStatus> status;
+		std::atomic_bool completed;
 		std::exception_ptr exception;
 		std::shared_ptr<ITask> task;
 
 		static_assert(std::atomic<JobStatus>::is_always_lock_free, "JobStatus enum is not lock-free");
+		static_assert(std::atomic_bool::is_always_lock_free, "Bool is not lock-free");
 	};
 }
 
@@ -62,6 +64,7 @@ namespace PonyEngine::Job
 {
 	Job::Job(const std::shared_ptr<ITask>& task) noexcept :
 		status{JobStatus::Pending},
+		completed{false},
 		exception(nullptr),
 		task(task)
 	{
@@ -80,9 +83,9 @@ namespace PonyEngine::Job
 
 	void Job::Wait() const noexcept
 	{
-		for (JobStatus s = Status(); s < JobStatus::Completed; s = Status())
+		while (!completed.load(std::memory_order::acquire))
 		{
-			status.wait(s, std::memory_order::acquire);
+			completed.wait(false, std::memory_order::acquire);
 		}
 	}
 
@@ -114,6 +117,11 @@ namespace PonyEngine::Job
 	void Job::UpdateStatus(const JobStatus status) noexcept
 	{
 		this->status.store(status, std::memory_order::release);
-		this->status.notify_all();
+		
+		if (status >= JobStatus::Completed)
+		{
+			completed.store(true, std::memory_order::release);
+			completed.notify_all();
+		}
 	}
 }
