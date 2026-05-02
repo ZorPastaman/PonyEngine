@@ -82,7 +82,7 @@ namespace PonyEngine::Job
 	{
 		for (JobStatus s = Status(); s < JobStatus::Completed; s = Status())
 		{
-			status.wait(s);
+			status.wait(s, std::memory_order::acquire);
 		}
 	}
 
