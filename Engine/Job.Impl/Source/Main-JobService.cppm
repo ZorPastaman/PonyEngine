@@ -50,6 +50,9 @@ export namespace PonyEngine::Job
 		virtual void Wait(std::span<const IJob* const> jobs) const override;
 
 	private:
+		[[nodiscard("Pure function")]]
+		static const Job* ToNativeJob(const IJob* job);
+
 		Application::IApplicationContext* application;
 
 		std::vector<std::unique_ptr<Worker>> workers;
@@ -134,6 +137,21 @@ namespace PonyEngine::Job
 
 	void JobService::Wait(const std::span<const IJob* const> jobs) const
 	{
-		// TODO: Implement
+		for (const IJob* const job : jobs)
+		{
+			ToNativeJob(job)->Wait();
+		}
+	}
+
+	const Job* JobService::ToNativeJob(const IJob* const job)
+	{
+#ifndef NDEBUG
+		if (!job || typeid(*job) != typeid(Job)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid job");
+		}
+#endif
+
+		return static_cast<const Job*>(job);
 	}
 }

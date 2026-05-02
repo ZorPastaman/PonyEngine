@@ -16,6 +16,7 @@ export module PonyEngine.Time.Impl:TimeService;
 import std;
 
 import PonyEngine.Application.Ext;
+import PonyEngine.Chrono;
 import PonyEngine.Log;
 import PonyEngine.Time;
 
@@ -144,10 +145,10 @@ namespace PonyEngine::Time
 {
 	TimeService::TimeService(Application::IApplicationContext& application) noexcept :
 		application{&application},
-		deltaTimeCap(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_DELTA_TIME_CAP)), std::chrono::nanoseconds(1))),
+		deltaTimeCap(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_DELTA_TIME_CAP}), std::chrono::nanoseconds(1))),
 		timeScale{std::max(PONY_ENGINE_TIME_SCALE, 0.)},
-		fixedStepPeriod(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_FIXED_STEP_PERIOD)), std::chrono::nanoseconds(1))),
-		targetFrameTime(std::max(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<double>(PONY_ENGINE_TIME_TARGET_FRAME_TIME)), std::chrono::nanoseconds(0))),
+		fixedStepPeriod(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_FIXED_STEP_PERIOD}), std::chrono::nanoseconds(1))),
+		targetFrameTime(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{ PONY_ENGINE_TIME_TARGET_FRAME_TIME}), std::chrono::nanoseconds(0))),
 		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
