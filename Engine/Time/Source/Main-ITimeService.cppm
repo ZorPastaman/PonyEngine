@@ -15,7 +15,7 @@ export module PonyEngine.Time:ITimeService;
 
 import std;
 
-import :ConversionUtility;
+import PonyEngine.Chrono;
 
 export namespace PonyEngine::Time
 {
@@ -265,55 +265,55 @@ namespace PonyEngine::Time
 	template<std::floating_point T>
 	T ITimeService::NowTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(NowTime());
+		return Chrono::ToSeconds<T>(NowTime());
 	}
 
 	template<std::floating_point T>
 	T ITimeService::RealTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(RealTime());
+		return Chrono::ToSeconds<T>(RealTime());
 	}
 
 	template<std::floating_point T>
 	T ITimeService::VirtualTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(VirtualTime());
+		return Chrono::ToSeconds<T>(VirtualTime());
 	}
 
 	template<std::floating_point T>
 	T ITimeService::UnscaledVirtualTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(UnscaledVirtualTime());
+		return Chrono::ToSeconds<T>(UnscaledVirtualTime());
 	}
 
 	template<std::floating_point T>
 	T ITimeService::RealDeltaTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(RealDeltaTime());
+		return Chrono::ToSeconds<T>(RealDeltaTime());
 	}
 
 	template<std::floating_point T>
 	T ITimeService::VirtualDeltaTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(VirtualDeltaTime());
+		return Chrono::ToSeconds<T>(VirtualDeltaTime());
 	}
 
 	template<std::floating_point T>
 	T ITimeService::UnscaledVirtualDeltaTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(UnscaledVirtualDeltaTime());
+		return Chrono::ToSeconds<T>(UnscaledVirtualDeltaTime());
 	}
 
 	template<std::floating_point T>
 	T ITimeService::DeltaTimeCapSeconds() const noexcept
 	{
-		return ToSeconds<T>(DeltaTimeCap());
+		return Chrono::ToSeconds<T>(DeltaTimeCap());
 	}
 
 	template<std::floating_point T>
 	void ITimeService::DeltaTimeCapSeconds(const T cap)
 	{
-		DeltaTimeCap(ToDuration<std::chrono::nanoseconds>(cap));
+		DeltaTimeCap(Chrono::ToDuration<std::chrono::nanoseconds>(cap));
 	}
 
 	template<std::floating_point T>
@@ -331,24 +331,24 @@ namespace PonyEngine::Time
 	template<std::floating_point T>
 	T ITimeService::FixedStepPeriodSeconds() const noexcept
 	{
-		return ToSeconds<T>(FixedStepPeriod());
+		return Chrono::ToSeconds<T>(FixedStepPeriod());
 	}
 
 	template<std::floating_point T>
 	void ITimeService::FixedStepPeriodSeconds(const T period)
 	{
-		FixedStepPeriod(ToDuration<std::chrono::nanoseconds>(period));
+		FixedStepPeriod(Chrono::ToDuration<std::chrono::nanoseconds>(period));
 	}
 
 	template<std::floating_point T>
 	T ITimeService::TargetFrameTimeSeconds() const noexcept
 	{
-		return ToSeconds<T>(TargetFrameTime());
+		return Chrono::ToSeconds<T>(TargetFrameTime());
 	}
 
 	template<std::floating_point T>
 	void ITimeService::TargetFrameTimeSeconds(const T frameTime)
 	{
-		TargetFrameTime(ToDuration<std::chrono::nanoseconds>(frameTime));
+		TargetFrameTime(Chrono::ToDuration<std::chrono::nanoseconds>(frameTime));
 	}
 }

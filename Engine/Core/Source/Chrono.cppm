@@ -7,6 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time;
+export module PonyEngine.Chrono;
 
-export import :ITimeService;
+export import :Conversion;

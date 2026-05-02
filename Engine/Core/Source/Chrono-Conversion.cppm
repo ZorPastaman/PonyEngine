@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time:ConversionUtility;
+export module PonyEngine.Chrono:Conversion;
 
 import std;
 
-export namespace PonyEngine::Time
+export namespace PonyEngine::Chrono
 {
 	/// @brief Casts the duration to seconds.
 	/// @tparam T Type representing seconds.
@@ -30,7 +30,7 @@ export namespace PonyEngine::Time
 	constexpr Duration ToDuration(T seconds) noexcept;
 }
 
-namespace PonyEngine::Time
+namespace PonyEngine::Chrono
 {
 	template<std::floating_point T, typename Rep, typename Period>
 	constexpr T ToSeconds(const std::chrono::duration<Rep, Period> duration) noexcept

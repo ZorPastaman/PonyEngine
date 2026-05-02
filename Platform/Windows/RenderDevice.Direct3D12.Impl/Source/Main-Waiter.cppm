@@ -35,7 +35,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		~Waiter() noexcept;
 
-		virtual void Wait(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, std::chrono::nanoseconds timeout) override;
+		virtual void Wait(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, std::chrono::milliseconds timeout) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -73,7 +73,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 	}
 
-	void Waiter::Wait(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, const std::chrono::nanoseconds timeout)
+	void Waiter::Wait(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, const std::chrono::milliseconds timeout)
 	{
 #ifndef NDEBUG
 		if (fenceValues.size() > MAXIMUM_WAIT_OBJECTS) [[unlikely]]
@@ -84,7 +84,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 		CreateEvents(fenceValues.size());
 		const std::size_t waitCount = SetEvents(fenceValues);
-		WaitEvents(waitCount, std::chrono::duration_cast<std::chrono::milliseconds>(timeout));
+		WaitEvents(waitCount, timeout);
 	}
 
 	std::string_view Waiter::Name() const noexcept

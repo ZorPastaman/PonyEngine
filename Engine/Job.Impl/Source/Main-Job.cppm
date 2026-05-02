@@ -35,6 +35,8 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]] 
 		virtual const std::exception_ptr& Exception() const noexcept override;
 
+		void Wait() const noexcept;
+
 		void Execute();
 
 		void Status(JobStatus status) noexcept;
@@ -44,6 +46,8 @@ export namespace PonyEngine::Job
 		Job& operator =(Job&&) = delete;
 
 	private:
+		void UpdateStatus(JobStatus status) noexcept;
+
 		inline static const std::exception_ptr NullptrException = nullptr;
 
 		std::atomic<JobStatus> status;
@@ -74,6 +78,14 @@ namespace PonyEngine::Job
 		return status.load(std::memory_order::acquire) >= JobStatus::Failed ? exception : NullptrException;
 	}
 
+	void Job::Wait() const noexcept
+	{
+		for (JobStatus s = Status(); s < JobStatus::Completed; s = Status())
+		{
+			status.wait(s);
+		}
+	}
+
 	void Job::Execute()
 	{
 		assert(task && "The task is dropped.");
@@ -85,7 +97,8 @@ namespace PonyEngine::Job
 	{
 		assert(this->status.load(std::memory_order::relaxed) <= JobStatus::Running && "The status is invalid for changing status.");
 		assert(status <= JobStatus::Completed && this->status.load(std::memory_order::relaxed) < status && "The new status is invalid.");
-		this->status.store(status, std::memory_order::release);
+		
+		UpdateStatus(status);
 	}
 
 	void Job::Status(const JobStatus status, const std::exception_ptr& exception) noexcept
@@ -94,6 +107,13 @@ namespace PonyEngine::Job
 		assert(status >= JobStatus::Failed && "The new status is invalid.");
 		assert(exception && "The exception is nullptr.");
 		this->exception = exception;
+
+		UpdateStatus(status);
+	}
+
+	void Job::UpdateStatus(const JobStatus status) noexcept
+	{
 		this->status.store(status, std::memory_order::release);
+		this->status.notify_all();
 	}
 }
