@@ -70,7 +70,7 @@ namespace PonyEngine::Job
 {
 	JobService::JobService(Application::IApplicationContext& application) :
 		application{&application},
-		targetWorkerIndex(0uz)
+		targetWorkerIndex{0uz}
 	{
 		const std::size_t concurrency = std::thread::hardware_concurrency();
 		const std::size_t threadCount = std::max(Math::DifferenceClamp(concurrency, std::size_t{PONY_ENGINE_JOB_RESERVED_THREAD_COUNT}), std::size_t{PONY_ENGINE_JOB_MIN_THREAD_COUNT});
