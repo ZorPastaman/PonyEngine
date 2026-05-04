@@ -22,22 +22,18 @@ export namespace PonyEngine::Job
 		Waiting,
 		Pending,
 		Running,
-		Completed,
-		Failed,
-		DependencyFailed
+		Completed
 	};
 }
 
 namespace PonyEngine::Job
 {
-	constexpr std::array<std::string_view, 8> JobStatusNames
+	constexpr std::array<std::string_view, 4> JobStatusNames
 	{
 		"Waiting",
 		"Pending",
 		"Running",
-		"Completed",
-		"Failed",
-		"DependencyFailed"
+		"Completed"
 	};
 }
 

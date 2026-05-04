@@ -47,6 +47,7 @@ export namespace PonyEngine::Job
 
 	private:
 		void Work() noexcept;
+		void Execute(Job& job) noexcept;
 
 		[[nodiscard("Must be used")]]
 		std::shared_ptr<Job> NextJob() noexcept;
@@ -81,6 +82,7 @@ namespace PonyEngine::Job
 	void Worker::AddJob(const std::shared_ptr<Job>& job)
 	{
 		assert(job && "The job is nullptr.");
+		assert(job->Status() == JobStatus::Pending && "The job has wrong status.");
 		const auto lock = std::lock_guard(jobQueueMutex);
 		jobQueue.push(job);
 	}
@@ -94,7 +96,7 @@ namespace PonyEngine::Job
 	void Worker::Start()
 	{
 		assert(!thread && "The thread was already started.");
-		assert(running.load(std::memory_order::relaxed) && "The worder is stopped.");
+		assert(running.load(std::memory_order::relaxed) && "The worker is stopped.");
 		thread = std::thread(&Worker::Work, this);
 	}
 
@@ -109,21 +111,34 @@ namespace PonyEngine::Job
 		{
 			if (const std::shared_ptr<Job> job = NextJob())
 			{
-				job->Status(JobStatus::Running);
+				Execute(*job);
+			}
+		}
+	}
+
+	void Worker::Execute(Job& job) noexcept
+	{
+		assert(job.Status() == JobStatus::Pending && "The job has wrong status.");
+		job.Status(JobStatus::Running);
+		job.Execute();
+		job.Status(JobStatus::Completed);
+
+		job.IterateDependents([&](const std::shared_ptr<Job>& dependent)
+		{
+			if (dependent->Unblock())
+			{
+				dependent->Status(JobStatus::Pending);
 				try
 				{
-					job->Execute();
+					AddJob(dependent);
 				}
 				catch (...)
 				{
-					const std::exception_ptr exception = std::current_exception();
-					PONY_LOG_X(application->Logger(), exception, "On executing job. Address: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(static_cast<IJob*>(job.get())));
-					job->Status(JobStatus::Failed, exception);
-					continue;
+					PONY_LOG_X(application->Logger(), std::current_exception(), "On adding job to worker queue. Worker thread: '{}'.", ThreadID());
+					Execute(*dependent); // Out of order execution because of memory shortage.
 				}
-				job->Status(JobStatus::Completed);
 			}
-		}
+		});
 	}
 
 	std::shared_ptr<Job> Worker::NextJob() noexcept

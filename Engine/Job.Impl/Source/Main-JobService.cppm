@@ -50,6 +50,8 @@ export namespace PonyEngine::Job
 		virtual void Wait(std::span<const IJob* const> jobs) const override;
 
 	private:
+		void AddJobToWorker(const std::shared_ptr<Job>& job);
+
 		[[nodiscard("Pure function")]]
 		static const Job* ToNativeJob(const IJob* job);
 
@@ -120,19 +122,47 @@ namespace PonyEngine::Job
 
 	std::shared_ptr<IJob> JobService::Schedule(const std::shared_ptr<ITask>& task, const std::span<const IJob* const> dependencies)
 	{
+#ifndef NDEBUG
+		if (!task) [[unlikely]]
+		{
+			throw std::invalid_argument("Task is nullptr");
+		}
+#endif
+
+		const auto job = std::make_shared<Job>(task, dependencies.size() > 0uz ? JobStatus::Waiting : JobStatus::Pending, dependencies.size());
+
 		if (dependencies.empty())
 		{
-			const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
-			const auto job = std::make_shared<Job>(task);
-			workers[workerIndex]->AddJob(job);
-
-			return job;
+			AddJobToWorker(job);
 		}
 		else
 		{
-			// TODO: Add dependency support
-			throw std::invalid_argument("Not supported");
+			for (std::size_t i = 0uz; i < dependencies.size(); ++i)
+			{
+				bool added;
+				try
+				{
+					added = ToNativeJob(dependencies[i])->AddDependent(job);
+				}
+				catch (...)
+				{
+					for (std::size_t j = i; j-- > 0uz; )
+					{
+						ToNativeJob(dependencies[j])->RemoveDependent(job);
+					}
+
+					throw;
+				}
+
+				if (!added && job->Unblock())
+				{
+					job->Status(JobStatus::Pending);
+					AddJobToWorker(job);
+				}
+			}
 		}
+
+		return job;
 	}
 
 	void JobService::Wait(const std::span<const IJob* const> jobs) const
@@ -141,6 +171,12 @@ namespace PonyEngine::Job
 		{
 			ToNativeJob(job)->Wait();
 		}
+	}
+
+	void JobService::AddJobToWorker(const std::shared_ptr<Job>& job)
+	{
+		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
+		workers[workerIndex]->AddJob(job);
 	}
 
 	const Job* JobService::ToNativeJob(const IJob* const job)

@@ -19,6 +19,6 @@ export namespace PonyEngine::Job
 	{
 		PONY_INTERFACE_BODY(ITask)
 
-		virtual void Execute() = 0;
+		virtual void Execute() noexcept = 0;
 	};
 }
