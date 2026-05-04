@@ -52,6 +52,8 @@ export namespace PonyEngine::Job
 	private:
 		void AddJobToWorker(const std::shared_ptr<Job>& job);
 
+		void Finish(std::size_t count) noexcept;
+
 		[[nodiscard("Pure function")]]
 		static const Job* ToNativeJob(const IJob* job);
 
@@ -74,32 +76,32 @@ namespace PonyEngine::Job
 		const std::size_t threadCount = std::max(Math::DifferenceClamp(concurrency, std::size_t{PONY_ENGINE_JOB_RESERVED_THREAD_COUNT}), std::size_t{PONY_ENGINE_JOB_MIN_THREAD_COUNT});
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating workers... Thread count: '{}'; Hardware concurrency: '{}'.", threadCount, concurrency);
-		workers.reserve(threadCount);
+		workers.resize(threadCount);
 		for (std::size_t i = 0uz; i < threadCount; ++i)
 		{
-			workers.push_back(std::make_unique<Worker>(*this->application));
+			workers[i] = std::make_unique<Worker>(*this->application, workers, i);
 		}
-		for (const std::unique_ptr<Worker>& worker : workers)
+		for (std::size_t i = 0uz; i < threadCount; ++i)
 		{
-			worker->Start();
-			PONY_LOG(this->application->Logger(), Log::LogType::Info, "Worker thread started. ID: '{}'.", worker->ThreadID());
+			try
+			{
+				const std::unique_ptr<Worker>& worker = workers[i];
+				worker->Start();
+				PONY_LOG(this->application->Logger(), Log::LogType::Info, "Worker thread started. ID: '{}'.", worker->ThreadID());
+			}
+			catch (...)
+			{
+				PONY_LOG_X(this->application->Logger(), std::current_exception(), "On starting worker thread.");
+				Finish(i);
+				throw;
+			}
 		}
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating workers done.");
 	}
 
 	JobService::~JobService() noexcept
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Destroying workers...");
-		for (std::size_t i = workers.size(); i-- > 0uz; )
-		{
-			PONY_LOG(this->application->Logger(), Log::LogType::Info, "Stopping worker thread ID: '{}'.", workers[i]->ThreadID());
-			workers[i]->Stop();
-		}
-		for (std::size_t i = workers.size(); i-- > 0uz; )
-		{
-			workers[i].reset();
-		}
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Destroying workers done.");
+		Finish(workers.size());
 	}
 
 	void JobService::Begin()
@@ -177,6 +179,25 @@ namespace PonyEngine::Job
 	{
 		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
 		workers[workerIndex]->AddJob(job);
+	}
+
+	void JobService::Finish(const std::size_t count) noexcept
+	{
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Destroying workers...");
+		for (std::size_t i = count; i-- > 0uz; )
+		{
+			PONY_LOG(this->application->Logger(), Log::LogType::Info, "Stopping worker thread ID: '{}'.", workers[i]->ThreadID());
+			workers[i]->Stop();
+		}
+		for (std::size_t i = count; i-- > 0uz; )
+		{
+			workers[i]->Join();
+		}
+		for (std::size_t i = count; i-- > 0uz; )
+		{
+			workers[i].reset();
+		}
+		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Destroying workers done.");
 	}
 
 	const Job* JobService::ToNativeJob(const IJob* const job)

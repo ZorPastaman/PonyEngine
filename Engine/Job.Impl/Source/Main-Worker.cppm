@@ -29,11 +29,11 @@ export namespace PonyEngine::Job
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Worker(Application::IApplicationContext& application);
+		Worker(Application::IApplicationContext& application, std::span<const std::unique_ptr<Worker>> workers, std::size_t myIndex);
 		Worker(const Worker&) = delete;
 		Worker(Worker&&) = delete;
 
-		~Worker() noexcept;
+		~Worker() noexcept = default;
 
 		void AddJob(const std::shared_ptr<Job>& job);
 
@@ -41,6 +41,7 @@ export namespace PonyEngine::Job
 		std::thread::id ThreadID() const noexcept;
 		void Start();
 		void Stop() noexcept;
+		void Join() noexcept;
 
 		Worker& operator =(const Worker&) = delete;
 		Worker& operator =(Worker&&) = delete;
@@ -50,12 +51,18 @@ export namespace PonyEngine::Job
 		void Execute(Job& job) noexcept;
 
 		[[nodiscard("Must be used")]]
+		std::shared_ptr<Job> FindJob() noexcept;
+		[[nodiscard("Must be used")]]
 		std::shared_ptr<Job> NextJob() noexcept;
+		[[nodiscard("Must be used")]]
+		std::shared_ptr<Job> StealJob() const noexcept;
 
 		Application::IApplicationContext* application;
 
 		std::atomic_bool running;
 		std::queue<std::shared_ptr<Job>> jobQueue;
+		std::span<const std::unique_ptr<Worker>> workers;
+		std::size_t myIndex;
 		std::mutex jobQueueMutex;
 		std::optional<std::thread> thread;
 	};
@@ -63,20 +70,13 @@ export namespace PonyEngine::Job
 
 namespace PonyEngine::Job
 {
-	Worker::Worker(Application::IApplicationContext& application) :
+	Worker::Worker(Application::IApplicationContext& application, const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex) :
 		application{&application},
-		running{true}
+		running{true},
+		workers(workers),
+		myIndex{myIndex}
 	{
-	}
-
-	Worker::~Worker() noexcept
-	{
-		Stop();
-
-		if (thread) [[likely]]
-		{
-			thread->join();
-		}
+		assert(this->myIndex < this->workers.size() && "Wrong worker index.");
 	}
 
 	void Worker::AddJob(const std::shared_ptr<Job>& job)
@@ -105,11 +105,17 @@ namespace PonyEngine::Job
 		running.store(false, std::memory_order::relaxed);
 	}
 
+	void Worker::Join() noexcept
+	{
+		assert(thread && "The thread wasn't created.");
+		thread->join();
+	}
+
 	void Worker::Work() noexcept
 	{
 		while (running.load(std::memory_order::relaxed))
 		{
-			if (const std::shared_ptr<Job> job = NextJob())
+			if (const std::shared_ptr<Job> job = FindJob())
 			{
 				Execute(*job);
 			}
@@ -141,6 +147,12 @@ namespace PonyEngine::Job
 		});
 	}
 
+	std::shared_ptr<Job> Worker::FindJob() noexcept
+	{
+		const std::shared_ptr<Job> job = NextJob();
+		return job ? job : StealJob();
+	}
+
 	std::shared_ptr<Job> Worker::NextJob() noexcept
 	{
 		const auto lock = std::lock_guard(jobQueueMutex);
@@ -154,5 +166,19 @@ namespace PonyEngine::Job
 		jobQueue.pop();
 
 		return nextJob;
+	}
+
+	std::shared_ptr<Job> Worker::StealJob() const noexcept
+	{
+		for (std::size_t i = 1uz; i < workers.size(); ++i)
+		{
+			const std::size_t workerIndex = (myIndex + i) % workers.size();
+			if (const std::shared_ptr<Job> job = workers[workerIndex]->NextJob())
+			{
+				return job;
+			}
+		}
+
+		return nullptr;
 	}
 }
