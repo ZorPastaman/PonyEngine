@@ -6,10 +6,9 @@ add_library(PonyEngine.Job STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Job PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-IJob.cppm"
 	"Source/Main-IJobService.cppm"
 	"Source/Main-ITask.cppm"
-	"Source/Main-JobStatus.cppm"
+	"Source/Main-JobHandle.cppm"
 )
 
 message(VERBOSE "Setting properties")

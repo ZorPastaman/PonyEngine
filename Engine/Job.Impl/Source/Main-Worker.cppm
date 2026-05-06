@@ -22,6 +22,7 @@ import PonyEngine.Job;
 import PonyEngine.Log;
 
 import :Job;
+import :JobPool;
 
 export namespace PonyEngine::Job
 {
@@ -29,7 +30,7 @@ export namespace PonyEngine::Job
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Worker(Application::IApplicationContext& application, std::span<const std::unique_ptr<Worker>> workers, std::size_t myIndex);
+		Worker(Application::IApplicationContext& application, std::span<const std::unique_ptr<Worker>> workers, std::size_t myIndex, std::atomic_size_t* jobQueueVersion) noexcept;
 		Worker(const Worker&) = delete;
 		Worker(Worker&&) = delete;
 
@@ -41,7 +42,11 @@ export namespace PonyEngine::Job
 		void Stop() noexcept;
 		void Join() noexcept;
 
-		void AddJob(const std::shared_ptr<Job>& job);
+		[[nodiscard("Pure function")]]
+		std::pair<Job*, bool> AcquireJob();
+		void ReleaseJob(Job& job);
+		void ReleaseJobUnsafe(Job& job);
+		void AddJob(Job& job);
 
 		Worker& operator =(const Worker&) = delete;
 		Worker& operator =(Worker&&) = delete;
@@ -49,40 +54,54 @@ export namespace PonyEngine::Job
 	private:
 		void Work() noexcept;
 		void Execute(Job& job) noexcept;
+		void Release(Job& job) noexcept;
 
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<Job> FindJob() noexcept;
+		Job* FindJob() noexcept;
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<Job> GetJob() noexcept;
+		Job* GetJob() noexcept;
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<Job> StealJob() const noexcept;
+		Job* StealJob() const noexcept;
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<Job> GrabJob() noexcept;
+		Job* GrabJob() noexcept;
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<Job> TakeJob() noexcept;
+		Job* TakeJob() noexcept;
+
+		void IncrementJobQueueVersion() const noexcept;
 
 		Application::IApplicationContext* application;
 
 		std::atomic_bool running;
-		std::queue<std::shared_ptr<Job>> jobQueue;
+
+		std::queue<Job*> jobQueue;
+		std::mutex jobQueueMutex;
+
+		JobPool jobPool;
+
 		std::span<const std::unique_ptr<Worker>> workers;
 		std::size_t myIndex;
-		std::mutex jobQueueMutex;
+
+		std::atomic_size_t* jobQueueVersion;
+
 		std::optional<std::thread> thread;
 
 		static_assert(std::atomic_bool::is_always_lock_free, "Bool is not lock-free");
+		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
 	};
 }
 
 namespace PonyEngine::Job
 {
-	Worker::Worker(Application::IApplicationContext& application, const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex) :
+	Worker::Worker(Application::IApplicationContext& application, const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex, 
+		std::atomic_size_t* const jobQueueVersion) noexcept :
 		application{&application},
 		running{true},
 		workers(workers),
-		myIndex{myIndex}
+		myIndex{myIndex},
+		jobQueueVersion{jobQueueVersion}
 	{
 		assert(this->myIndex < this->workers.size() && "Wrong worker index.");
+		assert(this->jobQueueVersion && "The job queue version is nullptr.");
 	}
 
 	std::thread::id Worker::ThreadID() const noexcept
@@ -109,37 +128,56 @@ namespace PonyEngine::Job
 		thread->join();
 	}
 
-	void Worker::AddJob(const std::shared_ptr<Job>& job)
+	std::pair<Job*, bool> Worker::AcquireJob()
 	{
-		assert(job && "The job is nullptr.");
-		assert(job->Status() == JobStatus::Pending && "The job has wrong status.");
-		const auto lock = std::lock_guard(jobQueueMutex);
-		jobQueue.push(job);
+		return jobPool.Acquire();
+	}
+
+	void Worker::ReleaseJob(Job& job)
+	{
+		jobPool.Release(job);
+	}
+
+	void Worker::ReleaseJobUnsafe(Job& job)
+	{
+		jobPool.ReleaseUnsafe(job);
+	}
+
+	void Worker::AddJob(Job& job)
+	{
+		{
+			const auto lock = std::lock_guard(jobQueueMutex);
+			jobQueue.push(&job);
+		}
+		
+		IncrementJobQueueVersion();
 	}
 
 	void Worker::Work() noexcept
 	{
 		while (running.load(std::memory_order::relaxed))
 		{
-			if (const std::shared_ptr<Job> job = FindJob())
+			const std::size_t initialJobQueueVersion = jobQueueVersion->load(std::memory_order::acquire);
+			if (Job* const job = FindJob())
 			{
 				Execute(*job);
+			}
+			else
+			{
+				jobQueueVersion->wait(initialJobQueueVersion, std::memory_order::acquire);
 			}
 		}
 	}
 
 	void Worker::Execute(Job& job) noexcept
 	{
-		assert(job.Status() == JobStatus::Pending && "The job has wrong status.");
-		job.Status(JobStatus::Running);
 		job.Execute();
-		job.Status(JobStatus::Completed);
-
-		job.IterateDependents([&](const std::shared_ptr<Job>& dependent)
+		job.Task(nullptr);
+		job.IncrementVersion();
+		job.ProcessDependents([&](Job& dependent)
 		{
-			if (dependent->Unblock())
+			if (dependent.Unblock())
 			{
-				dependent->Status(JobStatus::Pending);
 				try
 				{
 					AddJob(dependent);
@@ -147,30 +185,54 @@ namespace PonyEngine::Job
 				catch (...)
 				{
 					PONY_LOG_X(application->Logger(), std::current_exception(), "On adding job to worker queue. Worker thread: '{}'.", ThreadID());
-					Execute(*dependent); // Out of order execution because of memory shortage.
+					Execute(dependent); // Out of order execution because of memory shortage.
 				}
 			}
 		});
+		Release(job);
 	}
 
-	std::shared_ptr<Job> Worker::FindJob() noexcept
+	void Worker::Release(Job& job) noexcept
 	{
-		const std::shared_ptr<Job> job = GetJob();
+		try
+		{
+			jobPool.Release(job);
+		}
+		catch (...)
+		{
+			PONY_LOG_X(application->Logger(), std::current_exception(), "On adding job to job pool. Worker thread: '{}'.", ThreadID());
+			// Unfortunately, the job will be kept alive but not used anymore. May happen on memory shortage.
+		}
+	}
+
+	Job* Worker::FindJob() noexcept
+	{
+		Job* const job = GetJob();
 		return job ? job : StealJob();
 	}
 
-	std::shared_ptr<Job> Worker::GetJob() noexcept
+	Job* Worker::GetJob() noexcept
 	{
-		const auto lock = std::lock_guard(jobQueueMutex);
-		return TakeJob();
+		Job* job;
+		{
+			const auto lock = std::lock_guard(jobQueueMutex);
+			job = TakeJob();
+		}
+
+		if (job)
+		{
+			IncrementJobQueueVersion();
+		}
+
+		return job;
 	}
 
-	std::shared_ptr<Job> Worker::StealJob() const noexcept
+	Job* Worker::StealJob() const noexcept
 	{
 		for (std::size_t i = 1uz; i < workers.size(); ++i)
 		{
 			const std::size_t workerIndex = (myIndex + i) % workers.size();
-			if (const std::shared_ptr<Job> job = workers[workerIndex]->GrabJob())
+			if (Job* const job = workers[workerIndex]->GrabJob())
 			{
 				return job;
 			}
@@ -179,22 +241,38 @@ namespace PonyEngine::Job
 		return nullptr;
 	}
 
-	std::shared_ptr<Job> Worker::GrabJob() noexcept
+	Job* Worker::GrabJob() noexcept
 	{
-		const auto lock = std::unique_lock(jobQueueMutex, std::try_to_lock);
-		return lock ? TakeJob() : nullptr;
+		Job* job = nullptr;
+		if (const auto lock = std::unique_lock(jobQueueMutex, std::try_to_lock))
+		{
+			job = TakeJob();
+		}
+
+		if (job)
+		{
+			IncrementJobQueueVersion();
+		}
+
+		return job;
 	}
 
-	std::shared_ptr<Job> Worker::TakeJob() noexcept
+	Job* Worker::TakeJob() noexcept
 	{
 		if (jobQueue.empty())
 		{
 			return nullptr;
 		}
 
-		const std::shared_ptr<Job> nextJob = jobQueue.front();
+		Job* const nextJob = jobQueue.front();
 		jobQueue.pop();
 
 		return nextJob;
+	}
+
+	void Worker::IncrementJobQueueVersion() const noexcept
+	{
+		jobQueueVersion->fetch_add(1uz, std::memory_order::release);
+		jobQueueVersion->notify_one();
 	}
 }

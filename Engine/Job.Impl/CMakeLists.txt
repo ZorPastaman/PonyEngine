@@ -23,6 +23,7 @@ target_sources(PonyEngine.Job.Impl PRIVATE
 target_sources(PonyEngine.Job.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-Job.cppm"
+	"Source/Main-JobPool.cppm"
 	"Source/Main-JobService.cppm"
 	"Source/Main-JobServiceModule.cppm"
 	"Source/Main-Worker.cppm"

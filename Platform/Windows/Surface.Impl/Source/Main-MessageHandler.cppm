@@ -43,7 +43,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @param wParam WParam.
 		/// @param lParam LParam.
 		/// @return Result code.
-		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept = 0;
 	};
 
 	/// @brief Process window messages.
@@ -55,7 +55,7 @@ export namespace PonyEngine::Surface::Windows
 	/// @param wParam WParam.
 	/// @param lParam LParam.
 	/// @return Process result.
-	LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 }
 
 namespace PonyEngine::Surface::Windows
@@ -77,7 +77,7 @@ namespace PonyEngine::Surface::Windows
 	/// @return Window destroy result.
 	LRESULT UnsetHandlerPointer(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 
-	LRESULT CALLBACK WindowProc(const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
+	LRESULT CALLBACK WindowProc(const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		if (uMsg == WM_CREATE) [[unlikely]]
 		{

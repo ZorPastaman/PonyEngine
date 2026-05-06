@@ -19,30 +19,34 @@ import PonyEngine.Job;
 
 export namespace PonyEngine::Job
 {
-	class Job final : public IJob
+	class Job final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Job(const std::shared_ptr<ITask>& task, JobStatus status, std::size_t blockCount) noexcept;
+		Job() noexcept;
 		Job(const Job&) = delete;
 		Job(Job&&) = delete;
 
 		~Job() noexcept = default;
 
-		[[nodiscard("Pure function")]] 
-		virtual JobStatus Status() const noexcept override;
-		void Status(JobStatus status) noexcept;
+		[[nodiscard("Pure function")]]
+		std::size_t Version() const noexcept;
+		void IncrementVersion() noexcept;
 
-		void Wait() const noexcept;
+		void Wait(std::size_t waitedVersion) const noexcept;
 
+		[[nodiscard("Pure function")]]
+		bool HasTask() const noexcept;
+		void Task(const std::shared_ptr<ITask>& task) noexcept;
 		void Execute() noexcept;
 
 		[[nodiscard("Must be used")]]
 		bool Unblock() noexcept;
+		void Block(std::size_t blockCount) noexcept;
+
 		[[nodiscard("Must be used")]]
-		bool AddDependent(const std::shared_ptr<Job>& dependent) const;
-		void RemoveDependent(const std::shared_ptr<Job>& dependent) const noexcept;
-		void IterateDependents(const std::function<void(const std::shared_ptr<Job>&)>& func) const;
+		bool AddDependent(Job& dependent, std::size_t version) const;
+		void ProcessDependents(const std::function<void(Job&)>& func);
 
 		Job& operator =(const Job&) = delete;
 		Job& operator =(Job&&) = delete;
@@ -50,106 +54,99 @@ export namespace PonyEngine::Job
 	private:
 		inline static const std::exception_ptr NullptrException = nullptr;
 
-		std::atomic<JobStatus> status;
-		std::atomic_bool completed;
+		std::atomic_size_t version;
 		std::shared_ptr<ITask> task;
 
 		std::atomic_size_t blockCount;
-		mutable std::vector<std::shared_ptr<Job>> dependents;
+		mutable std::vector<Job*> dependents;
 		mutable std::mutex dependencyMutex;
 
-		static_assert(std::atomic<JobStatus>::is_always_lock_free, "JobStatus enum is not lock-free");
-		static_assert(std::atomic_bool::is_always_lock_free, "Bool is not lock-free");
 		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
 	};
 }
 
 namespace PonyEngine::Job
 {
-	Job::Job(const std::shared_ptr<ITask>& task, const JobStatus status, const std::size_t blockCount) noexcept :
-		status{status},
-		completed{false},
-		task(task),
-		blockCount{blockCount}
+	Job::Job() noexcept :
+		version{0uz},
+		blockCount{0uz}
 	{
-		assert(this->task && "The task is nullptr.");
 	}
 
-	JobStatus Job::Status() const noexcept
+	std::size_t Job::Version() const noexcept
 	{
-		return status.load(std::memory_order::acquire);
+		return version.load(std::memory_order::acquire);
 	}
 
-	void Job::Status(const JobStatus status) noexcept
+	void Job::IncrementVersion() noexcept
 	{
-		assert(status >= this->status.load(std::memory_order::relaxed) && "The new status is invalid.");
+		version.fetch_add(1uz, std::memory_order::release);
+		version.notify_all();
+	}
 
-		this->status.store(status, std::memory_order::release);
-		if (status >= JobStatus::Completed)
+	void Job::Wait(const std::size_t waitedVersion) const noexcept
+	{
+		while (version.load(std::memory_order::acquire) == waitedVersion)
 		{
-			completed.store(true, std::memory_order::release);
-			completed.notify_all();
+			version.wait(waitedVersion, std::memory_order::acquire);
 		}
 	}
 
-	void Job::Wait() const noexcept
+	bool Job::HasTask() const noexcept
 	{
-		while (!completed.load(std::memory_order::acquire))
-		{
-			completed.wait(false, std::memory_order::acquire);
-		}
+		return task.get();
+	}
+
+	void Job::Task(const std::shared_ptr<ITask>& task) noexcept
+	{
+		this->task = task;
 	}
 
 	void Job::Execute() noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == JobStatus::Running && "The status is invalid for executing.");
+		assert(task && "The task is nullptr.");
 		task->Execute();
 	}
 
 	bool Job::Unblock() noexcept
 	{
-		const std::size_t prev = blockCount.fetch_sub(1uz, std::memory_order::relaxed);
+		const std::size_t prev = blockCount.fetch_sub(1uz, std::memory_order::acq_rel);
 		assert(prev > 0uz && "The block count is 0.");
 		return prev == 1uz;
 	}
 
-	bool Job::AddDependent(const std::shared_ptr<Job>& dependent) const
+	void Job::Block(const std::size_t blockCount) noexcept
 	{
-		assert(dependent && "The dependent is nullptr.");
+		this->blockCount.store(blockCount, std::memory_order::release);
+	}
 
-		if (completed.load(std::memory_order::relaxed))
+	bool Job::AddDependent(Job& dependent, const std::size_t version) const
+	{
+		if (Version() != version)
 		{
 			return false;
 		}
 
 		const auto lock = std::lock_guard(dependencyMutex);
 
-		if (completed.load(std::memory_order::relaxed))
+		if (Version() != version)
 		{
 			return false;
 		}
 
-		dependents.push_back(dependent);
+		dependents.push_back(&dependent);
 		return true;
 	}
 
-	void Job::RemoveDependent(const std::shared_ptr<Job>& dependent) const noexcept
+	void Job::ProcessDependents(const std::function<void(Job&)>& func)
 	{
 		const auto lock = std::lock_guard(dependencyMutex);
 
-		if (const auto position = std::ranges::find(dependents, dependent); position != dependents.cend()) [[likely]]
+		for (Job* const dependent : dependents)
 		{
-			dependents.erase(position);
+			func(*dependent);
 		}
-	}
 
-	void Job::IterateDependents(const std::function<void(const std::shared_ptr<Job>&)>& func) const
-	{
-		const auto lock = std::lock_guard(dependencyMutex);
-
-		for (const std::shared_ptr<Job>& dependent : dependents)
-		{
-			func(dependent);
-		}
+		dependents.clear();
 	}
 }

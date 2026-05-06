@@ -15,8 +15,8 @@ export module PonyEngine.Job:IJobService;
 
 import std;
 
-import :IJob;
 import :ITask;
+import :JobHandle;
 
 export namespace PonyEngine::Job
 {
@@ -27,25 +27,23 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		virtual std::size_t WorkerCount() const noexcept = 0;
 
-		std::shared_ptr<IJob> Schedule(const std::shared_ptr<ITask>& task, const IJob& dependency);
-		virtual std::shared_ptr<IJob> Schedule(const std::shared_ptr<ITask>& task, std::span<const IJob* const> dependencies = std::span<const IJob* const>()) = 0;
+		JobHandle Schedule(const std::shared_ptr<ITask>& task, const JobHandle& dependency);
+		virtual JobHandle Schedule(const std::shared_ptr<ITask>& task, std::span<const JobHandle> dependencies = std::span<const JobHandle>()) = 0;
 
-		void Wait(const IJob& job) const;
-		virtual void Wait(std::span<const IJob* const> jobs) const = 0;
+		void Wait(const JobHandle& job) const;
+		virtual void Wait(std::span<const JobHandle> jobs) const = 0;
 	};
 }
 
 namespace PonyEngine::Job
 {
-	std::shared_ptr<IJob> IJobService::Schedule(const std::shared_ptr<ITask>& task, const IJob& dependency)
+	JobHandle IJobService::Schedule(const std::shared_ptr<ITask>& task, const JobHandle& dependency)
 	{
-		const IJob* const dep = &dependency;
-		return Schedule(task, std::span(&dep, 1uz));
+		return Schedule(task, std::span(&dependency, 1uz));
 	}
 
-	void IJobService::Wait(const IJob& job) const
+	void IJobService::Wait(const JobHandle& job) const
 	{
-		const IJob* const wait = &job;
-		Wait(std::span(&wait, 1uz));
+		Wait(std::span(&job, 1uz));
 	}
 }

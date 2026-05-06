@@ -45,22 +45,37 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		virtual std::size_t WorkerCount() const noexcept override;
 
-		virtual std::shared_ptr<IJob> Schedule(const std::shared_ptr<ITask>& task, std::span<const IJob* const> dependencies) override;
+		virtual JobHandle Schedule(const std::shared_ptr<ITask>& task, std::span<const JobHandle> dependencies) override;
 
-		virtual void Wait(std::span<const IJob* const> jobs) const override;
+		virtual void Wait(std::span<const JobHandle> jobs) const override;
 
 	private:
-		void AddJobToWorker(const std::shared_ptr<Job>& job);
+		class EmptyTask final : public ITask
+		{
+		public:
+			virtual void Execute() noexcept override
+			{
+			}
+		};
+
+		void AddJobToWorker(Job& job, std::size_t workerIndex);
 
 		void Finish(std::size_t count) noexcept;
 
 		[[nodiscard("Pure function")]]
-		static const Job* ToNativeJob(const IJob* job);
+		static const Job* ToNativeJob(const void* job);
 
 		Application::IApplicationContext* application;
 
 		std::vector<std::unique_ptr<Worker>> workers;
 		std::atomic_size_t targetWorkerIndex;
+
+		std::atomic_size_t jobQueueVersion;
+
+		std::vector<std::unique_ptr<Job>> jobs;
+		std::mutex jobsMutex;
+
+		std::shared_ptr<EmptyTask> emptyTask;
 
 		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
 	};
@@ -70,17 +85,34 @@ namespace PonyEngine::Job
 {
 	JobService::JobService(Application::IApplicationContext& application) :
 		application{&application},
-		targetWorkerIndex{0uz}
+		targetWorkerIndex{0uz},
+		jobQueueVersion{0uz},
+		emptyTask(std::make_shared<EmptyTask>())
 	{
+		constexpr std::size_t jobReserveCount = 64uz;
+
 		const std::size_t concurrency = std::thread::hardware_concurrency();
 		const std::size_t threadCount = std::max(Math::DifferenceClamp(concurrency, std::size_t{PONY_ENGINE_JOB_RESERVED_THREAD_COUNT}), std::size_t{PONY_ENGINE_JOB_MIN_THREAD_COUNT});
 
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating workers... Thread count: '{}'; Hardware concurrency: '{}'.", threadCount, concurrency);
 		workers.resize(threadCount);
+		jobs.reserve(threadCount * jobReserveCount);
+
 		for (std::size_t i = 0uz; i < threadCount; ++i)
 		{
-			workers[i] = std::make_unique<Worker>(*this->application, workers, i);
+			workers[i] = std::make_unique<Worker>(*this->application, workers, i, &jobQueueVersion);
 		}
+
+		for (std::size_t i = 0uz; i < threadCount; ++i)
+		{
+			for (std::size_t j = 0uz; j < jobReserveCount; ++j)
+			{
+				const auto job = new Job();
+				jobs.push_back(std::unique_ptr<Job>(job));
+				workers[i]->ReleaseJobUnsafe(*job);
+			}
+		}
+
 		for (std::size_t i = 0uz; i < threadCount; ++i)
 		{
 			try
@@ -122,7 +154,7 @@ namespace PonyEngine::Job
 		return workers.size();
 	}
 
-	std::shared_ptr<IJob> JobService::Schedule(const std::shared_ptr<ITask>& task, const std::span<const IJob* const> dependencies)
+	JobHandle JobService::Schedule(const std::shared_ptr<ITask>& task, const std::span<const JobHandle> dependencies)
 	{
 #ifndef NDEBUG
 		if (!task) [[unlikely]]
@@ -131,54 +163,73 @@ namespace PonyEngine::Job
 		}
 #endif
 
-		const auto job = std::make_shared<Job>(task, dependencies.size() > 0uz ? JobStatus::Waiting : JobStatus::Pending, dependencies.size());
+		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
+		const auto [job, isNew] = workers[workerIndex]->AcquireJob();
+		if (isNew)
+		{
+			const auto lock = std::lock_guard(jobsMutex);
+			jobs.push_back(std::unique_ptr<Job>(job));
+		}
+		job->Task(task);
+		job->Block(dependencies.size());
+
+		const auto handle = JobHandle(job, job->Version());
 
 		if (dependencies.empty())
 		{
-			AddJobToWorker(job);
+			AddJobToWorker(*job, workerIndex);
 		}
 		else
 		{
 			for (std::size_t i = 0uz; i < dependencies.size(); ++i)
 			{
-				bool added;
+				const JobHandle& dependency = dependencies[i];
+
 				try
 				{
-					added = ToNativeJob(dependencies[i])->AddDependent(job);
+					if (!ToNativeJob(dependency.data)->AddDependent(*job, dependency.version) && job->Unblock())
+					{
+						AddJobToWorker(*job, workerIndex);
+					}
 				}
 				catch (...)
 				{
-					for (std::size_t j = i; j-- > 0uz; )
+					job->Task(emptyTask);
+					for (; i < dependencies.size(); ++i)
 					{
-						ToNativeJob(dependencies[j])->RemoveDependent(job);
+						if (job->Unblock())
+						{
+							workers[workerIndex]->ReleaseJob(*job);
+						}
 					}
 
 					throw;
 				}
-
-				if (!added && job->Unblock())
-				{
-					job->Status(JobStatus::Pending);
-					AddJobToWorker(job);
-				}
 			}
 		}
 
-		return job;
+		return handle;
 	}
 
-	void JobService::Wait(const std::span<const IJob* const> jobs) const
+	void JobService::Wait(const std::span<const JobHandle> jobs) const
 	{
-		for (const IJob* const job : jobs)
+		for (const JobHandle& job : jobs)
 		{
-			ToNativeJob(job)->Wait();
+			ToNativeJob(job.data)->Wait(job.version);
 		}
 	}
 
-	void JobService::AddJobToWorker(const std::shared_ptr<Job>& job)
+	void JobService::AddJobToWorker(Job& job, const std::size_t workerIndex)
 	{
-		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
-		workers[workerIndex]->AddJob(job);
+		try
+		{
+			workers[workerIndex]->AddJob(job);
+		}
+		catch (...)
+		{
+			workers[workerIndex]->ReleaseJob(job);
+			throw;
+		}
 	}
 
 	void JobService::Finish(const std::size_t count) noexcept
@@ -189,10 +240,15 @@ namespace PonyEngine::Job
 			PONY_LOG(this->application->Logger(), Log::LogType::Info, "Stopping worker thread ID: '{}'.", workers[i]->ThreadID());
 			workers[i]->Stop();
 		}
+
+		jobQueueVersion.fetch_add(1uz, std::memory_order::release);
+		jobQueueVersion.notify_all();
+
 		for (std::size_t i = count; i-- > 0uz; )
 		{
 			workers[i]->Join();
 		}
+
 		for (std::size_t i = count; i-- > 0uz; )
 		{
 			workers[i].reset();
@@ -200,10 +256,10 @@ namespace PonyEngine::Job
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Destroying workers done.");
 	}
 
-	const Job* JobService::ToNativeJob(const IJob* const job)
+	const Job* JobService::ToNativeJob(const void* const job)
 	{
 #ifndef NDEBUG
-		if (!job || typeid(*job) != typeid(Job)) [[unlikely]]
+		if (!job) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid job");
 		}

@@ -9,7 +9,6 @@
 
 export module PonyEngine.Job;
 
-export import :IJob;
 export import :IJobService;
 export import :ITask;
-export import :JobStatus;
+export import :JobHandle;
