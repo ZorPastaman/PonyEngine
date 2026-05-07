@@ -15,10 +15,12 @@ export module PonyEngine.Job:ITask;
 
 export namespace PonyEngine::Job
 {
+	/// @brief Task.
 	class ITask
 	{
 		PONY_INTERFACE_BODY(ITask)
 
+		/// @brief Execute function.
 		virtual void Execute() noexcept = 0;
 	};
 }

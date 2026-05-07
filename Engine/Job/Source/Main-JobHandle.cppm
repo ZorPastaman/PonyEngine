@@ -15,10 +15,11 @@ import PonyEngine.Hash;
 
 export namespace PonyEngine::Job
 {
+	/// @brief Job handle.
 	struct JobHandle final
 	{
-		const void* data = nullptr;
-		std::size_t version = 0uz;
+		const void* data = nullptr; ///< Handle data. It's used only by the owner.
+		std::size_t version = 0uz; ///< Handle version. It's used only by the owner.
 
 		/// @brief Checks if the handle is valid.
 		/// @return @a True if it's valid; @a false otherwise.
