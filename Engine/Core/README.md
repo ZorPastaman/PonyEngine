@@ -8,6 +8,13 @@ The module requires a compiler specific implementation.
 
 ## C\++ modules
 
+### [PonyEngine.Chrono](Source/Chrono.cppm)
+
+Utilities for `std::chrono`.
+
+Utilities:
+- [Conversion](Source/Chrono-Conversion.cppm) - chrono conversion utilities.
+
 ### [PonyEngine.Hash](Source/Hash.cppm)
 
 Utilities for calculating hashes.

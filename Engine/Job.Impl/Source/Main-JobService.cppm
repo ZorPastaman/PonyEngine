@@ -27,9 +27,12 @@ import :Worker;
 
 export namespace PonyEngine::Job
 {
+	/// @brief Job service.
 	class JobService final : public Application::IService, private IJobService
 	{
 	public:
+		/// @brief Creates a job service.
+		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
 		explicit JobService(Application::IApplicationContext& application);
 		JobService(const JobService&) = delete;
@@ -50,6 +53,7 @@ export namespace PonyEngine::Job
 		virtual void Wait(std::span<const JobHandle> jobs) const override;
 
 	private:
+		/// @brief Empty task. It's used in case of an error.
 		class EmptyTask final : public ITask
 		{
 		public:
@@ -58,24 +62,32 @@ export namespace PonyEngine::Job
 			}
 		};
 
-		void AddJobToWorker(Job& job, std::size_t workerIndex);
+		/// @brief Adds the job to the worker queue.
+		/// @param job Job to add.
+		/// @param worker Worker.
+		void AddJobToWorker(Job& job, Worker& worker);
 
+		/// @brief Finishes the workers.
+		/// @param count How many workers to finish.
 		void Finish(std::size_t count) noexcept;
 
+		/// @brief Casts the job from a handle to a native job.
+		/// @param job Job from a handle.
+		/// @return Native job.
 		[[nodiscard("Pure function")]]
 		static const Job* ToNativeJob(const void* job);
 
-		Application::IApplicationContext* application;
+		Application::IApplicationContext* application; ///< Application context.
 
-		std::vector<std::unique_ptr<Worker>> workers;
-		std::atomic_size_t targetWorkerIndex;
+		std::vector<std::unique_ptr<Worker>> workers; ///< Workers.
+		std::atomic_size_t targetWorkerIndex; ///< Target worker index. Used and incremented on scheduling a new job.
 
-		std::atomic_size_t jobQueueVersion;
+		std::atomic_size_t jobQueueVersion; ///< Job queue version. Must be incremented each time when a queue of a worker is modified.
 
-		std::vector<std::unique_ptr<Job>> jobs;
-		std::mutex jobsMutex;
+		std::vector<std::unique_ptr<Job>> jobs; ///< Jobs. Used to keep all the jobs alive so that other parts of the code may use simple pointers.
+		std::mutex jobsMutex; ///< Mutex that must be used on using the @p jobs.
 
-		std::shared_ptr<EmptyTask> emptyTask;
+		std::shared_ptr<EmptyTask> emptyTask; ///< Empty task.
 
 		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
 	};
@@ -164,20 +176,22 @@ namespace PonyEngine::Job
 #endif
 
 		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
-		const auto [job, isNew] = workers[workerIndex]->AcquireJob();
+		Worker& worker = *workers[workerIndex];
+		const auto [job, isNew] = worker.AcquireJob();
 		if (isNew)
 		{
 			const auto lock = std::lock_guard(jobsMutex);
 			jobs.push_back(std::unique_ptr<Job>(job));
 		}
+		const std::size_t version = job->Version();
 		job->Task(task);
 		job->Block(dependencies.size());
 
-		const auto handle = JobHandle(job, job->Version());
+		const auto handle = JobHandle(job, version);
 
 		if (dependencies.empty())
 		{
-			AddJobToWorker(*job, workerIndex);
+			AddJobToWorker(*job, worker);
 		}
 		else
 		{
@@ -185,25 +199,28 @@ namespace PonyEngine::Job
 			{
 				const JobHandle& dependency = dependencies[i];
 
+				bool isAdded;
 				try
 				{
-					if (!ToNativeJob(dependency.data)->AddDependent(*job, dependency.version) && job->Unblock())
-					{
-						AddJobToWorker(*job, workerIndex);
-					}
+					isAdded = ToNativeJob(dependency.data)->AddDependent(*job, dependency.version);
 				}
 				catch (...)
 				{
-					job->Task(emptyTask);
+					job->Task(emptyTask); // Sets the empty task so that the job won't do anything but will be reused eventually.
 					for (; i < dependencies.size(); ++i)
 					{
 						if (job->Unblock())
 						{
-							workers[workerIndex]->ReleaseJob(*job);
+							worker.ReleaseJob(*job); // It may throw. Unfortunately, it will keep the job alive but not reused. It may happen only on memory shortage.
 						}
 					}
 
 					throw;
+				}
+
+				if (!isAdded && job->Unblock())
+				{
+					AddJobToWorker(*job, worker);
 				}
 			}
 		}
@@ -219,25 +236,25 @@ namespace PonyEngine::Job
 		}
 	}
 
-	void JobService::AddJobToWorker(Job& job, const std::size_t workerIndex)
+	void JobService::AddJobToWorker(Job& job, Worker& worker)
 	{
 		try
 		{
-			workers[workerIndex]->AddJob(job);
+			worker.AddJob(job);
 		}
 		catch (...)
 		{
-			workers[workerIndex]->ReleaseJob(job);
+			worker.ReleaseJob(job); // It may throw. Unfortunately, it will keep the job alive but not reused. It may happen only on memory shortage.
 			throw;
 		}
 	}
 
 	void JobService::Finish(const std::size_t count) noexcept
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Destroying workers...");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Destroying workers...");
 		for (std::size_t i = count; i-- > 0uz; )
 		{
-			PONY_LOG(this->application->Logger(), Log::LogType::Info, "Stopping worker thread ID: '{}'.", workers[i]->ThreadID());
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Stopping worker thread ID: '{}'.", workers[i]->ThreadID());
 			workers[i]->Stop();
 		}
 
@@ -253,7 +270,7 @@ namespace PonyEngine::Job
 		{
 			workers[i].reset();
 		}
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Destroying workers done.");
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Destroying workers done.");
 	}
 
 	const Job* JobService::ToNativeJob(const void* const job)

@@ -31,12 +31,12 @@ export namespace PonyEngine::Job
 		virtual std::size_t WorkerCount() const noexcept = 0;
 
 		/// @brief Schedules a job for execution.
-		/// @param task Job task. May be reused but mustn't be scheduled concurrently.
+		/// @param task Job task. May be reused but mustn't be scheduled concurrently. Mustn't be nullptr.
 		/// @param dependency Job dependency.
 		/// @return Job handle. May be used to wait for the job completion or as a dependency for other jobs.
 		JobHandle Schedule(const std::shared_ptr<ITask>& task, const JobHandle& dependency);
 		/// @brief Schedules a job for execution.
-		/// @param task Job task. May be reused but mustn't be scheduled concurrently.
+		/// @param task Job task. May be reused but mustn't be scheduled concurrently. Mustn't be nullptr.
 		/// @param dependencies Job dependencies.
 		/// @return Job handle. May be used to wait for the job completion or as a dependency for other jobs.
 		virtual JobHandle Schedule(const std::shared_ptr<ITask>& task, std::span<const JobHandle> dependencies = std::span<const JobHandle>()) = 0;

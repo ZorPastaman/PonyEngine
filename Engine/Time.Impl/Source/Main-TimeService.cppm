@@ -148,7 +148,7 @@ namespace PonyEngine::Time
 		deltaTimeCap(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_DELTA_TIME_CAP}), std::chrono::nanoseconds(1))),
 		timeScale{std::max(PONY_ENGINE_TIME_SCALE, 0.)},
 		fixedStepPeriod(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_FIXED_STEP_PERIOD}), std::chrono::nanoseconds(1))),
-		targetFrameTime(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{ PONY_ENGINE_TIME_TARGET_FRAME_TIME}), std::chrono::nanoseconds(0))),
+		targetFrameTime(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_TARGET_FRAME_TIME}), std::chrono::nanoseconds(0))),
 		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),

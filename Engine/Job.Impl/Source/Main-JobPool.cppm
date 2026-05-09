@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Job.Impl:JobPool;
 
 import std;
@@ -15,6 +19,7 @@ import :Job;
 
 export namespace PonyEngine::Job
 {
+	/// @brief Job pool.
 	class JobPool final
 	{
 	public:
@@ -25,9 +30,15 @@ export namespace PonyEngine::Job
 
 		~JobPool() noexcept = default;
 
+		/// @brief Acquires a job.
+		/// @return Job and a flag that tells if the job is newly created (if @a true).
 		[[nodiscard("Must be used")]]
 		std::pair<Job*, bool> Acquire();
+		/// @brief Releases the job.
+		/// @param job Job to release.
 		void Release(Job& job);
+		/// @brief Releases the job without locking the pool.
+		/// @param job Job to release.
 		void ReleaseUnsafe(Job& job);
 
 		JobPool& operator =(const JobPool&) = delete;
@@ -65,6 +76,7 @@ namespace PonyEngine::Job
 
 	void JobPool::ReleaseUnsafe(Job& job)
 	{
+		assert(!job.HasTask() && "The job has a task.");
 		pool.push(&job);
 	}
 }

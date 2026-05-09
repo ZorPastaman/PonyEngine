@@ -40,7 +40,3 @@ The fixed steps are calculated for all the time types in both overall and delta 
 
 The time service can control a frame pacing. There's a function `TargetFrameTime()` that sets a target frame time. 
 The service will wait in its tick till the frame time is equal or greater than that value.
-
-#### [ConversionUtility](Source/Main-ConversionUtility.cppm)
-
-Utility functions that convert durations in defferent formats.

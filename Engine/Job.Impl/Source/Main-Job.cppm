@@ -19,9 +19,11 @@ import PonyEngine.Job;
 
 export namespace PonyEngine::Job
 {
+	/// @brief Job.
 	class Job final
 	{
 	public:
+		/// @brief Creates a job.
 		[[nodiscard("Pure constructor")]]
 		Job() noexcept;
 		Job(const Job&) = delete;
@@ -29,37 +31,61 @@ export namespace PonyEngine::Job
 
 		~Job() noexcept = default;
 
+		/// @brief Gets the version.
+		/// @return Version.
 		[[nodiscard("Pure function")]]
 		std::size_t Version() const noexcept;
+		/// @brief Increments the version.
 		void IncrementVersion() noexcept;
 
+		/// @brief Waits for the version change.
+		/// @param waitedVersion Waited version. The function returns if the current version is different.
 		void Wait(std::size_t waitedVersion) const noexcept;
 
+		/// @brief Checks if the job has a task.
+		/// @return @a True if it has a task; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasTask() const noexcept;
+		/// @brief Sets the task.
+		/// @param task Task to set. Can be nullptr.
 		void Task(const std::shared_ptr<ITask>& task) noexcept;
+		/// @brief Executes a current task.
+		/// @note The job must have a task, otherwise the call is not allowed.
 		void Execute() noexcept;
 
+		/// @brief Decrements the block count.
+		/// @return @a True if the job is fully unlocked (block count has reached 0); @a false otherwise.
 		[[nodiscard("Must be used")]]
 		bool Unblock() noexcept;
+		/// @brief Gets the block count.
+		/// @return Block count.
+		[[nodiscard("Pure function")]]
+		std::size_t BlockCount() const noexcept;
+		/// @brief Sets the block count.
+		/// @param blockCount Block count to set.
 		void Block(std::size_t blockCount) noexcept;
 
+		/// @brief Adds the dependent.
+		/// @param dependent Dependent to add.
+		/// @param version Waited version of this job.
+		/// @return @a True if the dependent was added; @a false otherwise - the job has a different version.
 		[[nodiscard("Must be used")]]
 		bool AddDependent(Job& dependent, std::size_t version) const;
+		/// @brief Process dependents.
+		/// @param func Process function.
+		/// @note The function clears the dependent list after processing.
 		void ProcessDependents(const std::function<void(Job&)>& func);
 
 		Job& operator =(const Job&) = delete;
 		Job& operator =(Job&&) = delete;
 
 	private:
-		inline static const std::exception_ptr NullptrException = nullptr;
+		std::atomic_size_t version; ///< Job version.
+		std::shared_ptr<ITask> task; ///< Job task.
 
-		std::atomic_size_t version;
-		std::shared_ptr<ITask> task;
-
-		std::atomic_size_t blockCount;
-		mutable std::vector<Job*> dependents;
-		mutable std::mutex dependencyMutex;
+		std::atomic_size_t blockCount; ///< Block count. How many dependencies must be completed before starting this job.
+		mutable std::vector<Job*> dependents; ///< Dependents.
+		mutable std::mutex dependentMutex; ///< Mutex that must be used while working with the @p dependents.
 
 		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
 	};
@@ -115,6 +141,11 @@ namespace PonyEngine::Job
 		return prev == 1uz;
 	}
 
+	std::size_t Job::BlockCount() const noexcept
+	{
+		return blockCount.load(std::memory_order::acquire);
+	}
+
 	void Job::Block(const std::size_t blockCount) noexcept
 	{
 		this->blockCount.store(blockCount, std::memory_order::release);
@@ -127,7 +158,7 @@ namespace PonyEngine::Job
 			return false;
 		}
 
-		const auto lock = std::lock_guard(dependencyMutex);
+		const auto lock = std::lock_guard(dependentMutex);
 
 		if (Version() != version)
 		{
@@ -140,7 +171,7 @@ namespace PonyEngine::Job
 
 	void Job::ProcessDependents(const std::function<void(Job&)>& func)
 	{
-		const auto lock = std::lock_guard(dependencyMutex);
+		const auto lock = std::lock_guard(dependentMutex);
 
 		for (Job* const dependent : dependents)
 		{
