@@ -15,6 +15,8 @@ export module PonyEngine.RenderDevice:IWaiter;
 
 import std;
 
+import PonyEngine.Chrono;
+
 import :IFence;
 
 export namespace PonyEngine::RenderDevice
@@ -28,11 +30,11 @@ export namespace PonyEngine::RenderDevice
 		/// @param fence Fence. Must be valid.
 		/// @param value Fence target value.
 		/// @param timeout Timeout.
-		void Wait(const IFence& fence, std::uint64_t value, std::chrono::nanoseconds timeout);
+		void Wait(const IFence& fence, std::uint64_t value, std::chrono::milliseconds timeout);
 		/// @brief Puts a cpu thread the function is called on into a sleep till all the fences reach their target values.
 		/// @param fenceValues Pairs of fences and their target values. All the fences must be valid.
 		/// @param timeout Timeout.
-		virtual void Wait(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, std::chrono::nanoseconds timeout) = 0;
+		virtual void Wait(std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, std::chrono::milliseconds timeout) = 0;
 		/// @brief Puts a cpu thread the function is called on into a sleep till the fence reach its target values.
 		/// @tparam T Timeout type.
 		/// @param fence Fence. Must be valid.
@@ -59,7 +61,7 @@ export namespace PonyEngine::RenderDevice
 
 namespace PonyEngine::RenderDevice
 {
-	void IWaiter::Wait(const IFence& fence, const std::uint64_t value, const std::chrono::nanoseconds timeout)
+	void IWaiter::Wait(const IFence& fence, const std::uint64_t value, const std::chrono::milliseconds timeout)
 	{
 		const auto pair = std::pair(&fence, value);
 		Wait(std::span(&pair, 1uz), timeout);
@@ -68,12 +70,12 @@ namespace PonyEngine::RenderDevice
 	template<std::floating_point T>
 	void IWaiter::WaitSeconds(const IFence& fence, const std::uint64_t value, const T timeout)
 	{
-		Wait(fence, value, std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<T>(timeout)));
+		Wait(fence, value, Chrono::ToDuration<std::chrono::milliseconds>(timeout));
 	}
 
 	template<std::floating_point T>
 	void IWaiter::WaitSeconds(const std::span<const std::pair<const IFence*, std::uint64_t>> fenceValues, const T timeout)
 	{
-		Wait(fenceValues, std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::duration<T>(timeout)));
+		Wait(fenceValues, Chrono::ToDuration<std::chrono::milliseconds>(timeout));
 	}
 }

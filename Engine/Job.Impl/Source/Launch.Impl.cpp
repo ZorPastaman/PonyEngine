@@ -7,6 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time;
+#include "PonyEngine/Job/JobServiceModule.h"
 
-export import :ITimeService;
+import PonyEngine.Application.Ext;
+import PonyEngine.Job.Impl;
+
+namespace PonyEngine::Job
+{
+	Application::IModule* GetJobServiceModule()
+	{
+		static JobServiceModule jobServiceModule;
+		return &jobServiceModule;
+	}
+}

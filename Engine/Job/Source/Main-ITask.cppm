@@ -7,6 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time;
+module;
 
-export import :ITimeService;
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.Job:ITask;
+
+export namespace PonyEngine::Job
+{
+	/// @brief Task.
+	class ITask
+	{
+		PONY_INTERFACE_BODY(ITask)
+
+		/// @brief Execute function.
+		virtual void Execute() noexcept = 0;
+	};
+}

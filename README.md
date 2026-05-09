@@ -147,6 +147,8 @@ The table of the module-platform compatibility:
 | [PonyEngine.RenderDevice.Ext](Engine/RenderDevice.Ext)                         | -                                | &check;                     |
 | [PonyEngine.RenderDevice.Impl](Engine/RenderDevice.Impl)                       | -                                | &check;                     |
 | [PonyEngine.RenderDevice.Direct3D12.Impl](Engine/RenderDevice.Direct3D12.Impl) | &check;                          | &check;                     |
+| [PonyEngine.Job](Engine/Job)                                                   | -                                | &check;                     |
+| [PonyEngine.Job.Impl](Engine/Job.Impl)                                         | -                                | &check;                     |
 
 The engine automatically applies platform-specific configuration based on `CMAKE_SYSTEM_NAME`. The value must match one of the supported platforms.
 Users can provide their own platform implementations by setting the CMake flag `PONY_ENGINE_CUSTOM_PLATFORM` to `true`. In this case, the built-in platform configuration is disabled, and users are responsible for configuring the modules themselves.

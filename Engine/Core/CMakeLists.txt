@@ -13,6 +13,8 @@ target_include_directories(PonyEngine.Core PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+	"Source/Chrono.cppm"
+	"Source/Chrono-Conversion.cppm"
 	"Source/Hash.cppm"
 	"Source/Hash-FNV1a.cppm"
 	"Source/Math.cppm"

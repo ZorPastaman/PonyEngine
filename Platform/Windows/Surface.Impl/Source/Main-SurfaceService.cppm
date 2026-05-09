@@ -128,7 +128,7 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept override;
 
-		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept override;
 
 		/// @brief Updates a focus change.
 		void UpdateFocus() noexcept;
@@ -761,7 +761,7 @@ namespace PonyEngine::Surface::Windows
 		return *application;
 	}
 
-	LRESULT SurfaceService::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
+	LRESULT SurfaceService::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Received '{}' message.", uMsg);
 

@@ -3,6 +3,7 @@ add_executable(PonyEngine.Core.Tests)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
+	"Chrono/Conversion.cpp"
 	"Hash/FNV1a.cpp"
 	"Math/Ball.cpp"
 	"Math/BallInsides.cpp"

@@ -7,6 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time;
+export module PonyEngine.Job.Impl;
 
-export import :ITimeService;
+export import PonyEngine.Job;
+
+export import :JobServiceModule;
