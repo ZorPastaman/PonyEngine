@@ -51,6 +51,8 @@ export namespace PonyEngine::Job
 		virtual JobHandle Schedule(const std::shared_ptr<ITask>& task, std::span<const JobHandle> dependencies) override;
 
 		virtual void Wait(std::span<const JobHandle> jobs) const override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompleted(const JobHandle& job) const override;
 
 	private:
 		/// @brief Empty task. It's used in case of an error.
@@ -234,6 +236,17 @@ namespace PonyEngine::Job
 		{
 			ToNativeJob(job.data)->Wait(job.version);
 		}
+	}
+
+	bool JobService::IsCompleted(const JobHandle& job) const
+	{
+		if (ToNativeJob(job.data)->Version() == job.version)
+		{
+			return false;
+		}
+
+		std::atomic_thread_fence(std::memory_order::acquire);
+		return true;
 	}
 
 	void JobService::AddJobToWorker(Job& job, Worker& worker)

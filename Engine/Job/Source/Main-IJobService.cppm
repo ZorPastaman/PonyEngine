@@ -47,6 +47,11 @@ export namespace PonyEngine::Job
 		/// @brief Puts a cpu thread the function is called on into a sleep till the jobs are completed.
 		/// @param jobs Jobs to wait for.
 		virtual void Wait(std::span<const JobHandle> jobs) const = 0;
+		/// @brief Checks if the job is completed.
+		/// @param job Job to check.
+		/// @return @a True if it's completed; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompleted(const JobHandle& job) const = 0;
 	};
 }
 
