@@ -101,7 +101,7 @@ namespace PonyEngine::Job
 
 	std::size_t Job::Version() const noexcept
 	{
-		return version.load(std::memory_order::acquire);
+		return version.load(std::memory_order::relaxed);
 	}
 
 	void Job::IncrementVersion() noexcept
@@ -136,9 +136,16 @@ namespace PonyEngine::Job
 
 	bool Job::Unblock() noexcept
 	{
-		const std::size_t prev = blockCount.fetch_sub(1uz, std::memory_order::acq_rel);
+		const std::size_t prev = blockCount.fetch_sub(1uz, std::memory_order::release);
 		assert(prev > 0uz && "The block count is 0.");
-		return prev == 1uz;
+
+		if (prev == 1uz)
+		{
+			std::atomic_thread_fence(std::memory_order::acquire);
+			return true;
+		}
+
+		return false;
 	}
 
 	std::size_t Job::BlockCount() const noexcept
