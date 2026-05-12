@@ -279,9 +279,9 @@ namespace PonyEngine::RawInput::XInput::Windows
 		}
 
 		const DeviceHandle handle = gamepadContainer.DeviceHandle(index);
-		UpdateButtonInput(handle, prevState, currentState, now);
-		UpdateTriggerInput(handle, prevState, currentState, now);
 		UpdateStickInput(handle, prevState, currentState, now);
+		UpdateTriggerInput(handle, prevState, currentState, now);
+		UpdateButtonInput(handle, prevState, currentState, now);
 		gamepadContainer.GamepadState(index, currentState);
 	}
 
