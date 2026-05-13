@@ -12,7 +12,9 @@ export module PonyEngine.RawInput.Ext;
 export import PonyEngine.RawInput;
 
 export import :FeatureEntry;
+export import :IDeviceRegistry;
 export import :IInputProvider;
+export import :IInputRegistry;
 export import :InputProviderHandle;
 export import :IRawInputContext;
 export import :IRawInputModuleContext;

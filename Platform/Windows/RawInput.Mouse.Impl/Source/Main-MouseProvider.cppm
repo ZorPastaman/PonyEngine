@@ -41,9 +41,9 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 
 		~MouseProvider() noexcept = default;
 
-		virtual void Begin() override;
-		virtual void End() override;
-		virtual void Tick() override;
+		virtual void Begin(IDeviceRegistry& deviceRegistry) override;
+		virtual void End(IDeviceRegistry& deviceRegistry) override;
+		virtual void Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry) override;
 
 		MouseProvider& operator =(const MouseProvider&) = delete;
 		MouseProvider& operator =(MouseProvider&&) = delete;
@@ -66,9 +66,17 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 		void Unsubscribe() noexcept;
 
 		/// @brief Unregisters all the devices.
-		void UnregisterDevices();
+		/// @param deviceRegistry Device registry.
+		void UnregisterDevices(IDeviceRegistry& deviceRegistry);
 		/// @brief Clears all the data.
 		void Clear() noexcept;
+
+		/// @brief Register devices that are not registered yet.
+		/// @param deviceRegistry Device registry.
+		void RegisterDevices(IDeviceRegistry& deviceRegistry);
+		/// @brief Updates input.
+		/// @param inputRegistry Input registry.
+		void UpdateInput(IInputRegistry& inputRegistry);
 
 		/// @brief Gets or creates a mouse.
 		/// @param mouseHandle Mouse native handle.
@@ -100,6 +108,7 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 		DeviceTypeID deviceType; ///< Mouse device type.
 		MouseAxisMap axisMap; ///< Mouse axis map.
 
+		std::size_t registeredDeviceCount; ///< Registered device count.
 		MouseContainer<HANDLE> mouseContainer; ///< Mouse container.
 		MouseEventQueue eventQueue; ///< Mouse event queue.
 
@@ -113,79 +122,27 @@ namespace PonyEngine::RawInput::Mouse::Windows
 		input{&input},
 		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
 		deviceType(this->input->Hash(DeviceType(MouseDevice::GenericType))),
-		axisMap(*this->input)
+		axisMap(*this->input),
+		registeredDeviceCount{0uz}
 	{
 	}
 
-	void MouseProvider::Begin()
+	void MouseProvider::Begin(IDeviceRegistry& deviceRegistry)
 	{
 		Subscribe();
 	}
 
-	void MouseProvider::End()
+	void MouseProvider::End(IDeviceRegistry& deviceRegistry)
 	{
 		Unsubscribe();
-		UnregisterDevices();
+		UnregisterDevices(deviceRegistry);
 		Clear();
 	}
 
-	void MouseProvider::Tick()
+	void MouseProvider::Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry)
 	{
-		for (std::size_t i = 0uz; i < eventQueue.Size(); ++i)
-		{
-			const DeviceHandle device = eventQueue.Device(i);
-			const MouseEvent& event = eventQueue.Event(i);
-
-			std::visit(Type::Overload
-			{
-				[&](const MouseButtonEvent& button)
-				{
-					const AxisID axis = axisMap.Axis(button.button);
-					const float value = button.state;
-					input->AddInput(device, RawInputEvent
-					{
-						.axes = std::span<const AxisID>(&axis, 1uz),
-						.values = std::span<const float>(&value, 1uz),
-						.eventType = InputEventType::State,
-						.timePoint = event.timePoint,
-						.cursorPosition = button.cursorPosition
-					});
-				},
-				[&](const MouseWheelEvent& wheel)
-				{
-					const AxisID axis = axisMap.Axis(wheel.wheel);
-					input->AddInput(device, RawInputEvent
-					{
-						.axes = std::span<const AxisID>(&axis, 1uz),
-						.values = std::span<const float>(&wheel.delta, 1uz),
-						.eventType = InputEventType::Delta,
-						.timePoint = event.timePoint,
-						.cursorPosition = wheel.cursorPosition
-					});
-				},
-				[&](const MousePointerEvent& pointer)
-				{
-					input->AddInput(device, RawInputEvent
-					{
-						.axes = axisMap.Pointers(),
-						.values = pointer.delta.Span(),
-						.eventType = InputEventType::Delta,
-						.timePoint = event.timePoint,
-						.cursorPosition = pointer.cursorPosition
-					});
-				},
-				[&](const MouseConnectionEvent& connection)
-				{
-					input->Connect(device, ConnectionEvent
-					{
-						.isConnected = connection.isConnected,
-						.timePoint = event.timePoint
-					});
-				}
-			}, event.event);
-		}
-
-		eventQueue.Clear();
+		RegisterDevices(deviceRegistry);
+		UpdateInput(inputRegistry);
 	}
 
 	void MouseProvider::Observe(const RAWINPUT& rawInput)
@@ -198,9 +155,9 @@ namespace PonyEngine::RawInput::Mouse::Windows
 #endif
 
 		const std::size_t index = GetOrCreateMouse(rawInput.header.hDevice);
-		UpdateButtons(rawInput.data.mouse, index);
-		UpdateWheels(rawInput.data.mouse, index);
 		UpdatePointer(rawInput.data.mouse, index);
+		UpdateWheels(rawInput.data.mouse, index);
+		UpdateButtons(rawInput.data.mouse, index);
 	}
 
 	void MouseProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)
@@ -216,11 +173,10 @@ namespace PonyEngine::RawInput::Mouse::Windows
 
 			const auto connectionEvent = MouseConnectionEvent{.isConnected = isConnected};
 			const auto event = MouseEvent{ .event = connectionEvent, .timePoint = surface->LastMessageTime() };
-			const DeviceHandle deviceHandle = mouseContainer.DeviceHandle(index);
-			eventQueue.Add(deviceHandle, event);
+			eventQueue.Add(index, event);
 
-			PONY_LOG(input->Logger(), Log::LogType::Info, "Mouse device connection changed to '{}'. Handle: '0x{:X}'; Native handle: '0x{:X}'.",
-				isConnected, deviceHandle.id, reinterpret_cast<std::uintptr_t>(device));
+			PONY_LOG(input->Logger(), Log::LogType::Info, "Mouse device connection changed to '{}'. Native handle: '0x{:X}'.",
+				isConnected, reinterpret_cast<std::uintptr_t>(device));
 		};
 
 		if (isConnected)
@@ -284,7 +240,7 @@ namespace PonyEngine::RawInput::Mouse::Windows
 				.event = inputEvent,
 				.timePoint = eventTime
 			};
-			eventQueue.Add(mouseContainer.DeviceHandle(mouseIndex), event);
+			eventQueue.Add(mouseIndex, event);
 		}
 
 		mouseContainer.ResetButtons(mouseIndex);
@@ -310,19 +266,95 @@ namespace PonyEngine::RawInput::Mouse::Windows
 		surface->RemoveObserver(*this);
 	}
 
-	void MouseProvider::UnregisterDevices()
+	void MouseProvider::UnregisterDevices(IDeviceRegistry& deviceRegistry)
 	{
-		for (std::size_t i = 0uz; i < mouseContainer.Size(); ++i)
+		for (std::size_t i = 0uz; i < registeredDeviceCount; ++i)
 		{
 			const DeviceHandle handle = mouseContainer.DeviceHandle(i);
 			PONY_LOG(input->Logger(), Log::LogType::Info, "Unregistering mouse device. Handle: '0x{:X}'.", handle.id);
-			input->UnregisterDevice(handle);
+			deviceRegistry.UnregisterDevice(handle);
 		}
 	}
 
 	void MouseProvider::Clear() noexcept
 	{
 		mouseContainer.Clear();
+		eventQueue.Clear();
+	}
+
+	void MouseProvider::RegisterDevices(IDeviceRegistry& deviceRegistry)
+	{
+		for (; registeredDeviceCount < mouseContainer.Size(); ++registeredDeviceCount)
+		{
+			const HANDLE nativeHandle = mouseContainer.NativeHandle(registeredDeviceCount);
+			const std::string_view name = mouseContainer.Name(registeredDeviceCount);
+			const bool isConnected = mouseContainer.IsConnected(registeredDeviceCount);
+
+			PONY_LOG(input->Logger(), Log::LogType::Info, "Registering mouse device... NativeHandle: '0x{:X}'; Name: '{}'.",
+				reinterpret_cast<std::uintptr_t>(nativeHandle), name);
+			const DeviceHandle deviceHandle = mouseContainer.DeviceHandle(registeredDeviceCount) = deviceRegistry.RegisterDevice(deviceType, name, isConnected);
+			PONY_LOG(input->Logger(), Log::LogType::Info, "Registering mouse device done. NativeHandle: '0x{:X}'; Name: '{}'; DeviceHandle.",
+				reinterpret_cast<std::uintptr_t>(nativeHandle), name, deviceHandle.id);
+		}
+	}
+
+	void MouseProvider::UpdateInput(IInputRegistry& inputRegistry)
+	{
+		for (std::size_t i = 0uz; i < eventQueue.Size(); ++i)
+		{
+			const std::size_t deviceIndex = eventQueue.DeviceIndex(i);
+			const MouseEvent& event = eventQueue.Event(i);
+			const DeviceHandle device = mouseContainer.DeviceHandle(deviceIndex);
+
+			std::visit(Type::Overload
+			{
+				[&](const MouseButtonEvent& button)
+				{
+					const AxisID axis = axisMap.Axis(button.button);
+					const float value = button.state;
+					inputRegistry.AddInput(device, RawInputEvent
+					{
+						.axes = std::span<const AxisID>(&axis, 1uz),
+						.values = std::span<const float>(&value, 1uz),
+						.eventType = InputEventType::State,
+						.timePoint = event.timePoint,
+						.cursorPosition = button.cursorPosition
+					});
+				},
+				[&](const MouseWheelEvent& wheel)
+				{
+					const AxisID axis = axisMap.Axis(wheel.wheel);
+					inputRegistry.AddInput(device, RawInputEvent
+					{
+						.axes = std::span<const AxisID>(&axis, 1uz),
+						.values = std::span<const float>(&wheel.delta, 1uz),
+						.eventType = InputEventType::Delta,
+						.timePoint = event.timePoint,
+						.cursorPosition = wheel.cursorPosition
+					});
+				},
+				[&](const MousePointerEvent& pointer)
+				{
+					inputRegistry.AddInput(device, RawInputEvent
+					{
+						.axes = axisMap.Pointers(),
+						.values = pointer.delta.Span(),
+						.eventType = InputEventType::Delta,
+						.timePoint = event.timePoint,
+						.cursorPosition = pointer.cursorPosition
+					});
+				},
+				[&](const MouseConnectionEvent& connection)
+				{
+					inputRegistry.Connect(device, ConnectionEvent
+					{
+						.isConnected = connection.isConnected,
+						.timePoint = event.timePoint
+					});
+				}
+			}, event.event);
+		}
+
 		eventQueue.Clear();
 	}
 
@@ -335,18 +367,9 @@ namespace PonyEngine::RawInput::Mouse::Windows
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mouseHandle));
 		const std::string_view name = GetMouseName(mouseHandle);
-		const DeviceHandle deviceHandle = input->RegisterDevice(deviceType, name, true);
-		try
-		{
-			mouseContainer.Add(mouseHandle, deviceHandle, name, true);
-		}
-		catch (...)
-		{
-			input->UnregisterDevice(deviceHandle);
-			throw;
-		}
-		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device done. Native handle: '0x{:X}'; Device handle: '0x{:X}'; Device name: '{}'.",
-			reinterpret_cast<std::uintptr_t>(mouseHandle), deviceHandle.id, name);
+		mouseContainer.Add(mouseHandle, DeviceHandle{}, name, true);
+		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device done. Native handle: '0x{:X}'; Device name: '{}'.",
+			reinterpret_cast<std::uintptr_t>(mouseHandle), name);
 
 		return mouseContainer.Size() - 1uz;
 	}
@@ -376,7 +399,7 @@ namespace PonyEngine::RawInput::Mouse::Windows
 					.event = buttonEvent,
 					.timePoint = surface->LastMessageTime()
 				};
-				eventQueue.Add(mouseContainer.DeviceHandle(mouseIndex), event);
+				eventQueue.Add(mouseIndex, event);
 			}
 		};
 
@@ -386,7 +409,6 @@ namespace PonyEngine::RawInput::Mouse::Windows
 			USHORT upFlag;
 			MouseButton button;
 		};
-
 		constexpr auto buttonMap = std::array<ButtonFlagMap, 5>
 		{
 			ButtonFlagMap{.downFlag = RI_MOUSE_LEFT_BUTTON_DOWN, .upFlag = RI_MOUSE_LEFT_BUTTON_UP, .button = MouseButton::Left},
@@ -424,7 +446,7 @@ namespace PonyEngine::RawInput::Mouse::Windows
 				.event = wheelEvent,
 				.timePoint = surface->LastMessageTime()
 			};
-			eventQueue.Add(mouseContainer.DeviceHandle(mouseIndex), event);
+			eventQueue.Add(mouseIndex, event);
 		};
 
 		if (source.usButtonFlags & RI_MOUSE_WHEEL)
@@ -458,6 +480,6 @@ namespace PonyEngine::RawInput::Mouse::Windows
 			.event = pointerEvent,
 			.timePoint = surface->LastMessageTime()
 		};
-		eventQueue.Add(mouseContainer.DeviceHandle(mouseIndex), event);
+		eventQueue.Add(mouseIndex, event);
 	}
 }

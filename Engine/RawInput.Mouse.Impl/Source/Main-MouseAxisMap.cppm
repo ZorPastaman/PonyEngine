@@ -73,9 +73,17 @@ namespace PonyEngine::RawInput::Mouse
 {
 	MouseAxisMap::MouseAxisMap(IRawInputContext& input)
 	{
+		constexpr std::array<std::string_view, 5> buttonPaths =
+		{
+			MouseLayout::Button1Path,
+			MouseLayout::Button2Path,
+			MouseLayout::Button3Path,
+			MouseLayout::Button4Path,
+			MouseLayout::Button5Path
+		};
 		for (std::size_t i = 0uz; i < buttonAxes.size(); ++i)
 		{
-			buttonAxes[i] = input.Hash(RawInput::Axis(std::format("{}/{}", MouseLayout::ButtonPath, i + 1)));
+			buttonAxes[i] = input.Hash(RawInput::Axis(buttonPaths[i]));
 		}
 
 		wheelAxes[static_cast<std::size_t>(MouseWheel::Horizontal)] = input.Hash(RawInput::Axis(MouseLayout::WheelHorizontalPath));

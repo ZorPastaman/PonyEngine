@@ -39,7 +39,7 @@ export namespace PonyEngine::RawInput::Mouse
 		/// @param index Event index.
 		/// @return Device.
 		[[nodiscard("Pure function")]]
-		DeviceHandle Device(std::size_t index) const noexcept;
+		std::size_t DeviceIndex(std::size_t index) const noexcept;
 		/// @brief Gets a mouse event.
 		/// @param index Event index.
 		/// @return Mouse event.
@@ -47,12 +47,9 @@ export namespace PonyEngine::RawInput::Mouse
 		const MouseEvent& Event(std::size_t index) const noexcept;
 
 		/// @brief Adds the event.
-		/// @param device Device handle.
+		/// @param deviceIndex Device index.
 		/// @param event Mouse event.
-		void Add(DeviceHandle device, const MouseEvent& event);
-		/// @brief Removes all the mouse devices.
-		/// @param device Device handle.
-		void Remove(DeviceHandle device) noexcept;
+		void Add(std::size_t deviceIndex, const MouseEvent& event);
 		/// @brief Clears all the data.
 		void Clear() noexcept;
 
@@ -60,7 +57,7 @@ export namespace PonyEngine::RawInput::Mouse
 		MouseEventQueue& operator =(MouseEventQueue&& other) noexcept = default;
 
 	private:
-		std::vector<DeviceHandle> devices; ///< Mouse device handles.
+		std::vector<std::size_t> deviceIndices; ///< Mouse device indices.
 		std::vector<MouseEvent> events; ///< Mouse events.
 	};
 }
@@ -69,12 +66,12 @@ namespace PonyEngine::RawInput::Mouse
 {
 	std::size_t MouseEventQueue::Size() const noexcept
 	{
-		return devices.size();
+		return deviceIndices.size();
 	}
 
-	DeviceHandle MouseEventQueue::Device(const std::size_t index) const noexcept
+	std::size_t MouseEventQueue::DeviceIndex(const std::size_t index) const noexcept
 	{
-		return devices[index];
+		return deviceIndices[index];
 	}
 
 	const MouseEvent& MouseEventQueue::Event(const std::size_t index) const noexcept
@@ -82,35 +79,23 @@ namespace PonyEngine::RawInput::Mouse
 		return events[index];
 	}
 
-	void MouseEventQueue::Add(const DeviceHandle device, const MouseEvent& event)
+	void MouseEventQueue::Add(const std::size_t deviceIndex, const MouseEvent& event)
 	{
-		devices.push_back(device);
+		deviceIndices.push_back(deviceIndex);
 		try
 		{
 			events.push_back(event);
 		}
 		catch (...)
 		{
-			devices.pop_back();
+			deviceIndices.pop_back();
 			throw;
-		}
-	}
-
-	void MouseEventQueue::Remove(const DeviceHandle device) noexcept
-	{
-		for (std::size_t i = devices.size(); i-- > 0uz; )
-		{
-			if (devices[i] == device)
-			{
-				devices.erase(devices.cbegin() + i);
-				events.erase(events.cbegin() + i);
-			}
 		}
 	}
 
 	void MouseEventQueue::Clear() noexcept
 	{
-		devices.clear();
+		deviceIndices.clear();
 		events.clear();
 	}
 }
