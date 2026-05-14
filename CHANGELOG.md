@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Configurable settings for Time module.
 - Job module.
 
+### Changed
+
+- IRawInputContext doesn't have functions for registering/unregistering devices and adding input any more. Now IInputProvider gets special interfaces for that in its Begin(), End() and Tick().
+
+### Removed
+
+- Axis and DeviceType classes removed from raw input module. Now usual string views are used instead.
+
 ## [0.1.1] - 2026-04-21
 
 ### Fixed
