@@ -113,9 +113,6 @@ export namespace PonyEngine::RawInput::Keyboard
 		/// @param name Keyboard name.
 		/// @param isConnected Is the device connected?
 		void Add(const NativeHandleType& nativeHandle, struct DeviceHandle deviceHandle, std::string_view name, bool isConnected);
-		/// @brief Removed a keyboard.
-		/// @param index Keyboard index.
-		void Remove(std::size_t index) noexcept;
 		/// @brief Clears all the data.
 		void Clear() noexcept;
 
@@ -281,16 +278,6 @@ namespace PonyEngine::RawInput::Keyboard
 			nativeHandles.pop_back();
 			throw;
 		}
-	}
-
-	template<typename NativeHandleType, typename NativeKeyType>
-	void KeyboardContainer<NativeHandleType, NativeKeyType>::Remove(const std::size_t index) noexcept
-	{
-		pressedKeys.erase(pressedKeys.cbegin() + index);
-		connections.erase(connections.cbegin() + index);
-		deviceNames.erase(deviceNames.cbegin() + index);
-		deviceHandles.erase(deviceHandles.cbegin() + index);
-		nativeHandles.erase(nativeHandles.cbegin() + index);
 	}
 
 	template<typename NativeHandleType, typename NativeKeyType>

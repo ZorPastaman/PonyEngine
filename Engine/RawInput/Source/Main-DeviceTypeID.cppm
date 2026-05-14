@@ -19,7 +19,7 @@ export namespace PonyEngine::RawInput
 		std::uint64_t hash = 0u; ///< Device type hash.
 
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const DeviceTypeID& other) const noexcept = default;
+		constexpr auto operator <=>(const DeviceTypeID& other) const noexcept = default;
 	};
 }
 

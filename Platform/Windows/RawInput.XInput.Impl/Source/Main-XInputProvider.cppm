@@ -42,9 +42,9 @@ export namespace PonyEngine::RawInput::XInput::Windows
 
 		~XInputProvider() noexcept = default;
 
-		virtual void Begin() override;
-		virtual void End() override;
-		virtual void Tick() override;
+		virtual void Begin(IDeviceRegistry& deviceRegistry) override;
+		virtual void End(IDeviceRegistry& deviceRegistry) override;
+		virtual void Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry) override;
 
 		XInputProvider& operator =(const XInputProvider&) = delete;
 		XInputProvider& operator =(XInputProvider&&) = delete;
@@ -80,46 +80,54 @@ export namespace PonyEngine::RawInput::XInput::Windows
 
 		/// @brief Creates devices.
 		/// @param count How many devices were created.
-		void CreateDevices(DWORD& count);
+		/// @param deviceRegistry Device registry.
+		void CreateDevices(DWORD& count, IDeviceRegistry& deviceRegistry);
 		/// @brief Destroys devices.
 		/// @param count How many devices were created.
-		void DestroyDevices(DWORD count);
+		/// @param deviceRegistry Device registry.
+		void DestroyDevices(DWORD count, IDeviceRegistry& deviceRegistry);
 
 		/// @brief Connects a gamepad or does nothing if it's already connected.
 		/// @param index Gamepad index.
 		/// @param now Event time.
-		void ConnectGamepad(DWORD index, std::chrono::time_point<std::chrono::steady_clock> now);
+		/// @param inputRegistry Input registry.
+		void ConnectGamepad(DWORD index, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 		/// @brief Disconnects a gamepad or does nothing if it's already disconnected.
 		/// @param index Gamepad index.
 		/// @param now Event time.
-		void DisconnectGamepad(DWORD index, std::chrono::time_point<std::chrono::steady_clock> now);
+		/// @param inputRegistry Input registry.
+		void DisconnectGamepad(DWORD index, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 
 		/// @brief Updates a gamepad input.
 		/// @param index Gamepad index.
 		/// @param currentState Current gamepad state.
 		/// @param now Event time.
-		void UpdateInput(DWORD index, const XINPUT_GAMEPAD& currentState, std::chrono::time_point<std::chrono::steady_clock> now);
+		/// @param inputRegistry Input registry.
+		void UpdateInput(DWORD index, const XINPUT_GAMEPAD& currentState, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 		/// @brief Updates a button input.
 		/// @param handle Device handle.
 		/// @param prevState Previous gamepad state.
 		/// @param currentState Current gamepad state.
 		/// @param now Event time.
+		/// @param inputRegistry Input registry.
 		void UpdateButtonInput(DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState,
-			std::chrono::time_point<std::chrono::steady_clock> now);
+			std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 		/// @brief Updates a trigger input.
 		/// @param handle Device handle.
 		/// @param prevState Previous gamepad state.
 		/// @param currentState Current gamepad state.
 		/// @param now Event time.
+		/// @param inputRegistry Input registry.
 		void UpdateTriggerInput(DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState,
-			std::chrono::time_point<std::chrono::steady_clock> now);
+			std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 		/// @brief Updates a stick input.
 		/// @param handle Device handle.
 		/// @param prevState Previous gamepad state.
 		/// @param currentState Current gamepad state.
 		/// @param now Event time.
+		/// @param inputRegistry Input registry.
 		void UpdateStickInput(DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState,
-			std::chrono::time_point<std::chrono::steady_clock> now);
+			std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 
 		IRawInputContext* input; ///< Raw input context.
 		Surface::ISurfaceService* surface; ///< Surface service.
@@ -143,27 +151,27 @@ namespace PonyEngine::RawInput::XInput::Windows
 		}
 	}
 
-	void XInputProvider::Begin()
+	void XInputProvider::Begin(IDeviceRegistry& deviceRegistry)
 	{
 		DWORD count = 0uz;
 
 		try
 		{
-			CreateDevices(count);
+			CreateDevices(count, deviceRegistry);
 		}
 		catch (...)
 		{
-			DestroyDevices(count);
+			DestroyDevices(count, deviceRegistry);
 			throw;
 		}
 	}
 
-	void XInputProvider::End()
+	void XInputProvider::End(IDeviceRegistry& deviceRegistry)
 	{
-		DestroyDevices(XUSER_MAX_COUNT);
+		DestroyDevices(XUSER_MAX_COUNT, deviceRegistry);
 	}
 
-	void XInputProvider::Tick()
+	void XInputProvider::Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry)
 	{
 		const bool isInFocus = surface->IsInFocus();
 
@@ -179,8 +187,8 @@ namespace PonyEngine::RawInput::XInput::Windows
 					XINPUT_STATE state = {};
 					if (const DWORD stateResult = XInputGetState(i, &state); stateResult == ERROR_SUCCESS)
 					{
-						ConnectGamepad(i, now);
-						UpdateInput(i, isInFocus ? state.Gamepad : XINPUT_GAMEPAD{}, now);
+						ConnectGamepad(i, now, inputRegistry);
+						UpdateInput(i, isInFocus ? state.Gamepad : XINPUT_GAMEPAD{}, now, inputRegistry);
 
 						continue;
 					}
@@ -197,7 +205,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 					"Failed to get XInput device capabilities. Error code: '0x{:X}'.", capsResult);
 			}
 
-			DisconnectGamepad(i, now);
+			DisconnectGamepad(i, now, inputRegistry);
 		}
 	}
 
@@ -220,15 +228,15 @@ namespace PonyEngine::RawInput::XInput::Windows
 			"Failed to set XInput device vibration. Error code: '0x{:X}'.", result);
 	}
 
-	void XInputProvider::CreateDevices(DWORD& count)
+	void XInputProvider::CreateDevices(DWORD& count, IDeviceRegistry& deviceRegistry)
 	{
-		const DeviceTypeID type = input->Hash(DeviceType(GamepadDevice::XboxType));
+		const DeviceTypeID type = input->HashDeviceType(GamepadDevice::XboxType);
 
 		for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
 		{
 			IVibrating& vibrator = gamepadVibrators[i] = Vibrator(*this, i);
 
-			const DeviceHandle handle = input->RegisterDevice(type, std::format("XInput_{}", i), false,
+			const DeviceHandle handle = deviceRegistry.RegisterDevice(type, std::format("XInput_{}", i), false,
 				std::array<FeatureEntry, 1>{ FeatureEntry(vibrator) });
 
 			gamepadContainer.DeviceHandle(i) = handle;
@@ -237,40 +245,41 @@ namespace PonyEngine::RawInput::XInput::Windows
 		}
 	}
 
-	void XInputProvider::DestroyDevices(const DWORD count)
+	void XInputProvider::DestroyDevices(const DWORD count, IDeviceRegistry& deviceRegistry)
 	{
 		for (DWORD i = count; i-- > 0; )
 		{
 			gamepadVibrators[i].Vibrate(0.f, 0.f);
-			input->UnregisterDevice(gamepadContainer.DeviceHandle(i));
+			deviceRegistry.UnregisterDevice(gamepadContainer.DeviceHandle(i));
 			gamepadContainer.DeviceHandle(i) = DeviceHandle{};
 		}
 	}
 
-	void XInputProvider::ConnectGamepad(const DWORD index, const std::chrono::time_point<std::chrono::steady_clock> now)
+	void XInputProvider::ConnectGamepad(const DWORD index, const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry)
 	{
 		if (gamepadContainer.IsConnected(index))
 		{
 			return;
 		}
 
-		input->Connect(gamepadContainer.DeviceHandle(index), ConnectionEvent{.isConnected = true, .timePoint = now});
+		inputRegistry.Connect(gamepadContainer.DeviceHandle(index), ConnectionEvent{.isConnected = true, .timePoint = now});
 		gamepadContainer.Connect(index, true);
 	}
 
-	void XInputProvider::DisconnectGamepad(const DWORD index, const std::chrono::time_point<std::chrono::steady_clock> now)
+	void XInputProvider::DisconnectGamepad(const DWORD index, const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry)
 	{
 		if (!gamepadContainer.IsConnected(index))
 		{
 			return;
 		}
 
-		UpdateInput(index, XINPUT_GAMEPAD{}, now);
-		input->Connect(gamepadContainer.DeviceHandle(index), ConnectionEvent{.isConnected = false, .timePoint = now});
+		UpdateInput(index, XINPUT_GAMEPAD{}, now, inputRegistry);
+		inputRegistry.Connect(gamepadContainer.DeviceHandle(index), ConnectionEvent{.isConnected = false, .timePoint = now});
 		gamepadContainer.Connect(index, false);
 	}
 
-	void XInputProvider::UpdateInput(const DWORD index, const XINPUT_GAMEPAD& currentState, const std::chrono::time_point<std::chrono::steady_clock> now)
+	void XInputProvider::UpdateInput(const DWORD index, const XINPUT_GAMEPAD& currentState, const std::chrono::time_point<std::chrono::steady_clock> now,
+		IInputRegistry& inputRegistry)
 	{
 		const XINPUT_GAMEPAD& prevState = gamepadContainer.GamepadState(index);
 		if (std::memcmp(&currentState, &prevState, sizeof(XINPUT_GAMEPAD)) == 0)
@@ -279,14 +288,14 @@ namespace PonyEngine::RawInput::XInput::Windows
 		}
 
 		const DeviceHandle handle = gamepadContainer.DeviceHandle(index);
-		UpdateButtonInput(handle, prevState, currentState, now);
-		UpdateTriggerInput(handle, prevState, currentState, now);
-		UpdateStickInput(handle, prevState, currentState, now);
+		UpdateStickInput(handle, prevState, currentState, now, inputRegistry);
+		UpdateTriggerInput(handle, prevState, currentState, now, inputRegistry);
+		UpdateButtonInput(handle, prevState, currentState, now, inputRegistry);
 		gamepadContainer.GamepadState(index, currentState);
 	}
 
 	void XInputProvider::UpdateButtonInput(const DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState, 
-		const std::chrono::time_point<std::chrono::steady_clock> now)
+		const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry)
 	{
 		constexpr std::array<WORD, 14> buttons =
 		{
@@ -319,7 +328,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 			const bool pressed = current;
 			const float value = pressed;
 			const AxisID axis = gamepadAxisMap.Button(button);
-			input->AddInput(handle, RawInputEvent
+			inputRegistry.AddInput(handle, RawInputEvent
 			{
 				.axes = std::span<const AxisID>(&axis, 1uz),
 				.values = std::span<const float>(&value, 1uz),
@@ -330,7 +339,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 	}
 
 	void XInputProvider::UpdateTriggerInput(const DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState, 
-		const std::chrono::time_point<std::chrono::steady_clock> now)
+		const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry)
 	{
 		const auto updateTriggerInput = [&](const BYTE prev, const BYTE current, const GamepadAxisMap::TriggerAxis trigger)
 		{
@@ -342,7 +351,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 			const float value = Math::UnormToNormalized<float>(current, Math::Range<BYTE>{.min = XINPUT_GAMEPAD_TRIGGER_THRESHOLD});
 			const AxisID axis = gamepadAxisMap.Trigger(trigger);
 
-			input->AddInput(handle, RawInputEvent
+			inputRegistry.AddInput(handle, RawInputEvent
 			{
 				.axes = std::span<const AxisID>(&axis, 1uz),
 				.values = std::span<const float>(&value, 1uz),
@@ -356,7 +365,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 	}
 
 	void XInputProvider::UpdateStickInput(const DeviceHandle handle, const XINPUT_GAMEPAD& prevState, const XINPUT_GAMEPAD& currentState, 
-		const std::chrono::time_point<std::chrono::steady_clock> now)
+		const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry)
 	{
 		const auto updateStickInput = [&](const Math::Vector2<SHORT>& prev, const Math::Vector2<SHORT>& current, const SHORT threshold, 
 			const GamepadAxisMap::StickPlacement placement)
@@ -373,7 +382,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 				return;
 			}
 
-			input->AddInput(handle, RawInputEvent
+			inputRegistry.AddInput(handle, RawInputEvent
 			{
 				.axes = gamepadAxisMap.Stick(placement),
 				.values = currentNormalized.Span(),

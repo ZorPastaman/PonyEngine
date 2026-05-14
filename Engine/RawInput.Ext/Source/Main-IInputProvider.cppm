@@ -13,6 +13,9 @@ module;
 
 export module PonyEngine.RawInput.Ext:IInputProvider;
 
+import :IDeviceRegistry;
+import :IInputRegistry;
+
 export namespace PonyEngine::RawInput
 {
 	/// @brief Input provider.
@@ -21,13 +24,17 @@ export namespace PonyEngine::RawInput
 		PONY_INTERFACE_BODY(IInputProvider)
 
 		/// @brief Invoked before a first tick.
+		/// @param deviceRegistry Device registry.
 		/// @note The function is always called on a main thread.
-		virtual void Begin() = 0;
+		virtual void Begin(IDeviceRegistry& deviceRegistry) = 0;
 		/// @brief Invoked after a last tick.
+		/// @param deviceRegistry Device registry.
 		/// @note The function is always called on a main thread.
-		virtual void End() = 0;
+		virtual void End(IDeviceRegistry& deviceRegistry) = 0;
 		/// @brief Ticks the provider.
+		/// @param deviceRegistry Device registry.
+		/// @param inputRegistry Input registry.
 		/// @note The function is always called on a main thread.
-		virtual void Tick() = 0;
+		virtual void Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry) = 0;
 	};
 }

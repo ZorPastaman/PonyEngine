@@ -11,11 +11,9 @@ target_include_directories(PonyEngine.RawInput PUBLIC
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
-	"Source/Main-Axis.cppm"
 	"Source/Main-AxisID.cppm"
 	"Source/Main-ConnectionEvent.cppm"
 	"Source/Main-DeviceHandle.cppm"
-	"Source/Main-DeviceType.cppm"
 	"Source/Main-DeviceTypeID.cppm"
 	"Source/Main-Gamepad.cppm"
 	"Source/Main-IDeviceObserver.cppm"

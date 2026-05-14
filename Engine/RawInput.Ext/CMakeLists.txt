@@ -7,7 +7,9 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-FeatureEntry.cppm"
+	"Source/Main-IDeviceRegistry.cppm"
 	"Source/Main-IInputProvider.cppm"
+	"Source/Main-IInputRegistry.cppm"
 	"Source/Main-InputProviderHandle.cppm"
 	"Source/Main-IRawInputContext.cppm" 
 	"Source/Main-IRawInputModuleContext.cppm"

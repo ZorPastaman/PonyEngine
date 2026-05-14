@@ -219,6 +219,6 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 
 	AxisID KeyboardAxisMap::Bind(const WORD scanCode, const std::string_view axisPath)
 	{
-		return axisMap[scanCode] = input->Hash(RawInput::Axis(axisPath));
+		return axisMap[scanCode] = input->HashAxis(axisPath);
 	}
 }

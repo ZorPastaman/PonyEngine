@@ -44,9 +44,9 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 
 		~KeyboardProvider() noexcept = default;
 
-		virtual void Begin() override;
-		virtual void End() override;
-		virtual void Tick() override;
+		virtual void Begin(IDeviceRegistry& deviceRegistry) override;
+		virtual void End(IDeviceRegistry& deviceRegistry) override;
+		virtual void Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry) override;
 
 		KeyboardProvider& operator =(const KeyboardProvider&) = delete;
 		KeyboardProvider& operator =(KeyboardProvider&&) = delete;
@@ -69,9 +69,17 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		void Unsubscribe() noexcept;
 
 		/// @brief Unregisters all the devices.
-		void UnregisterDevices();
+		/// @param deviceRegistry Device registry.
+		void UnregisterDevices(IDeviceRegistry& deviceRegistry);
 		/// @brief Clears all the data.
 		void Clear() noexcept;
+
+		/// @brief Register devices that are not registered yet.
+		/// @param deviceRegistry Device registry.
+		void RegisterDevices(IDeviceRegistry& deviceRegistry);
+		/// @brief Updates input.
+		/// @param inputRegistry Input registry.
+		void UpdateInput(IInputRegistry& inputRegistry);
 
 		/// @brief Gets or creates a keyboard.
 		/// @param keyboardHandle Keyboard native handle.
@@ -90,6 +98,7 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		DeviceTypeID deviceType; ///< Keyboard device type.
 		KeyboardAxisMap axisMap; ///< Axis map.
 
+		std::size_t registeredDeviceCount; ///< Registered device count.
 		KeyboardContainer<HANDLE, WORD> keyboardContainer; ///< Keyboard container.
 		KeyboardEventQueue<WORD> eventQueue; ///< Keyboard event queue.
 
@@ -102,58 +111,28 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 	KeyboardProvider::KeyboardProvider(IRawInputContext& input) :
 		input{&input},
 		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
-		deviceType(this->input->Hash(DeviceType(KeyboardDevice::GenericType))),
-		axisMap(*this->input)
+		deviceType(this->input->HashDeviceType(KeyboardDevice::GenericType)),
+		axisMap(*this->input),
+		registeredDeviceCount{0uz}
 	{
 	}
 
-	void KeyboardProvider::Begin()
+	void KeyboardProvider::Begin(IDeviceRegistry& deviceRegistry)
 	{
 		Subscribe();
 	}
 
-	void KeyboardProvider::End()
+	void KeyboardProvider::End(IDeviceRegistry& deviceRegistry)
 	{
 		Unsubscribe();
-		UnregisterDevices();
+		UnregisterDevices(deviceRegistry);
 		Clear();
 	}
 
-	void KeyboardProvider::Tick()
+	void KeyboardProvider::Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry)
 	{
-		for (std::size_t i = 0uz; i < eventQueue.Size(); ++i)
-		{
-			const DeviceHandle device = eventQueue.Device(i);
-			const KeyboardEvent<WORD>& event = eventQueue.Event(i);
-
-			std::visit(Type::Overload
-			{
-				[&](const KeyboardInputEvent<WORD>& keyboardInput)
-				{
-					const AxisID axis = axisMap.Axis(keyboardInput.key);
-					const float value = keyboardInput.state;
-
-					input->AddInput(device, RawInputEvent
-					{
-						.axes = std::span<const AxisID>(&axis, 1uz),
-						.values = std::span<const float>(&value, 1uz),
-						.eventType = InputEventType::State,
-						.timePoint = event.timePoint,
-						.cursorPosition = keyboardInput.cursorPosition
-					});
-				},
-				[&](const KeyboardConnectionEvent& keyboardConnection)
-				{
-					input->Connect(device, ConnectionEvent
-					{
-						.isConnected = keyboardConnection.connected,
-						.timePoint = event.timePoint
-					});
-				}
-			}, event.event);
-		}
-
-		eventQueue.Clear();
+		RegisterDevices(deviceRegistry);
+		UpdateInput(inputRegistry);
 	}
 
 	void KeyboardProvider::Observe(const RAWINPUT& rawInput)
@@ -190,7 +169,7 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 				.event = inputEvent,
 				.timePoint = surface->LastMessageTime()
 			};
-			eventQueue.Add(keyboardContainer.DeviceHandle(index), event);
+			eventQueue.Add(index, event);
 		}
 	}
 
@@ -207,11 +186,10 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 
 			const auto connectionEvent = KeyboardConnectionEvent{.connected = isConnected};
 			const auto event = KeyboardEvent<WORD>{.event = connectionEvent, .timePoint = surface->LastMessageTime()};
-			const DeviceHandle deviceHandle = keyboardContainer.DeviceHandle(index);
-			eventQueue.Add(deviceHandle, event);
+			eventQueue.Add(index, event);
 
-			PONY_LOG(input->Logger(), Log::LogType::Info, "Keyboard device connection changed to '{}'. Handle: '0x{:X}'; Native handle: '0x{:X}'.",
-				isConnected, deviceHandle.id, reinterpret_cast<std::uintptr_t>(device));
+			PONY_LOG(input->Logger(), Log::LogType::Info, "Keyboard device connection changed to '{}'. Native handle: '0x{:X}'.",
+				isConnected, reinterpret_cast<std::uintptr_t>(device));
 		};
 
 		if (isConnected)
@@ -268,7 +246,7 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 				.event = inputEvent,
 				.timePoint = eventTime
 			};
-			eventQueue.Add(keyboardContainer.DeviceHandle(keyboardIndex), event);
+			eventQueue.Add(keyboardIndex, event);
 		}
 
 		keyboardContainer.ResetKeys(keyboardIndex);
@@ -294,19 +272,73 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 		surface->RemoveObserver(*this);
 	}
 
-	void KeyboardProvider::UnregisterDevices()
+	void KeyboardProvider::UnregisterDevices(IDeviceRegistry& deviceRegistry)
 	{
-		for (std::size_t i = 0uz; i < keyboardContainer.Size(); ++i)
+		for (std::size_t i = 0uz; i < registeredDeviceCount; ++i)
 		{
 			const DeviceHandle handle = keyboardContainer.DeviceHandle(i);
 			PONY_LOG(input->Logger(), Log::LogType::Info, "Unregistering keyboard device. Handle: '0x{:X}'.", handle.id);
-			input->UnregisterDevice(handle);
+			deviceRegistry.UnregisterDevice(handle);
 		}
 	}
 
 	void KeyboardProvider::Clear() noexcept
 	{
 		keyboardContainer.Clear();
+		eventQueue.Clear();
+	}
+
+	void KeyboardProvider::RegisterDevices(IDeviceRegistry& deviceRegistry)
+	{
+		for (; registeredDeviceCount < keyboardContainer.Size(); ++registeredDeviceCount)
+		{
+			const HANDLE nativeHandle = keyboardContainer.NativeHandle(registeredDeviceCount);
+			const std::string_view name = keyboardContainer.DeviceName(registeredDeviceCount);
+			const bool isConnected = keyboardContainer.IsConnected(registeredDeviceCount);
+
+			PONY_LOG(input->Logger(), Log::LogType::Info, "Registering keyboard device... NativeHandle: '0x{:X}'; Name: '{}'.", 
+				reinterpret_cast<std::uintptr_t>(nativeHandle), name);
+			const DeviceHandle deviceHandle = keyboardContainer.DeviceHandle(registeredDeviceCount) = deviceRegistry.RegisterDevice(deviceType, name, isConnected);
+			PONY_LOG(input->Logger(), Log::LogType::Info, "Registering keyboard device done. NativeHandle: '0x{:X}'; Name: '{}'; DeviceHandle.",
+				reinterpret_cast<std::uintptr_t>(nativeHandle), name, deviceHandle.id);
+		}
+	}
+
+	void KeyboardProvider::UpdateInput(IInputRegistry& inputRegistry)
+	{
+		for (std::size_t i = 0uz; i < eventQueue.Size(); ++i)
+		{
+			const std::size_t deviceIndex = eventQueue.DeviceIndex(i);
+			const KeyboardEvent<WORD>& event = eventQueue.Event(i);
+			const DeviceHandle deviceHandle = keyboardContainer.DeviceHandle(deviceIndex);
+
+			std::visit(Type::Overload
+			{
+				[&](const KeyboardInputEvent<WORD>& keyboardInput)
+				{
+					const AxisID axis = axisMap.Axis(keyboardInput.key);
+					const float value = keyboardInput.state;
+
+					inputRegistry.AddInput(deviceHandle, RawInputEvent
+					{
+						.axes = std::span<const AxisID>(&axis, 1uz),
+						.values = std::span<const float>(&value, 1uz),
+						.eventType = InputEventType::State,
+						.timePoint = event.timePoint,
+						.cursorPosition = keyboardInput.cursorPosition
+					});
+				},
+				[&](const KeyboardConnectionEvent& keyboardConnection)
+				{
+					inputRegistry.Connect(deviceHandle, ConnectionEvent
+					{
+						.isConnected = keyboardConnection.connected,
+						.timePoint = event.timePoint
+					});
+				}
+			}, event.event);
+		}
+
 		eventQueue.Clear();
 	}
 
@@ -319,18 +351,9 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(keyboardHandle));
 		const std::string_view name = GetKeyboardName(keyboardHandle);
-		const DeviceHandle deviceHandle = input->RegisterDevice(deviceType, name, true);
-		try
-		{
-			keyboardContainer.Add(keyboardHandle, deviceHandle, name, true);
-		}
-		catch (...)
-		{
-			input->UnregisterDevice(deviceHandle);
-			throw;
-		}
-		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device done. Native handle: '0x{:X}'; Device handle: '0x{:X}'; Device name: '{}'.", 
-			reinterpret_cast<std::uintptr_t>(keyboardHandle), deviceHandle.id, name);
+		keyboardContainer.Add(keyboardHandle, DeviceHandle{}, name, true);
+		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device done. Native handle: '0x{:X}'; Device name: '{}'.", 
+			reinterpret_cast<std::uintptr_t>(keyboardHandle), name);
 
 		return keyboardContainer.Size() - 1uz;
 	}

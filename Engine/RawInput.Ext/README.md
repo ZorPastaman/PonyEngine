@@ -29,6 +29,14 @@ Interface representing the raw input service context. Provides access to the app
 
 Interface representing the raw input service module context. This interface is used by modules to add input providers. It may be accessed via module data after the raw input service module initialization.
 
+#### [IDeviceRegistry](Source/Main-IDeviceRegistry.cppm)
+
+Interface that's used to register and unregister devices.
+
+#### [IInputRegistry](Source/Main-IInputRegistry.cppm)
+
+Interface that's used to report input including connection changes.
+
 ## Custom input provider
 
 Input providers are ticked every frame, and they must update devices and input of their devices in their tick. They mustn't do it out of their ticks.
@@ -73,10 +81,8 @@ void InputProviderModule::ShutDown(Application::IModuleContext& context)
 
 How to add an input event:
 
-1. An input provider registers an input device via `IRawInputContext.RegisterDevice` and gets a `DeviceHandle` as a return value;
-2. An input provider reports an input via `IRawInputContext.AddInput(deviceHandle, inputEvent)` and `IRawInputContext.Connect(deviceHandle, connectionEvent)`.
+1. An input provider registers an input device via `IDeviceRegistry.RegisterDevice` in its `Begin()` or `Tick()` and gets a `DeviceHandle` as a return value;
+2. An input provider reports an input via `IInputRegistry.AddInput(deviceHandle, inputEvent)` and `IInputContext.Connect(deviceHandle, connectionEvent)` in its `Tick()`.
 3. An input provider unregisters all its devices before its end inclusively. 
 
 An input provider must work with the raw input service only on a main thread.
-Registering and unregistering devices is available at any time between begin and end of the input provider.
-Adding input events and connection events must be done only on the input provider tick.

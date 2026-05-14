@@ -66,14 +66,6 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept override;
 
-		[[nodiscard("Must be used to unregister")]]
-		virtual DeviceHandle RegisterDevice(DeviceTypeID deviceType, std::string_view deviceName, bool isConnected,
-			std::span<const FeatureEntry> features = std::span<const FeatureEntry>()) override;
-		virtual void UnregisterDevice(DeviceHandle deviceHandle) override;
-
-		virtual void AddInput(DeviceHandle deviceHandle, const RawInputEvent& input) override;
-		virtual void Connect(DeviceHandle deviceHandle, const ConnectionEvent& connection) override;
-
 		[[nodiscard("Pure function")]]
 		virtual float Value(AxisID axis) const noexcept override;
 		[[nodiscard("Pure function")]]
@@ -102,23 +94,75 @@ export namespace PonyEngine::RawInput
 		virtual const void* FindFeature(DeviceHandle deviceHandle, std::type_index type) const override;
 
 		[[nodiscard("Pure function")]]
-		virtual AxisID Hash(const Axis& axis) override;
+		virtual AxisID HashAxis(std::string_view axis) override;
 		[[nodiscard("Pure function")]]
-		virtual const Axis& Unhash(AxisID axisId) const override;
+		virtual std::string_view UnhashAxis(AxisID axisId) const override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(AxisID axisId) const noexcept override;
+		virtual bool IsAxisValid(AxisID axisId) const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeID Hash(const class DeviceType& deviceType) override;
+		virtual DeviceTypeID HashDeviceType(std::string_view deviceType) override;
 		[[nodiscard("Pure function")]]
-		virtual const class DeviceType& Unhash(DeviceTypeID deviceTypeId) override;
+		virtual std::string_view UnhashDeviceType(DeviceTypeID deviceTypeId) override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(DeviceTypeID deviceTypeId) const noexcept override;
+		virtual bool IsDeviceTypeValid(DeviceTypeID deviceTypeId) const noexcept override;
 
 		virtual void AddObserver(IDeviceObserver& observer) override;
 		virtual void RemoveObserver(IDeviceObserver& observer) noexcept override;
 		virtual void AddObserver(IRawInputObserver& observer) override;
 		virtual void RemoveObserver(IRawInputObserver& observer) noexcept override;
+
+		/// @brief Device registry.
+		class DeviceRegistry final : public IDeviceRegistry
+		{
+		public:
+			/// @brief Creates a device registry.
+			/// @param rawInput Raw input service.
+			[[nodiscard("Pure constructor")]]
+			explicit DeviceRegistry(RawInputService& rawInput) noexcept;
+			[[nodiscard("Pure constructor")]]
+			DeviceRegistry(const DeviceRegistry& other) noexcept = default;
+			[[nodiscard("Pure constructor")]]
+			DeviceRegistry(DeviceRegistry&& other) noexcept = default;
+
+			~DeviceRegistry() noexcept = default;
+
+			[[nodiscard("Must be used to unregister")]]
+			virtual DeviceHandle RegisterDevice(DeviceTypeID deviceType, std::string_view deviceName, bool isConnected, 
+				std::span<const FeatureEntry> features) override;
+			virtual void UnregisterDevice(DeviceHandle deviceHandle) override;
+
+			DeviceRegistry& operator =(const DeviceRegistry& other) noexcept = default;
+			DeviceRegistry& operator =(DeviceRegistry&& other) noexcept = default;
+
+		private:
+			RawInputService* rawInput; ///< Raw input service.
+		};
+
+		/// @brief Input registry.
+		class InputRegistry final : public IInputRegistry
+		{
+		public:
+			/// @brief Creates an input registry.
+			/// @param rawInput Raw input service.
+			[[nodiscard("Pure constructor")]]
+			explicit InputRegistry(RawInputService& rawInput) noexcept;
+			[[nodiscard("Pure constructor")]]
+			InputRegistry(const InputRegistry& other) noexcept = default;
+			[[nodiscard("Pure constructor")]]
+			InputRegistry(InputRegistry&& other) noexcept = default;
+
+			~InputRegistry() noexcept = default;
+
+			virtual void AddInput(DeviceHandle deviceHandle, const RawInputEvent& input) override;
+			virtual void Connect(DeviceHandle deviceHandle, const ConnectionEvent& connection) override;
+
+			InputRegistry& operator =(const InputRegistry& other) noexcept = default;
+			InputRegistry& operator =(InputRegistry&& other) noexcept = default;
+
+		private:
+			RawInputService* rawInput; ///< Raw input service.
+		};
 
 		/// @brief Begins the providers.
 		/// @param count How many providers are begun.
@@ -131,6 +175,14 @@ export namespace PonyEngine::RawInput
 		void TickProviders();
 		/// @brief Processes input queue and sends events.
 		void ProcessInputQueue();
+
+		[[nodiscard("Must be used to unregister")]]
+		DeviceHandle RegisterDevice(DeviceTypeID deviceType, std::string_view deviceName, bool isConnected,
+			std::span<const FeatureEntry> features = std::span<const FeatureEntry>());
+		void UnregisterDevice(DeviceHandle deviceHandle);
+
+		void AddInput(DeviceHandle deviceHandle, const RawInputEvent& input);
+		void Connect(DeviceHandle deviceHandle, const ConnectionEvent& connection);
 
 		/// @brief Calls connection observers.
 		/// @param device Device.
@@ -156,8 +208,8 @@ export namespace PonyEngine::RawInput
 		RawInputQueue inputQueue; ///< Input queue.
 		DeviceHandle lastInputDevice; ///< Last device that sent input.
 
-		std::unordered_map<std::uint32_t, std::vector<Axis>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
-		std::unordered_map<DeviceTypeID, class DeviceType> deviceTypeHashMap; ///< Device type hash map.
+		std::unordered_map<std::uint32_t, std::vector<std::string>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
+		std::unordered_map<DeviceTypeID, std::string> deviceTypeHashMap; ///< Device type hash map.
 
 		std::vector<IDeviceObserver*> deviceObservers; ///< Device observers.
 		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
@@ -325,100 +377,6 @@ export namespace PonyEngine::RawInput
 		return application->Logger();
 	}
 
-	DeviceHandle RawInputService::RegisterDevice(const DeviceTypeID deviceType, const std::string_view deviceName, const bool isConnected,
-		const std::span<const FeatureEntry> features)
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
-		if (!deviceTypeHashMap.contains(deviceType))
-		{
-			throw std::invalid_argument("Device type is invalid");
-		}
-#endif
-
-		if (!nextDeviceHandle.IsValid()) [[unlikely]]
-		{
-			throw std::overflow_error("No more device handles available");
-		}
-
-		const DeviceHandle currentHandle = nextDeviceHandle;
-		devices.Add(currentHandle, deviceType, deviceName, isConnected, features);
-		++nextDeviceHandle.id;
-
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Name: '{}'.", currentHandle.id, deviceName);
-
-		ObserveDeviceAdded(currentHandle);
-
-		return currentHandle;
-	}
-
-	void RawInputService::UnregisterDevice(const DeviceHandle deviceHandle)
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
-		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
-		{
-			devices.Remove(index);
-			inputQueue.Remove(deviceHandle);
-
-			if (lastInputDevice == deviceHandle)
-			{
-				lastInputDevice.id = 0u;
-			}
-
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Device unregistered. Handle: '0x{:X}'.", deviceHandle.id);
-
-			ObserveDeviceRemoved(deviceHandle);
-		}
-		else [[unlikely]]
-		{
-			throw std::invalid_argument("Device not found");
-		}
-	}
-
-	void RawInputService::AddInput(const DeviceHandle deviceHandle, const RawInputEvent& input)
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
-		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Device not found");
-		}
-#endif
-
-		inputQueue.AddInput(deviceHandle, input);
-	}
-
-	void RawInputService::Connect(const DeviceHandle deviceHandle, const ConnectionEvent& connection)
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
-		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Device not found");
-		}
-#endif
-
-		inputQueue.AddConnection(deviceHandle, connection);
-	}
-
 	float RawInputService::Value(const AxisID axis) const noexcept
 	{
 		return devices.Value(axis);
@@ -540,39 +498,39 @@ export namespace PonyEngine::RawInput
 		return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
 	}
 
-	AxisID RawInputService::Hash(const Axis& axis)
+	AxisID RawInputService::HashAxis(const std::string_view axis)
 	{
-		const std::uint32_t hash = Hash::FNV1a32(axis.Path());
+		const std::uint32_t hash = Hash::FNV1a32(axis);
 		auto axisId = AxisID{.hash = hash};
 
 		if (const auto position = axisHashMap.find(hash); position != axisHashMap.cend())
 		{
-			std::vector<Axis>& axes = position->second;
+			std::vector<std::string>& axes = position->second;
 			const auto axisPosition = std::ranges::find(axes, axis);
 			axisId.index = static_cast<std::uint32_t>(axisPosition - axes.cbegin());
 
 			if (axisPosition == axes.cend()) [[unlikely]]
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis.Path(), axisId.hash, axisId.index);
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
 				if (axes.size() >= std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 				{
 					throw std::bad_alloc();
 				}
 
-				axes.push_back(axis);
+				axes.push_back(std::string(axis));
 			}
 		}
 		else
 		{
 			axisId.index = 0u;
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis.Path(), axisId.hash, axisId.index);
-			axisHashMap[hash] = std::vector<Axis>{ axis };
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
+			axisHashMap[hash] = std::vector<std::string>{ std::string(axis) };
 		}
 
 		return axisId;
 	}
 
-	const Axis& RawInputService::Unhash(const AxisID axisId) const
+	std::string_view RawInputService::UnhashAxis(const AxisID axisId) const
 	{
 		const auto position = axisHashMap.find(axisId.hash);
 #ifndef NDEBUG
@@ -585,15 +543,15 @@ export namespace PonyEngine::RawInput
 		return position->second[axisId.index];
 	}
 
-	bool RawInputService::IsValid(const AxisID axisId) const noexcept
+	bool RawInputService::IsAxisValid(const AxisID axisId) const noexcept
 	{
 		const auto position = axisHashMap.find(axisId.hash);
 		return position != axisHashMap.cend() && axisId.index < position->second.size();
 	}
 
-	DeviceTypeID RawInputService::Hash(const class DeviceType& deviceType)
+	DeviceTypeID RawInputService::HashDeviceType(const std::string_view deviceType)
 	{
-		const auto deviceTypeId = DeviceTypeID{.hash = Hash::FNV1a64(deviceType.Type())};
+		const auto deviceTypeId = DeviceTypeID{.hash = Hash::FNV1a64(deviceType)};
 
 		if (const auto position = deviceTypeHashMap.find(deviceTypeId); position != deviceTypeHashMap.cend())
 		{
@@ -604,14 +562,14 @@ export namespace PonyEngine::RawInput
 		}
 		else
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '{}'.", deviceType.Type(), deviceTypeId.hash);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '{}'.", deviceType, deviceTypeId.hash);
 			deviceTypeHashMap[deviceTypeId] = deviceType;
 		}
 
 		return deviceTypeId;
 	}
 
-	const DeviceType& RawInputService::Unhash(const DeviceTypeID deviceTypeId)
+	std::string_view RawInputService::UnhashDeviceType(const DeviceTypeID deviceTypeId)
 	{
 		const auto position = deviceTypeHashMap.find(deviceTypeId);
 #ifndef NDEBUG
@@ -624,7 +582,7 @@ export namespace PonyEngine::RawInput
 		return position->second;
 	}
 
-	bool RawInputService::IsValid(const DeviceTypeID deviceTypeId) const noexcept
+	bool RawInputService::IsDeviceTypeValid(const DeviceTypeID deviceTypeId) const noexcept
 	{
 		return deviceTypeHashMap.contains(deviceTypeId);
 	}
@@ -663,9 +621,41 @@ export namespace PonyEngine::RawInput
 		}
 	}
 
+	RawInputService::DeviceRegistry::DeviceRegistry(RawInputService& rawInput) noexcept :
+		rawInput{&rawInput}
+	{
+	}
+
+	DeviceHandle RawInputService::DeviceRegistry::RegisterDevice(const DeviceTypeID deviceType, const std::string_view deviceName,
+		const bool isConnected, const std::span<const FeatureEntry> features)
+	{
+		return rawInput->RegisterDevice(deviceType, deviceName, isConnected, features);
+	}
+
+	void RawInputService::DeviceRegistry::UnregisterDevice(const DeviceHandle deviceHandle)
+	{
+		rawInput->UnregisterDevice(deviceHandle);
+	}
+
+	RawInputService::InputRegistry::InputRegistry(RawInputService& rawInput) noexcept :
+		rawInput{&rawInput}
+	{
+	}
+
+	void RawInputService::InputRegistry::AddInput(const DeviceHandle deviceHandle, const RawInputEvent& input)
+	{
+		rawInput->AddInput(deviceHandle, input);
+	}
+
+	void RawInputService::InputRegistry::Connect(const DeviceHandle deviceHandle, const ConnectionEvent& connection)
+	{
+		rawInput->Connect(deviceHandle, connection);
+	}
+
 	void RawInputService::Begin(std::size_t& count)
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning input providers...");
+		auto deviceRegistry = DeviceRegistry(*this);
 		for (std::size_t i = 0uz; i < providers.Size(); ++i)
 		{
 			IInputProvider& provider = providers.Provider(i);
@@ -673,7 +663,7 @@ export namespace PonyEngine::RawInput
 			try
 			{
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' input provider...", typeid(provider).name());
-				provider.Begin();
+				provider.Begin(deviceRegistry);
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning '{}' input provider done.", typeid(provider).name());
 				++count;
 			}
@@ -689,13 +679,14 @@ export namespace PonyEngine::RawInput
 	void RawInputService::End(const std::size_t count) noexcept
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending input providers...");
+		auto deviceRegistry = DeviceRegistry(*this);
 		for (std::size_t i = count; i-- > 0uz; )
 		{
 			IInputProvider& provider = providers.Provider(i);
 			try
 			{
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' input provider...", typeid(provider).name());
-				provider.End();
+				provider.End(deviceRegistry);
 				PONY_LOG(application->Logger(), Log::LogType::Info, "Ending '{}' input provider done.", typeid(provider).name());
 			}
 			catch (...)
@@ -708,13 +699,15 @@ export namespace PonyEngine::RawInput
 
 	void RawInputService::TickProviders()
 	{
+		auto deviceRegistry = DeviceRegistry(*this);
+		auto inputRegistry = InputRegistry(*this);
 		for (std::size_t i = 0uz; i < providers.Size(); ++i)
 		{
 			IInputProvider& provider = providers.Provider(i);
 			try
 			{
 				PONY_LOG(application->Logger(), Log::LogType::Verbose, "Ticking '{}' provider.", typeid(provider).name());
-				provider.Tick();
+				provider.Tick(deviceRegistry, inputRegistry);
 			}
 			catch (...)
 			{
@@ -752,6 +745,100 @@ export namespace PonyEngine::RawInput
 				}
 			}, event);
 		}
+	}
+
+	DeviceHandle RawInputService::RegisterDevice(const DeviceTypeID deviceType, const std::string_view deviceName, const bool isConnected,
+		const std::span<const FeatureEntry> features)
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
+		if (!deviceTypeHashMap.contains(deviceType))
+		{
+			throw std::invalid_argument("Device type is invalid");
+		}
+#endif
+
+		if (!nextDeviceHandle.IsValid()) [[unlikely]]
+		{
+			throw std::overflow_error("No more device handles available");
+		}
+
+		const DeviceHandle currentHandle = nextDeviceHandle;
+		devices.Add(currentHandle, deviceType, deviceName, isConnected, features);
+		++nextDeviceHandle.id;
+
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Name: '{}'.", currentHandle.id, deviceName);
+
+		ObserveDeviceAdded(currentHandle);
+
+		return currentHandle;
+	}
+
+	void RawInputService::UnregisterDevice(const DeviceHandle deviceHandle)
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
+		{
+			devices.Remove(index);
+			inputQueue.Remove(deviceHandle);
+
+			if (lastInputDevice == deviceHandle)
+			{
+				lastInputDevice.id = 0u;
+			}
+
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Device unregistered. Handle: '0x{:X}'.", deviceHandle.id);
+
+			ObserveDeviceRemoved(deviceHandle);
+		}
+		else [[unlikely]]
+		{
+			throw std::invalid_argument("Device not found");
+		}
+	}
+
+	void RawInputService::AddInput(const DeviceHandle deviceHandle, const RawInputEvent& input)
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
+		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Device not found");
+		}
+#endif
+
+		inputQueue.AddInput(deviceHandle, input);
+	}
+
+	void RawInputService::Connect(const DeviceHandle deviceHandle, const ConnectionEvent& connection)
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
+		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Device not found");
+		}
+#endif
+
+		inputQueue.AddConnection(deviceHandle, connection);
 	}
 
 	void RawInputService::ObserveConnection(const DeviceHandle device, const ConnectionEvent& connection) const noexcept
