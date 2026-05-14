@@ -169,16 +169,16 @@ namespace PonyEngine::RawInput::XInput::Windows
 	void GamepadAxisMap::Bind(const std::size_t index, const WORD nativeAxis, const std::string_view axis, IRawInputContext& input)
 	{
 		nativeAxes[index] = nativeAxis;
-		buttonAxes[index] = input.Hash(Axis(axis));
+		buttonAxes[index] = input.HashAxis(axis);
 	}
 
 	void GamepadAxisMap::Bind(const TriggerAxis trigger, const std::string_view axis, IRawInputContext& input)
 	{
-		triggerAxes[static_cast<std::size_t>(trigger)] = input.Hash(Axis(axis));
+		triggerAxes[static_cast<std::size_t>(trigger)] = input.HashAxis(axis);
 	}
 
 	void GamepadAxisMap::Bind(const StickPlacement placement, const StickDirection direction, const std::string_view axis, IRawInputContext& input)
 	{
-		stickAxes[static_cast<std::size_t>(placement)][static_cast<std::size_t>(direction)] = input.Hash(Axis(axis));
+		stickAxes[static_cast<std::size_t>(placement)][static_cast<std::size_t>(direction)] = input.HashAxis(axis);
 	}
 }

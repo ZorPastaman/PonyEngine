@@ -94,18 +94,18 @@ export namespace PonyEngine::RawInput
 		virtual const void* FindFeature(DeviceHandle deviceHandle, std::type_index type) const override;
 
 		[[nodiscard("Pure function")]]
-		virtual AxisID Hash(const Axis& axis) override;
+		virtual AxisID HashAxis(std::string_view axis) override;
 		[[nodiscard("Pure function")]]
-		virtual const Axis& Unhash(AxisID axisId) const override;
+		virtual std::string_view UnhashAxis(AxisID axisId) const override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(AxisID axisId) const noexcept override;
+		virtual bool IsAxisValid(AxisID axisId) const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeID Hash(const class DeviceType& deviceType) override;
+		virtual DeviceTypeID HashDeviceType(std::string_view deviceType) override;
 		[[nodiscard("Pure function")]]
-		virtual const class DeviceType& Unhash(DeviceTypeID deviceTypeId) override;
+		virtual std::string_view UnhashDeviceType(DeviceTypeID deviceTypeId) override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(DeviceTypeID deviceTypeId) const noexcept override;
+		virtual bool IsDeviceTypeValid(DeviceTypeID deviceTypeId) const noexcept override;
 
 		virtual void AddObserver(IDeviceObserver& observer) override;
 		virtual void RemoveObserver(IDeviceObserver& observer) noexcept override;
@@ -208,8 +208,8 @@ export namespace PonyEngine::RawInput
 		RawInputQueue inputQueue; ///< Input queue.
 		DeviceHandle lastInputDevice; ///< Last device that sent input.
 
-		std::unordered_map<std::uint32_t, std::vector<Axis>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
-		std::unordered_map<DeviceTypeID, class DeviceType> deviceTypeHashMap; ///< Device type hash map.
+		std::unordered_map<std::uint32_t, std::vector<std::string>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
+		std::unordered_map<DeviceTypeID, std::string> deviceTypeHashMap; ///< Device type hash map.
 
 		std::vector<IDeviceObserver*> deviceObservers; ///< Device observers.
 		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
@@ -498,39 +498,39 @@ export namespace PonyEngine::RawInput
 		return featureIndex < features.Size() ? features.Feature(featureIndex) : nullptr;
 	}
 
-	AxisID RawInputService::Hash(const Axis& axis)
+	AxisID RawInputService::HashAxis(const std::string_view axis)
 	{
-		const std::uint32_t hash = Hash::FNV1a32(axis.Path());
+		const std::uint32_t hash = Hash::FNV1a32(axis);
 		auto axisId = AxisID{.hash = hash};
 
 		if (const auto position = axisHashMap.find(hash); position != axisHashMap.cend())
 		{
-			std::vector<Axis>& axes = position->second;
+			std::vector<std::string>& axes = position->second;
 			const auto axisPosition = std::ranges::find(axes, axis);
 			axisId.index = static_cast<std::uint32_t>(axisPosition - axes.cbegin());
 
 			if (axisPosition == axes.cend()) [[unlikely]]
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis.Path(), axisId.hash, axisId.index);
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
 				if (axes.size() >= std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 				{
 					throw std::bad_alloc();
 				}
 
-				axes.push_back(axis);
+				axes.push_back(std::string(axis));
 			}
 		}
 		else
 		{
 			axisId.index = 0u;
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis.Path(), axisId.hash, axisId.index);
-			axisHashMap[hash] = std::vector<Axis>{ axis };
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
+			axisHashMap[hash] = std::vector<std::string>{ std::string(axis) };
 		}
 
 		return axisId;
 	}
 
-	const Axis& RawInputService::Unhash(const AxisID axisId) const
+	std::string_view RawInputService::UnhashAxis(const AxisID axisId) const
 	{
 		const auto position = axisHashMap.find(axisId.hash);
 #ifndef NDEBUG
@@ -543,15 +543,15 @@ export namespace PonyEngine::RawInput
 		return position->second[axisId.index];
 	}
 
-	bool RawInputService::IsValid(const AxisID axisId) const noexcept
+	bool RawInputService::IsAxisValid(const AxisID axisId) const noexcept
 	{
 		const auto position = axisHashMap.find(axisId.hash);
 		return position != axisHashMap.cend() && axisId.index < position->second.size();
 	}
 
-	DeviceTypeID RawInputService::Hash(const class DeviceType& deviceType)
+	DeviceTypeID RawInputService::HashDeviceType(const std::string_view deviceType)
 	{
-		const auto deviceTypeId = DeviceTypeID{.hash = Hash::FNV1a64(deviceType.Type())};
+		const auto deviceTypeId = DeviceTypeID{.hash = Hash::FNV1a64(deviceType)};
 
 		if (const auto position = deviceTypeHashMap.find(deviceTypeId); position != deviceTypeHashMap.cend())
 		{
@@ -562,14 +562,14 @@ export namespace PonyEngine::RawInput
 		}
 		else
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '{}'.", deviceType.Type(), deviceTypeId.hash);
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '{}'.", deviceType, deviceTypeId.hash);
 			deviceTypeHashMap[deviceTypeId] = deviceType;
 		}
 
 		return deviceTypeId;
 	}
 
-	const DeviceType& RawInputService::Unhash(const DeviceTypeID deviceTypeId)
+	std::string_view RawInputService::UnhashDeviceType(const DeviceTypeID deviceTypeId)
 	{
 		const auto position = deviceTypeHashMap.find(deviceTypeId);
 #ifndef NDEBUG
@@ -582,7 +582,7 @@ export namespace PonyEngine::RawInput
 		return position->second;
 	}
 
-	bool RawInputService::IsValid(const DeviceTypeID deviceTypeId) const noexcept
+	bool RawInputService::IsDeviceTypeValid(const DeviceTypeID deviceTypeId) const noexcept
 	{
 		return deviceTypeHashMap.contains(deviceTypeId);
 	}

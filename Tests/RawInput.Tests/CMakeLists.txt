@@ -3,8 +3,6 @@ add_executable(PonyEngine.RawInput.Tests)
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Tests PRIVATE
-	"RawInput/Axis.cpp"
-	"RawInput/DeviceType.cpp"
 	"RawInput/Gamepad.cpp"
 	"RawInput/Keyboard.cpp" 
 	"RawInput/Layout.cpp"

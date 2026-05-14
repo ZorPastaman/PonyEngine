@@ -15,10 +15,8 @@ export module PonyEngine.RawInput:IRawInputService;
 
 import std;
 
-import :Axis;
 import :AxisID;
 import :DeviceHandle;
-import :DeviceType;
 import :DeviceTypeID;
 import :IDeviceObserver;
 import :IRawInputObserver;
@@ -142,19 +140,19 @@ export namespace PonyEngine::RawInput
 		/// @note This function mustn't be called on different threads at the same time.
 		/// @note This function mustn't be called while @p Unhash(AxisId) or @p IsValid(AxisId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual AxisID Hash(const Axis& axis) = 0;
+		virtual AxisID HashAxis(std::string_view axis) = 0;
 		/// @brief Gets an original axis from the hash value.
 		/// @param axisId Axis hash.
 		/// @return Axis.
 		/// @note This function mustn't be called while @p Hash(AxisId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual const Axis& Unhash(AxisID axisId) const = 0;
+		virtual std::string_view UnhashAxis(AxisID axisId) const = 0;
 		/// @brief Checks if the @p axisId is valid.
 		/// @param axisId Axis id.
 		/// @return @a true if it's valid; @a false otherwise.
 		/// @note This function mustn't be called while @p Hash(AxisId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(AxisID axisId) const noexcept = 0;
+		virtual bool IsAxisValid(AxisID axisId) const noexcept = 0;
 		/// @brief Calculates a hash for the @p deviceType.
 		/// @param deviceType Device type.
 		/// @return Device type hash.
@@ -162,19 +160,19 @@ export namespace PonyEngine::RawInput
 		/// @note This function mustn't be called on different threads at the same time.
 		/// @note This function mustn't be called while @p Unhash(DeviceTypeId) or @p IsValid(DeviceTypeId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual DeviceTypeID Hash(const class DeviceType& deviceType) = 0;
+		virtual DeviceTypeID HashDeviceType(std::string_view deviceType) = 0;
 		/// @brief Gets an original device type from the hash value.
 		/// @param deviceTypeId Device type hash.
 		/// @return Device type.
 		/// This function mustn't be called while @p Hash(DeviceTypeId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual const class DeviceType& Unhash(DeviceTypeID deviceTypeId) = 0;
+		virtual std::string_view UnhashDeviceType(DeviceTypeID deviceTypeId) = 0;
 		/// @brief Checks if the @p deviceTypeId is valid.
 		/// @param deviceTypeId Device type id.
 		/// @return @a true if it's valid; @a false otherwise.
 		/// This function mustn't be called while @p Hash(DeviceTypeId) is executing.
 		[[nodiscard("Pure function")]]
-		virtual bool IsValid(DeviceTypeID deviceTypeId) const noexcept = 0;
+		virtual bool IsDeviceTypeValid(DeviceTypeID deviceTypeId) const noexcept = 0;
 
 		/// @brief Adds the global device observer.
 		/// @param observer Device observer.

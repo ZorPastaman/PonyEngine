@@ -121,7 +121,7 @@ namespace PonyEngine::RawInput::Mouse::Windows
 	MouseProvider::MouseProvider(IRawInputContext& input) :
 		input{&input},
 		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
-		deviceType(this->input->Hash(DeviceType(MouseDevice::GenericType))),
+		deviceType(this->input->HashDeviceType(MouseDevice::GenericType)),
 		axisMap(*this->input),
 		registeredDeviceCount{0uz}
 	{

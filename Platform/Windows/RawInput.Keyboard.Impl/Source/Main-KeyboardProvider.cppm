@@ -111,7 +111,7 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 	KeyboardProvider::KeyboardProvider(IRawInputContext& input) :
 		input{&input},
 		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
-		deviceType(this->input->Hash(DeviceType(KeyboardDevice::GenericType))),
+		deviceType(this->input->HashDeviceType(KeyboardDevice::GenericType)),
 		axisMap(*this->input),
 		registeredDeviceCount{0uz}
 	{

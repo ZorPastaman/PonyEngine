@@ -23,13 +23,9 @@ Main sub-modules:
 
 Raw input service public interface.
 
-#### [Axis](Source/Main-Axis.cppm)
-
-Input axis. It's a special string wrapper.
-
 #### [AxisID](Source/Main-AxisID.cppm)
 
-Input axis ID. It's a hash value of the [Axis](Source/Main-Axis.cppm). The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
+Input axis ID. It's a hash value of a axis string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Axes](#axes) for details details.
 
@@ -37,13 +33,9 @@ See [Axes](#axes) for details details.
 
 Device handle. It's an integer, and it's a special handle that is used to access an input device.
 
-#### [DeviceType](Source/Main-DeviceType.cppm)
-
-Device type. It's a special string wrapper.
-
 #### [DeviceTypeID](Source/Main-DeviceTypeID.cppm)
 
-Device type ID. It's a hash value of the [DeviceType](Source/Main-DeviceType.cppm). The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
+Device type ID. It's a hash value of a device type string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Devices](#devices) for details details.
 
@@ -63,8 +55,7 @@ Device feature interface for vibration control.
 
 ## Axes
 
-Axes are represented as string paths in the form `<something>/<something>/<something>`. The first segment defines a layout, while the following segments represent subtypes.
-To make them easier to work with, the engine provides a wrapper class, [Axis](Source/Main-Axis.cppm).
+Axes are represented as strings. That allows to add as many axes at runtime as possible.
 However, working directly with strings is inefficient, so axes are hashed internally. The [AxisID](Source/Main-AxisID.cppm) wrapper simplifies working with these hash values.
 The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing axes, retrieving original strings from hash values, and validating those hashes. It also provides additional utility functions for working with axes.
 
@@ -72,9 +63,8 @@ Example of usage:
 
 ```
 PonyEngine::RawInput::IRawInputService* rawInputService = GetRawInputService();
-PonyEngine::RawInput::Axis axis = PonyEngine::RawInput::Axis("Gamepad/D-Pad/Up");
-PonyEngine::RawInput::AxisID axisId = rawInputService->Hash(axis);
-std::string axisOriginName = rawInputService->Unhash(axisId);
+PonyEngine::RawInput::AxisID axisId = rawInputService->HashAxis("Gamepad/D-Pad/Up");
+std::string_view axisOriginName = rawInputService->UnhashAxis(axisId);
 float value = rawInputService->Value(axisId);
 ```
 
@@ -85,8 +75,7 @@ The raw input service provides info about devices via different functions.
 
 The devices may be enumerated via these functions: `IRawInputService.DeviceCount()` and `IRawInputService.Device(deviceIndex)`.
 
-The devices have types that are represented as string paths in the form `<something>/<something>/<something>`. The first segment defines a base type, while the following segments represent subtypes.
-To make them easier to work with, the engine provides a wrapper class, [DeviceType](Source/Main-DeviceType.cppm).
+The devices have types that are represented as strings. That allows to add as many device types at runtime as possible.
 However, working directly with strings is inefficient, so device types are hashed internally. The [DeviceTypeID](Source/Main-DeviceTypeID.cppm) wrapper simplifies working with these hash values.
 The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing device types, retrieving original strings from hash values, and validating those hashes.
 

@@ -83,14 +83,14 @@ namespace PonyEngine::RawInput::Mouse
 		};
 		for (std::size_t i = 0uz; i < buttonAxes.size(); ++i)
 		{
-			buttonAxes[i] = input.Hash(RawInput::Axis(buttonPaths[i]));
+			buttonAxes[i] = input.HashAxis(buttonPaths[i]);
 		}
 
-		wheelAxes[static_cast<std::size_t>(MouseWheel::Horizontal)] = input.Hash(RawInput::Axis(MouseLayout::WheelHorizontalPath));
-		wheelAxes[static_cast<std::size_t>(MouseWheel::Vertical)] = input.Hash(RawInput::Axis(MouseLayout::WheelVerticalPath));
+		wheelAxes[static_cast<std::size_t>(MouseWheel::Horizontal)] = input.HashAxis(MouseLayout::WheelHorizontalPath);
+		wheelAxes[static_cast<std::size_t>(MouseWheel::Vertical)] = input.HashAxis(MouseLayout::WheelVerticalPath);
 
-		pointerAxes[static_cast<std::size_t>(MousePointer::X)] = input.Hash(RawInput::Axis(MouseLayout::AxisXPath));
-		pointerAxes[static_cast<std::size_t>(MousePointer::Y)] = input.Hash(RawInput::Axis(MouseLayout::AxisYPath));
+		pointerAxes[static_cast<std::size_t>(MousePointer::X)] = input.HashAxis(MouseLayout::AxisXPath);
+		pointerAxes[static_cast<std::size_t>(MousePointer::Y)] = input.HashAxis(MouseLayout::AxisYPath);
 	}
 
 	AxisID MouseAxisMap::Axis(const MouseButton button) const noexcept

@@ -230,7 +230,7 @@ namespace PonyEngine::RawInput::XInput::Windows
 
 	void XInputProvider::CreateDevices(DWORD& count, IDeviceRegistry& deviceRegistry)
 	{
-		const DeviceTypeID type = input->Hash(DeviceType(GamepadDevice::XboxType));
+		const DeviceTypeID type = input->HashDeviceType(GamepadDevice::XboxType);
 
 		for (DWORD i = 0; i < XUSER_MAX_COUNT; i++)
 		{
