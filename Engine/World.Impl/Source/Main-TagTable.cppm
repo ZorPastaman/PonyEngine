@@ -38,7 +38,7 @@ export namespace PonyEngine::World
 		bool IsValid(std::size_t index, EntityID entity) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		EntityID GetEntity(std::size_t index) const noexcept;
+		EntityID Entity(std::size_t index) const noexcept;
 
 		void Reserve(std::size_t addSize);
 		void Insert(std::size_t index, EntityID entity);
@@ -70,7 +70,7 @@ namespace PonyEngine::World
 		return index < entities.size() && entities[index] == entity;
 	}
 
-	EntityID TagTable::GetEntity(const std::size_t index) const noexcept
+	EntityID TagTable::Entity(const std::size_t index) const noexcept
 	{
 		return entities[index];
 	}

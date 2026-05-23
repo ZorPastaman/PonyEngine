@@ -75,13 +75,25 @@ export namespace PonyEngine::World
 		virtual bool HasTags(std::span<const Entity> entities, std::type_index tagType) const override;
 		virtual void HasTags(std::span<const Entity> entities, std::type_index tagType, std::span<bool> has) const override;
 
+		[[nodiscard("Pure function")]] 
+		virtual std::size_t CountComponents(std::type_index componentType) const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::size_t CountTags(std::type_index tagType) const override;
+
 		virtual void DropComponents(std::type_index componentType) override;
 		virtual void DropTags(std::type_index tagType) override;
+
+		[[nodiscard("Pure function")]] 
+		virtual std::size_t CountQuery(const QueryParams& params) const override;
+		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const override;
 
 		World& operator =(const World&) = delete;
 		World& operator =(World&&) = delete;
 
 	private:
+		[[nodiscard("Pure function")]]
+		static Memory::Arena& Arena();
+
 		[[nodiscard("Pure function")]]
 		bool IsValid(std::size_t entityIndex, Entity entity) const noexcept;
 		[[nodiscard("Pure function")]]
@@ -118,6 +130,33 @@ export namespace PonyEngine::World
 		void RemoveTags(Entity entity) noexcept;
 		void RemoveTags(std::span<const Entity> entities, std::span<std::size_t> tableIndices) noexcept;
 
+		[[nodiscard("Pure function")]]
+		bool GetRequiredComponentTables(std::span<const ComponentTable*> tables, std::span<const std::type_index> types) const;
+		[[nodiscard("Pure function")]]
+		bool GetRequiredTagTables(std::span<const TagTable*> tables, std::span<const std::type_index> types) const;
+		[[nodiscard("Pure function")]]
+		std::size_t GetExcludedComponentTables(std::span<const ComponentTable*> tables, std::span<const std::type_index> types) const;
+		[[nodiscard("Pure function")]]
+		std::size_t GetExcludedTagTables(std::span<const TagTable*> tables, std::span<const std::type_index> types) const;
+		[[nodiscard("Pure function")]]
+		std::size_t GetOptionalComponentTables(std::span<const ComponentTable*> tables, std::span<std::size_t> optionalOffsets, std::span<const std::type_index> types) const;
+		[[nodiscard("Pure function")]]
+		bool HasReachedEnd(std::span<const ComponentTable* const> componentTables, std::span<const TagTable* const> tagTables,
+			std::span<const std::size_t> componentIndices, std::span<const std::size_t> tagIndices, std::size_t entityIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		static EntityID GetMaxEntity(EntityID startEntity, std::span<const ComponentTable* const> componentTables, std::span<const std::size_t> componentIndices) noexcept;
+		[[nodiscard("Pure function")]]
+		static EntityID GetMaxEntity(EntityID startEntity, std::span<const TagTable* const> tagTables, std::span<const std::size_t> tagIndices) noexcept;
+		[[nodiscard("Pure function")]]
+		static bool FindEntity(EntityID entity, std::span<const ComponentTable* const> componentTables, std::span<std::size_t> componentIndices, bool excluded) noexcept;
+		[[nodiscard("Pure function")]]
+		static bool FindEntity(EntityID entity, std::span<const TagTable* const> tagTables, std::span<std::size_t> tagIndices, bool excluded) noexcept;
+		static void FillRequiredComponents(std::span<const ComponentTable* const> componentTables, std::span<const std::size_t> componentIndices, 
+			std::span<void*> components) noexcept;
+		static void FillOptionalComponents(EntityID entity, std::span<const ComponentTable* const> componentTables, std::span<std::size_t> componentIndices,
+			std::span<void*> components, std::size_t count, std::size_t baseOffset, std::span<const std::size_t> offsets) noexcept;
+		static void Increment(std::span<std::size_t> indices) noexcept;
+
 		void CheckIfValid(Entity entity) const;
 		void CheckIfValid(std::size_t entityIndex, Entity entity) const;
 		static void CheckIfSorted(std::span<const Entity> entities);
@@ -135,8 +174,6 @@ export namespace PonyEngine::World
 		std::vector<Entity> aliveEntities;
 		std::stack<Entity> deadEntities;
 
-		Memory::Arena arena;
-
 		EntityID nextEntityId;
 	};
 }
@@ -146,7 +183,6 @@ namespace PonyEngine::World
 	World::World(Application::IApplicationContext& application, const TypeRegistry& typeRegistry) noexcept :
 		application{&application},
 		typeRegistry{&typeRegistry},
-		arena(512uz),
 		nextEntityId{1u}
 	{
 	}
@@ -245,6 +281,7 @@ namespace PonyEngine::World
 	{
 		CheckIfSorted(entities);
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 
 		const Memory::Arena::Slice<std::size_t> entityIndicesSlice = arena.Allocate<std::size_t>(entities.size());
@@ -300,6 +337,7 @@ namespace PonyEngine::World
 		}
 #endif
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 
 		const Memory::Arena::Slice<std::size_t> tableIndicesSlice = arena.Allocate<std::size_t>(entities.size());
@@ -329,6 +367,7 @@ namespace PonyEngine::World
 		}
 #endif
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 
 		const Memory::Arena::Slice<std::size_t> tableIndicesSlice = arena.Allocate<std::size_t>(entities.size());
@@ -363,6 +402,7 @@ namespace PonyEngine::World
 
 		if (const auto position = componentTableIndices.find(componentType); position != componentTableIndices.cend()) [[likely]]
 		{
+			Memory::Arena& arena = Arena();
 			arena.Free();
 
 			const Memory::Arena::Slice<std::size_t> tableIndicesSlice = arena.Allocate<std::size_t>(entities.size());
@@ -385,6 +425,7 @@ namespace PonyEngine::World
 
 	void World::AddTags(const std::span<const Entity> entities, const std::type_index tagType)
 	{
+		Memory::Arena& arena = Arena();
 		arena.Free();
 
 		const Memory::Arena::Slice<std::size_t> tableIndicesSlice = arena.Allocate<std::size_t>(entities.size());
@@ -419,6 +460,7 @@ namespace PonyEngine::World
 
 		if (const auto position = tagTableIndices.find(tagType); position != tagTableIndices.cend()) [[likely]]
 		{
+			Memory::Arena& arena = Arena();
 			arena.Free();
 
 			const Memory::Arena::Slice<std::size_t> tableIndicesSlice = arena.Allocate<std::size_t>(entities.size());
@@ -596,6 +638,38 @@ namespace PonyEngine::World
 #endif
 	}
 
+	std::size_t World::CountComponents(const std::type_index componentType) const
+	{
+		if (const auto position = componentTableIndices.find(componentType); position != componentTableIndices.cend()) [[likely]]
+		{
+			return componentTables[position->second].Size();
+		}
+#ifndef NDEBUG
+		if (!typeRegistry->IsValidComponent(componentType)) [[unlikely]]
+		{
+			throw std::invalid_argument("Component type is not registered");
+		}
+#endif
+
+		return 0uz;
+	}
+
+	std::size_t World::CountTags(const std::type_index tagType) const
+	{
+		if (const auto position = tagTableIndices.find(tagType); position != tagTableIndices.cend()) [[likely]]
+		{
+			return tagTables[position->second].Size();
+		}
+#ifndef NDEBUG
+		if (!typeRegistry->IsValidTag(tagType)) [[unlikely]]
+		{
+			throw std::invalid_argument("Tag type is not registered");
+		}
+#endif
+
+		return 0uz;
+	}
+
 	void World::DropComponents(const std::type_index componentType)
 	{
 		if (const auto position = componentTableIndices.find(componentType); position != componentTableIndices.cend()) [[likely]]
@@ -622,6 +696,107 @@ namespace PonyEngine::World
 			throw std::invalid_argument("Tag type is not registered");
 		}
 #endif
+	}
+
+	std::size_t World::CountQuery(const QueryParams& params) const
+	{
+		std::size_t count = aliveEntities.size();
+		for (const std::type_index componentType : params.requiredComponentTypes)
+		{
+			count = std::min(count, CountComponents(componentType));
+		}
+		for (const std::type_index tagType : params.requiredTagTypes)
+		{
+			count = std::min(count, CountTags(tagType));
+		}
+
+		return count;
+	}
+
+	void World::Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const
+	{
+		Memory::Arena& arena = Arena();
+		arena.Free();
+
+		const Memory::Arena::Slice<const ComponentTable*> requiredComponentTablesSlice = arena.Allocate<const ComponentTable*>(params.requiredComponentTypes.size());
+		const Memory::Arena::Slice<const TagTable*> requiredTagTablesSlice = arena.Allocate<const TagTable*>(params.requiredTagTypes.size());
+		const Memory::Arena::Slice<const ComponentTable*> excludedComponentTablesSlice = arena.Allocate<const ComponentTable*>(params.excludedComponentTypes.size());
+		const Memory::Arena::Slice<const TagTable*> excludedTagTablesSlice = arena.Allocate<const TagTable*>(params.excludedTagTypes.size());
+		const Memory::Arena::Slice<const ComponentTable*> optionalComponentTablesSlice = arena.Allocate<const ComponentTable*>(params.optionalComponentTypes.size());
+		const Memory::Arena::Slice<std::size_t> requiredComponentIndicesSlice = arena.Allocate<std::size_t>(params.requiredComponentTypes.size());
+		const Memory::Arena::Slice<std::size_t> requiredTagIndicesSlice = arena.Allocate<std::size_t>(params.requiredTagTypes.size());
+		const Memory::Arena::Slice<std::size_t> excludedComponentIndicesSlice = arena.Allocate<std::size_t>(params.excludedComponentTypes.size());
+		const Memory::Arena::Slice<std::size_t> excludedTagIndicesSlice = arena.Allocate<std::size_t>(params.excludedTagTypes.size());
+		const Memory::Arena::Slice<std::size_t> optionalComponentIndicesSlice = arena.Allocate<std::size_t>(params.optionalComponentTypes.size());
+		const Memory::Arena::Slice<std::size_t> optionalOffsetsSlice = arena.Allocate<std::size_t>(params.optionalComponentTypes.size());
+		const Memory::Arena::Slice<void*> componentsSlice = arena.Allocate<void*>(params.requiredComponentTypes.size() + params.optionalComponentTypes.size());
+		const std::span<const ComponentTable*> requiredComponentTables = arena.Span(requiredComponentTablesSlice);
+		const std::span<const TagTable*> requiredTagTables = arena.Span(requiredTagTablesSlice);
+		const std::span<const ComponentTable*> excludedComponentTables = arena.Span(excludedComponentTablesSlice);
+		const std::span<const TagTable*> excludedTagTables = arena.Span(excludedTagTablesSlice);
+		const std::span<const ComponentTable*> optionalComponentTables = arena.Span(optionalComponentTablesSlice);
+		const std::span<std::size_t> requiredComponentIndices = arena.Span(requiredComponentIndicesSlice);
+		const std::span<std::size_t> requiredTagIndices = arena.Span(requiredTagIndicesSlice);
+		const std::span<std::size_t> excludedComponentIndices = arena.Span(excludedComponentIndicesSlice);
+		const std::span<std::size_t> excludedTagIndices = arena.Span(excludedTagIndicesSlice);
+		const std::span<std::size_t> optionalComponentIndices = arena.Span(optionalComponentIndicesSlice);
+		const std::span<std::size_t> optionalOffsets = arena.Span(optionalOffsetsSlice);
+		const std::span<void*> components = arena.Span(componentsSlice);
+
+		if (!GetRequiredComponentTables(requiredComponentTables, params.requiredComponentTypes) ||
+			!GetRequiredTagTables(requiredTagTables, params.requiredTagTypes))
+		{
+			return;
+		}
+
+		const std::size_t excludedComponentTableCount = GetExcludedComponentTables(excludedComponentTables, params.excludedComponentTypes);
+		const std::size_t excludedTagTableCount = GetExcludedTagTables(excludedTagTables, params.excludedTagTypes);
+		const std::size_t optionalComponentTableCount = GetOptionalComponentTables(optionalComponentTables, optionalOffsets, params.optionalComponentTypes);
+
+		std::ranges::fill(requiredComponentIndices, 0uz);
+		std::ranges::fill(requiredTagIndices, 0uz);
+		std::ranges::fill_n(excludedComponentIndices.begin(), excludedComponentTableCount, 0uz);
+		std::ranges::fill_n(excludedTagIndices.begin(), excludedTagTableCount, 0uz);
+		std::ranges::fill_n(optionalComponentIndices.begin(), optionalComponentTableCount, 0uz);
+		std::ranges::fill(components, nullptr);
+		std::size_t entityIndex = 0uz;
+
+		while (!HasReachedEnd(requiredComponentTables, requiredTagTables, requiredComponentIndices, requiredTagIndices, entityIndex))
+		{
+			EntityID entityId = aliveEntities[entityIndex].id;
+			entityId = GetMaxEntity(entityId, requiredComponentTables, requiredComponentIndices);
+			entityId = GetMaxEntity(entityId, requiredTagTables, requiredTagIndices);
+
+			if (FindEntity(entityId, requiredComponentTables, requiredComponentIndices, false) &&
+				FindEntity(entityId, requiredTagTables, requiredTagIndices, false) &&
+				!FindEntity(entityId, excludedComponentTables, excludedComponentIndices, true) &&
+				!FindEntity(entityId, excludedTagTables, excludedTagIndices, true))
+			{
+				FillRequiredComponents(requiredComponentTables, requiredComponentIndices, components);
+				FillOptionalComponents(entityId, optionalComponentTables, optionalComponentIndices, components, 
+					optionalComponentTableCount, requiredComponentTables.size(), optionalOffsets);
+
+				entityIndex = FindEntityIndex(entityId, entityIndex);
+				const Entity entity = aliveEntities[entityIndex];
+
+				auto queryItem = QueryItem{.components = components, .entity = entity, .terminate = false};
+				callback(queryItem);
+				if (queryItem.terminate) [[unlikely]]
+				{
+					break;
+				}
+			}
+
+			Increment(requiredComponentIndices);
+			Increment(requiredTagIndices);
+			++entityIndex;
+		}
+	}
+
+	Memory::Arena& World::Arena()
+	{
+		thread_local auto arena = Memory::Arena(0uz, 512uz);
+		return arena;
 	}
 
 	bool World::IsValid(const std::size_t entityIndex, const Entity entity) const noexcept
@@ -742,7 +917,7 @@ namespace PonyEngine::World
 			table.Insert(tableIndex, entity.id);
 		}
 
-		return std::pair(table.GetComponent(tableIndex), table.ComponentSize());
+		return std::pair(table.Component(tableIndex), table.ComponentSize());
 	}
 
 	std::size_t World::GetOrCreateComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::size_t> tableIndices,
@@ -774,7 +949,7 @@ namespace PonyEngine::World
 
 		for (std::size_t i = 0uz; i < tableIndices.size(); ++i)
 		{
-			componentPointers[i] = table.GetComponent(tableIndices[i]);
+			componentPointers[i] = table.Component(tableIndices[i]);
 		}
 
 		return table.ComponentSize();
@@ -922,6 +1097,233 @@ namespace PonyEngine::World
 		for (TagTable& table : tagTables)
 		{
 			RemoveTags(table, entities, tableIndices);
+		}
+	}
+
+	bool World::GetRequiredComponentTables(const std::span<const ComponentTable*> tables, const std::span<const std::type_index> types) const
+	{
+		for (std::size_t i = 0uz; i < tables.size(); ++i)
+		{
+			const std::type_index componentType = types[i];
+
+			if (const auto position = componentTableIndices.find(componentType); position != componentTableIndices.cend()) [[likely]]
+			{
+				tables[i] = &componentTables[position->second];
+			}
+#ifndef NDEBUG
+			else if (!typeRegistry->IsValidComponent(componentType)) [[unlikely]]
+			{
+				throw std::invalid_argument("Component type is not registered");
+			}
+#endif
+			else [[unlikely]]
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool World::GetRequiredTagTables(const std::span<const TagTable*> tables, const std::span<const std::type_index> types) const
+	{
+		for (std::size_t i = 0uz; i < tables.size(); ++i)
+		{
+			const std::type_index tagType = types[i];
+
+			if (const auto position = tagTableIndices.find(tagType); position != tagTableIndices.cend()) [[likely]]
+			{
+				tables[i] = &tagTables[position->second];
+			}
+#ifndef NDEBUG
+			else if (!typeRegistry->IsValidTag(tagType)) [[unlikely]]
+			{
+				throw std::invalid_argument("Tag type is not registered");
+			}
+#endif
+			else [[unlikely]]
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	std::size_t World::GetExcludedComponentTables(const std::span<const ComponentTable*> tables, const std::span<const std::type_index> types) const
+	{
+		std::size_t tableCount = 0uz;
+
+		for (const std::type_index componentType : types)
+		{
+			const auto position = componentTableIndices.find(componentType);
+			const bool isValid = position != componentTableIndices.cend();
+			tables[tableCount] = isValid ? &componentTables[position->second] : nullptr;
+			tableCount += isValid;
+
+#ifndef NDEBUG
+			if (!isValid && !typeRegistry->IsValidComponent(componentType)) [[unlikely]]
+			{
+				throw std::invalid_argument("Component type is not registered");
+			}
+#endif
+		}
+
+		return tableCount;
+	}
+
+	std::size_t World::GetExcludedTagTables(const std::span<const TagTable*> tables, const std::span<const std::type_index> types) const
+	{
+		std::size_t tableCount = 0uz;
+
+		for (const std::type_index tagType : types)
+		{
+			const auto position = tagTableIndices.find(tagType);
+			const bool isValid = position != tagTableIndices.cend();
+			tables[tableCount] = isValid ? &tagTables[position->second] : nullptr;
+			tableCount += isValid;
+
+#ifndef NDEBUG
+			if (!isValid && !typeRegistry->IsValidTag(tagType)) [[unlikely]]
+			{
+				throw std::invalid_argument("Tag type is not registered");
+			}
+#endif
+		}
+
+		return tableCount;
+	}
+
+	std::size_t World::GetOptionalComponentTables(const std::span<const ComponentTable*> tables, const std::span<std::size_t> optionalOffsets, 
+		const std::span<const std::type_index> types) const
+	{
+		std::size_t tableCount = 0uz;
+
+		for (std::size_t i = 0uz; i < tables.size(); ++i)
+		{
+			const std::type_index componentType = types[i];
+
+			const auto position = componentTableIndices.find(componentType);
+			const bool isValid = position != componentTableIndices.cend();
+			tables[tableCount] = isValid ? &componentTables[position->second] : nullptr;
+			optionalOffsets[tableCount] = i;
+			tableCount += isValid;
+
+#ifndef NDEBUG
+			if (!isValid && !typeRegistry->IsValidComponent(componentType)) [[unlikely]]
+			{
+				throw std::invalid_argument("Component type is not registered");
+			}
+#endif
+		}
+
+		return tableCount;
+	}
+
+	bool World::HasReachedEnd(const std::span<const ComponentTable* const> componentTables, const std::span<const TagTable* const> tagTables, 
+		const std::span<const std::size_t> componentIndices, const std::span<const std::size_t> tagIndices, const std::size_t entityIndex) const noexcept
+	{
+		for (std::size_t i = 0uz; i < componentTables.size(); ++i)
+		{
+			if (componentIndices[i] >= componentTables[i]->Size())
+			{
+				return true;
+			}
+		}
+
+		for (std::size_t i = 0uz; i < tagTables.size(); ++i)
+		{
+			if (tagIndices[i] >= tagTables[i]->Size())
+			{
+				return true;
+			}
+		}
+
+		return entityIndex >= aliveEntities.size();
+	}
+
+	EntityID World::GetMaxEntity(const EntityID startEntity, const std::span<const ComponentTable* const> componentTables, 
+		const std::span<const std::size_t> componentIndices) noexcept
+	{
+		EntityID entity = startEntity;
+		for (std::size_t i = 0uz; i < componentTables.size(); ++i)
+		{
+			entity = std::max(entity, componentTables[i]->Entity(componentIndices[i]));
+		}
+
+		return entity;
+	}
+
+	EntityID World::GetMaxEntity(const EntityID startEntity, const std::span<const TagTable* const> tagTables,
+		const std::span<const std::size_t> tagIndices) noexcept
+	{
+		EntityID entity = startEntity;
+		for (std::size_t i = 0uz; i < tagTables.size(); ++i)
+		{
+			entity = std::max(entity, tagTables[i]->Entity(tagIndices[i]));
+		}
+
+		return entity;
+	}
+
+	bool World::FindEntity(const EntityID entity, const std::span<const ComponentTable* const> componentTables,
+		const std::span<std::size_t> componentIndices, const bool excluded) noexcept
+	{
+		bool found = !excluded;
+		for (std::size_t i = 0uz; i < componentTables.size() && found ^ excluded; ++i)
+		{
+			std::size_t& index = componentIndices[i];
+			const ComponentTable* const table = componentTables[i];
+			index = table->Find(entity, index);
+			found = table->IsValid(index, entity);
+		}
+
+		return found;
+	}
+
+	bool World::FindEntity(const EntityID entity, const std::span<const TagTable* const> tagTables,
+		const std::span<std::size_t> tagIndices, const bool excluded) noexcept
+	{
+		bool found = !excluded;
+		for (std::size_t i = 0uz; i < tagTables.size() && found ^ excluded; ++i)
+		{
+			std::size_t& index = tagIndices[i];
+			const TagTable* const table = tagTables[i];
+			index = table->Find(entity, index);
+			found = table->IsValid(index, entity);
+		}
+
+		return found;
+	}
+
+	void World::FillRequiredComponents(const std::span<const ComponentTable* const> componentTables, const std::span<const std::size_t> componentIndices, 
+		const std::span<void*> components) noexcept
+	{
+		for (std::size_t i = 0uz; i < componentTables.size(); ++i)
+		{
+			components[i] = componentTables[i]->Component(componentIndices[i]);
+		}
+	}
+
+	void World::FillOptionalComponents(const EntityID entity, const std::span<const ComponentTable* const> componentTables,
+		const std::span<std::size_t> componentIndices, const std::span<void*> components, const std::size_t count, 
+		const std::size_t baseOffset, const std::span<const std::size_t> offsets) noexcept
+	{
+		for (std::size_t i = 0uz; i < count; ++i)
+		{
+			std::size_t& index = componentIndices[i];
+			const ComponentTable* const table = componentTables[i];
+			index = table->Find(entity, index);
+			const bool isValid = table->IsValid(index, entity);
+			components[baseOffset + offsets[i]] = isValid ? table->Component(index) : nullptr;
+		}
+	}
+
+	void World::Increment(const std::span<std::size_t> indices) noexcept
+	{
+		for (std::size_t& index : indices)
+		{
+			++index;
 		}
 	}
 

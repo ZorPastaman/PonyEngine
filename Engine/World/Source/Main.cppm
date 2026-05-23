@@ -13,3 +13,4 @@ export import :Component;
 export import :Entity;
 export import :IWorld;
 export import :IWorldService;
+export import :QueryParams;

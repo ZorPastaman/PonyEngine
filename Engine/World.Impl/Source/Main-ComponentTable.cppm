@@ -43,9 +43,9 @@ export namespace PonyEngine::World
 		bool IsValid(std::size_t index, EntityID entity) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		EntityID GetEntity(std::size_t index) const noexcept;
+		EntityID Entity(std::size_t index) const noexcept;
 		[[nodiscard("Pure function")]]
-		void* GetComponent(std::size_t index) const noexcept;
+		void* Component(std::size_t index) const noexcept;
 
 		void Reserve(std::size_t addSize);
 		void Insert(std::size_t index, EntityID entity);
@@ -108,13 +108,13 @@ namespace PonyEngine::World
 		return index < size && entities[index] == entity;
 	}
 
-	EntityID ComponentTable::GetEntity(const std::size_t index) const noexcept
+	EntityID ComponentTable::Entity(const std::size_t index) const noexcept
 	{
 		assert(index < size && "Out of range.");
 		return entities[index];
 	}
 
-	void* ComponentTable::GetComponent(const std::size_t index) const noexcept
+	void* ComponentTable::Component(const std::size_t index) const noexcept
 	{
 		assert(index < size && "Out of range.");
 		return &components[index * componentSize];

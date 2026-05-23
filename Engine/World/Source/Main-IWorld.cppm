@@ -17,6 +17,7 @@ import std;
 
 import :Component;
 import :Entity;
+import :QueryParams;
 
 export namespace PonyEngine::World
 {
@@ -95,6 +96,16 @@ export namespace PonyEngine::World
 		void HasTags(std::span<const Entity> entities, std::span<bool> has) const;
 		virtual void HasTags(std::span<const Entity> entities, std::type_index tagType, std::span<bool> has) const = 0;
 
+		template<Component T> [[nodiscard("Pure function")]]
+		std::size_t CountComponents() const;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t CountComponents(std::type_index componentType) const = 0;
+
+		template<Tag T> [[nodiscard("Pure function")]]
+		std::size_t CountTags() const;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t CountTags(std::type_index tagType) const = 0;
+
 		template<Component T>
 		void DropComponents();
 		virtual void DropComponents(std::type_index componentType) = 0;
@@ -102,6 +113,10 @@ export namespace PonyEngine::World
 		template<Tag T>
 		void DropTags();
 		virtual void DropTags(std::type_index tagType) = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual std::size_t CountQuery(const QueryParams& params) const = 0;
+		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const = 0;
 	};
 }
 
@@ -208,6 +223,18 @@ namespace PonyEngine::World
 	void IWorld::HasTags(const std::span<const Entity> entities, const std::span<bool> has) const
 	{
 		HasTags(entities, typeid(T), has);
+	}
+
+	template<Component T>
+	std::size_t IWorld::CountComponents() const
+	{
+		return CountComponents(typeid(T));
+	}
+
+	template<Tag T>
+	std::size_t IWorld::CountTags() const
+	{
+		return CountTags(typeid(T));
 	}
 
 	template<Component T>
