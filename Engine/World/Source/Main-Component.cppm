@@ -14,7 +14,5 @@ import std;
 export namespace PonyEngine::World
 {
 	template<typename T>
-	concept Component = std::is_trivially_copyable_v<T> && std::is_trivially_destructible_v<T> && !std::is_empty_v<T>;
-	template<typename T>
-	concept Tag = std::is_trivially_copyable_v<T> && std::is_trivially_destructible_v<T> && std::is_empty_v<T>;
+	concept Component = std::is_trivially_copyable_v<T> && std::is_trivially_destructible_v<T>;
 }

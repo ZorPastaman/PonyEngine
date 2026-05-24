@@ -14,7 +14,6 @@ import std;
 import PonyEngine.World;
 
 import :ComponentTable;
-import :TagTable;
 
 export namespace PonyEngine::World
 {
@@ -30,16 +29,11 @@ export namespace PonyEngine::World
 		~TypeRegistry() noexcept = default;
 
 		void AddComponentType(std::type_index componentType, std::size_t size, std::size_t alignment);
-		void AddTagType(std::type_index tagType);
 
 		[[nodiscard("Pure function")]]
 		bool IsValidComponent(std::type_index componentType) const noexcept;
 		[[nodiscard("Pure function")]]
 		ComponentTable CreateComponentTable(std::type_index componentType) const;
-		[[nodiscard("Pure function")]]
-		bool IsValidTag(std::type_index tagType) const noexcept;
-		[[nodiscard("Pure function")]]
-		TagTable CreateTagTable(std::type_index tagType) const;
 
 		TypeRegistry& operator =(const TypeRegistry&) = delete;
 		TypeRegistry& operator =(TypeRegistry&& other) noexcept = default;
@@ -52,7 +46,6 @@ export namespace PonyEngine::World
 		};
 
 		std::unordered_map<std::type_index, ComponentInfo> components;
-		std::unordered_set<std::type_index> tags;
 	};
 }
 
@@ -61,11 +54,6 @@ namespace PonyEngine::World
 	void TypeRegistry::AddComponentType(const std::type_index componentType, const std::size_t size, const std::size_t alignment)
 	{
 		components[componentType] = ComponentInfo{.size = size, .alignment = std::max(alignment, alignof(std::max_align_t))};
-	}
-
-	void TypeRegistry::AddTagType(const std::type_index tagType)
-	{
-		tags.insert(tagType);
 	}
 
 	bool TypeRegistry::IsValidComponent(const std::type_index componentType) const noexcept
@@ -81,20 +69,5 @@ namespace PonyEngine::World
 		}
 
 		throw std::invalid_argument("Component type is not registered");
-	}
-
-	bool TypeRegistry::IsValidTag(const std::type_index tagType) const noexcept
-	{
-		return tags.contains(tagType);
-	}
-
-	TagTable TypeRegistry::CreateTagTable(const std::type_index tagType) const
-	{
-		if (!IsValidTag(tagType)) [[unlikely]]
-		{
-			throw std::invalid_argument("Tag type is not registered");
-		}
-
-		return TagTable();
 	}
 }

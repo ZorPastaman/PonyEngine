@@ -44,7 +44,6 @@ export namespace PonyEngine::World
 
 	private:
 		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) override;
-		virtual void RegisterTag(std::type_index tagType) override;
 
 		[[nodiscard("Wierd call")]] 
 		virtual std::shared_ptr<IWorld> CreateWorld() override;
@@ -82,14 +81,8 @@ namespace PonyEngine::World
 		typeRegistry.AddComponentType(componentType, componentSize, componentAlignment);
 	}
 
-	void WorldService::RegisterTag(const std::type_index tagType)
-	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Registering tag type. Type name: '{}'.", tagType.name());
-		typeRegistry.AddTagType(tagType);
-	}
-
 	std::shared_ptr<IWorld> WorldService::CreateWorld()
 	{
-		return std::make_shared<World>(*application, typeRegistry);
+		return std::make_shared<World>(typeRegistry);
 	}
 }

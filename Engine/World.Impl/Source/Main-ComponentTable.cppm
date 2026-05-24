@@ -36,37 +36,43 @@ export namespace PonyEngine::World
 		std::size_t ComponentAlignment() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::size_t Size() const noexcept;
+		EntityID Size() const noexcept;
 		[[nodiscard("Pure function")]]
-		std::size_t Find(EntityID entity, std::size_t startIndex = 0uz) const noexcept;
+		bool Contains(EntityID entity) const noexcept;
 		[[nodiscard("Pure function")]]
-		bool IsValid(std::size_t index, EntityID entity) const noexcept;
-
+		EntityID Index(EntityID entity) const noexcept;
 		[[nodiscard("Pure function")]]
-		EntityID Entity(std::size_t index) const noexcept;
+		EntityID Entity(EntityID index) const noexcept;
 		[[nodiscard("Pure function")]]
-		void* Component(std::size_t index) const noexcept;
-
-		void Reserve(std::size_t addSize);
-		void Insert(std::size_t index, EntityID entity);
-		void Remove(std::size_t index) noexcept;
+		void* Component(EntityID index) const noexcept;
+		void Add(std::span<const EntityID> entitiesToAdd);
+		void Remove(std::span<const EntityID> entitiesToRemove) noexcept;
 		void Clear() noexcept;
 
 		ComponentTable& operator =(const ComponentTable&) = delete;
 		ComponentTable& operator =(ComponentTable&& other) noexcept = default;
 
 	private:
-		struct DataDeleter final
+		void EnsureSparse(EntityID maxEntityToAdd);
+		void EnsureDense(std::span<const EntityID> entitiesToAdd);
+
+		[[nodiscard("Pure function")]]
+		static EntityID MaxEntity(std::span<const EntityID> entities) noexcept;
+
+		struct ComponentDeleter final
 		{
 			std::size_t alignment;
 
 			void operator ()(std::byte* ptr) const noexcept;
 		};
 
+		std::unique_ptr<EntityID[]> sparse;
 		std::unique_ptr<EntityID[]> entities;
-		std::unique_ptr<std::byte[], DataDeleter> components;
-		std::size_t size;
-		std::size_t capacity;
+		std::unique_ptr<std::byte[], ComponentDeleter> components;
+
+		EntityID sparseCapacity;
+		EntityID denseSize;
+		EntityID denseCapacity;
 
 		std::size_t componentSize;
 		std::size_t componentAlignment;
@@ -76,8 +82,9 @@ export namespace PonyEngine::World
 namespace PonyEngine::World
 {
 	ComponentTable::ComponentTable(const std::size_t componentSize, const std::size_t componentAlignment) noexcept :
-		size{0uz},
-		capacity{0uz},
+		sparseCapacity{0u},
+		denseSize{0u},
+		denseCapacity{0u},
 		componentSize{componentSize},
 		componentAlignment{componentAlignment}
 	{
@@ -93,82 +100,112 @@ namespace PonyEngine::World
 		return componentAlignment;
 	}
 
-	std::size_t ComponentTable::Size() const noexcept
+	EntityID ComponentTable::Size() const noexcept
 	{
-		return size;
+		return denseSize;
 	}
 
-	std::size_t ComponentTable::Find(const EntityID entity, const std::size_t startIndex) const noexcept
+	bool ComponentTable::Contains(const EntityID entity) const noexcept
 	{
-		return std::lower_bound(entities.get() + startIndex, entities.get() + size, entity) - entities.get();
+		return entity < sparseCapacity && sparse[entity] < denseSize && entities[sparse[entity]] == entity;
 	}
 
-	bool ComponentTable::IsValid(const std::size_t index, const EntityID entity) const noexcept
+	EntityID ComponentTable::Index(const EntityID entity) const noexcept
 	{
-		return index < size && entities[index] == entity;
+		return sparse[entity];
 	}
 
-	EntityID ComponentTable::Entity(const std::size_t index) const noexcept
+	EntityID ComponentTable::Entity(const EntityID index) const noexcept
 	{
-		assert(index < size && "Out of range.");
 		return entities[index];
 	}
 
-	void* ComponentTable::Component(const std::size_t index) const noexcept
+	void* ComponentTable::Component(const EntityID index) const noexcept
 	{
-		assert(index < size && "Out of range.");
 		return &components[index * componentSize];
 	}
 
-	void ComponentTable::Reserve(const std::size_t addSize)
+	void ComponentTable::Add(const std::span<const EntityID> entitiesToAdd)
 	{
-		if (capacity - size < addSize)
+		EnsureSparse(MaxEntity(entitiesToAdd));
+		EnsureDense(entitiesToAdd);
+
+		for (const EntityID entity : entitiesToAdd)
 		{
-			const std::size_t newCapacity = std::bit_ceil(size + addSize);
-			auto newEntities = std::make_unique<EntityID[]>(newCapacity);
-			auto newComponents = std::unique_ptr<std::byte[], DataDeleter>(static_cast<std::byte*>(operator new[](newCapacity * componentSize, 
-				std::align_val_t{componentAlignment})), DataDeleter{.alignment = componentAlignment});
-
-			std::memcpy(newEntities.get(), entities.get(), size * sizeof(EntityID));
-			std::memcpy(newComponents.get(), components.get(), size * componentSize);
-
-			entities = std::move(newEntities);
-			components = std::move(newComponents);
-			capacity = newCapacity;
+			sparse[entity] = denseSize;
+			entities[denseSize] = entity;
+			++denseSize;
 		}
 	}
 
-	void ComponentTable::Insert(const std::size_t index, const EntityID entity)
+	void ComponentTable::Remove(const std::span<const EntityID> entitiesToRemove) noexcept
 	{
-		assert(index <= size && "Out of range.");
+		for (const EntityID entity : entitiesToRemove)
+		{
+			if (const EntityID denseIndexToRemove = sparse[entity]; denseIndexToRemove != --denseSize) [[likely]]
+			{
+				const EntityID lastEntity = entities[denseSize];
+				entities[denseIndexToRemove] = lastEntity;
+				std::memcpy(Component(denseIndexToRemove), Component(denseSize), componentSize);
+				sparse[lastEntity] = denseIndexToRemove;
+			}
 
-		Reserve(1uz);
-
-		const std::size_t count = size - index;
-		std::memmove(&entities[index + 1], &entities[index], count * sizeof(EntityID));
-		std::memmove(&components[(index + 1) * componentSize], &components[index * componentSize], count * componentSize);
-
-		entities[index] = entity;
-		++size;
-	}
-
-	void ComponentTable::Remove(const std::size_t index) noexcept
-	{
-		assert(index < size && "Out of range.");
-
-		const std::size_t count = size - index - 1uz;
-		std::memmove(&entities[index], &entities[index + 1], count * sizeof(EntityID));
-		std::memmove(&components[index * componentSize], &components[(index + 1) * componentSize], count * componentSize);
-
-		--size;
+			sparse[entity] = std::numeric_limits<EntityID>::max();
+		}
 	}
 
 	void ComponentTable::Clear() noexcept
 	{
-		size = 0uz;
+		denseSize = 0u;
+		std::fill_n(sparse.get(), sparseCapacity, std::numeric_limits<EntityID>::max());
 	}
 
-	void ComponentTable::DataDeleter::operator ()(std::byte* const ptr) const noexcept
+	void ComponentTable::EnsureSparse(const EntityID maxEntityToAdd)
+	{
+		if (maxEntityToAdd < sparseCapacity) [[likely]]
+		{
+			return;
+		}
+
+		const EntityID newCapacity = std::bit_ceil(maxEntityToAdd + 1u);
+		auto newSparse = std::make_unique<EntityID[]>(newCapacity);
+		std::memcpy(newSparse.get(), sparse.get(), sparseCapacity * sizeof(EntityID));
+		std::fill_n(newSparse.get() + sparseCapacity, newCapacity - sparseCapacity, std::numeric_limits<EntityID>::max());
+		sparse = std::move(newSparse);
+		sparseCapacity = newCapacity;
+	}
+
+	void ComponentTable::EnsureDense(const std::span<const EntityID> entitiesToAdd)
+	{
+		if (denseSize + entitiesToAdd.size() <= denseCapacity) [[likely]]
+		{
+			return;
+		}
+
+		const EntityID newCapacity = static_cast<EntityID>(std::bit_ceil(denseSize + entitiesToAdd.size()));
+		const std::size_t newComponentSize = newCapacity * componentSize;
+		auto newEntities = std::make_unique<EntityID[]>(newCapacity);
+		auto newComponents = std::unique_ptr<std::byte[], ComponentDeleter>(static_cast<std::byte*>(
+			operator new[](newComponentSize, std::align_val_t{componentAlignment})), ComponentDeleter{.alignment = componentAlignment});
+		std::memcpy(newEntities.get(), entities.get(), denseSize * sizeof(EntityID));
+		std::memcpy(newComponents.get(), components.get(), denseSize * componentSize);
+		entities = std::move(newEntities);
+		components = std::move(newComponents);
+		denseCapacity = newCapacity;
+	}
+
+	EntityID ComponentTable::MaxEntity(const std::span<const EntityID> entities) noexcept
+	{
+		EntityID maxEntity = 0u;
+		for (const EntityID entity : entities)
+		{
+			maxEntity = std::max(maxEntity, entity);
+		}
+
+		return maxEntity;
+	}
+
+	void ComponentTable::ComponentDeleter::operator ()(std::byte* const ptr) const noexcept
 	{
 		operator delete[](ptr, std::align_val_t{alignment});
 	}
