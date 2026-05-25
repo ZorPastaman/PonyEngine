@@ -40,7 +40,7 @@ export namespace PonyEngine::World
 		virtual void DestroyEntities(std::span<const Entity> entities) = 0;
 
 		template<Component T>
-		void AddComponent(Entity entity, const T& component = T{});
+		void AddComponent(Entity entity, const T& component);
 		void AddComponent(Entity entity, std::type_index componentType, const void* componentData);
 		template<Component T>
 		T& AddComponent(Entity entity);

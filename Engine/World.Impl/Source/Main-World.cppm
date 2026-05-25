@@ -402,7 +402,7 @@ namespace PonyEngine::World
 			return;
 		}
 
-		const std::span<const ComponentTable*> excludedComponentTables = FindExcluded(params.requiredComponentTypes, arena.Span(excludedComponentTablesSlice));
+		const std::span<const ComponentTable*> excludedComponentTables = FindExcluded(params.excludedComponentTypes, arena.Span(excludedComponentTablesSlice));
 		const auto [optionalComponentTables, optionalOutputIndices] = FindOptional(params.optionalComponentTypes, arena.Span(optionalComponentTablesSlice),
 			arena.Span(optionalOutputIndicesSlice));
 
@@ -502,7 +502,7 @@ namespace PonyEngine::World
 		for (const Entity entity : entities)
 		{
 			tableEntities[tableEntityCount] = entity.id;
-			tableEntityCount += table.Contains(entity.id);
+			tableEntityCount += !table.Contains(entity.id);
 		}
 
 		table.Add(tableEntities.subspan(0uz, tableEntityCount));
