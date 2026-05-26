@@ -13,13 +13,14 @@ import std;
 
 export namespace PonyEngine::World
 {
-	using EntityID = std::uint32_t;
-	using EntityGeneration = std::uint32_t;
+	using EntityID = std::uint32_t; ///< Entity ID type.
+	using EntityGeneration = std::uint32_t; ///< Entity generation type.
 
+	/// @brief Entity.
 	struct Entity final
 	{
-		EntityID id = 0u;
-		EntityGeneration generation = 0u;
+		EntityID id = 0u; ///< Entity ID.
+		EntityGeneration generation = 0u; ///< Entity generation.
 
 		[[nodiscard("Pure operator")]]
 		constexpr auto operator <=>(const Entity& other) const noexcept = default;

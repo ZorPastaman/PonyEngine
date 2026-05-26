@@ -13,6 +13,7 @@ import std;
 
 export namespace PonyEngine::World
 {
+	/// @brief The concept is satisfied for pure data types.
 	template<typename T>
 	concept Component = std::is_trivially_copyable_v<T> && std::is_trivially_destructible_v<T>;
 }

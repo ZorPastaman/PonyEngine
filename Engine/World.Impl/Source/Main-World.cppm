@@ -41,7 +41,7 @@ export namespace PonyEngine::World
 
 		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType) override;
 		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, const void* componentData) override;
-		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> componentPointers) override;
+		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> componentData) override;
 
 		virtual void RemoveComponents(std::span<const Entity> entities, std::type_index componentType) override;
 
@@ -76,6 +76,7 @@ export namespace PonyEngine::World
 		const ComponentTable* FindComponentTable(std::type_index componentType) const;
 		[[nodiscard("Pure function")]]
 		ComponentTable& GetOrCreateComponentTable(std::type_index componentType);
+		ComponentTable& UpdateComponents(std::span<const Entity> entities, std::type_index componentType);
 		static void AddComponents(ComponentTable& table, std::span<const Entity> entities, std::span<EntityID> tableEntities);
 		static void RemoveComponents(ComponentTable& table, std::span<const Entity> entities, std::span<EntityID> tableEntities) noexcept;
 
@@ -92,7 +93,7 @@ export namespace PonyEngine::World
 		void ProcessQuery(std::span<const ComponentTable* const> excludedTables, std::span<const ComponentTable* const> optionalTables, 
 			std::span<void*> optionalComponents, std::span<std::size_t> optionalIndices, const std::function<void(QueryItem&)>& callback) const;
 		[[nodiscard("Pure function")]]
-		static std::size_t SmallestTableIndex(std::span<const ComponentTable* const> tables) noexcept;
+		static const ComponentTable* SmallestTable(std::span<const ComponentTable* const> tables) noexcept;
 		static bool FindEntity(std::span<const ComponentTable* const> tables, EntityID entityID, bool excluded) noexcept;
 		static void FillRequired(EntityID entityId, std::span<const ComponentTable* const> requiredTables, std::span<void*> requiredComponents) noexcept;
 		static void FillOptional(EntityID entityId, std::span<const ComponentTable* const> optionalTables, std::span<const std::size_t> optionalIndices,
@@ -117,6 +118,8 @@ export namespace PonyEngine::World
 
 		std::vector<ComponentTable> componentTables;
 		std::unordered_map<std::type_index, std::size_t> componentTablesIndices;
+
+		static_assert(sizeof(std::size_t) >= sizeof(EntityID), "std::size_t is less than EntityID.");
 	};
 }
 
@@ -135,7 +138,7 @@ namespace PonyEngine::World
 	std::size_t World::GetEntities(const std::span<Entity> entities) const noexcept
 	{
 		const EntityID outputCount = static_cast<EntityID>(std::min(EntityCount(), entities.size()));
-		for (EntityID inputIndex = 0uz, outputIndex = 0uz; outputIndex < outputCount; ++inputIndex)
+		for (EntityID inputIndex = 0u, outputIndex = 0u; outputIndex < outputCount; ++inputIndex)
 		{
 			const EntityGeneration generation = entityGenerations[inputIndex];
 			entities[outputIndex] = Entity{.id = inputIndex, .generation =  generation};
@@ -177,7 +180,14 @@ namespace PonyEngine::World
 	{
 		if (entities.size() > deadEntities.size())
 		{
-			entityGenerations.reserve(entityGenerations.size() + (entities.size() - deadEntities.size()));
+			const std::size_t requiredSize = entityGenerations.size() + (entities.size() - deadEntities.size());
+			if (entities.size() > std::numeric_limits<EntityID>::max() || requiredSize > std::numeric_limits<EntityID>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Entity count is too great");
+			}
+
+
+			entityGenerations.reserve(requiredSize);
 		}
 
 		std::size_t index = 0uz;
@@ -216,22 +226,11 @@ namespace PonyEngine::World
 
 	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType)
 	{
-		CheckIfValid(entities);
-
-		Memory::Arena& arena = Arena();
-		arena.Free();
-
-		const Memory::Arena::Slice<EntityID> tableEntitiesSlice = arena.Allocate<EntityID>(entities.size());
-		const std::span<EntityID> tableEntities = arena.Span(tableEntitiesSlice);
-
-		ComponentTable& table = GetOrCreateComponentTable(componentType);
-		AddComponents(table, entities, tableEntities);
+		UpdateComponents(entities, componentType);
 	}
 
 	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const void* const componentData)
 	{
-		CheckIfValid(entities);
-
 #ifndef NDEBUG
 		if (!componentData) [[unlikely]]
 		{
@@ -239,47 +238,32 @@ namespace PonyEngine::World
 		}
 #endif
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-
-		const Memory::Arena::Slice<EntityID> tableEntitiesSlice = arena.Allocate<EntityID>(entities.size());
-		const std::span<EntityID> tableEntities = arena.Span(tableEntitiesSlice);
-
-		ComponentTable& table = GetOrCreateComponentTable(componentType);
-		AddComponents(table, entities, tableEntities);
+		const ComponentTable& table = UpdateComponents(entities, componentType);
 
 		auto byteData = static_cast<const std::byte*>(componentData);
-		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += table.ComponentSize())
+		const std::size_t componentSize = table.ComponentSize();
+		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += componentSize)
 		{
 			const EntityID index = table.Index(entities[i].id);
-			std::memcpy(table.Component(index), byteData, table.ComponentSize());
+			std::memcpy(table.Component(index), byteData, componentSize);
 		}
 	}
 
-	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> componentPointers)
+	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> componentData)
 	{
-		CheckIfValid(entities);
-
 #ifndef NDEBUG
-		if (entities.size() != componentPointers.size()) [[unlikely]]
+		if (entities.size() != componentData.size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Entity and component pointer span sizes are mismatched");
 		}
 #endif
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-
-		const Memory::Arena::Slice<EntityID> tableEntitiesSlice = arena.Allocate<EntityID>(entities.size());
-		const std::span<EntityID> tableEntities = arena.Span(tableEntitiesSlice);
-
-		ComponentTable& table = GetOrCreateComponentTable(componentType);
-		AddComponents(table, entities, tableEntities);
+		const ComponentTable& table = UpdateComponents(entities, componentType);
 
 		for (std::size_t i = 0uz; i < entities.size(); ++i)
 		{
 			const EntityID index = table.Index(entities[i].id);
-			componentPointers[i] = table.Component(index);
+			componentData[i] = table.Component(index);
 		}
 	}
 
@@ -337,8 +321,10 @@ namespace PonyEngine::World
 				has[i] = table->Contains(entities[i].id);
 			}
 		}
-
-		std::ranges::fill(has, false);
+		else
+		{
+			std::ranges::fill(has, false);
+		}
 	}
 
 	std::size_t World::CountComponents(const std::type_index componentType) const
@@ -495,6 +481,22 @@ namespace PonyEngine::World
 		return componentTables.back();
 	}
 
+	ComponentTable& World::UpdateComponents(const std::span<const Entity> entities, const std::type_index componentType)
+	{
+		CheckIfValid(entities);
+
+		Memory::Arena& arena = Arena();
+		arena.Free();
+
+		const Memory::Arena::Slice<EntityID> tableEntitiesSlice = arena.Allocate<EntityID>(entities.size());
+		const std::span<EntityID> tableEntities = arena.Span(tableEntitiesSlice);
+
+		ComponentTable& table = GetOrCreateComponentTable(componentType);
+		AddComponents(table, entities, tableEntities);
+
+		return table;
+	}
+
 	void World::AddComponents(ComponentTable& table, const std::span<const Entity> entities, const std::span<EntityID> tableEntities)
 	{
 		std::size_t tableEntityCount = 0uz;
@@ -564,9 +566,7 @@ namespace PonyEngine::World
 		const std::span<const ComponentTable* const> optionalTables, const std::span<void*> requiredComponents, const std::span<void*> optionalComponents,
 		const std::span<std::size_t> optionalIndices, const std::function<void(QueryItem&)>& callback) const
 	{
-		const std::size_t mainTableIndex = SmallestTableIndex(requiredTables);
-		const ComponentTable* const mainTable = requiredTables[mainTableIndex];
-
+		const ComponentTable* const mainTable = SmallestTable(requiredTables);
 		for (EntityID mainIndex = 0uz; mainIndex < mainTable->Size(); ++mainIndex)
 		{
 			const EntityID entityId = mainTable->Entity(mainIndex);
@@ -605,7 +605,7 @@ namespace PonyEngine::World
 		}
 	}
 
-	std::size_t World::SmallestTableIndex(const std::span<const ComponentTable* const> tables) noexcept
+	const ComponentTable* World::SmallestTable(const std::span<const ComponentTable* const> tables) noexcept
 	{
 		std::size_t smallestIndex = 0uz;
 		std::size_t smallestSize = tables[smallestIndex]->Size();
@@ -618,7 +618,7 @@ namespace PonyEngine::World
 			}
 		}
 
-		return smallestIndex;
+		return tables[smallestIndex];
 	}
 
 	bool World::FindEntity(const std::span<const ComponentTable* const> tables, const EntityID entityID, const bool excluded) noexcept

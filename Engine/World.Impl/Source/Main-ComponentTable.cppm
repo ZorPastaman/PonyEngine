@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyEngine.World.Impl:ComponentTable;
 
 import std;
@@ -76,6 +72,8 @@ export namespace PonyEngine::World
 
 		std::size_t componentSize;
 		std::size_t componentAlignment;
+
+		static_assert(sizeof(std::size_t) >= sizeof(EntityID), "std::size_t is less than EntityID.");
 	};
 }
 
@@ -157,7 +155,7 @@ namespace PonyEngine::World
 	void ComponentTable::Clear() noexcept
 	{
 		denseSize = 0u;
-		std::fill_n(sparse.get(), sparseCapacity, std::numeric_limits<EntityID>::max());
+		std::memset(sparse.get(), -1, sparseCapacity * sizeof(EntityID));
 	}
 
 	void ComponentTable::EnsureSparse(const EntityID maxEntityToAdd)
@@ -167,28 +165,39 @@ namespace PonyEngine::World
 			return;
 		}
 
-		const EntityID newCapacity = std::bit_ceil(maxEntityToAdd + 1u);
+		const EntityID requiredCapacity = maxEntityToAdd + 1u;
+		const EntityID newCapacity = requiredCapacity > 1u << (std::numeric_limits<EntityID>::digits - 1) 
+			? std::numeric_limits<EntityID>::max() 
+			: std::bit_ceil(requiredCapacity);
 		auto newSparse = std::make_unique<EntityID[]>(newCapacity);
+
 		std::memcpy(newSparse.get(), sparse.get(), sparseCapacity * sizeof(EntityID));
-		std::fill_n(newSparse.get() + sparseCapacity, newCapacity - sparseCapacity, std::numeric_limits<EntityID>::max());
+		std::memset(newSparse.get() + sparseCapacity, -1, (newCapacity - sparseCapacity) * sizeof(EntityID));
+
 		sparse = std::move(newSparse);
 		sparseCapacity = newCapacity;
 	}
 
 	void ComponentTable::EnsureDense(const std::span<const EntityID> entitiesToAdd)
 	{
-		if (denseSize + entitiesToAdd.size() <= denseCapacity) [[likely]]
+		const EntityID requiredCapacity = denseSize + static_cast<EntityID>(entitiesToAdd.size());
+
+		if (requiredCapacity <= denseCapacity) [[likely]]
 		{
 			return;
 		}
 
-		const EntityID newCapacity = static_cast<EntityID>(std::bit_ceil(denseSize + entitiesToAdd.size()));
-		const std::size_t newComponentSize = newCapacity * componentSize;
+		const EntityID newCapacity = requiredCapacity > 1u << (std::numeric_limits<EntityID>::digits - 1)
+			? std::numeric_limits<EntityID>::max()
+			: std::bit_ceil(requiredCapacity);
+		const std::size_t newComponentCapacity = newCapacity * componentSize;
 		auto newEntities = std::make_unique<EntityID[]>(newCapacity);
 		auto newComponents = std::unique_ptr<std::byte[], ComponentDeleter>(static_cast<std::byte*>(
-			operator new[](newComponentSize, std::align_val_t{componentAlignment})), ComponentDeleter{.alignment = componentAlignment});
+			operator new[](newComponentCapacity, std::align_val_t{componentAlignment})), ComponentDeleter{.alignment = componentAlignment});
+
 		std::memcpy(newEntities.get(), entities.get(), denseSize * sizeof(EntityID));
 		std::memcpy(newComponents.get(), components.get(), denseSize * componentSize);
+
 		entities = std::move(newEntities);
 		components = std::move(newComponents);
 		denseCapacity = newCapacity;
