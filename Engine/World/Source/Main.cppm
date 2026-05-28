@@ -13,4 +13,5 @@ export import :Component;
 export import :Entity;
 export import :IWorld;
 export import :IWorldService;
+export import :ObjectHandle;
 export import :QueryParams;

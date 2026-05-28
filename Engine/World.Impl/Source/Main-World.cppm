@@ -52,11 +52,18 @@ export namespace PonyEngine::World
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t CountComponents(std::type_index componentType) const override;
 
+		virtual std::size_t GetEntities(std::type_index componentType, std::span<Entity> entities) const override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> componentData) const override;
+		virtual std::size_t GetEntitiesAndComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> componentData) const override;
+
 		virtual void DropComponents(std::type_index componentType) override;
 
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t CountQuery(const QueryParams& params) const override;
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const override;
+
+		[[nodiscard("Pure function")]]
+		std::pair<std::span<const std::byte>, std::size_t> GetComponentData(std::type_index componentType) const noexcept;
 
 		World& operator =(const World&) = delete;
 		World& operator =(World&&) = delete;
@@ -64,9 +71,9 @@ export namespace PonyEngine::World
 	private:
 		[[nodiscard("Pure function")]]
 		bool IsInvalid(Entity entity) const noexcept;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		Entity MakeEntity() noexcept;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		Entity ResurrectEntity() noexcept;
 		void KillEntity(Entity entity) noexcept;
 
@@ -79,6 +86,8 @@ export namespace PonyEngine::World
 		ComponentTable& UpdateComponents(std::span<const Entity> entities, std::type_index componentType);
 		static void AddComponents(ComponentTable& table, std::span<const Entity> entities, std::span<EntityID> tableEntities);
 		static void RemoveComponents(ComponentTable& table, std::span<const Entity> entities, std::span<EntityID> tableEntities) noexcept;
+		void CopyEntities(const ComponentTable& table, std::span<Entity> entities) const noexcept;
+		static void CopyComponents(const ComponentTable& table, std::span<void*> componentData) noexcept;
 
 		[[nodiscard("Must be used")]]
 		bool FindRequired(std::span<const std::type_index> types, std::span<const ComponentTable*> requiredTables) const noexcept;
@@ -254,7 +263,7 @@ namespace PonyEngine::World
 #ifndef NDEBUG
 		if (entities.size() != componentData.size()) [[unlikely]]
 		{
-			throw std::invalid_argument("Entity and component pointer span sizes are mismatched");
+			throw std::invalid_argument("Entity and component data span sizes are mismatched");
 		}
 #endif
 
@@ -337,6 +346,53 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
+	std::size_t World::GetEntities(const std::type_index componentType, const std::span<Entity> entities) const
+	{
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			const EntityID count = static_cast<EntityID>(std::min(static_cast<std::size_t>(table->Size()), entities.size()));
+			CopyEntities(*table, entities.subspan(0uz, count));
+
+			return count;
+		}
+
+		return 0uz;
+	}
+
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<void*> componentData) const
+	{
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			const EntityID count = static_cast<EntityID>(std::min(static_cast<std::size_t>(table->Size()), componentData.size()));
+			CopyComponents(*table, componentData.subspan(0uz, count));
+
+			return count;
+		}
+
+		return 0uz;
+	}
+
+	std::size_t World::GetEntitiesAndComponents(const std::type_index componentType, const std::span<Entity> entities, const std::span<void*> componentData) const
+	{
+#ifndef NDEBUG
+		if (entities.size() != componentData.size())
+		{
+			throw std::invalid_argument("Entity and component data span sizes are mismatched");
+		}
+#endif
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			const EntityID count = static_cast<EntityID>(std::min(static_cast<std::size_t>(table->Size()), entities.size()));
+			CopyEntities(*table, entities.subspan(0uz, count));
+			CopyComponents(*table, componentData.subspan(0uz, count));
+
+			return count;
+		}
+
+		return 0uz;
+	}
+
 	void World::DropComponents(const std::type_index componentType)
 	{
 		if (ComponentTable* const table = FindComponentTable(componentType))
@@ -405,6 +461,20 @@ namespace PonyEngine::World
 			ProcessQuery(requiredComponentTables, excludedComponentTables, optionalComponentTables,
 				requiredComponents, optionalComponents, optionalOutputIndices, callback);
 		}
+	}
+
+	std::pair<std::span<const std::byte>, std::size_t> World::GetComponentData(const std::type_index componentType) const noexcept
+	{
+		if (const auto position = componentTablesIndices.find(componentType); position != componentTablesIndices.cend())
+		{
+			const ComponentTable& table = componentTables[position->second];
+			const std::size_t tableSize = table.Size();
+			const std::size_t componentSize = table.ComponentSize();
+			const std::byte* const components = tableSize > 0uz ? static_cast<const std::byte*>(table.Component(0u)) : nullptr;
+			return std::pair(std::span(components, tableSize * componentSize), componentSize);
+		}
+
+		return std::pair(std::span<const std::byte>(), 0uz);
 	}
 
 	bool World::IsInvalid(const Entity entity) const noexcept
@@ -521,6 +591,23 @@ namespace PonyEngine::World
 		}
 
 		table.Remove(tableEntities.subspan(0uz, tableEntityCount));
+	}
+
+	void World::CopyEntities(const ComponentTable& table, const std::span<Entity> entities) const noexcept
+	{
+		for (EntityID i = 0u; i < entities.size(); ++i)
+		{
+			const EntityID entityId = table.Entity(i);
+			entities[i] = Entity{.id = entityId, .generation = entityGenerations[entityId]};
+		}
+	}
+
+	void World::CopyComponents(const ComponentTable& table, const std::span<void*> componentData) noexcept
+	{
+		for (EntityID i = 0u; i < componentData.size(); ++i)
+		{
+			componentData[i] = table.Component(i);
+		}
 	}
 
 	bool World::FindRequired(const std::span<const std::type_index> types, const std::span<const ComponentTable*> requiredTables) const noexcept

@@ -19,7 +19,7 @@ export namespace PonyEngine::World
 	/// @brief Entity.
 	struct Entity final
 	{
-		EntityID id = 0u; ///< Entity ID.
+		EntityID id = std::numeric_limits<EntityID>::max(); ///< Entity ID.
 		EntityGeneration generation = 0u; ///< Entity generation.
 
 		[[nodiscard("Pure operator")]]

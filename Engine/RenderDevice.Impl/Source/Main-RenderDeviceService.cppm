@@ -64,10 +64,10 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		virtual struct DeviceSupport DeviceSupport() const override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params) override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual struct TextureFormatID TextureFormatID(std::string_view textureFormat) override;
 		[[nodiscard("Pure function")]]
 		virtual std::string_view TextureFormat(struct TextureFormatID textureFormatId) const override;
@@ -77,10 +77,10 @@ export namespace PonyEngine::RenderDevice
 		virtual struct TextureFormatSupport TextureFormatSupport(struct TextureFormatID textureFormatId) const override;
 		[[nodiscard("Pure function")]]
 		virtual TextureSupportResponse TextureSupport(const TextureSupportRequest& request) const override;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ITexture> CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params) override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) override;
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const CBVParams& params) override;
 		virtual void CreateView(const IBuffer* buffer, IShaderDataContainer& container, std::uint32_t index, const BufferSRVParams& params) override;
@@ -89,39 +89,39 @@ export namespace PonyEngine::RenderDevice
 		virtual void CreateView(const ITexture* texture, IShaderDataContainer& container, std::uint32_t index, const TextureUAVParams& params) override;
 		virtual void CopyViews(std::span<const ShaderDataCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) override;
 		virtual void CreateView(const ITexture* texture, IRenderTargetContainer& container, std::uint32_t index, const RTVParams& params) override;
 		virtual void CopyViews(std::span<const RenderTargetCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params) override;
 		virtual void CreateView(const ITexture* texture, IDepthStencilContainer& container, std::uint32_t index, const DSVParams& params) override;
 		virtual void CopyViews(std::span<const DepthStencilCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params) override;
 		virtual void CreateSampler(ISamplerContainer& container, std::uint32_t index, const SamplerParams& params) override;
 		virtual void CopySamplers(std::span<const SamplerCopyRange> ranges) override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) override;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, 
 			const GraphicsPipelineStateParams& params) override;
-		[[nodiscard("Wierd call")]] 
+		[[nodiscard("Weird call")]] 
 		virtual std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params) override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() override;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() override;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() override;
 		virtual void Execute(std::span<const IGraphicsCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const IComputeCommandList* const> commandLists, const QueueSync& sync) override;
 		virtual void Execute(std::span<const ICopyCommandList* const> commandLists, const QueueSync& sync) override;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList() override;
 
 		[[nodiscard("Pure function")]]
@@ -146,9 +146,9 @@ export namespace PonyEngine::RenderDevice
 		virtual std::shared_ptr<ITexture> SwapChainBuffer(std::uint8_t bufferIndex) const override;
 		virtual void PresentNextSwapChainBuffer() override;
 
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IFence> CreateFence() override;
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IWaiter> CreateWaiter() override;
 
 		virtual void AddObserver(IRenderDeviceServiceObserver& observer) override;

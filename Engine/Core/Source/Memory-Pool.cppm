@@ -82,14 +82,14 @@ export namespace PonyEngine::Memory
 		/// @brief Acquires an object.
 		/// @return Object.
 		/// @note When it's not needed anymore, call @p Release().
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		T& Acquire();
 		/// @brief Releases a previously acquired object.
 		/// @param object Object to release.
 		void Release(const T& object);
 		/// @brief Acquires an object and returns it in a wrapper that automatically releases it when out of scope.
 		/// @return Object.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		Object Lease();
 
 		/// @brief Gets the inactive object max count.
@@ -111,7 +111,7 @@ export namespace PonyEngine::Memory
 	private:
 		/// @brief Takes an object from the inactive pool.
 		/// @return Object.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		std::unique_ptr<T, std::function<void(T*)>> GetFromInactive();
 		/// @brief Puts the object into the inactive pool.
 		/// @param object Object.

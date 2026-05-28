@@ -43,7 +43,7 @@ export namespace PonyEngine::World
 		bool IsValid(Entity entity) const noexcept;
 		/// @brief Creates a new entity.
 		/// @return New entity.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		Entity CreateEntity();
 		/// @brief Destroys the entity.
 		/// @param entity Entity to destroy. Must be valid.
@@ -187,6 +187,48 @@ export namespace PonyEngine::World
 		[[nodiscard("Pure function")]]
 		virtual std::size_t CountComponents(std::type_index componentType) const = 0;
 
+		/// @brief Gets all the entities that have a component of type @p T.
+		/// @tparam T Component type.
+		/// @param entities Entities.
+		/// @return Count of entities written to the @p entities.
+		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
+		template<Component T>
+		std::size_t GetEntities(std::span<Entity> entities) const;
+		/// @brief Gets all the entities that have a component of type @p componentType.
+		/// @param componentType Component type.
+		/// @param entities Entities.
+		/// @return Count of entities written to the @p entities.
+		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
+		virtual std::size_t GetEntities(std::type_index componentType, std::span<Entity> entities) const = 0;
+		/// @brief Gets all the components of type @p T.
+		/// @tparam T Component type.
+		/// @param componentData Component data.
+		/// @return Count of components written to the @p componentData.
+		/// @note If the world has more components than the @p componentData size, only @p componentData.size() first components will be written.
+		template<Component T>
+		std::size_t GetComponents(std::span<T*> componentData) const;
+		/// @brief Gets all the components of type @p componentType.
+		/// @param componentType Component type.
+		/// @param componentData Component data.
+		/// @return Count of components written to the @p componentData.
+		/// @note If the world has more components than the @p componentData size, only @p componentData.size() first components will be written.
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> componentData) const = 0;
+		/// @brief Gets all the entities and components of type @p T.
+		/// @tparam T Component type.
+		/// @param entities Entities.
+		/// @param componentData Component data. Its size must be synced with the @p entities.
+		/// @return Count of entities written to the @p entities.
+		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
+		template<Component T>
+		std::size_t GetEntitiesAndComponents(std::span<Entity> entities, std::span<T*> componentData) const;
+		/// @brief Gets all the entities and components of type @p componentType.
+		/// @param componentType Component type.
+		/// @param entities Entities.
+		/// @param componentData Component data. Its size must be synced with the @p entities.
+		/// @return Count of entities written to the @p entities.
+		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
+		virtual std::size_t GetEntitiesAndComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> componentData) const = 0;
+
 		/// @brief Removes all the components of the type @p T.
 		/// @tparam T Component type.
 		template<Component T>
@@ -319,6 +361,24 @@ namespace PonyEngine::World
 	std::size_t IWorld::CountComponents() const
 	{
 		return CountComponents(typeid(T));
+	}
+
+	template<Component T>
+	std::size_t IWorld::GetEntities(const std::span<Entity> entities) const
+	{
+		return GetEntities(typeid(T), entities);
+	}
+
+	template<Component T>
+	std::size_t IWorld::GetComponents(const std::span<T*> componentData) const
+	{
+		return GetComponents(typeid(T), std::span(reinterpret_cast<void**>(componentData.data()), componentData.size()));
+	}
+
+	template<Component T>
+	std::size_t IWorld::GetEntitiesAndComponents(const std::span<Entity> entities, const std::span<T*> componentData) const
+	{
+		return GetEntitiesAndComponents(typeid(T), entities, std::span(reinterpret_cast<void**>(componentData.data()), componentData.size()));
 	}
 
 	template<Component T>
