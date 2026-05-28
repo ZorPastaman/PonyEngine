@@ -33,7 +33,7 @@ export namespace PonyEngine::Job
 		/// @brief Acquires a job.
 		/// @return Job and a flag that tells if the job is newly created (if @a true).
 		[[nodiscard("Must be used")]]
-		std::pair<Job*, bool> Acquire();
+		Job* Acquire();
 		/// @brief Releases the job.
 		/// @param job Job to release.
 		void Release(Job& job);
@@ -52,20 +52,20 @@ export namespace PonyEngine::Job
 
 namespace PonyEngine::Job
 {
-	std::pair<Job*, bool> JobPool::Acquire()
+	Job* JobPool::Acquire()
 	{
+		if (const auto lock = std::unique_lock(poolMutex, std::try_to_lock))
 		{
-			const auto lock = std::lock_guard(poolMutex);
 			if (!pool.empty())
 			{
 				Job* const job = pool.top();
 				pool.pop();
-				
-				return std::pair(job, false);
+
+				return job;
 			}
 		}
 
-		return std::pair(new Job(), true);
+		return nullptr;
 	}
 
 	void JobPool::Release(Job& job)
