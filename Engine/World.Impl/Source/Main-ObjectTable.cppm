@@ -135,11 +135,16 @@ namespace PonyEngine::World
 	void ObjectTable::CollectGarbage(const TypeRegistry& typeRegistry,
 		const std::span<const ComponentTable> componentTables, const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices)
 	{
+		if (objectsDense.empty()) [[unlikely]]
+		{
+			return;
+		}
+
 		aliveObjectFlags.resize(objectsDense.size());
 		std::ranges::fill(aliveObjectFlags, false);
 		objectsToRemove.resize(objectsDense.size());
 
-		for (const auto [componentType, componentTableIndex] : componentTablesIndices)
+		for (std::size_t foundCount = 0uz; const auto [componentType, componentTableIndex] : componentTablesIndices)
 		{
 			const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = typeRegistry.ObjectOffsets(componentType);
 			if (objectOffsets.empty())
@@ -155,8 +160,16 @@ namespace PonyEngine::World
 				for (const auto [offset, objectType] : objectOffsets)
 				{
 					const TypelessObjectHandle handle = *reinterpret_cast<const TypelessObjectHandle*>(component + offset);
-					const bool currentFlag = aliveObjectFlags[objectsSparse[handle.id]];
-					aliveObjectFlags[objectsSparse[handle.id]] = currentFlag | IsObjectValid(objectType, handle);
+					if (IsObjectValid(objectType, handle))
+					{
+						foundCount += !aliveObjectFlags[objectsSparse[handle.id]];
+						aliveObjectFlags[objectsSparse[handle.id]] = true;
+
+						if (foundCount == aliveObjectFlags.size()) [[unlikely]]
+						{
+							return;
+						}
+					}
 				}
 			}
 		}
