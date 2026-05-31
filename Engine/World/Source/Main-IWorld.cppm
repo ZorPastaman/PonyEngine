@@ -17,6 +17,7 @@ import std;
 
 import :Component;
 import :Entity;
+import :ObjectHandle;
 import :QueryParams;
 
 export namespace PonyEngine::World
@@ -246,6 +247,27 @@ export namespace PonyEngine::World
 		/// @param params Query parameters.
 		/// @param callback Query callback. It's called on each entity that satisfies the query parameters.
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const = 0;
+
+		template<typename T> [[nodiscard("Weird call")]]
+		ObjectHandle<T> RegisterObject(const std::shared_ptr<T>& object);
+		template<typename T>
+		void UnregisterObject(ObjectHandle<T> handle);
+		template<typename T> [[nodiscard("Pure function")]]
+		bool IsObjectValid(ObjectHandle<T> handle) const noexcept;
+		template<typename T> [[nodiscard("Pure function")]]
+		T* GetObject(ObjectHandle<T> handle) const;
+		template<typename T> [[nodiscard("Pure function")]]
+		std::shared_ptr<T> GetSharedObject(ObjectHandle<T> handle) const;
+		virtual void CollectGarbage() = 0;
+
+	protected:
+		[[nodiscard("Weird call")]]
+		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object) = 0;
+		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) = 0;
+		[[nodiscard("Pure function")]]
+		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const = 0;
 	};
 }
 
@@ -385,5 +407,35 @@ namespace PonyEngine::World
 	void IWorld::DropComponents()
 	{
 		DropComponents(typeid(T));
+	}
+
+	template<typename T>
+	ObjectHandle<T> IWorld::RegisterObject(const std::shared_ptr<T>& object)
+	{
+		return ObjectHandle<T>{.typeless = RegisterObject(typeid(T), object)};
+	}
+
+	template<typename T>
+	void IWorld::UnregisterObject(const ObjectHandle<T> handle)
+	{
+		UnregisterObject(typeid(T), handle.typeless);
+	}
+
+	template<typename T>
+	bool IWorld::IsObjectValid(const ObjectHandle<T> handle) const noexcept
+	{
+		return IsObjectValid(typeid(T), handle.typeless);
+	}
+
+	template<typename T>
+	T* IWorld::GetObject(const ObjectHandle<T> handle) const
+	{
+		return static_cast<T*>(GetObject(typeid(T), handle.typeless).get());
+	}
+
+	template<typename T>
+	std::shared_ptr<T> IWorld::GetSharedObject(const ObjectHandle<T> handle) const
+	{
+		return std::static_pointer_cast<T>(GetObject(typeid(T), handle.typeless));
 	}
 }

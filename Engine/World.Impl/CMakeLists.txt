@@ -21,7 +21,7 @@ target_sources(PonyEngine.World.Impl PRIVATE
 target_sources(PonyEngine.World.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-ComponentTable.cppm"
-	"Source/Main-ObjectRegistry.cppm"
+	"Source/Main-ObjectTable.cppm"
 	"Source/Main-TypeRegistry.cppm"
 	"Source/Main-World.cppm"
 	"Source/Main-WorldService.cppm"
@@ -52,5 +52,4 @@ target_link_libraries(PonyEngine.World.Impl PRIVATE
 	PonyEngine.World
 	PonyEngine.Core
 	PonyEngine.Log
-	PonyEngine.Job
 )

@@ -33,6 +33,7 @@ struct std::hash<PonyEngine::World::Entity> final
 	[[nodiscard("Pure function")]]
 	size_t operator ()(const PonyEngine::World::Entity& entity) const noexcept
 	{
-		return std::hash<std::uint64_t>()(*reinterpret_cast<const std::uint64_t*>(&entity));
+		const std::uint64_t hash = static_cast<std::uint64_t>(entity.id) << 32 | entity.generation;
+		return std::hash<std::uint64_t>()(hash);
 	}
 };

@@ -29,11 +29,14 @@ export namespace PonyEngine::World
 		~TypeRegistry() noexcept = default;
 
 		void AddComponentType(std::type_index componentType, std::size_t size, std::size_t alignment);
+		void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset);
 
 		[[nodiscard("Pure function")]]
 		bool IsValidComponent(std::type_index componentType) const noexcept;
 		[[nodiscard("Pure function")]]
 		ComponentTable CreateComponentTable(std::type_index componentType) const;
+		[[nodiscard("Pure function")]]
+		std::span<const std::pair<std::size_t, std::type_index>> ObjectOffsets(std::type_index componentType) const noexcept;
 
 		TypeRegistry& operator =(const TypeRegistry&) = delete;
 		TypeRegistry& operator =(TypeRegistry&& other) noexcept = default;
@@ -46,6 +49,7 @@ export namespace PonyEngine::World
 		};
 
 		std::unordered_map<std::type_index, ComponentInfo> components;
+		std::unordered_map<std::type_index, std::vector<std::pair<std::size_t, std::type_index>>> objectOffsets; /// <componentType, <offset, objectType>>
 	};
 }
 
@@ -54,6 +58,18 @@ namespace PonyEngine::World
 	void TypeRegistry::AddComponentType(const std::type_index componentType, const std::size_t size, const std::size_t alignment)
 	{
 		components[componentType] = ComponentInfo{.size = size, .alignment = std::max(alignment, alignof(std::max_align_t))};
+	}
+
+	void TypeRegistry::RegisterComponentObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
+	{
+		std::vector<std::pair<std::size_t, std::type_index>>& offsets = objectOffsets[componentType];
+
+		std::size_t index = 0uz;
+		for (; index < offsets.size() && offsets[index].first < componentOffset; ++index)
+		{
+		}
+
+		offsets.insert(offsets.cbegin() + index, std::pair(componentOffset, objectType));
 	}
 
 	bool TypeRegistry::IsValidComponent(const std::type_index componentType) const noexcept
@@ -69,5 +85,15 @@ namespace PonyEngine::World
 		}
 
 		throw std::invalid_argument("Component type is not registered");
+	}
+
+	std::span<const std::pair<std::size_t, std::type_index>> TypeRegistry::ObjectOffsets(const std::type_index componentType) const noexcept
+	{
+		if (const auto position = objectOffsets.find(componentType); position != objectOffsets.cend())
+		{
+			return position->second;
+		}
+
+		return std::span<const std::pair<std::size_t, std::type_index>>();
 	}
 }

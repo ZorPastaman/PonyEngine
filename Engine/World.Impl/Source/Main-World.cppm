@@ -16,6 +16,7 @@ import PonyEngine.Memory;
 import PonyEngine.World;
 
 import :ComponentTable;
+import :ObjectTable;
 import :TypeRegistry;
 
 export namespace PonyEngine::World
@@ -62,11 +63,19 @@ export namespace PonyEngine::World
 		virtual std::size_t CountQuery(const QueryParams& params) const override;
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const override;
 
-		[[nodiscard("Pure function")]]
-		std::pair<std::span<const std::byte>, std::size_t> GetComponentData(std::type_index componentType) const noexcept;
+		virtual void CollectGarbage() override;
 
 		World& operator =(const World&) = delete;
 		World& operator =(World&&) = delete;
+
+	protected:
+		[[nodiscard("Weird call")]] 
+		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object) override;
+		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) override;
+		[[nodiscard("Pure function")]] 
+		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const override;
 
 	private:
 		[[nodiscard("Pure function")]]
@@ -127,6 +136,8 @@ export namespace PonyEngine::World
 
 		std::vector<ComponentTable> componentTables;
 		std::unordered_map<std::type_index, std::size_t> componentTablesIndices;
+
+		ObjectTable objectTable;
 
 		static_assert(sizeof(std::size_t) >= sizeof(EntityID), "std::size_t is less than EntityID.");
 	};
@@ -463,18 +474,29 @@ namespace PonyEngine::World
 		}
 	}
 
-	std::pair<std::span<const std::byte>, std::size_t> World::GetComponentData(const std::type_index componentType) const noexcept
+	void World::CollectGarbage()
 	{
-		if (const auto position = componentTablesIndices.find(componentType); position != componentTablesIndices.cend())
-		{
-			const ComponentTable& table = componentTables[position->second];
-			const std::size_t tableSize = table.Size();
-			const std::size_t componentSize = table.ComponentSize();
-			const std::byte* const components = tableSize > 0uz ? static_cast<const std::byte*>(table.Component(0u)) : nullptr;
-			return std::pair(std::span(components, tableSize * componentSize), componentSize);
-		}
+		objectTable.CollectGarbage(*typeRegistry, componentTables, componentTablesIndices);
+	}
 
-		return std::pair(std::span<const std::byte>(), 0uz);
+	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
+	{
+		return objectTable.RegisterObject(objectType, object);
+	}
+
+	void World::UnregisterObject(const std::type_index objectType, const TypelessObjectHandle handle)
+	{
+		objectTable.UnregisterObject(objectType, handle);
+	}
+
+	bool World::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	{
+		return objectTable.IsObjectValid(objectType, handle);
+	}
+
+	const std::shared_ptr<void>& World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const
+	{
+		return objectTable.GetObject(objectType, handle);
 	}
 
 	bool World::IsInvalid(const Entity entity) const noexcept
