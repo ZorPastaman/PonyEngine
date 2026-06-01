@@ -751,11 +751,6 @@ export namespace PonyEngine::RawInput
 		const std::span<const FeatureEntry> features)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
 		if (!deviceTypeHashMap.contains(deviceType))
 		{
 			throw std::invalid_argument("Device type is invalid");
@@ -780,13 +775,6 @@ export namespace PonyEngine::RawInput
 
 	void RawInputService::UnregisterDevice(const DeviceHandle deviceHandle)
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
 		if (const std::size_t index = devices.IndexOf(deviceHandle); index < devices.Size()) [[likely]]
 		{
 			devices.Remove(index);
@@ -810,11 +798,6 @@ export namespace PonyEngine::RawInput
 	void RawInputService::AddInput(const DeviceHandle deviceHandle, const RawInputEvent& input)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
 		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");
@@ -827,11 +810,6 @@ export namespace PonyEngine::RawInput
 	void RawInputService::Connect(const DeviceHandle deviceHandle, const ConnectionEvent& connection)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
 		if (devices.IndexOf(deviceHandle) >= devices.Size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Device not found");

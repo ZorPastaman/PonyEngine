@@ -82,7 +82,6 @@ export namespace PonyEngine::World
 		std::vector<HandleID> objectsToRemove;
 
 		static_assert(sizeof(HandleID) <= sizeof(std::size_t), "HandleID is greater than std::size_t.");
-		static_assert(std::atomic_ref<bool>::is_always_lock_free, "bool is not lock free.");
 	};
 }
 

@@ -248,30 +248,73 @@ export namespace PonyEngine::World
 		/// @param callback Query callback. It's called on each entity that satisfies the query parameters.
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const = 0;
 
+		/// @brief Registers the object.
+		/// @tparam T Object type.
+		/// @param object Object.
+		/// @return Object handle.
 		template<typename T> [[nodiscard("Weird call")]]
 		ObjectHandle<T> RegisterObject(const std::shared_ptr<T>& object);
+		/// @brief Unregisters an object.
+		/// @tparam T Object type.
+		/// @param handle Object handle. Must be valid.
 		template<typename T>
 		void UnregisterObject(ObjectHandle<T> handle);
+		/// @brief Replaces a registered object.
+		/// @tparam T Object type.
+		/// @param handle Object handle. Must be valid.
+		/// @param object Replacement object.
 		template<typename T>
 		void ReplaceObject(ObjectHandle<T> handle, const std::shared_ptr<T>& object);
 
+		/// @brief Checks if the object handle is valid.
+		/// @tparam T Object type.
+		/// @param handle Object handle.
+		/// @return @a True if it's valid; @a false otherwise.
 		template<typename T> [[nodiscard("Pure function")]]
 		bool IsObjectValid(ObjectHandle<T> handle) const noexcept;
+		/// @brief Gets an object pointer.
+		/// @tparam T Object type.
+		/// @param handle Object handle. Must be valid.
+		/// @return Object pointer.
 		template<typename T> [[nodiscard("Pure function")]]
 		T* GetObject(ObjectHandle<T> handle) const;
+		/// @brief Gets an object shared pointer.
+		/// @tparam T Object type.
+		/// @param handle Object handle. Must be valid.
+		/// @return Object shared pointer.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::shared_ptr<T> GetSharedObject(ObjectHandle<T> handle) const;
 
+		/// @brief Collects garbage objects and removes them.
 		virtual void CollectGarbage() = 0;
 
 	protected:
+		/// @brief Registers the object.
+		/// @param objectType Object type.
+		/// @param object Object.
+		/// @return Object handle.
 		[[nodiscard("Weird call")]]
 		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object) = 0;
+		/// @brief Unregisters an object.
+		/// @param objectType Object type.
+		/// @param handle Object handle. Must be valid.
 		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) = 0;
+		/// @brief Replaces a registered object.
+		/// @param handle Object handle. Must be valid.
+		/// @param objectType Object type.
+		/// @param object Replacement object.
 		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, const std::shared_ptr<void>& object) = 0;
 
+		/// @brief Checks if the object handle is valid.
+		/// @param objectType Object type.
+		/// @param handle Object handle.
+		/// @return @a True if it's valid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
+		/// @brief Gets an object.
+		/// @param objectType Object type.
+		/// @param handle Object handle. Must be valid.
+		/// @return Object.
 		[[nodiscard("Pure function")]]
 		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const = 0;
 	};

@@ -27,9 +27,15 @@ export namespace PonyEngine::World
 
 		/// @brief Registers the component type.
 		/// @tparam T Component type.
-		/// @note The function is not thread-safe.
+		/// @note The function is not thread-safe and mustn't be used concurrently with @p IWorld functions.
 		template<Component T>
 		void RegisterComponent();
+		/// @brief Registers the component object handle member.
+		/// @tparam Component Component type.
+		/// @tparam Object Object type.
+		/// @param member Member pointer. Mustn't be nullptr.
+		/// @remark It's used for correct garbage collection.
+		/// @note The function is not thread-safe and mustn't be used concurrently with @p IWorld functions.
 		template<Component Component, typename Object>
 		void RegisterComponentObjectHandleMember(ObjectHandle<Object> Component::* member);
 
@@ -44,6 +50,10 @@ export namespace PonyEngine::World
 		/// @param componentSize Component size.
 		/// @param componentAlignment Component alignment.
 		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) = 0;
+		/// @brief Registers the component object handle member.
+		/// @param objectType Object type.
+		/// @param componentType Component type.
+		/// @param componentOffset Component offset.
 		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) = 0;
 	};
 }
