@@ -43,6 +43,7 @@ export namespace PonyEngine::World
 		[[nodiscard("Weird call")]]
 		TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object);
 		void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle);
+		void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, const std::shared_ptr<void>& object);
 
 		[[nodiscard("Pure function")]]
 		bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept;
@@ -112,6 +113,18 @@ namespace PonyEngine::World
 #endif
 
 		KillObject(handle.id);
+	}
+
+	void ObjectTable::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, const std::shared_ptr<void>& object)
+	{
+#ifndef NDEBUG
+		if (!IsObjectValid(objectType, handle)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid handle");
+		}
+#endif
+
+		objects[objectsSparse[handle.id]].object = object;
 	}
 
 	bool ObjectTable::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept

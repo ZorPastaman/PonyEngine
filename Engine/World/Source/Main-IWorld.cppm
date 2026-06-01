@@ -252,18 +252,24 @@ export namespace PonyEngine::World
 		ObjectHandle<T> RegisterObject(const std::shared_ptr<T>& object);
 		template<typename T>
 		void UnregisterObject(ObjectHandle<T> handle);
+		template<typename T>
+		void ReplaceObject(ObjectHandle<T> handle, const std::shared_ptr<T>& object);
+
 		template<typename T> [[nodiscard("Pure function")]]
 		bool IsObjectValid(ObjectHandle<T> handle) const noexcept;
 		template<typename T> [[nodiscard("Pure function")]]
 		T* GetObject(ObjectHandle<T> handle) const;
 		template<typename T> [[nodiscard("Pure function")]]
 		std::shared_ptr<T> GetSharedObject(ObjectHandle<T> handle) const;
+
 		virtual void CollectGarbage() = 0;
 
 	protected:
 		[[nodiscard("Weird call")]]
 		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object) = 0;
 		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) = 0;
+		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, const std::shared_ptr<void>& object) = 0;
+
 		[[nodiscard("Pure function")]]
 		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
 		[[nodiscard("Pure function")]]
@@ -419,6 +425,12 @@ namespace PonyEngine::World
 	void IWorld::UnregisterObject(const ObjectHandle<T> handle)
 	{
 		UnregisterObject(typeid(T), handle.typeless);
+	}
+
+	template<typename T>
+	void IWorld::ReplaceObject(const ObjectHandle<T> handle, const std::shared_ptr<T>& object)
+	{
+		ReplaceObject(handle.typeless, typeid(T), object);
 	}
 
 	template<typename T>

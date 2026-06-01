@@ -72,6 +72,8 @@ export namespace PonyEngine::World
 		[[nodiscard("Weird call")]] 
 		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object) override;
 		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) override;
+		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, const std::shared_ptr<void>& object) override;
+
 		[[nodiscard("Pure function")]] 
 		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 		[[nodiscard("Pure function")]] 
@@ -487,6 +489,11 @@ namespace PonyEngine::World
 	void World::UnregisterObject(const std::type_index objectType, const TypelessObjectHandle handle)
 	{
 		objectTable.UnregisterObject(objectType, handle);
+	}
+
+	void World::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, const std::shared_ptr<void>& object)
+	{
+		objectTable.ReplaceObject(handle, objectType, object);
 	}
 
 	bool World::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
