@@ -252,6 +252,7 @@ export namespace PonyEngine::World
 		/// @tparam T Object type.
 		/// @param object Object.
 		/// @return Object handle.
+		/// @remark If the object is already registered, its current handle is returned.
 		template<typename T> [[nodiscard("Weird call")]]
 		ObjectHandle<T> RegisterObject(const std::shared_ptr<T>& object);
 		/// @brief Unregisters an object.

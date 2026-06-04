@@ -11,6 +11,7 @@ export module PonyEngine.World.Impl:ObjectTable;
 
 import std;
 
+import PonyEngine.Memory;
 import PonyEngine.World;
 
 import :ComponentTable;
@@ -30,6 +31,7 @@ struct std::hash<std::pair<void*, std::type_index>> final
 
 export namespace PonyEngine::World
 {
+	/// @brief Object table.
 	class ObjectTable final
 	{
 	public:
@@ -40,46 +42,82 @@ export namespace PonyEngine::World
 
 		~ObjectTable() noexcept = default;
 
+		/// @brief Registers the object.
+		/// @param objectType Object type.
+		/// @param object Object.
+		/// @return Object handle.
 		[[nodiscard("Weird call")]]
 		TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object);
+		/// @brief Unregisters the object.
+		/// @param objectType Object type.
+		/// @param handle Object handle.
 		void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle);
+		/// @brief Replaces a registered object.
+		/// @param handle Object handle.
+		/// @param objectType Object type.
+		/// @param object Replacement object.
 		void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, const std::shared_ptr<void>& object);
 
+		/// @brief Checks if the object is valid.
+		/// @param objectType Object type.
+		/// @param handle Object handle.
+		/// @return @a True if it's valid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept;
+		/// @brief Gets an object.
+		/// @param objectType Object type.
+		/// @param handle Object handle.
+		/// @return Object.
 		[[nodiscard("Pure function")]]
 		const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const;
 
-		void CollectGarbage(const TypeRegistry& typeRegistry,
-			std::span<const ComponentTable> componentTables, const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices);
+		/// @brief Collects garbage.
+		/// @param typeRegistry Type registry.
+		/// @param componentTables Component table.
+		/// @param componentTablesIndices Component table index map.
+		/// @param arena Arena.
+		void CollectGarbage(const TypeRegistry& typeRegistry, std::span<const ComponentTable> componentTables, 
+			const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices, Memory::Arena& arena);
 
 		ObjectTable& operator =(const ObjectTable&) = delete;
 		ObjectTable& operator =(ObjectTable&&) = delete;
 
 	private:
+		/// @brief Object wrapper.
 		struct Object final
 		{
-			std::shared_ptr<void> object;
-			std::type_index type;
+			std::shared_ptr<void> object; ///< Object.
+			std::type_index type; ///< Object type.
 		};
 
+		/// @brief Tries to find an object handle.
+		/// @param objectType Object type.
+		/// @param object Object.
+		/// @return Object handle or @p std::nullopt if not found.
 		[[nodiscard("Pure function")]]
 		std::optional<TypelessObjectHandle> TryFindObject(std::type_index objectType, const std::shared_ptr<void>& object) const noexcept;
+		/// @brief Creates an object registration.
+		/// @param objectType Object type.
+		/// @param object Object.
+		/// @return Object handle.
 		[[nodiscard("Must be used")]]
 		TypelessObjectHandle CreateObject(std::type_index objectType, const std::shared_ptr<void>& object);
+		/// @brief Reuses an object registration.
+		/// @param objectType Object type.
+		/// @param object Object.
+		/// @return Object handle.
 		[[nodiscard("Must be used")]]
 		TypelessObjectHandle ResurrectObject(std::type_index objectType, const std::shared_ptr<void>& object);
+		/// @brief Kills an object.
+		/// @param handleId Object handle ID.
 		void KillObject(HandleID handleId);
 
-		std::vector<HandleID> objectsSparse;
-		std::vector<HandleVersion> handleVersions;
-		std::vector<HandleID> objectsDense;
-		std::vector<Object> objects;
-		std::vector<HandleID> objectFreeList;
-		std::unordered_map<std::pair<void*, std::type_index>, HandleID> objectIndices;
-
-		std::vector<bool> aliveObjectFlags;
-		std::vector<HandleID> objectsToRemove;
+		std::vector<HandleID> objectsSparse; ///< Sparse.
+		std::vector<HandleVersion> handleVersions; ///< Handle versions. Synced with the @p objectsSparse by index.
+		std::vector<HandleID> objectsDense; ///< Dense.
+		std::vector<Object> objects; ///< Objects. Synced with the @p objectsDense by index.
+		std::vector<HandleID> objectFreeList; ///< Object free list.
+		std::unordered_map<std::pair<void*, std::type_index>, HandleID> objectIndices; ///< Object index map.
 
 		static_assert(sizeof(HandleID) <= sizeof(std::size_t), "HandleID is greater than std::size_t.");
 	};
@@ -144,17 +182,21 @@ namespace PonyEngine::World
 		return objects[objectsSparse[handle.id]].object;
 	}
 
-	void ObjectTable::CollectGarbage(const TypeRegistry& typeRegistry,
-		const std::span<const ComponentTable> componentTables, const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices)
+	void ObjectTable::CollectGarbage(const TypeRegistry& typeRegistry, const std::span<const ComponentTable> componentTables, 
+		const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices, Memory::Arena& arena)
 	{
 		if (objectsDense.empty()) [[unlikely]]
 		{
 			return;
 		}
 
-		aliveObjectFlags.resize(objectsDense.size());
-		std::ranges::fill(aliveObjectFlags, false);
-		objectsToRemove.resize(objectsDense.size());
+		const std::size_t denseSize = objectsDense.size();
+		const Memory::Arena::Slice<bool> aliveObjectFlagsSlice = arena.Allocate<bool>(denseSize + 1uz); // The last element is a fake flag to remove a branch in the loop.
+		const Memory::Arena::Slice<HandleID> objectsToRemoveSlice = arena.Allocate<HandleID>(denseSize);
+		const std::span<bool> aliveObjectFlags = arena.Span(aliveObjectFlagsSlice);
+		const std::span<HandleID> objectsToRemove = arena.Span(objectsToRemoveSlice);
+
+		std::fill_n(aliveObjectFlags.data(), denseSize, false);
 
 		for (std::size_t foundCount = 0uz; const auto [componentType, componentTableIndex] : componentTablesIndices)
 		{
@@ -165,29 +207,30 @@ namespace PonyEngine::World
 			}
 
 			const ComponentTable& componentTable = componentTables[componentTableIndex];
-			for (EntityID i = 0uz; i < componentTable.Size(); ++i)
+			for (EntityID entityIndex = 0uz; entityIndex < componentTable.Size(); ++entityIndex)
 			{
-				const auto component = static_cast<std::byte*>(componentTable.Component(i));
+				const auto component = static_cast<std::byte*>(componentTable.Component(entityIndex));
 
 				for (const auto [offset, objectType] : objectOffsets)
 				{
 					const TypelessObjectHandle handle = *reinterpret_cast<const TypelessObjectHandle*>(component + offset);
-					if (IsObjectValid(objectType, handle))
-					{
-						foundCount += !aliveObjectFlags[objectsSparse[handle.id]];
-						aliveObjectFlags[objectsSparse[handle.id]] = true;
+					const bool isValid = IsObjectValid(objectType, handle);
+					const std::size_t validIndex = handle.id;
+					const std::size_t flagIndex = isValid ? validIndex : denseSize;
+					
+					foundCount += isValid && !aliveObjectFlags[flagIndex];
+					aliveObjectFlags[flagIndex] = true;
 
-						if (foundCount == aliveObjectFlags.size()) [[unlikely]]
-						{
-							return;
-						}
+					if (foundCount >= denseSize) [[unlikely]]
+					{
+						return;
 					}
 				}
 			}
 		}
 
 		std::size_t removeCount = 0uz;
-		for (std::size_t i = 0uz; i < objectsDense.size(); ++i)
+		for (std::size_t i = 0uz; i < denseSize; ++i)
 		{
 			objectsToRemove[removeCount] = objectsDense[i];
 			removeCount += !aliveObjectFlags[i];

@@ -17,6 +17,7 @@ import :ComponentTable;
 
 export namespace PonyEngine::World
 {
+	/// @brief Type registry.
 	class TypeRegistry final
 	{
 	public:
@@ -28,13 +29,30 @@ export namespace PonyEngine::World
 
 		~TypeRegistry() noexcept = default;
 
+		/// @brief Adds the component type.
+		/// @param componentType Component type.
+		/// @param size Component size.
+		/// @param alignment Component alignment.
 		void AddComponentType(std::type_index componentType, std::size_t size, std::size_t alignment);
+		/// @brief Registers the component object handle member.
+		/// @param objectType Object type.
+		/// @param componentType Component type.
+		/// @param componentOffset Handle offset.
 		void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset);
 
+		/// @brief Checks if the component type is valid.
+		/// @param componentType Component type.
+		/// @return @a True if it's valid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsValidComponent(std::type_index componentType) const noexcept;
+		/// @brief Creates a component table.
+		/// @param componentType Component type. Must be valid.
+		/// @return Component table.
 		[[nodiscard("Pure function")]]
 		ComponentTable CreateComponentTable(std::type_index componentType) const;
+		/// @brief Gets object handle offsets.
+		/// @param componentType Component type.
+		/// @return Offsets in the format <offset, object type>.
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::size_t, std::type_index>> ObjectOffsets(std::type_index componentType) const noexcept;
 
@@ -42,14 +60,15 @@ export namespace PonyEngine::World
 		TypeRegistry& operator =(TypeRegistry&& other) noexcept = default;
 
 	private:
+		/// @brief Component info.
 		struct ComponentInfo final
 		{
-			std::size_t size;
-			std::size_t alignment;
+			std::size_t size; ///< Component size.
+			std::size_t alignment; ///< Component alignment.
 		};
 
-		std::unordered_map<std::type_index, ComponentInfo> components;
-		std::unordered_map<std::type_index, std::vector<std::pair<std::size_t, std::type_index>>> objectOffsets; /// <componentType, <offset, objectType>>
+		std::unordered_map<std::type_index, ComponentInfo> components; ///< Component infos. <component type, info>.
+		std::unordered_map<std::type_index, std::vector<std::pair<std::size_t, std::type_index>>> objectOffsets; /// Object offsets. <componentType, <offset, objectType>>.
 	};
 }
 
@@ -65,7 +84,7 @@ namespace PonyEngine::World
 		std::vector<std::pair<std::size_t, std::type_index>>& offsets = objectOffsets[componentType];
 
 		std::size_t index = 0uz;
-		for (; index < offsets.size() && offsets[index].first < componentOffset; ++index)
+		for (; index < offsets.size() && offsets[index].first < componentOffset; ++index) // Sorted offsets.S
 		{
 		}
 

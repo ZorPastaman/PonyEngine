@@ -21,6 +21,7 @@ import :TypeRegistry;
 
 export namespace PonyEngine::World
 {
+	/// @brief World.
 	class World final : public IWorld
 	{
 	public:
@@ -80,66 +81,163 @@ export namespace PonyEngine::World
 		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const override;
 
 	private:
+		/// @brief Checks if the entity is invalid.
+		/// @param entity Entity to check.
+		/// @return @a True if it's invalid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsInvalid(Entity entity) const noexcept;
+		/// @brief Makes a new entity.
+		/// @return Entity.
 		[[nodiscard("Weird call")]]
 		Entity MakeEntity() noexcept;
+		/// @brief Resurrects an entity.
+		/// @return Entity.
 		[[nodiscard("Weird call")]]
 		Entity ResurrectEntity() noexcept;
+		/// @brief Kills the entity.
+		/// @param entity Entity to kill.
 		void KillEntity(Entity entity) noexcept;
 
+		/// @brief Tries to find a component table.
+		/// @param componentType Component type.
+		/// @return Component table or @a nullptr if not found.
 		[[nodiscard("Pure function")]]
 		ComponentTable* FindComponentTable(std::type_index componentType);
+		/// @brief Tries to find a component table.
+		/// @param componentType Component type.
+		/// @return Component table or @a nullptr if not found.
 		[[nodiscard("Pure function")]]
 		const ComponentTable* FindComponentTable(std::type_index componentType) const;
-		[[nodiscard("Pure function")]]
+		/// @brief Gets or creates a component table.
+		/// @param componentType Component type.
+		/// @return Component table.
+		[[nodiscard("Weird call")]]
 		ComponentTable& GetOrCreateComponentTable(std::type_index componentType);
+		/// @brief Adds entities and components to a component table if it doesn't have them.
+		/// @param entities Entities to add.
+		/// @param componentType Component type.
+		/// @return Component table.
 		ComponentTable& UpdateComponents(std::span<const Entity> entities, std::type_index componentType);
+		/// @brief Adds components to the table.
+		/// @param table Component table
+		/// @param entities Entities to add.
+		/// @param tableEntities Table entities cache.
 		static void AddComponents(ComponentTable& table, std::span<const Entity> entities, std::span<EntityID> tableEntities);
+		/// @brief Removes components from the table.
+		/// @param table Component table.
+		/// @param entities Entities.
+		/// @param tableEntities Table entities cache.
 		static void RemoveComponents(ComponentTable& table, std::span<const Entity> entities, std::span<EntityID> tableEntities) noexcept;
+		/// @brief Copies entities from the table to the external array.
+		/// @param table Component table.
+		/// @param entities Entities.
 		void CopyEntities(const ComponentTable& table, std::span<Entity> entities) const noexcept;
+		/// @brief Copies component pointers from the table to the external array.
+		/// @param table Component table.
+		/// @param componentData Component data.
 		static void CopyComponents(const ComponentTable& table, std::span<void*> componentData) noexcept;
 
+		/// @brief Finds required tables.
+		/// @param types Component types.
+		/// @param requiredTables Required tables.
+		/// @return @a True if all the tables found; @a false otherwise.
 		[[nodiscard("Must be used")]]
 		bool FindRequired(std::span<const std::type_index> types, std::span<const ComponentTable*> requiredTables) const noexcept;
+		/// @brief Finds excluded tables.
+		/// @param types Component types.
+		/// @param excludedTables Excluded tables cache.
+		/// @return Excluded tables.
 		[[nodiscard("Must be used")]]
 		std::span<const ComponentTable*> FindExcluded(std::span<const std::type_index> types, std::span<const ComponentTable*> excludedTables) const noexcept;
+		/// @brief Finds optional tables.
+		/// @param types Component types.
+		/// @param optionalTables Optional tables cache.
+		/// @param optionalIndices Optional table to output index map cache.
+		/// @return Optional tables and table to output index map.
 		[[nodiscard("Must be used")]]
 		std::pair<std::span<const ComponentTable*>, std::span<std::size_t>> FindOptional(std::span<const std::type_index> types, 
 			std::span<const ComponentTable*> optionalTables, std::span<std::size_t> optionalIndices) const noexcept;
+		/// @brief Processes a query with required tables.
+		/// @param requiredTables Required tables. Mustn't be empty.
+		/// @param excludedTables Excluded tables.
+		/// @param optionalTables Optional tables.
+		/// @param requiredComponents Required components cache.
+		/// @param optionalComponents Optional components cache.
+		/// @param optionalIndices Optional table to output index map.
+		/// @param callback Callback.
 		void ProcessQuery(std::span<const ComponentTable* const> requiredTables, std::span<const ComponentTable* const> excludedTables,
 			std::span<const ComponentTable* const> optionalTables, std::span<void*> requiredComponents, std::span<void*> optionalComponents,
 			std::span<std::size_t> optionalIndices, const std::function<void(QueryItem&)>& callback) const;
+		/// @brief Processes a query without required tables.
+		/// @param excludedTables Excluded tables.
+		/// @param optionalTables Optional tables.
+		/// @param optionalComponents Optional components cache.
+		/// @param optionalIndices Optional table to output index map.
+		/// @param callback Callback.
 		void ProcessQuery(std::span<const ComponentTable* const> excludedTables, std::span<const ComponentTable* const> optionalTables, 
 			std::span<void*> optionalComponents, std::span<std::size_t> optionalIndices, const std::function<void(QueryItem&)>& callback) const;
+		/// @brief Finds the smallest table.
+		/// @param tables Tables.
+		/// @return Smallest table.
 		[[nodiscard("Pure function")]]
 		static const ComponentTable* SmallestTable(std::span<const ComponentTable* const> tables) noexcept;
-		static bool FindEntity(std::span<const ComponentTable* const> tables, EntityID entityID, bool excluded) noexcept;
+		/// @brief Tries to find the entity in the tables.
+		/// @param tables Component tables.
+		/// @param entityId Entity to find.
+		/// @param excluded Required/excluded mode.
+		/// @return @a True if all the tables or at least one table contain the entity (depending on the @p excluded); @a false otherwise.
+		static bool FindEntity(std::span<const ComponentTable* const> tables, EntityID entityId, bool excluded) noexcept;
+		/// @brief Fills required components to the output.
+		/// @param entityId Entity.
+		/// @param requiredTables Required tables.
+		/// @param requiredComponents Required components.
 		static void FillRequired(EntityID entityId, std::span<const ComponentTable* const> requiredTables, std::span<void*> requiredComponents) noexcept;
+		/// @brief Fills optional components to the output.
+		/// @param entityId Entity.
+		/// @param optionalTables Optional tables.
+		/// @param optionalIndices Optional table to output index map.
+		/// @param optionalComponents Optional components.
 		static void FillOptional(EntityID entityId, std::span<const ComponentTable* const> optionalTables, std::span<const std::size_t> optionalIndices,
 			std::span<void*> optionalComponents) noexcept;
+		/// @brief Executes the callback.
+		/// @param requiredComponents Required components.
+		/// @param optionalComponents Optional components.
+		/// @param entityId Entity.
+		/// @param callback Callback.
+		/// @return @a True if the query must terminate; @a false otherwise.
 		[[nodiscard("Must be used")]]
 		bool ExecuteCallback(std::span<void* const> requiredComponents, std::span<void* const> optionalComponents, EntityID entityId, 
 			const std::function<void(QueryItem&)>& callback) const;
 
+		/// @brief Gets an arena.
+		/// @return Arena.
 		[[nodiscard("Pure function")]]
 		static Memory::Arena& Arena();
 
+		/// @brief Checks if the entities ara valid for world operations.
+		/// @param entities Entities to check.
 		void CheckIfValid(std::span<const Entity> entities) const;
+		/// @brief Checks if the entities contains duplicates.
+		/// @param entities Entities to check.
 		static void CheckForDuplicates(std::span<const Entity> entities);
 
+		/// @brief Checks if the types contains duplicates.
+		/// @param types Types to check.
 		static void CheckForDuplicates(std::span<const std::type_index> types);
+		/// @brief Checks if the type spans have the same types.
+		/// @param firstTypes First types.
+		/// @param secondTypes Second types.
 		static void CheckForDuplicates(std::span<const std::type_index> firstTypes, std::span<const std::type_index> secondTypes);
 
-		const TypeRegistry* typeRegistry;
+		const TypeRegistry* typeRegistry; ///< Type registry.
 
-		std::vector<EntityGeneration> entityGenerations;
-		std::vector<EntityID> deadEntities;
+		std::vector<EntityGeneration> entityGenerations; ///< Entity generations.
+		std::vector<EntityID> deadEntities; ///< Dead entities.
 
-		std::vector<ComponentTable> componentTables;
-		std::unordered_map<std::type_index, std::size_t> componentTablesIndices;
+		std::vector<ComponentTable> componentTables; ///< Component tables.
+		std::unordered_map<std::type_index, std::size_t> componentTablesIndices; ///< Component type to component tables index map.
 
-		ObjectTable objectTable;
+		ObjectTable objectTable; ///< Object table.
 
 		static_assert(sizeof(std::size_t) >= sizeof(EntityID), "std::size_t is less than EntityID.");
 	};
@@ -478,7 +576,7 @@ namespace PonyEngine::World
 
 	void World::CollectGarbage()
 	{
-		objectTable.CollectGarbage(*typeRegistry, componentTables, componentTablesIndices);
+		objectTable.CollectGarbage(*typeRegistry, componentTables, componentTablesIndices, Arena());
 	}
 
 	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
@@ -737,12 +835,12 @@ namespace PonyEngine::World
 		return tables[smallestIndex];
 	}
 
-	bool World::FindEntity(const std::span<const ComponentTable* const> tables, const EntityID entityID, const bool excluded) noexcept
+	bool World::FindEntity(const std::span<const ComponentTable* const> tables, const EntityID entityId, const bool excluded) noexcept
 	{
 		bool found = !excluded;
 		for (std::size_t i = 0uz; i < tables.size() && found ^ excluded; ++i)
 		{
-			found = tables[i]->Contains(entityID);
+			found = tables[i]->Contains(entityId);
 		}
 
 		return found;
@@ -784,7 +882,7 @@ namespace PonyEngine::World
 
 	Memory::Arena& World::Arena()
 	{
-		thread_local auto arena = Memory::Arena(0uz, 512uz);
+		thread_local auto arena = Memory::Arena(0uz, 256uz);
 		return arena;
 	}
 

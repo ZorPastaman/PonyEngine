@@ -25,9 +25,12 @@ import :World;
 
 export namespace PonyEngine::World
 {
+	/// @brief World service.
 	class WorldService final : public Application::IService, private IWorldService
 	{
 	public:
+		/// @brief Creates a world service.
+		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
 		explicit WorldService(Application::IApplicationContext& application) noexcept;
 		WorldService(const WorldService&) = delete;
@@ -50,9 +53,9 @@ export namespace PonyEngine::World
 		[[nodiscard("Weird call")]] 
 		virtual std::shared_ptr<IWorld> CreateWorld() override;
 
-		Application::IApplicationContext* application;
+		Application::IApplicationContext* application; ///< Application context.
 
-		TypeRegistry typeRegistry;
+		TypeRegistry typeRegistry; ///< Type registry.
 	};
 }
 

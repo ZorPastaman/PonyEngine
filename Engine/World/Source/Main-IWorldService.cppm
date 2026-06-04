@@ -41,6 +41,7 @@ export namespace PonyEngine::World
 
 		/// @brief Creates a world.
 		/// @return World.
+		/// @note The function is thread-safe.
 		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IWorld> CreateWorld() = 0;
 
@@ -76,7 +77,8 @@ namespace PonyEngine::World
 		}
 #endif
 
-		const std::size_t offset = reinterpret_cast<std::size_t>(&(reinterpret_cast<const Component*>(0)->*member).typeless);
+		Component dummy{};
+		const std::size_t offset = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(&(dummy.*member).typeless) - reinterpret_cast<std::uintptr_t>(&dummy));
 		RegisterComponentObjectHandleMember(typeid(Object), typeid(Component), offset);
 	}
 }
