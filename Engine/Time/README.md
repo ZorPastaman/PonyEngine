@@ -1,6 +1,6 @@
 # PonyEngine.Time module
 
-Log API module. Provides interfaces for a time service.
+Time service API module. Provides interfaces for a time service.
 
 The time service provides an engine time including real time, virtual time and fixed time steps.
 The time service controls a frame frequency as well.

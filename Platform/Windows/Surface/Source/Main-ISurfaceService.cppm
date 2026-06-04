@@ -36,12 +36,12 @@ export namespace PonyEngine::Surface::Windows
 
 		/// @brief Gets a last message time.
 		/// @return Last message time.
-		/// @note Must be called on a main thread only.
+		/// @note Must be used only in callbacks of observers; otherwise the return value may be invalid.
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept = 0;
 		/// @brief Gets the cursor position of the last message.
 		/// @return Cursor position in the screen coordinates of the last message.
-		/// @note Must be called on a main thread only.
+		/// @note Must be used only in callbacks of observers; otherwise the return value may be invalid.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> LastMessageCursorPosition() const noexcept = 0;
 
@@ -49,27 +49,27 @@ export namespace PonyEngine::Surface::Windows
 		/// @param observer Observer to add.
 		/// @param usagePage Usage page.
 		/// @param usage Usage.
-		/// @note Must be called on a main thread only.
+		/// @note The function is not thread-safe and mustn't be called concurrently with other input observer functions or the service tick.
 		virtual void AddRawInputObserver(IRawInputObserver& observer, USHORT usagePage, USHORT usage) = 0;
 		/// @brief Adds the raw input observer.
 		/// @param observer Observer to add.
 		/// @param rawInputUsages Pairs of usage page and usage.
-		/// @note Must be called on a main thread only.
+		/// @note The function is not thread-safe and mustn't be called concurrently with other input observer functions or the service tick.
 		virtual void AddRawInputObserver(IRawInputObserver& observer, std::span<const std::pair<USHORT, USHORT>> rawInputUsages) = 0;
 		/// @brief Removes the raw input observer from the specified message type.
 		/// @param observer Observer to remove.
 		/// @param usagePage Usage page.
 		/// @param usage Usage.
-		/// @note Must be called on a main thread only.
+		/// @note The function is not thread-safe and mustn't be called concurrently with other input observer functions or the service tick.
 		virtual void RemoveRawInputObserver(IRawInputObserver& observer, USHORT usagePage, USHORT usage) noexcept = 0;
 		/// @brief Removes the raw input observer from the specified message types.
 		/// @param observer Observer to remove.
 		/// @param rawInputUsages Pairs of usage page and usage.
-		/// @note Must be called on a main thread only.
+		/// @note The function is not thread-safe and mustn't be called concurrently with other input observer functions or the service tick.
 		virtual void RemoveRawInputObserver(IRawInputObserver& observer, std::span<const std::pair<USHORT, USHORT>> rawInputUsages) noexcept = 0;
 		/// @brief Removes the raw input observer from all the message types.
 		/// @param observer Observer to remove.
-		/// @note Must be called on a main thread only.
+		/// @note The function is not thread-safe and mustn't be called concurrently with other input observer functions or the service tick.
 		virtual void RemoveRawInputObserver(IRawInputObserver& observer) noexcept = 0;
 	};
 }

@@ -16,7 +16,6 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:ComputeCommandList
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
@@ -93,22 +92,19 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		class CommandList commandList; ///< Command list.
 		ComputePipelineBinding pipelineBinding; ///< Pipeline binding.
 		ContainerBinding containerBinding; ///< Container binding.
-		Memory::Arena arena; ///< Arena.
 	};
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	ComputeCommandList::ComputeCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
-		commandList(allocator, commandList),
-		arena(0uz, 128uz)
+		commandList(allocator, commandList)
 	{
 	}
 
 	ComputeCommandList::ComputeCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
-		commandList(std::move(allocator), std::move(commandList)),
-		arena(0uz, 128uz)
+		commandList(std::move(allocator), std::move(commandList))
 	{
 	}
 
@@ -129,7 +125,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void ComputeCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
-		commandList.Barrier(bufferBarriers, textureBarriers, arena);
+		commandList.Barrier(bufferBarriers, textureBarriers);
 	}
 
 	void ComputeCommandList::BindContainers(const IShaderDataContainer* const shaderDataContainer, const ISamplerContainer* const samplerContainer)
@@ -161,7 +157,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void ComputeCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
 		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding, arena);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
 	}
 
 	void ComputeCommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
@@ -173,7 +169,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	void ComputeCommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
 		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
-		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding, arena);
+		commandList.ClearUAV(texture, gpuViewIndex, cpuContainer, cpuViewIndex, values, rects, containerBinding);
 	}
 
 	void ComputeCommandList::Copy(const IBuffer& source, IBuffer& destination)

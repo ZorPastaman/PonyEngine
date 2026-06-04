@@ -38,7 +38,7 @@ export namespace PonyEngine::Surface
 		/// @return Rectangle style.
 		/// @note Must be called on a main thread only.
 		[[nodiscard("Pure function")]]
-		virtual Surface::RectStyle RectStyle() const noexcept = 0;
+		virtual Surface::RectStyle RectStyle() const = 0;
 		/// @brief Sets the rectangle style.
 		/// @param rectStyle Rectangle style.
 		/// @remark The final style may be different from the requested one, depending on the platform capabilities.
@@ -88,7 +88,7 @@ export namespace PonyEngine::Surface
 		virtual bool IsInFocus() const = 0;
 
 		/// @brief Gets a client title.
-		/// @return Client title.
+		/// @return Client title. May be a temporal string which must be used immediately.
 		/// @note Must be called on a main thread only.
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Title() const = 0;
@@ -142,11 +142,11 @@ export namespace PonyEngine::Surface
 
 		/// @brief Adds the observer.
 		/// @param observer Observer.
-		/// @note Must be called on a main thread only.
+		/// @note The function is not thread-safe and mustn't be called concurrently with @p RemoveObserver() or the service tick.
 		virtual void AddObserver(ISurfaceObserver& observer) = 0;
 		/// @brief Removes the observer.
 		/// @param observer Observer.
-		/// @note Must be called on a main thread only.
+		/// @note The function is not thread-safe and mustn't be called concurrently with @p AddObserver() or the service tick.
 		virtual void RemoveObserver(ISurfaceObserver& observer) noexcept = 0;
 	};
 }

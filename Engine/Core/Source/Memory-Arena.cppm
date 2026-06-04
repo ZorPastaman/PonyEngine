@@ -416,7 +416,8 @@ namespace PonyEngine::Memory
 		const std::size_t newSize = offset + byteCount;
 		if (newSize > capacity)
 		{
-			Reserve(std::bit_ceil(newSize));
+			const std::size_t alignedSize = newSize > 1uz << (std::numeric_limits<std::size_t>::digits - 1) ? std::numeric_limits<std::size_t>::max() : std::bit_ceil(newSize);
+			Reserve(alignedSize);
 		}
 
 		this->size = newSize;

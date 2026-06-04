@@ -177,7 +177,7 @@ namespace PonyEngine::Application
 			}
 			else [[unlikely]]
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Debug, "Tried to stop Application in inappropriate state. Ignoring. Current flow state: '{}'.", FlowState());
+				PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to stop Application in inappropriate state. Ignoring. Current flow state: '{}'.", FlowState());
 			}
 		}
 	}

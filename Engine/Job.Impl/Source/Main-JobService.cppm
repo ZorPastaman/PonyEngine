@@ -64,6 +64,8 @@ export namespace PonyEngine::Job
 			}
 		};
 
+		[[nodiscard("Must be used")]]
+		Job* GetFreeJob(std::size_t startWorkerIndex);
 		/// @brief Adds the job to the worker queue.
 		/// @param job Job to add.
 		/// @param worker Worker.
@@ -178,18 +180,13 @@ namespace PonyEngine::Job
 #endif
 
 		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
-		Worker& worker = *workers[workerIndex];
-		const auto [job, isNew] = worker.AcquireJob();
-		if (isNew)
-		{
-			const auto lock = std::lock_guard(jobsMutex);
-			jobs.push_back(std::unique_ptr<Job>(job));
-		}
+		Job* const job = GetFreeJob(workerIndex);
 		const std::size_t version = job->Version();
 		job->Task(task);
 		job->Block(dependencies.size());
 
 		const auto handle = JobHandle(job, version);
+		Worker& worker = *workers[workerIndex];
 
 		if (dependencies.empty())
 		{
@@ -247,6 +244,25 @@ namespace PonyEngine::Job
 
 		std::atomic_thread_fence(std::memory_order::acquire);
 		return true;
+	}
+
+	Job* JobService::GetFreeJob(const std::size_t startWorkerIndex)
+	{
+		for (std::size_t i = 0uz; i < workers.size(); ++i)
+		{
+			const std::size_t workerIndex = (startWorkerIndex + i) % workers.size();
+			if (Job* const job = workers[workerIndex]->AcquireJob())
+			{
+				return job;
+			}
+		}
+
+		auto job = std::make_unique<Job>();
+		Job* const jobPointer = job.get();
+		const auto lock = std::lock_guard(jobsMutex);
+		jobs.push_back(std::move(job));
+
+		return jobPointer;
 	}
 
 	void JobService::AddJobToWorker(Job& job, Worker& worker)

@@ -15,7 +15,6 @@ export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:CopyCommandList;
 
 import std;
 
-import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RenderDevice;
 
@@ -73,22 +72,19 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	private:
 		class CommandList commandList; ///< Command list.
-		Memory::Arena arena; ///< Arena.
 	};
 }
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
 	CopyCommandList::CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
-		commandList(allocator, commandList),
-		arena(0uz, 128uz)
+		commandList(allocator, commandList)
 	{
 	}
 
 	CopyCommandList::CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
-		commandList(std::move(allocator), std::move(commandList)),
-		arena(0uz, 128uz)
+		commandList(std::move(allocator), std::move(commandList))
 	{
 	}
 
@@ -109,7 +105,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	void CopyCommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
-		commandList.Barrier(bufferBarriers, textureBarriers, arena);
+		commandList.Barrier(bufferBarriers, textureBarriers);
 	}
 
 	void CopyCommandList::Copy(const IBuffer& source, IBuffer& destination)

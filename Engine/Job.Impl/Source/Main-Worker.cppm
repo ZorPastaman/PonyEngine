@@ -59,7 +59,7 @@ export namespace PonyEngine::Job
 		/// @brief Acquires a job from the worker job pool.
 		/// @return Job and a flag that tells if the job is newly created (if @a true).
 		[[nodiscard("Pure function")]]
-		std::pair<Job*, bool> AcquireJob();
+		Job* AcquireJob();
 		/// @brief Releases the job to the worker job pool.
 		/// @param job Job to release.
 		void ReleaseJob(Job& job);
@@ -168,7 +168,7 @@ namespace PonyEngine::Job
 		thread->join();
 	}
 
-	std::pair<Job*, bool> Worker::AcquireJob()
+	Job* Worker::AcquireJob()
 	{
 		return jobPool.Acquire();
 	}

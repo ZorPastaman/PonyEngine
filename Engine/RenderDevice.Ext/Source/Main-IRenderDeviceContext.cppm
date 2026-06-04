@@ -52,7 +52,7 @@ export namespace PonyEngine::RenderDevice
 		/// @note This function mustn't be called on different threads at the same time.
 		/// @note This function mustn't be called while @p TextureFormat(TextureFormatID) or @p IsValid(TextureFormatID) is executing.
 		/// @note It's recommended that the backend get all texture format ids on its initialization.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual struct TextureFormatID TextureFormatID(std::string_view textureFormat) = 0;
 		/// @brief Gets a texture format.
 		/// @param textureFormatId Texture format ID.

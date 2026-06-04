@@ -1,6 +1,6 @@
 # PonyEngine.Time.Impl module
 
-Time implementation module.
+Time service implementation module.
 
 ## Dependencies
 

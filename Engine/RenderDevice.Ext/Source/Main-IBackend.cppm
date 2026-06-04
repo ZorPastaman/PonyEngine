@@ -54,7 +54,7 @@ export namespace PonyEngine::RenderDevice
 		/// @param params Buffer parameters.
 		/// @return Buffer.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IBuffer> CreateBuffer(const CommittedResourceHeapParams& heapParams, const BufferParams& params) = 0;
 
 		/// @brief Gets a texture format support.
@@ -74,7 +74,7 @@ export namespace PonyEngine::RenderDevice
 		/// @param params Texture parameters.
 		/// @return Texture.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ITexture> CreateTexture(const CommittedResourceHeapParams& heapParams, const TextureParams& params) = 0;
 
 		/// @brief Gets a copyable footprint count for a texture created with the @p params.
@@ -114,7 +114,7 @@ export namespace PonyEngine::RenderDevice
 		/// @param params Container parameters.
 		/// @return Shader data container.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IShaderDataContainer> CreateShaderDataContainer(const ShaderDataContainerParams& params) = 0;
 		/// @brief Creates a constant buffer view.
 		/// @param buffer Target buffer. May be nullptr.
@@ -160,7 +160,7 @@ export namespace PonyEngine::RenderDevice
 		/// @param params Container parameters.
 		/// @return Render target container.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IRenderTargetContainer> CreateRenderTargetContainer(const RenderTargetContainerParams& params) = 0;
 		/// @brief Creates a render target view.
 		/// @param texture Target texture. May be nullptr.
@@ -178,7 +178,7 @@ export namespace PonyEngine::RenderDevice
 		/// @param params Container parameters.
 		/// @return Depth stencil container.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IDepthStencilContainer> CreateDepthStencilContainer(const DepthStencilContainerParams& params) = 0;
 		/// @brief Creates a depth stencil view.
 		/// @param texture Target texture. May be nullptr.
@@ -196,7 +196,7 @@ export namespace PonyEngine::RenderDevice
 		/// @param params Container parameters.
 		/// @return Sampler container.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ISamplerContainer> CreateSamplerContainer(const SamplerContainerParams& params) = 0;
 		/// @brief Creates a sampler.
 		/// @param container Sampler container.
@@ -213,37 +213,37 @@ export namespace PonyEngine::RenderDevice
 		/// @param params Pipeline layout parameters.
 		/// @return Pipeline layout.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IPipelineLayout> CreatePipelineLayout(const PipelineLayoutParams& params) = 0;
 		/// @brief Creates a graphics pipeline state.
 		/// @param layout Pipeline layout.
 		/// @param params Pipeline state parameters.
 		/// @return Graphics pipeline state.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IGraphicsPipelineState> CreateGraphicsPipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) = 0;
 		/// @brief Creates a compute pipeline state.
 		/// @param layout Pipeline layout.
 		/// @param params Pipeline state parameters.
 		/// @return Compute pipeline state.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IComputePipelineState> CreateComputePipelineState(const std::shared_ptr<const IPipelineLayout>& layout, const ComputePipelineStateParams& params) = 0;
 
 		/// @brief Creates a graphics command list.
 		/// @return Graphics command list.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IGraphicsCommandList> CreateGraphicsCommandList() = 0;
 		/// @brief Creates a compute command list.
 		/// @return Compute command list.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IComputeCommandList> CreateComputeCommandList() = 0;
 		/// @brief Creates a copy command list.
 		/// @return Copy command list.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ICopyCommandList> CreateCopyCommandList() = 0;
 		/// @brief Executes the graphics command lists.
 		/// @param commandLists Graphics command lists to execute. May be empty.
@@ -263,7 +263,7 @@ export namespace PonyEngine::RenderDevice
 		/// @brief Creates a secondary graphics command list.
 		/// @return Secondary graphics command list.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<ISecondaryGraphicsCommandList> CreateSecondaryGraphicsCommandList() = 0;
 
 		/// @brief Checks if the swap chain is created and alive.
@@ -307,12 +307,12 @@ export namespace PonyEngine::RenderDevice
 		/// @brief Creates a fence.
 		/// @return Fence.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IFence> CreateFence() = 0;
 		/// @brief Creates a waiter.
 		/// @return Waiter.
 		/// @note The function is thread-safe.
-		[[nodiscard("Wierd call")]]
+		[[nodiscard("Weird call")]]
 		virtual std::shared_ptr<IWaiter> CreateWaiter() = 0;
 	};
 }

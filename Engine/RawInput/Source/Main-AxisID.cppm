@@ -30,6 +30,7 @@ struct std::hash<PonyEngine::RawInput::AxisID> final
 	[[nodiscard("Pure function")]]
 	std::size_t operator ()(const PonyEngine::RawInput::AxisID axisId) const noexcept
 	{
-		return std::hash<std::uint64_t>()(*reinterpret_cast<const std::uint64_t*>(&axisId));
+		const std::uint64_t hash = static_cast<std::uint64_t>(axisId.hash) << 32 | axisId.index;
+		return std::hash<std::uint64_t>()(hash);
 	}
 };

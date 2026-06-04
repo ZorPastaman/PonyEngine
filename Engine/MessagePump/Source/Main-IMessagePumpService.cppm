@@ -32,12 +32,12 @@ export namespace PonyEngine::MessagePump
 
 		/// @brief Gets the time of the last message.
 		/// @return Time of the last message. It's a low resolution time point.
-		/// @note The function is thread-safe if the message pump service isn't ticking. Otherwise, it mustn't be called.
+		/// @note The function is thread-safe if called on a main thread or if the message pump service isn't ticking. Otherwise, it mustn't be called.
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const noexcept = 0;
 		/// @brief Gets the cursor position of the last message.
 		/// @return Cursor position in the screen coordinates of the last message.
-		/// @note The function is thread-safe if the message pump service isn't ticking. Otherwise, it mustn't be called.
+		/// @note The function is thread-safe if called on a main thread or if the message pump service isn't ticking. Otherwise, it mustn't be called.
 		[[nodiscard("Pure function")]]
 		virtual Math::Vector2<std::int32_t> LastMessageCursorPosition() const noexcept = 0;
 	};

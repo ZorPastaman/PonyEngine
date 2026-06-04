@@ -88,8 +88,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Adds barriers to the command list.
 		/// @param bufferBarriers Buffer barriers.
 		/// @param textureBarriers Texture barriers.
-		/// @param arena Arena.
-		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers, Memory::Arena& arena);
+		void Barrier(std::span<const BufferBarrier> bufferBarriers, std::span<const TextureBarrier> textureBarriers);
 
 		/// @brief Sets the raster regions.
 		/// @param regions Raster regions.
@@ -173,18 +172,16 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param viewIndex RTV index.
 		/// @param color Clear color.
 		/// @param rects Clear rectangles.
-		/// @param arena Arena.
-		void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, std::span<const Math::CornerRect<std::uint32_t>> rects,
-			Memory::Arena& arena);
+		void ClearRTV(const IRenderTargetContainer& container, std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
+			std::span<const Math::CornerRect<std::uint32_t>> rects);
 		/// @brief Clears the depth stencil view.
 		/// @param container DSV container.
 		/// @param viewIndex DSV index.
 		/// @param depth Clear depth. Nullopt means no depth clearing.
 		/// @param stencil Clear stencil. Nullopt means no stencil clearing.
 		/// @param rects Clear rectangles.
-		/// @param arena Arena.
 		void ClearDSV(const IDepthStencilContainer& container, std::uint32_t viewIndex, std::optional<float> depth, std::optional<std::uint8_t> stencil,
-			std::span<const Math::CornerRect<std::uint32_t>> rects, Memory::Arena& arena);
+			std::span<const Math::CornerRect<std::uint32_t>> rects);
 		/// @brief Clears the unordered access view.
 		/// @param buffer Target buffer.
 		/// @param gpuViewIndex GPU shader data container index.
@@ -202,9 +199,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param values Clear values.
 		/// @param rects Clear rectangles.
 		/// @param containerBinding Container bindings.
-		/// @param arena Arena.
 		void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena);
+			const Math::Vector4<std::uint32_t>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding);
 		/// @brief Clears the unordered access view.
 		/// @param buffer Target buffer.
 		/// @param gpuViewIndex GPU shader data container index.
@@ -222,9 +218,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param values Clear values.
 		/// @param rects Clear rectangles.
 		/// @param containerBinding Container bindings.
-		/// @param arena Arena.
 		void ClearUAV(const ITexture& texture, std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex,
-			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena);
+			const Math::Vector4<float>& values, std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding);
 
 		/// @brief Copies from the buffer to the buffer.
 		/// @param source Source buffer.
@@ -308,6 +303,11 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		CommandList& operator =(CommandList&&) = delete;
 
 	private:
+		/// @brief Gets an arena.
+		/// @return Arena.
+		[[nodiscard("Pure function")]]
+		static Memory::Arena& Arena();
+
 		/// @brief Casts the engine buffer barrier to native buffer barriers.
 		/// @param bufferBarriers Engine buffer barriers.
 		/// @param nativeBufferBarriers Native buffer barriers.
@@ -540,10 +540,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		return isOpen;
 	}
 
-	void CommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers, Memory::Arena& arena)
+	void CommandList::Barrier(const std::span<const BufferBarrier> bufferBarriers, const std::span<const TextureBarrier> textureBarriers)
 	{
 		ValidateState();
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_BUFFER_BARRIER> nativeBufferBarriers = arena.Allocate<D3D12_BUFFER_BARRIER>(bufferBarriers.size());
 		const Memory::Arena::Slice<D3D12_TEXTURE_BARRIER> nativeTextureBarriers = arena.Allocate<D3D12_TEXTURE_BARRIER>(textureBarriers.size());
@@ -894,7 +895,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearRTV(const IRenderTargetContainer& container, const std::uint32_t viewIndex, const Math::ColorRGBA<float>& color, 
-		const std::span<const Math::CornerRect<std::uint32_t>> rects, Memory::Arena& arena)
+		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
 		ValidateState();
 
@@ -912,6 +913,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		}
 #endif
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
 		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
@@ -926,7 +928,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearDSV(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
-		const std::span<const Math::CornerRect<std::uint32_t>> rects, Memory::Arena& arena)
+		const std::span<const Math::CornerRect<std::uint32_t>> rects)
 	{
 		ValidateState();
 
@@ -949,6 +951,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			return;
 		}
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
 		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
@@ -972,10 +975,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena)
+		const Math::Vector4<std::uint32_t>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding)
 	{
 		ValidateState();
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
 		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
@@ -998,10 +1002,11 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	}
 
 	void CommandList::ClearUAV(const ITexture& texture, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
-		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding, Memory::Arena& arena)
+		const Math::Vector4<float>& values, const std::span<const Math::CornerRect<std::uint32_t>> rects, const ContainerBinding& containerBinding)
 	{
 		ValidateState();
 
+		Memory::Arena& arena = Arena();
 		arena.Free();
 		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
 		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
@@ -1327,6 +1332,12 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 			SetObjectName(*allocator, this->name);
 			throw;
 		}
+	}
+
+	Memory::Arena& CommandList::Arena()
+	{
+		thread_local auto arena = Memory::Arena(0uz, 256uz);
+		return arena;
 	}
 
 	void CommandList::ToNativeBarriers(const std::span<const BufferBarrier> bufferBarriers, const std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriers)
