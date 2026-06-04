@@ -8,7 +8,8 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 - Modular architecture;
 - Replaceable engine modules;
 - Easily extensible;
-- Mesh shader–based render.
+- Mesh shader–based render;
+- ECS.
 
 ## Prerequisites
 
@@ -104,11 +105,15 @@ These modules are optional. To add them to a build, a specific CMake flag must b
 | [PonyEngine.RawInput.Keyboard.Impl](Engine/RawInput.Keyboard.Impl)             | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL`       | Raw input keyboard provider module. Reads input from keyboard devices and provides it to a raw input service.                 |
 | [PonyEngine.RawInput.Mouse.Impl](Engine/RawInput.Mouse.Impl)                   | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`          | Raw input mouse provider module. Reads input from mouse devices and provides it to a raw input service.                       |
 | [PonyEngine.RawInput.XInput.Impl](Engine/RawInput.XInput.Impl)                 | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`         | Raw input XInput provider module. Reads input from XInput devices and provides it to a raw input service.                     |
-| [PonyEngine.Shader](Engine/Shader)                                             | `PONY_ENGINE_SHADER`                        | Shader utilities module. Provides utility functions and classes for both C\++ and hlsl.                                        |
+| [PonyEngine.Shader](Engine/Shader)                                             | `PONY_ENGINE_SHADER`                        | Shader utilities module. Provides utility functions and classes for both C\++ and hlsl.                                       |
 | [PonyEngine.RenderDevice](Engine/RenderDevice)                                 | `PONY_ENGINE_RENDER_DEVICE`                 | Render device service API module. The service provides a low level access to a GPU.                                           |
 | [PonyEngine.RenderDevice.Ext](Engine/RenderDevice.Ext)                         | `PONY_ENGINE_RENDER_DEVICE_EXT`             | Render device service extension API module. Provides interfaces for backends.                                                 |
 | [PonyEngine.RenderDevice.Impl](Engine/RenderDevice.Impl)                       | `PONY_ENGINE_RENDER_DEVICE_IMPL`            | Render device service implementation module. Provides a low level access to a GPU via added backends.                         |
 | [PonyEngine.RenderDevice.Direct3D12.Impl](Engine/RenderDevice.Direct3D12.Impl) | `PONY_ENGINE_RENDER_DEVICE_DIRECT3D12_IMPL` | Direct3D12 backend implementation.                                                                                            |
+| [PonyEngine.Job](Engine/Job)                                                   | `PONY_ENGINE_JOB`                           | Job service API module. The job service is a simple way to utilize multi-threaded CPUs.                                       |
+| [PonyEngine.Job.Impl](Engine/Job.Impl)                                         | `PONY_ENGINE_JOB_IMPL`                      | Job service implementation module.                                                                                            |
+| [PonyEngine.World](Engine/World)                                               | `PONY_ENGINE_WORLD`                         | World service API module. The service manages game worlds.                                                                    |
+| [PonyEngine.World.Impl](Engine/World.Impl)                                     | `PONY_ENGINE_WORLD_IMPL`                    | World service implementation module.                                                                                          |
 
 ### Platform modules
 
@@ -149,6 +154,8 @@ The table of the module-platform compatibility:
 | [PonyEngine.RenderDevice.Direct3D12.Impl](Engine/RenderDevice.Direct3D12.Impl) | &check;                          | &check;                     |
 | [PonyEngine.Job](Engine/Job)                                                   | -                                | &check;                     |
 | [PonyEngine.Job.Impl](Engine/Job.Impl)                                         | -                                | &check;                     |
+| [PonyEngine.World](Engine/World)                                               | -                                | &check;                     |
+| [PonyEngine.World.Impl](Engine/World.Impl)                                     | -                                | &check;                     |
 
 The engine automatically applies platform-specific configuration based on `CMAKE_SYSTEM_NAME`. The value must match one of the supported platforms.
 Users can provide their own platform implementations by setting the CMake flag `PONY_ENGINE_CUSTOM_PLATFORM` to `true`. In this case, the built-in platform configuration is disabled, and users are responsible for configuring the modules themselves.
@@ -220,6 +227,21 @@ The register types are shared and not divided into `b, t, u, s`. The engine trea
 ## Text
 
 The engine exclusively uses char and std::string with UTF-8 encoding, except where platform APIs require different types or encodings.
+
+## Multi-threading
+
+The engine tries to utilize modern multi-threaded CPUs as much as possible keeping the ease of use of a single-threaded logic.
+To achieve it, it follows the paradigm single-threaded logic, multi-threaded computations.
+
+It means that cross-service interaction should be done only on a main thread and only from a service tick. But any service may use jobs or dedicated threads to compute something 
+if they don't interact with other services.
+Some services may allow to interact with them from other threads. But usually a service should access that service only inside its own tick.
+Your service may create jobs that access another service in its tick and wait for their completion inside the same tick function.
+
+Some services create objects that can be accessed on other threads. But usually the same object can be accessed only on one thread.
+
+In any case, the paradigm is just a target, and you have to check the docs of a service and follow them. Some may be more strict, some may be less.
+By default, read functions are safe, write functions are not.
 
 ## Build
 

@@ -246,6 +246,7 @@ export namespace PonyEngine::World
 		/// @brief Runs the entity query.
 		/// @param params Query parameters.
 		/// @param callback Query callback. It's called on each entity that satisfies the query parameters.
+		/// @note You mustn't call any function of the world inside the @p callback.
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const = 0;
 
 		/// @brief Registers the object.
