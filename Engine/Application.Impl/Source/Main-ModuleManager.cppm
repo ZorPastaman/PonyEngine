@@ -232,24 +232,24 @@ namespace PonyEngine::Application
 		{
 			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
 			{
-				IModule* const module = *modulePtr;
+				IModule* const appModule = *modulePtr;
 #ifndef NDEBUG
-				if (!module) [[unlikely]]
+				if (!appModule) [[unlikely]]
 				{
 					throw std::logic_error("Module is nullptr");
 				}
 #endif
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*&*module).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*&*appModule).name());
 				try
 				{
-					module->StartUp(*this);
+					appModule->StartUp(*this);
 				}
 				catch (...)
 				{
-					PONY_LOG_X(application->Logger(), std::current_exception(), "On starting up '{}' module.", typeid(*&*module).name());
+					PONY_LOG_X(application->Logger(), std::current_exception(), "On starting up '{}' module.", typeid(*&*appModule).name());
 					throw;
 				}
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module done.", typeid(*&*module).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module done.", typeid(*&*appModule).name());
 				lastModule = current;
 			}
 		}
@@ -267,17 +267,17 @@ namespace PonyEngine::Application
 		{
 			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
 			{
-				IModule* const module = *modulePtr;
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module...", typeid(*&*module).name());
+				IModule* const appModule = *modulePtr;
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module...", typeid(*&*appModule).name());
 				try
 				{
-					module->ShutDown(*this);
+					appModule->ShutDown(*this);
 				}
 				catch (...)
 				{
-					PONY_LOG_X(application->Logger(), std::current_exception(), "On shutting down '{}' module.", typeid(*&*module).name());
+					PONY_LOG_X(application->Logger(), std::current_exception(), "On shutting down '{}' module.", typeid(*&*appModule).name());
 				}
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module done.", typeid(*&*module).name());
+				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module done.", typeid(*&*appModule).name());
 			}
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down modules done.")

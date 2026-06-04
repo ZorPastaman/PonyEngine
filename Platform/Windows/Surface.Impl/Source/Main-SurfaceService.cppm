@@ -67,7 +67,7 @@ export namespace PonyEngine::Surface::Windows
 		virtual SurfaceFeature SupportedFeatures() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual Surface::RectStyle RectStyle() const noexcept override;
+		virtual Surface::RectStyle RectStyle() const override;
 		virtual void RectStyle(const Surface::RectStyle& rectStyle) override;
 
 		[[nodiscard("Pure funtion")]]
@@ -411,14 +411,26 @@ namespace PonyEngine::Surface::Windows
 		return SurfaceFeature::FullscreenStyle | SurfaceFeature::WindowStyle | SurfaceFeature::ClientRect | SurfaceFeature::Title | SurfaceFeature::HardwareCursor;
 	}
 
-	Surface::RectStyle SurfaceService::RectStyle() const noexcept
+	Surface::RectStyle SurfaceService::RectStyle() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return rectStyle;
 	}
 
 	void SurfaceService::RectStyle(const Surface::RectStyle& rectStyle)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -451,12 +463,24 @@ namespace PonyEngine::Surface::Windows
 
 	Math::Vector2<std::int32_t> SurfaceService::ScreenResolution() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return static_cast<Math::Vector2<std::int32_t>>(GetResolution());
 	}
 
 	Math::CornerRect<std::int32_t> SurfaceService::ClientRect() const
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -469,6 +493,11 @@ namespace PonyEngine::Surface::Windows
 	void SurfaceService::ClientRect(const Math::CornerRect<std::int32_t>& clientRect)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -512,12 +541,24 @@ namespace PonyEngine::Surface::Windows
 
 	Math::Vector2<std::int32_t> SurfaceService::MinimalSize() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return minimalClientSize;
 	}
 
 	void SurfaceService::MinimalSize(const Math::Vector2<std::int32_t>& minimalSize)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -546,22 +587,48 @@ namespace PonyEngine::Surface::Windows
 
 	bool SurfaceService::IsAlive() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return IsWindow(windowHandle);
 	}
 
 	bool SurfaceService::IsActive() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return windowActive;
 	}
 
 	bool SurfaceService::IsInFocus() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return windowInFocus;
 	}
 
 	std::string_view SurfaceService::Title() const
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -593,6 +660,11 @@ namespace PonyEngine::Surface::Windows
 	void SurfaceService::Title(const std::string_view title)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -607,11 +679,25 @@ namespace PonyEngine::Surface::Windows
 
 	bool SurfaceService::CursorVisibility() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return cursorVisible;
 	}
 
 	void SurfaceService::CursorVisibility(const bool visible)
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		if (cursorVisible != visible)
 		{
 			ShowCursor(visible);
@@ -622,11 +708,25 @@ namespace PonyEngine::Surface::Windows
 
 	std::optional<Math::CornerRect<float>> SurfaceService::CursorClippingRect() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		return cursorClippingRect;
 	}
 
 	void SurfaceService::CursorClippingRect(const std::optional<Math::CornerRect<float>>& clippingRect)
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		if (CanApplyCursorClipping())
 		{
 			ClipCursor(clippingRect);
@@ -637,6 +737,13 @@ namespace PonyEngine::Surface::Windows
 
 	Math::Vector2<std::int32_t> SurfaceService::CursorPosition() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		POINT position;
 		if (!GetCursorPos(&position)) [[unlikely]]
 		{
@@ -648,6 +755,13 @@ namespace PonyEngine::Surface::Windows
 
 	bool SurfaceService::IsCursorVisible() const
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		CURSORINFO cursorInfo;
 		cursorInfo.cbSize = sizeof(CURSORINFO);
 		if (!GetCursorInfo(&cursorInfo)) [[unlikely]]
@@ -661,6 +775,11 @@ namespace PonyEngine::Surface::Windows
 	Math::Vector2<std::int32_t> SurfaceService::ClientToScreen(const Math::Vector2<std::int32_t>& clientPoint) const
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");
@@ -679,6 +798,11 @@ namespace PonyEngine::Surface::Windows
 	Math::Vector2<std::int32_t> SurfaceService::ScreenToClient(const Math::Vector2<std::int32_t>& screenPoint) const
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (!IsAlive()) [[unlikely]]
 		{
 			throw std::logic_error("Window is dead");

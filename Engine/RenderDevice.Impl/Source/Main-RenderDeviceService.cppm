@@ -243,6 +243,10 @@ namespace PonyEngine::RenderDevice
 	BackendHandle RenderDeviceService::AddBackend(const std::function<std::shared_ptr<IBackend>(IRenderDeviceContext&)>& factory)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
 		if (!nextBackendHandle.IsValid()) [[unlikely]]
 		{
 			throw std::overflow_error("No more backend handles available");
@@ -276,6 +280,10 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::RemoveBackend(const BackendHandle backendHandle)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
 		if (application->FlowState() != Application::FlowState::StartingUp && application->FlowState() != Application::FlowState::ShuttingDown) [[unlikely]]
 		{
 			throw std::logic_error("Backend can be removed only on start-up or shut-down");
@@ -322,6 +330,11 @@ namespace PonyEngine::RenderDevice
 	void RenderDeviceService::SwitchBackend(const std::optional<std::size_t> backendIndex)
 	{
 #ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
 		if (backendIndex && *backendIndex >= backends.Size()) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");

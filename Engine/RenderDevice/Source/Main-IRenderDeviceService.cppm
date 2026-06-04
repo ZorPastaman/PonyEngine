@@ -95,6 +95,7 @@ export namespace PonyEngine::RenderDevice
 		/// @param backendIndex Backend index to switch to. Nullopt means no backend. Must be nullopt or less than the @p BackendCount().
 		/// @remark On a backend switch, all the backend data becomes invalid.
 		/// @note The function isn't thread-safe.
+		/// @note The function must be called on a main thread.
 		virtual void SwitchBackend(std::optional<std::size_t> backendIndex) = 0;
 
 		/// @brief Gets a device support of an active backend.
