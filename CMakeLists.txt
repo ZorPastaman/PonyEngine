@@ -93,6 +93,7 @@ option(PONY_ENGINE_RENDER_DEVICE_EXT "Enable PonyEngine.RenderDevice.Ext module.
 option(PONY_ENGINE_RENDER_DEVICE_IMPL "Enable PonyEngine.RenderDevice.Impl module." OFF)
 option(PONY_ENGINE_RENDER_DEVICE_DIRECT3D12_IMPL "Enable PonyEngine.RenderDevice.Direct3D12.Impl module." OFF)
 option(PONY_ENGINE_SHADER "Enable PonyEngine.Shader module" OFF)
+option(PONY_ENGINE_FILE "Enable PonyEngine.File module" OFF)
 option(PONY_ENGINE_WORLD "Enable PonyEngine.World module" OFF)
 option(PONY_ENGINE_WORLD_IMPL "Enable PonyEngine.World.Impl module" OFF)
 
@@ -176,6 +177,10 @@ endif()
 
 if(PONY_ENGINE_SHADER)
 	add_subdirectory("Engine/Shader")
+endif()
+
+if(PONY_ENGINE_FILE)
+	add_subdirectory("Engine/File")
 endif()
 
 if(PONY_ENGINE_WORLD)
@@ -315,6 +320,11 @@ if(NOT PONY_IS_SUBPROJECT)
 	if(TARGET PonyEngine.Shader)
 		pony_set_log_defines(PonyEngine.Shader ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 		pony_set_build_options(PonyEngine.Shader ${PONY_ENGINE_OPTIMIZATION})
+	endif()
+
+	if(TARGET PonyEngine.File)
+		pony_set_log_defines(PonyEngine.File ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+		pony_set_build_options(PonyEngine.File ${PONY_ENGINE_OPTIMIZATION})
 	endif()
 
 	if(TARGET PonyEngine.World)
