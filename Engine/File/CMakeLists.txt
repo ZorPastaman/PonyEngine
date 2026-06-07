@@ -7,6 +7,7 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-FileAccess.cppm"
+	"Source/Main-FileOpenMode.cppm"
 	"Source/Main-IFile.cppm"
 	"Source/Main-IFileService.cppm"
 	"Source/Main-IReadRequest.cppm"

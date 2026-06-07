@@ -32,7 +32,9 @@ export namespace PonyEngine::File
 		[[nodiscard("Pure function")]]
 		virtual FileAccess Access() const noexcept = 0;
 
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, const std::function<void(const IReadRequest&)>* callback = nullptr) const = 0;
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, const std::function<void(const IWriteRequest&)>* callback = nullptr) = 0;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params) const = 0;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) const = 0;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params) = 0;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback) = 0;
 	};
 }

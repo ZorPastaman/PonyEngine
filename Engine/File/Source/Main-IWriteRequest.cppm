@@ -28,6 +28,6 @@ export namespace PonyEngine::File
 		virtual const WriteParams& Params() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual std::size_t WriteByteCount() const = 0;
+		virtual std::size_t WrittenByteCount() const = 0;
 	};
 }

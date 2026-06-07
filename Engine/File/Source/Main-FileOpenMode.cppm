@@ -9,23 +9,33 @@
 
 module;
 
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Type/Enum.h"
 
-export module PonyEngine.File:IFileService;
+export module PonyEngine.File:FileOpenMode;
 
 import std;
 
-import :FileAccess;
-import :FileOpenMode;
-import :IFile;
-
 export namespace PonyEngine::File
 {
-	class IFileService
+	enum class FileOpenMode : std::uint8_t
 	{
-		PONY_INTERFACE_BODY(IFileService)
-
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const std::filesystem::path& path, FileAccess access, FileOpenMode openMode = FileOpenMode::None) = 0;
+		None = 0,
+		Truncate = 1 << 0,
+		All = (1 << 1) - 1
 	};
+
+	PONY_ENUM_MASK_FEATURES(FileOpenMode)
+}
+
+namespace PonyEngine::File
+{
+	constexpr std::array<std::string_view, 1> FileOpenModeNames
+	{
+		"Truncate"
+	};
+}
+
+export
+{
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::File::FileOpenMode, PonyEngine::File::FileOpenModeNames)
 }
