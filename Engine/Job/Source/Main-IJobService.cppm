@@ -31,17 +31,17 @@ export namespace PonyEngine::Job
 		virtual std::size_t WorkerCount() const noexcept = 0;
 
 		/// @brief Schedules a job for execution.
-		/// @param task Job task. May be reused but mustn't be scheduled concurrently. Mustn't be nullptr.
+		/// @param task Job task. May be reused but mustn't be scheduled concurrently. Must be valid till the job completes.
 		/// @param dependency Job dependency.
 		/// @return Job handle. May be used to wait for the job completion or as a dependency for other jobs.
 		/// @note The function is thread-safe.
-		JobHandle Schedule(const std::shared_ptr<ITask>& task, const JobHandle& dependency);
+		JobHandle Schedule(ITask& task, const JobHandle& dependency);
 		/// @brief Schedules a job for execution.
-		/// @param task Job task. May be reused but mustn't be scheduled concurrently. Mustn't be nullptr.
+		/// @param task Job task. May be reused but mustn't be scheduled concurrently. Must be valid till the job completes.
 		/// @param dependencies Job dependencies.
 		/// @return Job handle. May be used to wait for the job completion or as a dependency for other jobs.
 		/// @note The function is thread-safe.
-		virtual JobHandle Schedule(const std::shared_ptr<ITask>& task, std::span<const JobHandle> dependencies = std::span<const JobHandle>()) = 0;
+		virtual JobHandle Schedule(ITask& task, std::span<const JobHandle> dependencies = std::span<const JobHandle>()) = 0;
 
 		/// @brief Puts a cpu thread the function is called on into a sleep till the job is completed.
 		/// @param job Job to wait for.
@@ -62,7 +62,7 @@ export namespace PonyEngine::Job
 
 namespace PonyEngine::Job
 {
-	JobHandle IJobService::Schedule(const std::shared_ptr<ITask>& task, const JobHandle& dependency)
+	JobHandle IJobService::Schedule(ITask& task, const JobHandle& dependency)
 	{
 		return Schedule(task, std::span(&dependency, 1uz));
 	}
