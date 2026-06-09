@@ -32,7 +32,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @param smallIcon Small application icon.
 		/// @param cursor Cursor.
 		[[nodiscard("Pure constructor")]]
-		WindowClass(Application::IApplicationContext& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor);
+		WindowClass(const Application::IApplicationContext& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor);
 		WindowClass(const WindowClass&) = delete;
 		WindowClass(WindowClass&&) = delete;
 
@@ -51,7 +51,7 @@ export namespace PonyEngine::Surface::Windows
 		WindowClass& operator =(WindowClass&&) = delete;
 
 	private:
-		Application::IApplicationContext* application; ///< Application.
+		const Application::IApplicationContext* application; ///< Application.
 
 		HMODULE moduleHandle; ///< Module instance handle.
 		ATOM classHandle; /// Registered class handle.
@@ -60,7 +60,7 @@ export namespace PonyEngine::Surface::Windows
 
 namespace PonyEngine::Surface::Windows
 {
-	WindowClass::WindowClass(Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
+	WindowClass::WindowClass(const Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
 		application{&application},
 		moduleHandle(Platform::Windows::GetModule())
 	{

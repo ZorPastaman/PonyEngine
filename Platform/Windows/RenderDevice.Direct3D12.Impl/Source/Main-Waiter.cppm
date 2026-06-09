@@ -11,13 +11,15 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/RenderDevice/Windows/D3D12Framework.h"
 
 export module PonyEngine.RenderDevice.Direct3D12.Impl.Windows:Waiter;
 
 import std;
 
-import PonyEngine.RenderDevice;
+import PonyEngine.Log;
+import PonyEngine.RenderDevice.Ext;
 
 import :Fence;
 import :FenceUtility;
@@ -28,8 +30,10 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 	class Waiter final : public IWaiter
 	{
 	public:
+		/// @brief Creates a waiter.
+		/// @param renderDevice Render device context.
 		[[nodiscard("Pure constructor")]]
-		Waiter() noexcept = default;
+		explicit Waiter(const IRenderDeviceContext& renderDevice) noexcept;
 		Waiter(const Waiter&) = delete;
 		Waiter(Waiter&&) = delete;
 
@@ -57,6 +61,8 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param timeout Timeout.
 		void WaitEvents(std::size_t count, std::chrono::milliseconds timeout);
 
+		const IRenderDeviceContext* renderDevice; ///< Render device context.
+
 		std::vector<HANDLE> waitEvents; ///< Wait events.
 
 		std::string name; ///< Name.
@@ -65,11 +71,19 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
+	Waiter::Waiter(const IRenderDeviceContext& renderDevice) noexcept :
+		renderDevice{&renderDevice}
+	{
+	}
+
 	Waiter::~Waiter() noexcept
 	{
 		for (std::size_t i = waitEvents.size(); i-- > 0uz; )
 		{
-			CloseHandle(waitEvents[i]);
+			if (!CloseHandle(waitEvents[i])) [[unlikely]]
+			{
+				PONY_LOG(renderDevice->Logger(), Log::LogType::Error, "Failed to close wait event handle. Error code: '0x{:X}'.", GetLastError())
+			}
 		}
 	}
 

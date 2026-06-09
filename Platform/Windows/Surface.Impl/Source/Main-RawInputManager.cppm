@@ -34,7 +34,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @param surface Surface service.
 		/// @param memoryManager Memory manager.
 		[[nodiscard("Pure constructor")]]
-		RawInputManager(Application::Windows::IApplicationContext& application, ISurfaceService& surface, MemoryManager& memoryManager) noexcept;
+		RawInputManager(const Application::Windows::IApplicationContext& application, ISurfaceService& surface, MemoryManager& memoryManager) noexcept;
 		RawInputManager(const RawInputManager&) = delete;
 		RawInputManager(RawInputManager&&) = delete;
 
@@ -110,7 +110,7 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		static constexpr std::pair<USHORT, USHORT> Unpack(DWORD value) noexcept;
 
-		Application::Windows::IApplicationContext* application; ///< Application context.
+		const Application::Windows::IApplicationContext* application; ///< Application context.
 		ISurfaceService* surface; ///< Surface service.
 		MemoryManager* memoryManager; ///< Memory manager.
 
@@ -122,7 +122,7 @@ export namespace PonyEngine::Surface::Windows
 
 namespace PonyEngine::Surface::Windows
 {
-	RawInputManager::RawInputManager(Application::Windows::IApplicationContext& application, ISurfaceService& surface, MemoryManager& memoryManager) noexcept :
+	RawInputManager::RawInputManager(const Application::Windows::IApplicationContext& application, ISurfaceService& surface, MemoryManager& memoryManager) noexcept :
 		application{&application},
 		surface{&surface},
 		memoryManager{&memoryManager}

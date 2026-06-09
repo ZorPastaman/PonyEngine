@@ -130,7 +130,7 @@ export namespace PonyEngine::RawInput::XInput::Windows
 			std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 
 		IRawInputContext* input; ///< Raw input context.
-		Surface::ISurfaceService* surface; ///< Surface service.
+		const Surface::ISurfaceService* surface; ///< Surface service.
 
 		GamepadAxisMap gamepadAxisMap; ///< Gamepad axis map.
 		GamepadContainer gamepadContainer; ///< Gamepad containers.

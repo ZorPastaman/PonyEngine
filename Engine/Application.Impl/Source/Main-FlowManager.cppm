@@ -31,7 +31,7 @@ export namespace PonyEngine::Application
 		/// @brief Creates a flow manager.
 		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
-		explicit FlowManager(IApplicationContext& application) noexcept;
+		explicit FlowManager(const IApplicationContext& application) noexcept;
 		FlowManager(const FlowManager&) = delete;
 		FlowManager(FlowManager&&) = delete;
 
@@ -93,7 +93,7 @@ export namespace PonyEngine::Application
 			enum FlowState flowState; ///< Flow state.
 		};
 
-		IApplicationContext* application; ///< Application context.
+		const IApplicationContext* application; ///< Application context.
 
 		std::atomic<std::uint64_t> frameCount; ///< Frame count.
 		std::atomic<FlowInfo> flowInfo; ///< Flow info.
@@ -105,7 +105,7 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	FlowManager::FlowManager(IApplicationContext& application) noexcept :
+	FlowManager::FlowManager(const IApplicationContext& application) noexcept :
 		application{&application},
 		frameCount{0ull},
 		flowInfo(FlowInfo{.exitCode = ExitCodes::InitialExitCode, .flowState = FlowState::StartingUp})

@@ -34,7 +34,7 @@ export namespace PonyEngine::Job
 		/// @brief Creates a job service.
 		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
-		explicit JobService(Application::IApplicationContext& application);
+		explicit JobService(const Application::IApplicationContext& application);
 		JobService(const JobService&) = delete;
 		JobService(JobService&&) = delete;
 
@@ -81,7 +81,7 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		static const Job* ToNativeJob(const void* job);
 
-		Application::IApplicationContext* application; ///< Application context.
+		const Application::IApplicationContext* application; ///< Application context.
 
 		std::vector<std::unique_ptr<Worker>> workers; ///< Workers.
 		std::atomic_size_t targetWorkerIndex; ///< Target worker index. Used and incremented on scheduling a new job.
@@ -99,7 +99,7 @@ export namespace PonyEngine::Job
 
 namespace PonyEngine::Job
 {
-	JobService::JobService(Application::IApplicationContext& application) :
+	JobService::JobService(const Application::IApplicationContext& application) :
 		application{&application},
 		targetWorkerIndex{0uz},
 		jobQueueVersion{0uz}
