@@ -142,7 +142,10 @@ namespace PonyEngine::File::Windows
 
 		if (!WriteFile(fileHandle, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to create file write task: Error code = '0x{:X}'", GetLastError()));
+			if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING)
+			{
+				throw std::runtime_error(std::format("Failed to create file write task: Error code = '0x{:X}'", error));
+			}
 		}
 
 		return request;
