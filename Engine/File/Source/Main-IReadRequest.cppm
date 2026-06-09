@@ -26,8 +26,5 @@ export namespace PonyEngine::File
 
 		[[nodiscard("Pure function")]]
 		virtual const ReadParams& Params() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::size_t ReadByteCount() const = 0;
 	};
 }

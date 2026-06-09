@@ -15,8 +15,7 @@ export module PonyEngine.File:IFileService;
 
 import std;
 
-import :FileAccess;
-import :FileOpenMode;
+import :FileParams;
 import :IFile;
 
 export namespace PonyEngine::File
@@ -26,6 +25,6 @@ export namespace PonyEngine::File
 		PONY_INTERFACE_BODY(IFileService)
 
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const std::filesystem::path& path, FileAccess access, FileOpenMode openMode = FileOpenMode::None) = 0;
+		virtual std::shared_ptr<IFile> OpenFile(const FileParams& params) = 0;
 	};
 }

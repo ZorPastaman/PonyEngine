@@ -11,31 +11,37 @@ module;
 
 #include "PonyEngine/Type/Enum.h"
 
-export module PonyEngine.File:RequestStatus;
+export module PonyEngine.File:FileFlag;
 
 import std;
 
 export namespace PonyEngine::File
 {
-	enum class RequestStatus : std::uint8_t
+	enum class FileFlag : std::uint8_t
 	{
-		Pending,
-		Success,
-		Failed
+		None = 0,
+		SequentialScan = 1 << 0,
+		RandomAccess = 1 << 1,
+		DeleteOnClose = 1 << 2,
+		WriteThrough = 1 << 3,
+		All = (1 << 4) - 1,
 	};
+
+	PONY_ENUM_MASK_FEATURES(FileFlag)
 }
 
 namespace PonyEngine::File
 {
-	constexpr std::array<std::string_view, 3> RequestStatusNames
+	constexpr std::array<std::string_view, 4> FileFlagNames
 	{
-		"Pending",
-		"Success",
-		"Failed"
+		"SequentialScan",
+		"RandomAccess",
+		"DeleteOnClose",
+		"WriteThrough"
 	};
 }
 
-export 
+export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::File::RequestStatus, PonyEngine::File::RequestStatusNames)
+	PONY_ENUM_MASK_FORMATTER(PonyEngine::File::FileFlag, PonyEngine::File::FileFlagNames)
 }

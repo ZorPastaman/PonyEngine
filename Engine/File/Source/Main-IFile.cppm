@@ -16,6 +16,7 @@ export module PonyEngine.File:IFile;
 import std;
 
 import :FileAccess;
+import :FileFlag;
 import :IReadRequest;
 import :IWriteRequest;
 import :ReadParams;
@@ -31,10 +32,12 @@ export namespace PonyEngine::File
 		virtual const std::filesystem::path& Path() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual FileAccess Access() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual FileFlag Flags() const noexcept = 0;
 
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params) const = 0;
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) const = 0;
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params) = 0;
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback) = 0;
+		[[nodiscard("Must be used")]]
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback = nullptr) const = 0;
+		[[nodiscard("Must be used")]]
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback = nullptr) = 0;
 	};
 }

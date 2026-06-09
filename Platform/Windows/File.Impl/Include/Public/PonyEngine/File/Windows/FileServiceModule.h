@@ -7,24 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+#pragma once
 
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Macro/Compiler.h"
 
-export module PonyEngine.File:IWriteRequest;
+import PonyEngine.Application.Ext;
 
-import std;
-
-import :IRequest;
-import :WriteParams;
-
-export namespace PonyEngine::File
+namespace PonyEngine::File::Windows
 {
-	class IWriteRequest : public IRequest
-	{
-		PONY_INTERFACE_BODY(IWriteRequest)
-
-		[[nodiscard("Pure function")]]
-		virtual const WriteParams& Params() const noexcept = 0;
-	};
+	/// @brief Gets the file service module.
+	/// @return File service module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT Application::IModule* GetFileServiceModule();
 }

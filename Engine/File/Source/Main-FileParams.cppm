@@ -7,24 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.File:IWriteRequest;
+export module PonyEngine.File:FileParams;
 
 import std;
 
-import :IRequest;
-import :WriteParams;
+import :FileAccess;
+import :FileFlag;
+import :FileOpenMode;
 
 export namespace PonyEngine::File
 {
-	class IWriteRequest : public IRequest
+	struct FileParams final
 	{
-		PONY_INTERFACE_BODY(IWriteRequest)
-
-		[[nodiscard("Pure function")]]
-		virtual const WriteParams& Params() const noexcept = 0;
+		std::filesystem::path path;
+		FileAccess access = FileAccess::None;
+		FileOpenMode openMode = FileOpenMode::None;
+		FileFlag flags = FileFlag::None;
 	};
 }

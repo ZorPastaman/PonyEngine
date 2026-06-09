@@ -28,6 +28,10 @@ if(TARGET PonyEngine.Surface.Impl)
 	add_subdirectory("Surface.Impl")
 endif()
 
+if(TARGET PonyEngine.File.Impl)
+	add_subdirectory("File.Impl")
+endif()
+
 if(TARGET PonyEngine.RawInput.Keyboard.Impl)
 	add_subdirectory("RawInput.Keyboard.Impl")
 endif()

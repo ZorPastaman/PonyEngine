@@ -10,7 +10,9 @@
 export module PonyEngine.File;
 
 export import :FileAccess;
+export import :FileFlag;
 export import :FileOpenMode;
+export import :FileParams;
 export import :IFile;
 export import :IFileService;
 export import :IReadRequest;
