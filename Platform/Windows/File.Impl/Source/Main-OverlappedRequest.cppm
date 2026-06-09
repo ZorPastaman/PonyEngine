@@ -9,6 +9,8 @@
 
 module;
 
+#include <cstddef>
+
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.File.Impl.Windows:OverlappedRequest;
@@ -67,11 +69,13 @@ namespace PonyEngine::File::Windows
 
 	OVERLAPPED& OverlappedRequest::Overlapped() noexcept
 	{
+		static_assert(offsetof(OverlappedRequest, overlapped) == 0, "Invalid overlapped placement.");
 		return overlapped;
 	}
 
 	const OVERLAPPED& OverlappedRequest::Overlapped() const noexcept
 	{
+		static_assert(offsetof(OverlappedRequest, overlapped) == 0, "Invalid overlapped placement.");
 		return overlapped;
 	}
 

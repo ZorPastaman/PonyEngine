@@ -62,16 +62,43 @@ export namespace PonyEngine::File::Windows
 
 namespace PonyEngine::File::Windows
 {
+	template<typename CharT>
+	struct CreateFileSelector;
+	template<>
+	struct CreateFileSelector<char>
+	{
+		static constexpr auto Value = &CreateFileA;
+	};
+	template<>
+	struct CreateFileSelector<wchar_t>
+	{
+		static constexpr auto Value = &CreateFileW;
+	};
+
 	File::File(const Application::IApplicationContext& application, const Worker& worker, const FileParams& params) :
 		application{&application},
 		worker{&worker},
 		info(params.path, params.access, params.flags),
-		fileHandle{CreateFileW(params.path.lexically_normal().c_str(), ToDesiredAccess(params.access), FILE_SHARE_READ, nullptr, 
+		fileHandle{CreateFileSelector<std::filesystem::path::value_type>::Value(params.path.c_str(), ToDesiredAccess(params.access), FILE_SHARE_READ, nullptr,
 			ToCreationDisposition(params.access, params.openMode), FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | ToFlags(params.flags), nullptr)}
 	{
 		if (fileHandle == INVALID_HANDLE_VALUE) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create file: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		try
+		{
+			this->worker->AssociateFile(fileHandle, *this);
+		}
+		catch (...)
+		{
+			if (!CloseHandle(fileHandle)) [[unlikely]]
+			{
+				PONY_LOG(this->application->Logger(), Log::LogType::Error, "Failed to close file. Error code: '0x{:X}'.", GetLastError());
+			}
+
+			throw;
 		}
 	}
 
