@@ -113,9 +113,9 @@ namespace PonyEngine::File::Windows
 			throw std::runtime_error(std::format("Failed to create file iocp: Error code = '0x{:X}'", GetLastError()));
 		}
 
-		if (!ReadFile(fileHandle, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
+		if (!ReadFile(fileHandle, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[likely]]
 		{
-			if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING)
+			if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
 			{
 				throw std::runtime_error(std::format("Failed to create file read task: Error code = '0x{:X}'", error));
 			}
@@ -140,9 +140,9 @@ namespace PonyEngine::File::Windows
 			throw std::runtime_error(std::format("Failed to create file iocp: Error code = '0x{:X}'", GetLastError()));
 		}
 
-		if (!WriteFile(fileHandle, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
+		if (!WriteFile(fileHandle, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[likely]]
 		{
-			if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING)
+			if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
 			{
 				throw std::runtime_error(std::format("Failed to create file write task: Error code = '0x{:X}'", error));
 			}
