@@ -32,6 +32,8 @@ export namespace PonyEngine::File::Windows
 		virtual void Begin() override;
 		virtual void End() override;
 
+		virtual void AddInterfaces(Application::IServiceInterfaceAdder& adder) override;
+
 		FileService& operator =(const FileService&) = delete;
 		FileService& operator =(FileService&&) = delete;
 
@@ -59,6 +61,11 @@ namespace PonyEngine::File::Windows
 
 	void FileService::End()
 	{
+	}
+
+	void FileService::AddInterfaces(Application::IServiceInterfaceAdder& adder)
+	{
+		adder.AddInterface<IFileService>(*this);
 	}
 
 	std::shared_ptr<IFile> FileService::OpenFile(const FileParams& params)

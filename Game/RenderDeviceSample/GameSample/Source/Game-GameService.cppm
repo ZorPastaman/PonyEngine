@@ -7,6 +7,7 @@ export module Game:GameService;
 import std;
 
 import PonyEngine.Application.Ext;
+import PonyEngine.File;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput;
@@ -37,9 +38,6 @@ export namespace Game
 
 	private:
 		virtual void Tick() override;
-
-		[[nodiscard("Pure function")]]
-		std::vector<std::byte> LoadShader(const std::filesystem::path& path);
 
 		class GpuTransform final
 		{
@@ -72,6 +70,7 @@ export namespace Game
 		};
 
 		PonyEngine::Application::IApplicationContext* application;
+		PonyEngine::File::IFileService* fileService;
 		PonyEngine::RenderDevice::IRenderDeviceService* renderDevice;
 		PonyEngine::RawInput::IRawInputService* rawInput;
 		PonyEngine::Time::ITimeService* time;
@@ -139,6 +138,7 @@ namespace Game
 	GameService::GameService(PonyEngine::Application::IApplicationContext& application) :
 		application{&application},
 		renderDevice{&this->application->GetService<PonyEngine::RenderDevice::IRenderDeviceService>()},
+		fileService{&this->application->GetService<PonyEngine::File::IFileService>()},
 		rawInput{&this->application->GetService<PonyEngine::RawInput::IRawInputService>()},
 		time{&this->application->GetService<PonyEngine::Time::ITimeService>()},
 		aAxis(rawInput->HashAxis(PonyEngine::RawInput::KeyboardLayout::MainAPath)),
@@ -172,6 +172,54 @@ namespace Game
 
 	void GameService::Begin()
 	{
+		const std::shared_ptr<PonyEngine::File::IFile> objectShader = fileService->OpenFile(PonyEngine::File::FileParams
+		{
+			.path = (application->RootDirectory() / OBJECT_SHADER).lexically_normal(),
+			.access = PonyEngine::File::FileAccess::Read
+		});
+		const std::size_t objectShaderSize = std::filesystem::file_size(objectShader->Path());
+		auto objectShaderBytes = std::vector<std::byte>(objectShaderSize);
+		const std::shared_ptr<PonyEngine::File::IReadRequest> objectShaderRead = objectShader->Read(PonyEngine::File::ReadParams
+		{
+			.buffer = objectShaderBytes
+		});
+
+		const std::shared_ptr<PonyEngine::File::IFile> pixelShader = fileService->OpenFile(PonyEngine::File::FileParams
+		{
+			.path = (application->RootDirectory() / PIXEL_SHADER).lexically_normal(),
+			.access = PonyEngine::File::FileAccess::Read
+		});
+		const std::size_t pixelShaderSize = std::filesystem::file_size(pixelShader->Path());
+		auto pixelShaderBytes = std::vector<std::byte>(pixelShaderSize);
+		const std::shared_ptr<PonyEngine::File::IReadRequest> pixelShaderRead = pixelShader->Read(PonyEngine::File::ReadParams
+		{
+			.buffer = pixelShaderBytes
+		});
+
+		const std::shared_ptr<PonyEngine::File::IFile> fullscreenQuadShader = fileService->OpenFile(PonyEngine::File::FileParams
+		{
+			.path = (application->RootDirectory() / FULLSCREEN_QUAD_SHADER).lexically_normal(),
+			.access = PonyEngine::File::FileAccess::Read
+		});
+		const std::size_t fullscreenQuadShaderSize = std::filesystem::file_size(fullscreenQuadShader->Path());
+		auto fullscreenQuadShaderBytes = std::vector<std::byte>(fullscreenQuadShaderSize);
+		const std::shared_ptr<PonyEngine::File::IReadRequest> fullscreenQuadShaderRead = fullscreenQuadShader->Read(PonyEngine::File::ReadParams
+		{
+			.buffer = fullscreenQuadShaderBytes
+		});
+
+		const std::shared_ptr<PonyEngine::File::IFile> textureShader = fileService->OpenFile(PonyEngine::File::FileParams
+		{
+			.path = (application->RootDirectory() / TEXTURE_SHADER).lexically_normal(),
+			.access = PonyEngine::File::FileAccess::Read
+		});
+		const std::size_t textureShaderSize = std::filesystem::file_size(textureShader->Path());
+		auto textureShaderBytes = std::vector<std::byte>(textureShaderSize);
+		const std::shared_ptr<PonyEngine::File::IReadRequest> textureShaderRead = textureShader->Read(PonyEngine::File::ReadParams
+		{
+			.buffer = textureShaderBytes
+		});
+
 		PONY_LOG(application->Logger(), PonyEngine::Log::LogType::Info, "Setting cursor...");
 		auto& surface = application->GetService<PonyEngine::Surface::ISurfaceService>();
 		surface.CursorVisibility(false);
@@ -531,13 +579,13 @@ namespace Game
 		});
 		layout->Name("BoxLayout");
 
-		const std::vector<std::byte> objectShader = LoadShader(OBJECT_SHADER);
-		const std::vector<std::byte> pixelShader = LoadShader(PIXEL_SHADER);
+		objectShaderRead->Wait();
+		pixelShaderRead->Wait();
 		constexpr auto opaqueBlendParams = PonyEngine::RenderDevice::ArithmeticRenderTargetBlendParams{};
 		boxPipelineState = renderDevice->CreateGraphicsPipelineState(layout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
 		{
-			.meshShader = objectShader,
-			.pixelShader = pixelShader,
+			.meshShader = objectShaderBytes,
+			.pixelShader = pixelShaderBytes,
 			.attachment = PonyEngine::RenderDevice::AttachmentParams
 			{
 				.renderTargetFormats = std::span<const PonyEngine::RenderDevice::RenderTargetAttachmentFormat>(&renderTargetTextureFormat, 1uz),
@@ -597,17 +645,17 @@ namespace Game
 		});
 		outputLayout->Name("OutputLayout");
 
-		const std::vector<std::byte> fullscreenQuadShader = LoadShader(FULLSCREEN_QUAD_SHADER);
-		const std::vector<std::byte> textureShader = LoadShader(TEXTURE_SHADER);
 		const auto outputTextureFormat = PonyEngine::RenderDevice::RenderTargetAttachmentFormat
 		{
 			.format = renderDevice->TextureFormatID(PonyEngine::RenderDevice::TextureFormat::B8G8R8A8_Unorm),
 			.srgb = true
 		};
+		fullscreenQuadShaderRead->Wait();
+		textureShaderRead->Wait();
 		outputPipelineState = renderDevice->CreateGraphicsPipelineState(outputLayout, PonyEngine::RenderDevice::GraphicsPipelineStateParams
 		{
-			.meshShader = fullscreenQuadShader,
-			.pixelShader = textureShader,
+			.meshShader = fullscreenQuadShaderBytes,
+			.pixelShader = textureShaderBytes,
 			.attachment = PonyEngine::RenderDevice::AttachmentParams
 			{
 				.renderTargetFormats = std::span<const PonyEngine::RenderDevice::RenderTargetAttachmentFormat>(&outputTextureFormat, 1uz)
@@ -1035,23 +1083,6 @@ namespace Game
 		});
 
 		renderDevice->PresentNextSwapChainBuffer();
-	}
-
-	std::vector<std::byte> GameService::LoadShader(const std::filesystem::path& path)
-	{
-		auto file = std::ifstream(application->RootDirectory() / path, std::ios::binary | std::ios::ate);
-		if (!file) [[unlikely]]
-		{
-			throw std::runtime_error("Failed to open file");
-		}
-
-		const auto size = file.tellg();
-		file.seekg(0);
-
-		auto data = std::vector<std::byte>(static_cast<size_t>(size));
-		file.read(reinterpret_cast<char*>(data.data()), size);
-
-		return data;
 	}
 
 	GameService::GpuTransform::GpuTransform() noexcept :
