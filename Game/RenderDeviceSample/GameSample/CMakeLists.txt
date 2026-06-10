@@ -31,6 +31,7 @@ target_link_libraries(GameSample PUBLIC
 target_link_libraries(GameSample PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
+	PonyEngine.File
 	PonyEngine.RawInput
 	PonyEngine.RenderDevice
 	PonyEngine.Shader

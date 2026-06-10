@@ -48,7 +48,7 @@ export namespace PonyEngine::Job
 		bool HasTask() const noexcept;
 		/// @brief Sets the task.
 		/// @param task Task to set. Can be nullptr.
-		void Task(const std::shared_ptr<ITask>& task) noexcept;
+		void Task(ITask* task) noexcept;
 		/// @brief Executes a current task.
 		/// @note The job must have a task, otherwise the call is not allowed.
 		void Execute() noexcept;
@@ -81,7 +81,7 @@ export namespace PonyEngine::Job
 
 	private:
 		std::atomic_size_t version; ///< Job version.
-		std::shared_ptr<ITask> task; ///< Job task.
+		ITask* task; ///< Job task.
 
 		std::atomic_size_t blockCount; ///< Block count. How many dependencies must be completed before starting this job.
 		mutable std::vector<Job*> dependents; ///< Dependents.
@@ -94,7 +94,8 @@ export namespace PonyEngine::Job
 namespace PonyEngine::Job
 {
 	Job::Job() noexcept :
-		version{0uz},
+		version{0uz}, 
+		task{nullptr},
 		blockCount{0uz}
 	{
 	}
@@ -120,10 +121,10 @@ namespace PonyEngine::Job
 
 	bool Job::HasTask() const noexcept
 	{
-		return task.get();
+		return task;
 	}
 
-	void Job::Task(const std::shared_ptr<ITask>& task) noexcept
+	void Job::Task(ITask* const task) noexcept
 	{
 		this->task = task;
 	}

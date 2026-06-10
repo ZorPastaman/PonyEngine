@@ -1259,7 +1259,7 @@ namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 	std::shared_ptr<IWaiter> Engine::CreateWaiter()
 	{
-		return std::make_shared<Waiter>();
+		return std::make_shared<Waiter>(*renderDevice);
 	}
 
 	struct SwapChainSupport Engine::SwapChainSupport() const

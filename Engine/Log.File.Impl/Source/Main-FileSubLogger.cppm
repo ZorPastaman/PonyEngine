@@ -27,7 +27,7 @@ export namespace PonyEngine::Log::File
 		/// @param logger Logger context.
 		/// @param path Log file path.
 		[[nodiscard("Pure constructor")]]
-		FileSubLogger(ILoggerContext& logger, const std::filesystem::path& path);
+		FileSubLogger(const ILoggerContext& logger, const std::filesystem::path& path);
 		FileSubLogger(const FileSubLogger&) = delete;
 		FileSubLogger(FileSubLogger&&) = delete;
 
@@ -39,7 +39,7 @@ export namespace PonyEngine::Log::File
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
 
 	private:
-		ILoggerContext* logger; ///< Logger context.
+		const ILoggerContext* logger; ///< Logger context.
 
 		std::ofstream logFile; ///< Log file.
 	};
@@ -47,7 +47,7 @@ export namespace PonyEngine::Log::File
 
 namespace PonyEngine::Log::File
 {
-	FileSubLogger::FileSubLogger(ILoggerContext& logger, const std::filesystem::path& path) :
+	FileSubLogger::FileSubLogger(const ILoggerContext& logger, const std::filesystem::path& path) :
 		logger{&logger},
 		logFile(path)
 	{

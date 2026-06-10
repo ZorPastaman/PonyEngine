@@ -276,7 +276,7 @@ export namespace PonyEngine::Surface::Windows
 		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
 
 		Application::Windows::IApplicationContext* application; ///< Application context.
-		MessagePump::IMessagePumpService* pumpService; ///< Message pump service.
+		const MessagePump::IMessagePumpService* pumpService; ///< Message pump service.
 
 		Surface::RectStyle rectStyle; ///< Client rectangle style.
 		Math::Vector2<int> minimalClientSize; ///< Minimal client size.

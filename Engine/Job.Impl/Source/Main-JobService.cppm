@@ -34,7 +34,7 @@ export namespace PonyEngine::Job
 		/// @brief Creates a job service.
 		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
-		explicit JobService(Application::IApplicationContext& application);
+		explicit JobService(const Application::IApplicationContext& application);
 		JobService(const JobService&) = delete;
 		JobService(JobService&&) = delete;
 
@@ -48,7 +48,7 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		virtual std::size_t WorkerCount() const noexcept override;
 
-		virtual JobHandle Schedule(const std::shared_ptr<ITask>& task, std::span<const JobHandle> dependencies) override;
+		virtual JobHandle Schedule(ITask& task, std::span<const JobHandle> dependencies) override;
 
 		virtual void Wait(std::span<const JobHandle> jobs) const override;
 		[[nodiscard("Pure function")]]
@@ -81,7 +81,7 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		static const Job* ToNativeJob(const void* job);
 
-		Application::IApplicationContext* application; ///< Application context.
+		const Application::IApplicationContext* application; ///< Application context.
 
 		std::vector<std::unique_ptr<Worker>> workers; ///< Workers.
 		std::atomic_size_t targetWorkerIndex; ///< Target worker index. Used and incremented on scheduling a new job.
@@ -91,7 +91,7 @@ export namespace PonyEngine::Job
 		std::vector<std::unique_ptr<Job>> jobs; ///< Jobs. Used to keep all the jobs alive so that other parts of the code may use simple pointers.
 		std::mutex jobsMutex; ///< Mutex that must be used on using the @p jobs.
 
-		std::shared_ptr<EmptyTask> emptyTask; ///< Empty task.
+		EmptyTask emptyTask; ///< Empty task.
 
 		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
 	};
@@ -99,11 +99,10 @@ export namespace PonyEngine::Job
 
 namespace PonyEngine::Job
 {
-	JobService::JobService(Application::IApplicationContext& application) :
+	JobService::JobService(const Application::IApplicationContext& application) :
 		application{&application},
 		targetWorkerIndex{0uz},
-		jobQueueVersion{0uz},
-		emptyTask(std::make_shared<EmptyTask>())
+		jobQueueVersion{0uz}
 	{
 		constexpr std::size_t jobReserveCount = 64uz;
 
@@ -170,19 +169,12 @@ namespace PonyEngine::Job
 		return workers.size();
 	}
 
-	JobHandle JobService::Schedule(const std::shared_ptr<ITask>& task, const std::span<const JobHandle> dependencies)
+	JobHandle JobService::Schedule(ITask& task, const std::span<const JobHandle> dependencies)
 	{
-#ifndef NDEBUG
-		if (!task) [[unlikely]]
-		{
-			throw std::invalid_argument("Task is nullptr");
-		}
-#endif
-
 		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
 		Job* const job = GetFreeJob(workerIndex);
 		const std::size_t version = job->Version();
-		job->Task(task);
+		job->Task(&task);
 		job->Block(dependencies.size());
 
 		const auto handle = JobHandle(job, version);
@@ -205,7 +197,7 @@ namespace PonyEngine::Job
 				}
 				catch (...)
 				{
-					job->Task(emptyTask); // Sets the empty task so that the job won't do anything but will be reused eventually.
+					job->Task(&emptyTask); // Sets the empty task so that the job won't do anything but will be reused eventually.
 					for (; i < dependencies.size(); ++i)
 					{
 						if (job->Unblock())
@@ -273,6 +265,7 @@ namespace PonyEngine::Job
 		}
 		catch (...)
 		{
+			job.Task(&emptyTask);
 			worker.ReleaseJob(job); // It may throw. Unfortunately, it will keep the job alive but not reused. It may happen only on memory shortage.
 			throw;
 		}

@@ -31,7 +31,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @brief Creates a DXGI factory wrapper.
 		/// @param renderDevice Render device context.
 		[[nodiscard("Pure constructor")]]
-		explicit Factory(IRenderDeviceContext& renderDevice);
+		explicit Factory(const IRenderDeviceContext& renderDevice);
 		Factory(const Factory&) = delete;
 		Factory(Factory&&) = delete;
 
@@ -63,7 +63,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Factory& operator =(Factory&&) = delete;
 
 	private:
-		IRenderDeviceContext* renderDevice; ///< Render device context.
+		const IRenderDeviceContext* renderDevice; ///< Render device context.
 
 #ifndef NDEBUG
 		Platform::Windows::ComPtr<IDXGIDebug1> debug; ///< DXGI debug.
@@ -74,7 +74,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	Factory::Factory(IRenderDeviceContext& renderDevice) :
+	Factory::Factory(const IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice}
 	{
 #ifndef NDEBUG

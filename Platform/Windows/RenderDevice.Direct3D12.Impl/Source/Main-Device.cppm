@@ -38,7 +38,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		/// @param renderDevice Render device context.
 		/// @param adapter Adapter.
 		[[nodiscard("Pure constructor")]]
-		Device(IRenderDeviceContext& renderDevice, IUnknown& adapter);
+		Device(const IRenderDeviceContext& renderDevice, IUnknown& adapter);
 		Device(const Device&) = delete;
 		Device(Device&& other) noexcept = default;
 
@@ -207,7 +207,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 		Device& operator =(Device&&) = delete;
 
 	private:
-		IRenderDeviceContext* renderDevice; ///< Render device context.
+		const IRenderDeviceContext* renderDevice; ///< Render device context.
 
 #ifndef NDEBUG
 		Platform::Windows::ComPtr<ID3D12Debug6> debug; ///< Debug interface.
@@ -218,7 +218,7 @@ export namespace PonyEngine::RenderDevice::Direct3D12::Windows
 
 namespace PonyEngine::RenderDevice::Direct3D12::Windows
 {
-	Device::Device(IRenderDeviceContext& renderDevice, IUnknown& adapter) :
+	Device::Device(const IRenderDeviceContext& renderDevice, IUnknown& adapter) :
 		renderDevice{&renderDevice}
 	{
 #ifndef NDEBUG
