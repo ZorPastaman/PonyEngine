@@ -17,11 +17,12 @@ import :FileOpenMode;
 
 export namespace PonyEngine::File
 {
+	/// @brief File parameters.
 	struct FileParams final
 	{
-		std::filesystem::path path;
-		FileAccess access = FileAccess::None;
-		FileOpenMode openMode = FileOpenMode::None;
-		FileFlag flags = FileFlag::None;
+		std::filesystem::path path; /// File path. Must be valid.
+		FileAccess access = FileAccess::None; ///< File access mode.
+		FileOpenMode openMode = FileOpenMode::None; ///< File open mode.
+		FileFlag flags = FileFlag::None; ///< File flags.
 	};
 }

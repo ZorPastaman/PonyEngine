@@ -95,6 +95,8 @@ These modules are optional. To add them to a build, a specific CMake flag must b
 | [PonyEngine.Log.File.Impl](Engine/Log.File.Impl)                               | `PONY_ENGINE_LOG_FILE_IMPL`                 | File sub-logger module. That sub-logger logs to a log file.                                                                   |
 | [PonyEngine.Time](Engine/Time)                                                 | `PONY_ENGINE_TIME`                          | Time service API module. The service provides info about delta time, fixed time step and other time info.                     |
 | [PonyEngine.Time.Impl](Engine/Time.Impl)                                       | `PONY_ENGINE_TIME_IMPL`                     | Time service implementation module.                                                                                           |
+| [PonyEngine.File](Engine/File)                                                 | `PONY_ENGINE_FILE`                          | File service API module. The file service is a simple way to utilize modern SSDs with totally async read/write operations.    |
+| [PonyEngine.File.Impl](Engine/File.Impl)                                       | `PONY_ENGINE_FILE_IMPL`                     | File service implementation module.                                                                                           |
 | [PonyEngine.MessagePump](Engine/MessagePump)                                   | `PONY_ENGINE_MESSAGE_PUMP`                  | Message pump service API module. The service reads platform messages and provides info about them.                            |
 | [PonyEngine.MessagePump.Impl](Engine/MessagePump.Impl)                         | `PONY_ENGINE_MESSAGE_PUMP_IMPL`             | Message pump service implementation module.                                                                                   |
 | [PonyEngine.Surface](Engine/Surface)                                           | `PONY_ENGINE_SURFACE`                       | Surface service API module. The service controls an output video surface.                                                     |
@@ -137,6 +139,8 @@ The table of the module-platform compatibility:
 | [PonyEngine.Log.File.Impl](Engine/Log.File.Impl)                               | -                                | &check;                     |
 | [PonyEngine.Time](Engine/Time)                                                 | -                                | &check;                     |
 | [PonyEngine.Time.Impl](Engine/Time.Impl)                                       | -                                | &check;                     |
+| [PonyEngine.File](Engine/File)                                                 | -                                | &check;                     |
+| [PonyEngine.File.Impl](Engine/File.Impl)                                       | &check;                          | &check;                     |
 | [PonyEngine.MessagePump](Engine/MessagePump)                                   | -                                | &check;                     |
 | [PonyEngine.MessagePump.Impl](Engine/MessagePump.Impl)                         | &check;                          | &check;                     |
 | [PonyEngine.Surface](Engine/Surface)                                           | -                                | &check;                     |

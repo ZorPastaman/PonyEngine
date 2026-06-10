@@ -25,4 +25,5 @@ if(NOT TARGET PonyEngine.File)
 endif()
 target_link_libraries(PonyEngine.File.Impl PRIVATE
 	PonyEngine.File
+	PonyEngine.Core
 )

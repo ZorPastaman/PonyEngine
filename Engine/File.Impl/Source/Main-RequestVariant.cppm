@@ -19,11 +19,18 @@ import :WriteRequest;
 
 export namespace PonyEngine::File
 {
+	/// @brief Wrapper that holds a variant of read and write requests.
 	class RequestVariant final
 	{
 	public:
+		/// @brief Creates a read request.
+		/// @param params Read parameters.
+		/// @param callback Request callback.
 		[[nodiscard("Pure constructor")]]
 		RequestVariant(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) noexcept;
+		/// @brief Creates a write request.
+		/// @param params Write parameters.
+		/// @param callback Request callback.
 		[[nodiscard("Pure constructor")]]
 		RequestVariant(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback) noexcept;
 		RequestVariant(const RequestVariant&) = delete;
@@ -31,28 +38,44 @@ export namespace PonyEngine::File
 
 		~RequestVariant() noexcept = default;
 
+		/// @brief Checks if it's a read request.
+		/// @return @a True if it's a read request; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsRead() const noexcept;
+		/// @brief Checks if it's a write request.
+		/// @return @a True if it's a write request; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsWrite() const noexcept;
 
+		/// @brief Gets the read request.
+		/// @return Read request.
 		[[nodiscard("Pure function")]]
 		ReadRequest& Read() noexcept;
+		/// @brief Gets the read request.
+		/// @return Read request.
 		[[nodiscard("Pure function")]]
 		const ReadRequest& Read() const noexcept;
+		/// @brief Gets the write request.
+		/// @return Write request.
 		[[nodiscard("Pure function")]]
 		WriteRequest& Write() noexcept;
+		/// @brief Gets the write request.
+		/// @return Write request.
 		[[nodiscard("Pure function")]]
 		const WriteRequest& Write() const noexcept;
 
+		/// @brief Sets the status to success.
+		/// @param byteCount Transferred byte count.
 		void SetSuccess(std::size_t byteCount) noexcept;
+		/// @brief Sets the status to failure.
+		/// @param exception Exception that occured during the request execution.
 		void SetFailed(const std::exception_ptr& exception) noexcept;
 
 		RequestVariant& operator =(const RequestVariant&) = delete;
 		RequestVariant& operator =(RequestVariant&&) = delete;
 
 	private:
-		std::variant<ReadRequest, WriteRequest> request;
+		std::variant<ReadRequest, WriteRequest> request; ///< Read/write request.
 	};
 }
 
@@ -119,11 +142,11 @@ namespace PonyEngine::File
 		{
 			[&](ReadRequest& readRequest)
 			{
-				readRequest.SetFailed(exception);
+				readRequest.SetFailure(exception);
 			},
 			[&](WriteRequest& writeRequest)
 			{
-				writeRequest.SetFailed(exception);
+				writeRequest.SetFailure(exception);
 			}
 		}, request);
 	}

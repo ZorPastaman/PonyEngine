@@ -17,9 +17,13 @@ import :Request;
 
 export namespace PonyEngine::File
 {
+	/// @brief Write request.
 	class WriteRequest final : public IWriteRequest
 	{
 	public:
+		/// @brief Creates a write request.
+		/// @param params Write parameters.
+		/// @param callback Request callback. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
 		WriteRequest(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback) noexcept;
 		WriteRequest(const WriteRequest&) = delete;
@@ -39,18 +43,23 @@ export namespace PonyEngine::File
 
 		virtual void Wait() const noexcept override;
 
+		/// @brief Sets the status to success.
+		/// @param byteCount Transferred byte count.
 		void SetSuccess(std::size_t byteCount) noexcept;
-		void SetFailed(const std::exception_ptr& exception) noexcept;
+		/// @brief Sets the status to failure.
+		/// @param exception Exception that occured during the request execution.
+		void SetFailure(const std::exception_ptr& exception) noexcept;
 
 		WriteRequest& operator =(const WriteRequest&) = delete;
 		WriteRequest& operator =(WriteRequest&&) = delete;
 
 	private:
+		/// @brief Invokes the callback if it's not nullptr.
 		void InvokeCallback() const;
 
-		WriteParams params;
-		Request request;
-		std::function<void(const IWriteRequest&)> callback;
+		WriteParams params; ///< Write parameters.
+		Request request; ///< Write request.
+		std::function<void(const IWriteRequest&)> callback; ///< Request callback.
 	};
 }
 
@@ -93,7 +102,7 @@ namespace PonyEngine::File
 		InvokeCallback();
 	}
 
-	void WriteRequest::SetFailed(const std::exception_ptr& exception) noexcept
+	void WriteRequest::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		request.SetFailed(exception);
 		InvokeCallback();

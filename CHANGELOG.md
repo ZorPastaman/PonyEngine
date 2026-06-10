@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Configurable settings for Time module.
 - Job module.
 - World module.
+- File module.
 
 ### Changed
 

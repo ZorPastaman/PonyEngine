@@ -13,6 +13,7 @@ The Windows support mutates engine modules, adding code and defines to them.
 | [PonyEngine.Core](../../Engine/Core)                                                 | [PonyEngine.Core.Windows](Core)                                                 |
 | [PonyEngine.Application.Ext](../../Engine/Application.Ext)                           | [PonyEngine.Application.Ext.Windows](Application.Ext)                           |
 | [PonyEngine.Application.Impl](../../Engine/Application.Impl)                         | [PonyEngine.Application.Impl.Windows](Application.Impl)                         |
+| [PonyEngine.File.Impl](../../Engine/File.Impl)                                       | [PonyEngine.File.Impl.Windows](File.Impl)                                       |
 | [PonyEngine.MessagePump.Impl](../../Engine/MessagePump.Impl)                         | [PonyEngine.MessagePump.Impl.Windows](MessagePump.Impl)                         |
 | [PonyEngine.RawInput.Keyboard.Impl](../../Engine/RawInput.Keyboard.Impl)             | [PonyEngine.RawInput.Keyboard.Impl.Windows](RawInput.Keyboard.Impl)             |
 | [PonyEngine.RawInput.Mouse.Impl](../../Engine/RawInput.Mouse.Impl)                   | [PonyEngine.RawInput.Mouse.Impl.Windows](RawInput.Keyboard.Impl)                |

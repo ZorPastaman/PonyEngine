@@ -17,10 +17,11 @@ import std;
 
 export namespace PonyEngine::File
 {
+	/// @brief File open modes.
 	enum class FileOpenMode : std::uint8_t
 	{
 		None = 0,
-		Truncate = 1 << 0,
+		Truncate = 1 << 0, ///< Truncate a file on open. May be used only with a write access.
 		All = (1 << 1) - 1
 	};
 
@@ -29,6 +30,7 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
+	/// @brief File open mode names.
 	constexpr std::array<std::string_view, 1> FileOpenModeNames
 	{
 		"Truncate"

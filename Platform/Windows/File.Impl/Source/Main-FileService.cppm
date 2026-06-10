@@ -12,16 +12,19 @@ export module PonyEngine.File.Impl.Windows:FileService;
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.File.Impl;
+import PonyEngine.File;
 
 import :File;
 import :Worker;
 
 export namespace PonyEngine::File::Windows
 {
+	/// @brief File service.
 	class FileService final : public Application::IService, private IFileService
 	{
 	public:
+		/// @brief Creates a file service.
+		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
 		explicit FileService(const Application::IApplicationContext& application);
 		FileService(const FileService&) = delete;
@@ -41,9 +44,9 @@ export namespace PonyEngine::File::Windows
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<IFile> OpenFile(const FileParams& params) override;
 
-		const Application::IApplicationContext* application;
+		const Application::IApplicationContext* application; ///< Application context.
 
-		Worker worker;
+		Worker worker; ///< Worker.
 	};
 }
 

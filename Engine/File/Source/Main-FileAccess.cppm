@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::File
 {
+	/// @brief File access mode.
 	enum class FileAccess : std::uint8_t
 	{
 		None = 0,
@@ -30,6 +31,7 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
+	/// @brief File access mode names.
 	constexpr std::array<std::string_view, 2> FileAccessNames
 	{
 		"Read",

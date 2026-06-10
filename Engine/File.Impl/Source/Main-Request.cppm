@@ -19,6 +19,7 @@ import PonyEngine.File;
 
 export namespace PonyEngine::File
 {
+	/// @brief Request.
 	class Request final
 	{
 	public:
@@ -29,25 +30,38 @@ export namespace PonyEngine::File
 
 		~Request() noexcept = default;
 
+		/// @brief Gets the request status.
+		/// @return Request status.
 		[[nodiscard("Pure function")]]
 		RequestStatus Status() const noexcept;
+		/// @brief Gets how many bytes were transferred.
+		/// @return Transferred byte count.
+		/// @note It's valid to call it only if the request status is success.
 		[[nodiscard("Pure function")]]
 		std::size_t ByteCount() const;
+		/// @brief Gets an exception that occured during the request execution.
+		/// @return Exception.
+		/// @note It's valid to call it only if the request status is failure.
 		[[nodiscard("Pure function")]]
 		const std::exception_ptr& Exception() const;
 
+		/// @brief Sets the status to success.
+		/// @param byteCount Transferred byte count.
 		void SetSuccess(std::size_t byteCount) noexcept;
+		/// @brief Sets the status to failure.
+		/// @param exception Exception that occured during the request execution.
 		void SetFailed(const std::exception_ptr& exception) noexcept;
 
+		/// @brief Makes the thread sleep till the request is completed with success or failure.
 		void Wait() const noexcept;
 
 		Request& operator =(const Request&) = delete;
 		Request& operator =(Request&&) = delete;
 
 	private:
-		std::size_t byteCount;
-		std::exception_ptr exception;
-		std::atomic<RequestStatus> status;
+		std::size_t byteCount; ///< Transferred byte count.
+		std::exception_ptr exception; ///< Exception that occured during the request execution.
+		std::atomic<RequestStatus> status; ///< Request status.
 
 		static_assert(std::atomic<RequestStatus>::is_always_lock_free, "RequestStatus is not lock-free.");
 	};
@@ -68,24 +82,20 @@ namespace PonyEngine::File
 
 	std::size_t Request::ByteCount() const
 	{
-#ifndef NDEBUG
 		if (status.load(std::memory_order::acquire) != RequestStatus::Success) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
-#endif
 
 		return byteCount;
 	}
 
 	const std::exception_ptr& Request::Exception() const
 	{
-#ifndef NDEBUG
-		if (status.load(std::memory_order::acquire) != RequestStatus::Failed) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
-#endif
 
 		return exception;
 	}
@@ -103,7 +113,7 @@ namespace PonyEngine::File
 		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status.");
 		
 		this->exception = exception;
-		status.store(RequestStatus::Failed, std::memory_order::release);
+		status.store(RequestStatus::Failure, std::memory_order::release);
 	}
 
 	void Request::Wait() const noexcept

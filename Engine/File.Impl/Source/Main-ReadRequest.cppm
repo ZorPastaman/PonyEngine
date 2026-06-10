@@ -17,9 +17,13 @@ import :Request;
 
 export namespace PonyEngine::File
 {
+	/// @brief Read request.
 	class ReadRequest final : public IReadRequest
 	{
 	public:
+		/// @brief Creates a read request.
+		/// @param params Read parameters.
+		/// @param callback Request callback. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
 		ReadRequest(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) noexcept;
 		ReadRequest(const ReadRequest&) = delete;
@@ -39,18 +43,23 @@ export namespace PonyEngine::File
 
 		virtual void Wait() const noexcept override;
 
+		/// @brief Sets the status to success.
+		/// @param byteCount Transferred byte count.
 		void SetSuccess(std::size_t byteCount) noexcept;
-		void SetFailed(const std::exception_ptr& exception) noexcept;
+		/// @brief Sets the status to failure.
+		/// @param exception Exception that occured during the request execution.
+		void SetFailure(const std::exception_ptr& exception) noexcept;
 
 		ReadRequest& operator =(const ReadRequest&) = delete;
 		ReadRequest& operator =(ReadRequest&&) = delete;
 
 	private:
+		/// @brief Invokes the callback if it's not nullptr.
 		void InvokeCallback() const;
 
-		ReadParams params;
-		Request request;
-		std::function<void(const IReadRequest&)> callback;
+		ReadParams params; ///< Read parameters.
+		Request request; ///< Read request.
+		std::function<void(const IReadRequest&)> callback; ///< Request callback.
 	};
 }
 
@@ -93,7 +102,7 @@ namespace PonyEngine::File
 		InvokeCallback();
 	}
 
-	void ReadRequest::SetFailed(const std::exception_ptr& exception) noexcept
+	void ReadRequest::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		request.SetFailed(exception);
 		InvokeCallback();

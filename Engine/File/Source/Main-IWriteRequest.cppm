@@ -20,10 +20,13 @@ import :WriteParams;
 
 export namespace PonyEngine::File
 {
+	/// @brief Write request.
 	class IWriteRequest : public IRequest
 	{
 		PONY_INTERFACE_BODY(IWriteRequest)
 
+		/// @brief Gets the request params.
+		/// @return Request params.
 		[[nodiscard("Pure function")]]
 		virtual const WriteParams& Params() const noexcept = 0;
 	};

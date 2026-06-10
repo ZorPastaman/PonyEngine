@@ -17,6 +17,9 @@ import std;
 
 export namespace PonyEngine::File::Windows
 {
+	/// @brief Creates an overlapped by the file offset.
+	/// @param offset File offset.
+	/// @return Overlapped.
 	[[nodiscard("Pure function")]]
 	OVERLAPPED CreateOverlapped(std::size_t offset) noexcept;
 }

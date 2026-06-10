@@ -20,10 +20,14 @@ import :IFile;
 
 export namespace PonyEngine::File
 {
+	/// @brief File service.
 	class IFileService
 	{
 		PONY_INTERFACE_BODY(IFileService)
 
+		/// @brief Opens a file.
+		/// @param params File parameters.
+		/// @return File.
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<IFile> OpenFile(const FileParams& params) = 0;
 	};
