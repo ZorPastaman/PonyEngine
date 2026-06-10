@@ -14,7 +14,7 @@ The file service is a simple way to utilize modern SSDs with totally async read/
 
 Main sub-modules:
 
-#### [IFileService](Source/Main-IFile.cppm)
+#### [IFile](Source/Main-IFile.cppm)
 
 File interface. Creates requests to a file.
 
