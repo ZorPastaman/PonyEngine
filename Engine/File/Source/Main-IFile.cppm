@@ -50,6 +50,7 @@ export namespace PonyEngine::File
 		/// @remark The callback may be called on an io thread or on the thread this function was called on if the request is completed immediately.
 		/// @remark The callback may be called before this function returns.
 		/// @remark The callback mustn't do expensive operations, it should return as fast as possible. If you need to parse data or something else, do it on another thread.
+		/// @note The function is thread-safe.
 		[[nodiscard("Must be used")]]
 		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback = nullptr) const = 0;
 		/// @brief Makes a write request.
@@ -60,6 +61,7 @@ export namespace PonyEngine::File
 		/// @remark The callback may be called on an io thread or on the thread this function was called on if the request is completed immediately.
 		/// @remark The callback may be called before this function returns.
 		/// @remark The callback mustn't do expensive operations, it should return as fast as possible. If you need to parse data or something else, do it on another thread.
+		/// @note The function is thread-safe.
 		[[nodiscard("Must be used")]]
 		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback = nullptr) = 0;
 	};

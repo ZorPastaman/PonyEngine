@@ -11,25 +11,26 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.File:IFileService;
+export module PonyEngine.Resource:IResource;
 
 import std;
 
-import :FileParams;
-import :IFile;
+import :ILoadRequest;
+import :LoadParams;
+import :ResourceType;
 
-export namespace PonyEngine::File
+export namespace PonyEngine::Resource
 {
-	/// @brief File service.
-	class IFileService
+	class IResource
 	{
-		PONY_INTERFACE_BODY(IFileService)
+		PONY_INTERFACE_BODY(IResource)
 
-		/// @brief Opens a file.
-		/// @param params File parameters.
-		/// @return File.
-		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const FileParams& params) = 0;
+		virtual ResourceType Type() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t Size() const noexcept = 0;
+
+		[[nodiscard("Must be used")]]
+		virtual std::shared_ptr<ILoadRequest> Load(const LoadParams& params, const std::function<void(const ILoadRequest&)>& callback = nullptr) const = 0;
 	};
 }

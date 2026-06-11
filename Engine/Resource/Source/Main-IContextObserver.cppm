@@ -11,25 +11,18 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.File:IFileService;
+export module PonyEngine.Resource:IContextObserver;
 
 import std;
 
-import :FileParams;
-import :IFile;
+import :ContextKey;
 
-export namespace PonyEngine::File
+export namespace PonyEngine::Resource
 {
-	/// @brief File service.
-	class IFileService
+	class IContextObserver
 	{
-		PONY_INTERFACE_BODY(IFileService)
+		PONY_INTERFACE_BODY(IContextObserver)
 
-		/// @brief Opens a file.
-		/// @param params File parameters.
-		/// @return File.
-		/// @note The function is thread-safe.
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const FileParams& params) = 0;
+		virtual void OnContextChanged(std::span<const ContextKey> changedKeys) = 0;
 	};
 }
