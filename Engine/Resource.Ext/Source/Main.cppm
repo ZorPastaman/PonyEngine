@@ -7,18 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource;
+export module PonyEngine.Resource.Ext;
 
-export import :ContextKey;
-export import :ContextValue;
-export import :FileReference;
-export import :IContextObserver;
-export import :ILoadRequest;
-export import :IResource;
-export import :IResourceService;
-export import :LoadParams;
-export import :MemoryReference;
-export import :RequestStatus;
-export import :ResourceAvailability;
-export import :ResourceID;
-export import :ResourceType;
+export import PonyEngine.Resource;
+
+export import :IResourceContext;
+export import :IResourceProvider;
+export import :ResourceHandle;
+export import :ResourceReference;
+export import :VariantHandle;

@@ -7,18 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource;
+module;
 
-export import :ContextKey;
-export import :ContextValue;
-export import :FileReference;
-export import :IContextObserver;
-export import :ILoadRequest;
-export import :IResource;
-export import :IResourceService;
-export import :LoadParams;
-export import :MemoryReference;
-export import :RequestStatus;
-export import :ResourceAvailability;
-export import :ResourceID;
-export import :ResourceType;
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.Resource.Ext:IResourceProvider;
+
+import std;
+
+import PonyEngine.Resource;
+
+export namespace PonyEngine::Resource
+{
+	class IResourceProvider
+	{
+		PONY_INTERFACE_BODY(IResourceProvider)
+
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IResource> LoadResourceVariant(std::size_t index) const = 0;
+	};
+}
