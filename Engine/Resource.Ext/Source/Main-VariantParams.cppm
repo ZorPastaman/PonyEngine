@@ -7,29 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.Resource.Ext:IResourceProvider;
+export module PonyEngine.Resource.Ext:VariantParams;
 
 import std;
 
 import PonyEngine.Resource;
 
-import :IResourceRegistry;
+import :ResourceReference;
 
 export namespace PonyEngine::Resource
 {
-	class IResourceProvider
+	struct VariantParams final
 	{
-		PONY_INTERFACE_BODY(IResourceProvider)
-
-		virtual void Begin(IResourceRegistry& registry) = 0;
-		virtual void End(IResourceRegistry& registry) = 0;
-		virtual void Tick(IResourceRegistry& registry) = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResource> LoadResourceVariant(std::size_t index) const = 0;
+		std::span<const std::pair<ContextKey, ContextValue>> requiredContext;
+		std::uint32_t priority = 0uz;
+		std::size_t index = 0uz;
+		ResourceReference resourceReference;
 	};
 }

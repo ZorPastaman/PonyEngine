@@ -34,9 +34,11 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		virtual bool HasContextKey(ContextKey key) const noexcept = 0;
 		[[nodiscard("Pure function")]]
+		virtual std::size_t ContextSize() const noexcept = 0;
+		[[nodiscard("Pure function")]]
 		virtual std::optional<ContextValue> GetContextValue(ContextKey key) const noexcept = 0;
 		virtual void SetContextValue(ContextKey key, ContextValue value) = 0;
-		virtual void GetContext(std::span<std::pair<ContextKey, ContextValue>> context) const noexcept = 0;
+		virtual std::size_t GetContext(std::span<std::pair<ContextKey, ContextValue>> context) const noexcept = 0;
 		virtual void SetContext(std::span<const std::pair<ContextKey, ContextValue>> context) = 0;
 
 		[[nodiscard("Pure function")]]

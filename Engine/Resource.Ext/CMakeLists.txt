@@ -7,10 +7,14 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-IResourceContext.cppm"
+	"Source/Main-IResourceModuleContext.cppm"
 	"Source/Main-IResourceProvider.cppm"
+	"Source/Main-IResourceRegistry.cppm"
 	"Source/Main-ResourceHandle.cppm"
+	"Source/Main-ResourceProviderHandle.cppm"
 	"Source/Main-ResourceReference.cppm"
 	"Source/Main-VariantHandle.cppm"
+	"Source/Main-VariantParams.cppm"
 )
 
 message(VERBOSE "Setting properties")
@@ -27,4 +31,6 @@ endif()
 target_link_libraries(PonyEngine.Resource.Ext PUBLIC
 	PonyEngine.Resource
 	PonyEngine.Core
+	PonyEngine.Application.Ext
+	PonyEngine.Log
 )

@@ -7,16 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Ext;
+#pragma once
 
-export import PonyEngine.Resource;
+#include "PonyEngine/Macro/Compiler.h"
 
-export import :IResourceContext;
-export import :IResourceModuleContext;
-export import :IResourceProvider;
-export import :IResourceRegistry;
-export import :ResourceHandle;
-export import :ResourceProviderHandle;
-export import :ResourceReference;
-export import :VariantHandle;
-export import :VariantParams;
+import PonyEngine.Application.Ext;
+
+namespace PonyEngine::Resource
+{
+	/// @brief Gets the resource service module.
+	/// @return Resource service module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT Application::IModule* GetResourceServiceModule();
+}

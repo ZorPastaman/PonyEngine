@@ -419,7 +419,7 @@ namespace PonyEngine::RenderDevice
 		else
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new texture format. TextureFormat: '{}'; TextureFormatHash: '{}'.", textureFormat, textureFormatId.hash);
-			textureFormatHashMap[textureFormatId] = textureFormat;
+			textureFormatHashMap.emplace(textureFormatId, textureFormat);
 		}
 
 		return textureFormatId;

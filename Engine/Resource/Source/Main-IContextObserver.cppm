@@ -16,6 +16,7 @@ export module PonyEngine.Resource:IContextObserver;
 import std;
 
 import :ContextKey;
+import :ResourceID;
 
 export namespace PonyEngine::Resource
 {
@@ -23,6 +24,7 @@ export namespace PonyEngine::Resource
 	{
 		PONY_INTERFACE_BODY(IContextObserver)
 
-		virtual void OnContextChanged(std::span<const ContextKey> changedKeys) = 0;
+		virtual void OnContextChanged(std::span<const ContextKey> changedKeys) {}
+		virtual void OnResourceChanged(std::span<const ResourceID> resourceIds) {}
 	};
 }

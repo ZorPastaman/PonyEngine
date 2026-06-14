@@ -11,25 +11,22 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Resource.Ext:IResourceProvider;
+export module PonyEngine.Resource.Ext:IResourceModuleContext;
 
 import std;
 
-import PonyEngine.Resource;
-
-import :IResourceRegistry;
+import :IResourceContext;
+import :IResourceProvider;
+import :ResourceProviderHandle;
 
 export namespace PonyEngine::Resource
 {
-	class IResourceProvider
+	class IResourceModuleContext
 	{
-		PONY_INTERFACE_BODY(IResourceProvider)
+		PONY_INTERFACE_BODY(IResourceModuleContext)
 
-		virtual void Begin(IResourceRegistry& registry) = 0;
-		virtual void End(IResourceRegistry& registry) = 0;
-		virtual void Tick(IResourceRegistry& registry) = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResource> LoadResourceVariant(std::size_t index) const = 0;
+		[[nodiscard("Must be used")]]
+		virtual ResourceProviderHandle AddProvider(const std::function<std::shared_ptr<IResourceProvider>(IResourceContext&)>& factory) = 0;
+		virtual void RemoveProvider(ResourceProviderHandle providerHandle) = 0;
 	};
 }

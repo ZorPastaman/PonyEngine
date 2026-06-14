@@ -97,6 +97,7 @@ option(PONY_ENGINE_RENDER_DEVICE_DIRECT3D12_IMPL "Enable PonyEngine.RenderDevice
 option(PONY_ENGINE_SHADER "Enable PonyEngine.Shader module" OFF)
 option(PONY_ENGINE_RESOURCE "Enable PonyEngine.Resource module" OFF)
 option(PONY_ENGINE_RESOURCE_EXT "Enable PonyEngine.Resource.Ext module" OFF)
+option(PONY_ENGINE_RESOURCE_IMPL "Enable PonyEngine.Resource.Impl module" OFF)
 option(PONY_ENGINE_WORLD "Enable PonyEngine.World module" OFF)
 option(PONY_ENGINE_WORLD_IMPL "Enable PonyEngine.World.Impl module" OFF)
 
@@ -195,6 +196,9 @@ endif()
 if(PONY_ENGINE_RESOURCE_EXT)
 	add_subdirectory("Engine/Resource.Ext")
 endif()
+if(PONY_ENGINE_RESOURCE_IMPL)
+	add_subdirectory("Engine/Resource.Impl")
+endif()
 
 if(PONY_ENGINE_WORLD)
 	add_subdirectory("Engine/World")
@@ -216,6 +220,7 @@ if(NOT PONY_IS_SUBPROJECT)
 	set(PONY_PLATFORM_MODULES "")
 	set(PONY_INPUT_MODULES "")
 	set(PONY_RENDER_MODULES "")
+	set(PONY_RESOURCE_MODULES "")
 	set(PONY_LOGIC_MODULES "")
 
 	message(VERBOSE "Post-configuring")
@@ -353,6 +358,11 @@ if(NOT PONY_IS_SUBPROJECT)
 		pony_set_log_defines(PonyEngine.Resource.Ext ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 		pony_set_build_options(PonyEngine.Resource.Ext ${PONY_ENGINE_OPTIMIZATION})
 	endif()
+	if(TARGET PonyEngine.Resource.Impl)
+		pony_set_log_defines(PonyEngine.Resource.Impl ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+		pony_set_build_options(PonyEngine.Resource.Impl ${PONY_ENGINE_OPTIMIZATION})
+		list(APPEND PONY_RESOURCE_MODULES PonyEngine.Resource.Impl)
+	endif()
 
 	if(TARGET PonyEngine.World)
 		pony_set_log_defines(PonyEngine.World ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
@@ -415,6 +425,14 @@ if(NOT PONY_IS_SUBPROJECT)
 			list(APPEND PONY_INSTALL_TARGETS PonyModule.Render)
 		endif()
 
+		if(PONY_RESOURCE_MODULES)
+			pony_make_module_group(PONY_RESOURCE_MODULES PonyModule.Resource "PonyModule.Resource" 23)
+			pony_set_log_defines(PonyModule.Resource ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
+			pony_set_build_options(PonyModule.Resource ${PONY_ENGINE_OPTIMIZATION})
+			target_link_libraries(PonyEngine.Application.Impl PRIVATE PonyModule.Resource)
+			list(APPEND PONY_INSTALL_TARGETS PonyModule.Resource)
+		endif()
+
 		if(PONY_LOGIC_MODULES)
 			pony_make_module_group(PONY_LOGIC_MODULES PonyModule.Logic "PonyModule.Logic" 23)
 			pony_set_log_defines(PonyModule.Logic ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
@@ -438,6 +456,7 @@ if(NOT PONY_IS_SUBPROJECT)
 			${PONY_PLATFORM_MODULES}
 			${PONY_INPUT_MODULES}
 			${PONY_RENDER_MODULES}
+			${PONY_RESOURCE_MODULES}
 			${PONY_LOGIC_MODULES}
 			${PONY_GAME_MODULES}
 		)

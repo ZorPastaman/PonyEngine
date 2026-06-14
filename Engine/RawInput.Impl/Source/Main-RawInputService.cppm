@@ -524,7 +524,7 @@ export namespace PonyEngine::RawInput
 		{
 			axisId.index = 0u;
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
-			axisHashMap[hash] = std::vector<std::string>{ std::string(axis) };
+			axisHashMap.emplace(hash, std::vector<std::string>{ std::string(axis) });
 		}
 
 		return axisId;
@@ -563,7 +563,7 @@ export namespace PonyEngine::RawInput
 		else
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '{}'.", deviceType, deviceTypeId.hash);
-			deviceTypeHashMap[deviceTypeId] = deviceType;
+			deviceTypeHashMap.emplace(deviceTypeId, deviceType);
 		}
 
 		return deviceTypeId;
