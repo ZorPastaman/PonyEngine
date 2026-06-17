@@ -12,11 +12,10 @@ export module PonyEngine.Resource.Ext;
 export import PonyEngine.Resource;
 
 export import :IResourceContext;
+export import :IResourceData;
 export import :IResourceModuleContext;
 export import :IResourceProvider;
 export import :IResourceRegistry;
 export import :ResourceHandle;
+export import :ResourceParams;
 export import :ResourceProviderHandle;
-export import :ResourceReference;
-export import :VariantHandle;
-export import :VariantParams;

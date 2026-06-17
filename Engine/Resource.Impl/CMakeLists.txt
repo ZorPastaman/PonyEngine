@@ -2,6 +2,7 @@ message(STATUS "Configuring PonyEngine.Resource.Impl")
 
 message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_RESOURCE_ORDER "p" CACHE STRING "PonyEngine.Resource.Impl module initialization order. Its first character must be in range [b-y].")
+set(PONY_ENGINE_RESOURCE_TICK_ORDER "0" CACHE STRING "PonyEngine.Resource.Impl service tick order. It must be an int32 number.")
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Resource.Impl STATIC)
@@ -20,14 +21,21 @@ target_sources(PonyEngine.Resource.Impl PRIVATE
 )
 target_sources(PonyEngine.Resource.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-Context.cppm"
+	"Source/Main-ResourceContainer.cppm"
+	"Source/Main-ResourceEntry.cppm"
+	"Source/Main-ResourceObject.cppm"
+	"Source/Main-ResourceProviderContainer.cppm"
 	"Source/Main-ResourceService.cppm"
+	"Source/Main-ResourceServiceModule.cppm"
+	"Source/Main-VariantEntry.cppm"
 )
 
 message(VERBOSE "Configuring defines")
 pony_validate_module_order(PONY_ENGINE_RESOURCE_ORDER)
+pony_validate_tick_order(PONY_ENGINE_RESOURCE_TICK_ORDER)
 target_compile_definitions(PonyEngine.Resource.Impl PUBLIC
 	PONY_ENGINE_RESOURCE_ORDER=${PONY_ENGINE_RESOURCE_ORDER}
+	PONY_ENGINE_RESOURCE_TICK_ORDER=${PONY_ENGINE_RESOURCE_TICK_ORDER}
 )
 
 message(VERBOSE "Setting properties")

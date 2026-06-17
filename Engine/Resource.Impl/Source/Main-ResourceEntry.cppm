@@ -7,24 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.Resource:IContextObserver;
+export module PonyEngine.Resource.Impl:ResourceEntry;
 
 import std;
 
-import :ContextKey;
-import :ResourceID;
+import PonyEngine.Resource;
+
+import :VariantEntry;
 
 export namespace PonyEngine::Resource
 {
-	class IContextObserver
+	struct ResourceEntry final
 	{
-		PONY_INTERFACE_BODY(IContextObserver)
-
-		virtual void OnContextChanged(std::span<const ContextKey> changedKeys) {}
-		virtual void OnResourceChanged(std::span<const ResourceID> resourceIds) {}
+		ResourceID id;
+		ResourceType type;
+		std::vector<VariantEntry> variants;
 	};
 }

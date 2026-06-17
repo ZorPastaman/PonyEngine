@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Resource;
 
+import :IResourceData;
 import :IResourceRegistry;
 
 export namespace PonyEngine::Resource
@@ -30,6 +31,6 @@ export namespace PonyEngine::Resource
 		virtual void Tick(IResourceRegistry& registry) = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResource> LoadResourceVariant(std::size_t index) const = 0;
+		virtual std::shared_ptr<IResourceData> GetResource(std::size_t index) const = 0;
 	};
 }

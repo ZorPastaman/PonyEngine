@@ -7,15 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Ext:ResourceReference;
+export module PonyEngine.Resource.Impl:VariantEntry;
 
-import PonyEngine.Resource;
+import std;
+
+import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
-	struct ResourceReference final
+	struct VariantEntry final
 	{
-		const FileReference* fileReference = nullptr;
-		const MemoryReference* memoryReference = nullptr;
+		std::vector<std::pair<ContextKey, ContextValue>> requiredContext;
+		std::uint32_t priority = 0uz;
+		IResourceProvider* provider;
+		std::size_t index;
+		ResourceHandle handle;
 	};
 }

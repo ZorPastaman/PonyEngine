@@ -16,8 +16,7 @@ export module PonyEngine.Resource.Ext:IResourceRegistry;
 import std;
 
 import :ResourceHandle;
-import :VariantHandle;
-import :VariantParams;
+import :ResourceParams;
 
 export namespace PonyEngine::Resource
 {
@@ -26,11 +25,7 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(IResourceRegistry)
 
 		[[nodiscard("Must be used")]]
-		virtual ResourceHandle RegisterResource(ResourceID resourceId, ResourceType type) = 0;
+		virtual ResourceHandle RegisterResource(const ResourceParams& params) = 0;
 		virtual void UnregisterResource(ResourceHandle handle) = 0;
-
-		[[nodiscard("Must be used")]]
-		virtual VariantHandle RegisterVariant(ResourceHandle resourceHandle, const VariantParams& params) = 0;
-		virtual void UnregisterVariant(VariantHandle handle) = 0;
 	};
 }

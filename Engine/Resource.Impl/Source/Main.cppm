@@ -10,3 +10,5 @@
 export module PonyEngine.Resource.Impl;
 
 export import PonyEngine.Resource.Ext;
+
+export import :ResourceServiceModule;

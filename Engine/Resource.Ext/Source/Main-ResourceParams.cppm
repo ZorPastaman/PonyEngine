@@ -7,21 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Ext:VariantParams;
+export module PonyEngine.Resource.Ext:ResourceParams;
 
 import std;
 
 import PonyEngine.Resource;
 
-import :ResourceReference;
-
 export namespace PonyEngine::Resource
 {
-	struct VariantParams final
+	struct ResourceParams final
 	{
+		ResourceID resourceId; 
+		ResourceType type;
 		std::span<const std::pair<ContextKey, ContextValue>> requiredContext;
 		std::uint32_t priority = 0uz;
 		std::size_t index = 0uz;
-		ResourceReference resourceReference;
 	};
 }

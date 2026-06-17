@@ -17,11 +17,7 @@ import std;
 
 import :ContextKey;
 import :ContextValue;
-import :FileReference;
-import :IContextObserver;
 import :IResource;
-import :MemoryReference;
-import :ResourceAvailability;
 import :ResourceID;
 import :ResourceType;
 
@@ -32,14 +28,14 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(IResourceService)
 
 		[[nodiscard("Pure function")]]
-		virtual bool HasContextKey(ContextKey key) const noexcept = 0;
+		virtual bool IsResourceAvailable(ResourceID resourceId) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::size_t ContextSize() const noexcept = 0;
+		virtual bool IsResourceAvailable(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::optional<ContextValue> GetContextValue(ContextKey key) const noexcept = 0;
-		virtual void SetContextValue(ContextKey key, ContextValue value) = 0;
-		virtual std::size_t GetContext(std::span<std::pair<ContextKey, ContextValue>> context) const noexcept = 0;
-		virtual void SetContext(std::span<const std::pair<ContextKey, ContextValue>> context) = 0;
+		virtual struct ResourceType ResourceType(ResourceID resourceId) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IResource> GetResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
+			std::span<const std::pair<ContextKey, ContextValue>>()) const = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual ContextKey MakeContextKey(std::string_view key) = 0;
@@ -55,21 +51,6 @@ export namespace PonyEngine::Resource
 		virtual std::string_view GetContextValueString(ContextValue value) const = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual ResourceAvailability IsResourceAvailable(ResourceID resourceId) const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual struct ResourceType ResourceType(ResourceID resourceId) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResource> LoadResource(ResourceID resourceId) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual bool IsFileReferenceAvailable(ResourceID resourceId) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual const FileReference& GetFileReference(ResourceID resourceId) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual bool IsMemoryReferenceAvailable(ResourceID resourceId) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual const MemoryReference& GetMemoryReference(ResourceID resourceId) const = 0;
-
-		[[nodiscard("Pure function")]]
 		virtual ResourceID MakeResourceID(std::string_view resourceId) = 0;
 		[[nodiscard("Pure function")]]
 		virtual bool IsResourceIDValid(ResourceID resourceId) const noexcept = 0;
@@ -82,8 +63,5 @@ export namespace PonyEngine::Resource
 		virtual bool IsResourceTypeValid(struct ResourceType type) const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual std::string_view GetResourceTypeString(struct ResourceType type) const = 0;
-
-		virtual void AddContextObserver(IContextObserver& observer) = 0;
-		virtual void RemoveContextObserver(IContextObserver& observer) noexcept = 0;
 	};
 }

@@ -11,43 +11,29 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Resource:IResource;
+export module PonyEngine.Resource.Ext:IResourceData;
 
 import std;
 
-import :ContextKey;
-import :ContextValue;
-import :FileReference;
-import :ILoadRequest;
-import :LoadParams;
-import :MemoryReference;
-import :ResourceID;
-import :ResourceType;
+import PonyEngine.Resource;
 
 export namespace PonyEngine::Resource
 {
-	class IResource
+	class IResourceData
 	{
-		PONY_INTERFACE_BODY(IResource)
-
-		[[nodiscard("Pure function")]]
-		virtual ResourceID ResourceID() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual ResourceType Type() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::pair<ContextKey, ContextValue>> RequiredContext() const noexcept = 0;
+		PONY_INTERFACE_BODY(IResourceData)
 
 		[[nodiscard("Pure function")]]
 		virtual std::size_t Size() const noexcept = 0;
 		[[nodiscard("Must be used")]]
 		virtual std::shared_ptr<ILoadRequest> Load(const LoadParams& params, const std::function<void(const ILoadRequest&)>& callback = nullptr) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual bool IsFileReferenceAvailable() const noexcept = 0;
+		virtual bool IsFileReferenceAvailable() const noexcept { return false; }
 		[[nodiscard("Pure function")]]
-		virtual const FileReference& GetFileReference() const = 0;
+		virtual const FileReference& GetFileReference() const { throw std::logic_error("Not implemented"); }
 		[[nodiscard("Pure function")]]
-		virtual bool IsMemoryReferenceAvailable() const noexcept = 0;
+		virtual bool IsMemoryReferenceAvailable() const noexcept { return false; }
 		[[nodiscard("Pure function")]]
-		virtual const MemoryReference& GetMemoryReference() const = 0;
+		virtual const MemoryReference& GetMemoryReference() const { throw std::logic_error("Not implemented"); }
 	};
 }
