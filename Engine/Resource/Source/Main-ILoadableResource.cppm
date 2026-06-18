@@ -11,26 +11,23 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Resource:IResource;
+export module PonyEngine.Resource:ILoadableResource;
 
 import std;
 
-import :ContextKey;
-import :ContextValue;
-import :ResourceID;
-import :ResourceType;
+import :ILoadRequest;
+import :IResource;
+import :LoadParams;
 
 export namespace PonyEngine::Resource
 {
-	class IResource
+	class ILoadableResource : public IResource
 	{
-		PONY_INTERFACE_BODY(IResource)
+		PONY_INTERFACE_BODY(ILoadableResource)
 
 		[[nodiscard("Pure function")]]
-		virtual ResourceID ResourceID() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual ResourceType Type() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::pair<ContextKey, ContextValue>> RequiredContext() const noexcept = 0;
+		virtual std::size_t Size() const noexcept = 0;
+		[[nodiscard("Must be used")]]
+		virtual std::shared_ptr<ILoadRequest> Load(const LoadParams& params, const std::function<void(const ILoadRequest&)>& callback = nullptr) const = 0;
 	};
 }

@@ -1,0 +1,85 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include <cassert>
+
+export module PonyEngine.Resource.Impl:MemoryResource;
+
+import std;
+
+import PonyEngine.Resource.Ext;
+
+export namespace PonyEngine::Resource
+{
+	class MemoryResource final : public IMemoryResource
+	{
+	public:
+		[[nodiscard("Pure constructor")]]
+		MemoryResource(struct ResourceID id, ResourceType type, std::span<const std::pair<ContextKey, ContextValue>> requiredContext,
+			const std::shared_ptr<IMemoryResourceData>& data) noexcept;
+		MemoryResource(const MemoryResource&) = delete;
+		MemoryResource(MemoryResource&&) = delete;
+
+		~MemoryResource() noexcept = default;
+
+		[[nodiscard("Pure function")]]
+		virtual struct ResourceID ResourceID() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual ResourceType Type() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::span<const std::pair<ContextKey, ContextValue>> RequiredContext() const noexcept override;
+
+		[[nodiscard("Pure function")]] 
+		virtual std::span<const std::byte> Memory() const noexcept override;
+
+		MemoryResource& operator =(const MemoryResource&) = delete;
+		MemoryResource& operator =(MemoryResource&&) = delete;
+
+	private:
+		struct ResourceID id;
+		ResourceType type;
+		std::vector<std::pair<ContextKey, ContextValue>> requiredContext;
+		std::shared_ptr<IMemoryResourceData> data;
+	};
+}
+
+namespace PonyEngine::Resource
+{
+	MemoryResource::MemoryResource(const struct ResourceID id, const ResourceType type, const std::span<const std::pair<ContextKey, ContextValue>> requiredContext,
+		const std::shared_ptr<IMemoryResourceData>& data) noexcept :
+		id(id),
+		type(type),
+		requiredContext(std::from_range, requiredContext),
+		data(data)
+	{
+		assert(data && "The data is nullptr.");
+	}
+
+	struct ResourceID MemoryResource::ResourceID() const noexcept
+	{
+		return id;
+	}
+
+	ResourceType MemoryResource::Type() const noexcept
+	{
+		return type;
+	}
+
+	std::span<const std::pair<ContextKey, ContextValue>> MemoryResource::RequiredContext() const noexcept
+	{
+		return requiredContext;
+	}
+
+	std::span<const std::byte> MemoryResource::Memory() const noexcept
+	{
+		return data->Memory();
+	}
+}

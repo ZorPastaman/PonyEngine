@@ -18,9 +18,10 @@ export namespace PonyEngine::Resource
 	struct VariantEntry final
 	{
 		std::vector<std::pair<ContextKey, ContextValue>> requiredContext;
-		std::uint32_t priority = 0uz;
-		IResourceProvider* provider;
-		std::size_t index;
+		IResourceProvider* provider = nullptr;
+		std::size_t index = 0uz;
 		ResourceHandle handle;
+		std::uint32_t priority = 0u;
+		ResourceAvailability availability = ResourceAvailability::None;
 	};
 }

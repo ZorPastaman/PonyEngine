@@ -27,11 +27,6 @@ export namespace PonyEngine::Resource
 	class ResourceContainer final
 	{
 	public:
-		static constexpr auto ContextSort = [](const std::pair<ContextKey, ContextValue>& lhs, const std::pair<ContextKey, ContextValue>& rhs) 
-		{
-			return lhs.first < rhs.first;
-		};
-
 		[[nodiscard("Pure constructor")]]
 		ResourceContainer() noexcept = default;
 		ResourceContainer(const ResourceContainer&) = delete;
@@ -39,14 +34,13 @@ export namespace PonyEngine::Resource
 
 		~ResourceContainer() noexcept = default;
 
+		static void SortContext(std::span<std::pair<ContextKey, ContextValue>> context) noexcept;
+
 		[[nodiscard("Pure function")]]
-		bool HasResource(ResourceID resourceId) const noexcept;
+		const ResourceEntry* GetResource(ResourceID resourceId) const noexcept;
 		[[nodiscard("Pure function")]]
-		bool HasResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept;
-		[[nodiscard("Pure function")]]
-		const ResourceEntry* GetResource(ResourceID resourceId) const;
-		[[nodiscard("Pure function")]]
-		std::pair<const ResourceEntry*, std::size_t> GetResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const;
+		std::pair<const ResourceEntry*, std::optional<std::size_t>> GetResource(ResourceID resourceId, 
+			std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept;
 
 		[[nodiscard("Pure function")]]
 		bool Empty() const noexcept;
@@ -80,41 +74,26 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
-	bool ResourceContainer::HasResource(const ResourceID resourceId) const noexcept
+	void ResourceContainer::SortContext(const std::span<std::pair<ContextKey, ContextValue>> context) noexcept
 	{
-		return resources.contains(resourceId);
-	}
-
-	bool ResourceContainer::HasResource(const ResourceID resourceId, const std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept
-	{
-		if (const auto position = resources.find(resourceId); position != resources.cend())
+		std::ranges::sort(context, [](const std::pair<ContextKey, ContextValue>& lhs, const std::pair<ContextKey, ContextValue>& rhs)
 		{
-			const ResourceEntry& entry = position->second;
-			const std::span variants = entry.variants;
-			for (std::size_t i = 0uz; i < variants.size(); ++i)
-			{
-				if (AreMatched(variants[i].requiredContext, context))
-				{
-					return true;
-				}
-			}
-		}
-
-		return false;
+			return lhs.first < rhs.first;
+		});
 	}
 
-	const ResourceEntry* ResourceContainer::GetResource(const ResourceID resourceId) const
+	const ResourceEntry* ResourceContainer::GetResource(const ResourceID resourceId) const noexcept
 	{
 		if (const auto position = resources.find(resourceId); position != resources.cend()) [[likely]]
 		{
 			return &position->second;
 		}
 
-		throw std::invalid_argument("Not found by resource id");
+		return nullptr;
 	}
 
-	std::pair<const ResourceEntry*, std::size_t> ResourceContainer::GetResource(const ResourceID resourceId,
-		const std::span<const std::pair<ContextKey, ContextValue>> context) const
+	std::pair<const ResourceEntry*, std::optional<std::size_t>> ResourceContainer::GetResource(const ResourceID resourceId,
+		const std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept
 	{
 		if (const auto position = resources.find(resourceId); position != resources.cend()) [[likely]]
 		{
@@ -128,10 +107,10 @@ namespace PonyEngine::Resource
 				}
 			}
 
-			throw std::invalid_argument("Not found by context");
+			return std::pair(&entry, std::optional<std::size_t>());
 		}
 
-		throw std::invalid_argument("Not found by resource id");
+		return std::pair<const ResourceEntry*, std::optional<std::size_t>>(nullptr, std::nullopt);
 	}
 
 	bool ResourceContainer::Empty() const noexcept
@@ -143,25 +122,25 @@ namespace PonyEngine::Resource
 	{
 		assert(!handleToIdMap.contains(handle) && "The handle has already been added.");
 
-		handleToIdMap.emplace(handle, params.resourceId);
+		handleToIdMap.emplace(handle, params.id);
 		try
 		{
-			if (const auto position = resources.find(params.resourceId); position != resources.cend())
+			if (const auto position = resources.find(params.id); position != resources.cend())
 			{
 				if (position->second.type != params.type) [[unlikely]]
 				{
 					throw std::invalid_argument("Invalid type");
 				}
 
-				std::vector<VariantEntry>& variants = resources[params.resourceId].variants;
+				std::vector<VariantEntry>& variants = resources[params.id].variants;
 				VariantEntry variant = MakeVariant(params, provider, handle);
 				const std::size_t index = InsertIndex(variants, variant);
 				variants.insert(variants.cbegin() + index, std::move(variant));
 			}
 			else
 			{
-				ResourceEntry& entry = resources[params.resourceId];
-				entry.id = params.resourceId;
+				ResourceEntry& entry = resources[params.id];
+				entry.id = params.id;
 				entry.type = params.type;
 				try
 				{
@@ -169,7 +148,7 @@ namespace PonyEngine::Resource
 				}
 				catch (...)
 				{
-					resources.erase(params.resourceId);
+					resources.erase(params.id);
 					throw;
 				}
 			}
@@ -254,12 +233,13 @@ namespace PonyEngine::Resource
 		auto variant = VariantEntry
 		{
 			.requiredContext = std::vector(std::from_range, params.requiredContext),
-			.priority = params.priority,
 			.provider = &provider,
 			.index = params.index,
-			.handle = handle
+			.handle = handle,
+			.priority = params.priority,
+			.availability = params.availability
 		};
-		std::ranges::sort(variant.requiredContext, ContextSort);
+		SortContext(variant.requiredContext);
 		
 		for (std::size_t i = 1uz; i < variant.requiredContext.size(); ++i)
 		{

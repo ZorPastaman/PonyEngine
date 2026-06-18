@@ -11,12 +11,14 @@ export module PonyEngine.Resource;
 
 export import :ContextKey;
 export import :ContextValue;
-export import :FileReference;
+export import :IFileResource;
+export import :ILoadableResource;
 export import :ILoadRequest;
+export import :IMemoryResource;
 export import :IResource;
 export import :IResourceService;
 export import :LoadParams;
-export import :MemoryReference;
 export import :RequestStatus;
+export import :ResourceAvailability;
 export import :ResourceID;
 export import :ResourceType;

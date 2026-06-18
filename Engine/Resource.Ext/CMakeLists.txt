@@ -6,15 +6,16 @@ add_library(PonyEngine.Resource.Ext STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
+	"Source/Main-IFileResourceData.cppm"
+	"Source/Main-ILoadableResourceData.cppm"
+	"Source/Main-IMemoryResourceData.cppm"
 	"Source/Main-IResourceContext.cppm"
-	"Source/Main-IResourceData.cppm"
 	"Source/Main-IResourceModuleContext.cppm"
 	"Source/Main-IResourceProvider.cppm"
 	"Source/Main-IResourceRegistry.cppm"
 	"Source/Main-ResourceHandle.cppm"
 	"Source/Main-ResourceParams.cppm"
 	"Source/Main-ResourceProviderHandle.cppm"
-	
 )
 
 message(VERBOSE "Setting properties")

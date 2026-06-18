@@ -18,9 +18,12 @@ import std;
 import PonyEngine.Application.Ext;
 import PonyEngine.Hash;
 import PonyEngine.Log;
+import PonyEngine.Memory;
 import PonyEngine.Resource.Ext;
 
-import :ResourceObject;
+import :FileResource;
+import :LoadableResource;
+import :MemoryResource;
 import :ResourceContainer;
 import :ResourceProviderContainer;
 
@@ -65,11 +68,15 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]] 
 		virtual bool IsResourceAvailable(ResourceID resourceId) const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual bool IsResourceAvailable(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept override;
+		virtual ResourceAvailability IsResourceAvailable(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual struct ResourceType ResourceType(ResourceID resourceId) const override;
 		[[nodiscard("Pure function")]] 
-		virtual std::shared_ptr<IResource> GetResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const override;
+		virtual std::shared_ptr<ILoadableResource> GetLoadableResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<IFileResource> GetFileResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<IMemoryResource> GetMemoryResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const override;
 
 		[[nodiscard("Pure function")]] 
 		virtual ContextKey MakeContextKey(std::string_view key) override;
@@ -130,24 +137,44 @@ export namespace PonyEngine::Resource
 		/// @param count How many providers to end.
 		void End(std::size_t count) noexcept;
 
+		template<std::derived_from<IResource> ResourceT, typename ResourceD> [[nodiscard("Pure function")]]
+		std::shared_ptr<ResourceT> GetResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context, 
+			std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mapMutex,
+			const std::function<std::shared_ptr<ResourceD>(const VariantEntry&)>& dataGetter) const;
+		[[nodiscard("Pure function")]]
+		std::pair<const ResourceEntry&, const VariantEntry&> GetResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const;
 		[[nodiscard("Must be used")]]
 		ResourceHandle AddResource(const ResourceParams& params, IResourceProvider& provider);
 		void RemoveResource(ResourceHandle handle);
 
+		template<std::derived_from<IResource> ResourceT> [[nodiscard("Pure function")]]
+		std::shared_ptr<ResourceT> GetResourceFromCache(ResourceHandle resourceHandle, 
+			const std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) const noexcept;
+		template<std::derived_from<IResource> ResourceT, typename ResourceD> [[nodiscard("Pure function")]]
+		std::shared_ptr<ResourceT> AddResourceToCache(const ResourceEntry& resourceEntry, const VariantEntry& variantEntry, const std::shared_ptr<ResourceD>& data,
+			std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) const;
+		template<std::derived_from<IResource> ResourceT> [[nodiscard("Pure function")]]
+		std::shared_ptr<ResourceT> GetResourceFromCacheUnsafe(ResourceHandle resourceHandle, 
+			const std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map) const noexcept;
+
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<ResourceObject> GetResourceFromCache(ResourceHandle resourceHandle) const noexcept;
-		[[nodiscard("Pure function")]]
-		std::shared_ptr<ResourceObject> AddResourceToCache(const ResourceEntry& resourceEntry, const VariantEntry& variantEntry) const noexcept;
-		[[nodiscard("Pure function")]]
-		std::shared_ptr<ResourceObject> GetResourceFromCacheUnsafe(ResourceHandle resourceHandle) const noexcept;
+		static Memory::Arena& Arena();
 
 		Application::IApplicationContext* application;
 
 		ResourceProviderContainer providers;
+
 		ResourceContainer resources;
-		mutable std::unordered_map<ResourceHandle, std::weak_ptr<ResourceObject>> resourceCache;
 		mutable std::shared_mutex resourceMutex;
-		mutable std::shared_mutex resourceCacheMutex;
+
+		mutable std::unordered_map<ResourceHandle, std::weak_ptr<LoadableResource>> loadableResourceCache;
+		mutable std::shared_mutex loadableResourceCacheMutex;
+
+		mutable std::unordered_map<ResourceHandle, std::weak_ptr<FileResource>> fileResourceCache;
+		mutable std::shared_mutex fileResourceCacheMutex;
+
+		mutable std::unordered_map<ResourceHandle, std::weak_ptr<MemoryResource>> memoryResourceCache;
+		mutable std::shared_mutex memoryResourceCacheMutex;
 
 		std::unordered_map<ContextKey, std::string> keyMap;
 		std::unordered_map<ContextValue, std::string> valueMap;
@@ -329,34 +356,53 @@ namespace PonyEngine::Resource
 	bool ResourceService::IsResourceAvailable(const ResourceID resourceId) const noexcept
 	{
 		const auto lock = std::shared_lock(resourceMutex);
-		return resources.HasResource(resourceId);
+		return resources.GetResource(resourceId);
 	}
 
-	bool ResourceService::IsResourceAvailable(const ResourceID resourceId, const std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept
+	ResourceAvailability ResourceService::IsResourceAvailable(const ResourceID resourceId, const std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept
 	{
 		const auto lock = std::shared_lock(resourceMutex);
-		return resources.HasResource(resourceId, context);
+		const auto [resource, variantIndex] = resources.GetResource(resourceId, context);
+
+		return variantIndex.has_value() ? resource->variants[*variantIndex].availability : ResourceAvailability::None;
 	}
 
 	struct ResourceType ResourceService::ResourceType(const ResourceID resourceId) const
 	{
 		const auto lock = std::shared_lock(resourceMutex);
-		return resources.GetResource(resourceId)->type;
-	}
 
-	std::shared_ptr<IResource> ResourceService::GetResource(const ResourceID resourceId, const std::span<const std::pair<ContextKey, ContextValue>> context) const
-	{
-		const auto lock = std::shared_lock(resourceMutex);
-
-		const auto [resourceEntry, variantIndex] = resources.GetResource(resourceId, context);
-		const VariantEntry& variantEntry = resourceEntry->variants[variantIndex];
-
-		if (const std::shared_ptr<ResourceObject> resource = GetResourceFromCache(variantEntry.handle))
+		if (const ResourceEntry* const resourceEntry = resources.GetResource(resourceId)) [[likely]]
 		{
-			return resource;
+			return resourceEntry->type;
 		}
 
-		return AddResourceToCache(*resourceEntry, variantEntry);
+		throw std::invalid_argument("Invalid ID");
+	}
+
+	std::shared_ptr<ILoadableResource> ResourceService::GetLoadableResource(const ResourceID resourceId, 
+		const std::span<const std::pair<ContextKey, ContextValue>> context) const
+	{
+		return GetResource<LoadableResource, ILoadableResourceData>(resourceId, context, loadableResourceCache, loadableResourceCacheMutex, [](const VariantEntry& variant)
+		{
+			return variant.provider->GetLoadableResource(variant.index);
+		});
+	}
+
+	std::shared_ptr<IFileResource> ResourceService::GetFileResource(const ResourceID resourceId, const std::span<const std::pair<ContextKey, ContextValue>> context) const
+	{
+		return GetResource<FileResource, IFileResourceData>(resourceId, context, fileResourceCache, fileResourceCacheMutex, [](const VariantEntry& variant)
+		{
+			return variant.provider->GetFileResource(variant.index);
+		});
+	}
+
+	std::shared_ptr<IMemoryResource> ResourceService::GetMemoryResource(const ResourceID resourceId,
+		const std::span<const std::pair<ContextKey, ContextValue>> context) const
+	{
+		return GetResource<MemoryResource, IMemoryResourceData>(resourceId, context, memoryResourceCache, memoryResourceCacheMutex, [](const VariantEntry& variant)
+		{
+			return variant.provider->GetMemoryResource(variant.index);
+		});
 	}
 
 	ContextKey ResourceService::MakeContextKey(const std::string_view key)
@@ -561,6 +607,24 @@ namespace PonyEngine::Resource
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending resource providers done.");
 	}
 
+	std::pair<const ResourceEntry&, const VariantEntry&> ResourceService::GetResource(const ResourceID resourceId,
+		const std::span<const std::pair<ContextKey, ContextValue>> context) const
+	{
+		const auto [resourceEntry, variantIndex] = resources.GetResource(resourceId, context);
+		if (!resourceEntry) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid ID");
+		}
+		if (!variantIndex) [[unlikely]]
+		{
+			throw std::invalid_argument("No resource satisfies context");
+		}
+
+		const VariantEntry& variantEntry = resourceEntry->variants[*variantIndex];
+
+		return std::pair(*resourceEntry, variantEntry);
+	}
+
 	ResourceHandle ResourceService::AddResource(const ResourceParams& params, IResourceProvider& provider)
 	{
 #ifndef NDEBUG
@@ -581,7 +645,7 @@ namespace PonyEngine::Resource
 
 		const ResourceHandle currentHandle = nextResourceHandle;
 		resources.AddResource(params, provider, currentHandle);
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Resource added. Handle: '0x{:X}'; ID: '{}'.", currentHandle.id, params.resourceId.value);
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Resource added. Handle: '0x{:X}'; ID: '{}'.", currentHandle.id, params.id.value);
 		++nextResourceHandle.id;
 
 		return currentHandle;
@@ -593,30 +657,66 @@ namespace PonyEngine::Resource
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Resource removed. Handle: '0x{:X}'.", handle.id);
 	}
 
-	std::shared_ptr<ResourceObject> ResourceService::GetResourceFromCache(const ResourceHandle resourceHandle) const noexcept
+	Memory::Arena& ResourceService::Arena()
 	{
-		const auto lock = std::shared_lock(resourceCacheMutex);
-		return GetResourceFromCacheUnsafe(resourceHandle);
+		thread_local auto arena = Memory::Arena(0uz, 128uz);
+		return arena;
 	}
 
-	std::shared_ptr<ResourceObject> ResourceService::AddResourceToCache(const ResourceEntry& resourceEntry, const VariantEntry& variantEntry) const noexcept
+	template<std::derived_from<IResource> ResourceT, typename ResourceD>
+	std::shared_ptr<ResourceT> ResourceService::GetResource(const ResourceID resourceId, const std::span<const std::pair<ContextKey, ContextValue>> context,
+		std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mapMutex,
+		const std::function<std::shared_ptr<ResourceD>(const VariantEntry&)>& dataGetter) const
 	{
-		const std::shared_ptr<IResourceData> data = variantEntry.provider->GetResource(variantEntry.index);
-		const auto resource = std::make_shared<ResourceObject>(resourceEntry.id, resourceEntry.type, variantEntry.requiredContext, data);
+		Memory::Arena& arena = Arena();
+		arena.Free();
 
-		const auto lock = std::unique_lock(resourceCacheMutex);
-		if (const std::shared_ptr<ResourceObject> cacheResource = GetResourceFromCacheUnsafe(variantEntry.handle)) [[unlikely]]
+		const Memory::Arena::Slice<std::pair<ContextKey, ContextValue>> sortedContextSlice = arena.Allocate<std::pair<ContextKey, ContextValue>>(context.size());
+		const std::span<std::pair<ContextKey, ContextValue>> sortedContext = arena.Span(sortedContextSlice);
+		std::memcpy(sortedContext.data(), context.data(), sortedContext.size_bytes());
+		ResourceContainer::SortContext(sortedContext);
+
+		const auto lock = std::shared_lock(resourceMutex);
+
+		const auto [resourceEntry, variantEntry] = GetResource(resourceId, sortedContext);
+		if (const std::shared_ptr<ResourceT> resource = GetResourceFromCache(variantEntry.handle, map, mapMutex))
+		{
+			return resource;
+		}
+
+		return AddResourceToCache(resourceEntry, variantEntry, dataGetter(variantEntry), map, mapMutex);
+	}
+
+	template<std::derived_from<IResource> ResourceT>
+	std::shared_ptr<ResourceT> ResourceService::GetResourceFromCache(const ResourceHandle resourceHandle,
+		const std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) const noexcept
+	{
+		const auto lock = std::shared_lock(mutex);
+		return GetResourceFromCacheUnsafe<ResourceT>(resourceHandle, map);
+	}
+
+	template<std::derived_from<IResource> ResourceT, typename ResourceD>
+	std::shared_ptr<ResourceT> ResourceService::AddResourceToCache(const ResourceEntry& resourceEntry, const VariantEntry& variantEntry, 
+		const std::shared_ptr<ResourceD>& data, std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map,
+		std::shared_mutex& mutex) const
+	{
+		const auto resource = std::make_shared<ResourceT>(resourceEntry.id, resourceEntry.type, variantEntry.requiredContext, data);
+
+		const auto lock = std::unique_lock(mutex);
+		if (const std::shared_ptr<ResourceT> cacheResource = GetResourceFromCacheUnsafe<ResourceT>(variantEntry.handle, map)) [[unlikely]]
 		{
 			return cacheResource;
 		}
-		resourceCache[variantEntry.handle] = resource;
+		map[variantEntry.handle] = resource;
 
 		return resource;
 	}
 
-	std::shared_ptr<ResourceObject> ResourceService::GetResourceFromCacheUnsafe(const ResourceHandle resourceHandle) const noexcept
+	template<std::derived_from<IResource> ResourceT>
+	std::shared_ptr<ResourceT> ResourceService::GetResourceFromCacheUnsafe(const ResourceHandle resourceHandle,
+		const std::unordered_map<ResourceHandle, std::weak_ptr<ResourceT>>& map) const noexcept
 	{
-		if (const auto position = resourceCache.find(resourceHandle); position != resourceCache.cend())
+		if (const auto position = map.find(resourceHandle); position != map.cend())
 		{
 			return std::shared_ptr(position->second);
 		}

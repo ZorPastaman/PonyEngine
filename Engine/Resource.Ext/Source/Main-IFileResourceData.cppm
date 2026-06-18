@@ -7,14 +7,25 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource:MemoryReference;
+module;
+
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.Resource.Ext:IFileResourceData;
 
 import std;
 
 export namespace PonyEngine::Resource
 {
-	struct MemoryReference final
+	class IFileResourceData
 	{
-		std::span<const std::byte> buffer;
+		PONY_INTERFACE_BODY(IFileResourceData)
+
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& Path() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t Offset() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t Size() const noexcept = 0;
 	};
 }

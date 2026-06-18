@@ -17,7 +17,10 @@ import std;
 
 import :ContextKey;
 import :ContextValue;
-import :IResource;
+import :IFileResource;
+import :ILoadableResource;
+import :IMemoryResource;
+import :ResourceAvailability;
 import :ResourceID;
 import :ResourceType;
 
@@ -30,11 +33,17 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		virtual bool IsResourceAvailable(ResourceID resourceId) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual bool IsResourceAvailable(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept = 0;
+		virtual ResourceAvailability IsResourceAvailable(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual struct ResourceType ResourceType(ResourceID resourceId) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResource> GetResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
+		virtual std::shared_ptr<ILoadableResource> GetLoadableResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
+			std::span<const std::pair<ContextKey, ContextValue>>()) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IFileResource> GetFileResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
+			std::span<const std::pair<ContextKey, ContextValue>>()) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IMemoryResource> GetMemoryResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
 			std::span<const std::pair<ContextKey, ContextValue>>()) const = 0;
 
 		[[nodiscard("Pure function")]]

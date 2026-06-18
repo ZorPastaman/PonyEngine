@@ -7,21 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Ext:ResourceParams;
+module;
+
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.Resource:IFileResource;
 
 import std;
 
-import PonyEngine.Resource;
+import :IResource;
 
 export namespace PonyEngine::Resource
 {
-	struct ResourceParams final
+	class IFileResource : public IResource
 	{
-		ResourceID id;
-		ResourceType type;
-		std::span<const std::pair<ContextKey, ContextValue>> requiredContext;
-		std::size_t index = 0uz;
-		std::uint32_t priority = 0u;
-		ResourceAvailability availability = ResourceAvailability::None;
+		PONY_INTERFACE_BODY(IFileResource)
+
+		[[nodiscard("Pure function")]]
+		virtual const std::filesystem::path& Path() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t Offset() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::size_t Size() const noexcept = 0;
 	};
 }

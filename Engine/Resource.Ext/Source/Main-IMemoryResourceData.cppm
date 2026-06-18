@@ -7,17 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Ext;
+module;
 
-export import PonyEngine.Resource;
+#include "PonyEngine/Object/Body.h"
 
-export import :IFileResourceData;
-export import :ILoadableResourceData;
-export import :IMemoryResourceData;
-export import :IResourceContext;
-export import :IResourceModuleContext;
-export import :IResourceProvider;
-export import :IResourceRegistry;
-export import :ResourceHandle;
-export import :ResourceParams;
-export import :ResourceProviderHandle;
+export module PonyEngine.Resource.Ext:IMemoryResourceData;
+
+import std;
+
+export namespace PonyEngine::Resource
+{
+	class IMemoryResourceData
+	{
+		PONY_INTERFACE_BODY(IMemoryResourceData)
+
+		[[nodiscard("Pure function")]]
+		virtual std::span<const std::byte> Memory() const noexcept = 0;
+	};
+}

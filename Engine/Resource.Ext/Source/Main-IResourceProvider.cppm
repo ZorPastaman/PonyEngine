@@ -17,7 +17,9 @@ import std;
 
 import PonyEngine.Resource;
 
-import :IResourceData;
+import :IFileResourceData;
+import :ILoadableResourceData;
+import :IMemoryResourceData;
 import :IResourceRegistry;
 
 export namespace PonyEngine::Resource
@@ -31,6 +33,10 @@ export namespace PonyEngine::Resource
 		virtual void Tick(IResourceRegistry& registry) = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResourceData> GetResource(std::size_t index) const = 0;
+		virtual std::shared_ptr<ILoadableResourceData> GetLoadableResource(std::size_t index) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IFileResourceData> GetFileResource(std::size_t index) const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IMemoryResourceData> GetMemoryResource(std::size_t index) const = 0;
 	};
 }
