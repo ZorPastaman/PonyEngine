@@ -195,6 +195,7 @@ export namespace PonyEngine::RenderDevice
 		std::optional<std::size_t> activeBackendIndex; ///< Active backend index.
 
 		std::unordered_map<struct TextureFormatID, std::string> textureFormatHashMap; ///< Texture format hash map.
+		mutable std::shared_mutex textureFormatHashMapMutex; ///< Texture format hash map mutex.
 
 		std::vector<IRenderDeviceServiceObserver*> observers; ///< Render device service observers.
 
@@ -409,6 +410,7 @@ namespace PonyEngine::RenderDevice
 	{
 		const auto textureFormatId = RenderDevice::TextureFormatID{.hash = Hash::FNV1a64(textureFormat)};
 
+		const auto lock = std::unique_lock(textureFormatHashMapMutex);
 		if (const auto position = textureFormatHashMap.find(textureFormatId); position != textureFormatHashMap.cend())
 		{
 			if (position->second != textureFormat)
@@ -427,19 +429,20 @@ namespace PonyEngine::RenderDevice
 
 	std::string_view RenderDeviceService::TextureFormat(const struct TextureFormatID textureFormatId) const
 	{
+		const auto lock = std::shared_lock(textureFormatHashMapMutex);
+
 		const auto position = textureFormatHashMap.find(textureFormatId);
-#ifndef NDEBUG
 		if (position == textureFormatHashMap.cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid texture format ID");
 		}
-#endif
 
 		return position->second;
 	}
 
 	bool RenderDeviceService::IsValid(const struct TextureFormatID textureFormatId) const noexcept
 	{
+		const auto lock = std::shared_lock(textureFormatHashMapMutex);
 		return textureFormatHashMap.contains(textureFormatId);
 	}
 

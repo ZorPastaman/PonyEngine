@@ -118,20 +118,19 @@ export namespace PonyEngine::RenderDevice
 		/// @brief Gets a texture format ID.
 		/// @param textureFormat Texture format.
 		/// @return Texture format ID.
-		/// @note This function mustn't be called on different threads at the same time.
-		/// @note This function mustn't be called while @p TextureFormat(TextureFormatID) or @p IsValid(TextureFormatID) is executing.
+		/// @note This function is thread-safe.
 		[[nodiscard("Weird call")]]
 		virtual struct TextureFormatID TextureFormatID(std::string_view textureFormat) = 0;
 		/// @brief Gets a texture format.
 		/// @param textureFormatId Texture format ID.
 		/// @return Texture format.
-		/// @note The function mustn't be called concurrently with the @p TextureFormatID().
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::string_view TextureFormat(struct TextureFormatID textureFormatId) const = 0;
 		/// @brief Checks if the texture format ID is valid.
 		/// @param textureFormatId Texture format ID.
 		/// @return @a True if it's valid; @a false otherwise.
-		/// @note The function mustn't be called concurrently with the @p TextureFormatID().
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual bool IsValid(struct TextureFormatID textureFormatId) const noexcept = 0;
 		/// @brief Gets a texture format support.

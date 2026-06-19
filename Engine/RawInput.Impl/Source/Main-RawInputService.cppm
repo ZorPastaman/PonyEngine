@@ -34,7 +34,7 @@ export namespace PonyEngine::RawInput
 		/// @brief Creates an input service.
 		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
-		explicit RawInputService(Application::IApplicationContext& application) noexcept;
+		explicit RawInputService(Application::IApplicationContext& application);
 		RawInputService(const RawInputService&) = delete;
 		RawInputService(RawInputService&&) = delete;
 
@@ -209,7 +209,9 @@ export namespace PonyEngine::RawInput
 		DeviceHandle lastInputDevice; ///< Last device that sent input.
 
 		std::unordered_map<std::uint32_t, std::vector<std::string>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
+		mutable std::shared_mutex axisHashMapMutex; ///< Input axis hash map mutex.
 		std::unordered_map<DeviceTypeID, std::string> deviceTypeHashMap; ///< Device type hash map.
+		mutable std::shared_mutex deviceTypeHashMapMutex; ///< Device type hash map mutex.
 
 		std::vector<IDeviceObserver*> deviceObservers; ///< Device observers.
 		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
@@ -218,7 +220,7 @@ export namespace PonyEngine::RawInput
 		DeviceHandle nextDeviceHandle; ///< Next device handle.
 	};
 
-	RawInputService::RawInputService(Application::IApplicationContext& application) noexcept :
+	RawInputService::RawInputService(Application::IApplicationContext& application) :
 		application{&application},
 		lastInputDevice{.id = 0u},
 		nextProviderHandle{.id = 1u},
@@ -503,6 +505,7 @@ export namespace PonyEngine::RawInput
 		const std::uint32_t hash = Hash::FNV1a32(axis);
 		auto axisId = AxisID{.hash = hash};
 
+		const auto lock = std::unique_lock(axisHashMapMutex);
 		if (const auto position = axisHashMap.find(hash); position != axisHashMap.cend())
 		{
 			std::vector<std::string>& axes = position->second;
@@ -532,19 +535,20 @@ export namespace PonyEngine::RawInput
 
 	std::string_view RawInputService::UnhashAxis(const AxisID axisId) const
 	{
+		const auto lock = std::shared_lock(axisHashMapMutex);
+
 		const auto position = axisHashMap.find(axisId.hash);
-#ifndef NDEBUG
 		if (position == axisHashMap.cend() || axisId.index >= position->second.size()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid axis ID");
 		}
-#endif
 
 		return position->second[axisId.index];
 	}
 
 	bool RawInputService::IsAxisValid(const AxisID axisId) const noexcept
 	{
+		const auto lock = std::shared_lock(axisHashMapMutex);
 		const auto position = axisHashMap.find(axisId.hash);
 		return position != axisHashMap.cend() && axisId.index < position->second.size();
 	}
@@ -553,6 +557,7 @@ export namespace PonyEngine::RawInput
 	{
 		const auto deviceTypeId = DeviceTypeID{.hash = Hash::FNV1a64(deviceType)};
 
+		const auto lock = std::unique_lock(deviceTypeHashMapMutex);
 		if (const auto position = deviceTypeHashMap.find(deviceTypeId); position != deviceTypeHashMap.cend())
 		{
 			if (position->second != deviceType) [[unlikely]]
@@ -571,19 +576,20 @@ export namespace PonyEngine::RawInput
 
 	std::string_view RawInputService::UnhashDeviceType(const DeviceTypeID deviceTypeId)
 	{
+		const auto lock = std::shared_lock(deviceTypeHashMapMutex);
+
 		const auto position = deviceTypeHashMap.find(deviceTypeId);
-#ifndef NDEBUG
 		if (position == deviceTypeHashMap.cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid device type ID");
 		}
-#endif
 
 		return position->second;
 	}
 
 	bool RawInputService::IsDeviceTypeValid(const DeviceTypeID deviceTypeId) const noexcept
 	{
+		const auto lock = std::shared_lock(deviceTypeHashMapMutex);
 		return deviceTypeHashMap.contains(deviceTypeId);
 	}
 

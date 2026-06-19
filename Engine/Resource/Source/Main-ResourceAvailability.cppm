@@ -31,9 +31,8 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
-	constexpr std::array<std::string_view, 4> ResourceAvailabilityNames
+	constexpr std::array<std::string_view, 3> ResourceAvailabilityNames
 	{
-		"None",
 		"Loadable",
 		"File",
 		"Memory"

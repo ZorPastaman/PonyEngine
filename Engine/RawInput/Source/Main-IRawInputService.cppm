@@ -136,41 +136,37 @@ export namespace PonyEngine::RawInput
 		/// @brief Calculates a hash for the @p axis.
 		/// @param axis Axis.
 		/// @return Axis hash.
-		/// @note Don't call it during the raw input service tick.
-		/// @note This function mustn't be called on different threads at the same time.
-		/// @note This function mustn't be called while @p Unhash(AxisId) or @p IsValid(AxisId) is executing.
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual AxisID HashAxis(std::string_view axis) = 0;
 		/// @brief Gets an original axis from the hash value.
 		/// @param axisId Axis hash.
 		/// @return Axis.
-		/// @note This function mustn't be called while @p Hash(AxisId) is executing.
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::string_view UnhashAxis(AxisID axisId) const = 0;
 		/// @brief Checks if the @p axisId is valid.
 		/// @param axisId Axis id.
 		/// @return @a true if it's valid; @a false otherwise.
-		/// @note This function mustn't be called while @p Hash(AxisId) is executing.
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual bool IsAxisValid(AxisID axisId) const noexcept = 0;
 		/// @brief Calculates a hash for the @p deviceType.
 		/// @param deviceType Device type.
 		/// @return Device type hash.
-		/// @note Don't call it during the raw input service tick.
-		/// @note This function mustn't be called on different threads at the same time.
-		/// @note This function mustn't be called while @p Unhash(DeviceTypeId) or @p IsValid(DeviceTypeId) is executing.
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual DeviceTypeID HashDeviceType(std::string_view deviceType) = 0;
 		/// @brief Gets an original device type from the hash value.
 		/// @param deviceTypeId Device type hash.
 		/// @return Device type.
-		/// This function mustn't be called while @p Hash(DeviceTypeId) is executing.
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::string_view UnhashDeviceType(DeviceTypeID deviceTypeId) = 0;
 		/// @brief Checks if the @p deviceTypeId is valid.
 		/// @param deviceTypeId Device type id.
 		/// @return @a true if it's valid; @a false otherwise.
-		/// This function mustn't be called while @p Hash(DeviceTypeId) is executing.
+		/// @note This function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual bool IsDeviceTypeValid(DeviceTypeID deviceTypeId) const noexcept = 0;
 
