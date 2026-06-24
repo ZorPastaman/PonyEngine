@@ -13,10 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Job module.
 - World module.
 - File module.
+- Resource module.
+- Resource file module.
 
 ### Changed
 
 - IRawInputContext doesn't have functions for registering/unregistering devices and adding input any more. Now IInputProvider gets special interfaces for that in its Begin(), End() and Tick().
+- PonyEngine.Application.Impl is an optional module now.
 
 ### Removed
 
