@@ -15,8 +15,6 @@ export module PonyEngine.Resource:IResourceService;
 
 import std;
 
-import :ContextKey;
-import :ContextValue;
 import :IFileResource;
 import :ILoadableResource;
 import :IMemoryResource;
@@ -31,33 +29,15 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(IResourceService)
 
 		[[nodiscard("Pure function")]]
-		virtual bool IsResourceAvailable(ResourceID resourceId) const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual ResourceAvailability IsResourceAvailable(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context) const noexcept = 0;
+		virtual ResourceAvailability IsResourceAvailable(ResourceID resourceId) const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual struct ResourceType ResourceType(ResourceID resourceId) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<ILoadableResource> GetLoadableResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
-			std::span<const std::pair<ContextKey, ContextValue>>()) const = 0;
+		virtual std::shared_ptr<ILoadableResource> GetLoadableResource(ResourceID resourceId) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFileResource> GetFileResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
-			std::span<const std::pair<ContextKey, ContextValue>>()) const = 0;
+		virtual std::shared_ptr<IFileResource> GetFileResource(ResourceID resourceId) const = 0;
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IMemoryResource> GetMemoryResource(ResourceID resourceId, std::span<const std::pair<ContextKey, ContextValue>> context =
-			std::span<const std::pair<ContextKey, ContextValue>>()) const = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual ContextKey MakeContextKey(std::string_view key) = 0;
-		[[nodiscard("Pure function")]]
-		virtual bool IsContextKeyValid(ContextKey key) const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::string_view GetContextKeyString(ContextKey key) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual ContextValue MakeContextValue(std::string_view value) = 0;
-		[[nodiscard("Pure function")]]
-		virtual bool IsContextValueValid(ContextValue value) const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::string_view GetContextValueString(ContextValue value) const = 0;
+		virtual std::shared_ptr<IMemoryResource> GetMemoryResource(ResourceID resourceId) const = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual ResourceID MakeResourceID(std::string_view resourceId) = 0;

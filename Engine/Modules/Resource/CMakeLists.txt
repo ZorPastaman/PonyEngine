@@ -6,8 +6,6 @@ add_library(PonyEngine.Resource STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Resource PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-ContextKey.cppm"
-	"Source/Main-ContextValue.cppm"
 	"Source/Main-IFileResource.cppm"
 	"Source/Main-ILoadableResource.cppm"
 	"Source/Main-ILoadRequest.cppm"

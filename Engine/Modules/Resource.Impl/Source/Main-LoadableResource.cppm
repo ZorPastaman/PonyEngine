@@ -23,8 +23,7 @@ export namespace PonyEngine::Resource
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		LoadableResource(struct ResourceID id, ResourceType type, std::span<const std::pair<ContextKey, ContextValue>> requiredContext, 
-			const std::shared_ptr<ILoadableResourceData>& data) noexcept;
+		LoadableResource(struct ResourceID id, ResourceType type, const std::shared_ptr<ILoadableResourceData>& data) noexcept;
 		LoadableResource(const LoadableResource&) = delete;
 		LoadableResource(LoadableResource&&) = delete;
 
@@ -34,8 +33,6 @@ export namespace PonyEngine::Resource
 		virtual struct ResourceID ResourceID() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual ResourceType Type() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::span<const std::pair<ContextKey, ContextValue>> RequiredContext() const noexcept override;
 
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t Size() const noexcept override;
@@ -48,18 +45,15 @@ export namespace PonyEngine::Resource
 	private:
 		struct ResourceID id;
 		ResourceType type;
-		std::vector<std::pair<ContextKey, ContextValue>> requiredContext;
 		std::shared_ptr<ILoadableResourceData> data;
 	};
 }
 
 namespace PonyEngine::Resource
 {
-	LoadableResource::LoadableResource(const struct ResourceID id, const ResourceType type, const std::span<const std::pair<ContextKey, ContextValue>> requiredContext,
-		const std::shared_ptr<ILoadableResourceData>& data) noexcept :
+	LoadableResource::LoadableResource(const struct ResourceID id, const ResourceType type, const std::shared_ptr<ILoadableResourceData>& data) noexcept :
 		id(id),
 		type(type),
-		requiredContext(std::from_range, requiredContext),
 		data(data)
 	{
 		assert(data && "The data is nullptr.");
@@ -73,11 +67,6 @@ namespace PonyEngine::Resource
 	ResourceType LoadableResource::Type() const noexcept
 	{
 		return type;
-	}
-
-	std::span<const std::pair<ContextKey, ContextValue>> LoadableResource::RequiredContext() const noexcept
-	{
-		return requiredContext;
 	}
 
 	std::size_t LoadableResource::Size() const noexcept

@@ -26,6 +26,6 @@ namespace PonyEngine::Application
 {
 	std::filesystem::path AddTail(const std::filesystem::path& path)
 	{
-		return (path / CompanyName() / ProjectName()).lexically_normal();
+		return path / CompanyName() / ProjectName();
 	}
 }

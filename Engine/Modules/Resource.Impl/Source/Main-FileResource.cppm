@@ -23,8 +23,7 @@ export namespace PonyEngine::Resource
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		FileResource(struct ResourceID id, ResourceType type, std::span<const std::pair<ContextKey, ContextValue>> requiredContext,
-			const std::shared_ptr<IFileResourceData>& data) noexcept;
+		FileResource(struct ResourceID id, ResourceType type, const std::shared_ptr<IFileResourceData>& data) noexcept;
 		FileResource(const FileResource&) = delete;
 		FileResource(FileResource&&) = delete;
 
@@ -34,8 +33,6 @@ export namespace PonyEngine::Resource
 		virtual struct ResourceID ResourceID() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual ResourceType Type() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::pair<ContextKey, ContextValue>> RequiredContext() const noexcept override;
 
 		[[nodiscard("Pure function")]] 
 		virtual const std::filesystem::path& Path() const noexcept override;
@@ -50,18 +47,15 @@ export namespace PonyEngine::Resource
 	private:
 		struct ResourceID id;
 		ResourceType type;
-		std::vector<std::pair<ContextKey, ContextValue>> requiredContext;
 		std::shared_ptr<IFileResourceData> data;
 	};
 }
 
 namespace PonyEngine::Resource
 {
-	FileResource::FileResource(const struct ResourceID id, const ResourceType type, const std::span<const std::pair<ContextKey, ContextValue>> requiredContext,
-		const std::shared_ptr<IFileResourceData>& data) noexcept :
+	FileResource::FileResource(const struct ResourceID id, const ResourceType type, const std::shared_ptr<IFileResourceData>& data) noexcept :
 		id(id),
 		type(type),
-		requiredContext(std::from_range, requiredContext),
 		data(data)
 	{
 		assert(data && "The data is nullptr.");
@@ -75,11 +69,6 @@ namespace PonyEngine::Resource
 	ResourceType FileResource::Type() const noexcept
 	{
 		return type;
-	}
-
-	std::span<const std::pair<ContextKey, ContextValue>> FileResource::RequiredContext() const noexcept
-	{
-		return requiredContext;
 	}
 
 	const std::filesystem::path& FileResource::Path() const noexcept

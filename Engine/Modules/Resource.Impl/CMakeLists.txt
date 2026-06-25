@@ -29,7 +29,6 @@ target_sources(PonyEngine.Resource.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main-ResourceProviderContainer.cppm"
 	"Source/Main-ResourceService.cppm"
 	"Source/Main-ResourceServiceModule.cppm"
-	"Source/Main-VariantEntry.cppm"
 )
 
 message(VERBOSE "Configuring defines")

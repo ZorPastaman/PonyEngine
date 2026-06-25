@@ -54,6 +54,9 @@ export namespace PonyEngine::Resource::File
 		void Begin(IResourceRegistry& registry, std::size_t& count);
 		void End(IResourceRegistry& registry, std::size_t count) const;
 
+		[[nodiscard("Pure function")]]
+		std::filesystem::path MakeAbsolutePath(const std::filesystem::path& relativePath) const;
+
 		IResourceContext* resourceContext;
 		PonyEngine::File::IFileService* fileService;
 
@@ -100,7 +103,7 @@ namespace PonyEngine::Resource::File
 	{
 		std::shared_ptr<PonyEngine::File::IFile> file = fileService->OpenFile(PonyEngine::File::FileParams
 		{
-			.path = filePaths[index],
+			.path = MakeAbsolutePath(filePaths[index]),
 			.access = PonyEngine::File::FileAccess::Read,
 		});
 
@@ -109,12 +112,12 @@ namespace PonyEngine::Resource::File
 
 	std::shared_ptr<IFileResourceData> FileResourceProvider::GetFileResource(const std::size_t index) const
 	{
-		return std::make_shared<FileFileResourceData>(filePaths[index]);
+		return std::make_shared<FileFileResourceData>(MakeAbsolutePath(filePaths[index]));
 	}
 
 	std::shared_ptr<IMemoryResourceData> FileResourceProvider::GetMemoryResource(const std::size_t index) const
 	{
-		throw std::logic_error("Not implemented");
+		throw std::logic_error("Not available");
 	}
 
 	void FileResourceProvider::Begin(IResourceRegistry& registry, std::size_t& count)
@@ -128,5 +131,10 @@ namespace PonyEngine::Resource::File
 		{
 			registry.UnregisterResource(resourceHandles[i]);
 		}
+	}
+
+	std::filesystem::path FileResourceProvider::MakeAbsolutePath(const std::filesystem::path& relativePath) const
+	{
+		return resourceContext->Application().RootDirectory() / relativePath;
 	}
 }

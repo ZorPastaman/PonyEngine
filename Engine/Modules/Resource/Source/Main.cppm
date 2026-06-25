@@ -9,8 +9,6 @@
 
 export module PonyEngine.Resource;
 
-export import :ContextKey;
-export import :ContextValue;
 export import :IFileResource;
 export import :ILoadableResource;
 export import :ILoadRequest;

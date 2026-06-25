@@ -11,9 +11,7 @@ export module PonyEngine.Resource.Impl:ResourceEntry;
 
 import std;
 
-import PonyEngine.Resource;
-
-import :VariantEntry;
+import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
@@ -21,6 +19,8 @@ export namespace PonyEngine::Resource
 	{
 		ResourceID id;
 		ResourceType type;
-		std::vector<VariantEntry> variants;
+		ResourceAvailability availability = ResourceAvailability::None;
+		std::size_t index = 0uz;
+		IResourceProvider* provider = nullptr;
 	};
 }

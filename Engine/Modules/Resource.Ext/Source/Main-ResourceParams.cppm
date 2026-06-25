@@ -19,9 +19,7 @@ export namespace PonyEngine::Resource
 	{
 		ResourceID id;
 		ResourceType type;
-		std::span<const std::pair<ContextKey, ContextValue>> requiredContext;
-		std::size_t index = 0uz;
-		std::uint32_t priority = 0u;
 		ResourceAvailability availability = ResourceAvailability::None;
+		std::size_t index = 0uz;
 	};
 }

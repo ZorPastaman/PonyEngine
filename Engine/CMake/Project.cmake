@@ -8,7 +8,7 @@ function(pony_validate_name name)
 	pony_validate_path(${name} CAN_BE_RELATIVE)
 
 	string(SUBSTRING ${${name}} 0 1 NAME_FIRST_CHAR)
-	if(NAME_FIRST_CHAR STREQUAL "." OR ${name} MATCHES "/")
+	if(NAME_FIRST_CHAR STREQUAL "." OR ${name} MATCHES "[/\\\\]")
 		message(FATAL_ERROR "${name} is an invalid name")
 	endif()
 endfunction()

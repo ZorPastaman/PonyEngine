@@ -48,19 +48,6 @@ export namespace PonyEngine::Resource
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual ContextKey MakeContextKey(std::string_view key) = 0;
-		[[nodiscard("Pure function")]]
-		virtual bool IsContextKeyValid(ContextKey key) const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::string_view GetContextKeyString(ContextKey key) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual ContextValue MakeContextValue(std::string_view value) = 0;
-		[[nodiscard("Pure function")]]
-		virtual bool IsContextValueValid(ContextValue value) const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::string_view GetContextValueString(ContextValue value) const = 0;
-
-		[[nodiscard("Pure function")]]
 		virtual ResourceID MakeResourceID(std::string_view resourceId) = 0;
 		[[nodiscard("Pure function")]]
 		virtual bool IsResourceIDValid(ResourceID resourceId) const noexcept = 0;

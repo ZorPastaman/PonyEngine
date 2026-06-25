@@ -23,8 +23,7 @@ export namespace PonyEngine::Resource
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		MemoryResource(struct ResourceID id, ResourceType type, std::span<const std::pair<ContextKey, ContextValue>> requiredContext,
-			const std::shared_ptr<IMemoryResourceData>& data) noexcept;
+		MemoryResource(struct ResourceID id, ResourceType type, const std::shared_ptr<IMemoryResourceData>& data) noexcept;
 		MemoryResource(const MemoryResource&) = delete;
 		MemoryResource(MemoryResource&&) = delete;
 
@@ -34,8 +33,6 @@ export namespace PonyEngine::Resource
 		virtual struct ResourceID ResourceID() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual ResourceType Type() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::pair<ContextKey, ContextValue>> RequiredContext() const noexcept override;
 
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const std::byte> Memory() const noexcept override;
@@ -46,18 +43,15 @@ export namespace PonyEngine::Resource
 	private:
 		struct ResourceID id;
 		ResourceType type;
-		std::vector<std::pair<ContextKey, ContextValue>> requiredContext;
 		std::shared_ptr<IMemoryResourceData> data;
 	};
 }
 
 namespace PonyEngine::Resource
 {
-	MemoryResource::MemoryResource(const struct ResourceID id, const ResourceType type, const std::span<const std::pair<ContextKey, ContextValue>> requiredContext,
-		const std::shared_ptr<IMemoryResourceData>& data) noexcept :
+	MemoryResource::MemoryResource(const struct ResourceID id, const ResourceType type, const std::shared_ptr<IMemoryResourceData>& data) noexcept :
 		id(id),
 		type(type),
-		requiredContext(std::from_range, requiredContext),
 		data(data)
 	{
 		assert(data && "The data is nullptr.");
@@ -71,11 +65,6 @@ namespace PonyEngine::Resource
 	ResourceType MemoryResource::Type() const noexcept
 	{
 		return type;
-	}
-
-	std::span<const std::pair<ContextKey, ContextValue>> MemoryResource::RequiredContext() const noexcept
-	{
-		return requiredContext;
 	}
 
 	std::span<const std::byte> MemoryResource::Memory() const noexcept
