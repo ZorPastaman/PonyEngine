@@ -24,6 +24,8 @@ export namespace PonyEngine::Resource
 	public:
 		[[nodiscard("Pure constructor")]]
 		FileResource(struct ResourceID id, ResourceType type, const std::shared_ptr<IFileResourceData>& data) noexcept;
+		[[nodiscard("Pure constructor")]]
+		FileResource(struct ResourceID id, ResourceType type, std::shared_ptr<IFileResourceData>&& data) noexcept;
 		FileResource(const FileResource&) = delete;
 		FileResource(FileResource&&) = delete;
 
@@ -58,7 +60,15 @@ namespace PonyEngine::Resource
 		type(type),
 		data(data)
 	{
-		assert(data && "The data is nullptr.");
+		assert(this->data && "The data is nullptr.");
+	}
+
+	FileResource::FileResource(const struct ResourceID id, const ResourceType type, std::shared_ptr<IFileResourceData>&& data) noexcept :
+		id(id),
+		type(type),
+		data(std::move(data))
+	{
+		assert(this->data && "The data is nullptr.");
 	}
 
 	struct ResourceID FileResource::ResourceID() const noexcept

@@ -26,10 +26,11 @@ export namespace PonyEngine::File
 		PONY_INTERFACE_BODY(IFileService)
 
 		/// @brief Opens a file.
+		/// @param path File path. Must be valid.
 		/// @param params File parameters.
 		/// @return File.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const FileParams& params) = 0;
+		virtual std::shared_ptr<IFile> OpenFile(const std::filesystem::path& path, FileParams params) = 0;
 	};
 }

@@ -42,7 +42,7 @@ export namespace PonyEngine::File::Windows
 
 	private:
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const FileParams& params) override;
+		virtual std::shared_ptr<IFile> OpenFile(const std::filesystem::path& path, FileParams params) override;
 
 		const Application::IApplicationContext* application; ///< Application context.
 
@@ -71,8 +71,8 @@ namespace PonyEngine::File::Windows
 		adder.AddInterface<IFileService>(*this);
 	}
 
-	std::shared_ptr<IFile> FileService::OpenFile(const FileParams& params)
+	std::shared_ptr<IFile> FileService::OpenFile(const std::filesystem::path& path, const FileParams params)
 	{
-		return std::make_shared<File>(*application, worker, params);
+		return std::make_shared<File>(*application, worker, path, params);
 	}
 }

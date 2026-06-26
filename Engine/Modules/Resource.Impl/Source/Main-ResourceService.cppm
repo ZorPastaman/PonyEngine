@@ -132,8 +132,8 @@ export namespace PonyEngine::Resource
 		static std::shared_ptr<ResourceT> GetResourceFromCache(ResourceID resourceId, 
 			const std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) noexcept;
 		template<std::derived_from<IResource> ResourceT, typename ResourceD> [[nodiscard("Pure function")]]
-		static std::shared_ptr<ResourceT> AddResourceToCache(const ResourceEntry& resourceEntry, const std::shared_ptr<ResourceD>& data,
-			std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex);
+		std::shared_ptr<ResourceT> AddResourceToCache(const ResourceEntry& resourceEntry, std::shared_ptr<ResourceD>&& data,
+			std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) const;
 		template<std::derived_from<IResource> ResourceT> [[nodiscard("Pure function")]]
 		static std::shared_ptr<ResourceT> GetResourceFromCacheUnsafe(ResourceID resourceId, 
 			const std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map) noexcept;
@@ -540,14 +540,15 @@ namespace PonyEngine::Resource
 		}
 		if (params.availability == ResourceAvailability::None) [[unlikely]]
 		{
-			throw std::invalid_argument("No availability flag is set");
+			throw std::invalid_argument("No availability flag set");
 		}
 
 		const ResourceHandle currentHandle = nextResourceHandle;
 		auto lock = std::unique_lock(resourceMutex);
 		resources.AddResource(params, provider, currentHandle);
 		lock.unlock();
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Resource added. Handle: '0x{:X}'; ID: '{}'.", currentHandle.id, params.id.value);
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Resource added. Handle: '0x{:X}'; ID: '{}'; Type: '0x{:X}'; Availability: '{}'.", 
+			currentHandle.id, params.id.value, params.type.value, params.availability);
 		++nextResourceHandle.id;
 
 		return currentHandle;
@@ -555,6 +556,13 @@ namespace PonyEngine::Resource
 
 	void ResourceService::RemoveResource(const ResourceHandle handle)
 	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
 		auto lock = std::unique_lock(resourceMutex);
 		resources.RemoveResource(handle);
 		lock.unlock();
@@ -573,12 +581,21 @@ namespace PonyEngine::Resource
 			throw std::invalid_argument("Invalid resource ID");
 		}
 
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Getting resource... ResourceID: '0x{:X}'.", resourceId.value);
+
 		if (const std::shared_ptr<ResourceT> resource = GetResourceFromCache(resourceId, map, mapMutex))
 		{
+			PONY_LOG(application->Logger(), Log::LogType::Debug, "Getting resource done. Gotten from cache. ResourceID: '0x{:X}'.", resourceId.value);
 			return resource;
 		}
 
-		return AddResourceToCache(*resourceEntry, dataGetter(*resourceEntry), map, mapMutex);
+		std::shared_ptr<ResourceD> data = dataGetter(*resourceEntry);
+		if (!data) [[unlikely]]
+		{
+			throw std::logic_error("Failed to create resource data");
+		}
+
+		return AddResourceToCache(*resourceEntry, std::move(data), map, mapMutex);
 	}
 
 	template<std::derived_from<IResource> ResourceT>
@@ -590,17 +607,19 @@ namespace PonyEngine::Resource
 	}
 
 	template<std::derived_from<IResource> ResourceT, typename ResourceD>
-	std::shared_ptr<ResourceT> ResourceService::AddResourceToCache(const ResourceEntry& resourceEntry, const std::shared_ptr<ResourceD>& data, 
-		std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex)
+	std::shared_ptr<ResourceT> ResourceService::AddResourceToCache(const ResourceEntry& resourceEntry, std::shared_ptr<ResourceD>&& data, 
+		std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) const
 	{
-		const auto resource = std::make_shared<ResourceT>(resourceEntry.id, resourceEntry.type, data);
+		const auto resource = std::make_shared<ResourceT>(resourceEntry.id, resourceEntry.type, std::move(data));
 
 		const auto lock = std::unique_lock(mutex);
 		if (const std::shared_ptr<ResourceT> cacheResource = GetResourceFromCacheUnsafe<ResourceT>(resourceEntry.id, map)) [[unlikely]]
 		{
+			PONY_LOG(application->Logger(), Log::LogType::Debug, "Getting resource done. Gotten from cache late. ResourceID: '0x{:X}'.", resourceEntry.id.value);
 			return cacheResource;
 		}
 		map[resourceEntry.id] = resource;
+		PONY_LOG(application->Logger(), Log::LogType::Debug, "Getting resource done. Added to cache. ResourceID: '0x{:X}'.", resourceEntry.id.value);
 
 		return resource;
 	}

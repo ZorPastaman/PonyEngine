@@ -33,9 +33,10 @@ export namespace PonyEngine::File::Windows
 		/// @brief Opens a file.
 		/// @param application Application context.
 		/// @param worker Worker.
+		/// @param path File path
 		/// @param params File parameters.
 		[[nodiscard("Pure constructor")]]
-		File(const Application::IApplicationContext& application, const Worker& worker, const FileParams& params);
+		File(const Application::IApplicationContext& application, const Worker& worker, const std::filesystem::path& path, FileParams params);
 		File(const File&) = delete;
 		File(File&&) = delete;
 
@@ -82,14 +83,14 @@ namespace PonyEngine::File::Windows
 		static constexpr auto Value = &CreateFileW; ///< @p CreateFileW.
 	};
 
-	File::File(const Application::IApplicationContext& application, const Worker& worker, const FileParams& params) :
+	File::File(const Application::IApplicationContext& application, const Worker& worker, const std::filesystem::path& path, const FileParams params) :
 		application{&application},
 		worker{&worker},
-		fileInfo(params.path, params.access, params.flags)
+		fileInfo(path, params.access, params.flags)
 	{
 		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating file... Path: '{}'; Access: '{}'; OpenMode: '{}'; Flags: '{}'.",
-			params.path.string(), params.access, params.openMode, params.flags);
-		fileHandle = CreateFileSelector<std::filesystem::path::value_type>::Value(params.path.c_str(), ToDesiredAccess(params.access), FILE_SHARE_READ, nullptr,
+			path.string(), params.access, params.openMode, params.flags);
+		fileHandle = CreateFileSelector<std::filesystem::path::value_type>::Value(path.c_str(), ToDesiredAccess(params.access), FILE_SHARE_READ, nullptr,
 			ToCreationDisposition(params.access, params.openMode), FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | ToFlags(params.flags), nullptr);
 		if (fileHandle == INVALID_HANDLE_VALUE) [[unlikely]]
 		{
