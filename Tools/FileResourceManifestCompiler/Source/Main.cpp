@@ -13,13 +13,10 @@
 
 import std;
 
-struct Command final
-{
-	std::string_view input;
-	std::string_view output;
-};
-
 constexpr std::string_view OutputFlag = "-o";
+constexpr std::string_view VersionFlag = "--version";
+constexpr std::string_view HelpFlag = "--help";
+constexpr std::string_view VerboseFlag = "--verbose";
 
 constexpr std::string_view SchemaPropertyName = "schema";
 constexpr std::string_view ResourcesPropertyName = "resources";
@@ -29,13 +26,23 @@ constexpr std::string_view PathPropertyName = "path";
 
 constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0";
 
-static constexpr std::string_view ManifestExtension = ".pfrm";
-static constexpr std::string_view MagicHeader = "PonyEngineFRM";
+constexpr std::string_view ManifestExtension = ".pfrm";
+constexpr std::string_view MagicHeader = "PonyEngineFRM";
 
-[[nodiscard("Pure function")]]
-Command ParseCommandLine(int argc, const char* const argv[]);
+std::string_view Input = std::string_view();
+std::string_view Output = std::string_view();
+bool ShowVersion = false;
+bool ShowHowToUse = false;
+bool ShowHelp = false;
+bool Verbose = false;
 
-void ExecuteCommand(const Command& command);
+void ParseCommandLine(int argc, const char* const argv[]);
+
+void PrintVersion();
+void PrintHowToUse();
+void PrintHelp();
+
+void Compile();
 [[nodiscard("Pure function")]]
 std::vector<char> GenerateData(const toml::parse_result& manifest);
 [[nodiscard("Pure function")]]
@@ -44,100 +51,164 @@ std::vector<char> GenerateDataV0(const toml::parse_result& manifest);
 std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id = std::string_view());
 void PushSize(std::vector<char>& data, std::size_t size, std::string_view propertyName);
 
-void SaveToFile(std::span<const char> data, std::string_view path);
+void SaveToFile(std::span<const char> data);
 
 int main(const int argc, const char* const argv[])
 {
 	try
 	{
-		const Command command = ParseCommandLine(argc, argv);
-		try
-		{
-			ExecuteCommand(command);
-		}
-		catch (const std::exception& e)
-		{
-			std::println(std::cerr, "Executing. Exception of type '{}': '{}'.", typeid(e).name(), e.what());
-			return 2;
-		}
-		catch (...)
-		{
-			std::println(std::cerr, "Executing. Unexpected exception.");
-			return 2;
-		}
+		ParseCommandLine(argc, argv);
+		PrintVersion();
+		PrintHowToUse();
+		PrintHelp();
+		Compile();
 	}
 	catch (const std::exception& e)
 	{
-		std::println(std::cerr, "Parsing. Exception of type '{}': '{}'.", typeid(e).name(), e.what());
+		std::println(std::cerr, "Exception of type '{}': '{}'.", typeid(e).name(), e.what());
 		return 1;
 	}
 	catch (...)
 	{
-		std::println(std::cerr, "Parsing. Unexpected exception.");
+		std::println(std::cerr, "Unexpected exception.");
 		return 1;
 	}
-
-#ifndef NDEBUG
-	std::println("Finished successfully.");
-#endif
 
 	return 0;
 }
 
-Command ParseCommandLine(const int argc, const char* const argv[])
+void ParseCommandLine(const int argc, const char* const argv[])
 {
-	Command command;
+	if (argc <= 1) [[unlikely]]
+	{
+		ShowVersion = true;
+		ShowHowToUse = true;
+
+		return;
+	}
 
 	for (int i = 1; i < argc; ++i)
 	{
 		const std::string_view arg = argv[i];
 
-		if (arg == OutputFlag)
+		if (arg == OutputFlag) [[likely]]
 		{
-			if (!command.output.empty()) [[unlikely]]
+			if (!Output.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument("Output flag set multiple times");
+				throw std::invalid_argument(std::format("Parsing - Output flag '{}' set multiple times", OutputFlag));
 			}
 
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::runtime_error("Missing path after output flag");
+				throw std::runtime_error(std::format("Parsing - Missing path after output flag '{}'", OutputFlag));
 			}
 
-			command.output = argv[i];
+			Output = argv[i];
 		}
-		else
+		else if (arg == VersionFlag) [[unlikely]]
 		{
-			if (!command.input.empty()) [[unlikely]]
+			if (ShowVersion) [[unlikely]]
 			{
-				throw std::invalid_argument("Input path set multiple times");
+				std::println(std::clog, "Version flag '{}' set multiple times", VersionFlag);
 			}
 
-			command.input = arg;
+			ShowVersion = true;
+		}
+		else if (arg == HelpFlag) [[unlikely]]
+		{
+			if (ShowHelp) [[unlikely]]
+			{
+				std::println(std::clog, "Help flag '{}' set multiple times", HelpFlag);
+			}
+
+			ShowHelp = true;
+		}
+		else if (arg == VerboseFlag) [[unlikely]]
+		{
+			if (Verbose) [[unlikely]]
+			{
+				std::println(std::clog, "Verbose flag '{}' set multiple times", VersionFlag);
+			}
+
+			Verbose = true;
+		}
+		else [[likely]]
+		{
+			if (!Input.empty()) [[unlikely]]
+			{
+				throw std::invalid_argument("Parsing - Input path set multiple times");
+			}
+
+			Input = arg;
 		}
 	}
 	
-	if (command.input.empty()) [[unlikely]]
+	if (!Output.empty() && Input.empty()) [[unlikely]]
 	{
-		throw std::invalid_argument("No input path");
+		throw std::invalid_argument("Parsing - No input path");
 	}
-	if (command.output.empty()) [[unlikely]]
+	if (!Input.empty() && Output.empty()) [[unlikely]]
 	{
-		throw std::invalid_argument("No output path");
+		throw std::invalid_argument("Parsing - No output path");
 	}
 
-	return command;
+	if (ShowHelp) [[unlikely]]
+	{
+		ShowVersion = true;
+	}
 }
 
-void ExecuteCommand(const Command& command)
+void PrintVersion()
 {
-#ifndef NDEBUG
-	std::println("Executing command. Input: '{}'; Output: '{}'.", command.input, command.output);
-#endif
+	if (ShowVersion) [[unlikely]]
+	{
+		std::println("Pony Engine File Resource Manifest Compiler v{}.{}.{}.{}",
+			PONY_ENGINE_VERSION_MAJOR, PONY_ENGINE_VERSION_MINOR, PONY_ENGINE_VERSION_PATCH, PONY_ENGINE_VERSION_TWEAK);
+	}
+}
 
-	const toml::parse_result manifest = toml::parse_file(command.input);
+void PrintHowToUse()
+{
+	if (ShowHowToUse) [[unlikely]]
+	{
+		std::println("Use '--help' to know how to use it.");
+	}
+}
+
+void PrintHelp()
+{
+	if (ShowHelp) [[unlikely]]
+	{
+		std::println("\nCompiles a file resource manifest to a binary format used by PonyEngine.Resource.File.Impl module.");
+		std::println("\nUsage:");
+		std::println("\tponyfrmc <input> [options]");
+		std::println("\nArguments:");
+		std::println("\t<input>          Input manifest file. See the engine documentation for the file format.");
+		std::println("\nOptions:");
+		std::println("\t-o <output>      Output file path without extension. The extension .pfrm will be added automatically.");
+		std::println("\t                 See the engine documentation for the file format.");
+		std::println("\t--version        Display version information and exit.");
+		std::println("\t--verbose        Enable verbose output.");
+		std::println("\t--help           Display this help message and exit.");
+		std::println();
+	}
+}
+
+void Compile()
+{
+	if (Input.empty() || Output.empty()) [[unlikely]]
+	{
+		return;
+	}
+
+	if (Verbose) [[unlikely]]
+	{
+		std::println("Input: '{}'; Output: '{}'.", Input, Output);
+	}
+
+	const toml::parse_result manifest = toml::parse_file(Input);
 	const std::vector<char> data = GenerateData(manifest);
-	SaveToFile(data, command.output);
+	SaveToFile(data);
 }
 
 std::vector<char> GenerateData(const toml::parse_result& manifest)
@@ -150,22 +221,26 @@ std::vector<char> GenerateData(const toml::parse_result& manifest)
 
 	if (schema == SchemaV0) [[likely]]
 	{
-#ifndef NDEBUG
-		std::println("Generating Data V0.");
-#endif
-
 		return GenerateDataV0(manifest);
 	}
 
-	throw std::invalid_argument("Unsupported schema");
+	throw std::invalid_argument(std::format("Compiling - Unsupported schema '{}'", *schema));
 }
 
 std::vector<char> GenerateDataV0(const toml::parse_result& manifest)
 {
+	if (Verbose) [[unlikely]]
+	{
+		std::println("Generating Data V0.");
+	}
+
 	std::vector<char> data;
 
-	if (std::vector<std::string_view> ids; const toml::array* const resources = manifest[ResourcesPropertyName].as_array()) [[likely]]
+	if (const toml::array* const resources = manifest[ResourcesPropertyName].as_array()) [[likely]]
 	{
+		std::vector<std::string_view> ids;
+		ids.reserve(resources->size());
+
 		for (const toml::node& node : *resources) 
 		{
 			if (const toml::table* const table = node.as_table()) [[likely]]
@@ -175,12 +250,13 @@ std::vector<char> GenerateDataV0(const toml::parse_result& manifest)
 				const std::string_view path = GetResourcePropertyValue(*table, PathPropertyName, id);
 				if (std::ranges::find(ids, id) != ids.cend()) [[unlikely]]
 				{
-					throw std::invalid_argument(std::format("Resource id '{}' used multiple times", id));
+					throw std::invalid_argument(std::format("Compiling - Resource id '{}' used multiple times", id));
 				}
 
-#ifndef NDEBUG
-				std::println("Adding resource element. ID: '{}'; Type: '{}'; Path: '{}'.", id, type, path);
-#endif
+				if (Verbose) [[unlikely]]
+				{
+					std::println("Adding resource element. ID: '{}'; Type: '{}'; Path: '{}'.", id, type, path);
+				}
 
 				PushSize(data, id.size(), IdPropertyName);
 				PushSize(data, type.size(), TypePropertyName);
@@ -193,7 +269,7 @@ std::vector<char> GenerateDataV0(const toml::parse_result& manifest)
 			}
 			else [[unlikely]]
 			{
-				throw std::invalid_argument("Invalid resource element");
+				throw std::invalid_argument("Compiling - Invalid resource element");
 			}
 		}
 	}
@@ -208,10 +284,10 @@ std::string_view GetResourcePropertyValue(const toml::table& table, const std::s
 	{
 		if (propertyName == IdPropertyName)
 		{
-			throw std::invalid_argument("Resource element doesn't have property 'id'");
+			throw std::invalid_argument("Compiling - Resource element doesn't have property 'id'");
 		}
 
-		throw std::invalid_argument(std::format("Resource element with id '{}' doesn't have property '{}'", id, propertyName));
+		throw std::invalid_argument(std::format("Compiling - Resource element with id '{}' doesn't have property '{}'", id, propertyName));
 	}
 
 	return *property;
@@ -221,25 +297,24 @@ void PushSize(std::vector<char>& data, const std::size_t size, const std::string
 {
 	if (size > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
 	{
-		throw std::invalid_argument(std::format("Value of property '{}' is too long: Length = '{}', Max = '{}'", 
+		throw std::invalid_argument(std::format("Compiling - Value of property '{}' is too long: Length = '{}', Max = '{}'", 
 			propertyName, size, std::numeric_limits<std::uint8_t>::max()));
 	}
 
 	data.push_back(std::bit_cast<char>(static_cast<std::uint8_t>(size)));
 }
 
-void SaveToFile(const std::span<const char> data, const std::string_view path)
+void SaveToFile(const std::span<const char> data)
 {
-	auto filePath = std::string();
-	filePath.reserve(path.size() + ManifestExtension.size());
-	filePath.append_range(path);
-	filePath.append_range(ManifestExtension);
-
-	auto file = std::ofstream(filePath, std::ios::trunc | std::ios::binary);
-	if (!file)
+	if (Verbose) [[unlikely]]
 	{
-		throw std::runtime_error("Failed to open output file");
+		std::println("Saving to file.");
 	}
 
+	auto filePath = std::string();
+	filePath.reserve(Output.size() + ManifestExtension.size());
+	filePath.append_range(Output).append_range(ManifestExtension);
+
+	auto file = std::ofstream(filePath, std::ios::trunc | std::ios::binary);
 	file << MagicHeader << std::string_view(data);
 }

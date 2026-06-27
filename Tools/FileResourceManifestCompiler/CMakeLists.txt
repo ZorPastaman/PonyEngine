@@ -4,8 +4,16 @@ message(VERBOSE "Configuring target")
 add_executable(PonyTools.FileResourceManifestCompiler)
 
 message(VERBOSE "Configuring sources")
-target_sources(PonyTools.FileResourceManifestCompiler PUBLIC
+target_sources(PonyTools.FileResourceManifestCompiler PRIVATE
 	"Source/Main.cpp"
+)
+
+message(VERBOSE "Configuring defines")
+target_compile_definitions(PonyTools.FileResourceManifestCompiler PRIVATE
+	PONY_ENGINE_VERSION_MAJOR=${PONY_ENGINE_VERSION_MAJOR}
+	PONY_ENGINE_VERSION_MINOR=${PONY_ENGINE_VERSION_MINOR}
+	PONY_ENGINE_VERSION_PATCH=${PONY_ENGINE_VERSION_PATCH}
+	PONY_ENGINE_VERSION_TWEAK=${PONY_ENGINE_VERSION_TWEAK}
 )
 
 message(VERBOSE "Setting properties")
