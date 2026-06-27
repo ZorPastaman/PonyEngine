@@ -3,7 +3,7 @@ message(STATUS "Configuring PonyEngine.File.Impl")
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.File.Impl STATIC)
 
-target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
+target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-FileInfo.cppm"
 	"Source/Main-ReadRequest.cppm"

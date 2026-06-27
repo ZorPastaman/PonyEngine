@@ -68,6 +68,7 @@
 				"PONY_ENGINE_PLATFORM_CONSOLE_LOG": true,
 				"PONY_ENGINE_DEFAULT_LOGGER": true,
 				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
+				"PONY_ENGINE_RESOURCE_FILE_MANIFEST_DIR": "Manifests/Resource/File",
 				"PONY_ENGINE_APPLICATION_ICON_MODE": "Default",
 				"PONY_ENGINE_ADD_SAMPLE": true,
 				"PONY_ENGINE_SAMPLE_NAME": "RenderDeviceSample",
@@ -206,6 +207,81 @@
 			"name": "R-Win-MSVC-Shi",
 			"displayName": "Runtime: Windows MSVC - Shipping",
 			"inherits": [ "Runtime-Shipping", "Runtime-Windows-MSVC" ]
+		},
+		{
+			"name": "Tools",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_BUILD_MODE": "Tools",
+				"PONY_TOOLS_FILE_RESOURCE_MANIFEST_COMPILER": true
+			}
+		},
+		{
+			"name": "Tools-Debug",
+			"inherits": "Tools",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_ENGINE_OPTIMIZATION": "Debug"
+			}
+		},
+		{
+			"name": "Tools-Optimized",
+			"inherits": "Tools",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_ENGINE_OPTIMIZATION": "Release"
+			}
+		},
+		{
+			"name": "Tools-Release",
+			"inherits": "Tools",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
+				"PONY_ENGINE_OPTIMIZATION": "Release"
+			}
+		},
+		{
+			"name": "Tools-Shipping",
+			"inherits": "Tools",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"PONY_ENGINE_OPTIMIZATION": "Release"
+			}
+		},
+		{
+			"name": "Tools-Windows",
+			"hidden": true
+		},
+		{
+			"name": "Tools-Windows-MSVC",
+			"inherits": "Tools-Windows",
+			"hidden": true,
+			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
+		},
+		{
+			"name": "T-Win-MSVC-Deb",
+			"displayName": "Tools: Windows MSVC - Debug",
+			"inherits": [ "Tools-Debug", "Tools-Windows-MSVC" ]
+		},
+		{
+			"name": "T-Win-MSVC-Opt",
+			"displayName": "Tools: Windows MSVC - Optimized",
+			"inherits": [ "Tools-Optimized", "Tools-Windows-MSVC" ]
+		},
+		{
+			"name": "T-Win-MSVC-Rel",
+			"displayName": "Tools: Windows MSVC - Release",
+			"inherits": [ "Tools-Release", "Tools-Windows-MSVC" ]
+		},
+		{
+			"name": "T-Win-MSVC-Shi",
+			"displayName": "Tools: Windows MSVC - Shipping",
+			"inherits": [ "Tools-Shipping", "Tools-Windows-MSVC" ]
 		}
 	],
 	"buildPresets": [
@@ -233,6 +309,26 @@
 			"name": "R-Win-MSVC-Shi",
 			"displayName": "Runtime: Windows MSVC - Shipping",
 			"configurePreset": "R-Win-MSVC-Shi"
+		},
+		{
+			"name": "T-Win-MSVC-Deb",
+			"displayName": "Tools: Windows MSVC - Debug",
+			"configurePreset": "T-Win-MSVC-Deb"
+		},
+		{
+			"name": "T-Win-MSVC-Opt",
+			"displayName": "Tools: Windows MSVC - Optimized",
+			"configurePreset": "T-Win-MSVC-Opt"
+		},
+		{
+			"name": "T-Win-MSVC-Rel",
+			"displayName": "Tools: Windows MSVC - Release",
+			"configurePreset": "T-Win-MSVC-Rel"
+		},
+		{
+			"name": "T-Win-MSVC-Shi",
+			"displayName": "Tools: Windows MSVC - Shipping",
+			"configurePreset": "T-Win-MSVC-Shi"
 		}
 	],
 	"testPresets": [

@@ -49,7 +49,7 @@ if(NOT PONY_BUILD_MODE STREQUAL "Runtime" AND NOT PONY_BUILD_MODE STREQUAL "Tool
 	message(FATAL_ERROR "Incorrect PONY_BUILD_MODE: ${PONY_BUILD_MODE}")
 endif()
 
-if(PONY_BUILD_MODE STREQUAL "Runtime") # TODO: Add new presets
+if(PONY_BUILD_MODE STREQUAL "Runtime")
 	message(STATUS "Configuring engine project")
 	project(${PONY_ENGINE_NAME} VERSION ${PONY_ENGINE_VERSION} LANGUAGES CXX)
 	if(NOT PONY_IS_SUBPROJECT)
@@ -327,7 +327,28 @@ if(PONY_BUILD_MODE STREQUAL "Runtime") # TODO: Add new presets
 		endif()
 	endif()
 elseif(PONY_BUILD_MODE STREQUAL "Tools")
-	message(FATAL_ERROR "Tools build not implemented yet")
+	message(STATUS "Configuring tools project")
+	project("${PONY_ENGINE_NAME} Tools" VERSION ${PONY_ENGINE_VERSION} LANGUAGES CXX)
+	if(NOT PONY_IS_SUBPROJECT)
+		pony_clean_build_options()
+	endif()
+
+	add_subdirectory("Tools")
+
+	if(NOT PONY_IS_SUBPROJECT)
+		set(PONY_INSTALL_TARGETS "")
+
+		if(TARGET PonyTools.FileResourceManifestCompiler)
+			pony_set_build_options(PonyTools.FileResourceManifestCompiler ${PONY_ENGINE_OPTIMIZATION})
+			list(APPEND PONY_INSTALL_TARGETS PonyTools.FileResourceManifestCompiler)
+		endif()
+
+		message(VERBOSE "Installing")
+		install(TARGETS ${PONY_INSTALL_TARGETS}
+			RUNTIME DESTINATION .
+			LIBRARY DESTINATION
+		)
+	endif()
 elseif(PONY_BUILD_MODE STREQUAL "Editor")
 	message(FATAL_ERROR "Editor build not implemented yet")
 endif()
