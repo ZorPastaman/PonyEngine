@@ -5,7 +5,10 @@
 			"name": "Base",
 			"hidden": true,
 			"binaryDir": "${sourceDir}/Build/${presetName}",
-			"installDir": "${sourceDir}/Install/${presetName}"
+			"installDir": "${sourceDir}/Install/${presetName}",
+			"cacheVariables": {
+				"PONY_TOOLS_INSTALL_DIR": "${sourceDir}/Install/Tools"
+			}
 		},
 		{
 			"name": "Runtime",
@@ -72,7 +75,7 @@
 				"PONY_ENGINE_APPLICATION_ICON_MODE": "Default",
 				"PONY_ENGINE_ADD_SAMPLE": true,
 				"PONY_ENGINE_SAMPLE_NAME": "RenderDeviceSample",
-				"PONY_ENGINE_TESTING": true,
+				"PONY_ENGINE_TESTING": false,
 				"PONY_ENGINE_TESTING_BENCHMARK": false
 			}
 		},
@@ -214,7 +217,8 @@
 			"hidden": true,
 			"cacheVariables": {
 				"PONY_BUILD_MODE": "Tools",
-				"PONY_TOOLS_FILE_RESOURCE_MANIFEST_COMPILER": true
+				"PONY_TOOLS_FILE_RESOURCE_MANIFEST_COMPILER": true,
+				"PONY_TOOLS_FILE_RESOURCE_MANIFEST_GENERATOR": true
 			}
 		},
 		{

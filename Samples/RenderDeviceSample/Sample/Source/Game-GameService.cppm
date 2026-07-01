@@ -1,17 +1,18 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Macro/Text.h"
 
 export module Game:GameService;
 
 import std;
 
 import PonyEngine.Application.Ext;
-import PonyEngine.File;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput;
 import PonyEngine.RenderDevice;
+import PonyEngine.Resource;
 import PonyEngine.Shader;
 import PonyEngine.Surface;
 import PonyEngine.Time;
@@ -70,7 +71,7 @@ export namespace Game
 		};
 
 		PonyEngine::Application::IApplicationContext* application;
-		PonyEngine::File::IFileService* fileService;
+		PonyEngine::Resource::IResourceService* resourceService;
 		PonyEngine::RenderDevice::IRenderDeviceService* renderDevice;
 		PonyEngine::RawInput::IRawInputService* rawInput;
 		PonyEngine::Time::ITimeService* time;
@@ -137,8 +138,8 @@ namespace Game
 {
 	GameService::GameService(PonyEngine::Application::IApplicationContext& application) :
 		application{&application},
+		resourceService{&this->application->GetService<PonyEngine::Resource::IResourceService>()},
 		renderDevice{&this->application->GetService<PonyEngine::RenderDevice::IRenderDeviceService>()},
-		fileService{&this->application->GetService<PonyEngine::File::IFileService>()},
 		rawInput{&this->application->GetService<PonyEngine::RawInput::IRawInputService>()},
 		time{&this->application->GetService<PonyEngine::Time::ITimeService>()},
 		aAxis(rawInput->HashAxis(PonyEngine::RawInput::KeyboardLayout::MainAPath)),
@@ -172,38 +173,34 @@ namespace Game
 
 	void GameService::Begin()
 	{
-		const std::shared_ptr<PonyEngine::File::IFile> objectShader = fileService->OpenFile((application->RootDirectory() / OBJECT_SHADER).lexically_normal(),
-			PonyEngine::File::FileParams::Read());
-		const std::size_t objectShaderSize = std::filesystem::file_size(objectShader->Path());
+		const std::shared_ptr<PonyEngine::Resource::ILoadableResource> objectShader = resourceService->GetLoadableResource(resourceService->MakeResourceID(PONY_STRINGIFY_VALUE(OBJECT_SHADER_RESOURCE_ID)));
+		const std::size_t objectShaderSize = objectShader->Size();
 		auto objectShaderBytes = std::vector<std::byte>(objectShaderSize);
-		const std::shared_ptr<PonyEngine::File::IReadRequest> objectShaderRead = objectShader->Read(PonyEngine::File::ReadParams
+		const std::shared_ptr<PonyEngine::Resource::ILoadRequest> objectShaderRead = objectShader->Load(PonyEngine::Resource::LoadParams
 		{
 			.buffer = objectShaderBytes
 		});
 
-		const std::shared_ptr<PonyEngine::File::IFile> pixelShader = fileService->OpenFile((application->RootDirectory() / PIXEL_SHADER).lexically_normal(),
-			PonyEngine::File::FileParams::Read());
-		const std::size_t pixelShaderSize = std::filesystem::file_size(pixelShader->Path());
+		const std::shared_ptr<PonyEngine::Resource::ILoadableResource> pixelShader = resourceService->GetLoadableResource(resourceService->MakeResourceID(PONY_STRINGIFY_VALUE(PIXEL_SHADER_RESOURCE_ID)));
+		const std::size_t pixelShaderSize = pixelShader->Size();
 		auto pixelShaderBytes = std::vector<std::byte>(pixelShaderSize);
-		const std::shared_ptr<PonyEngine::File::IReadRequest> pixelShaderRead = pixelShader->Read(PonyEngine::File::ReadParams
+		const std::shared_ptr<PonyEngine::Resource::ILoadRequest> pixelShaderRead = pixelShader->Load(PonyEngine::Resource::LoadParams
 		{
 			.buffer = pixelShaderBytes
 		});
 
-		const std::shared_ptr<PonyEngine::File::IFile> fullscreenQuadShader = fileService->OpenFile((application->RootDirectory() / FULLSCREEN_QUAD_SHADER).lexically_normal(),
-			PonyEngine::File::FileParams::Read());
-		const std::size_t fullscreenQuadShaderSize = std::filesystem::file_size(fullscreenQuadShader->Path());
+		const std::shared_ptr<PonyEngine::Resource::ILoadableResource> fullscreenQuadShader = resourceService->GetLoadableResource(resourceService->MakeResourceID(PONY_STRINGIFY_VALUE(FULLSCREEN_QUAD_SHADER_RESOURCE_ID)));
+		const std::size_t fullscreenQuadShaderSize = fullscreenQuadShader->Size();
 		auto fullscreenQuadShaderBytes = std::vector<std::byte>(fullscreenQuadShaderSize);
-		const std::shared_ptr<PonyEngine::File::IReadRequest> fullscreenQuadShaderRead = fullscreenQuadShader->Read(PonyEngine::File::ReadParams
+		const std::shared_ptr<PonyEngine::Resource::ILoadRequest> fullscreenQuadShaderRead = fullscreenQuadShader->Load(PonyEngine::Resource::LoadParams
 		{
 			.buffer = fullscreenQuadShaderBytes
 		});
 
-		const std::shared_ptr<PonyEngine::File::IFile> textureShader = fileService->OpenFile((application->RootDirectory() / TEXTURE_SHADER).lexically_normal(),
-			PonyEngine::File::FileParams::Read());
-		const std::size_t textureShaderSize = std::filesystem::file_size(textureShader->Path());
+		const std::shared_ptr<PonyEngine::Resource::ILoadableResource> textureShader = resourceService->GetLoadableResource(resourceService->MakeResourceID(PONY_STRINGIFY_VALUE(TEXTURE_SHADER_RESOURCE_ID)));
+		const std::size_t textureShaderSize = textureShader->Size();
 		auto textureShaderBytes = std::vector<std::byte>(textureShaderSize);
-		const std::shared_ptr<PonyEngine::File::IReadRequest> textureShaderRead = textureShader->Read(PonyEngine::File::ReadParams
+		const std::shared_ptr<PonyEngine::Resource::ILoadRequest> textureShaderRead = textureShader->Load(PonyEngine::Resource::LoadParams
 		{
 			.buffer = textureShaderBytes
 		});

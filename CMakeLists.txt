@@ -342,12 +342,22 @@ elseif(PONY_BUILD_MODE STREQUAL "Tools")
 			pony_set_build_options(PonyTools.FileResourceManifestCompiler ${PONY_ENGINE_OPTIMIZATION})
 			list(APPEND PONY_INSTALL_TARGETS PonyTools.FileResourceManifestCompiler)
 		endif()
+		if(TARGET PonyTools.FileResourceManifestGenerator)
+			pony_set_build_options(PonyTools.FileResourceManifestGenerator ${PONY_ENGINE_OPTIMIZATION})
+			list(APPEND PONY_INSTALL_TARGETS PonyTools.FileResourceManifestGenerator)
+		endif()
 
 		message(VERBOSE "Installing")
 		install(TARGETS ${PONY_INSTALL_TARGETS}
 			RUNTIME DESTINATION .
 			LIBRARY DESTINATION
 		)
+		if(PONY_TOOLS_INSTALL_DIR)
+			install(TARGETS ${PONY_INSTALL_TARGETS}
+				RUNTIME DESTINATION ${PONY_TOOLS_INSTALL_DIR}
+				LIBRARY DESTINATION
+			)
+		endif()
 	endif()
 elseif(PONY_BUILD_MODE STREQUAL "Editor")
 	message(FATAL_ERROR "Editor build not implemented yet")

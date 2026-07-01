@@ -11,7 +11,7 @@
 # DEFINES - defines.
 # INCLUDES - include folders
 # ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
-function(compile_shader_with_dxc source output profile)
+function(pony_compile_shader_with_dxc source output profile)
 	set(options SPIRV PDB ENABLE_16_BIT)
 	set(oneValueArgs ROOT_SIG_VER ENTRY OPTIMIZATION SPIRV_TARGET)
 	set(multiValueArgs DEFINES INCLUDES ADDITIONAL_PARAMS)

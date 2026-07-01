@@ -11,10 +11,7 @@ export module PonyEngine.Resource.File.Impl:FileFileResourceData;
 
 import std;
 
-import PonyEngine.File;
 import PonyEngine.Resource.Ext;
-
-import :LoadRequestManager;
 
 export namespace PonyEngine::Resource::File
 {

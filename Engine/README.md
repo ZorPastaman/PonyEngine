@@ -229,12 +229,12 @@ There are 3 modes to set the application icon:
 
 The engine has some useful CMake functions:
 
-| Function name             | Script file                 | Description                                   |
-|:--------------------------|:----------------------------|:----------------------------------------------|
-| `pony_validate_path`      | [File](CMake/Path.cmake)    | Validates if the path variable is correct.    |
-| `pony_validate_name`      | [File](CMake/Project.cmake) | Validates if the name variable is correct.    |
-| `pony_validate_title`     | [File](CMake/Project.cmake) | Validates if the title variable is correct.   |
-| `pony_validate_version`   | [File](CMake/Project.cmake) | Validates if the version variable is correct. |
-| `compile_shader_with_dxc` | [File](CMake/Shader.cmake)  | Compiles a shader using DXC compiler.         |
+| Function name                  | Script file                 | Description                                   |
+|:-------------------------------|:----------------------------|:----------------------------------------------|
+| `pony_validate_path`           | [File](CMake/Path.cmake)    | Validates if the path variable is correct.    |
+| `pony_validate_name`           | [File](CMake/Project.cmake) | Validates if the name variable is correct.    |
+| `pony_validate_title`          | [File](CMake/Project.cmake) | Validates if the title variable is correct.   |
+| `pony_validate_version`        | [File](CMake/Project.cmake) | Validates if the version variable is correct. |
+| `pony_compile_shader_with_dxc` | [File](CMake/Shader.cmake)  | Compiles a shader using DXC compiler.         |
 
 Some modules may add their own functions. Refer to their documentation to find out.

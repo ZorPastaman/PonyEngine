@@ -31,16 +31,13 @@ target_link_libraries(Sample PUBLIC
 target_link_libraries(Sample PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
-	PonyEngine.File
+	PonyEngine.Resource
 	PonyEngine.RawInput
 	PonyEngine.RenderDevice
 	PonyEngine.Shader
 	PonyEngine.Surface
 	PonyEngine.Time
 )
-
-# Add data.
-set(DATA "Data")
 
 # Add shaders.
 get_target_property(PONY_ENGINE_SHADER_LIB PonyEngine.Shader PONY_ENGINE_SHADER_INCLUDE)
@@ -54,28 +51,52 @@ macro(compile_shader)
 		${ARGN}
 	)
 
-	compile_shader_with_dxc("${SHADER_INPUT}" "${SHADER_OUTPUT}" "${SHADER_PROFILE}"
+	pony_compile_shader_with_dxc("${SHADER_INPUT}" "${SHADER_OUTPUT}" "${SHADER_PROFILE}"
 		PDB
 		INCLUDES ${PONY_ENGINE_SHADER_LIB} "${CMAKE_CURRENT_LIST_DIR}/ShaderInclude"
 	)
 	list(APPEND SHADER_REGISTRY "${SHADER_OUTPUT}")
 endmacro()
-set(OBJECT_SHADER "${DATA}/Shaders/Mesh/Object.cso")
-set(PIXEL_SHADER "${DATA}/Shaders/Pixel/Pixel.cso")
-set(FULLSCREEN_QUAD_SHADER "${DATA}/Shaders/Mesh/FullscreenQuad.cso")
-set(TEXTURE_SHADER "${DATA}/Shaders/Pixel/Texture.cso")
+set(OBJECT_SHADER "Data/Shaders/Mesh/Object.cso")
+set(PIXEL_SHADER "Data/Shaders/Pixel/Pixel.cso")
+set(FULLSCREEN_QUAD_SHADER "Data/Shaders/Mesh/FullscreenQuad.cso")
+set(TEXTURE_SHADER "Data/Shaders/Pixel/Texture.cso")
 compile_shader(INPUT "Assets/Shaders/Mesh/Object.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${OBJECT_SHADER}" PROFILE ms_6_6)
 compile_shader(INPUT "Assets/Shaders/Pixel/Pixel.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${PIXEL_SHADER}" PROFILE ps_6_6)
 compile_shader(INPUT "Assets/Shaders/Mesh/FullscreenQuad.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${FULLSCREEN_QUAD_SHADER}" PROFILE ms_6_6)
 compile_shader(INPUT "Assets/Shaders/Pixel/Texture.hlsl" OUTPUT "${CMAKE_BINARY_DIR}/${TEXTURE_SHADER}" PROFILE ps_6_6)
 add_custom_target(Shaders ALL DEPENDS ${SHADER_REGISTRY})
 
-message(VERBOSE "Configuring defines")
+# Make shader manifest
+set(SHADER_MANIFEST "Manifests/Resource/File/ShaderManifest")
+set(SHADER_MANIFEST_SOURCE "${CMAKE_BINARY_DIR}/Intermediate/${SHADER_MANIFEST}.toml")
+pony_create_file_resource_manifest(${SHADER_MANIFEST_SOURCE})
+set(OBJECT_SHADER_RESOURCE_ID "Object")
+set(PIXEL_SHADER_RESOURCE_ID "Pixel")
+set(FULLSCREEN_QUAD_SHADER_RESOURCE_ID "FullscreenQuad")
+set(TEXTURE_SHADER_RESOURCE_ID "Texture")
+set(PONY_SHADER_TYPE "PonyShader")
+set(OBJECT_SHADER_RESOURCE "")
+set(PIXEL_SHADER_RESOURCE "")
+set(FULLSCREEN_QUAD_SHADER_RESOURCE "")
+set(TEXTURE_SHADER_RESOURCE "")
+pony_make_resource_for_file_resource_manifest(${OBJECT_SHADER_RESOURCE_ID} ${PONY_SHADER_TYPE} ${OBJECT_SHADER} OBJECT_SHADER_RESOURCE)
+pony_make_resource_for_file_resource_manifest(${PIXEL_SHADER_RESOURCE_ID} ${PONY_SHADER_TYPE} ${PIXEL_SHADER} PIXEL_SHADER_RESOURCE)
+pony_make_resource_for_file_resource_manifest(${FULLSCREEN_QUAD_SHADER_RESOURCE_ID} ${PONY_SHADER_TYPE} ${FULLSCREEN_QUAD_SHADER} FULLSCREEN_QUAD_SHADER_RESOURCE)
+pony_make_resource_for_file_resource_manifest(${TEXTURE_SHADER_RESOURCE_ID} ${PONY_SHADER_TYPE} ${TEXTURE_SHADER} TEXTURE_SHADER_RESOURCE)
+set(SHADER_RESOURCE_LIST ${OBJECT_SHADER_RESOURCE} ${PIXEL_SHADER_RESOURCE} ${FULLSCREEN_QUAD_SHADER_RESOURCE} ${TEXTURE_SHADER_RESOURCE})
+pony_add_to_file_resource_manifest(${SHADER_MANIFEST_SOURCE} RESOURCES ${SHADER_RESOURCE_LIST})
+set(SHADER_MANIFEST "${SHADER_MANIFEST}.pfrm")
+pony_compile_file_resource_manifest(${SHADER_MANIFEST_SOURCE} "${CMAKE_BINARY_DIR}/${SHADER_MANIFEST}")
+add_custom_target(Manifests ALL DEPENDS "${CMAKE_BINARY_DIR}/${SHADER_MANIFEST}")
+
+# Set defines.
 target_compile_definitions(Sample PRIVATE
-	OBJECT_SHADER="${OBJECT_SHADER}"
-	PIXEL_SHADER="${PIXEL_SHADER}"
-	FULLSCREEN_QUAD_SHADER="${FULLSCREEN_QUAD_SHADER}"
-	TEXTURE_SHADER="${TEXTURE_SHADER}"
+	OBJECT_SHADER_RESOURCE_ID=${OBJECT_SHADER_RESOURCE_ID}
+	PIXEL_SHADER_RESOURCE_ID=${PIXEL_SHADER_RESOURCE_ID}
+	FULLSCREEN_QUAD_SHADER_RESOURCE_ID=${FULLSCREEN_QUAD_SHADER_RESOURCE_ID}
+	TEXTURE_SHADER_RESOURCE_ID=${TEXTURE_SHADER_RESOURCE_ID}
 )
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/${DATA}" DESTINATION . FILES_MATCHING PATTERN "*.cso")
+install(DIRECTORY "${CMAKE_BINARY_DIR}/Data" DESTINATION . FILES_MATCHING PATTERN "*.cso")
+install(DIRECTORY "${CMAKE_BINARY_DIR}/Manifests" DESTINATION . FILES_MATCHING PATTERN "*.pfrm")

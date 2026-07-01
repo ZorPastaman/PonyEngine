@@ -3,6 +3,7 @@ message(STATUS "Configuring engine")
 message(VERBOSE "Configuring engine environment")
 include("CMake/Path.cmake")
 include("CMake/Project.cmake")
+include("CMake/Resource.cmake")
 include("CMake/Shader.cmake")
 
 message(VERBOSE "Configuring engine parameters")

@@ -52,14 +52,14 @@ namespace PonyEngine::Resource::File
 	FileLoadableResourceData::FileLoadableResourceData(const LoadRequestManager& loadRequestManager, const std::shared_ptr<PonyEngine::File::IFile>& file) :
 		loadRequestManager{&loadRequestManager},
 		file(file),
-		size{static_cast<std::size_t>(std::filesystem::file_size(file->Path()))}
+		size{static_cast<std::size_t>(std::filesystem::file_size(this->file->Path()))}
 	{
 	}
 
 	FileLoadableResourceData::FileLoadableResourceData(const LoadRequestManager& loadRequestManager, std::shared_ptr<PonyEngine::File::IFile>&& file) :
 		loadRequestManager{&loadRequestManager},
 		file(std::move(file)),
-		size{static_cast<std::size_t>(std::filesystem::file_size(file->Path()))}
+		size{static_cast<std::size_t>(std::filesystem::file_size(this->file->Path()))}
 	{
 	}
 
@@ -70,6 +70,11 @@ namespace PonyEngine::Resource::File
 
 	std::shared_ptr<ILoadRequest> FileLoadableResourceData::Load(const LoadParams& params, const std::function<void(const ILoadRequest&)>& callback) const
 	{
+		if (params.buffer.size() + params.offset > size) [[unlikely]]
+		{
+			throw std::out_of_range("Out of range of file bounds");
+		}
+
 		return loadRequestManager->CreateRequest(*file, params, callback);
 	}
 }
