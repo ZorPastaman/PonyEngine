@@ -108,13 +108,13 @@ namespace PonyEngine::Resource::File
 
 	std::shared_ptr<ILoadableResourceData> FileResourceProvider::GetLoadableResource(const std::size_t index) const
 	{
-		std::shared_ptr<PonyEngine::File::IFile> file = fileService->OpenFile(MakeAbsolutePath(filePaths[index]), PonyEngine::File::FileParams::Read());
+		std::shared_ptr<PonyEngine::File::IFile> file = fileService->OpenFile(filePaths[index], PonyEngine::File::FileParams::Read());
 		return std::make_shared<FileLoadableResourceData>(loadRequestManager, std::move(file));
 	}
 
 	std::shared_ptr<IFileResourceData> FileResourceProvider::GetFileResource(const std::size_t index) const
 	{
-		return std::make_shared<FileFileResourceData>(MakeAbsolutePath(filePaths[index]));
+		return std::make_shared<FileFileResourceData>(filePaths[index]);
 	}
 
 	std::shared_ptr<IMemoryResourceData> FileResourceProvider::GetMemoryResource(const std::size_t index) const
@@ -132,7 +132,7 @@ namespace PonyEngine::Resource::File
 			return;
 		}
 
-		for (std::vector<char> fileData; const std::filesystem::directory_entry& file : std::filesystem::directory_iterator(manifestDirectory))
+		for (std::vector<char> fileData; const std::filesystem::directory_entry& file : std::filesystem::recursive_directory_iterator(manifestDirectory))
 		{
 			const std::filesystem::path& path = file.path();
 			if (path.extension() != ManifestExtension) [[unlikely]]
@@ -209,7 +209,7 @@ namespace PonyEngine::Resource::File
 		const ResourceType type = resourceContext->MakeResourceType(resourceType);
 		const std::size_t index = filePaths.size();
 
-		filePaths.push_back(std::filesystem::path(resourcePath).lexically_normal());
+		filePaths.push_back(MakeAbsolutePath(std::filesystem::path(resourcePath).lexically_normal()));
 
 		try
 		{
