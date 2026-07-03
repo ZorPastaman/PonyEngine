@@ -19,7 +19,7 @@ export namespace PonyEngine::Resource::File
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit FileFileResourceData(const std::filesystem::path& filePath);
+		explicit FileFileResourceData(const std::filesystem::path* filePath);
 		[[nodiscard("Pure constructor")]]
 		FileFileResourceData(const FileFileResourceData& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -38,22 +38,22 @@ export namespace PonyEngine::Resource::File
 		FileFileResourceData& operator =(FileFileResourceData&& other) noexcept = default;
 
 	private:
-		std::filesystem::path filePath;
+		const std::filesystem::path* filePath;
 		std::size_t size;
 	};
 }
 
 namespace PonyEngine::Resource::File
 {
-	FileFileResourceData::FileFileResourceData(const std::filesystem::path& filePath) :
-		filePath(filePath),
-		size{static_cast<std::size_t>(std::filesystem::file_size(this->filePath))}
+	FileFileResourceData::FileFileResourceData(const std::filesystem::path* const filePath) :
+		filePath{filePath},
+		size{static_cast<std::size_t>(std::filesystem::file_size(*this->filePath))}
 	{
 	}
 
 	const std::filesystem::path& FileFileResourceData::Path() const noexcept
 	{
-		return filePath;
+		return *filePath;
 	}
 
 	std::size_t FileFileResourceData::Offset() const noexcept

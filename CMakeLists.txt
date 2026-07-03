@@ -352,6 +352,11 @@ elseif(PONY_BUILD_MODE STREQUAL "Tools")
 			list(APPEND PONY_INSTALL_TARGETS PonyTools.FileResourceManifestGenerator)
 		endif()
 
+		if(TARGET PonyTools.PackResourceManifestCompiler)
+			pony_set_build_options(PonyTools.PackResourceManifestCompiler ${PONY_ENGINE_OPTIMIZATION})
+			list(APPEND PONY_INSTALL_TARGETS PonyTools.PackResourceManifestCompiler)
+		endif()
+
 		message(VERBOSE "Installing")
 		install(TARGETS ${PONY_INSTALL_TARGETS}
 			RUNTIME DESTINATION .

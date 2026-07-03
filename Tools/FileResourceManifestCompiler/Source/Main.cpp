@@ -337,7 +337,7 @@ void SaveToFile(const std::span<const char> data)
 
 std::filesystem::path GetOutputPath()
 {
-	const auto path = std::filesystem::path(Output).lexically_normal();
+	const auto path = std::filesystem::absolute(std::filesystem::path(Output).lexically_normal());
 	if (path.extension() != ManifestExtension) [[unlikely]]
 	{
 		throw std::invalid_argument(std::format("Saving - Invalid file format. Must be '{}'", ManifestExtension));

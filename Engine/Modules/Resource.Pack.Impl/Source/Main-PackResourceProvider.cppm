@@ -52,13 +52,6 @@ export namespace PonyEngine::Resource::Pack
 		PackResourceProvider& operator =(PackResourceProvider&&) = delete;
 
 	private:
-		[[nodiscard("Pure function")]]
-		std::shared_ptr<File::IFile> GetFileFromCache(std::size_t pathIndex) const noexcept;
-		[[nodiscard("Pure function")]]
-		std::shared_ptr<File::IFile> CreateFile(std::size_t pathIndex) const;
-		[[nodiscard("Pure function")]]
-		std::shared_ptr<File::IFile> GetOrCreateFile(std::size_t pathIndex) const;
-
 		void Begin(IResourceRegistry& registry, std::size_t& count);
 		void End(IResourceRegistry& registry, std::size_t count) const;
 
@@ -66,14 +59,14 @@ export namespace PonyEngine::Resource::Pack
 		[[nodiscard("Pure function")]]
 		static std::size_t ParseSize(const char* data) noexcept;
 		void AddResource(IResourceRegistry& registry, std::string_view resourceId, std::string_view resourceType, 
-			std::size_t pathIndex, std::size_t offset, std::size_t size);
+			std::size_t packIndex, std::size_t offset, std::size_t size);
 
 		[[nodiscard("Pure function")]]
 		std::filesystem::path MakeAbsolutePath(const std::filesystem::path& relativePath) const;
 
 		struct ResourceEntry final
 		{
-			std::size_t pathIndex;
+			std::size_t packIndex;
 			std::size_t offset;
 			std::size_t size;
 		};
@@ -86,12 +79,9 @@ export namespace PonyEngine::Resource::Pack
 
 		LoadRequestManager loadRequestManager;
 
-		std::vector<std::filesystem::path> packPaths;
+		std::vector<std::shared_ptr<File::IFile>> packs;
 		std::vector<ResourceEntry> resourceEntries;
 		std::vector<ResourceHandle> resourceHandles;
-
-		mutable std::vector<std::weak_ptr<File::IFile>> fileCache;
-		mutable std::vector<std::shared_mutex> fileCacheMutexes;
 	};
 }
 
@@ -130,50 +120,18 @@ namespace PonyEngine::Resource::Pack
 	std::shared_ptr<ILoadableResourceData> PackResourceProvider::GetLoadableResource(const std::size_t index) const
 	{
 		const ResourceEntry& entry = resourceEntries[index];
-		std::shared_ptr<File::IFile> file = GetOrCreateFile(entry.pathIndex);
-		return std::make_shared<PackLoadableResourceData>(loadRequestManager, std::move(file), entry.offset, entry.size);
+		return std::make_shared<PackLoadableResourceData>(loadRequestManager, packs[entry.packIndex].get(), entry.offset, entry.size);
 	}
 
 	std::shared_ptr<IFileResourceData> PackResourceProvider::GetFileResource(const std::size_t index) const
 	{
 		const ResourceEntry& entry = resourceEntries[index];
-		return std::make_shared<PackFileResourceData>(packPaths[entry.pathIndex], entry.offset, entry.size);
+		return std::make_shared<PackFileResourceData>(packs[entry.packIndex].get(), entry.offset, entry.size);
 	}
 
 	std::shared_ptr<IMemoryResourceData> PackResourceProvider::GetMemoryResource(const std::size_t index) const
 	{
 		throw std::logic_error("Not available");
-	}
-
-	std::shared_ptr<File::IFile> PackResourceProvider::GetFileFromCache(const std::size_t pathIndex) const noexcept
-	{
-		const auto lock = std::shared_lock(fileCacheMutexes[pathIndex]);
-		return fileCache[pathIndex].lock();
-	}
-
-	std::shared_ptr<File::IFile> PackResourceProvider::CreateFile(const std::size_t pathIndex) const
-	{
-		const std::filesystem::path& path = packPaths[pathIndex];
-		const auto file = fileService->OpenFile(path, File::FileParams::Read());
-
-		const auto lock = std::unique_lock(fileCacheMutexes[pathIndex]);
-		if (const std::shared_ptr<File::IFile> cacheFile = fileCache[pathIndex].lock()) [[unlikely]]
-		{
-			return cacheFile;
-		}
-		fileCache[pathIndex] = file;
-
-		return file;
-	}
-
-	std::shared_ptr<File::IFile> PackResourceProvider::GetOrCreateFile(const std::size_t pathIndex) const
-	{
-		if (const std::shared_ptr<File::IFile> cacheFile = GetFileFromCache(pathIndex))
-		{
-			return cacheFile;
-		}
-
-		return CreateFile(pathIndex);
 	}
 
 	void PackResourceProvider::Begin(IResourceRegistry& registry, std::size_t& count)
@@ -186,10 +144,11 @@ namespace PonyEngine::Resource::Pack
 			return;
 		}
 
+		const auto manifestExtension = std::filesystem::path(ManifestExtension);
 		for (std::vector<char> fileData; const std::filesystem::directory_entry& file : std::filesystem::recursive_directory_iterator(manifestDirectory))
 		{
 			const std::filesystem::path& path = file.path();
-			if (path.extension() != ManifestExtension) [[unlikely]]
+			if (path.extension() != manifestExtension) [[unlikely]]
 			{
 				continue;
 			}
@@ -206,9 +165,6 @@ namespace PonyEngine::Resource::Pack
 			ParseManifest(fileData, registry, count);
 			PONY_LOG(resourceContext->Logger(), Log::LogType::Info, "Reading pack resource manifest done. Path: '{}'.", path.string());
 		}
-
-		fileCache.resize(packPaths.size());
-		fileCacheMutexes = std::vector<std::shared_mutex>(packPaths.size());
 	}
 
 	void PackResourceProvider::End(IResourceRegistry& registry, const std::size_t count) const
@@ -240,9 +196,12 @@ namespace PonyEngine::Resource::Pack
 		{
 			throw std::runtime_error("Unexpected manifest file end");
 		}
-		const std::size_t packPathIndex = packPaths.size();
+		const std::size_t packIndex = packs.size();
 		const auto packPath = std::string_view(current, packPathSize);
-		packPaths.push_back(MakeAbsolutePath(std::filesystem::path(packPath).lexically_normal()));
+		const std::filesystem::path absolutePath = MakeAbsolutePath(std::filesystem::path(packPath).lexically_normal());
+		std::shared_ptr<File::IFile> pack = fileService->OpenFile(absolutePath, File::FileParams::Read());
+		const std::size_t packSize = static_cast<std::size_t>(std::filesystem::file_size(absolutePath));
+		packs.push_back(std::move(pack));
 		current += packPathSize;
 
 		PONY_LOG(resourceContext->Logger(), Log::LogType::Info, "Registering resources from pack... PackPath: '{}'.", packPath);
@@ -257,6 +216,11 @@ namespace PonyEngine::Resource::Pack
 			current += sizeof(std::size_t);
 			const std::size_t resourceSize = ParseSize(current);
 			current += sizeof(std::size_t);
+			if (resourceOffset + resourceSize > packSize) [[unlikely]]
+			{
+				throw std::out_of_range("Invalid resource offset and/or size");
+			}
+
 			const std::uint8_t resourceIdSize = static_cast<std::uint8_t>(*current++);
 			const std::uint8_t resourceTypeSize = static_cast<std::uint8_t>(*current++);
 			if (end - current < static_cast<std::uint_fast16_t>(resourceIdSize) + resourceTypeSize) [[unlikely]]
@@ -269,7 +233,7 @@ namespace PonyEngine::Resource::Pack
 			const auto resourceType = std::string_view(current, resourceTypeSize);
 			current += resourceTypeSize;
 
-			AddResource(registry, resourceId, resourceType, packPathIndex, resourceOffset, resourceSize);
+			AddResource(registry, resourceId, resourceType, packIndex, resourceOffset, resourceSize);
 
 			++count;
 		}
@@ -284,7 +248,7 @@ namespace PonyEngine::Resource::Pack
 	}
 
 	void PackResourceProvider::AddResource(IResourceRegistry& registry, const std::string_view resourceId, const std::string_view resourceType, 
-		const std::size_t pathIndex, const std::size_t offset, const std::size_t size)
+		const std::size_t packIndex, const std::size_t offset, const std::size_t size)
 	{
 		PONY_LOG(resourceContext->Logger(), Log::LogType::Info, "Registering resource... ID: '{}'; Type: '{}'; Offset: '{}'; Size: '{}'.", 
 			resourceId, resourceType, offset, size);
@@ -295,7 +259,7 @@ namespace PonyEngine::Resource::Pack
 
 		resourceEntries.push_back(ResourceEntry
 		{
-			.pathIndex = pathIndex,
+			.packIndex = packIndex,
 			.offset = offset,
 			.size = size
 		});

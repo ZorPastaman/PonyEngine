@@ -114,7 +114,7 @@ namespace PonyEngine::Resource::File
 
 	std::shared_ptr<IFileResourceData> FileResourceProvider::GetFileResource(const std::size_t index) const
 	{
-		return std::make_shared<FileFileResourceData>(filePaths[index]);
+		return std::make_shared<FileFileResourceData>(&filePaths[index]);
 	}
 
 	std::shared_ptr<IMemoryResourceData> FileResourceProvider::GetMemoryResource(const std::size_t index) const
@@ -132,10 +132,11 @@ namespace PonyEngine::Resource::File
 			return;
 		}
 
+		const auto manifestExtension = std::filesystem::path(ManifestExtension);
 		for (std::vector<char> fileData; const std::filesystem::directory_entry& file : std::filesystem::recursive_directory_iterator(manifestDirectory))
 		{
 			const std::filesystem::path& path = file.path();
-			if (path.extension() != ManifestExtension) [[unlikely]]
+			if (path.extension() != manifestExtension) [[unlikely]]
 			{
 				continue;
 			}

@@ -22,9 +22,7 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		PackLoadableResourceData(const LoadRequestManager& loadRequestManager, const std::shared_ptr<File::IFile>& file, std::size_t offset, std::size_t size);
-		[[nodiscard("Pure constructor")]]
-		PackLoadableResourceData(const LoadRequestManager& loadRequestManager, std::shared_ptr<File::IFile>&& file, std::size_t offset, std::size_t size);
+		PackLoadableResourceData(const LoadRequestManager& loadRequestManager, const File::IFile* file, std::size_t offset, std::size_t size);
 		[[nodiscard("Pure constructor")]]
 		PackLoadableResourceData(const PackLoadableResourceData& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -42,7 +40,7 @@ export namespace PonyEngine::Resource::Pack
 
 	private:
 		const LoadRequestManager* loadRequestManager;
-		std::shared_ptr<File::IFile> file;
+		const File::IFile* file;
 		std::size_t offset;
 		std::size_t size;
 	};
@@ -50,30 +48,13 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	PackLoadableResourceData::PackLoadableResourceData(const LoadRequestManager& loadRequestManager, const std::shared_ptr<File::IFile>& file, 
+	PackLoadableResourceData::PackLoadableResourceData(const LoadRequestManager& loadRequestManager, const File::IFile* const file,
 		const std::size_t offset, const std::size_t size) :
 		loadRequestManager{&loadRequestManager},
-		file(file),
+		file{file},
 		offset{offset},
 		size{size}
 	{
-		if (std::filesystem::file_size(this->file->Path()) < this->offset + this->size) [[unlikely]]
-		{
-			throw std::out_of_range("File out of range");
-		}
-	}
-
-	PackLoadableResourceData::PackLoadableResourceData(const LoadRequestManager& loadRequestManager, std::shared_ptr<File::IFile>&& file,
-		const std::size_t offset, const std::size_t size) :
-		loadRequestManager{&loadRequestManager},
-		file(std::move(file)),
-		offset{offset},
-		size{size}
-	{
-		if (std::filesystem::file_size(this->file->Path()) < this->offset + this->size) [[unlikely]]
-		{
-			throw std::out_of_range("File out of range");
-		}
 	}
 
 	std::size_t PackLoadableResourceData::Size() const noexcept

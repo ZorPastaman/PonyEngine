@@ -423,7 +423,7 @@ void SaveToFile(const toml::table& manifest)
 
 std::filesystem::path GetOutputPath()
 {
-	const std::filesystem::path path = std::filesystem::path(FilePath).lexically_normal();
+	const std::filesystem::path path = std::filesystem::absolute(std::filesystem::path(FilePath).lexically_normal());
 	std::filesystem::create_directories(path.parent_path());
 
 	return path;

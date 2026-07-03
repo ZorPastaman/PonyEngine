@@ -11,6 +11,7 @@ export module PonyEngine.Resource.Pack.Impl:PackFileResourceData;
 
 import std;
 
+import PonyEngine.File;
 import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource::Pack
@@ -19,7 +20,7 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		PackFileResourceData(const std::filesystem::path& packPath, std::size_t offset, std::size_t size);
+		PackFileResourceData(const File::IFile* pack, std::size_t offset, std::size_t size);
 		[[nodiscard("Pure constructor")]]
 		PackFileResourceData(const PackFileResourceData& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -38,7 +39,7 @@ export namespace PonyEngine::Resource::Pack
 		PackFileResourceData& operator =(PackFileResourceData&& other) noexcept = default;
 
 	private:
-		std::filesystem::path packPath;
+		const File::IFile* pack;
 		std::size_t offset;
 		std::size_t size;
 	};
@@ -46,20 +47,16 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	PackFileResourceData::PackFileResourceData(const std::filesystem::path& packPath, const std::size_t offset, const std::size_t size) :
-		packPath(packPath),
+	PackFileResourceData::PackFileResourceData(const File::IFile* const pack, const std::size_t offset, const std::size_t size) :
+		pack{pack},
 		offset{offset},
 		size{size}
 	{
-		if (std::filesystem::file_size(this->packPath) < this->offset + this->size) [[unlikely]]
-		{
-			throw std::out_of_range("File out of range");
-		}
 	}
 
 	const std::filesystem::path& PackFileResourceData::Path() const noexcept
 	{
-		return packPath;
+		return pack->Path();
 	}
 
 	std::size_t PackFileResourceData::Offset() const noexcept
