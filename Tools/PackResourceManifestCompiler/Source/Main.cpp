@@ -652,7 +652,7 @@ void FinishDepStreamDependencyList(std::ofstream& depFile)
 
 std::string ConvertPathToDepPath(const std::filesystem::path& path)
 {
-	const std::string targetPath = std::filesystem::absolute(path).generic_string();
+	const std::string targetPath = path.generic_string();
 	std::string depPath;
 	depPath.reserve(targetPath.size() + 2uz);
 
