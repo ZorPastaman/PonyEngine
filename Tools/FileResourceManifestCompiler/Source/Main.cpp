@@ -268,6 +268,11 @@ std::vector<char> GenerateDataV0(const toml::table& manifest)
 						std::println("Adding resource element. ID: '{}'; Type: '{}'; Path: '{}'.", id, type, path);
 					}
 
+					if (!std::filesystem::path(path).is_relative()) [[unlikely]]
+					{
+						throw std::invalid_argument(std::format("Compiling - Resource id '{}' has not relative path '{}'", id, path));
+					}
+
 					PushSize(data, id.size(), IdPropertyName);
 					PushSize(data, type.size(), TypePropertyName);
 					PushSize(data, path.size(), PathPropertyName);

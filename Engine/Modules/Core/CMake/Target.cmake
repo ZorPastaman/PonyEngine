@@ -8,7 +8,7 @@ function(pony_make_module_group group_target)
 	set(multiValueArgs MODULES)
 	cmake_parse_arguments(module_arg "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-	message(STATUS "Making module group: ${group_target}. Modules: ${module_arg_MODULES}")
+	message(STATUS "Making module group: '${group_target}'. Modules: '${module_arg_MODULES}'")
 
 	message(VERBOSE "Adding PONY_DLL define")
 	foreach(MODULE IN LISTS module_arg_MODULES)
@@ -29,7 +29,7 @@ function(pony_make_module_group group_target)
 		POSITION_INDEPENDENT_CODE TRUE
 	)
 	if(module_arg_GROUP_NAME)
-		set_target_properties(${group_target} PROPERTIES OUTPUT_NAME ${module_arg_GROUP_NAME})
+		set_target_properties(${group_target} PROPERTIES OUTPUT_NAME "${module_arg_GROUP_NAME}")
 	endif()
 
 	message(VERBOSE "Configuring dependencies")

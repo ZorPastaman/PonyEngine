@@ -17,13 +17,13 @@ function(pony_compile_shader_with_dxc source output profile)
 	set(multiValueArgs DEFINES INCLUDES ADDITIONAL_PARAMS)
 	cmake_parse_arguments(dxc_arg "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-	if(NOT source)
+	if(source STREQUAL "")
 		message(FATAL_ERROR "Empty source")
 	endif()
-	if(NOT output)
+	if(output STREQUAL "")
 		message(FATAL_ERROR "Empty output")
 	endif()
-	if(NOT profile)
+	if(profile STREQUAL "")
 		message(FATAL_ERROR "Empty profile")
 	endif()
 
@@ -31,16 +31,16 @@ function(pony_compile_shader_with_dxc source output profile)
 		message(FATAL_ERROR "SPIR-V target is set in non-spirv build")
 	endif()
 
-	get_filename_component(source_abs ${source} ABSOLUTE)
-	get_filename_component(output_abs ${output} ABSOLUTE)
+	cmake_path(ABSOLUTE_PATH source NORMALIZE OUTPUT_VARIABLE source_abs)
+	cmake_path(ABSOLUTE_PATH output NORMALIZE OUTPUT_VARIABLE output_abs)
 
 	if(NOT dxc_arg_ENTRY)
 		set(dxc_arg_ENTRY "main")
 	endif()
 
-	get_filename_component(output_dir ${output_abs} DIRECTORY)
-	file(MAKE_DIRECTORY ${output_dir})
-	set(DXC_OPTIONS -T ${profile} -E ${dxc_arg_ENTRY} -Fo ${output_abs})
+	cmake_path(GET output_abs PARENT_PATH output_dir)
+	file(MAKE_DIRECTORY "${output_dir}")
+	set(DXC_OPTIONS -T ${profile} -E ${dxc_arg_ENTRY} -Fo "${output_abs}")
 	if(dxc_arg_ROOT_SIG_VER)
 		list(APPEND DXC_OPTIONS -force-rootsig-ver ${dxc_arg_ROOT_SIG_VER})
 	endif()
@@ -50,9 +50,9 @@ function(pony_compile_shader_with_dxc source output profile)
 	foreach(define ${dxc_arg_DEFINES})
 		list(APPEND DXC_OPTIONS -D ${define})
 	endforeach()
-	foreach(include ${dxc_arg_INCLUDES})
-		get_filename_component(include_abs ${include} ABSOLUTE)
-		list(APPEND DXC_OPTIONS -I ${include_abs})
+	foreach(include IN LISTS dxc_arg_INCLUDES)
+		cmake_path(ABSOLUTE_PATH include NORMALIZE OUTPUT_VARIABLE include_abs)
+		list(APPEND DXC_OPTIONS -I "${include_abs}")
 	endforeach()
 
 	if(dxc_arg_ENABLE_16_BIT)
@@ -69,28 +69,32 @@ function(pony_compile_shader_with_dxc source output profile)
 		list(APPEND DXC_OPTIONS -fspv-target-env=${dxc_arg_SPIRV_TARGET})
 	endif()
 
+	set(DXC_BYPRODUCTS "")
+
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 		list(APPEND DXC_OPTIONS -Zi)
 		if(dxc_arg_PDB)
-			list(APPEND DXC_OPTIONS -Fd ${output_abs}.pdb)
+			set(DXC_PDB_PATH "${output_abs}.pdb")
+			list(APPEND DXC_OPTIONS -Fd "${DXC_PDB_PATH}")
+			list(APPEND DXC_BYPRODUCTS "${DXC_PDB_PATH}")
 		else()
 			list(APPEND DXC_OPTIONS -Qembed_debug)
 		endif()
 	else()
 		list(APPEND DXC_OPTIONS -Qstrip_debug -Qstrip_reflect)
-		set(dxc_arg_PDB OFF)
 	endif()
 
 	if(dxc_arg_ADDITIONAL_PARAMS)
 		list(APPEND DXC_OPTIONS ${dxc_arg_ADDITIONAL_PARAMS})
 	endif()
 
-	set(DXC_DEP_FILE ${output_abs}.d)
-	add_custom_command(COMMAND dxc ${DXC_OPTIONS} -MD -MF ${DXC_DEP_FILE} ${source_abs} && dxc ${DXC_OPTIONS} ${source_abs}
-		DEPENDS ${source_abs}
-		OUTPUT ${output_abs}
-		DEPFILE ${DXC_DEP_FILE}
-		COMMENT "Compiling ${source} to ${output} with dxc"
-		VERBATIM
+	set(DXC_DEP_FILE "${output_abs}.d")
+	add_custom_command(COMMAND dxc ${DXC_OPTIONS} -MD -MF "${DXC_DEP_FILE}" "${source_abs}" && dxc ${DXC_OPTIONS} "${source_abs}"
+		DEPENDS "${source_abs}"
+		OUTPUT "${output_abs}"
+		BYPRODUCTS ${DXC_BYPRODUCTS}
+		DEPFILE "${DXC_DEP_FILE}"
+		COMMENT "Compiling '${source}' to '${output}' (profile: '${profile}') with dxc"
+		VERBATIM COMMAND_EXPAND_LISTS
 	)
 endfunction()

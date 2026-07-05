@@ -15,6 +15,7 @@ import std;
 
 constexpr std::string_view PackOutputFlag = "-po";
 constexpr std::string_view ManifestOutputFlag = "-mo";
+constexpr std::string_view DepFileFlag = "-d";
 constexpr std::string_view RootPathFlag = "-r";
 constexpr std::string_view SizeTFlag = "--size-t";
 constexpr std::string_view BigEndianFlag = "--big-endian";
@@ -37,6 +38,7 @@ constexpr std::string_view MagicHeader = "PonyEnginePRM";
 std::string_view Input = std::string_view();
 std::string_view PackOutput = std::string_view();
 std::string_view ManifestOutput = std::string_view();
+std::string_view DepFile = std::string_view();
 std::string_view RootPath = std::string_view();
 std::uintmax_t SizeTSize = 0uz;
 bool BigEndian = false;
@@ -53,15 +55,15 @@ void PrintHelp();
 
 void Compile();
 [[nodiscard("Pure function")]]
-std::vector<char> GenerateData(const toml::table& manifest);
+std::vector<char> GenerateData(const toml::table& manifest, const std::filesystem::path& outputManifestPath);
 [[nodiscard("Pure function")]]
-std::vector<char> GenerateDataV0(const toml::table& manifest);
+std::vector<char> GenerateDataV0(const toml::table& manifest, const std::filesystem::path& outputManifestPath);
 [[nodiscard("Pure function")]]
 std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id = std::string_view());
 void PushBigSize(std::vector<char>& data, std::uintmax_t size);
 void PushSmallSize(std::vector<char>& data, std::size_t size, std::string_view propertyName);
 
-void SaveManifest(std::span<const char> manifest);
+void SaveManifest(std::span<const char> manifest, const std::filesystem::path& outputManifestPath);
 
 [[nodiscard("Pure function")]]
 std::filesystem::path GetInputPath();
@@ -71,6 +73,13 @@ std::filesystem::path GetPackOutputPath();
 std::filesystem::path GetManifestOutputPath();
 [[nodiscard("Pure function")]]
 std::filesystem::path GetResourcePath(std::string_view path);
+
+[[nodiscard("Pure function")]]
+std::ofstream CreateDepFile();
+void AddPathToDepFile(std::ofstream& depFile, const std::filesystem::path& target);
+void AddPathSeparatorToDepFile(std::ofstream& depFile);
+void AddTargetSeparatorToDepFile(std::ofstream& depFile);
+void AddFinishToDepFile(std::ofstream& depFile);
 
 int main(const int argc, const char* const argv[])
 {
@@ -137,6 +146,20 @@ void ParseCommandLine(const int argc, const char* const argv[])
 			}
 
 			ManifestOutput = argv[i];
+		}
+		else if (arg == DepFileFlag)
+		{
+			if (!DepFile.empty()) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Parsing - Dep file flag '{}' set multiple times", DepFileFlag));
+			}
+
+			if (++i >= argc) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Parsing - Missing path after dep file flag '{}'", DepFileFlag));
+			}
+
+			DepFile = argv[i];
 		}
 		else if (arg == RootPathFlag)
 		{
@@ -313,12 +336,13 @@ void Compile()
 	}
 
 	const toml::table manifest = toml::parse_file(GetInputPath().c_str());
-	const std::vector<char> data = GenerateData(manifest);
-	SaveManifest(data);
+	const std::filesystem::path outputManifestPath = GetManifestOutputPath();
+	const std::vector<char> data = GenerateData(manifest, outputManifestPath);
+	SaveManifest(data, outputManifestPath);
 }
 
 [[nodiscard("Pure function")]]
-std::vector<char> GenerateData(const toml::table& manifest)
+std::vector<char> GenerateData(const toml::table& manifest, const std::filesystem::path& outputManifestPath)
 {
 	const std::optional<std::string_view> schema = manifest[SchemaPropertyName].value<std::string_view>();
 	if (!schema) [[unlikely]]
@@ -328,14 +352,14 @@ std::vector<char> GenerateData(const toml::table& manifest)
 
 	if (schema == SchemaV0) [[likely]]
 	{
-		return GenerateDataV0(manifest);
+		return GenerateDataV0(manifest, outputManifestPath);
 	}
 
 	throw std::invalid_argument(std::format("Compiling - Unsupported schema '{}'", *schema));
 }
 
 [[nodiscard("Pure function")]]
-std::vector<char> GenerateDataV0(const toml::table& manifest)
+std::vector<char> GenerateDataV0(const toml::table& manifest, const std::filesystem::path& outputManifestPath)
 {
 	if (Verbose) [[unlikely]]
 	{
@@ -344,22 +368,36 @@ std::vector<char> GenerateDataV0(const toml::table& manifest)
 
 	std::vector<char> data;
 
-	const std::optional<std::string_view> packPath = manifest[PackPathPropertyName].value<std::string_view>();
-	if (!packPath) [[unlikely]]
+	const std::optional<std::string_view> runtimePackPath = manifest[PackPathPropertyName].value<std::string_view>();
+	if (!runtimePackPath) [[unlikely]]
 	{
 		throw std::invalid_argument(std::format("Compiling - Pack manifest doesn't have property '{}'", PackPathPropertyName));
 	}
 	if (Verbose) [[unlikely]]
 	{
-		std::println("Runtime pack path: '{}'.", *packPath);
+		std::println("Runtime pack path: '{}'.", *runtimePackPath);
 	}
-	PushSmallSize(data, packPath->size(), PackPathPropertyName);
-	data.append_range(*packPath);
+	if (!std::filesystem::path(*runtimePackPath).is_relative()) [[unlikely]]
+	{
+		throw std::invalid_argument(std::format("Compiling - Not relative pack path '{}'", *runtimePackPath));
+	}
+	PushSmallSize(data, runtimePackPath->size(), PackPathPropertyName);
+	data.append_range(*runtimePackPath);
 
-	auto pack = std::ofstream(GetPackOutputPath(), std::ios::trunc | std::ios::binary);
+	const std::filesystem::path packPath = GetPackOutputPath();
+	auto pack = std::ofstream(packPath, std::ios::trunc | std::ios::binary);
 	if (!pack) [[unlikely]]
 	{
 		throw std::runtime_error("Compiling - Failed to create pack output file stream");
+	}
+
+	auto depFile = CreateDepFile();
+	if (depFile)
+	{
+		AddPathToDepFile(depFile, outputManifestPath);
+		AddPathSeparatorToDepFile(depFile);
+		AddPathToDepFile(depFile, packPath);
+		AddTargetSeparatorToDepFile(depFile);
 	}
 
 	if (const toml::node_view resourcesProperty = manifest[ResourcesPropertyName]) [[likely]]
@@ -406,6 +444,12 @@ std::vector<char> GenerateDataV0(const toml::table& manifest)
 					const std::uintmax_t resourceOffset = currentPackSize;
 					currentPackSize += resourceSize;
 
+					if (depFile)
+					{
+						AddPathToDepFile(depFile, resourceFilePath);
+						AddPathSeparatorToDepFile(depFile);
+					}
+
 					PushBigSize(data, resourceOffset);
 					PushBigSize(data, resourceSize);
 					PushSmallSize(data, id.size(), IdPropertyName);
@@ -425,6 +469,11 @@ std::vector<char> GenerateDataV0(const toml::table& manifest)
 		{
 			throw std::invalid_argument("Compiling - Invalid resources array");
 		}
+	}
+
+	if (depFile)
+	{
+		AddFinishToDepFile(depFile);
 	}
 
 	return data;
@@ -468,14 +517,14 @@ void PushSmallSize(std::vector<char>& data, const std::size_t size, const std::s
 	data.push_back(std::bit_cast<char>(static_cast<std::uint8_t>(size)));
 }
 
-void SaveManifest(const std::span<const char> manifest)
+void SaveManifest(const std::span<const char> manifest, const std::filesystem::path& outputManifestPath)
 {
 	if (Verbose) [[unlikely]]
 	{
 		std::println("Saving to file.");
 	}
 
-	auto file = std::ofstream(GetManifestOutputPath(), std::ios::trunc | std::ios::binary);
+	auto file = std::ofstream(outputManifestPath, std::ios::trunc | std::ios::binary);
 	if (!file) [[unlikely]]
 	{
 		throw std::runtime_error("Saving - Failed to create manifest output file stream");
@@ -502,7 +551,7 @@ std::filesystem::path GetManifestOutputPath()
 	const auto path = std::filesystem::absolute(std::filesystem::path(ManifestOutput).lexically_normal());
 	if (path.extension() != ManifestExtension) [[unlikely]]
 	{
-		throw std::invalid_argument(std::format("Saving - Invalid file format. Must be '{}'", ManifestExtension));
+		throw std::invalid_argument(std::format("Compiling - Invalid manifest output file format. Must be '{}'", ManifestExtension));
 	}
 	std::filesystem::create_directories(path.parent_path());
 
@@ -511,5 +560,78 @@ std::filesystem::path GetManifestOutputPath()
 
 std::filesystem::path GetResourcePath(const std::string_view path)
 {
-	return (std::filesystem::path(RootPath) / path).lexically_normal();
+	const auto resourcePath = std::filesystem::path(path);
+	if (resourcePath.is_absolute())
+	{
+		return resourcePath.lexically_normal();
+	}
+
+	return (std::filesystem::path(RootPath) / resourcePath).lexically_normal();
+}
+
+std::ofstream CreateDepFile()
+{
+	if (!DepFile.empty())
+	{
+		auto dep = std::ofstream(std::filesystem::path(DepFile).lexically_normal(), std::ios::trunc | std::ios::app);
+		if (!dep) [[unlikely]]
+		{
+			throw std::runtime_error("Compiling - Failed to create dep file");
+		}
+
+		return dep;
+	}
+
+	return std::ofstream();
+}
+
+void AddPathToDepFile(std::ofstream& depFile, const std::filesystem::path& target)
+{
+	const std::string targetPath = std::filesystem::absolute(target).generic_string();
+	std::string resultPath;
+	resultPath.reserve(targetPath.size() + 2uz);
+
+	resultPath += '"';
+	for (const char c : targetPath)
+	{
+		switch (c)
+		{
+		case ' ':
+			resultPath += "\\ ";
+			break;
+		case '\\':
+			resultPath += "\\\\";
+			break;
+		case '#':
+			resultPath += "\\#";
+			break;
+		case '$':
+			resultPath += "$$";
+			break;
+		case ':':
+			resultPath += "\\:";
+			break;
+		default: [[likely]]
+			resultPath += c;
+			break;
+		}
+	}
+	resultPath += '"';
+
+	depFile << resultPath;
+}
+
+void AddPathSeparatorToDepFile(std::ofstream& depFile)
+{
+	depFile << ' ';
+}
+
+void AddTargetSeparatorToDepFile(std::ofstream& depFile)
+{
+	depFile << ": ";
+}
+
+void AddFinishToDepFile(std::ofstream& depFile)
+{
+	depFile << '\n';
 }

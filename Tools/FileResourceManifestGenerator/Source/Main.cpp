@@ -396,6 +396,11 @@ void AddResources(toml::table& manifest)
 			throw std::invalid_argument(std::format("Adding - Resource element duplicate found: id = '{}'", addCommand.id));
 		}
 
+		if (!std::filesystem::path(addCommand.path).is_relative()) [[unlikely]]
+		{
+			throw std::invalid_argument(std::format("Adding - Not relative path: id = '{}', path = '{}'", addCommand.id, addCommand.path));
+		}
+
 		resources->push_back(toml::table
 		{
 			{ IdPropertyName, addCommand.id },
