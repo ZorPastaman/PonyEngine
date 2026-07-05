@@ -7,6 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include <cassert>
+
 #include "toml++/toml.hpp"
 
 #define SCHEMA_BASE "PonyEngine/Manifest/Resource/Pack/"
@@ -35,61 +37,71 @@ constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0";
 constexpr std::string_view ManifestExtension = ".pprm";
 constexpr std::string_view MagicHeader = "PonyEnginePRM";
 
-std::string_view Input = std::string_view();
-std::string_view PackOutput = std::string_view();
-std::string_view ManifestOutput = std::string_view();
-std::string_view DepFile = std::string_view();
-std::string_view RootPath = std::string_view();
-std::uintmax_t SizeTSize = 0uz;
-bool BigEndian = false;
-bool ShowVersion = false;
-bool ShowHowToUse = false;
-bool ShowHelp = false;
-bool Verbose = false;
-
-void ParseCommandLine(int argc, const char* const argv[]);
-
-void PrintVersion();
-void PrintHowToUse();
-void PrintHelp();
-
-void Compile();
-[[nodiscard("Pure function")]]
-std::vector<char> GenerateData(const toml::table& manifest, const std::filesystem::path& outputManifestPath);
-[[nodiscard("Pure function")]]
-std::vector<char> GenerateDataV0(const toml::table& manifest, const std::filesystem::path& outputManifestPath);
-[[nodiscard("Pure function")]]
-std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id = std::string_view());
-void PushBigSize(std::vector<char>& data, std::uintmax_t size);
-void PushSmallSize(std::vector<char>& data, std::size_t size, std::string_view propertyName);
-
-void SaveManifest(std::span<const char> manifest, const std::filesystem::path& outputManifestPath);
+struct Command final
+{
+	std::string_view input = std::string_view();
+	std::string_view packOutput = std::string_view();
+	std::string_view manifestOutput = std::string_view();
+	std::string_view depFile = std::string_view();
+	std::string_view root = std::string_view();
+	std::uintmax_t sizeTSize = 0uz;
+	bool bigEndian = false;
+	bool showVersion = false;
+	bool showHowToUse = false;
+	bool showHelp = false;
+	bool verbose = false;
+};
 
 [[nodiscard("Pure function")]]
-std::filesystem::path GetInputPath();
+Command ParseCommandLine(int argc, const char* const argv[]);
+
+void PrintVersion(const Command& command);
+void PrintHowToUse(const Command& command);
+void PrintHelp(const Command& command);
+
+void Compile(const Command& command);
 [[nodiscard("Pure function")]]
-std::filesystem::path GetPackOutputPath();
+std::uint32_t GetManifestVersion(const toml::table& manifest);
+void CompileV0(const Command& command, const toml::table& source);
 [[nodiscard("Pure function")]]
-std::filesystem::path GetManifestOutputPath();
+std::string_view GetRuntimePackPath(const Command& command, const toml::table& source, std::string_view propertyName);
 [[nodiscard("Pure function")]]
-std::filesystem::path GetResourcePath(std::string_view path);
+std::string_view GetResourceID(const toml::table& table, std::string_view propertyName);
+[[nodiscard("Pure function")]]
+std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id);
+[[nodiscard("Pure function")]]
+std::filesystem::path GetResourcePathRoot(const Command& command);
+[[nodiscard("Pure function")]]
+std::uintmax_t GetMaxSize(const Command& command) noexcept;
+void PushBigSize(std::ofstream& stream, std::uintmax_t size, const Command& command);
+void PushSmallSize(std::ofstream& stream, std::size_t size, std::string_view propertyName);
 
 [[nodiscard("Pure function")]]
-std::ofstream CreateDepFile();
-void AddPathToDepFile(std::ofstream& depFile, const std::filesystem::path& target);
-void AddPathSeparatorToDepFile(std::ofstream& depFile);
-void AddTargetSeparatorToDepFile(std::ofstream& depFile);
-void AddFinishToDepFile(std::ofstream& depFile);
+std::filesystem::path GetPackPath(std::string_view path);
+[[nodiscard("Pure function")]]
+std::ofstream CreatePackStream(const std::filesystem::path& path);
+[[nodiscard("Pure function")]]
+std::filesystem::path GetManifestPath(std::string_view path);
+[[nodiscard("Pure function")]]
+std::ofstream CreateManifestStream(const std::filesystem::path& path);
+
+[[nodiscard("Pure function")]]
+std::ofstream CreateDepStream(std::string_view path);
+void AddTargetsToDepStream(std::ofstream& depFile, const std::filesystem::path& packPath, const std::filesystem::path& manifestPath);
+void AddDependencyToDepStream(std::ofstream& depFile, const std::filesystem::path& path);
+void FinishDepStreamDependencyList(std::ofstream& depFile);
+[[nodiscard("Pure function")]]
+std::string ConvertPathToDepPath(const std::filesystem::path& path);
 
 int main(const int argc, const char* const argv[])
 {
 	try
 	{
-		ParseCommandLine(argc, argv);
-		PrintVersion();
-		PrintHowToUse();
-		PrintHelp();
-		Compile();
+		const Command command = ParseCommandLine(argc, argv);
+		PrintVersion(command);
+		PrintHowToUse(command);
+		PrintHelp(command);
+		Compile(command);
 	}
 	catch (const std::exception& e)
 	{
@@ -105,14 +117,17 @@ int main(const int argc, const char* const argv[])
 	return 0;
 }
 
-void ParseCommandLine(const int argc, const char* const argv[])
+[[nodiscard("Pure function")]]
+Command ParseCommandLine(const int argc, const char* const argv[])
 {
+	auto command = Command{};
+
 	if (argc <= 1) [[unlikely]]
 	{
-		ShowVersion = true;
-		ShowHowToUse = true;
+		command.showVersion = true;
+		command.showHowToUse = true;
 
-		return;
+		return command;
 	}
 
 	for (int i = 1; i < argc; ++i)
@@ -121,188 +136,190 @@ void ParseCommandLine(const int argc, const char* const argv[])
 
 		if (arg == PackOutputFlag) [[likely]]
 		{
-			if (!PackOutput.empty()) [[unlikely]]
+			if (!command.packOutput.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Pack output flag '{}' set multiple times", PackOutputFlag));
+				throw std::invalid_argument(std::format("Pack output flag '{}' set multiple times", PackOutputFlag));
 			}
 
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing path after pack output flag '{}'", PackOutputFlag));
+				throw std::invalid_argument(std::format("Missing path after pack output flag '{}'", PackOutputFlag));
 			}
 
-			PackOutput = argv[i];
+			command.packOutput = argv[i];
 		}
 		else if (arg == ManifestOutputFlag) [[likely]]
 		{
-			if (!ManifestOutput.empty()) [[unlikely]]
+			if (!command.manifestOutput.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Manifest output flag '{}' set multiple times", ManifestOutputFlag));
+				throw std::invalid_argument(std::format("Manifest output flag '{}' set multiple times", ManifestOutputFlag));
 			}
 
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing path after manifest output flag '{}'", ManifestOutputFlag));
+				throw std::invalid_argument(std::format("Missing path after manifest output flag '{}'", ManifestOutputFlag));
 			}
 
-			ManifestOutput = argv[i];
+			command.manifestOutput = argv[i];
 		}
 		else if (arg == DepFileFlag)
 		{
-			if (!DepFile.empty()) [[unlikely]]
+			if (!command.depFile.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Dep file flag '{}' set multiple times", DepFileFlag));
+				throw std::invalid_argument(std::format("Dep file flag '{}' set multiple times", DepFileFlag));
 			}
 
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing path after dep file flag '{}'", DepFileFlag));
+				throw std::invalid_argument(std::format("Missing path after dep file flag '{}'", DepFileFlag));
 			}
 
-			DepFile = argv[i];
+			command.depFile = argv[i];
 		}
 		else if (arg == RootPathFlag)
 		{
-			if (!RootPath.empty()) [[unlikely]]
+			if (!command.root.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Root path flag '{}' set multiple times", ManifestOutputFlag));
+				throw std::invalid_argument(std::format("Root path flag '{}' set multiple times", ManifestOutputFlag));
 			}
 
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing path after root path flag '{}'", ManifestOutputFlag));
+				throw std::invalid_argument(std::format("Missing path after root path flag '{}'", ManifestOutputFlag));
 			}
 
-			RootPath = argv[i];
+			command.root = argv[i];
 		}
 		else if (arg == SizeTFlag) [[likely]]
 		{
-			if (SizeTSize != 0u) [[unlikely]]
+			if (command.sizeTSize != 0u) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - size_t flag '{}' set multiple times", SizeTFlag));
+				throw std::invalid_argument(std::format("sizeof(std::size_t) flag '{}' set multiple times", SizeTFlag));
 			}
 
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing size after size_t flag '{}'", SizeTFlag));
+				throw std::invalid_argument(std::format("Missing size after size_t flag '{}'", SizeTFlag));
 			}
 
 			const std::string_view serializedSize = argv[i];
-			auto [ptr, ec] = std::from_chars(serializedSize.data(), serializedSize.data() + serializedSize.size(), SizeTSize);
-			if (ec != std::errc() || SizeTSize == 0u) [[unlikely]]
+			auto [ptr, ec] = std::from_chars(serializedSize.data(), serializedSize.data() + serializedSize.size(), command.sizeTSize);
+			if (ec != std::errc() || command.sizeTSize == 0u) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Invalid size after size_t flag '{}'", SizeTFlag));
+				throw std::invalid_argument(std::format("Invalid size after size_t flag '{}'", SizeTFlag));
 			}
-			if (SizeTSize > sizeof(std::uintmax_t)) [[unlikely]]
+			if (command.sizeTSize > sizeof(std::uintmax_t)) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Too great size after size_t flag '{}', it can't be greater than std::uintmax_t of the host platform", SizeTFlag));
+				throw std::invalid_argument(std::format("Too great size after size_t flag '{}', it can't be greater than std::uintmax_t of the host platform", SizeTFlag));
 			}
 		}
 		else if (arg == BigEndianFlag)
 		{
-			if (BigEndian) [[unlikely]]
+			if (command.bigEndian) [[unlikely]]
 			{
 				std::println(std::clog, "Big endian flag '{}' set multiple times.", BigEndianFlag);
 			}
 
-			BigEndian = true;
+			command.bigEndian = true;
 		}
 		else if (arg == VersionFlag) [[unlikely]]
 		{
-			if (ShowVersion) [[unlikely]]
+			if (command.showVersion) [[unlikely]]
 			{
 				std::println(std::clog, "Version flag '{}' set multiple times.", VersionFlag);
 			}
 
-			ShowVersion = true;
+			command.showVersion = true;
 		}
 		else if (arg == HelpFlag) [[unlikely]]
 		{
-			if (ShowHelp) [[unlikely]]
+			if (command.showHelp) [[unlikely]]
 			{
 				std::println(std::clog, "Help flag '{}' set multiple times.", HelpFlag);
 			}
 
-			ShowHelp = true;
+			command.showHelp = true;
 		}
 		else if (arg == VerboseFlag) [[unlikely]]
 		{
-			if (Verbose) [[unlikely]]
+			if (command.verbose) [[unlikely]]
 			{
 				std::println(std::clog, "Verbose flag '{}' set multiple times.", VersionFlag);
 			}
 
-			Verbose = true;
+			command.verbose = true;
 		}
 		else [[likely]]
 		{
-			if (!Input.empty()) [[unlikely]]
+			if (!command.input.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument("Parsing - Input path set multiple times");
+				throw std::invalid_argument("Input path set multiple times");
 			}
 
-			Input = arg;
+			command.input = arg;
 		}
 	}
 
-	const bool hasOutput = !PackOutput.empty() || !ManifestOutput.empty();
+	const bool hasOutput = !command.packOutput.empty() || !command.manifestOutput.empty();
 	if (hasOutput) [[likely]]
 	{
-		if (PackOutput.empty()) [[unlikely]]
+		if (command.packOutput.empty()) [[unlikely]]
 		{
-			throw std::invalid_argument("Parsing - No pack output path");
+			throw std::invalid_argument("No pack output path");
 		}
-		if (ManifestOutput.empty()) [[unlikely]]
+		if (command.manifestOutput.empty()) [[unlikely]]
 		{
-			throw std::invalid_argument("Parsing - No manifest output path");
+			throw std::invalid_argument("No manifest output path");
 		}
 	}
 	
-	if (hasOutput && Input.empty()) [[unlikely]]
+	if (hasOutput && command.input.empty()) [[unlikely]]
 	{
-		throw std::invalid_argument("Parsing - No input path");
+		throw std::invalid_argument("No input path");
 	}
-	if (!Input.empty() && !hasOutput) [[unlikely]]
+	if (!command.input.empty() && !hasOutput) [[unlikely]]
 	{
-		throw std::invalid_argument("Parsing - No output path");
+		throw std::invalid_argument("No output path");
 	}
 
-	if (!RootPath.empty() && Input.empty()) [[unlikely]]
+	if (!command.root.empty() && command.input.empty()) [[unlikely]]
 	{
 		std::println(std::clog, "Root path flag '{}' set but input isn't.", RootPathFlag);
 	}
 
-	if (hasOutput && SizeTSize == 0u) [[unlikely]]
+	if (hasOutput && command.sizeTSize == 0u) [[unlikely]]
 	{
-		throw std::invalid_argument("Parsing - No size_t size");
+		throw std::invalid_argument("No std::size_t size");
 	}
 
-	if (ShowHelp) [[unlikely]]
+	if (command.showHelp) [[unlikely]]
 	{
-		ShowVersion = true;
+		command.showVersion = true;
 	}
+
+	return command;
 }
 
-void PrintVersion()
+void PrintVersion(const Command& command)
 {
-	if (ShowVersion) [[unlikely]]
+	if (command.showVersion) [[unlikely]]
 	{
 		std::println("Pony Engine Pack Resource Manifest Compiler v{}.{}.{}.{}",
 			PONY_ENGINE_VERSION_MAJOR, PONY_ENGINE_VERSION_MINOR, PONY_ENGINE_VERSION_PATCH, PONY_ENGINE_VERSION_TWEAK);
 	}
 }
 
-void PrintHowToUse()
+void PrintHowToUse(const Command& command)
 {
-	if (ShowHowToUse) [[unlikely]]
+	if (command.showHowToUse) [[unlikely]]
 	{
 		std::println("Use '--help' to know how to use it.");
 	}
 }
 
-void PrintHelp()
+void PrintHelp(const Command& command)
 {
-	if (ShowHelp) [[unlikely]]
+	if (command.showHelp) [[unlikely]]
 	{
 		std::println("\nCompiles a text pack resource manifest into a binary pack resource manifest and pack data.");
 		std::println("\nUsage:");
@@ -313,8 +330,9 @@ void PrintHelp()
 		std::println("\t-po <output>     Output pack data file.");
 		std::println("\t-mo <output>     Output manifest file. The extension must be '.pprm'.");
 		std::println("\t-r <path>        Root path of resources in the source manifest.");
-		std::println("\t                 If not set, the working directory is used as a root path.");
-		std::println("\t--size-t         std::size_t size of a target platform.");
+		std::println("\t                 If set, it must be absolute.");
+		std::println("\t                 If not set, the input manifest directory is used as a root.");
+		std::println("\t--size-t         std::size_t size of a target platform. Can't be greater than host platform std::uintmax_t.");
 		std::println("\t--big-endian     Must be set if the target platform has big-endian memory; otherwise don't set it.");
 		std::println("\t--version        Display version information and exit.");
 		std::println("\t--verbose        Enable verbose output.");
@@ -323,160 +341,161 @@ void PrintHelp()
 	}
 }
 
-void Compile()
+void Compile(const Command& command)
 {
-	if (Input.empty() || PackOutput.empty() || ManifestOutput.empty()) [[unlikely]]
+	if (command.input.empty() || command.packOutput.empty() || command.manifestOutput.empty()) [[unlikely]]
 	{
 		return;
 	}
 
-	if (Verbose) [[unlikely]]
+	if (command.verbose) [[unlikely]]
 	{
-		std::println("Input: '{}'; Pack output: '{}'; Manifest output: '{}'; SizeT: '{}'; Big endian: '{}'.", Input, PackOutput, ManifestOutput, SizeTSize, BigEndian);
+		std::println("Input: '{}'; Pack output: '{}'; Manifest output: '{}'; std::size_t size: '{}'; Big endian: '{}'.", 
+			command.input, command.packOutput, command.manifestOutput, command.sizeTSize, command.bigEndian);
 	}
 
-	const toml::table manifest = toml::parse_file(GetInputPath().c_str());
-	const std::filesystem::path outputManifestPath = GetManifestOutputPath();
-	const std::vector<char> data = GenerateData(manifest, outputManifestPath);
-	SaveManifest(data, outputManifestPath);
+	switch (const toml::table manifest = toml::parse_file(command.input); GetManifestVersion(manifest))
+	{
+	case 0:
+		CompileV0(command, manifest);
+		break;
+	default: [[unlikely]]
+		throw std::invalid_argument("Invalid schema");
+	}
 }
 
-[[nodiscard("Pure function")]]
-std::vector<char> GenerateData(const toml::table& manifest, const std::filesystem::path& outputManifestPath)
+std::uint32_t GetManifestVersion(const toml::table& manifest)
 {
 	const std::optional<std::string_view> schema = manifest[SchemaPropertyName].value<std::string_view>();
 	if (!schema) [[unlikely]]
 	{
-		throw std::invalid_argument("Compiling - No schema property found or it's invalid");
+		throw std::invalid_argument("No schema property found or it's invalid");
 	}
 
-	if (schema == SchemaV0) [[likely]]
+	if (schema == SchemaV0)
 	{
-		return GenerateDataV0(manifest, outputManifestPath);
+		return 0;
 	}
 
-	throw std::invalid_argument(std::format("Compiling - Unsupported schema '{}'", *schema));
+	throw std::invalid_argument("Invalid schema");
 }
 
-[[nodiscard("Pure function")]]
-std::vector<char> GenerateDataV0(const toml::table& manifest, const std::filesystem::path& outputManifestPath)
+void CompileV0(const Command& command, const toml::table& source)
 {
-	if (Verbose) [[unlikely]]
+	if (command.verbose) [[unlikely]]
 	{
 		std::println("Generating Data V0.");
 	}
 
-	std::vector<char> data;
+	const std::filesystem::path packPath = GetPackPath(command.packOutput);
+	const std::filesystem::path manifestPath = GetManifestPath(command.manifestOutput);
+	const std::filesystem::path rootPath = GetResourcePathRoot(command);
+	std::ofstream pack = CreatePackStream(packPath);
+	std::ofstream manifest = CreateManifestStream(manifestPath);
+	std::ofstream depFile = CreateDepStream(command.depFile);
+	AddTargetsToDepStream(depFile, packPath, manifestPath);
 
-	const std::optional<std::string_view> runtimePackPath = manifest[PackPathPropertyName].value<std::string_view>();
-	if (!runtimePackPath) [[unlikely]]
-	{
-		throw std::invalid_argument(std::format("Compiling - Pack manifest doesn't have property '{}'", PackPathPropertyName));
-	}
-	if (Verbose) [[unlikely]]
-	{
-		std::println("Runtime pack path: '{}'.", *runtimePackPath);
-	}
-	if (!std::filesystem::path(*runtimePackPath).is_relative()) [[unlikely]]
-	{
-		throw std::invalid_argument(std::format("Compiling - Not relative pack path '{}'", *runtimePackPath));
-	}
-	PushSmallSize(data, runtimePackPath->size(), PackPathPropertyName);
-	data.append_range(*runtimePackPath);
+	const std::string_view runtimePackPath = GetRuntimePackPath(command, source, PackPathPropertyName);
+	PushSmallSize(manifest, runtimePackPath.size(), PackPathPropertyName);
+	manifest << runtimePackPath;
 
-	const std::filesystem::path packPath = GetPackOutputPath();
-	auto pack = std::ofstream(packPath, std::ios::trunc | std::ios::binary);
-	if (!pack) [[unlikely]]
-	{
-		throw std::runtime_error("Compiling - Failed to create pack output file stream");
-	}
-
-	auto depFile = CreateDepFile();
-	if (depFile)
-	{
-		AddPathToDepFile(depFile, outputManifestPath);
-		AddPathSeparatorToDepFile(depFile);
-		AddPathToDepFile(depFile, packPath);
-		AddTargetSeparatorToDepFile(depFile);
-	}
-
-	if (const toml::node_view resourcesProperty = manifest[ResourcesPropertyName]) [[likely]]
+	if (const toml::node_view resourcesProperty = source[ResourcesPropertyName]) [[likely]]
 	{
 		if (const toml::array* const resources = resourcesProperty.as_array()) [[likely]]
 		{
 			std::vector<std::string_view> ids;
 			ids.reserve(resources->size());
 
-			const std::uintmax_t maxPackSize = sizeof(std::uintmax_t) > SizeTSize 
-				? (std::uintmax_t{1u} << (SizeTSize * 8u)) - 1u
-				: std::numeric_limits<std::uintmax_t>::max();
+			const std::uintmax_t maxPackSize = GetMaxSize(command);
 			std::uintmax_t currentPackSize = 0u;
 
 			for (const toml::node& node : *resources)
 			{
 				if (const toml::table* const table = node.as_table()) [[likely]]
 				{
-					const std::string_view id = GetResourcePropertyValue(*table, IdPropertyName);
+					const std::string_view id = GetResourceID(*table, IdPropertyName);
 					const std::string_view type = GetResourcePropertyValue(*table, TypePropertyName, id);
 					const std::string_view path = GetResourcePropertyValue(*table, PathPropertyName, id);
 					if (std::ranges::find(ids, id) != ids.cend()) [[unlikely]]
 					{
-						throw std::invalid_argument(std::format("Compiling - Resource id '{}' used multiple times", id));
+						throw std::invalid_argument(std::format("Resource id '{}' used multiple times", id));
 					}
 
-					if (Verbose) [[unlikely]]
+					if (command.verbose) [[unlikely]]
 					{
 						std::println("Adding resource element. ID: '{}'; Type: '{}'; Path: '{}'.", id, type, path);
 					}
 
-					const std::filesystem::path resourceFilePath = GetResourcePath(path);
+					const std::filesystem::path resourceFilePath = (rootPath / path).lexically_normal();
 					auto resourceFile = std::ifstream(resourceFilePath, std::ios::binary);
 					if (!resourceFile) [[unlikely]]
 					{
-						throw std::runtime_error(std::format("Compiling - Failed to open resource '{}' file stream", id));
+						throw std::runtime_error(std::format("Failed to open resource '{}' file stream", id));
 					}
 					const std::uintmax_t resourceSize = std::filesystem::file_size(resourceFilePath);
-					if (resourceSize > maxPackSize - currentPackSize)
+					if (resourceSize > maxPackSize - currentPackSize) [[unlikely]]
 					{
-						throw std::runtime_error(std::format("Compiling - Output pack is too big for the target platform", id));
+						throw std::runtime_error(std::format("Output pack is too big for the target platform", id));
 					}
 					pack << resourceFile.rdbuf();
 					const std::uintmax_t resourceOffset = currentPackSize;
 					currentPackSize += resourceSize;
 
-					if (depFile)
-					{
-						AddPathToDepFile(depFile, resourceFilePath);
-						AddPathSeparatorToDepFile(depFile);
-					}
+					PushBigSize(manifest, resourceOffset, command);
+					PushBigSize(manifest, resourceSize, command);
+					PushSmallSize(manifest, id.size(), IdPropertyName);
+					PushSmallSize(manifest, type.size(), TypePropertyName);
+					manifest << id << type;
 
-					PushBigSize(data, resourceOffset);
-					PushBigSize(data, resourceSize);
-					PushSmallSize(data, id.size(), IdPropertyName);
-					PushSmallSize(data, type.size(), TypePropertyName);
-					data.append_range(id);
-					data.append_range(type);
+					AddDependencyToDepStream(depFile, resourceFilePath);
 
 					ids.push_back(id);
 				}
 				else [[unlikely]]
 				{
-					throw std::invalid_argument("Compiling - Invalid resource element");
+					throw std::invalid_argument("Invalid resource element");
 				}
 			}
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Compiling - Invalid resources array");
+			throw std::invalid_argument("Invalid resources array");
 		}
 	}
 
-	if (depFile)
+	FinishDepStreamDependencyList(depFile);
+}
+
+std::string_view GetRuntimePackPath(const Command& command, const toml::table& source, const std::string_view propertyName)
+{
+	const std::optional<std::string_view> runtimePackPath = source[propertyName].value<std::string_view>();
+	if (!runtimePackPath) [[unlikely]]
 	{
-		AddFinishToDepFile(depFile);
+		throw std::invalid_argument(std::format("Pack manifest doesn't have property '{}'", propertyName));
 	}
 
-	return data;
+	if (command.verbose) [[unlikely]]
+	{
+		std::println("Runtime pack path: '{}'.", *runtimePackPath);
+	}
+
+	if (!std::filesystem::path(*runtimePackPath).is_relative()) [[unlikely]]
+	{
+		throw std::invalid_argument(std::format("Not relative pack path '{}'", *runtimePackPath));
+	}
+
+	return *runtimePackPath;
+}
+
+std::string_view GetResourceID(const toml::table& table, const std::string_view propertyName)
+{
+	const std::optional<std::string_view> property = table[propertyName].value<std::string_view>();
+	if (!property) [[unlikely]]
+	{
+		throw std::invalid_argument(std::format("Resource element doesn't have property ID property '{}'", propertyName));
+	}
+
+	return *property;
 }
 
 std::string_view GetResourcePropertyValue(const toml::table& table, const std::string_view propertyName, const std::string_view id)
@@ -484,154 +503,185 @@ std::string_view GetResourcePropertyValue(const toml::table& table, const std::s
 	const std::optional<std::string_view> property = table[propertyName].value<std::string_view>();
 	if (!property) [[unlikely]]
 	{
-		if (propertyName == IdPropertyName)
-		{
-			throw std::invalid_argument("Compiling - Resource element doesn't have property 'id'");
-		}
-
-		throw std::invalid_argument(std::format("Compiling - Resource element with id '{}' doesn't have property '{}'", id, propertyName));
+		throw std::invalid_argument(std::format("Resource element with id '{}' doesn't have property '{}'", id, propertyName));
 	}
 
 	return *property;
 }
 
-void PushBigSize(std::vector<char>& data, const std::uintmax_t size)
+std::filesystem::path GetResourcePathRoot(const Command& command)
 {
-	for (std::size_t i = 0uz; i < SizeTSize; ++i)
+	if (command.root.empty())
 	{
-		const std::byte byte = BigEndian
-			? static_cast<std::byte>((size >> ((SizeTSize - 1u - i) * 8u)) & 0xFFu)
+		return std::filesystem::absolute(std::filesystem::path(command.input).lexically_normal()).parent_path();
+	}
+
+	const std::filesystem::path root = std::filesystem::path(command.root).lexically_normal();
+	if (!root.is_absolute()) [[unlikely]]
+	{
+		throw std::invalid_argument("Root path isn't absolute");
+	}
+	if (!std::filesystem::is_directory(root)) [[unlikely]]
+	{
+		throw std::invalid_argument("Root path isn't directory");
+	}
+
+	return root;
+}
+
+std::uintmax_t GetMaxSize(const Command& command) noexcept
+{
+	return sizeof(std::uintmax_t) > command.sizeTSize
+		? (std::uintmax_t{1u} << (command.sizeTSize * 8u)) - 1u
+		: std::numeric_limits<std::uintmax_t>::max();
+}
+
+void PushBigSize(std::ofstream& stream, const std::uintmax_t size, const Command& command)
+{
+	for (std::uintmax_t i = 0uz; i < command.sizeTSize; ++i)
+	{
+		const std::byte byte = command.bigEndian
+			? static_cast<std::byte>((size >> ((command.sizeTSize - 1u - i) * 8u)) & 0xFFu)
 			: static_cast<std::byte>((size >> (i * 8u)) & 0xFFu);
-		data.push_back(std::bit_cast<char>(byte));
+		stream << std::bit_cast<char>(byte);
 	}
 }
 
-void PushSmallSize(std::vector<char>& data, const std::size_t size, const std::string_view propertyName)
+void PushSmallSize(std::ofstream& stream, const std::size_t size, const std::string_view propertyName)
 {
 	if (size > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
 	{
-		throw std::invalid_argument(std::format("Compiling - Value of property '{}' is too long: Length = '{}', Max = '{}'",
+		throw std::invalid_argument(std::format("Value of property '{}' is too long: Length = '{}', Max = '{}'",
 			propertyName, size, std::numeric_limits<std::uint8_t>::max()));
 	}
 
-	data.push_back(std::bit_cast<char>(static_cast<std::uint8_t>(size)));
+	stream << std::bit_cast<char>(static_cast<std::uint8_t>(size));
 }
 
-void SaveManifest(const std::span<const char> manifest, const std::filesystem::path& outputManifestPath)
+std::filesystem::path GetPackPath(const std::string_view path)
 {
-	if (Verbose) [[unlikely]]
+	const std::filesystem::path packPath = std::filesystem::absolute(std::filesystem::path(path).lexically_normal());
+	std::filesystem::create_directories(packPath.parent_path());
+
+	return packPath;
+}
+
+std::ofstream CreatePackStream(const std::filesystem::path& path)
+{
+	auto packStream = std::ofstream(path, std::ios::trunc | std::ios::binary);
+	if (!packStream) [[unlikely]]
 	{
-		std::println("Saving to file.");
+		throw std::runtime_error("Failed to open pack output file for writing");
 	}
 
-	auto file = std::ofstream(outputManifestPath, std::ios::trunc | std::ios::binary);
-	if (!file) [[unlikely]]
+	return packStream;
+}
+
+std::filesystem::path GetManifestPath(const std::string_view path)
+{
+	const std::filesystem::path manifestPath = std::filesystem::absolute(std::filesystem::path(path).lexically_normal());
+	if (manifestPath.extension() != ManifestExtension) [[unlikely]]
 	{
-		throw std::runtime_error("Saving - Failed to create manifest output file stream");
+		throw std::invalid_argument(std::format("Invalid manifest output file extension, must be '{}'", ManifestExtension));
+	}
+	std::filesystem::create_directories(manifestPath.parent_path());
+
+	return manifestPath;
+}
+
+std::ofstream CreateManifestStream(const std::filesystem::path& path)
+{
+	auto manifestStream = std::ofstream(path, std::ios::trunc | std::ios::binary);
+	if (!manifestStream) [[unlikely]]
+	{
+		throw std::runtime_error("Failed to open manifest output file for writing");
 	}
 
-	file << MagicHeader << std::string_view(manifest);
+	manifestStream << MagicHeader;
+
+	return manifestStream;
 }
 
-std::filesystem::path GetInputPath()
+std::ofstream CreateDepStream(const std::string_view path)
 {
-	return std::filesystem::path(Input).lexically_normal();
-}
-
-std::filesystem::path GetPackOutputPath()
-{
-	const auto path = std::filesystem::absolute(std::filesystem::path(PackOutput).lexically_normal());
-	std::filesystem::create_directories(path.parent_path());
-
-	return path;
-}
-
-std::filesystem::path GetManifestOutputPath()
-{
-	const auto path = std::filesystem::absolute(std::filesystem::path(ManifestOutput).lexically_normal());
-	if (path.extension() != ManifestExtension) [[unlikely]]
+	if (path.empty())
 	{
-		throw std::invalid_argument(std::format("Compiling - Invalid manifest output file format. Must be '{}'", ManifestExtension));
-	}
-	std::filesystem::create_directories(path.parent_path());
-
-	return path;
-}
-
-std::filesystem::path GetResourcePath(const std::string_view path)
-{
-	const auto resourcePath = std::filesystem::path(path);
-	if (resourcePath.is_absolute())
-	{
-		return resourcePath.lexically_normal();
+		return std::ofstream();
 	}
 
-	return (std::filesystem::path(RootPath) / resourcePath).lexically_normal();
-}
+	const std::filesystem::path depPath = std::filesystem::absolute(std::filesystem::path(path).lexically_normal());
+	std::filesystem::create_directories(depPath.parent_path());
 
-std::ofstream CreateDepFile()
-{
-	if (!DepFile.empty())
+	auto depStream = std::ofstream(depPath, std::ios::trunc);
+	if (!depStream)
 	{
-		auto dep = std::ofstream(std::filesystem::path(DepFile).lexically_normal(), std::ios::trunc | std::ios::app);
-		if (!dep) [[unlikely]]
-		{
-			throw std::runtime_error("Compiling - Failed to create dep file");
-		}
-
-		return dep;
+		throw std::runtime_error("Failed to open dep file for writing");
 	}
 
-	return std::ofstream();
+	return depStream;
 }
 
-void AddPathToDepFile(std::ofstream& depFile, const std::filesystem::path& target)
+void AddTargetsToDepStream(std::ofstream& depFile, const std::filesystem::path& packPath, const std::filesystem::path& manifestPath)
 {
-	const std::string targetPath = std::filesystem::absolute(target).generic_string();
-	std::string resultPath;
-	resultPath.reserve(targetPath.size() + 2uz);
+	assert(packPath.is_absolute() && "Pack path isn't absolute");
+	assert(manifestPath.is_absolute() && "Manifest path isn't absolute");
 
-	resultPath += '"';
+	if (depFile)
+	{
+		depFile << ConvertPathToDepPath(packPath) << ' ' << ConvertPathToDepPath(manifestPath) << ':';
+	}
+}
+
+void AddDependencyToDepStream(std::ofstream& depFile, const std::filesystem::path& path)
+{
+	assert(path.is_absolute() && "Dependency path isn't absolute");
+
+	if (depFile)
+	{
+		depFile << ' ' << ConvertPathToDepPath(path);
+	}
+}
+
+void FinishDepStreamDependencyList(std::ofstream& depFile)
+{
+	if (depFile)
+	{
+		depFile << '\n';
+	}
+}
+
+std::string ConvertPathToDepPath(const std::filesystem::path& path)
+{
+	const std::string targetPath = std::filesystem::absolute(path).generic_string();
+	std::string depPath;
+	depPath.reserve(targetPath.size() + 2uz);
+
+	depPath += '"';
 	for (const char c : targetPath)
 	{
 		switch (c)
 		{
 		case ' ':
-			resultPath += "\\ ";
+			depPath += "\\ ";
 			break;
 		case '\\':
-			resultPath += "\\\\";
+			depPath += "\\\\";
 			break;
 		case '#':
-			resultPath += "\\#";
+			depPath += "\\#";
 			break;
 		case '$':
-			resultPath += "$$";
+			depPath += "$$";
 			break;
 		case ':':
-			resultPath += "\\:";
+			depPath += "\\:";
 			break;
 		default: [[likely]]
-			resultPath += c;
+			depPath += c;
 			break;
 		}
 	}
-	resultPath += '"';
+	depPath += '"';
 
-	depFile << resultPath;
-}
-
-void AddPathSeparatorToDepFile(std::ofstream& depFile)
-{
-	depFile << ' ';
-}
-
-void AddTargetSeparatorToDepFile(std::ofstream& depFile)
-{
-	depFile << ": ";
-}
-
-void AddFinishToDepFile(std::ofstream& depFile)
-{
-	depFile << '\n';
+	return depPath;
 }
