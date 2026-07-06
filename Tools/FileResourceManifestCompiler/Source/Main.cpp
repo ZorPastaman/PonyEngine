@@ -29,43 +29,47 @@ constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0";
 constexpr std::string_view ManifestExtension = ".pfrm";
 constexpr std::string_view MagicHeader = "PonyEngineFRM";
 
-std::string_view Input = std::string_view();
-std::string_view Output = std::string_view();
-bool ShowVersion = false;
-bool ShowHowToUse = false;
-bool ShowHelp = false;
-bool Verbose = false;
+struct Command final
+{
+	std::string_view input = std::string_view();
+	std::string_view output = std::string_view();
+	bool showVersion = false;
+	bool showHowToUse = false;
+	bool showHelp = false;
+	bool verbose = false;
+};
 
-void ParseCommandLine(int argc, const char* const argv[]);
+[[nodiscard("Pure function")]]
+Command ParseCommandLine(int argc, const char* const argv[]);
 
-void PrintVersion();
-void PrintHowToUse();
-void PrintHelp();
+void PrintVersion(const Command& command);
+void PrintHowToUse(const Command& command);
+void PrintHelp(const Command& command);
 
-void Compile();
+void Compile(const Command& command);
 [[nodiscard("Pure function")]]
-std::filesystem::path GetInputPath();
+std::uint32_t GetManifestVersion(const toml::table& manifest);
+void CompileV0(const Command& command, const toml::table& source);
 [[nodiscard("Pure function")]]
-std::vector<char> GenerateData(const toml::table& manifest);
+std::string_view GetResourceID(const toml::table& table, std::string_view propertyName);
 [[nodiscard("Pure function")]]
-std::vector<char> GenerateDataV0(const toml::table& manifest);
-[[nodiscard("Pure function")]]
-std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id = std::string_view());
-void PushSize(std::vector<char>& data, std::size_t size, std::string_view propertyName);
+std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id);
+void PushSize(std::ofstream& stream, std::size_t size, std::string_view propertyName);
 
-void SaveToFile(std::span<const char> data);
 [[nodiscard("Pure function")]]
-std::filesystem::path GetOutputPath();
+std::filesystem::path GetManifestPath(std::string_view path);
+[[nodiscard("Pure function")]]
+std::ofstream CreateManifestStream(const std::filesystem::path& path);
 
 int main(const int argc, const char* const argv[])
 {
 	try
 	{
-		ParseCommandLine(argc, argv);
-		PrintVersion();
-		PrintHowToUse();
-		PrintHelp();
-		Compile();
+		const Command command = ParseCommandLine(argc, argv);
+		PrintVersion(command);
+		PrintHowToUse(command);
+		PrintHelp(command);
+		Compile(command);
 	}
 	catch (const std::exception& e)
 	{
@@ -81,14 +85,16 @@ int main(const int argc, const char* const argv[])
 	return 0;
 }
 
-void ParseCommandLine(const int argc, const char* const argv[])
+Command ParseCommandLine(const int argc, const char* const argv[])
 {
+	auto command = Command{};
+
 	if (argc <= 1) [[unlikely]]
 	{
-		ShowVersion = true;
-		ShowHowToUse = true;
+		command.showVersion = true;
+		command.showHowToUse = true;
 
-		return;
+		return command;
 	}
 
 	for (int i = 1; i < argc; ++i)
@@ -97,91 +103,93 @@ void ParseCommandLine(const int argc, const char* const argv[])
 
 		if (arg == OutputFlag) [[likely]]
 		{
-			if (!Output.empty()) [[unlikely]]
+			if (!command.output.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Output flag '{}' set multiple times", OutputFlag));
+				throw std::invalid_argument(std::format("Output flag '{}' set multiple times", OutputFlag));
 			}
 
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing path after output flag '{}'", OutputFlag));
+				throw std::invalid_argument(std::format("Missing path after output flag '{}'", OutputFlag));
 			}
 
-			Output = argv[i];
+			command.output = argv[i];
 		}
 		else if (arg == VersionFlag) [[unlikely]]
 		{
-			if (ShowVersion) [[unlikely]]
+			if (command.showVersion) [[unlikely]]
 			{
 				std::println(std::clog, "Version flag '{}' set multiple times.", VersionFlag);
 			}
 
-			ShowVersion = true;
+			command.showVersion = true;
 		}
 		else if (arg == HelpFlag) [[unlikely]]
 		{
-			if (ShowHelp) [[unlikely]]
+			if (command.showHelp) [[unlikely]]
 			{
 				std::println(std::clog, "Help flag '{}' set multiple times.", HelpFlag);
 			}
 
-			ShowHelp = true;
+			command.showHelp = true;
 		}
 		else if (arg == VerboseFlag) [[unlikely]]
 		{
-			if (Verbose) [[unlikely]]
+			if (command.verbose) [[unlikely]]
 			{
 				std::println(std::clog, "Verbose flag '{}' set multiple times.", VersionFlag);
 			}
 
-			Verbose = true;
+			command.verbose = true;
 		}
 		else [[likely]]
 		{
-			if (!Input.empty()) [[unlikely]]
+			if (!command.input.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument("Parsing - Input path set multiple times");
+				throw std::invalid_argument("Input path set multiple times");
 			}
 
-			Input = arg;
+			command.input = arg;
 		}
 	}
 	
-	if (!Output.empty() && Input.empty()) [[unlikely]]
+	if (!command.output.empty() && command.input.empty()) [[unlikely]]
 	{
-		throw std::invalid_argument("Parsing - No input path");
+		throw std::invalid_argument("No input path");
 	}
-	if (!Input.empty() && Output.empty()) [[unlikely]]
+	if (!command.input.empty() && command.output.empty()) [[unlikely]]
 	{
-		throw std::invalid_argument("Parsing - No output path");
+		throw std::invalid_argument("No output path");
 	}
 
-	if (ShowHelp) [[unlikely]]
+	if (command.showHelp) [[unlikely]]
 	{
-		ShowVersion = true;
+		command.showVersion = true;
 	}
+
+	return command;
 }
 
-void PrintVersion()
+void PrintVersion(const Command& command)
 {
-	if (ShowVersion) [[unlikely]]
+	if (command.showVersion) [[unlikely]]
 	{
 		std::println("Pony Engine File Resource Manifest Compiler v{}.{}.{}.{}",
 			PONY_ENGINE_VERSION_MAJOR, PONY_ENGINE_VERSION_MINOR, PONY_ENGINE_VERSION_PATCH, PONY_ENGINE_VERSION_TWEAK);
 	}
 }
 
-void PrintHowToUse()
+void PrintHowToUse(const Command& command)
 {
-	if (ShowHowToUse) [[unlikely]]
+	if (command.showHowToUse) [[unlikely]]
 	{
 		std::println("Use '--help' to know how to use it.");
 	}
 }
 
-void PrintHelp()
+void PrintHelp(const Command& command)
 {
-	if (ShowHelp) [[unlikely]]
+	if (command.showHelp) [[unlikely]]
 	{
 		std::println("\nCompiles a text file resource manifest into a binary file resource manifest.");
 		std::println("\nUsage:");
@@ -197,104 +205,112 @@ void PrintHelp()
 	}
 }
 
-void Compile()
+void Compile(const Command& command)
 {
-	if (Input.empty() || Output.empty()) [[unlikely]]
+	if (command.input.empty() || command.output.empty()) [[unlikely]]
 	{
 		return;
 	}
 
-	if (Verbose) [[unlikely]]
+	if (command.verbose) [[unlikely]]
 	{
-		std::println("Input: '{}'; Output: '{}'.", Input, Output);
+		std::println("Input: '{}'; Output: '{}'.", command.input, command.output);
 	}
 
-	const toml::table manifest = toml::parse_file(GetInputPath().c_str());
-	const std::vector<char> data = GenerateData(manifest);
-	SaveToFile(data);
+	switch (const toml::table manifest = toml::parse_file(command.input); GetManifestVersion(manifest))
+	{
+	case 0:
+		CompileV0(command, manifest);
+		break;
+	default: [[unlikely]]
+		throw std::invalid_argument("Invalid schema");
+	}
 }
 
-std::filesystem::path GetInputPath()
-{
-	return std::filesystem::path(Input).lexically_normal();
-}
-
-std::vector<char> GenerateData(const toml::table& manifest)
+std::uint32_t GetManifestVersion(const toml::table& manifest)
 {
 	const std::optional<std::string_view> schema = manifest[SchemaPropertyName].value<std::string_view>();
 	if (!schema) [[unlikely]]
 	{
-		throw std::invalid_argument("Compiling - No schema property found or it's invalid");
+		throw std::invalid_argument("No schema property found or it's invalid");
 	}
 
-	if (schema == SchemaV0) [[likely]]
+	if (schema == SchemaV0)
 	{
-		return GenerateDataV0(manifest);
+		return 0;
 	}
 
-	throw std::invalid_argument(std::format("Compiling - Unsupported schema '{}'", *schema));
+	throw std::invalid_argument("Invalid schema");
 }
 
-std::vector<char> GenerateDataV0(const toml::table& manifest)
+void CompileV0(const Command& command, const toml::table& source)
 {
-	if (Verbose) [[unlikely]]
+	if (command.verbose) [[unlikely]]
 	{
-		std::println("Generating Data V0.");
+		std::println("Compiling manifest V0.");
 	}
 
-	std::vector<char> data;
+	const std::filesystem::path manifestPath = GetManifestPath(command.output);
+	std::ofstream manifest = CreateManifestStream(manifestPath);
 
-	if (const toml::node_view resourcesProperty = manifest[ResourcesPropertyName]) [[likely]]
+	if (const toml::node_view resourcesProperty = source[ResourcesPropertyName]) [[likely]]
 	{
 		if (const toml::array* const resources = resourcesProperty.as_array()) [[likely]]
 		{
 			std::vector<std::string_view> ids;
 			ids.reserve(resources->size());
 
-			for (const toml::node& node : *resources) 
+			for (const toml::node& node : *resources)
 			{
 				if (const toml::table* const table = node.as_table()) [[likely]]
 				{
-					const std::string_view id = GetResourcePropertyValue(*table, IdPropertyName);
+					const std::string_view id = GetResourceID(*table, IdPropertyName);
 					const std::string_view type = GetResourcePropertyValue(*table, TypePropertyName, id);
 					const std::string_view path = GetResourcePropertyValue(*table, PathPropertyName, id);
 					if (std::ranges::find(ids, id) != ids.cend()) [[unlikely]]
 					{
-						throw std::invalid_argument(std::format("Compiling - Resource id '{}' used multiple times", id));
+						throw std::invalid_argument(std::format("Resource id '{}' used multiple times", id));
 					}
 
-					if (Verbose) [[unlikely]]
+					if (command.verbose) [[unlikely]]
 					{
 						std::println("Adding resource element. ID: '{}'; Type: '{}'; Path: '{}'.", id, type, path);
 					}
 
 					if (!std::filesystem::path(path).is_relative()) [[unlikely]]
 					{
-						throw std::invalid_argument(std::format("Compiling - Resource id '{}' has not relative path '{}'", id, path));
+						throw std::invalid_argument(std::format("Resource id '{}' has not relative path '{}'", id, path));
 					}
 
-					PushSize(data, id.size(), IdPropertyName);
-					PushSize(data, type.size(), TypePropertyName);
-					PushSize(data, path.size(), PathPropertyName);
-					data.append_range(id);
-					data.append_range(type);
-					data.append_range(path);
+					PushSize(manifest, id.size(), IdPropertyName);
+					PushSize(manifest, type.size(), TypePropertyName);
+					PushSize(manifest, path.size(), PathPropertyName);
+					manifest << id << type << path;
 
 					ids.push_back(id);
 				}
 				else [[unlikely]]
 				{
-					throw std::invalid_argument("Compiling - Invalid resource element");
+					throw std::invalid_argument("Invalid resource element");
 				}
 			}
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Compiling - Invalid resources array");
+			throw std::invalid_argument("Invalid resources array");
 		}
 	}
+}
 
-	return data;
+std::string_view GetResourceID(const toml::table& table, const std::string_view propertyName)
+{
+	const std::optional<std::string_view> property = table[propertyName].value<std::string_view>();
+	if (!property) [[unlikely]]
+	{
+		throw std::invalid_argument(std::format("Resource element doesn't have property ID property '{}'", propertyName));
+	}
+
+	return *property;
 }
 
 std::string_view GetResourcePropertyValue(const toml::table& table, const std::string_view propertyName, const std::string_view id)
@@ -302,52 +318,44 @@ std::string_view GetResourcePropertyValue(const toml::table& table, const std::s
 	const std::optional<std::string_view> property = table[propertyName].value<std::string_view>();
 	if (!property) [[unlikely]]
 	{
-		if (propertyName == IdPropertyName)
-		{
-			throw std::invalid_argument("Compiling - Resource element doesn't have property 'id'");
-		}
-
-		throw std::invalid_argument(std::format("Compiling - Resource element with id '{}' doesn't have property '{}'", id, propertyName));
+		throw std::invalid_argument(std::format("Resource element with id '{}' doesn't have property '{}'", id, propertyName));
 	}
 
 	return *property;
 }
 
-void PushSize(std::vector<char>& data, const std::size_t size, const std::string_view propertyName)
+void PushSize(std::ofstream& stream, const std::size_t size, const std::string_view propertyName)
 {
 	if (size > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
 	{
-		throw std::invalid_argument(std::format("Compiling - Value of property '{}' is too long: Length = '{}', Max = '{}'", 
+		throw std::invalid_argument(std::format("Value of property '{}' is too long: Length = '{}', Max = '{}'",
 			propertyName, size, std::numeric_limits<std::uint8_t>::max()));
 	}
 
-	data.push_back(std::bit_cast<char>(static_cast<std::uint8_t>(size)));
+	stream << std::bit_cast<char>(static_cast<std::uint8_t>(size));
 }
 
-void SaveToFile(const std::span<const char> data)
+std::filesystem::path GetManifestPath(const std::string_view path)
 {
-	if (Verbose) [[unlikely]]
+	const std::filesystem::path manifestPath = std::filesystem::absolute(std::filesystem::path(path).lexically_normal());
+	if (manifestPath.extension() != ManifestExtension) [[unlikely]]
 	{
-		std::println("Saving to file.");
+		throw std::invalid_argument(std::format("Invalid output file extension, must be '{}'", ManifestExtension));
 	}
+	std::filesystem::create_directories(manifestPath.parent_path());
 
-	auto file = std::ofstream(GetOutputPath(), std::ios::trunc | std::ios::binary);
-	if (!file) [[unlikely]]
-	{
-		throw std::runtime_error("Saving - Failed to create output file stream");
-	}
-
-	file << MagicHeader << std::string_view(data);
+	return manifestPath;
 }
 
-std::filesystem::path GetOutputPath()
+std::ofstream CreateManifestStream(const std::filesystem::path& path)
 {
-	const auto path = std::filesystem::absolute(std::filesystem::path(Output).lexically_normal());
-	if (path.extension() != ManifestExtension) [[unlikely]]
+	auto manifestStream = std::ofstream(path, std::ios::trunc | std::ios::binary);
+	if (!manifestStream) [[unlikely]]
 	{
-		throw std::invalid_argument(std::format("Saving - Invalid file format. Must be '{}'", ManifestExtension));
+		throw std::runtime_error("Failed to open output file for writing");
 	}
-	std::filesystem::create_directories(path.parent_path());
 
-	return path;
+	manifestStream << MagicHeader;
+
+	return manifestStream;
 }

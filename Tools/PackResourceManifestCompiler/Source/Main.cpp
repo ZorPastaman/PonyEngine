@@ -384,7 +384,7 @@ void CompileV0(const Command& command, const toml::table& source)
 {
 	if (command.verbose) [[unlikely]]
 	{
-		std::println("Generating Data V0.");
+		std::println("Compiling manifest V0.");
 	}
 
 	const std::filesystem::path packPath = GetPackPath(command.packOutput);

@@ -219,10 +219,7 @@
 			"inherits": "Base",
 			"hidden": true,
 			"cacheVariables": {
-				"PONY_BUILD_MODE": "Tools",
-				"PONY_TOOLS_FILE_RESOURCE_MANIFEST_COMPILER": true,
-				"PONY_TOOLS_FILE_RESOURCE_MANIFEST_GENERATOR": true,
-				"PONY_TOOLS_PACK_RESOURCE_MANIFEST_COMPILER": true
+				"PONY_BUILD_MODE": "Tools"
 			}
 		},
 		{

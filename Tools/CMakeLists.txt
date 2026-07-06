@@ -11,17 +11,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(tomlplusplus)
 
-option(PONY_TOOLS_FILE_RESOURCE_MANIFEST_COMPILER "Enable PonyTools.FileResourceManifestCompiler module" ON)
-option(PONY_TOOLS_FILE_RESOURCE_MANIFEST_GENERATOR "Enable PonyTools.FileResourceManifestGenerator module" ON)
-option(PONY_TOOLS_PACK_RESOURCE_MANIFEST_COMPILER "Enable PonyTools.PackResourceManifestCompiler module" ON)
+add_subdirectory("FileResourceManifestCompiler")
+add_subdirectory("FileResourceManifestGenerator")
 
-if(PONY_TOOLS_FILE_RESOURCE_MANIFEST_COMPILER)
-	add_subdirectory("FileResourceManifestCompiler")
-endif()
-if(PONY_TOOLS_FILE_RESOURCE_MANIFEST_GENERATOR)
-	add_subdirectory("FileResourceManifestGenerator")
-endif()
-
-if(PONY_TOOLS_PACK_RESOURCE_MANIFEST_COMPILER)
-	add_subdirectory("PackResourceManifestCompiler")
-endif()
+add_subdirectory("PackResourceManifestCompiler")

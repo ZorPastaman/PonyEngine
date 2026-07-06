@@ -89,7 +89,8 @@ function(pony_compile_shader_with_dxc source output profile)
 	endif()
 
 	set(DXC_DEP_FILE "${output_abs}.d")
-	add_custom_command(COMMAND dxc ${DXC_OPTIONS} -MD -MF "${DXC_DEP_FILE}" "${source_abs}" && dxc ${DXC_OPTIONS} "${source_abs}"
+	add_custom_command(COMMAND dxc ${DXC_OPTIONS} -MD -MF "${DXC_DEP_FILE}" "${source_abs}"
+		COMMAND dxc ${DXC_OPTIONS} "${source_abs}"
 		DEPENDS "${source_abs}"
 		OUTPUT "${output_abs}"
 		BYPRODUCTS ${DXC_BYPRODUCTS}

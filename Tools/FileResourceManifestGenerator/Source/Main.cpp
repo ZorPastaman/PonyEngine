@@ -39,37 +39,41 @@ struct RemoveCommand final
 {
 	std::string_view id;
 };
-
-std::string_view FilePath = std::string_view();
-std::vector<AddCommand> AddCommands;
-std::vector<RemoveCommand> RemoveCommands;
-bool Create = false;
-bool Upgrade = false;
-bool ShowVersion = false;
-bool ShowHowToUse = false;
-bool ShowHelp = false;
-bool Verbose = false;
-
-void ParseCommandLine(int argc, const char* const argv[]);
-
-void PrintVersion();
-void PrintHowToUse();
-void PrintHelp();
+struct Command final
+{
+	std::string_view filePath = std::string_view();
+	std::vector<AddCommand> addCommands;
+	std::vector<RemoveCommand> removeCommands;
+	bool create = false;
+	bool upgrade = false;
+	bool showVersion = false;
+	bool showHowToUse = false;
+	bool showHelp = false;
+	bool verbose = false;
+};
 
 [[nodiscard("Pure function")]]
-toml::table ReadManifest();
+Command ParseCommandLine(int argc, const char* const argv[]);
+
+void PrintVersion(const Command& command);
+void PrintHowToUse(const Command& command);
+void PrintHelp(const Command& command);
+
+void Execute(const Command& command);
 [[nodiscard("Pure function")]]
-std::filesystem::path GetInputPath();
+toml::table CreateOrReadManifest(const Command& command);
+[[nodiscard("Pure function")]]
+toml::table CreateManifest(const Command& command);
+[[nodiscard("Pure function")]]
+toml::table ReadManifest(const Command& command);
 void ValidateManifestV0(const toml::table& manifest);
-void RemoveResources(toml::table& manifest);
-void AddResources(toml::table& manifest);
+void RemoveResources(const Command& command, toml::table& manifest);
+void AddResources(const Command& command, toml::table& manifest);
 
-void SaveToFile(const toml::table& manifest);
-[[nodiscard("Pure function")]]
-std::filesystem::path GetOutputPath();
+void SaveToFile(const Command& command, const toml::table& manifest);
 
 [[nodiscard("Pure function")]]
-std::optional<std::size_t> FindResource(const toml::array& resources, std::string_view id, std::string_view stage);
+std::optional<std::size_t> FindResource(const toml::array& resources, std::string_view id);
 [[nodiscard("Pure function")]]
 toml::array* GetOrCreateResourceArray(toml::table& manifest);
 
@@ -77,20 +81,11 @@ int main(const int argc, const char* const argv[])
 {
 	try
 	{
-		ParseCommandLine(argc, argv);
-
-		PrintVersion();
-		PrintHowToUse();
-		PrintHelp();
-
-		if (!FilePath.empty()) [[likely]]
-		{
-			toml::table manifest = ReadManifest();
-			RemoveResources(manifest);
-			AddResources(manifest);
-
-			SaveToFile(manifest);
-		}
+		const Command command = ParseCommandLine(argc, argv);
+		PrintVersion(command);
+		PrintHowToUse(command);
+		PrintHelp(command);
+		Execute(command);
 	}
 	catch (const std::exception& e)
 	{
@@ -106,14 +101,16 @@ int main(const int argc, const char* const argv[])
 	return 0;
 }
 
-void ParseCommandLine(const int argc, const char* const argv[])
+Command ParseCommandLine(const int argc, const char* const argv[])
 {
+	auto command = Command{};
+
 	if (argc <= 1) [[unlikely]]
 	{
-		ShowVersion = true;
-		ShowHowToUse = true;
+		command.showVersion = true;
+		command.showHowToUse = true;
 
-		return;
+		return command;
 	}
 
 	for (int i = 1; i < argc; ++i)
@@ -122,18 +119,18 @@ void ParseCommandLine(const int argc, const char* const argv[])
 
 		if (arg == CreateFlag)
 		{
-			if (Create)
+			if (command.create)
 			{
 				std::println(std::clog, "Create flag '{}' set multiple times.", CreateFlag);
 			}
 
-			Create = true;
+			command.create = true;
 		}
 		else if (arg == AddFlag)
 		{
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing resource description after add flag '{}'", AddFlag));
+				throw std::invalid_argument(std::format("Missing resource description after add flag '{}'", AddFlag));
 			}
 
 			const std::string_view resource = argv[i];
@@ -142,10 +139,10 @@ void ParseCommandLine(const int argc, const char* const argv[])
 			const std::size_t thirdCommaIndex = resource.find(',', secondCommaIndex + 1uz);
 			if (firstCommaIndex == std::string_view::npos || secondCommaIndex == std::string_view::npos || thirdCommaIndex != std::string_view::npos) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Invalid object to add = '{}'", resource));
+				throw std::invalid_argument(std::format("Invalid object to add = '{}'", resource));
 			}
 
-			AddCommands.push_back(AddCommand
+			command.addCommands.push_back(AddCommand
 			{
 				.id = resource.substr(0uz, firstCommaIndex),
 				.type = resource.substr(firstCommaIndex + 1uz, secondCommaIndex - firstCommaIndex - 1uz),
@@ -156,101 +153,104 @@ void ParseCommandLine(const int argc, const char* const argv[])
 		{
 			if (++i >= argc) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("Parsing - Missing id after remove flag '{}'", RemoveFlag));
+				throw std::invalid_argument(std::format("Missing id after remove flag '{}'", RemoveFlag));
 			}
 
-			RemoveCommands.push_back(RemoveCommand{.id = argv[i]});
+			command.removeCommands.push_back(RemoveCommand{.id = argv[i]});
 		}
 		else if (arg == UpgradeFlag)
 		{
-			if (Upgrade) [[unlikely]]
+			if (command.upgrade) [[unlikely]]
 			{
 				std::println(std::clog, "Upgrade flag '{}' set multiple times.", UpgradeFlag);
 			}
 
-			Upgrade = true;
+			command.upgrade = true;
 		}
 		else if (arg == VersionFlag) [[unlikely]]
 		{
-			if (ShowVersion) [[unlikely]]
+			if (command.showVersion) [[unlikely]]
 			{
 				std::println(std::clog, "Version flag '{}' set multiple times.", VersionFlag);
 			}
 
-			ShowVersion = true;
+			command.showVersion = true;
 		}
 		else if (arg == HelpFlag) [[unlikely]]
 		{
-			if (ShowHelp) [[unlikely]]
+			if (command.showHelp) [[unlikely]]
 			{
 				std::println(std::clog, "Help flag '{}' set multiple times.", HelpFlag);
 			}
 
-			ShowHelp = true;
+			command.showHelp = true;
 		}
 		else if (arg == VerboseFlag) [[unlikely]]
 		{
-			if (Verbose) [[unlikely]]
+			if (command.verbose) [[unlikely]]
 			{
 				std::println(std::clog, "Verbose flag '{}' set multiple times.", VersionFlag);
 			}
 
-			Verbose = true;
+			command.verbose = true;
 		}
 		else
 		{
-			if (!FilePath.empty()) [[unlikely]]
+			if (!command.filePath.empty()) [[unlikely]]
 			{
-				throw std::invalid_argument("Parsing - File path set multiple times");
+				throw std::invalid_argument("File path set multiple times");
 			}
 
-			FilePath = arg;
+			command.filePath = arg;
 		}
 	}
 
-	if ((Create || Upgrade || !RemoveCommands.empty() || !AddCommands.empty()) && FilePath.empty()) [[unlikely]]
+	const bool modify = command.create || command.upgrade || !command.addCommands.empty() || !command.removeCommands.empty();
+	if (modify && command.filePath.empty()) [[unlikely]]
 	{
-		throw std::invalid_argument("Parsing - File path isn't set");
+		throw std::invalid_argument("File path isn't set");
 	}
 
-	if (Create)
+	if (command.create)
 	{
-		if (!RemoveCommands.empty()) [[unlikely]]
+		if (!command.removeCommands.empty()) [[unlikely]]
 		{
 			std::println(std::clog, "Create '{}' and remove '{}' flags are set in one command.", CreateFlag, RemoveFlag);
 		}
-		if (Upgrade) [[unlikely]]
+		if (command.upgrade) [[unlikely]]
 		{
 			std::println(std::clog, "Create '{}' and upgrade '{}' flags are set in one command.", CreateFlag, UpgradeFlag);
 		}
 	}
 
-	if (ShowHelp) [[unlikely]]
+	if (command.showHelp) [[unlikely]]
 	{
-		ShowVersion = true;
+		command.showVersion = true;
 	}
+
+	return command;
 }
 
-void PrintVersion()
+void PrintVersion(const Command& command)
 {
-	if (ShowVersion) [[unlikely]]
+	if (command.showVersion) [[unlikely]]
 	{
 		std::println("Pony Engine File Resource Manifest Generator v{}.{}.{}.{}",
 			PONY_ENGINE_VERSION_MAJOR, PONY_ENGINE_VERSION_MINOR, PONY_ENGINE_VERSION_PATCH, PONY_ENGINE_VERSION_TWEAK);
 	}
 }
 
-void PrintHowToUse()
+void PrintHowToUse(const Command& command)
 {
-	if (ShowHowToUse) [[unlikely]]
+	if (command.showHowToUse) [[unlikely]]
 	{
 		std::println("Use '--help' to know how to use it.");
 	}
 }
 
-void PrintHelp()
+void PrintHelp(const Command& command)
 {
-	if (ShowHelp) [[unlikely]]
+	if (command.showHelp) [[unlikely]]
 	{
 		std::println("\nGenerates a text file resource manifest.");
 		std::println("\nUsage:");
@@ -270,57 +270,82 @@ void PrintHelp()
 	}
 }
 
-toml::table ReadManifest()
+void Execute(const Command& command)
 {
-	if (Verbose) [[unlikely]]
+	if (command.filePath.empty()) [[unlikely]]
 	{
-		std::println("File: '{}'.", FilePath);
+		return;
 	}
 
-	if (Create)
-	{
-		if (Verbose) [[unlikely]]
-		{
-			std::println("Creating new manifest.");
-		}
+	toml::table manifest = CreateOrReadManifest(command);
+	RemoveResources(command, manifest);
+	AddResources(command, manifest);
 
-		auto manifest = toml::table();
-		manifest.insert(SchemaPropertyName, SchemaV0);
-		return manifest;
+	SaveToFile(command, manifest);
+}
+
+toml::table CreateOrReadManifest(const Command& command)
+{
+	if (command.verbose) [[unlikely]]
+	{
+		std::println("File: '{}'.", command.filePath);
 	}
 
-	if (Verbose) [[unlikely]]
+	if (command.create)
+	{
+		return CreateManifest(command);
+	}
+
+	return ReadManifest(command);
+}
+
+toml::table CreateManifest(const Command& command)
+{
+	if (command.verbose) [[unlikely]]
+	{
+		std::println("Creating new manifest.");
+	}
+
+	auto manifest = toml::table();
+	manifest.insert(SchemaPropertyName, SchemaV0);
+
+	return manifest;
+}
+
+toml::table ReadManifest(const Command& command)
+{
+	if (command.verbose) [[unlikely]]
 	{
 		std::println("Reading manifest.");
 	}
 
-	toml::table manifest = toml::parse_file(GetInputPath().c_str());
+	const toml::table manifest = toml::parse_file(command.filePath);
 
 	const std::optional<std::string_view> schema = manifest[SchemaPropertyName].value<std::string_view>();
 	if (!schema) [[unlikely]]
 	{
-		throw std::invalid_argument("Reading - No schema property found or it's invalid");
+		throw std::invalid_argument("No schema property found or it's invalid");
 	}
 
 	if (schema == SchemaV0)
 	{
+		if (command.verbose) [[unlikely]]
+		{
+			std::println("Manifest has schema V0. It's the newest schema.");
+		}
+
 		ValidateManifestV0(manifest);
 		return manifest;
 	}
 
-	if (!Upgrade) [[unlikely]]
+	if (!command.upgrade) [[unlikely]]
 	{
-		throw std::invalid_argument("Reading - Manifest is old version and upgrade flag isn't set");
+		throw std::invalid_argument("Manifest has old version and upgrade flag isn't set");
 	}
 
 	// In the future, it may have upgraders here
 
-	throw std::invalid_argument("Reading - Invalid schema");
-}
-
-std::filesystem::path GetInputPath()
-{
-	return std::filesystem::path(FilePath).lexically_normal();
+	throw std::invalid_argument("Invalid schema");
 }
 
 void ValidateManifestV0(const toml::table& manifest)
@@ -336,43 +361,52 @@ void ValidateManifestV0(const toml::table& manifest)
 					const std::optional<std::string_view> resourceId = (*table)[IdPropertyName].value<std::string_view>();
 					if (!resourceId) [[unlikely]]
 					{
-						throw std::invalid_argument("Reading - Resource element doesn't have property 'id'");
+						throw std::invalid_argument(std::format("Resource element doesn't have property '{}'", IdPropertyName));
 					}
 
-					if (FindResource(*resources, *resourceId, "Reading") != i) [[unlikely]]
+					if (FindResource(*resources, *resourceId) != i) [[unlikely]]
 					{
-						throw std::invalid_argument(std::format("Reading - Resource element duplicate found: id = '{}'", *resourceId));
+						throw std::invalid_argument(std::format("Resource element duplicate found: id = '{}'", *resourceId));
+					}
+
+					if (!(*table)[TypePropertyName].value<std::string_view>()) [[unlikely]]
+					{
+						throw std::invalid_argument(std::format("Resource '{}' doesn't have property '{}'", *resourceId, TypePropertyName));
+					}
+					if (!(*table)[PathPropertyName].value<std::string_view>()) [[unlikely]]
+					{
+						throw std::invalid_argument(std::format("Resource '{}' doesn't have property '{}'", *resourceId, PathPropertyName));
 					}
 				}
 				else [[unlikely]]
 				{
-					throw std::invalid_argument("Reading - Invalid resource element");
+					throw std::invalid_argument("Invalid resource element");
 				}
 			}
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument("Reading - Invalid resources array");
+			throw std::invalid_argument("Invalid resources array");
 		}
 	}
 }
 
-void RemoveResources(toml::table& manifest)
+void RemoveResources(const Command& command, toml::table& manifest)
 {
 	if (toml::array* const resources = manifest[ResourcesPropertyName].as_array()) [[likely]]
 	{
-		for (const RemoveCommand& removeCommand : RemoveCommands)
+		for (const RemoveCommand& removeCommand : command.removeCommands)
 		{
-			if (Verbose) [[unlikely]]
+			if (command.verbose) [[unlikely]]
 			{
 				std::println("Removing resource. ID: '{}'.", removeCommand.id);
 			}
 
-			if (const std::optional<std::size_t> resourceIndex = FindResource(*resources, removeCommand.id, "Removing")) [[likely]]
+			if (const std::optional<std::size_t> resourceIndex = FindResource(*resources, removeCommand.id)) [[likely]]
 			{
 				resources->erase(resources->cbegin() + *resourceIndex);
 			}
-			else if (Verbose) [[unlikely]]
+			else if (command.verbose) [[unlikely]]
 			{
 				std::println("Resource not found");
 			}
@@ -380,25 +414,25 @@ void RemoveResources(toml::table& manifest)
 	}
 }
 
-void AddResources(toml::table& manifest)
+void AddResources(const Command& command, toml::table& manifest)
 {
 	toml::array* const resources = GetOrCreateResourceArray(manifest);
 
-	for (const AddCommand& addCommand : AddCommands)
+	for (const AddCommand& addCommand : command.addCommands)
 	{
-		if (Verbose) [[unlikely]]
+		if (command.verbose) [[unlikely]]
 		{
 			std::println("Adding resource. ID: '{}'; Type: '{}'; Path: '{}'.", addCommand.id, addCommand.type, addCommand.path);
 		}
 
-		if (FindResource(*resources, addCommand.id, "Adding")) [[unlikely]]
+		if (FindResource(*resources, addCommand.id)) [[unlikely]]
 		{
-			throw std::invalid_argument(std::format("Adding - Resource element duplicate found: id = '{}'", addCommand.id));
+			throw std::invalid_argument(std::format("Tried to add resource element duplicate: id = '{}'", addCommand.id));
 		}
 
 		if (!std::filesystem::path(addCommand.path).is_relative()) [[unlikely]]
 		{
-			throw std::invalid_argument(std::format("Adding - Not relative path: id = '{}', path = '{}'", addCommand.id, addCommand.path));
+			throw std::invalid_argument(std::format("Not relative path: id = '{}', path = '{}'", addCommand.id, addCommand.path));
 		}
 
 		resources->push_back(toml::table
@@ -410,31 +444,26 @@ void AddResources(toml::table& manifest)
 	}
 }
 
-void SaveToFile(const toml::table& manifest)
+void SaveToFile(const Command& command, const toml::table& manifest)
 {
-	if (Verbose) [[unlikely]]
+	if (command.verbose) [[unlikely]]
 	{
 		std::println("Saving to file.");
 	}
 
-	auto file = std::ofstream(GetOutputPath(), std::ios::trunc | std::ios::binary);
+	const std::filesystem::path path = std::filesystem::absolute(std::filesystem::path(command.filePath).lexically_normal());
+	std::filesystem::create_directories(path.parent_path());
+
+	auto file = std::ofstream(path, std::ios::trunc);
 	if (!file) [[unlikely]]
 	{
-		throw std::runtime_error("Saving - Failed to create output file stream");
+		throw std::runtime_error("Failed to create output file stream");
 	}
 
 	file << manifest << '\n';
 }
 
-std::filesystem::path GetOutputPath()
-{
-	const std::filesystem::path path = std::filesystem::absolute(std::filesystem::path(FilePath).lexically_normal());
-	std::filesystem::create_directories(path.parent_path());
-
-	return path;
-}
-
-std::optional<std::size_t> FindResource(const toml::array& resources, const std::string_view id, const std::string_view stage)
+std::optional<std::size_t> FindResource(const toml::array& resources, const std::string_view id)
 {
 	for (std::size_t i = 0; i < resources.size(); ++i)
 	{
@@ -443,7 +472,7 @@ std::optional<std::size_t> FindResource(const toml::array& resources, const std:
 			const std::optional<std::string_view> resourceId = (*table)[IdPropertyName].value<std::string_view>();
 			if (!resourceId) [[unlikely]]
 			{
-				throw std::invalid_argument(std::format("{} - Resource element doesn't have property 'id'", stage));
+				throw std::invalid_argument("Resource element doesn't have property 'id'");
 			}
 
 			if (resourceId == id)
@@ -453,7 +482,7 @@ std::optional<std::size_t> FindResource(const toml::array& resources, const std:
 		}
 		else [[unlikely]]
 		{
-			throw std::invalid_argument(std::format("{} - Invalid resource element", stage));
+			throw std::invalid_argument("Invalid resource element");
 		}
 	}
 
