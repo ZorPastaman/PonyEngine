@@ -1,10 +1,8 @@
-include(CheckTypeSize)
-
 function(pony_create_file_resource_manifest path)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
 
-	if("${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
 		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
 	endif()
 
@@ -35,7 +33,7 @@ function(pony_add_to_file_resource_manifest path)
 	set(multiValueArgs RESOURCES ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
 
-	if("${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
 		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
 	endif()
 
@@ -75,7 +73,7 @@ function(pony_remove_from_file_resource_manifest path)
 	set(multiValueArgs IDS ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
 
-	if("${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
 		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
 	endif()
 
@@ -115,7 +113,7 @@ function(pony_upgrade_file_resource_manifest path)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
 
-	if("${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
 		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
 	endif()
 
@@ -150,7 +148,7 @@ function(pony_compile_file_resource_manifest input output)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmc_arg "" "" "${multiValueArgs}" ${ARGN})
 
-	if("${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
 		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
 	endif()
 
@@ -183,12 +181,161 @@ function(pony_compile_file_resource_manifest input output)
 	)
 endfunction()
 
+function(pony_create_pack_resource_manifest manifest_path pack_path)
+	set(multiValueArgs ADDITIONAL_PARAMS)
+	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
+
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
+	endif()
+
+	if("${manifest_path}" STREQUAL "")
+		message(FATAL_ERROR "Empty manifest path")
+	endif()
+	if("${pack_path}" STREQUAL "")
+		message(FATAL_ERROR "Empty pack path")
+	endif()
+
+	set(PONY_PRMG "${PONY_TOOLS_INSTALL_DIR}/ponyprmg${CMAKE_EXECUTABLE_SUFFIX}")
+	if(NOT EXISTS "${PONY_PRMG}")
+		message(FATAL_ERROR "'${PONY_PRMG}' not found")
+	endif()
+
+	cmake_path(ABSOLUTE_PATH manifest_path NORMALIZE OUTPUT_VARIABLE manifest_path_abs)
+
+	set(PPRMG_OPTIONS "")
+
+	if(pprmg_arg_ADDITIONAL_PARAMS)
+		list(APPEND PPRMG_OPTIONS ${pprmg_arg_ADDITIONAL_PARAMS})
+	endif()
+
+	message(STATUS "Creating '${manifest_path}' with ponyprmg")
+	execute_process(COMMAND "${PONY_PRMG}" "${manifest_path_abs}" --create "${pack_path}" ${PPRMG_OPTIONS}
+		COMMAND_ERROR_IS_FATAL ANY
+	)
+endfunction()
+
+function(pony_add_to_pack_resource_manifest path)
+	set(multiValueArgs RESOURCES ADDITIONAL_PARAMS)
+	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
+
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
+	endif()
+
+	if("${path}" STREQUAL "")
+		message(FATAL_ERROR "Empty path")
+	endif()
+
+	set(PONY_PRMG "${PONY_TOOLS_INSTALL_DIR}/ponyprmg${CMAKE_EXECUTABLE_SUFFIX}")
+	if(NOT EXISTS "${PONY_PRMG}")
+		message(FATAL_ERROR "'${PONY_PRMG}' not found")
+	endif()
+
+	if(NOT pprmg_arg_RESOURCES)
+		return()
+	endif()
+
+	cmake_path(ABSOLUTE_PATH path NORMALIZE OUTPUT_VARIABLE path_abs)
+
+	set(ADD_LIST "")
+	foreach(RESOURCE IN LISTS pprmg_arg_RESOURCES)
+		list(APPEND ADD_LIST --add "${RESOURCE}")
+	endforeach()
+
+	set(PPRMG_OPTIONS "")
+
+	if(pprmg_arg_ADDITIONAL_PARAMS)
+		list(APPEND PPRMG_OPTIONS ${pprmg_arg_ADDITIONAL_PARAMS})
+	endif()
+
+	message(STATUS "Adding '${pprmg_arg_RESOURCES}' to '${path}' with ponyprmg")
+	execute_process(COMMAND "${PONY_PRMG}" "${path_abs}" ${ADD_LIST} ${PPRMG_OPTIONS}
+		COMMAND_ERROR_IS_FATAL ANY
+	)
+endfunction()
+
+function(pony_remove_from_pack_resource_manifest path)
+	set(multiValueArgs IDS ADDITIONAL_PARAMS)
+	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
+
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
+	endif()
+
+	if("${path}" STREQUAL "")
+		message(FATAL_ERROR "Empty path")
+	endif()
+
+	set(PONY_PRMG "${PONY_TOOLS_INSTALL_DIR}/ponyprmg${CMAKE_EXECUTABLE_SUFFIX}")
+	if(NOT EXISTS "${PONY_PRMG}")
+		message(FATAL_ERROR "'${PONY_PRMG}' not found")
+	endif()
+
+	if(NOT pprmg_arg_IDS)
+		return()
+	endif()
+
+	cmake_path(ABSOLUTE_PATH path NORMALIZE OUTPUT_VARIABLE path_abs)
+
+	set(REMOVE_LIST "")
+	foreach(ID IN LISTS pprmg_arg_IDS)
+		list(APPEND REMOVE_LIST --remove "${ID}")
+	endforeach()
+
+	set(PPRMG_OPTIONS "")
+
+	if(pprmg_arg_ADDITIONAL_PARAMS)
+		list(APPEND PPRMG_OPTIONS ${pprmg_arg_ADDITIONAL_PARAMS})
+	endif()
+
+	message(STATUS "Removing '${pprmg_arg_IDS}' from '${path}' with ponyprmg")
+	execute_process(COMMAND "${PONY_PRMG}" "${path_abs}" ${REMOVE_LIST} ${PPRMG_OPTIONS}
+		COMMAND_ERROR_IS_FATAL ANY
+	)
+endfunction()
+
+function(pony_upgrade_pack_resource_manifest path)
+	set(multiValueArgs ADDITIONAL_PARAMS)
+	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
+
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
+	endif()
+
+	if("${path}" STREQUAL "")
+		message(FATAL_ERROR "Empty path")
+	endif()
+
+	set(PONY_PRMG "${PONY_TOOLS_INSTALL_DIR}/ponyprmg${CMAKE_EXECUTABLE_SUFFIX}")
+	if(NOT EXISTS "${PONY_PRMG}")
+		message(FATAL_ERROR "'${PONY_PRMG}' not found")
+	endif()
+
+	cmake_path(ABSOLUTE_PATH path NORMALIZE OUTPUT_VARIABLE path_abs)
+
+	set(PPRMG_OPTIONS "")
+
+	if(pprmg_arg_ADDITIONAL_PARAMS)
+		list(APPEND PPRMG_OPTIONS ${pprmg_arg_ADDITIONAL_PARAMS})
+	endif()
+
+	message(STATUS "Upgrading '${path}' with ponyprmg")
+	execute_process(COMMAND "${PONY_PRMG}" "${path_abs}" --upgrade ${PPRMG_OPTIONS}
+		COMMAND_ERROR_IS_FATAL ANY
+	)
+endfunction()
+
+function(pony_make_resource_for_pack_resource_manifest id type path resource)
+	set(${resource} "${id},${type},${path}" PARENT_SCOPE)
+endfunction()
+
 function(pony_compile_pack_resource_manifest input pack_output manifest_output)
 	set(oneValueArgs ROOT)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pprmc_arg "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-	if("${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
+	if(NOT DEFINED PONY_TOOLS_INSTALL_DIR OR "${PONY_TOOLS_INSTALL_DIR}" STREQUAL "")
 		message(FATAL_ERROR "PONY_TOOLS_INSTALL_DIR isn't set")
 	endif()
 
@@ -211,15 +358,14 @@ function(pony_compile_pack_resource_manifest input pack_output manifest_output)
 	cmake_path(ABSOLUTE_PATH pack_output NORMALIZE OUTPUT_VARIABLE pack_output_abs)
 	cmake_path(ABSOLUTE_PATH manifest_output NORMALIZE OUTPUT_VARIABLE manifest_output_abs)
 
-	check_type_size("std::size_t" SIZEOF_SIZE_T LANGUAGE CXX)
-	if(NOT HAVE_SIZEOF_SIZE_T)
+	if(NOT PONY_SIZEOF_SIZE_T)
 		message(FATAL_ERROR "Failed to check sizeof(std::size_t) of the target platform")
 	endif()
 
 	set(PPRMC_OPTIONS "")
 
 	if(DEFINED pprmc_arg_ROOT)
-		cmake_path(IS_ABSOLUTE "${pprmc_arg_ROOT}" IS_ROOT_ABS)
+		cmake_path(IS_ABSOLUTE pprmc_arg_ROOT IS_ROOT_ABS)
 		if(NOT IS_ROOT_ABS)
 			message(FATAL_ERROR "Root path '${pprmc_arg_ROOT}' isn't absolute")
 		endif()
@@ -235,7 +381,7 @@ function(pony_compile_pack_resource_manifest input pack_output manifest_output)
 	endif()
 
 	set(PONY_PRMC_DEPFILE "${manifest_output_abs}.d")
-	add_custom_command(COMMAND "${PONY_PRMC}" "${input_abs}" -po "${pack_output_abs}" -mo "${manifest_output_abs}" -d "${PONY_PRMC_DEPFILE}" --size-t ${SIZEOF_SIZE_T} ${PPRMC_OPTIONS}
+	add_custom_command(COMMAND "${PONY_PRMC}" "${input_abs}" -po "${pack_output_abs}" -mo "${manifest_output_abs}" -d "${PONY_PRMC_DEPFILE}" --size-t ${PONY_SIZEOF_SIZE_T} ${PPRMC_OPTIONS}
 		DEPENDS "${input_abs}"
 		OUTPUT "${pack_output_abs}" "${manifest_output_abs}"
 		DEPFILE "${PONY_PRMC_DEPFILE}"

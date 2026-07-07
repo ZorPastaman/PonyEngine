@@ -9,7 +9,7 @@
 
 #include "toml++/toml.hpp"
 
-#define SCHEMA_BASE "PonyEngine/Manifest/Resource/File/"
+#define SCHEMA_BASE "PonyEngine/Manifest/Resource/Pack/"
 
 import std;
 
@@ -22,6 +22,7 @@ constexpr std::string_view HelpFlag = "--help";
 constexpr std::string_view VerboseFlag = "--verbose";
 
 constexpr std::string_view SchemaPropertyName = "schema";
+constexpr std::string_view PackPathPropertyName = "pack";
 constexpr std::string_view ResourcesPropertyName = "resources";
 constexpr std::string_view IdPropertyName = "id";
 constexpr std::string_view TypePropertyName = "type";
@@ -41,9 +42,10 @@ struct RemoveCommand final
 };
 struct Command final
 {
-	std::string_view filePath = std::string_view();
+	std::string_view filePath;
 	std::vector<AddCommand> addCommands;
 	std::vector<RemoveCommand> removeCommands;
+	std::string_view packPath;
 	bool create = false;
 	bool upgrade = false;
 	bool showVersion = false;
@@ -124,7 +126,13 @@ Command ParseCommandLine(const int argc, const char* const argv[])
 				std::println(std::clog, "Create flag '{}' set multiple times.", CreateFlag);
 			}
 
+			if (++i >= argc) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Missing runtime pack path after create flag '{}'", CreateFlag));
+			}
+
 			command.create = true;
+			command.packPath = argv[i];
 		}
 		else if (arg == AddFlag)
 		{
@@ -235,7 +243,7 @@ void PrintVersion(const Command& command)
 {
 	if (command.showVersion) [[unlikely]]
 	{
-		std::println("Pony Engine File Resource Manifest Generator v{}.{}.{}.{}",
+		std::println("Pony Engine Pack Resource Manifest Generator v{}.{}.{}.{}",
 			PONY_ENGINE_VERSION_MAJOR, PONY_ENGINE_VERSION_MINOR, PONY_ENGINE_VERSION_PATCH, PONY_ENGINE_VERSION_TWEAK);
 	}
 }
@@ -252,13 +260,13 @@ void PrintHelp(const Command& command)
 {
 	if (command.showHelp) [[unlikely]]
 	{
-		std::println("\nGenerates a text file resource manifest.");
+		std::println("\nGenerates a text pack resource manifest.");
 		std::println("\nUsage:");
-		std::println("\tponyfrmg <input> [options]");
+		std::println("\tponyprmg <input> [options]");
 		std::println("\nArguments:");
 		std::println("\t<input>             Input manifest file.");
 		std::println("\nOptions:");
-		std::println("\t--create            Create new file.");
+		std::println("\t--create <path>     Create new file and sets runtime pack path to <path>.");
 		std::println("\t--add <resource>    Add resource to manifest.");
 		std::println("\t                    <resource> format: '<id>,<type>,<path>'.");
 		std::println("\t--remove <id>       Remove resource from manifest.");
@@ -303,11 +311,12 @@ toml::table CreateManifest(const Command& command)
 {
 	if (command.verbose) [[unlikely]]
 	{
-		std::println("Creating new manifest.");
+		std::println("Creating new manifest. Runtime pack path: '{}'.", command.packPath);
 	}
 
 	auto manifest = toml::table();
 	manifest.insert(SchemaPropertyName, SchemaV0);
+	manifest.insert(PackPathPropertyName, command.packPath);
 
 	return manifest;
 }
@@ -350,6 +359,11 @@ toml::table ReadManifest(const Command& command)
 
 void ValidateManifestV0(const toml::table& manifest)
 {
+	if (!manifest[PackPathPropertyName].value<std::string_view>()) [[unlikely]]
+	{
+		throw std::invalid_argument("Runtime pack path not found");
+	}
+
 	if (const toml::node_view resourcesProperty = manifest[ResourcesPropertyName]) [[likely]]
 	{
 		if (const toml::array* const resources = resourcesProperty.as_array()) [[likely]]

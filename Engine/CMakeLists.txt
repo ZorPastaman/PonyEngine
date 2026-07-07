@@ -1,6 +1,7 @@
 message(STATUS "Configuring engine")
 
 message(VERBOSE "Configuring engine environment")
+include("CMake/Target.cmake")
 include("CMake/Path.cmake")
 include("CMake/Project.cmake")
 include("CMake/Resource.cmake")
