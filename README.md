@@ -28,9 +28,32 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 
 ### Advanced way
 
-1. Build C++ std module;
-2. Add the engine as a dependency to your CMake project. Add this to your project `CMakeLists.txt`:
+#### Build tools (build for a host platform)
+
+1. Build c++ std module;
+2. Add the engine tools as a dependency to your CMake project. Add this to your project `CMakeLists.txt`:
 ```
+set(PONY_BUILD_MODE "Tools")
+FetchContent_Declare(
+	PonyEngineTools
+	GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine.git
+	GIT_TAG <Branch_or_Tag>
+)
+FetchContent_MakeAvailable(PonyEngineTools)
+```
+3. Add your game build tools if needed;
+4. Build and install the tools project.
+
+#### Build runtime (build for a target platform)
+
+1. Build C++ std module;
+2. Set a path to the build tools:
+```
+set(PONY_TOOLS_INSTALL_DIR <path_to_tools>)
+```
+3. Add the engine runtime as a dependency to your CMake project. Add this to your project `CMakeLists.txt`:
+```
+set(PONY_BUILD_MODE "Runtime")
 FetchContent_Declare(
 	PonyEngine
 	GIT_REPOSITORY https://github.com/ZorPastaman/PonyEngine.git
@@ -38,9 +61,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(PonyEngine)
 ```
-3. Add your game modules (see [Architecture](#Architecture) and [Modules](#modules) for details);
-4. Link the engine and game modules to the engine application module. 
-5. Build and install the project.
+4. Add your game modules (see [Architecture](#Architecture) and [Engine](Engine) for details);
+5. Link the engine and game modules to the engine application module. 
+6. Build and install the project.
 
 ## Architecture
 
@@ -69,15 +92,19 @@ Some implementation modules support extensions.
 For example, an input module provides core functionality but does not include support for specific devices.
 Device support is added via extension modules that implement the corresponding extension interfaces.
 
+## Custom formats
+
+The engine uses custom file formats for different purposes. You can find their descriptions [here](EngineFormats).
+
 ## Build
 
 This repo can be built in different modes. You have to set `PONY_BUILD_MODE` to one of the supported modes:
 
-| Build mode        | Description                                                                                                                                 |
-|:------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
-| [Runtime](Engine) | Only runtime part of the engine is built. It's used to build a game as well.                                                                |
-| [Tools](Tools)    | Different build tools are built. Contains resource compilers and other tools that may be needed for Runtime build mode. Not yet implmented! |
-| [Editor](Editor)  | Engine editor is built. Not yet implemented!                                                                                                |
+| Build mode        | Description                                                                                                             |
+|:------------------|:------------------------------------------------------------------------------------------------------------------------|
+| [Runtime](Engine) | Only runtime part of the engine is built. It's used to build a game as well.                                            |
+| [Tools](Tools)    | Different build tools are built. Contains resource compilers and other tools that may be needed for Runtime build mode. |
+| [Editor](Editor)  | Engine editor is built. Not yet implemented!                                                                            |
 
 ### Output
 

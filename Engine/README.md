@@ -3,6 +3,11 @@
 Pony Engine is very modular. Game developers decide what modules they need and pass required build flags.
 To build a game, create your own project, add Pony Engine as a dependency and then add your game targets.
 
+## Tools
+
+Some modules or cmake functions require tools built for a host platform. Build them first, and then build the engine and a game.
+See [Tools](../Tools) docs for more info.
+
 ## Modules
 
 Each module is a separate CMake target. A module name is its target name in CMake scripts as well.
