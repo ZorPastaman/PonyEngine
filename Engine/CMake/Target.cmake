@@ -1,3 +1,5 @@
+# Initializes target dependent variables.
+
 include(CheckTypeSize)
 
 check_type_size("std::size_t" PONY_SIZEOF_SIZE_T LANGUAGE CXX)
