@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource type.
 	struct ResourceType final
 	{
-		std::uint64_t value = 0ull;
+		std::uint64_t value = 0ull; ///< Type value.
 
 		[[nodiscard("Pure operator")]]
 		constexpr auto operator <=>(const ResourceType& other) const noexcept = default;

@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Load parameters.
 	struct LoadParams final
 	{
-		std::span<std::byte> buffer;
-		std::size_t offset;
+		std::span<std::byte> buffer; ///< Result buffer.
+		std::size_t offset; ///< Load offset.
 	};
 }

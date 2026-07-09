@@ -20,10 +20,13 @@ import :RequestStatus;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Load request.
 	class ILoadRequest
 	{
 		PONY_INTERFACE_BODY(ILoadRequest)
 
+		/// @brief Gets the load parameters.
+		/// @return Load parameters.
 		[[nodiscard("Pure function")]]
 		virtual const LoadParams& Params() const noexcept = 0;
 

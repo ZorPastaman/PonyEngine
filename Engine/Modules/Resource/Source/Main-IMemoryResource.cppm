@@ -19,10 +19,13 @@ import :IResource;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Direct memory resource access.
 	class IMemoryResource : public IResource
 	{
 		PONY_INTERFACE_BODY(IMemoryResource)
 
+		/// @brief Gets a resource memory.
+		/// @return Resource memory.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const std::byte> Memory() const noexcept = 0;
 	};

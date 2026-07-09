@@ -17,12 +17,13 @@ import std;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource availability.
 	enum class ResourceAvailability : std::uint8_t
 	{
-		None = 0,
-		Loadable = 1 << 0,
-		File = 1 << 1,
-		Memory = 1 << 2,
+		None = 0, ///< Not available.
+		Loadable = 1 << 0, ///< Available as a loadable resource.
+		File = 1 << 1, ///< Available as a file resource.
+		Memory = 1 << 2, ///< Available as a memory resource.
 		All = (1 << 3) - 1
 	};
 
@@ -31,6 +32,7 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
+	/// @brief Resource availability names.
 	constexpr std::array<std::string_view, 3> ResourceAvailabilityNames
 	{
 		"Loadable",

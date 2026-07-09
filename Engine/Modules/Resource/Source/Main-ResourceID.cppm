@@ -13,9 +13,10 @@ import std;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource ID.
 	struct ResourceID final
 	{
-		std::uint64_t value = 0ull;
+		std::uint64_t value = 0ull; ///< ID value.
 
 		[[nodiscard("Pure operator")]]
 		constexpr auto operator <=>(const ResourceID& other) const noexcept = default;

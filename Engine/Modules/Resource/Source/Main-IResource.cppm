@@ -20,12 +20,17 @@ import :ResourceType;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource.
 	class IResource
 	{
 		PONY_INTERFACE_BODY(IResource)
 
+		/// @brief Gets a resource ID.
+		/// @return Resource ID.
 		[[nodiscard("Pure function")]]
 		virtual ResourceID ResourceID() const noexcept = 0;
+		/// @brief Gets a resource type.
+		/// @return Resource type.
 		[[nodiscard("Pure function")]]
 		virtual ResourceType Type() const noexcept = 0;
 	};

@@ -15,7 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - File module.
 - Resource module.
 - Resource file module.
-- File resource manifest compiler.
+- File resource manifest compiler and generator.
+- Resource pack module.
+- Pack resource manifest compiler and generator.
 
 ### Changed
 
