@@ -1,3 +1,6 @@
+# Creates a file resource manifest.
+# path - manifest path.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_create_file_resource_manifest path)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -29,6 +32,11 @@ function(pony_create_file_resource_manifest path)
 	)
 endfunction()
 
+# Adds resources to a file resource manifest.
+# path - manifest path.
+# RESOURCES - resource list. Each resource must be in the format: '<id>,<type>,<path>'.
+#             The string can be easily generated with the 'pony_make_resource_for_file_resource_manifest' function.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_add_to_file_resource_manifest path)
 	set(multiValueArgs RESOURCES ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -69,6 +77,10 @@ function(pony_add_to_file_resource_manifest path)
 	)
 endfunction()
 
+# Removes resources from a file resource manifest.
+# path - manifest path.
+# IDS - resource ids to remove.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_remove_from_file_resource_manifest path)
 	set(multiValueArgs IDS ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -109,6 +121,9 @@ function(pony_remove_from_file_resource_manifest path)
 	)
 endfunction()
 
+# Upgrades a file resource manifest to an actual version.
+# path - manifest path.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_upgrade_file_resource_manifest path)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -140,10 +155,19 @@ function(pony_upgrade_file_resource_manifest path)
 	)
 endfunction()
 
+# Makes a resource string for a file resource manifest.
+# id - resource ID.
+# type - resource type.
+# path - resource path.
+# resource - output variable that will hold the resource string.
 function(pony_make_resource_for_file_resource_manifest id type path resource)
 	set(${resource} "${id},${type},${path}" PARENT_SCOPE)
 endfunction()
 
+# Compiles a file resource manifest.
+# input - path to a text resource manifest.
+# output - path to binary resource manifest.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_compile_file_resource_manifest input output)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pfrmc_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -181,6 +205,10 @@ function(pony_compile_file_resource_manifest input output)
 	)
 endfunction()
 
+# Creates a pack resource manifest.
+# manifest_path - path to a created resource manifest.
+# pack_path - path to a runtime pack.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_create_pack_resource_manifest manifest_path pack_path)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -215,6 +243,11 @@ function(pony_create_pack_resource_manifest manifest_path pack_path)
 	)
 endfunction()
 
+# Adds resources to a pack resource manifest.
+# path - manifest path.
+# RESOURCES - resource list. Each resource must be in the format: '<id>,<type>,<path>'.
+#             The string can be easily generated with the 'pony_make_resource_for_pack_resource_manifest' function.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_add_to_pack_resource_manifest path)
 	set(multiValueArgs RESOURCES ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -255,6 +288,10 @@ function(pony_add_to_pack_resource_manifest path)
 	)
 endfunction()
 
+# Removes resources from a pack resource manifest.
+# path - manifest path.
+# IDS - resource ids to remove.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_remove_from_pack_resource_manifest path)
 	set(multiValueArgs IDS ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -295,6 +332,9 @@ function(pony_remove_from_pack_resource_manifest path)
 	)
 endfunction()
 
+# Upgrades a pack resource manifest to an actual version.
+# path - manifest path.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_upgrade_pack_resource_manifest path)
 	set(multiValueArgs ADDITIONAL_PARAMS)
 	cmake_parse_arguments(pprmg_arg "" "" "${multiValueArgs}" ${ARGN})
@@ -326,10 +366,21 @@ function(pony_upgrade_pack_resource_manifest path)
 	)
 endfunction()
 
+# Makes a resource string for a pack resource manifest.
+# id - resource ID.
+# type - resource type.
+# path - resource path.
+# resource - output variable that will hold the resource string.
 function(pony_make_resource_for_pack_resource_manifest id type path resource)
 	set(${resource} "${id},${type},${path}" PARENT_SCOPE)
 endfunction()
 
+# Compiles a pack resource manifest.
+# input - path to a text resource manifest.
+# pack_output - path to binary resource pack.
+# manifest_output - path to a binary resource manifest.
+# ROOT - Root path of resources in the source manifest. If not set, the parent of the input resource manifest will be used.
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
 function(pony_compile_pack_resource_manifest input pack_output manifest_output)
 	set(oneValueArgs ROOT)
 	set(multiValueArgs ADDITIONAL_PARAMS)

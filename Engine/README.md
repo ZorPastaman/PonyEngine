@@ -29,11 +29,13 @@ These modules are optional. To add them to a build, a specific CMake flag must b
 | Module name                                                                     | Build flag                                  | Description                                                                                                                   |
 |:--------------------------------------------------------------------------------|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------|
 | [PonyEngine.Application.Impl](Modules/Application.Impl)                         | `PONY_ENGINE_APPLICATION_IMPL`              | Application implementation module. Contains `main()` and a default logger as well.                                            |
+| [PonyEngine.Time](Modules/Time)                                                 | `PONY_ENGINE_TIME`                          | Time service API module. The service provides info about delta time, fixed time step and other time info.                     |
+| [PonyEngine.Time.Impl](Modules/Time.Impl)                                       | `PONY_ENGINE_TIME_IMPL`                     | Time service implementation module.                                                                                           |
+| [PonyEngine.Job](Modules/Job)                                                   | `PONY_ENGINE_JOB`                           | Job service API module. The job service is a simple way to utilize multi-threaded CPUs.                                       |
+| [PonyEngine.Job.Impl](Modules/Job.Impl)                                         | `PONY_ENGINE_JOB_IMPL`                      | Job service implementation module.                                                                                            |
 | [PonyEngine.Log.Ext](Modules/Log.Ext)                                           | `PONY_ENGINE_LOG_EXT`                       | Logger extension API module. Provides interfaces for the logger extensions.                                                   |
 | [PonyEngine.Log.Impl](Modules/Log.Impl)                                         | `PONY_ENGINE_LOG_IMPL`                      | Logger module. Replaces the default logger. Logs to a console and sub-loggers that are added as extensions.                   |
 | [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                               | `PONY_ENGINE_LOG_FILE_IMPL`                 | File sub-logger module. That sub-logger logs to a log file.                                                                   |
-| [PonyEngine.Time](Modules/Time)                                                 | `PONY_ENGINE_TIME`                          | Time service API module. The service provides info about delta time, fixed time step and other time info.                     |
-| [PonyEngine.Time.Impl](Modules/Time.Impl)                                       | `PONY_ENGINE_TIME_IMPL`                     | Time service implementation module.                                                                                           |
 | [PonyEngine.File](Modules/File)                                                 | `PONY_ENGINE_FILE`                          | File service API module. The file service is a simple way to utilize modern SSDs with totally async read/write operations.    |
 | [PonyEngine.File.Impl](Modules/File.Impl)                                       | `PONY_ENGINE_FILE_IMPL`                     | File service implementation module.                                                                                           |
 | [PonyEngine.MessagePump](Modules/MessagePump)                                   | `PONY_ENGINE_MESSAGE_PUMP`                  | Message pump service API module. The service reads platform messages and provides info about them.                            |
@@ -51,8 +53,11 @@ These modules are optional. To add them to a build, a specific CMake flag must b
 | [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)                         | `PONY_ENGINE_RENDER_DEVICE_EXT`             | Render device service extension API module. Provides interfaces for backends.                                                 |
 | [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)                       | `PONY_ENGINE_RENDER_DEVICE_IMPL`            | Render device service implementation module. Provides a low level access to a GPU via added backends.                         |
 | [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl)           | `PONY_ENGINE_RENDER_DEVICE_D3D12_IMPL`      | Direct3D12 backend implementation.                                                                                            |
-| [PonyEngine.Job](Modules/Job)                                                   | `PONY_ENGINE_JOB`                           | Job service API module. The job service is a simple way to utilize multi-threaded CPUs.                                       |
-| [PonyEngine.Job.Impl](Modules/Job.Impl)                                         | `PONY_ENGINE_JOB_IMPL`                      | Job service implementation module.                                                                                            |
+| [PonyEngine.Resource](Modules/Resource)                                         | `PONY_ENGINE_RESOURCE`                      | Resource service API module. The service provides resources.                                                                  |
+| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                                 | `PONY_ENGINE_RESOURCE_EXT`                  | Resource service extension API module. Provides interfaces for resource providers.                                            |
+| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                               | `PONY_ENGINE_RESOURCE_IMPL`                 | Resource service implementation module.                                                                                       |
+| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)                     | `PONY_ENGINE_RESOURCE_FILE_IMPL`            | File resource provider module. Provides resources that are individual files.                                                  |
+| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)                     | `PONY_ENGINE_RESOURCE_PACK_IMPL`            | Pack resource provider module. Provides resources that are stored in binary containers.                                       |
 | [PonyEngine.World](Modules/World)                                               | `PONY_ENGINE_WORLD`                         | World service API module. The service manages game worlds.                                                                    |
 | [PonyEngine.World.Impl](Modules/World.Impl)                                     | `PONY_ENGINE_WORLD_IMPL`                    | World service implementation module.                                                                                          |
 
@@ -72,12 +77,14 @@ The table of the module-platform compatibility:
 | [PonyEngine.Core](Modules/Core)                                                 | -                                | &check;                     |
 | [PonyEngine.Application.Ext](Modules/Application.Ext)                           | -                                | &check;                     |
 | [PonyEngine.Application.Impl](Modules/Application.Impl)                         | &check;                          | &check;                     |
+| [PonyEngine.Time](Modules/Time)                                                 | -                                | &check;                     |
+| [PonyEngine.Time.Impl](Modules/Time.Impl)                                       | -                                | &check;                     |
+| [PonyEngine.Job](Modules/Job)                                                   | -                                | &check;                     |
+| [PonyEngine.Job.Impl](Modules/Job.Impl)                                         | -                                | &check;                     |
 | [PonyEngine.Log](Modules/Log)                                                   | -                                | &check;                     |
 | [PonyEngine.Log.Ext](Modules/Log.Ext)                                           | -                                | &check;                     |
 | [PonyEngine.Log.Impl](Modules/Log.Impl)                                         | -                                | &check;                     |
 | [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                               | -                                | &check;                     |
-| [PonyEngine.Time](Modules/Time)                                                 | -                                | &check;                     |
-| [PonyEngine.Time.Impl](Modules/Time.Impl)                                       | -                                | &check;                     |
 | [PonyEngine.File](Modules/File)                                                 | -                                | &check;                     |
 | [PonyEngine.File.Impl](Modules/File.Impl)                                       | &check;                          | &check;                     |
 | [PonyEngine.MessagePump](Modules/MessagePump)                                   | -                                | &check;                     |
@@ -95,8 +102,11 @@ The table of the module-platform compatibility:
 | [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)                         | -                                | &check;                     |
 | [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)                       | -                                | &check;                     |
 | [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl)           | &check;                          | &check;                     |
-| [PonyEngine.Job](Modules/Job)                                                   | -                                | &check;                     |
-| [PonyEngine.Job.Impl](Modules/Job.Impl)                                         | -                                | &check;                     |
+| [PonyEngine.Resource](Modules/Resource)                                         | -                                | &check;                     |
+| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                                 | -                                | &check;                     |
+| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                               | -                                | &check;                     |
+| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)                     | -                                | &check;                     |
+| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)                     | -                                | &check;                     |
 | [PonyEngine.World](Modules/World)                                               | -                                | &check;                     |
 | [PonyEngine.World.Impl](Modules/World.Impl)                                     | -                                | &check;                     |
 
@@ -234,12 +244,24 @@ There are 3 modes to set the application icon:
 
 The engine has some useful CMake functions:
 
-| Function name                  | Script file                 | Description                                   |
-|:-------------------------------|:----------------------------|:----------------------------------------------|
-| `pony_validate_path`           | [File](CMake/Path.cmake)    | Validates if the path variable is correct.    |
-| `pony_validate_name`           | [File](CMake/Project.cmake) | Validates if the name variable is correct.    |
-| `pony_validate_title`          | [File](CMake/Project.cmake) | Validates if the title variable is correct.   |
-| `pony_validate_version`        | [File](CMake/Project.cmake) | Validates if the version variable is correct. |
-| `pony_compile_shader_with_dxc` | [File](CMake/Shader.cmake)  | Compiles a shader using DXC compiler.         |
+| Function name                                   | Script file                  | Description                                             |
+|:------------------------------------------------|:-----------------------------|:--------------------------------------------------------|
+| `pony_validate_path`                            | [File](CMake/Path.cmake)     | Validates if the path variable is correct.              |
+| `pony_validate_name`                            | [File](CMake/Project.cmake)  | Validates if the name variable is correct.              |
+| `pony_validate_title`                           | [File](CMake/Project.cmake)  | Validates if the title variable is correct.             |
+| `pony_validate_version`                         | [File](CMake/Project.cmake)  | Validates if the version variable is correct.           |
+| `pony_create_file_resource_manifest`            | [File](CMake/Resource.cmake) | Creates a file resource manifest.                       |
+| `pony_add_to_file_resource_manifest`            | [File](CMake/Resource.cmake) | Adds resources to a file resource manifest.             |
+| `pony_remove_from_file_resource_manifest`       | [File](CMake/Resource.cmake) | Removes resources from a file resource manifest.        |
+| `pony_upgrade_file_resource_manifest`           | [File](CMake/Resource.cmake) | Upgrades a file resource manifest to an actual version. |
+| `pony_make_resource_for_file_resource_manifest` | [File](CMake/Resource.cmake) | Makes a resource string for a file resource manifest.   |
+| `pony_compile_file_resource_manifest`           | [File](CMake/Resource.cmake) | Compiles a file resource manifest.                      |
+| `pony_create_pack_resource_manifest`            | [File](CMake/Resource.cmake) | Creates a pack resource manifest.                       |
+| `pony_add_to_pack_resource_manifest`            | [File](CMake/Resource.cmake) | Adds resources to a pack resource manifest.             |
+| `pony_remove_from_pack_resource_manifest`       | [File](CMake/Resource.cmake) | Removes resources from a pack resource manifest.        |
+| `pony_upgrade_pack_resource_manifest`           | [File](CMake/Resource.cmake) | Upgrades a pack resource manifest to an actual version. |
+| `pony_make_resource_for_pack_resource_manifest` | [File](CMake/Resource.cmake) | Makes a resource string for a pack resource manifest.   |
+| `pony_compile_pack_resource_manifest`           | [File](CMake/Resource.cmake) | Compiles a pack resource manifest.                      |
+| `pony_compile_shader_with_dxc`                  | [File](CMake/Shader.cmake)   | Compiles a shader using DXC compiler.                   |
 
 Some modules may add their own functions. Refer to their documentation to find out.

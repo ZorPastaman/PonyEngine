@@ -11,7 +11,7 @@ The text variant is used in source assets and during the build configuration pro
 
 ### Text
 
-The text variant is based on TOML. One of the root properties must be `schema` in the format `PonyEngine/Manifest/Resource/File/v<version_number>`.
+The text variant is based on TOML. One of the root properties must be `schema` in the format `PonyEngine/Manifest/Resource/File/<version>`.
 All other properties are dependent on the version.
 
 #### V0
@@ -67,7 +67,7 @@ The text variant is used in source assets and during the build configuration pro
 
 ### Text
 
-The text variant is based on TOML. One of the root properties must be `schema` in the format `PonyEngine/Manifest/Resource/Pack/v<version_number>`.
+The text variant is based on TOML. One of the root properties must be `schema` in the format `PonyEngine/Manifest/Resource/Pack/<version>`.
 All other properties are dependent on the version.
 
 #### V0

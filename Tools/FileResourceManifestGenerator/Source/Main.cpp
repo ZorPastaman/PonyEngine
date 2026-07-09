@@ -9,71 +9,114 @@
 
 #include "toml++/toml.hpp"
 
+/// @brief File resource manifest schema base.
 #define SCHEMA_BASE "PonyEngine/Manifest/Resource/File/"
 
 import std;
 
-constexpr std::string_view CreateFlag = "--create";
-constexpr std::string_view AddFlag = "--add";
-constexpr std::string_view RemoveFlag = "--remove";
-constexpr std::string_view UpgradeFlag = "--upgrade";
-constexpr std::string_view VersionFlag = "--version";
-constexpr std::string_view HelpFlag = "--help";
-constexpr std::string_view VerboseFlag = "--verbose";
+constexpr std::string_view CreateFlag = "--create"; ///< Create flag. The next argument must be a path.
+constexpr std::string_view AddFlag = "--add"; ///< Add flag. The next argument must be a resource info: '<id>,<type>,<path>'.
+constexpr std::string_view RemoveFlag = "--remove"; ///< Remove flag. The next argument must be a resource ID.
+constexpr std::string_view UpgradeFlag = "--upgrade"; ///< Upgrade flag.
+constexpr std::string_view VersionFlag = "--version"; ///< Version flag.
+constexpr std::string_view HelpFlag = "--help"; ///< Help flag.
+constexpr std::string_view VerboseFlag = "--verbose"; ///< Verbose flag.
 
-constexpr std::string_view SchemaPropertyName = "schema";
-constexpr std::string_view ResourcesPropertyName = "resources";
-constexpr std::string_view IdPropertyName = "id";
-constexpr std::string_view TypePropertyName = "type";
-constexpr std::string_view PathPropertyName = "path";
+constexpr std::string_view SchemaPropertyName = "schema"; ///< Schema property name. Must be a string.
+constexpr std::string_view ResourcesPropertyName = "resources"; ///< Resources property name. Must be an array.
+constexpr std::string_view IdPropertyName = "id"; ///< Resource ID property name. Must be a string.
+constexpr std::string_view TypePropertyName = "type"; ///< Resource type property name. Must be a string.
+constexpr std::string_view PathPropertyName = "path"; ///< Resource path property name. Must be a string.
 
-constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0";
+constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0"; ///< Schema v0. It's the actual schema.
 
+/// @brief Parsed add resource command.
 struct AddCommand final
 {
-	std::string_view id;
-	std::string_view type;
-	std::string_view path;
+	std::string_view id; ///< Resource ID.
+	std::string_view type; ///< Resource type.
+	std::string_view path; ///< Resource path.
 };
+/// @brief Parsed remove resource command.
 struct RemoveCommand final
 {
-	std::string_view id;
+	std::string_view id; ///< Resource ID.
 };
+/// @brief Parsed command.
 struct Command final
 {
-	std::string_view filePath = std::string_view();
-	std::vector<AddCommand> addCommands;
-	std::vector<RemoveCommand> removeCommands;
-	bool create = false;
-	bool upgrade = false;
-	bool showVersion = false;
-	bool showHowToUse = false;
-	bool showHelp = false;
-	bool verbose = false;
+	std::string_view filePath = std::string_view(); ///< Manifest file path.
+	std::vector<AddCommand> addCommands; ///< Add commands.
+	std::vector<RemoveCommand> removeCommands; ///< Remove commands.
+	bool create = false; ///< Create a new manifest file?
+	bool upgrade = false; ///< Upgrade the manifest file?
+	bool showVersion = false; ///< Show the generator version?
+	bool showHowToUse = false; ///< Show how to use?
+	bool showHelp = false; ///< Show help?
+	bool verbose = false; ///< Verbose?
 };
 
+/// @brief Parses the command line.
+/// @param argc Command line argument count.
+/// @param argv Command line argument views.
+/// @return Parsed command.
 [[nodiscard("Pure function")]]
 Command ParseCommandLine(int argc, const char* const argv[]);
 
+/// @brief Prints the compiler version if requested.
+/// @param command Parsed command.
 void PrintVersion(const Command& command);
+/// @brief Prints how to use if requested.
+/// @param command Parsed command.
 void PrintHowToUse(const Command& command);
+/// @brief Prints the help.
+/// @param command Parsed command.
 void PrintHelp(const Command& command);
 
+/// @brief Executes the command.
+/// @param command Parsed command.
 void Execute(const Command& command);
+/// @brief Creates or reads a manifest.
+/// @param command Parsed command.
+/// @return Manifest.
 [[nodiscard("Pure function")]]
 toml::table CreateOrReadManifest(const Command& command);
+/// @brief Creates a manifest.
+/// @param command Parsed command.
+/// @return Manifest.
 [[nodiscard("Pure function")]]
 toml::table CreateManifest(const Command& command);
+/// @brief Reads a manifest.
+/// @param command Parsed command.
+/// @return Manifest.
 [[nodiscard("Pure function")]]
 toml::table ReadManifest(const Command& command);
+/// @brief Validates the manifest of version v0.
+/// @param manifest Manifest to validate.
 void ValidateManifestV0(const toml::table& manifest);
+/// @brief Removes resources.
+/// @param command Parsed command.
+/// @param manifest Manifest.
 void RemoveResources(const Command& command, toml::table& manifest);
+/// @brief Adds resources.
+/// @param command Parsed command.
+/// @param manifest Manifest.
 void AddResources(const Command& command, toml::table& manifest);
 
+/// @brief Saves the manifest to a file.
+/// @param command Parsed command.
+/// @param manifest Manifest.
 void SaveToFile(const Command& command, const toml::table& manifest);
 
+/// @brief Finds a resource.
+/// @param resources Resources.
+/// @param id Resource ID to find.
+/// @return Resource index; std::nullopt if not found.
 [[nodiscard("Pure function")]]
 std::optional<std::size_t> FindResource(const toml::array& resources, std::string_view id);
+/// @brief Gets or creates a resource array.
+/// @param manifest Manifest.
+/// @return Resource array.
 [[nodiscard("Pure function")]]
 toml::array* GetOrCreateResourceArray(toml::table& manifest);
 

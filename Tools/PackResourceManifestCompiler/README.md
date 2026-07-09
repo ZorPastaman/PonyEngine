@@ -13,6 +13,7 @@ Options:
 	-po <output>     Output pack data file.
 	-mo <output>     Output manifest file. The extension must be '.pprm'.
 	-r <path>        Root path of resources in the source manifest.
+	-d <path>        Dep file path.
 	                 If set, it must be absolute.
 	                 If not set, the input manifest directory is used as a root.
 	--size-t         std::size_t size of a target platform. Can't be greater than host platform std::uintmax_t.

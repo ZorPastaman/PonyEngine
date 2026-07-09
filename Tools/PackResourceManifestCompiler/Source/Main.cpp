@@ -11,85 +11,160 @@
 
 #include "toml++/toml.hpp"
 
+ /// @brief Pack resource manifest schema base.
 #define SCHEMA_BASE "PonyEngine/Manifest/Resource/Pack/"
 
 import std;
 
-constexpr std::string_view PackOutputFlag = "-po";
-constexpr std::string_view ManifestOutputFlag = "-mo";
-constexpr std::string_view DepFileFlag = "-d";
-constexpr std::string_view RootPathFlag = "-r";
-constexpr std::string_view SizeTFlag = "--size-t";
-constexpr std::string_view BigEndianFlag = "--big-endian";
-constexpr std::string_view VersionFlag = "--version";
-constexpr std::string_view HelpFlag = "--help";
-constexpr std::string_view VerboseFlag = "--verbose";
+constexpr std::string_view PackOutputFlag = "-po"; ///< Pack output flag. The next argument must be a path.
+constexpr std::string_view ManifestOutputFlag = "-mo"; ///< Manifest output flag. The next argument must be a path.
+constexpr std::string_view DepFileFlag = "-d"; ///< Dep file flag. The next argument must be a path.
+constexpr std::string_view RootPathFlag = "-r"; ///< Root path flag. It's used as a root for resource paths.
+constexpr std::string_view SizeTFlag = "--size-t"; ///< sizeof(std::size_t) of a target platform. The next argument must be a number.
+constexpr std::string_view BigEndianFlag = "--big-endian"; ///< If set, the target platform has big endian memory. If not set, it has little endian memory.
+constexpr std::string_view VersionFlag = "--version"; ///< Version flag.
+constexpr std::string_view HelpFlag = "--help"; ///< Help flag.
+constexpr std::string_view VerboseFlag = "--verbose"; ///< Verbose flag.
 
-constexpr std::string_view SchemaPropertyName = "schema";
-constexpr std::string_view PackPathPropertyName = "pack";
-constexpr std::string_view ResourcesPropertyName = "resources";
-constexpr std::string_view IdPropertyName = "id";
-constexpr std::string_view TypePropertyName = "type";
-constexpr std::string_view PathPropertyName = "path";
+constexpr std::string_view SchemaPropertyName = "schema"; ///< Schema property name. Must be a string.
+constexpr std::string_view PackPathPropertyName = "pack"; ///< Runtime pack path property name. Must be a string.
+constexpr std::string_view ResourcesPropertyName = "resources"; ///< Resources property name. Must be an array.
+constexpr std::string_view IdPropertyName = "id"; ///< Resource ID property name. Must be a string.
+constexpr std::string_view TypePropertyName = "type"; ///< Resource type property name. Must be a string.
+constexpr std::string_view PathPropertyName = "path"; ///< Resource path property name. Must be a string.
 
-constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0";
+constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0"; ///< Schema v0. It's the actual schema.
 
-constexpr std::string_view ManifestExtension = ".pprm";
-constexpr std::string_view MagicHeader = "PonyEnginePRM";
+constexpr std::string_view ManifestExtension = ".pprm"; ///< Binary manifest extension.
+constexpr std::string_view MagicHeader = "PonyEnginePRM"; ///< Magic header of a binary manifest.
 
+/// @brief Parsed command.
 struct Command final
 {
-	std::string_view input = std::string_view();
-	std::string_view packOutput = std::string_view();
-	std::string_view manifestOutput = std::string_view();
-	std::string_view depFile = std::string_view();
-	std::string_view root = std::string_view();
-	std::uintmax_t sizeTSize = 0uz;
-	bool bigEndian = false;
-	bool showVersion = false;
-	bool showHowToUse = false;
-	bool showHelp = false;
-	bool verbose = false;
+	std::string_view input = std::string_view(); ///< Text manifest input path.
+	std::string_view packOutput = std::string_view(); ///< Binary container output path.
+	std::string_view manifestOutput = std::string_view(); ///< Binary manifest output path.
+	std::string_view depFile = std::string_view(); ///< Dep file path.
+	std::string_view root = std::string_view(); ///< Resource path root.
+	std::uintmax_t sizeTSize = 0uz; ///< Target platform std::size_t size.
+	bool bigEndian = false; ///< Is the target platform big endian?
+	bool showVersion = false; ///< Show compiler version?
+	bool showHowToUse = false; ///< Show how to use?
+	bool showHelp = false; ///< Show help?
+	bool verbose = false; ///< Verbose?
 };
 
+/// @brief Parses the command line.
+/// @param argc Command line argument count.
+/// @param argv Command line argument views.
+/// @return Parsed command.
 [[nodiscard("Pure function")]]
 Command ParseCommandLine(int argc, const char* const argv[]);
 
+/// @brief Prints the compiler version if requested.
+/// @param command Parsed command.
 void PrintVersion(const Command& command);
+/// @brief Prints how to use if requested.
+/// @param command Parsed command.
 void PrintHowToUse(const Command& command);
+/// @brief Prints the help.
+/// @param command Parsed command.
 void PrintHelp(const Command& command);
 
+/// @brief Compiles a manifest if requested.
+/// @param command Parsed command.
 void Compile(const Command& command);
+/// @brief Gets a manifest version index.
+/// @param manifest Parsed manifest.
+/// @return Manifest version index.
 [[nodiscard("Pure function")]]
 std::uint32_t GetManifestVersion(const toml::table& manifest);
+/// @brief Compiles a manifest of version 0.
+/// @param command Parsed command.
+/// @param source Parsed manifest.
 void CompileV0(const Command& command, const toml::table& source);
+/// @brief Gets a runtime pack container path.
+/// @param command Parsed command.
+/// @param source Manifest.
+/// @param propertyName Property name of the path.
+/// @return Runtime pack container path.
 [[nodiscard("Pure function")]]
 std::string_view GetRuntimePackPath(const Command& command, const toml::table& source, std::string_view propertyName);
+/// @brief Gets a resource ID.
+/// @param table Resource.
+/// @param propertyName Resource ID property name.
+/// @return Resource ID.
 [[nodiscard("Pure function")]]
 std::string_view GetResourceID(const toml::table& table, std::string_view propertyName);
+/// @brief Gets a resource property value.
+/// @param table Resource.
+/// @param propertyName Resource property name.
+/// @param id Resource ID.
+/// @return Resource property value.
 [[nodiscard("Pure function")]]
 std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id);
+/// @brief Gets a resource path root.
+/// @param command Parsed command.
+/// @return Resource path root.
 [[nodiscard("Pure function")]]
 std::filesystem::path GetResourcePathRoot(const Command& command);
+/// @brief Gets a max value of std::size_t of a target platform.
+/// @param command Parsed command.
+/// @return std::size_t max value.
 [[nodiscard("Pure function")]]
 std::uintmax_t GetMaxSize(const Command& command) noexcept;
+/// @brief Pushes a value of std::size_t of a target platform.
+/// @param stream Target stream.
+/// @param size Value to push.
+/// @param command Parsed command.
 void PushBigSize(std::ofstream& stream, std::uintmax_t size, const Command& command);
+/// @brief Pushes a value of std::uint8_t.
+/// @param stream Target stream.
+/// @param size Value to push.
+/// @param propertyName Resource property name.
 void PushSmallSize(std::ofstream& stream, std::size_t size, std::string_view propertyName);
 
+/// @brief Gets an output binary pack container path.
+/// @param path Pack path.
+/// @return Output binary pack container path.
 [[nodiscard("Pure function")]]
 std::filesystem::path GetPackPath(std::string_view path);
+/// @brief Creates an output binary pack container stream.
+/// @param path Pack path.
+/// @return Stream.
 [[nodiscard("Pure function")]]
 std::ofstream CreatePackStream(const std::filesystem::path& path);
+/// @brief Gets an output binary pack manifest path.
+/// @param path Manifest path.
+/// @return Output binary pack manifest path.
 [[nodiscard("Pure function")]]
 std::filesystem::path GetManifestPath(std::string_view path);
+/// @brief Creates an output binary pack manifest stream.
+/// @param path Manifest path.
+/// @return Stream.
 [[nodiscard("Pure function")]]
 std::ofstream CreateManifestStream(const std::filesystem::path& path);
 
+/// @brief Creates a dep file stream if needed.
+/// @param path Dep file stream.
+/// @return Dep file stream; empty stream if the @p path is empty.
 [[nodiscard("Pure function")]]
 std::ofstream CreateDepStream(std::string_view path);
+/// @brief Adds targets to the dep stream if the stream isn't empty.
+/// @param depFile Dep file stream. May be empty.
+/// @param packPath Pack container path. Must be absolute.
+/// @param manifestPath Manifest path. Must be absolute.
 void AddTargetsToDepStream(std::ofstream& depFile, const std::filesystem::path& packPath, const std::filesystem::path& manifestPath);
+/// @brief Adds a dependency to the dep stream if the stream isn't empty.
+/// @param depFile Dep file stream. May be empty.
+/// @param path Dependency path. Must be absolute.
 void AddDependencyToDepStream(std::ofstream& depFile, const std::filesystem::path& path);
+/// @brief Finishes the dep stream dependency list if the stream isn't empty.
+/// @param depFile Dep file stream. May be empty.
 void FinishDepStreamDependencyList(std::ofstream& depFile);
+/// @brief Converts the path to a path suitable for the dep path.
+/// @param path Path.
+/// @return Dep file path.
 [[nodiscard("Pure function")]]
 std::string ConvertPathToDepPath(const std::filesystem::path& path);
 
@@ -329,6 +404,7 @@ void PrintHelp(const Command& command)
 		std::println("\nOptions:");
 		std::println("\t-po <output>     Output pack data file.");
 		std::println("\t-mo <output>     Output manifest file. The extension must be '.pprm'.");
+		std::println("\t-d <path>        Dep file path.");
 		std::println("\t-r <path>        Root path of resources in the source manifest.");
 		std::println("\t                 If set, it must be absolute.");
 		std::println("\t                 If not set, the input manifest directory is used as a root.");

@@ -9,55 +9,94 @@
 
 #include "toml++/toml.hpp"
 
+/// @brief File resource manifest schema base.
 #define SCHEMA_BASE "PonyEngine/Manifest/Resource/File/"
 
 import std;
 
-constexpr std::string_view OutputFlag = "-o";
-constexpr std::string_view VersionFlag = "--version";
-constexpr std::string_view HelpFlag = "--help";
-constexpr std::string_view VerboseFlag = "--verbose";
+constexpr std::string_view OutputFlag = "-o"; ///< Output flag. The next argument must be a path.
+constexpr std::string_view VersionFlag = "--version"; ///< Version flag.
+constexpr std::string_view HelpFlag = "--help"; ///< Help flag.
+constexpr std::string_view VerboseFlag = "--verbose"; ///< Verbose flag.
 
-constexpr std::string_view SchemaPropertyName = "schema";
-constexpr std::string_view ResourcesPropertyName = "resources";
-constexpr std::string_view IdPropertyName = "id";
-constexpr std::string_view TypePropertyName = "type";
-constexpr std::string_view PathPropertyName = "path";
+constexpr std::string_view SchemaPropertyName = "schema"; ///< Schema property name. Must be a string.
+constexpr std::string_view ResourcesPropertyName = "resources"; ///< Resources property name. Must be an array.
+constexpr std::string_view IdPropertyName = "id"; ///< Resource ID property name. Must be a string.
+constexpr std::string_view TypePropertyName = "type"; ///< Resource type property name. Must be a string.
+constexpr std::string_view PathPropertyName = "path"; ///< Resource path property name. Must be a string.
 
-constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0";
+constexpr std::string_view SchemaV0 = SCHEMA_BASE "v0"; ///< Schema v0. It's the actual schema.
 
-constexpr std::string_view ManifestExtension = ".pfrm";
-constexpr std::string_view MagicHeader = "PonyEngineFRM";
+constexpr std::string_view ManifestExtension = ".pfrm"; ///< Binary manifest extension.
+constexpr std::string_view MagicHeader = "PonyEngineFRM"; ///< Magic header of a binary manifest.
 
+/// @brief Parsed command.
 struct Command final
 {
-	std::string_view input = std::string_view();
-	std::string_view output = std::string_view();
-	bool showVersion = false;
-	bool showHowToUse = false;
-	bool showHelp = false;
-	bool verbose = false;
+	std::string_view input = std::string_view(); ///< Path to an input text manifest.
+	std::string_view output = std::string_view(); ///< Path to an output binary manifest.
+	bool showVersion = false; ///< Show compiler version?
+	bool showHowToUse = false; ///< Show how to use?
+	bool showHelp = false; ///< Show help?
+	bool verbose = false; ///< Verbose?
 };
 
+/// @brief Parses the command line.
+/// @param argc Command line argument count.
+/// @param argv Command line argument views.
+/// @return Parsed command.
 [[nodiscard("Pure function")]]
 Command ParseCommandLine(int argc, const char* const argv[]);
 
+/// @brief Prints the compiler version if requested.
+/// @param command Parsed command.
 void PrintVersion(const Command& command);
+/// @brief Prints how to use if requested.
+/// @param command Parsed command.
 void PrintHowToUse(const Command& command);
+/// @brief Prints the help.
+/// @param command Parsed command.
 void PrintHelp(const Command& command);
 
+/// @brief Compiles a manifest if requested.
+/// @param command Parsed command.
 void Compile(const Command& command);
+/// @brief Gets a manifest version index.
+/// @param manifest Parsed manifest.
+/// @return Manifest version index.
 [[nodiscard("Pure function")]]
 std::uint32_t GetManifestVersion(const toml::table& manifest);
+/// @brief Compiles a manifest of version 0.
+/// @param command Parsed command.
+/// @param source Parsed manifest.
 void CompileV0(const Command& command, const toml::table& source);
+/// @brief Gets a resource ID.
+/// @param table Resource table.
+/// @param propertyName Resource ID property name.
+/// @return Resource ID.
 [[nodiscard("Pure function")]]
 std::string_view GetResourceID(const toml::table& table, std::string_view propertyName);
+/// @brief Gets a resource property value.
+/// @param table Resource table.
+/// @param propertyName Resource property name.
+/// @param id Resource ID.
+/// @return Resource property value.
 [[nodiscard("Pure function")]]
 std::string_view GetResourcePropertyValue(const toml::table& table, std::string_view propertyName, std::string_view id);
+/// @brief Pushes the small size to the stream.
+/// @param stream Target stream.
+/// @param size Size.
+/// @param propertyName Property name.
 void PushSize(std::ofstream& stream, std::size_t size, std::string_view propertyName);
 
+/// @brief Gets a binary resource manifest path.
+/// @param path Parsed resource manifest path.
+/// @return Binary resource manifest path.
 [[nodiscard("Pure function")]]
 std::filesystem::path GetManifestPath(std::string_view path);
+/// @brief Gets a binary resource manifest output stream.
+/// @param path Binary resource manifest path.
+/// @return Binary resource manifest output stream.
 [[nodiscard("Pure function")]]
 std::ofstream CreateManifestStream(const std::filesystem::path& path);
 
