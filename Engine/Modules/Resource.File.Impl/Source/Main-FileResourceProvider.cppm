@@ -21,15 +21,18 @@ import PonyEngine.File;
 import PonyEngine.Log;
 import PonyEngine.Resource.Ext;
 
-import :FileFileResourceData;
-import :FileLoadableResourceData;
+import :FileResourceData;
+import :LoadableResourceData;
 import :LoadRequestManager;
 
 export namespace PonyEngine::Resource::File
 {
+	/// @brief File resource provider.
 	class FileResourceProvider final : public IResourceProvider
 	{
 	public:
+		/// @brief Creates a file resource provider.
+		/// @param resourceContext Resource context.
 		[[nodiscard("Pure constructor")]]
 		explicit FileResourceProvider(IResourceContext& resourceContext);
 		FileResourceProvider(const FileResourceProvider&) = delete;
@@ -52,25 +55,43 @@ export namespace PonyEngine::Resource::File
 		FileResourceProvider& operator =(FileResourceProvider&&) = delete;
 
 	private:
+		/// @brief Begins the provider.
+		/// @param registry Resource registry.
+		/// @param count How many resources are registered.
 		void Begin(IResourceRegistry& registry, std::size_t& count);
+		/// @brief Ends the provider.
+		/// @param registry Resource registry.
+		/// @param count How many resources to unregister.
 		void End(IResourceRegistry& registry, std::size_t count) const;
 
+		/// @brief Parses the manifest.
+		/// @param data Manifest.
+		/// @param registry Resource registry.
+		/// @param count How many resources are registered.
 		void ParseManifest(std::span<const char> data, IResourceRegistry& registry, std::size_t& count);
+		/// @brief Adds a resource.
+		/// @param registry Resource registry.
+		/// @param resourceId Resource ID.
+		/// @param resourceType Resource type.
+		/// @param resourcePath Resource path.
 		void AddResource(IResourceRegistry& registry, std::string_view resourceId, std::string_view resourceType, std::string_view resourcePath);
 
+		/// @brief Makes an absolute resource path.
+		/// @param relativePath Relative to a game root path.
+		/// @return Absolute resource path.
 		[[nodiscard("Pure function")]]
 		std::filesystem::path MakeAbsolutePath(const std::filesystem::path& relativePath) const;
 
-		static constexpr std::string_view ManifestExtension = ".pfrm";
-		static constexpr std::string_view MagicHeader = "PonyEngineFRM";
+		static constexpr std::string_view ManifestExtension = ".pfrm"; ///< Resource manifest file extension.
+		static constexpr std::string_view MagicHeader = "PonyEngineFRM"; ///< Resource manifest magic header.
 
-		IResourceContext* resourceContext;
-		PonyEngine::File::IFileService* fileService;
+		IResourceContext* resourceContext; ///< Resource context.
+		PonyEngine::File::IFileService* fileService; ///< File service.
 
-		LoadRequestManager loadRequestManager;
+		LoadRequestManager loadRequestManager; ///< Load request manager.
 
-		std::vector<std::filesystem::path> filePaths;
-		std::vector<ResourceHandle> resourceHandles;
+		std::vector<std::filesystem::path> filePaths; ///< File paths.
+		std::vector<ResourceHandle> resourceHandles; ///< Resource handles. Synced with the @p filePaths by index.
 	};
 }
 
@@ -109,12 +130,12 @@ namespace PonyEngine::Resource::File
 	std::shared_ptr<ILoadableResourceData> FileResourceProvider::GetLoadableResource(const std::size_t index) const
 	{
 		std::shared_ptr<PonyEngine::File::IFile> file = fileService->OpenFile(filePaths[index], PonyEngine::File::FileParams::Read());
-		return std::make_shared<FileLoadableResourceData>(loadRequestManager, std::move(file));
+		return std::make_shared<LoadableResourceData>(loadRequestManager, std::move(file));
 	}
 
 	std::shared_ptr<IFileResourceData> FileResourceProvider::GetFileResource(const std::size_t index) const
 	{
-		return std::make_shared<FileFileResourceData>(&filePaths[index]);
+		return std::make_shared<FileResourceData>(&filePaths[index]);
 	}
 
 	std::shared_ptr<IMemoryResourceData> FileResourceProvider::GetMemoryResource(const std::size_t index) const

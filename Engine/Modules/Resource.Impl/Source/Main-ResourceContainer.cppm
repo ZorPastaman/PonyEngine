@@ -21,6 +21,7 @@ import :ResourceEntry;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource container.
 	class ResourceContainer final
 	{
 	public:
@@ -31,15 +32,29 @@ export namespace PonyEngine::Resource
 
 		~ResourceContainer() noexcept = default;
 
+		/// @brief Gets a resource entry.
+		/// @param resourceId Resource ID.
+		/// @return Resource entry; @a nullptr if not found.
 		[[nodiscard("Pure function")]]
 		const ResourceEntry* GetResource(ResourceID resourceId) const noexcept;
+		/// @brief Checks if the container is empty.
+		/// @return @a True if it's empty; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool Empty() const noexcept;
 
+		/// @brief Adds a resource.
+		/// @param params Resource parameters.
+		/// @param provider Resource provider.
+		/// @param handle Resource handle.
 		void AddResource(const ResourceParams& params, IResourceProvider& provider, ResourceHandle handle);
+		/// @brief Removes a resource.
+		/// @param handle Resource handle.
 		void RemoveResource(ResourceHandle handle);
+		/// @brief Clears the container.
 		void Clear() noexcept;
 
+		/// @brief Gets the handle map.
+		/// @return Handle map.
 		[[nodiscard("Pure function")]]
 		const std::unordered_map<ResourceHandle, ResourceID>& Handles() const noexcept;
 
@@ -47,8 +62,8 @@ export namespace PonyEngine::Resource
 		ResourceContainer& operator =(ResourceContainer&&) = delete;
 
 	private:
-		std::unordered_map<ResourceID, ResourceEntry> resources;
-		std::unordered_map<ResourceHandle, ResourceID> handleToIdMap;
+		std::unordered_map<ResourceID, ResourceEntry> resources; ///< ResourceID to resource entry map.
+		std::unordered_map<ResourceHandle, ResourceID> handleToIdMap; ///< Resource handle to resource ID map.
 	};
 }
 

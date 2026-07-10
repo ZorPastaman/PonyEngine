@@ -29,10 +29,13 @@ import :ResourceProviderContainer;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource service.
 	class ResourceService final : public Application::IService, public IResourceModuleContext, private Application::ITickableService, 
 		private IResourceContext, private IResourceService
 	{
 	public:
+		/// @brief Creates a resource service.
+		/// @param application Application context.
 		[[nodiscard("Pure constructor")]]
 		explicit ResourceService(Application::IApplicationContext& application);
 		ResourceService(const ResourceService&) = delete;
@@ -90,9 +93,13 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]] 
 		virtual std::string_view GetResourceTypeString(struct ResourceType type) const override;
 
+		/// @brief Resource registry.
 		class ResourceRegistry final : public IResourceRegistry
 		{
 		public:
+			/// @brief Creates a resource registry.
+			/// @param service Resource service.
+			/// @param provider Current handled resource provider.
 			[[nodiscard("Pure constructor")]]
 			ResourceRegistry(ResourceService& service, IResourceProvider& provider) noexcept;
 			[[nodiscard("Pure constructor")]]
@@ -110,8 +117,8 @@ export namespace PonyEngine::Resource
 			ResourceRegistry& operator =(ResourceRegistry&& other) noexcept = default;
 
 		private:
-			ResourceService* service;
-			IResourceProvider* provider;
+			ResourceService* service; ///< Resource service.
+			IResourceProvider* provider; ///< Resource provider.
 		};
 
 		/// @brief Begins the providers.
@@ -121,46 +128,80 @@ export namespace PonyEngine::Resource
 		/// @param count How many providers to end.
 		void End(std::size_t count) noexcept;
 
+		/// @brief Gets a resource.
+		/// @tparam ResourceT Resource type.
+		/// @tparam ResourceD Resource data type.
+		/// @param resourceId Resource ID.
+		/// @param map Resource cache.
+		/// @param mapMutex Resource cache mutex.
+		/// @param dataGetter Resource data getter.
+		/// @return Resource.
 		template<std::derived_from<IResource> ResourceT, typename ResourceD> [[nodiscard("Pure function")]]
 		std::shared_ptr<ResourceT> GetResource(ResourceID resourceId, std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mapMutex,
 			const std::function<std::shared_ptr<ResourceD>(const ResourceEntry&)>& dataGetter) const;
+		/// @brief Adds a resource.
+		/// @param params Resource parameters.
+		/// @param provider Resource provider.
+		/// @return Resource handle.
 		[[nodiscard("Must be used")]]
 		ResourceHandle AddResource(const ResourceParams& params, IResourceProvider& provider);
+		/// @brief Removes a resource.
+		/// @param handle Resource handle.
 		void RemoveResource(ResourceHandle handle);
 
+		/// @brief Gets a resource from the cache.
+		/// @tparam ResourceT Resource type.
+		/// @param resourceId Resource ID.
+		/// @param map Resource cache.
+		/// @param mutex Resource cache mutex.
+		/// @return Resource from cache or @a nullptr if not found.
 		template<std::derived_from<IResource> ResourceT> [[nodiscard("Pure function")]]
 		static std::shared_ptr<ResourceT> GetResourceFromCache(ResourceID resourceId, 
 			const std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) noexcept;
+		/// @brief Adds the resource to the cache.
+		/// @tparam ResourceT Resource type.
+		/// @tparam ResourceD Resource data.
+		/// @param resourceEntry Resource entry.
+		/// @param data Resource data.
+		/// @param map Resource cache.
+		/// @param mutex Resource cache mutex.
+		/// @return Added resource or gotten from the cache if it has such a resource.
 		template<std::derived_from<IResource> ResourceT, typename ResourceD> [[nodiscard("Pure function")]]
 		std::shared_ptr<ResourceT> AddResourceToCache(const ResourceEntry& resourceEntry, std::shared_ptr<ResourceD>&& data,
 			std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map, std::shared_mutex& mutex) const;
+		/// @brief Gets a resource from the cache.
+		/// @tparam ResourceT Resource type.
+		/// @param resourceId Resource ID.
+		/// @param map Resource cache.
+		/// @return Resource from the cache or @a nullptr if not found.
+		/// @note This function doesn't use mutexes.
 		template<std::derived_from<IResource> ResourceT> [[nodiscard("Pure function")]]
 		static std::shared_ptr<ResourceT> GetResourceFromCacheUnsafe(ResourceID resourceId, 
 			const std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map) noexcept;
 
-		Application::IApplicationContext* application;
+		Application::IApplicationContext* application; ///< Application context.
 
-		ResourceProviderContainer providers;
+		ResourceProviderContainer providers; ///< Resource provider container.
 
-		ResourceContainer resources;
-		mutable std::shared_mutex resourceMutex;
+		ResourceContainer resources; ///< Resource container.
+		mutable std::shared_mutex resourceMutex; ///< Resource container mutex.
 
-		mutable std::unordered_map<ResourceID, std::weak_ptr<LoadableResource>> loadableResourceCache;
-		mutable std::shared_mutex loadableResourceCacheMutex;
+		mutable std::unordered_map<ResourceID, std::weak_ptr<LoadableResource>> loadableResourceCache; ///< Loadable resource cache.
+		mutable std::shared_mutex loadableResourceCacheMutex; ///< Loadable resource cache mutex.
 
-		mutable std::unordered_map<ResourceID, std::weak_ptr<FileResource>> fileResourceCache;
-		mutable std::shared_mutex fileResourceCacheMutex;
+		mutable std::unordered_map<ResourceID, std::weak_ptr<FileResource>> fileResourceCache; ///< File resource cache.
+		mutable std::shared_mutex fileResourceCacheMutex; ///< File resource cache mutex.
 
-		mutable std::unordered_map<ResourceID, std::weak_ptr<MemoryResource>> memoryResourceCache;
-		mutable std::shared_mutex memoryResourceCacheMutex;
+		mutable std::unordered_map<ResourceID, std::weak_ptr<MemoryResource>> memoryResourceCache; ///< Memory resource cache.
+		mutable std::shared_mutex memoryResourceCacheMutex; ///< Memory resource cache mutex.
 
-		std::unordered_map<ResourceID, std::string> resourceIdMap;
-		mutable std::shared_mutex resourceIdMapMutex;
-		std::unordered_map<struct ResourceType, std::string> resourceTypeMap;
-		mutable std::shared_mutex resourceTypeMapMutex;
+		std::unordered_map<ResourceID, std::string> resourceIdMap; ///< Resource ID to resource ID string map.
+		mutable std::shared_mutex resourceIdMapMutex; ///< Resource ID map mutex.
+		std::unordered_map<struct ResourceType, std::string> resourceTypeMap; ///< Resource type to resource type string map.
+		mutable std::shared_mutex resourceTypeMapMutex; ///< Resource type map mutex.
 
-		ResourceProviderHandle nextProviderHandle;
-		ResourceHandle nextResourceHandle;
+		ResourceProviderHandle nextProviderHandle; ///< Next provider handle.
+		ResourceHandle nextResourceHandle; ///< Next resource handle.
 	};
 }
 

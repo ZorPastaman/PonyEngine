@@ -22,7 +22,7 @@ import :ResourceService;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Raw input service module.
+	/// @brief Resource service module.
 	class ResourceServiceModule final : public Application::IModule
 	{
 	public:
@@ -40,8 +40,8 @@ export namespace PonyEngine::Resource
 		ResourceServiceModule& operator =(ResourceServiceModule&&) = delete;
 
 	private:
-		Application::ModuleDataHandle inputServiceModuleHandle; ///< Input service module handle.
-		Application::ServiceHandle inputServiceHandle; ///< Input service handle.
+		Application::ModuleDataHandle inputServiceModuleHandle; ///< Resource service module handle.
+		Application::ServiceHandle inputServiceHandle; ///< Resource service handle.
 	};
 }
 

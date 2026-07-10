@@ -17,6 +17,7 @@ import :LoadRequest;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Load request manager.
 	class LoadRequestManager final
 	{
 	public:
@@ -27,6 +28,12 @@ export namespace PonyEngine::Resource::Pack
 
 		~LoadRequestManager() noexcept = default;
 
+		/// @brief Creates a load request.
+		/// @param file Pack file.
+		/// @param offset Resource offset.
+		/// @param loadParams Load parameters.
+		/// @param callback Load callback.
+		/// @return Load request.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<LoadRequest> CreateRequest(const File::IFile& file, std::size_t offset,
 			const LoadParams& loadParams, const std::function<void(const ILoadRequest&)>& callback) const;

@@ -86,9 +86,6 @@ The devices may have custom features. Those may be accessed via `IRawInputServic
 The API provides default string for axes and device types. Use them wherever it's possible:
 
 - [Layout](Source/Main-Layout.cppm) - layout(axis) element names;
-- [KeyboardDevice](Source/Main-Keyboard.cppm) - keyboard device sub-type names;
 - [KeyboardLayout](Source/Main-Keyboard.cppm) - keyboard axis names;
-- [MouseDevice](Source/Main-Mouse.cppm) - mouse device sub-type names;
 - [MouseLayout](Source/Main-Mouse.cppm) - mouse axis names;
-- [GamepadDevice](Source/Main-Gamepad.cppm) - gamepad device sub-type names;
 - [GamepadLayout](Source/Main-Gamepad.cppm) - gamepad axis names;

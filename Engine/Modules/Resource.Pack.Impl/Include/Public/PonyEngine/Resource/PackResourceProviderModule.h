@@ -15,6 +15,8 @@ import PonyEngine.Application.Ext;
 
 namespace PonyEngine::Resource::Pack
 {
+	/// @brief Gets the pack resource provider module.
+	/// @return Pack resource provider module.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetPackResourceProviderModule();
 }

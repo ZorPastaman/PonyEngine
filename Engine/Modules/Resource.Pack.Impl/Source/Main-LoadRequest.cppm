@@ -20,9 +20,13 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Load request.
 	class LoadRequest final : public ILoadRequest
 	{
 	public:
+		/// @brief Creates a load request.
+		/// @param loadParams Load parameters.
+		/// @param loadCallback Load callback.
 		[[nodiscard("Pure constructor")]]
 		LoadRequest(const LoadParams& loadParams, const std::function<void(const ILoadRequest&)>& loadCallback) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -32,9 +36,15 @@ export namespace PonyEngine::Resource::Pack
 
 		~LoadRequest() noexcept = default;
 
+		/// @brief Gets the file request.
+		/// @return File request.
 		[[nodiscard("Pure function")]]
 		const std::shared_ptr<File::IReadRequest>& FileRequest() const noexcept;
+		/// @brief Sets the file request.
+		/// @param fileRequest File request.
 		void FileRequest(const std::shared_ptr<File::IReadRequest>& fileRequest) noexcept;
+		/// @brief Sets the file request.
+		/// @param fileRequest File request.
 		void FileRequest(std::shared_ptr<File::IReadRequest>&& fileRequest) noexcept;
 
 		[[nodiscard("Pure function")]] 
@@ -49,6 +59,8 @@ export namespace PonyEngine::Resource::Pack
 
 		virtual void Wait() const noexcept override;
 
+		/// @brief Gets the file callback.
+		/// @return File callback.
 		[[nodiscard("Pure function")]]
 		const std::function<void(const File::IReadRequest&)>& FileCallback() const noexcept;
 
@@ -56,10 +68,10 @@ export namespace PonyEngine::Resource::Pack
 		LoadRequest& operator =(LoadRequest&& other) noexcept = default;
 
 	private:
-		std::shared_ptr<File::IReadRequest> fileRequest;
-		LoadParams loadParams;
-		std::function<void(const ILoadRequest&)> loadCallback;
-		std::function<void(const File::IReadRequest&)> fileCallback;
+		std::shared_ptr<File::IReadRequest> fileRequest; ///< File request.
+		LoadParams loadParams; ///< Load parameters.
+		std::function<void(const ILoadRequest&)> loadCallback; ///< Load callback.
+		std::function<void(const File::IReadRequest&)> fileCallback; ///< File callback.
 	};
 }
 

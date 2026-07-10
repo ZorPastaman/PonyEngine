@@ -19,11 +19,20 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Memory resource.
 	class MemoryResource final : public IMemoryResource
 	{
 	public:
+		/// @brief Creates a memory resource.
+		/// @param id Resource ID.
+		/// @param type Resource type.
+		/// @param data Memory resource data.
 		[[nodiscard("Pure constructor")]]
 		MemoryResource(struct ResourceID id, ResourceType type, const std::shared_ptr<IMemoryResourceData>& data) noexcept;
+		/// @brief Creates a memory resource.
+		/// @param id Resource ID.
+		/// @param type Resource type.
+		/// @param data Memory resource data.
 		[[nodiscard("Pure constructor")]]
 		MemoryResource(struct ResourceID id, ResourceType type, std::shared_ptr<IMemoryResourceData>&& data) noexcept;
 		MemoryResource(const MemoryResource&) = delete;
@@ -43,9 +52,9 @@ export namespace PonyEngine::Resource
 		MemoryResource& operator =(MemoryResource&&) = delete;
 
 	private:
-		struct ResourceID id;
-		ResourceType type;
-		std::shared_ptr<IMemoryResourceData> data;
+		struct ResourceID id; ///< Resource ID.
+		ResourceType type; ///< Resource type.
+		std::shared_ptr<IMemoryResourceData> data; ///< Resource data.
 	};
 }
 

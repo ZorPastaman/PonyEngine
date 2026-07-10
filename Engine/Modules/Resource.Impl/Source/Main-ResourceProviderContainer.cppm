@@ -19,11 +19,16 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource provider container.
 	class ResourceProviderContainer final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
 		ResourceProviderContainer() noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		ResourceProviderContainer(const ResourceProviderContainer& other) = default;
+		[[nodiscard("Pure constructor")]]
+		ResourceProviderContainer(ResourceProviderContainer&& other) noexcept = default;
 
 		/// @brief Gets the size.
 		/// @return Size.
@@ -62,9 +67,12 @@ export namespace PonyEngine::Resource
 		/// @brief Clears the data.
 		void Clear() noexcept;
 
+		ResourceProviderContainer& operator =(const ResourceProviderContainer&) = delete;
+		ResourceProviderContainer& operator =(ResourceProviderContainer&& other) noexcept = default;
+
 	private:
-		std::vector<ResourceProviderHandle> handles;
-		std::vector<std::shared_ptr<IResourceProvider>> providers;
+		std::vector<ResourceProviderHandle> handles; ///< Resource provider handles.
+		std::vector<std::shared_ptr<IResourceProvider>> providers; ///< Resource providers.
 	};
 }
 

@@ -17,10 +17,13 @@ import std;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Memory resource data.
 	class IMemoryResourceData
 	{
 		PONY_INTERFACE_BODY(IMemoryResourceData)
 
+		/// @brief Gets a resource memory.
+		/// @return Resource memory.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const std::byte> Memory() const noexcept = 0;
 	};

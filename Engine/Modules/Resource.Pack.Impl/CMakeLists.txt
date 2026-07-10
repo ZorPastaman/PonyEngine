@@ -21,10 +21,10 @@ target_sources(PonyEngine.Resource.Pack.Impl PRIVATE
 )
 target_sources(PonyEngine.Resource.Pack.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
+	"Source/Main-FileResourceData.cppm"
+	"Source/Main-LoadableResourceData.cppm"
 	"Source/Main-LoadRequest.cppm"
 	"Source/Main-LoadRequestManager.cppm"
-	"Source/Main-PackFileResourceData.cppm"
-	"Source/Main-PackLoadableResourceData.cppm"
 	"Source/Main-PackResourceProvider.cppm"
 	"Source/Main-PackResourceProviderModule.cppm"
 )

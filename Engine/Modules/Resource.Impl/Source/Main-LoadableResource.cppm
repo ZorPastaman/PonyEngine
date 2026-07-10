@@ -19,11 +19,20 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Loadable resource.
 	class LoadableResource final : public ILoadableResource
 	{
 	public:
+		/// @brief Creates a loadable resource.
+		/// @param id Resource ID.
+		/// @param type Resource type.
+		/// @param data Loadable resource data.
 		[[nodiscard("Pure constructor")]]
 		LoadableResource(struct ResourceID id, ResourceType type, const std::shared_ptr<ILoadableResourceData>& data) noexcept;
+		/// @brief Creates a loadable resource.
+		/// @param id Resource ID.
+		/// @param type Resource type.
+		/// @param data Loadable resource data.
 		[[nodiscard("Pure constructor")]]
 		LoadableResource(struct ResourceID id, ResourceType type, std::shared_ptr<ILoadableResourceData>&& data) noexcept;
 		LoadableResource(const LoadableResource&) = delete;
@@ -45,9 +54,9 @@ export namespace PonyEngine::Resource
 		LoadableResource& operator =(LoadableResource&&) = delete;
 
 	private:
-		struct ResourceID id;
-		ResourceType type;
-		std::shared_ptr<ILoadableResourceData> data;
+		struct ResourceID id; ///< Resource ID.
+		ResourceType type; ///< Resource type.
+		std::shared_ptr<ILoadableResourceData> data; ///< Resource data.
 	};
 }
 

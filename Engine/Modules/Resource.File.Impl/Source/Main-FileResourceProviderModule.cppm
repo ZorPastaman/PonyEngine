@@ -23,6 +23,7 @@ import :FileResourceProvider;
 
 export namespace PonyEngine::Resource::File
 {
+	/// @brief File resource provider module.
 	class FileResourceProviderModule final : public Application::IModule
 	{
 	public:
@@ -40,7 +41,7 @@ export namespace PonyEngine::Resource::File
 		FileResourceProviderModule& operator =(FileResourceProviderModule&&) = delete;
 
 	private:
-		ResourceProviderHandle providerHandle;
+		ResourceProviderHandle providerHandle; ///< File resource provider handle.
 	};
 }
 

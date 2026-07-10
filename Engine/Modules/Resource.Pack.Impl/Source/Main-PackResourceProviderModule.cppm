@@ -23,6 +23,7 @@ import :PackResourceProvider;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack resource provider module.
 	class PackResourceProviderModule final : public Application::IModule
 	{
 	public:
@@ -40,7 +41,7 @@ export namespace PonyEngine::Resource::Pack
 		PackResourceProviderModule& operator =(PackResourceProviderModule&&) = delete;
 
 	private:
-		ResourceProviderHandle providerHandle;
+		ResourceProviderHandle providerHandle; ///< Pack resource provider handle.
 	};
 }
 

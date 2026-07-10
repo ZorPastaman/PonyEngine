@@ -15,12 +15,13 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource entry.
 	struct ResourceEntry final
 	{
-		ResourceID id;
-		ResourceType type;
-		ResourceAvailability availability = ResourceAvailability::None;
-		std::size_t index = 0uz;
-		IResourceProvider* provider = nullptr;
+		ResourceID id; ///< Resource ID.
+		ResourceType type; ///< Resource type.
+		ResourceAvailability availability = ResourceAvailability::None; ///< Resource availability.
+		std::size_t index = 0uz; ///< Resource index.
+		IResourceProvider* provider = nullptr; ///< Resource provider.
 	};
 }

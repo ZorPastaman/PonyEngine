@@ -21,15 +21,18 @@ import PonyEngine.File;
 import PonyEngine.Log;
 import PonyEngine.Resource.Ext;
 
-import :PackFileResourceData;
-import :PackLoadableResourceData;
+import :FileResourceData;
+import :LoadableResourceData;
 import :LoadRequestManager;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack resource provider.
 	class PackResourceProvider final : public IResourceProvider
 	{
 	public:
+		/// @brief Creates a pack resource provider.
+		/// @param resourceContext Resource context.
 		[[nodiscard("Pure constructor")]]
 		explicit PackResourceProvider(IResourceContext& resourceContext);
 		PackResourceProvider(const PackResourceProvider&) = delete;
@@ -52,36 +55,60 @@ export namespace PonyEngine::Resource::Pack
 		PackResourceProvider& operator =(PackResourceProvider&&) = delete;
 
 	private:
+		/// @brief Begins the provider.
+		/// @param registry Resource registry.
+		/// @param count How many resources are registered.
 		void Begin(IResourceRegistry& registry, std::size_t& count);
+		/// @brief Ends the provider.
+		/// @param registry Resource registry.
+		/// @param count How many resources to unregister.
 		void End(IResourceRegistry& registry, std::size_t count) const;
 
+		/// @brief Parses the manifest.
+		/// @param data Manifest.
+		/// @param registry Resource registry.
+		/// @param count How many resources are registered.
 		void ParseManifest(std::span<const char> data, IResourceRegistry& registry, std::size_t& count);
+		/// @brief Parses an std::size_t.
+		/// @param data std::size_t pointer.
+		/// @return Parsed std::size_t.
 		[[nodiscard("Pure function")]]
 		static std::size_t ParseSize(const char* data) noexcept;
+		/// @brief Adds a resource.
+		/// @param registry Resource registry.
+		/// @param resourceId Resource ID.
+		/// @param resourceType Resource type.
+		/// @param packIndex Pack index.
+		/// @param offset Resource pack offset.
+		/// @param size Resource size.
 		void AddResource(IResourceRegistry& registry, std::string_view resourceId, std::string_view resourceType, 
 			std::size_t packIndex, std::size_t offset, std::size_t size);
 
+		/// @brief Makes an absolute resource path.
+		/// @param relativePath Relative to a game root path.
+		/// @return Absolute resource path.
 		[[nodiscard("Pure function")]]
 		std::filesystem::path MakeAbsolutePath(const std::filesystem::path& relativePath) const;
 
+		/// @brief Resource entry.
 		struct ResourceEntry final
 		{
-			std::size_t packIndex;
-			std::size_t offset;
-			std::size_t size;
+			std::size_t packIndex; ///< Pack index.
+			std::size_t offset; ///< Resource pack offset.
+			std::size_t size; ///< Resource size.
 		};
 
-		static constexpr std::string_view ManifestExtension = ".pprm";
-		static constexpr std::string_view MagicHeader = "PonyEnginePRM";
+		static constexpr std::string_view ManifestExtension = ".pprm"; ///< Resource manifest file extension.
+		static constexpr std::string_view MagicHeader = "PonyEnginePRM"; ///< Resource manifest magic header.
 
-		IResourceContext* resourceContext;
-		File::IFileService* fileService;
+		IResourceContext* resourceContext; ///< Resource context.
+		File::IFileService* fileService; ///< File service.
 
-		LoadRequestManager loadRequestManager;
+		LoadRequestManager loadRequestManager; ///< Load request manager.
 
-		std::vector<std::shared_ptr<File::IFile>> packs;
-		std::vector<ResourceEntry> resourceEntries;
-		std::vector<ResourceHandle> resourceHandles;
+		std::vector<std::shared_ptr<File::IFile>> packs; ///< Resource packs.
+		std::vector<ResourceEntry> resourceEntries; ///< Resource entries.
+		std::vector<ResourceHandle> resourceHandles; ///< Resource handles. Synced with the @p resourceEntries by index.
 	};
 }
 
@@ -120,13 +147,13 @@ namespace PonyEngine::Resource::Pack
 	std::shared_ptr<ILoadableResourceData> PackResourceProvider::GetLoadableResource(const std::size_t index) const
 	{
 		const ResourceEntry& entry = resourceEntries[index];
-		return std::make_shared<PackLoadableResourceData>(loadRequestManager, packs[entry.packIndex].get(), entry.offset, entry.size);
+		return std::make_shared<LoadableResourceData>(loadRequestManager, packs[entry.packIndex].get(), entry.offset, entry.size);
 	}
 
 	std::shared_ptr<IFileResourceData> PackResourceProvider::GetFileResource(const std::size_t index) const
 	{
 		const ResourceEntry& entry = resourceEntries[index];
-		return std::make_shared<PackFileResourceData>(packs[entry.packIndex].get(), entry.offset, entry.size);
+		return std::make_shared<FileResourceData>(packs[entry.packIndex].get(), entry.offset, entry.size);
 	}
 
 	std::shared_ptr<IMemoryResourceData> PackResourceProvider::GetMemoryResource(const std::size_t index) const

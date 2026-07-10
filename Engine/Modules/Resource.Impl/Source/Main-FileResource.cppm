@@ -19,11 +19,20 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief File resource.
 	class FileResource final : public IFileResource
 	{
 	public:
+		/// @brief Creates a file resource.
+		/// @param id Resource ID.
+		/// @param type Resource type.
+		/// @param data File resource data.
 		[[nodiscard("Pure constructor")]]
 		FileResource(struct ResourceID id, ResourceType type, const std::shared_ptr<IFileResourceData>& data) noexcept;
+		/// @brief Creates a file resource.
+		/// @param id Resource ID.
+		/// @param type Resource type.
+		/// @param data File resource data.
 		[[nodiscard("Pure constructor")]]
 		FileResource(struct ResourceID id, ResourceType type, std::shared_ptr<IFileResourceData>&& data) noexcept;
 		FileResource(const FileResource&) = delete;
@@ -47,9 +56,9 @@ export namespace PonyEngine::Resource
 		FileResource& operator =(FileResource&&) = delete;
 
 	private:
-		struct ResourceID id;
-		ResourceType type;
-		std::shared_ptr<IFileResourceData> data;
+		struct ResourceID id; ///< Resource ID.
+		ResourceType type; ///< Resource type.
+		std::shared_ptr<IFileResourceData> data; ///< Resource data.
 	};
 }
 

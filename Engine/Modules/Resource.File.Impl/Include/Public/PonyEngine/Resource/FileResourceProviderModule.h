@@ -15,6 +15,8 @@ import PonyEngine.Application.Ext;
 
 namespace PonyEngine::Resource::File
 {
+	/// @brief Gets the file resource provider module.
+	/// @return File resource provider module.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetFileResourceProviderModule();
 }
