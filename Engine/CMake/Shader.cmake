@@ -1,0 +1,101 @@
+# Compiles a shader using DXC compiler.
+# source - Source file path.
+# output - Output file path.
+# profile - Shader profile. Examples: as_6_7, ms_6_6, ps_6_5, etc.
+# SPIRV - flag that enables building for spir-v.
+# PDB - flag that enables creating a .pdb file in debug builds.
+# ENABLE_16_BIT - flag that enables 16-bit values support.
+# ROOT_SIG_VER - root signature version. If not set, a default value is used.
+# OPTIMIZATION - optimation level. -0 is added before this value. If not set, a default value is used.
+# SPIRV_TARGET - spir-v target. Must be set if SPIRV is set.
+# DEFINES - defines.
+# INCLUDES - include folders
+# ADDITIONAL_PARAMS - any parameters that are added as pure text to a command line.
+function(pony_compile_shader_with_dxc source output profile)
+	set(options SPIRV PDB ENABLE_16_BIT)
+	set(oneValueArgs ROOT_SIG_VER ENTRY OPTIMIZATION SPIRV_TARGET)
+	set(multiValueArgs DEFINES INCLUDES ADDITIONAL_PARAMS)
+	cmake_parse_arguments(dxc_arg "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+	if(source STREQUAL "")
+		message(FATAL_ERROR "Empty source")
+	endif()
+	if(output STREQUAL "")
+		message(FATAL_ERROR "Empty output")
+	endif()
+	if(profile STREQUAL "")
+		message(FATAL_ERROR "Empty profile")
+	endif()
+
+	if(dxc_arg_SPIRV_TARGET AND NOT dxc_arg_SPIRV)
+		message(FATAL_ERROR "SPIR-V target is set in non-spirv build")
+	endif()
+
+	cmake_path(ABSOLUTE_PATH source NORMALIZE OUTPUT_VARIABLE source_abs)
+	cmake_path(ABSOLUTE_PATH output NORMALIZE OUTPUT_VARIABLE output_abs)
+
+	if(NOT dxc_arg_ENTRY)
+		set(dxc_arg_ENTRY "main")
+	endif()
+
+	cmake_path(GET output_abs PARENT_PATH output_dir)
+	file(MAKE_DIRECTORY "${output_dir}")
+	set(DXC_OPTIONS -T ${profile} -E ${dxc_arg_ENTRY} -Fo "${output_abs}")
+	if(dxc_arg_ROOT_SIG_VER)
+		list(APPEND DXC_OPTIONS -force-rootsig-ver ${dxc_arg_ROOT_SIG_VER})
+	endif()
+	if(dxc_arg_OPTIMIZATION)
+		list(APPEND DXC_OPTIONS -O${dxc_arg_OPTIMIZATION})
+	endif()
+	foreach(define ${dxc_arg_DEFINES})
+		list(APPEND DXC_OPTIONS -D ${define})
+	endforeach()
+	foreach(include IN LISTS dxc_arg_INCLUDES)
+		cmake_path(ABSOLUTE_PATH include NORMALIZE OUTPUT_VARIABLE include_abs)
+		list(APPEND DXC_OPTIONS -I "${include_abs}")
+	endforeach()
+
+	if(dxc_arg_ENABLE_16_BIT)
+		list(APPEND DXC_OPTIONS -enable-16bit-types)
+	endif()
+
+	if(dxc_arg_SPIRV)
+		list(APPEND DXC_OPTIONS -spirv)
+		list(APPEND DXC_OPTIONS -D PONY_SPIRV)
+	else()
+		list(APPEND DXC_OPTIONS -D PONY_DIXL)
+	endif()
+	if(dxc_arg_SPIRV_TARGET)
+		list(APPEND DXC_OPTIONS -fspv-target-env=${dxc_arg_SPIRV_TARGET})
+	endif()
+
+	set(DXC_BYPRODUCTS "")
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+		list(APPEND DXC_OPTIONS -Zi)
+		if(dxc_arg_PDB)
+			set(DXC_PDB_PATH "${output_abs}.pdb")
+			list(APPEND DXC_OPTIONS -Fd "${DXC_PDB_PATH}")
+			list(APPEND DXC_BYPRODUCTS "${DXC_PDB_PATH}")
+		else()
+			list(APPEND DXC_OPTIONS -Qembed_debug)
+		endif()
+	else()
+		list(APPEND DXC_OPTIONS -Qstrip_debug -Qstrip_reflect)
+	endif()
+
+	if(dxc_arg_ADDITIONAL_PARAMS)
+		list(APPEND DXC_OPTIONS ${dxc_arg_ADDITIONAL_PARAMS})
+	endif()
+
+	set(DXC_DEP_FILE "${output_abs}.d")
+	add_custom_command(COMMAND dxc ${DXC_OPTIONS} -MD -MF "${DXC_DEP_FILE}" "${source_abs}"
+		COMMAND dxc ${DXC_OPTIONS} "${source_abs}"
+		DEPENDS "${source_abs}"
+		OUTPUT "${output_abs}"
+		BYPRODUCTS ${DXC_BYPRODUCTS}
+		DEPFILE "${DXC_DEP_FILE}"
+		COMMENT "Compiling '${source}' to '${output}' (profile: '${profile}') with dxc"
+		VERBATIM COMMAND_EXPAND_LISTS
+	)
+endfunction()
