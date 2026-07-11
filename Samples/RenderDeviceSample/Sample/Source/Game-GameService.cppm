@@ -807,9 +807,7 @@ namespace Game
 
 		const float deltaTime = time->VirtualDeltaTimeSeconds<float>();
 		const PonyEngine::Math::Vector3<float> translate = PonyEngine::Math::ClampMagnitude(PonyEngine::Math::Vector3<float>(dValue - aValue, spaceValue - ctrlValue, wValue - sValue), 1.f) * 10.f * deltaTime;
-		const PonyEngine::Math::Quaternion<float> rotate = PonyEngine::Math::RotationQuaternion(cameraTransform.Up(), xValue * 0.001f) *
-			PonyEngine::Math::RotationQuaternion(cameraTransform.Right(), yValue * 0.001f) * 
-			PonyEngine::Math::RotationQuaternion(cameraTransform.Forward(), (qValue - eValue) * 1.f * deltaTime);
+		const PonyEngine::Math::Quaternion<float> rotate = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(yValue * 0.001f, xValue * 0.001f, (qValue - eValue) * deltaTime));
 		cameraTransform.Rotate(rotate);
 		cameraTransform.Translate(cameraTransform.Rotation() * translate);
 

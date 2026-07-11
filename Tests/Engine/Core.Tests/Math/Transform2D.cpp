@@ -84,6 +84,11 @@ TEST_CASE("Transform2D move constructor", "[Math][Transform2D]")
 	REQUIRE(copy.Scale() == scale);
 }
 
+TEST_CASE("Transform2D predefined", "[Math][Transform2D]")
+{
+	REQUIRE(PonyEngine::Math::Transform2D<float>::Identity() == PonyEngine::Math::Transform2D<float>());
+}
+
 TEST_CASE("Transform2D position", "[Math][Transform2D]")
 {
 	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
@@ -235,6 +240,17 @@ TEST_CASE("Transform2D rotate", "[Math][Transform2D]")
 #endif
 }
 
+TEST_CASE("Transform2D stretch", "[Math][Transform2D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
+	constexpr float rotation = 0.4f;
+	constexpr auto scale = PonyEngine::Math::Vector2<float>(-2.f, 3.f);
+	auto transform = PonyEngine::Math::Transform2D<float>(position, rotation, scale);
+	constexpr auto stretch = PonyEngine::Math::Vector2<float>(-2.f, 5.f);
+	transform.Stretch(stretch);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Scale(), PonyEngine::Math::Multiply(scale, stretch)));
+}
+
 TEST_CASE("Transform2D look-in", "[Math][Transform2D]")
 {
 	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
@@ -355,6 +371,28 @@ TEST_CASE("Transform2D equal", "[Math][Transform2D]")
 		REQUIRE(transform != copy);
 		transform.Scale(scale);
 	}
+}
+
+TEST_CASE("Transform2D TransformPoint", "[Math][Transform2D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
+	constexpr float rotation = 0.4f;
+	constexpr auto scale = PonyEngine::Math::Vector2<float>(2.f, 3.f);
+	const auto transform = PonyEngine::Math::Transform2D<float>(position, rotation, scale);
+	constexpr auto point = PonyEngine::Math::Vector2<float>(1.f, 1.f);
+	const auto expectedTransformedPoint = position + PonyEngine::Math::Rotate(PonyEngine::Math::Multiply(point, scale), rotation);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::TransformPoint(transform, point), expectedTransformedPoint));
+}
+
+TEST_CASE("Transform2D TransformDirection", "[Math][Transform2D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector2<float>(4.f, -2.f);
+	constexpr float rotation = 0.4f;
+	constexpr auto scale = PonyEngine::Math::Vector2<float>(2.f, 3.f);
+	const auto transform = PonyEngine::Math::Transform2D<float>(position, rotation, scale);
+	constexpr auto direction = PonyEngine::Math::Vector2<float>(0.5f, -0.7f);
+	const auto expectedTransformedDir = PonyEngine::Math::Rotate(direction, rotation);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::TransformDirection(transform, direction), expectedTransformedDir));
 }
 
 TEST_CASE("Transform2D are almost equal", "[Math][Transform2D]")

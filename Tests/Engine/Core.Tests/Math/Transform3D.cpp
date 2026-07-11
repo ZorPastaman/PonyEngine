@@ -78,6 +78,11 @@ TEST_CASE("Transform3D move constructor", "[Math][Transform3D]")
 	REQUIRE(copy.Scale() == scale);
 }
 
+TEST_CASE("Transform3D predefined", "[Math][Transform3D]")
+{
+	REQUIRE(PonyEngine::Math::Transform3D<float>::Identity() == PonyEngine::Math::Transform3D<float>());
+}
+
 TEST_CASE("Transform3D position", "[Math][Transform3D]")
 {
 	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);
@@ -204,11 +209,11 @@ TEST_CASE("Transform3D rotate", "[Math][Transform3D]")
 
 	const auto otherRotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(1.f, -0.5f, 0.7f));
 	transform.Rotate(otherRotation);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), otherRotation * rotation));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), rotation * otherRotation));
 
 	constexpr auto bigRotation = PonyEngine::Math::Quaternion<float>(4.f, 6.f, -2.f, -3.f);
 	transform.Rotate(bigRotation);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), (bigRotation * otherRotation * rotation).Normalized()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), (rotation * otherRotation * bigRotation).Normalized()));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -218,6 +223,17 @@ TEST_CASE("Transform3D rotate", "[Math][Transform3D]")
 		return trans;
 	};
 #endif
+}
+
+TEST_CASE("Transform3D stretch", "[Math][Transform3D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);
+	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
+	constexpr auto scale = PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f);
+	auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
+	constexpr auto stretch = PonyEngine::Math::Vector3<float>(-2.f, 5.f, -1.f);
+	transform.Stretch(stretch);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Scale(), PonyEngine::Math::Multiply(scale, stretch)));
 }
 
 TEST_CASE("Transform3D look-in", "[Math][Transform3D]")
@@ -340,6 +356,30 @@ TEST_CASE("Transform3D equal", "[Math][Transform3D]")
 		REQUIRE(transform != copy);
 		transform.Scale(scale);
 	}
+}
+
+TEST_CASE("Transform3D TransformPoint", "[Math][Transform3D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);
+	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
+	constexpr auto scale = PonyEngine::Math::Vector3<float>(2.f, 3.f, 0.5f);
+	const auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
+
+	constexpr auto point = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f);
+	const auto expectedTransformedPoint = position + (rotation * PonyEngine::Math::Multiply(point, scale));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::TransformPoint(transform, point), expectedTransformedPoint));
+}
+
+TEST_CASE("Transform3D TransformDirection", "[Math][Transform3D]")
+{
+	constexpr auto position = PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f);
+	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
+	constexpr auto scale = PonyEngine::Math::Vector3<float>(2.f, 3.f, 0.5f);
+	const auto transform = PonyEngine::Math::Transform3D<float>(position, rotation, scale);
+
+	constexpr auto direction = PonyEngine::Math::Vector3<float>(0.5f, -0.7f, 0.2f);
+	const auto expectedTransformedDir = rotation * direction;
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::TransformDirection(transform, direction), expectedTransformedDir));
 }
 
 TEST_CASE("Transform3D are almost equal", "[Math][Transform3D]")
