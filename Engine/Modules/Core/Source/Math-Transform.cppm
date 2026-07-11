@@ -49,6 +49,11 @@ export namespace PonyEngine::Math
 
 		~Transform() noexcept = default;
 
+		/// @brief Gets an identity transform.
+		/// @return Identity transform.
+		[[nodiscard("Pure function")]]
+		static const Transform& Identity() noexcept;
+
 		/// @brief Gets the position.
 		/// @return Position.
 		[[nodiscard("Pure function")]]
@@ -116,8 +121,11 @@ export namespace PonyEngine::Math
 		void Translate(const Vector<T, Size>& translation) noexcept;
 		/// @brief Rotates the transform.
 		/// @note The function normalizes the rotation.
-		/// @param rotationToAdd Rotation in radians.
+		/// @param rotationToAdd Rotation to add.
 		void Rotate(const RotationType& rotationToAdd) noexcept;
+		/// @brief Multiplies the current scale by the @p stretch components-wise.
+		/// @param stretch Stretch.
+		void Stretch(const Vector<T, Size>& stretch) noexcept;
 
 		/// @brief Rotates the transform so that it looks in the specific direction.
 		/// @param direction Look direction. Must be unit.
@@ -139,7 +147,7 @@ export namespace PonyEngine::Math
 		/// @brief Converts the transform to another transform type.
 		/// @tparam U Target component type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
-		explicit constexpr operator Transform<U, Size>() const noexcept;
+		explicit operator Transform<U, Size>() const noexcept;
 
 		Transform& operator =(const Transform& other) noexcept = default;
 		Transform& operator =(Transform&& other) noexcept = default;
@@ -151,6 +159,11 @@ export namespace PonyEngine::Math
 		bool operator ==(const Transform& other) const noexcept = default;
 
 	private:
+		/// @brief Gets an identity rotation.
+		/// @return Identity rotation.
+		[[nodiscard("Pure function")]]
+		static const RotationType& IdentityRotation() noexcept;
+
 		Vector<T, Size> position; ///< Position.
 		RotationType rotation; ///< Rotation.
 		Vector<T, Size> scale; ///< Scale.
@@ -164,6 +177,23 @@ export namespace PonyEngine::Math
 	/// @tparam T Component type.
 	template<std::floating_point T>
 	using Transform3D = Transform<T, 3>;
+
+	/// @brief Applies the transform to the point vector.
+	/// @tparam T Value type.
+	/// @tparam Size Dimension.
+	/// @param transform Transform.
+	/// @param vector Point.
+	/// @return Transformed point.
+	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
+	Vector<T, Size> TransformPoint(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept;
+	/// @brief Applies the transform to the direction vector.
+	/// @tparam T Value type.
+	/// @tparam Size Dimension.
+	/// @param transform Transform.
+	/// @param vector Direction.
+	/// @return Transformed direction.
+	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
+	Vector<T, Size> TransformDirection(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept;
 
 	/// @brief Checks if positions, rotations and scales of the two transforms are almost equal.
 	/// @tparam T Component type.
@@ -181,16 +211,9 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
 	Transform<T, Size>::Transform() noexcept :
 		position(Vector<T, Size>::Zero()),
+		rotation(IdentityRotation()),
 		scale(Vector<T, Size>::One())
 	{
-		if constexpr (Size == 3)
-		{
-			rotation = Quaternion<T>::Identity();
-		}
-		else
-		{
-			rotation = T{0};
-		}
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
@@ -318,6 +341,12 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
+	void Transform<T, Size>::Stretch(const Vector<T, Size>& stretch) noexcept
+	{
+		scale.Multiply(stretch);
+	}
+
+	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
 	void Transform<T, Size>::LookIn(const Vector<T, Size>& direction) noexcept requires (Size == 2)
 	{
 		Rotation(AngleSigned(Vector<T, Size>::Right(), direction));
@@ -348,10 +377,43 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
+	const Transform<T, Size>& Transform<T, Size>::Identity() noexcept
+	{
+		static auto identityTransform = Transform();
+		return identityTransform;
+	}
+
+	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
 	template<std::floating_point U>
-	constexpr Transform<T, Size>::operator Transform<U, Size>() const noexcept
+	Transform<T, Size>::operator Transform<U, Size>() const noexcept
 	{
 		return Transform<U, Size>(static_cast<Vector<U, Size>>(position), static_cast<typename Transform<U, Size>::RotationType>(rotation), static_cast<Vector<U, Size>>(scale));
+	}
+
+	template<std::floating_point T, std::size_t Size>
+	Vector<T, Size> TransformPoint(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept
+	{
+		return transform.Position() + Math::Rotate(Multiply(vector, transform.Scale()), transform.Rotation());
+	}
+
+	template<std::floating_point T, std::size_t Size>
+	Vector<T, Size> TransformDirection(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept
+	{
+		return Math::Rotate(vector, transform.Rotation());
+	}
+
+	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
+	const Transform<T, Size>::RotationType& Transform<T, Size>::IdentityRotation() noexcept
+	{
+		if constexpr (Size == 3)
+		{
+			return Quaternion<T>::Identity();
+		}
+		else
+		{
+			static constexpr T IdentityRotation = T{0};
+			return IdentityRotation;
+		}
 	}
 
 	template<std::floating_point T, std::size_t Size>
