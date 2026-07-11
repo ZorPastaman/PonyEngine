@@ -204,11 +204,11 @@ TEST_CASE("Transform3D rotate", "[Math][Transform3D]")
 
 	const auto otherRotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(1.f, -0.5f, 0.7f));
 	transform.Rotate(otherRotation);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), otherRotation * rotation));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), rotation * otherRotation));
 
 	constexpr auto bigRotation = PonyEngine::Math::Quaternion<float>(4.f, 6.f, -2.f, -3.f);
 	transform.Rotate(bigRotation);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), (bigRotation * otherRotation * rotation).Normalized()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Rotation(), (rotation * otherRotation * bigRotation).Normalized()));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")

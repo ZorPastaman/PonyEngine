@@ -307,7 +307,14 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
 	void Transform<T, Size>::Rotate(const RotationType& rotationToAdd) noexcept
 	{
-		Rotation(SumRotations(rotation, rotationToAdd));
+		if constexpr (Size == 3)
+		{
+			Rotation(rotation * rotationToAdd);
+		}
+		else
+		{
+			Rotation(rotation + rotationToAdd);
+		}
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
