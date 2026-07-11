@@ -19,3 +19,7 @@ Options:
 The input file must be file resource manifest compatible.
 The output file is binary and optimized for a target platform.
 See [EngineFormats](../../EngineFormats) for details.
+
+## Third party
+
+- TOML++

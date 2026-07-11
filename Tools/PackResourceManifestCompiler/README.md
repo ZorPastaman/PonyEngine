@@ -26,3 +26,7 @@ Options:
 The input file must be pack resource manifest compatible.
 The output file is two file: binary manifest and binary container. Both are optimized for a target platform.
 See [EngineFormats](../../EngineFormats) for details.
+
+## Third party
+
+- TOML++

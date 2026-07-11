@@ -22,3 +22,7 @@ Options:
 
 The input file must be file resource manifest compatible.
 See [EngineFormats](../../EngineFormats) for details.
+
+## Third party
+
+- TOML++
