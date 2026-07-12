@@ -31,8 +31,6 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Memory/Arena.cpp"
 	"Memory/Pool.cpp"
 	"Meta/Version.cpp"
-	"Serialization/Array.cpp"
-	"Serialization/Basic.cpp"
 	"Type/Common.cpp"
 	"Type/Enum.cpp"
 	"Type/Limits.cpp"
