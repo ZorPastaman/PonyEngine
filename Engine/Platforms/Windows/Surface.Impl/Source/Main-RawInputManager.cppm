@@ -20,7 +20,6 @@ import PonyEngine.Application.Ext.Windows;
 import PonyEngine.Log;
 import PonyEngine.Surface.Windows;
 
-import :MemoryManager;
 import :RawInputDeviceContainer;
 
 export namespace PonyEngine::Surface::Windows
@@ -32,9 +31,8 @@ export namespace PonyEngine::Surface::Windows
 		/// @brief Creates a raw input manager.
 		/// @param application Application context.
 		/// @param surface Surface service.
-		/// @param memoryManager Memory manager.
 		[[nodiscard("Pure constructor")]]
-		RawInputManager(const Application::Windows::IApplicationContext& application, ISurfaceService& surface, MemoryManager& memoryManager) noexcept;
+		RawInputManager(Application::Windows::IApplicationContext& application, ISurfaceService& surface) noexcept;
 		RawInputManager(const RawInputManager&) = delete;
 		RawInputManager(RawInputManager&&) = delete;
 
@@ -110,9 +108,8 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		static constexpr std::pair<USHORT, USHORT> Unpack(DWORD value) noexcept;
 
-		const Application::Windows::IApplicationContext* application; ///< Application context.
+		Application::Windows::IApplicationContext* application; ///< Application context.
 		ISurfaceService* surface; ///< Surface service.
-		MemoryManager* memoryManager; ///< Memory manager.
 
 		RawInputDeviceContainer deviceContainer; ///< Device container.
 
@@ -122,10 +119,9 @@ export namespace PonyEngine::Surface::Windows
 
 namespace PonyEngine::Surface::Windows
 {
-	RawInputManager::RawInputManager(const Application::Windows::IApplicationContext& application, ISurfaceService& surface, MemoryManager& memoryManager) noexcept :
+	RawInputManager::RawInputManager(Application::Windows::IApplicationContext& application, ISurfaceService& surface) noexcept :
 		application{&application},
-		surface{&surface},
-		memoryManager{&memoryManager}
+		surface{&surface}
 	{
 	}
 
@@ -249,10 +245,10 @@ namespace PonyEngine::Surface::Windows
 			return 0;
 		}
 
-		std::span<std::byte> inputData;
+		auto buffer = Application::ScopedTempBuffer();
 		try
 		{
-			inputData = memoryManager->AllocateTemp<std::byte>(size);
+			buffer = application->AcquiredScopedTempBuffer(size);
 		}
 		catch (...)
 		{
@@ -260,13 +256,13 @@ namespace PonyEngine::Surface::Windows
 			return 0;
 		}
 
-		if (GetRawInputData(rawInputInfo, RID_INPUT, inputData.data(), &size, sizeof(RAWINPUTHEADER)) != inputData.size()) [[unlikely]]
+		if (GetRawInputData(rawInputInfo, RID_INPUT, buffer->data(), &size, sizeof(RAWINPUTHEADER)) != size) [[unlikely]]
 		{
 			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
 			return 0;
 		}
 
-		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(inputData.data());
+		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(buffer->data());
 		if (const std::size_t index = deviceContainer.IndexOf(input->header.hDevice); index < deviceContainer.Size()) [[likely]]
 		{
 			const DWORD deviceType = deviceContainer.DeviceType(index);

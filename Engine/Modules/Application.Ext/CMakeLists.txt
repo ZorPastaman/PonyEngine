@@ -28,6 +28,7 @@ target_sources(PonyEngine.Application.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-LoggerHandle.cppm"
 	"Source/Main-ModuleDataHandle.cppm"
 	"Source/Main-ServiceHandle.cppm"
+	"Source/Main-TempBuffer.cppm"
 )
 
 message(VERBOSE "Setting properties")

@@ -11,6 +11,7 @@ export module PonyEngine.World.Impl:World;
 
 import std;
 
+import PonyEngine.Application.Ext;
 import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.World;
@@ -25,8 +26,11 @@ export namespace PonyEngine::World
 	class World final : public IWorld
 	{
 	public:
+		/// @brief Creates a world.
+		/// @param application Application.
+		/// @param typeRegistry Type registry.
 		[[nodiscard("Pure constructor")]]
-		explicit World(const TypeRegistry& typeRegistry) noexcept;
+		World(Application::IApplicationContext& application, const TypeRegistry& typeRegistry) noexcept;
 		World(const World&) = delete;
 		World(World&&) = delete;
 
@@ -209,11 +213,6 @@ export namespace PonyEngine::World
 		bool ExecuteCallback(std::span<void* const> requiredComponents, std::span<void* const> optionalComponents, EntityID entityId, 
 			const std::function<void(QueryItem&)>& callback) const;
 
-		/// @brief Gets an arena.
-		/// @return Arena.
-		[[nodiscard("Pure function")]]
-		static Memory::Arena& Arena();
-
 		/// @brief Checks if the entities ara valid for world operations.
 		/// @param entities Entities to check.
 		void CheckIfValid(std::span<const Entity> entities) const;
@@ -229,6 +228,7 @@ export namespace PonyEngine::World
 		/// @param secondTypes Second types.
 		static void CheckForDuplicates(std::span<const std::type_index> firstTypes, std::span<const std::type_index> secondTypes);
 
+		Application::IApplicationContext* application; ///< Application.
 		const TypeRegistry* typeRegistry; ///< Type registry.
 
 		std::vector<EntityGeneration> entityGenerations; ///< Entity generations.
@@ -245,8 +245,10 @@ export namespace PonyEngine::World
 
 namespace PonyEngine::World
 {
-	World::World(const TypeRegistry& typeRegistry) noexcept :
-		typeRegistry{&typeRegistry}
+	World::World(Application::IApplicationContext& application, const TypeRegistry& typeRegistry) noexcept :
+		application{&application},
+		typeRegistry{&typeRegistry},
+		objectTable(*this->application)
 	{
 	}
 
@@ -327,11 +329,10 @@ namespace PonyEngine::World
 
 		deadEntities.reserve(deadEntities.size() + entities.size());
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-
-		const Memory::Arena::Slice<EntityID> tableEntitiesSlice = arena.Allocate<EntityID>(entities.size());
-		const std::span<EntityID> tableEntities = arena.Span(tableEntitiesSlice);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
+		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 
 		for (ComponentTable& table : componentTables)
 		{
@@ -393,12 +394,10 @@ namespace PonyEngine::World
 
 		if (ComponentTable* const table = FindComponentTable(componentType))
 		{
-			Memory::Arena& arena = Arena();
-			arena.Free();
-
-			const Memory::Arena::Slice<EntityID> tableEntitiesSlice = arena.Allocate<EntityID>(entities.size());
-			const std::span<EntityID> tableEntities = arena.Span(tableEntitiesSlice);
-
+			const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
+			const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+			auto arena = Memory::Arena(*buffer);
+			const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 			RemoveComponents(*table, entities, tableEntities);
 		}
 	}
@@ -539,28 +538,29 @@ namespace PonyEngine::World
 		}
 #endif
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
+		const std::size_t bufferSize = Memory::CalculateBufferSize<void*>(params.requiredComponentTypes.size()) + 
+			Memory::CalculateBufferSize<void*, void*>(params.optionalComponentTypes.size()) +
+			Memory::CalculateBufferSize<const ComponentTable*, void*>(params.requiredComponentTypes.size()) +
+			Memory::CalculateBufferSize<const ComponentTable*, const ComponentTable*>(params.excludedComponentTypes.size()) +
+			Memory::CalculateBufferSize<const ComponentTable*, const ComponentTable*>(params.optionalComponentTypes.size()) +
+			Memory::CalculateBufferSize<std::size_t, const ComponentTable*>(params.optionalComponentTypes.size());
+		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<void*> requiredComponents = arena.AllocateArray<void*>(params.requiredComponentTypes.size());
+		const std::span<void*> optionalComponents = arena.AllocateArray<void*>(params.optionalComponentTypes.size());
+		const std::span<const ComponentTable*> requiredComponentTables = arena.AllocateArray<const ComponentTable*>(params.requiredComponentTypes.size());
+		const std::span<const ComponentTable*> excludedComponentTablesProto = arena.AllocateArray<const ComponentTable*>(params.excludedComponentTypes.size());
+		const std::span<const ComponentTable*> optionalComponentTablesProto = arena.AllocateArray<const ComponentTable*>(params.optionalComponentTypes.size());
+		const std::span<std::size_t> optionalOutputIndicesProto = arena.AllocateArray<std::size_t>(params.optionalComponentTypes.size());
 
-		const Memory::Arena::Slice<const ComponentTable*> requiredComponentTablesSlice = arena.Allocate<const ComponentTable*>(params.requiredComponentTypes.size());
-		const Memory::Arena::Slice<const ComponentTable*> excludedComponentTablesSlice = arena.Allocate<const ComponentTable*>(params.excludedComponentTypes.size());
-		const Memory::Arena::Slice<const ComponentTable*> optionalComponentTablesSlice = arena.Allocate<const ComponentTable*>(params.optionalComponentTypes.size());
-		const Memory::Arena::Slice<std::size_t> optionalOutputIndicesSlice = arena.Allocate<std::size_t>(params.optionalComponentTypes.size());
-		const Memory::Arena::Slice<void*> requiredComponentsSlice = arena.Allocate<void*>(params.requiredComponentTypes.size());
-		const Memory::Arena::Slice<void*> optionalComponentsSlice = arena.Allocate<void*>(params.optionalComponentTypes.size());
-
-		const std::span<const ComponentTable*> requiredComponentTables = arena.Span(requiredComponentTablesSlice);
 		if (!FindRequired(params.requiredComponentTypes, requiredComponentTables))
 		{
 			return;
 		}
 
-		const std::span<const ComponentTable*> excludedComponentTables = FindExcluded(params.excludedComponentTypes, arena.Span(excludedComponentTablesSlice));
-		const auto [optionalComponentTables, optionalOutputIndices] = FindOptional(params.optionalComponentTypes, arena.Span(optionalComponentTablesSlice),
-			arena.Span(optionalOutputIndicesSlice));
+		const std::span<const ComponentTable*> excludedComponentTables = FindExcluded(params.excludedComponentTypes, excludedComponentTablesProto);
+		const auto [optionalComponentTables, optionalOutputIndices] = FindOptional(params.optionalComponentTypes, optionalComponentTablesProto, optionalOutputIndicesProto);
 
-		const std::span<void*> requiredComponents = arena.Span(requiredComponentsSlice);
-		const std::span<void*> optionalComponents = arena.Span(optionalComponentsSlice);
 		std::ranges::fill(optionalComponents, nullptr);
 
 		if (requiredComponentTables.empty())
@@ -576,7 +576,7 @@ namespace PonyEngine::World
 
 	void World::CollectGarbage()
 	{
-		objectTable.CollectGarbage(*typeRegistry, componentTables, componentTablesIndices, Arena());
+		objectTable.CollectGarbage(*typeRegistry, componentTables, componentTablesIndices);
 	}
 
 	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
@@ -682,11 +682,10 @@ namespace PonyEngine::World
 	{
 		CheckIfValid(entities);
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-
-		const Memory::Arena::Slice<EntityID> tableEntitiesSlice = arena.Allocate<EntityID>(entities.size());
-		const std::span<EntityID> tableEntities = arena.Span(tableEntitiesSlice);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
+		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 
 		ComponentTable& table = GetOrCreateComponentTable(componentType);
 		AddComponents(table, entities, tableEntities);
@@ -878,12 +877,6 @@ namespace PonyEngine::World
 		callback(queryItem);
 
 		return queryItem.terminate;
-	}
-
-	Memory::Arena& World::Arena()
-	{
-		thread_local auto arena = Memory::Arena(0uz, 256uz);
-		return arena;
 	}
 
 	void World::CheckIfValid(const std::span<const Entity> entities) const

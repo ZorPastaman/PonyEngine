@@ -17,10 +17,11 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:CommandList;
 
 import std;
 
+import PonyEngine.Application.Ext;
 import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
-import PonyEngine.RenderDevice;
+import PonyEngine.RenderDevice.Ext;
 
 import :Buffer;
 import :BufferUtility;
@@ -49,15 +50,17 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	public:
 		/// @brief Creates a command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Command allocator.
 		/// @param commandList Command list.
 		[[nodiscard("Pure constructor")]]
-		CommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		CommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		/// @brief Creates a command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Command allocator.
 		/// @param commandList Command list.
 		[[nodiscard("Pure constructor")]]
-		CommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
+		CommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		CommandList(const CommandList&) = delete;
 		CommandList(CommandList&&) = delete;
 
@@ -303,11 +306,6 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		CommandList& operator =(CommandList&&) = delete;
 
 	private:
-		/// @brief Gets an arena.
-		/// @return Arena.
-		[[nodiscard("Pure function")]]
-		static Memory::Arena& Arena();
-
 		/// @brief Casts the engine buffer barrier to native buffer barriers.
 		/// @param bufferBarriers Engine buffer barriers.
 		/// @param nativeBufferBarriers Native buffer barriers.
@@ -410,6 +408,12 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		void ClearUAV(const Resource& resource, const ContainerBinding& containerBinding, std::uint32_t gpuViewIndex,
 			const ShaderDataContainer& cpuContainer, std::uint32_t cpuViewIndex, std::span<const Value, 4> clearValue, std::span<const D3D12_RECT> rects);
 
+		/// @brief Creates native rects.
+		/// @param rects Engine rects.
+		/// @return Buffer and native rects.
+		[[nodiscard("Pure function")]]
+		std::pair<Application::ScopedTempBuffer, std::span<D3D12_RECT>> CreateNativeRects(std::span<const Math::CornerRect<std::uint32_t>> rects) const;
+
 		/// @brief Validates if the command list is in a correct state for new commands.
 		void ValidateState() const;
 
@@ -461,6 +465,8 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param destination Destination texture.
 		static void ValidateResolve(const Texture& source, const Texture& destination);
 
+		IRenderDeviceContext* renderDevice; ///< Render device context.
+
 		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator; ///< Command allocator.
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList; ///< Command list.
 
@@ -472,7 +478,8 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 
 namespace PonyEngine::RenderDevice::D3D12::Windows
 {
-	CommandList::CommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
+	CommandList::CommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
+		renderDevice{&renderDevice},
 		allocator(&allocator),
 		commandList(&commandList),
 		isOpen{true}
@@ -480,8 +487,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		Reset();
 	}
 
-	CommandList::CommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
+	CommandList::CommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
+		renderDevice{&renderDevice},
 		allocator(std::move(allocator)),
 		commandList(std::move(commandList)),
 		isOpen{true}
@@ -544,33 +552,33 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 		ValidateState();
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_BUFFER_BARRIER> nativeBufferBarriers = arena.Allocate<D3D12_BUFFER_BARRIER>(bufferBarriers.size());
-		const Memory::Arena::Slice<D3D12_TEXTURE_BARRIER> nativeTextureBarriers = arena.Allocate<D3D12_TEXTURE_BARRIER>(textureBarriers.size());
-		const std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriersSpan = arena.Span(nativeBufferBarriers);
-		const std::span<D3D12_TEXTURE_BARRIER> nativeTextureBarriersSpan = arena.Span(nativeTextureBarriers);
-		ToNativeBarriers(bufferBarriers, nativeBufferBarriersSpan);
-		ToNativeBarriers(textureBarriers, nativeTextureBarriersSpan);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<D3D12_BUFFER_BARRIER>(bufferBarriers.size()) +
+			Memory::CalculateBufferSize<D3D12_TEXTURE_BARRIER, D3D12_BUFFER_BARRIER>(textureBarriers.size());
+		const Application::ScopedTempBuffer buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriers = arena.AllocateArray<D3D12_BUFFER_BARRIER>(bufferBarriers.size());
+		const std::span<D3D12_TEXTURE_BARRIER> nativeTextureBarriers = arena.AllocateArray<D3D12_TEXTURE_BARRIER>(textureBarriers.size());
+		ToNativeBarriers(bufferBarriers, nativeBufferBarriers);
+		ToNativeBarriers(textureBarriers, nativeTextureBarriers);
 
 		std::array<D3D12_BARRIER_GROUP, 2> barrierGroups;
 		UINT32 groupCount = 0u;
-		if (!nativeBufferBarriersSpan.empty())
+		if (!nativeBufferBarriers.empty())
 		{
 			barrierGroups[groupCount++] = D3D12_BARRIER_GROUP
 			{
 				.Type = D3D12_BARRIER_TYPE_BUFFER,
-				.NumBarriers = static_cast<UINT32>(nativeBufferBarriersSpan.size()),
-				.pBufferBarriers = nativeBufferBarriersSpan.data()
+				.NumBarriers = static_cast<UINT32>(nativeBufferBarriers.size()),
+				.pBufferBarriers = nativeBufferBarriers.data()
 			};
 		}
-		if (!nativeTextureBarriersSpan.empty())
+		if (!nativeTextureBarriers.empty())
 		{
 			barrierGroups[groupCount++] = D3D12_BARRIER_GROUP
 			{
 				.Type = D3D12_BARRIER_TYPE_TEXTURE,
-				.NumBarriers = static_cast<UINT32>(nativeTextureBarriersSpan.size()),
-				.pTextureBarriers = nativeTextureBarriersSpan.data()
+				.NumBarriers = static_cast<UINT32>(nativeTextureBarriers.size()),
+				.pTextureBarriers = nativeTextureBarriers.data()
 			};
 		}
 
@@ -913,18 +921,10 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		}
 #endif
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
-		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
-		for (std::size_t i = 0uz; i < rects.size(); ++i)
-		{
-			clearRectsSpan[i] = ToRect(rects[i]);
-		}
-
+		const auto [buffer, clearRects] = CreateNativeRects(rects);
 		const FLOAT clearColor[4] = { color.R(), color.G(), color.B(), color.A() };
 		commandList->ClearRenderTargetView(nativeContainer.CpuHandle(viewIndex), clearColor, 
-			static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
+			static_cast<UINT>(clearRects.size()), clearRects.empty() ? nullptr : clearRects.data());
 	}
 
 	void CommandList::ClearDSV(const IDepthStencilContainer& container, const std::uint32_t viewIndex, const std::optional<float> depth, const std::optional<std::uint8_t> stencil,
@@ -951,18 +951,10 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 			return;
 		}
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
-		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
-		for (std::size_t i = 0uz; i < rects.size(); ++i)
-		{
-			clearRectsSpan[i] = ToRect(rects[i]);
-		}
-
+		const auto [buffer, clearRects] = CreateNativeRects(rects);
 		const auto clearFlags = static_cast<D3D12_CLEAR_FLAGS>((depth ? D3D12_CLEAR_FLAG_DEPTH : 0) | (stencil ? D3D12_CLEAR_FLAG_STENCIL : 0));
 		commandList->ClearDepthStencilView(nativeContainer.CpuHandle(viewIndex), clearFlags, depth.value_or(0.f), stencil.value_or(0u),
-			static_cast<UINT>(clearRectsSpan.size()), clearRectsSpan.empty() ? nullptr : clearRectsSpan.data());
+			static_cast<UINT>(clearRects.size()), clearRects.empty() ? nullptr : clearRects.data());
 	}
 
 	void CommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex,
@@ -979,17 +971,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 		ValidateState();
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
-		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
-		for (std::size_t i = 0uz; i < rects.size(); ++i)
-		{
-			clearRectsSpan[i] = ToRect(rects[i]);
-		}
-
+		const auto [buffer, clearRects] = CreateNativeRects(rects);
 		const UINT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
-		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRectsSpan);
+		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRects);
 	}
 
 	void CommandList::ClearUAV(const IBuffer& buffer, const std::uint32_t gpuViewIndex, const IShaderDataContainer& cpuContainer, const std::uint32_t cpuViewIndex, 
@@ -1006,17 +990,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 		ValidateState();
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_RECT> clearRects = arena.Allocate<D3D12_RECT>(rects.size());
-		const std::span<D3D12_RECT> clearRectsSpan = arena.Span(clearRects);
-		for (std::size_t i = 0uz; i < rects.size(); ++i)
-		{
-			clearRectsSpan[i] = ToRect(rects[i]);
-		}
-
+		const auto [buffer, clearRects] = CreateNativeRects(rects);
 		const FLOAT clearValue[4] = { values.X(), values.Y(), values.Z(), values.W() };
-		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRectsSpan);
+		ClearUAV<TextureUAVMeta>(ToNativeTexture(texture), containerBinding, gpuViewIndex, ToNativeContainer(cpuContainer), cpuViewIndex, std::span(clearValue), clearRects);
 	}
 
 	void CommandList::Copy(const IBuffer& source, IBuffer& destination)
@@ -1332,12 +1308,6 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 			SetObjectName(*allocator, this->name);
 			throw;
 		}
-	}
-
-	Memory::Arena& CommandList::Arena()
-	{
-		thread_local auto arena = Memory::Arena(0uz, 256uz);
-		return arena;
 	}
 
 	void CommandList::ToNativeBarriers(const std::span<const BufferBarrier> bufferBarriers, const std::span<D3D12_BUFFER_BARRIER> nativeBufferBarriers)
@@ -1766,6 +1736,26 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 			commandList->ClearUnorderedAccessViewFloat(gpuHandle, cpuHandle, &resource.Resource(), clearValue.data(),
 				static_cast<UINT>(rects.size()), rects.empty() ? nullptr : rects.data());
 		}
+	}
+
+	std::pair<Application::ScopedTempBuffer, std::span<D3D12_RECT>> CommandList::CreateNativeRects(const std::span<const Math::CornerRect<std::uint32_t>> rects) const
+	{
+		if (rects.empty())
+		{
+			return std::pair<Application::ScopedTempBuffer, std::span<D3D12_RECT>>();
+		}
+
+		const std::size_t bufferSize = Memory::CalculateBufferSize<D3D12_RECT>(rects.size());
+		Application::ScopedTempBuffer buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<D3D12_RECT> clearRects = arena.AllocateArray<D3D12_RECT>(rects.size());
+
+		for (std::size_t i = 0uz; i < rects.size(); ++i)
+		{
+			clearRects[i] = ToRect(rects[i]);
+		}
+
+		return std::pair(std::move(buffer), clearRects);
 	}
 
 	void CommandList::ValidateState() const

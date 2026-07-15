@@ -18,7 +18,7 @@ These modules are always added to a build.
 
 | Module name                                             | Description                                                                                                        |
 |:--------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------|
-| [PonyEngine.Core](Modules/Core)                         | Core utilities module: Math, Hash, Meta, Memory, Serialization and Type utilities.                                 |
+| [PonyEngine.Core](Modules/Core)                         | Core utilities module: Math, Hash, Meta, Memory and Type utilities.                                 |
 | [PonyEngine.Log](Modules/Log)                           | Logging API module.                                                                                                |
 | [PonyEngine.Application.Ext](Modules/Application.Ext)   | Application extension API module. Provides interfaces access to engine services, logging, and application context. |
 

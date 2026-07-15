@@ -425,6 +425,13 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @return Max array size.
 		[[nodiscard("Pure function")]]
 		static std::uint16_t GetMaxArraySize(TextureViewDimension dimension) noexcept;
+		/// @brief Casts the engine castable formats to the native castable formats.
+		/// @param format Texture format. Can be changed.
+		/// @param srgb Is the SRGB format?
+		/// @param params Texture parameters.
+		/// @return Temporary buffer and native castable formats.
+		[[nodiscard("Pure function")]]
+		std::pair<Application::ScopedTempBuffer, std::span<DXGI_FORMAT>> CreateCastableFormats(DXGI_FORMAT& format, bool srgb, const TextureParams& params) const;
 
 		/// @brief Casts to a native shader byte-code.
 		/// @param byteCode Engine shader byte-code.
@@ -471,11 +478,6 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @return Swap chain.
 		[[nodiscard("Pure function")]]
 		SwapChainWrapper& GetSwapChain() const;
-
-		/// @brief Gets a current thread arena.
-		/// @return Arena.
-		[[nodiscard("Pure function")]]
-		static Memory::Arena& Arena();
 
 		/// @brief Creates a device.
 		/// @return Device.
@@ -790,42 +792,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		DXGI_FORMAT format = GetFormat(params.format);
 		const bool srgb = Any(TextureFlag::SRGB, params.flags);
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		auto castableFormats = Memory::Arena::Slice<DXGI_FORMAT>{};
-		if (IsDepthStencilFormat(format))
-		{
-			ValidateDepthTexture(params);
-
-			if (Any(TextureUsage::ShaderResource, params.usage))
-			{
-				if (HasStencil(format))
-				{
-					format = GetTypelessFormat(format);
-				}
-				else
-				{
-					const DXGI_FORMAT depthViewFormat = GetDepthViewFormat(format);
-					castableFormats = arena.Push(std::span(&depthViewFormat, 1uz));
-				}
-			}
-		}
-		else
-		{
-			ValidateColorTexture(params);
-
-			castableFormats = arena.Allocate<DXGI_FORMAT>(params.castableFormats.size() + srgb);
-			const std::span<DXGI_FORMAT> formats = arena.Span(castableFormats);
-			for (std::size_t i = 0uz; i < params.castableFormats.size(); ++i)
-			{
-				formats[i] = GetFormat(params.castableFormats[i]);
-			}
-
-			if (srgb)
-			{
-				formats[formats.size() - 1] = GetSRGBVariant(format);
-			}
-		}
+		const auto [buffer, castableFormats] = CreateCastableFormats(format, srgb, params);
 
 		const D3D12_HEAP_PROPERTIES heapProperties = MakeHeapProperties(heapParams.heapType);
 		const D3D12_HEAP_FLAGS heapFlags = MakeHeapFlags(params.usage, heapParams.notZeroed);
@@ -833,7 +800,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(params.initialLayout);
 		const D3D12_CLEAR_VALUE clearValue = ToClearValue(params.clearValue, format);
 		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
-			resourceDesc, initialLayout, clearValue, arena.Span(castableFormats));
+			resourceDesc, initialLayout, clearValue, castableFormats);
 
 		return std::make_shared<Texture>(std::move(resource), params.format, format, params.castableFormats, 
 			static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), resourceDesc.DepthOrArraySize,
@@ -1098,17 +1065,17 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 		ValidatePipelineLayoutParams(params);
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
 		const RootSignatureDescCounts rootSigDescCounts = GetRootSignatureCounts(params.descriptorSets);
-		const Memory::Arena::Slice<D3D12_ROOT_PARAMETER1> parameters = arena.Allocate<D3D12_ROOT_PARAMETER1>(rootSigDescCounts.tableCount);
-		const Memory::Arena::Slice<D3D12_DESCRIPTOR_RANGE1> ranges = arena.Allocate<D3D12_DESCRIPTOR_RANGE1>(rootSigDescCounts.rangeCount);
-		const Memory::Arena::Slice<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.Allocate<D3D12_STATIC_SAMPLER_DESC>(rootSigDescCounts.staticSamplerCount);
-		const std::span<D3D12_ROOT_PARAMETER1> parametersSpan = arena.Span(parameters);
-		const std::span<D3D12_DESCRIPTOR_RANGE1> rangesSpan = arena.Span(ranges);
-		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplersSpan = arena.Span(staticSamplers);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<D3D12_ROOT_PARAMETER1>(rootSigDescCounts.tableCount) +
+			Memory::CalculateBufferSize<D3D12_DESCRIPTOR_RANGE1, D3D12_ROOT_PARAMETER1>(rootSigDescCounts.rangeCount) +
+			Memory::CalculateBufferSize<D3D12_STATIC_SAMPLER_DESC, D3D12_DESCRIPTOR_RANGE1>(rootSigDescCounts.staticSamplerCount);
+		const auto buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<D3D12_ROOT_PARAMETER1> parameters = arena.AllocateArray<D3D12_ROOT_PARAMETER1>(rootSigDescCounts.tableCount);
+		const std::span<D3D12_DESCRIPTOR_RANGE1> ranges = arena.AllocateArray<D3D12_DESCRIPTOR_RANGE1>(rootSigDescCounts.rangeCount);
+		const std::span<D3D12_STATIC_SAMPLER_DESC> staticSamplers = arena.AllocateArray<D3D12_STATIC_SAMPLER_DESC>(rootSigDescCounts.staticSamplerCount);
 
-		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = MakeRootSignatureDesc(params, parametersSpan, rangesSpan, staticSamplersSpan);
+		const D3D12_ROOT_SIGNATURE_DESC1 rootSigDesc = MakeRootSignatureDesc(params, parameters, ranges, staticSamplers);
 		return std::make_shared<RootSignature>(device.CreateRootSignature(rootSigDesc), params);
 	}
 
@@ -1142,34 +1109,41 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 		ValidatePipelineStateParams(params);
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
+		constexpr std::size_t maxStreamSize = sizeof(PipelineStateSubobjectRootSignature) + sizeof(PipelineStateSubobjectAmplificationShader) +
+			sizeof(PipelineStateSubobjectMeshShader) + sizeof(PipelineStateSubobjectPixelShader) + sizeof(PipelineStateSubobjectRasterizer) +
+			sizeof(PipelineStateSubobjectBlend) + sizeof(PipelineStateSubobjectRenderTargetFormats) + sizeof(PipelineStateSubobjectDepthStencil) +
+			sizeof(PipelineStateSubobjectDepthStencilFormat) + sizeof(PipelineStateSubobjectSampleDesc) + sizeof(PipelineStateSubobjectSampleMask) +
+			sizeof(PipelineStateSubobjectFlags);
+		alignas(void*) std::array<std::byte, maxStreamSize> stream;
+		auto arena = Memory::Arena(stream);
+
+		arena.CreateObject<PipelineStateSubobjectMeshShader>(ToByteCode(params.meshShader));
+		arena.CreateObject<PipelineStateSubobjectRasterizer>(MakeRasterizerDesc(params.rasterizer));
+		arena.CreateObject<PipelineStateSubobjectSampleDesc>(DXGI_SAMPLE_DESC{.Count = ToNumber(params.sample.sampleCount), .Quality = 0u});
+		arena.CreateObject<PipelineStateSubobjectSampleMask>(params.sample.sampleMask);
+		arena.CreateObject<PipelineStateSubobjectFlags>(D3D12_PIPELINE_STATE_FLAG_DYNAMIC_DEPTH_BIAS);
 
 		if (layout)
 		{
-			arena.Push(PipelineStateSubobjectRootSignature(&ToNativeRootSignature(*layout).GetRootSignature()));
+			arena.CreateObject<PipelineStateSubobjectRootSignature>(&ToNativeRootSignature(*layout).GetRootSignature());
 		}
 
 		if (!params.amplificationShader.empty())
 		{
-			arena.Push(PipelineStateSubobjectAmplificationShader(ToByteCode(params.amplificationShader)));
+			arena.CreateObject<PipelineStateSubobjectAmplificationShader>(ToByteCode(params.amplificationShader));
 		}
-		arena.Push(PipelineStateSubobjectMeshShader(ToByteCode(params.meshShader)));
 		if (!params.pixelShader.empty())
 		{
-			arena.Push(PipelineStateSubobjectPixelShader(ToByteCode(params.pixelShader)));
+			arena.CreateObject<PipelineStateSubobjectPixelShader>(ToByteCode(params.pixelShader));
 		}
-
-		arena.Push(PipelineStateSubobjectRasterizer(MakeRasterizerDesc(params.rasterizer)));
 
 		if (!params.attachment.renderTargetFormats.empty())
 		{
-			arena.Push(PipelineStateSubobjectBlend(MakeBlendDesc(params)));
-			const Memory::Arena::Pointer<PipelineStateSubobjectRenderTargetFormats> rtFormats = arena.Push(PipelineStateSubobjectRenderTargetFormats(D3D12_RT_FORMAT_ARRAY
+			arena.CreateObject<PipelineStateSubobjectBlend>(MakeBlendDesc(params));
+			D3D12_RT_FORMAT_ARRAY& rtArray = arena.CreateObject<PipelineStateSubobjectRenderTargetFormats>(D3D12_RT_FORMAT_ARRAY
 			{
 				.NumRenderTargets = static_cast<UINT>(params.attachment.renderTargetFormats.size())
-			}));
-			D3D12_RT_FORMAT_ARRAY& rtArray = arena.Object(rtFormats)->Data();
+			})->Data();
 			for (std::size_t i = 0uz; i < std::min(std::size(rtArray.RTFormats), params.attachment.renderTargetFormats.size()); ++i)
 			{
 				rtArray.RTFormats[i] = GetFormat(params.attachment.renderTargetFormats[i].format, params.attachment.renderTargetFormats[i].srgb);
@@ -1178,14 +1152,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 
 		if (params.attachment.depthStencilFormat)
 		{
-			arena.Push(PipelineStateSubobjectDepthStencil(MakeDepthStencilDesc(params.depthStencil)));
-			arena.Push(PipelineStateSubobjectDepthStencilFormat(GetFormat(*params.attachment.depthStencilFormat)));
+			arena.CreateObject<PipelineStateSubobjectDepthStencil>(MakeDepthStencilDesc(params.depthStencil));
+			arena.CreateObject<PipelineStateSubobjectDepthStencilFormat>(GetFormat(*params.attachment.depthStencilFormat));
 		}
-
-		arena.Push(PipelineStateSubobjectSampleDesc(DXGI_SAMPLE_DESC{.Count = ToNumber(params.sample.sampleCount), .Quality = 0u}));
-		arena.Push(PipelineStateSubobjectSampleMask(params.sample.sampleMask));
-
-		arena.Push(PipelineStateSubobjectFlags(D3D12_PIPELINE_STATE_FLAG_DYNAMIC_DEPTH_BIAS));
 
 		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
@@ -1199,15 +1168,16 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 		ValidatePipelineStateParams(params);
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
+		constexpr std::size_t maxStreamSize = sizeof(PipelineStateSubobjectRootSignature) + sizeof(PipelineStateSubobjectComputeShader);
+		alignas(void*) std::array<std::byte, maxStreamSize> stream;
+		auto arena = Memory::Arena(stream);
+
+		arena.CreateObject<PipelineStateSubobjectComputeShader>(ToByteCode(params.computeShader));
 
 		if (layout)
 		{
-			arena.Push(PipelineStateSubobjectRootSignature(&ToNativeRootSignature(*layout).GetRootSignature()));
+			arena.CreateObject<PipelineStateSubobjectRootSignature>(&ToNativeRootSignature(*layout).GetRootSignature());
 		}
-
-		arena.Push(PipelineStateSubobjectComputeShader(ToByteCode(params.computeShader)));
 
 		const auto pipelineStateStream = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
@@ -1402,23 +1372,23 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		}
 #endif
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprints = arena.Allocate<D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount);
-		const Memory::Arena::Slice<UINT> rowCounts = arena.Allocate<UINT>(footprintCount);
-		const Memory::Arena::Slice<UINT64> rowSizes = arena.Allocate<UINT64>(footprintCount);
-		const std::span<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprintsSpan = arena.Span(subresourceFootprints);
-		const std::span<UINT> rowCountsSpan = arena.Span(rowCounts);
-		const std::span<UINT64> rowSizesSpan = arena.Span(rowSizes);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount) +
+			Memory::CalculateBufferSize<UINT64, D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount) +
+			Memory::CalculateBufferSize<UINT, UINT64>(footprintCount);
+		const auto buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<D3D12_PLACED_SUBRESOURCE_FOOTPRINT> subresourceFootprints = arena.AllocateArray<D3D12_PLACED_SUBRESOURCE_FOOTPRINT>(footprintCount);
+		const std::span<UINT64> rowSizes = arena.AllocateArray<UINT64>(footprintCount);
+		const std::span<UINT> rowCounts = arena.AllocateArray<UINT>(footprintCount);
 
 		UINT64 totalSize = 0ull;
 		const bool hasMipGaps = (arrayCount > 1u || planeCount > 1u) && mipCount != resourceDesc.MipLevels;
 		const bool hasArrayGaps = planeCount > 1u && arrayCount != arraySize;
 		if (hasMipGaps)
 		{
-			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprintsSpan.data();
-			UINT* rowCount = rowCountsSpan.data();
-			UINT64* rowSize = rowSizesSpan.data();
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprints.data();
+			UINT* rowCount = rowCounts.data();
+			UINT64* rowSize = rowSizes.data();
 
 			for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < planeCount; ++planeIndex)
 			{
@@ -1432,9 +1402,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		else if (hasArrayGaps)
 		{
 			const UINT subresourceCount = mipCount * arrayCount;
-			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprintsSpan.data();
-			UINT* rowCount = rowCountsSpan.data();
-			UINT64* rowSize = rowSizesSpan.data();
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT* footprint = subresourceFootprints.data();
+			UINT* rowCount = rowCounts.data();
+			UINT64* rowSize = rowSizes.data();
 
 			for (UINT8 planeIndex = ToFirstPlaneIndex(range.aspects); planeIndex < planeCount; ++planeIndex, footprint += subresourceCount, rowCount += subresourceCount, rowSize += subresourceCount)
 			{
@@ -1447,7 +1417,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 			const UINT footprintOffset = CalculateSubresource(range.mipRange.mostDetailedMipIndex, range.arrayRange.firstArrayIndex, ToFirstPlaneIndex(range.aspects), 
 				resourceDesc.MipLevels, arraySize);
 			totalSize = device.GetCopyableFootprints(resourceDesc, footprintOffset, footprintCount, offset, 
-				subresourceFootprintsSpan.data(), rowCountsSpan.data(), rowSizesSpan.data());
+				subresourceFootprints.data(), rowCounts.data(), rowSizes.data());
 		}
 
 		UINT16 mipIndex = 0u;
@@ -1457,13 +1427,13 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		{
 			footprints[i] = CopyableFootprint
 			{
-				.offset = subresourceFootprintsSpan[i].Offset,
-				.rowSize = rowSizesSpan[i],
-				.rowPitch = subresourceFootprintsSpan[i].Footprint.RowPitch,
-				.rowCount = rowCountsSpan[i],
-				.width = subresourceFootprintsSpan[i].Footprint.Width,
-				.height = subresourceFootprintsSpan[i].Footprint.Height,
-				.depth = subresourceFootprintsSpan[i].Footprint.Depth,
+				.offset = subresourceFootprints[i].Offset,
+				.rowSize = rowSizes[i],
+				.rowPitch = subresourceFootprints[i].Footprint.RowPitch,
+				.rowCount = rowCounts[i],
+				.width = subresourceFootprints[i].Footprint.Width,
+				.height = subresourceFootprints[i].Footprint.Height,
+				.depth = subresourceFootprints[i].Footprint.Depth,
 				.arrayIndex = static_cast<std::uint16_t>(range.arrayRange.firstArrayIndex + arrayIndex),
 				.mipIndex = static_cast<std::uint8_t>(range.mipRange.mostDetailedMipIndex + mipIndex),
 				.aspect = ToValue(static_cast<AspectMask>(1u << std::countr_zero(std::to_underlying(range.aspects)) << planeIndex))
@@ -1481,7 +1451,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		UINT64 totalRowSizes = 0ull;
 		for (std::size_t i = 0uz; i < footprintCount; ++i)
 		{
-			totalRowSizes += rowSizesSpan[i] * subresourceFootprintsSpan[i].Footprint.Depth * rowCountsSpan[i];
+			totalRowSizes += rowSizes[i] * subresourceFootprints[i].Footprint.Depth * rowCounts[i];
 		}
 
 		return CopyableFootprintSize{.sourceTotalSize = totalRowSizes, .destinationTotalSize = totalSize};
@@ -1679,6 +1649,54 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		}
 	}
 
+	std::pair<Application::ScopedTempBuffer, std::span<DXGI_FORMAT>> Engine::CreateCastableFormats(DXGI_FORMAT& format, const bool srgb, const TextureParams& params) const
+	{
+		if (IsDepthStencilFormat(format))
+		{
+			ValidateDepthTexture(params);
+
+			if (Any(TextureUsage::ShaderResource, params.usage))
+			{
+				if (HasStencil(format))
+				{
+					format = GetTypelessFormat(format);
+					return std::pair<Application::ScopedTempBuffer, std::span<DXGI_FORMAT>>();
+				}
+
+				const DXGI_FORMAT depthViewFormat = GetDepthViewFormat(format);
+				constexpr std::size_t bufferSize = Memory::CalculateBufferSize<DXGI_FORMAT>();
+				auto buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+				auto arena = Memory::Arena(*buffer);
+				const std::span<DXGI_FORMAT> castableFormats = arena.AllocateArray<DXGI_FORMAT>(1uz);
+				castableFormats.front() = depthViewFormat;
+
+				return std::pair(std::move(buffer), castableFormats);
+			}
+
+			return std::pair<Application::ScopedTempBuffer, std::span<DXGI_FORMAT>>();
+		}
+
+		ValidateColorTexture(params);
+
+		const std::size_t castableFormatCount = params.castableFormats.size() + srgb;
+		const std::size_t bufferSize = Memory::CalculateBufferSize<DXGI_FORMAT>(castableFormatCount);
+		auto buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<DXGI_FORMAT> castableFormats = arena.AllocateArray<DXGI_FORMAT>(castableFormatCount);
+
+		for (std::size_t i = 0uz; i < params.castableFormats.size(); ++i)
+		{
+			castableFormats[i] = GetFormat(params.castableFormats[i]);
+		}
+
+		if (srgb)
+		{
+			castableFormats.back() = GetSRGBVariant(format);
+		}
+
+		return std::pair(std::move(buffer), castableFormats);
+	}
+
 	D3D12_SHADER_BYTECODE Engine::ToByteCode(const std::span<const std::byte> byteCode) noexcept
 	{
 		return D3D12_SHADER_BYTECODE{.pShaderBytecode = byteCode.data(), .BytecodeLength = static_cast<SIZE_T>(byteCode.size())};
@@ -1689,25 +1707,25 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 		ValidateCopyRange(ranges);
 
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> sources = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
-		const Memory::Arena::Slice<D3D12_CPU_DESCRIPTOR_HANDLE> destinations = arena.Allocate<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
-		const Memory::Arena::Slice<UINT> rangeSizes = arena.Allocate<UINT>(ranges.size());
-		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> sourcesSpan = arena.Span(sources);
-		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> destinationsSpan = arena.Span(destinations);
-		const std::span<UINT> rangesSizesSpan = arena.Span(rangeSizes);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size()) +
+			Memory::CalculateBufferSize<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size()) +
+			Memory::CalculateBufferSize<UINT, D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
+		const auto buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> sources = arena.AllocateArray<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
+		const std::span<D3D12_CPU_DESCRIPTOR_HANDLE> destinations = arena.AllocateArray<D3D12_CPU_DESCRIPTOR_HANDLE>(ranges.size());
+		const std::span<UINT> rangesSizes = arena.AllocateArray<UINT>(ranges.size());
 
 		for (std::size_t i = 0uz; i < ranges.size(); ++i)
 		{
 			const Range& range = ranges[i];
-			sourcesSpan[i] = ToNativeContainerNotNullptr(range.source)->CpuHandle(range.sourceOffset);
-			destinationsSpan[i] = ToNativeContainerNotNullptr(range.destination)->CpuHandle(range.destinationOffset);
-			rangesSizesSpan[i] = range.count;
+			sources[i] = ToNativeContainerNotNullptr(range.source)->CpuHandle(range.sourceOffset);
+			destinations[i] = ToNativeContainerNotNullptr(range.destination)->CpuHandle(range.destinationOffset);
+			rangesSizes[i] = range.count;
 		}
 
-		device.CopyDescriptors(static_cast<UINT>(ranges.size()), rangesSizesSpan.data(),
-			sourcesSpan.data(), destinationsSpan.data(), type);
+		device.CopyDescriptors(static_cast<UINT>(ranges.size()), rangesSizes.data(),
+			sources.data(), destinations.data(), type);
 
 		for (std::size_t i = 0uz; i < ranges.size(); ++i)
 		{
@@ -1721,29 +1739,29 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	template<typename T>
 	std::shared_ptr<T> Engine::CreateCommandList(const D3D12_COMMAND_LIST_TYPE type)
 	{
-		return std::make_shared<T>(device.CreateCommandAllocator(type), device.CreateCommandList(type));
+		return std::make_shared<T>(*renderDevice, device.CreateCommandAllocator(type), device.CreateCommandList(type));
 	}
 
 	template<typename CommandListInterface>
 	void Engine::Execute(const std::span<const CommandListInterface* const> commandLists, const QueueSync& sync, CommandQueue& commandQueue)
 	{
-		Memory::Arena& arena = Arena();
-		arena.Free();
-		const Memory::Arena::Slice<ID3D12CommandList*> lists = arena.Allocate<ID3D12CommandList*>(commandLists.size());
-		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> beforeFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.before.size());
-		const Memory::Arena::Slice<std::pair<ID3D12Fence*, UINT64>> afterFences = arena.Allocate<std::pair<ID3D12Fence*, UINT64>>(sync.after.size());
-		const std::span<ID3D12CommandList*> listsSpan = arena.Span(lists);
-		const std::span<std::pair<ID3D12Fence*, UINT64>> beforeFencesSpan = arena.Span(beforeFences);
-		const std::span<std::pair<ID3D12Fence*, UINT64>> afterFencesSpan = arena.Span(afterFences);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<ID3D12CommandList*>(commandLists.size()) +
+			Memory::CalculateBufferSize<std::pair<ID3D12Fence*, UINT64>, ID3D12CommandList*>(sync.before.size()) +
+			Memory::CalculateBufferSize<std::pair<ID3D12Fence*, UINT64>, std::pair<ID3D12Fence*, UINT64>>(sync.after.size());
+		const auto buffer = renderDevice->Application().AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<ID3D12CommandList*> lists = arena.AllocateArray<ID3D12CommandList*>(commandLists.size());
+		const std::span<std::pair<ID3D12Fence*, UINT64>> beforeFences = arena.AllocateArray<std::pair<ID3D12Fence*, UINT64>>(sync.before.size());
+		const std::span<std::pair<ID3D12Fence*, UINT64>> afterFences = arena.AllocateArray<std::pair<ID3D12Fence*, UINT64>>(sync.after.size());
 
-		for (std::size_t i = 0uz; i < listsSpan.size(); ++i)
+		for (std::size_t i = 0uz; i < lists.size(); ++i)
 		{
-			listsSpan[i] = &ToNativeCommandListNotNullptr(commandLists[i])->CommandList();
+			lists[i] = &ToNativeCommandListNotNullptr(commandLists[i])->CommandList();
 		}
-		GetFences(sync.before, beforeFencesSpan);
-		GetFences(sync.after, afterFencesSpan);
+		GetFences(sync.before, beforeFences);
+		GetFences(sync.after, afterFences);
 
-		commandQueue.Execute(listsSpan, beforeFencesSpan, afterFencesSpan);
+		commandQueue.Execute(lists, beforeFences, afterFences);
 	}
 
 	void Engine::GetFences(const std::span<const std::pair<IFence*, std::uint64_t>> input, const std::span<std::pair<ID3D12Fence*, UINT64>> output)
@@ -1785,12 +1803,6 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 #endif
 
 		return *swapChain;
-	}
-
-	Memory::Arena& Engine::Arena()
-	{
-		thread_local auto arena = Memory::Arena(0uz, 128uz);
-		return arena;
 	}
 
 	Device Engine::CreateDevice() const

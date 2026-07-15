@@ -87,11 +87,17 @@ export namespace PonyEngine::Surface
 		[[nodiscard("Pure funtion")]]
 		virtual bool IsInFocus() const = 0;
 
-		/// @brief Gets a client title.
-		/// @return Client title. May be a temporal string which must be used immediately.
+		/// @brief Gets the title length.
+		/// @return Title length.
 		/// @note Must be called on a main thread only.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view Title() const = 0;
+		virtual std::size_t TitleLength() const = 0;
+		/// @brief Gets a client title.
+		/// @param title Title buffer. May be smaller than the actual title.
+		/// @return Count of copied chars.
+		/// @note Must be called on a main thread only.
+		[[nodiscard("Pure function")]]
+		virtual std::size_t Title(std::span<char> title) const = 0;
 		/// @brief Sets a client title.
 		/// @param title Client title.
 		/// @remark If the platform doesn't support client titles, the function throws.

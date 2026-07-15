@@ -20,6 +20,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main-IdentityUtility.cppm"
 	"Source/Main-InterfaceContainer.cppm"
 	"Source/Main-LoggerManager.cppm"
+	"Source/Main-MemoryManager.cppm"
 	"Source/Main-ModuleDataContainer.cppm"
 	"Source/Main-ModuleManager.cppm"
 	"Source/Main-PathUtility.cppm"

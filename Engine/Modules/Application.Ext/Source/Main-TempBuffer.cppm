@@ -7,8 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.World.Impl;
+export module PonyEngine.Application.Ext:TempBuffer;
 
-export import PonyEngine.World;
+import std;
 
-export import :WorldServiceModule;
+export namespace PonyEngine::Application
+{
+	/// @brief Temporary buffer.
+	struct TempBuffer final
+	{
+		std::span<std::byte> buffer; ///< Buffer.
+	};
+}

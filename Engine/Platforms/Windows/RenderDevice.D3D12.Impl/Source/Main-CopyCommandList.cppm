@@ -27,15 +27,17 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	public:
 		/// @brief Creates a copy command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Copy command list allocator.
 		/// @param commandList Copy command list.
 		[[nodiscard("Pure constructor")]]
-		CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		CopyCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		/// @brief Creates a copy command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Copy command list allocator.
 		/// @param commandList Copy command list.
 		[[nodiscard("Pure constructor")]]
-		CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
+		CopyCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		CopyCommandList(const CopyCommandList&) = delete;
 		CopyCommandList(CopyCommandList&&) = delete;
 
@@ -77,14 +79,14 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 
 namespace PonyEngine::RenderDevice::D3D12::Windows
 {
-	CopyCommandList::CopyCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
-		commandList(allocator, commandList)
+	CopyCommandList::CopyCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
+		commandList(renderDevice, allocator, commandList)
 	{
 	}
 
-	CopyCommandList::CopyCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
+	CopyCommandList::CopyCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
-		commandList(std::move(allocator), std::move(commandList))
+		commandList(renderDevice, std::move(allocator), std::move(commandList))
 	{
 	}
 

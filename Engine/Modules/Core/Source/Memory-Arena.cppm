@@ -15,59 +15,76 @@ export module PonyEngine.Memory:Arena;
 
 import std;
 
-import PonyEngine.Math;
-
 export namespace PonyEngine::Memory
 {
-	/// @brief The concept is satisfied for pure data types.
-	template<typename T>
-	concept ArenaCompatible = std::is_trivially_copyable_v<T> && std::is_trivially_destructible_v<T>;
-
 	/// @brief Arena memory.
-	/// @details It's a contiguous memory array that can automatically grow.
-	///          It works only with pure data types - it allows fast allocations and deallocations.
 	class Arena final
 	{
 	public:
-		/// @brief Size marker that can be used to free an arena to this point.
+		/// @brief Marker. Used to rewind an arena to previous point.
 		struct Marker final
 		{
-			std::size_t index = 0uz; ///< Marker index. Only an arena may use it.
+			std::size_t mark = 0uz; ///< Mark to rewind to.
 		};
-		/// @brief Data pointer.
-		/// @tparam T Data type.
-		template<ArenaCompatible T>
-		struct Pointer final
+
+		/// @brief Arena scope. Automatically rewinds it on its destruction.
+		class Scope final
 		{
-			std::size_t byteOffset = 0uz; ///< Offset in bytes.
-		};
-		/// @brief Data slice.
-		/// @tparam T Data type.
-		/// @details Because an arena can grow, it would invalidate all previously created spans.
-		///          That's why you should use slices - they keep indices. You can get current spans via functions in an arena.
-		template<ArenaCompatible T>
-		struct Slice final
-		{
-			std::size_t byteOffset = 0uz; ///< Offset in bytes.
-			std::size_t objectCount = 0uz; ///< Count of objects of type @p T.
+		public:
+			[[nodiscard("Pure constructor")]]
+			Scope() noexcept;
+			/// @brief Creates a scope.
+			/// @param arena Arena.
+			/// @param marker Marker to rewind to.
+			[[nodiscard("Pure constructor")]]
+			Scope(class Arena& arena, const Marker& marker) noexcept;
+			Scope(const Scope&) = delete;
+			[[nodiscard("Pure constructor")]]
+			Scope(Scope&& other) noexcept;
+
+			~Scope() noexcept;
+
+			/// @brief Gets the arena.
+			/// @return Arena. May be nullptr.
+			[[nodiscard("Pure function")]]
+			const class Arena* Arena() const noexcept;
+			/// @brief Gets the marker.
+			/// @return Marker.
+			[[nodiscard("Pure function")]]
+			struct Marker Marker() const noexcept;
+
+			/// @brief Releases the scope with rewinding the arena.
+			void Release() noexcept;
+			/// @brief Releases the scope without rewinding the arena.
+			void Forget() noexcept;
+
+			Scope& operator =(const Scope&) = default;
+			Scope& operator =(Scope&& other) noexcept;
+
+		private:
+			class Arena* arena; ///< Arena.
+			struct Marker marker; ///< Marker.
 		};
 
 		/// @brief Creates an arena.
-		/// @param alignment Arena array alignment. It must be at least an alignment of @p std::max_align_t.
-		/// @param reserve Reserve size.
+		/// @param buffer Buffer.
 		[[nodiscard("Pure constructor")]]
-		explicit Arena(std::size_t alignment, std::size_t reserve = 0uz);
+		explicit Arena(std::span<std::byte> buffer) noexcept;
 		[[nodiscard("Pure constructor")]]
-		Arena(const Arena& other);
+		Arena(const Arena&) = delete;
 		[[nodiscard("Pure constructor")]]
-		Arena(Arena&& other) noexcept = default;
+		Arena(Arena&&) = delete;
 
 		~Arena() noexcept = default;
 
-		/// @brief Gets the alignment.
-		/// @return Alignment.
+		/// @brief Gets the data.
+		/// @return Data.
 		[[nodiscard("Pure function")]]
-		std::size_t Alignment() const noexcept;
+		std::byte* Data() noexcept;
+		/// @brief Gets the data.
+		/// @return Data.
+		[[nodiscard("Pure function")]]
+		const std::byte* Data() const noexcept;
 
 		/// @brief Gets the size.
 		/// @return Size.
@@ -78,155 +95,137 @@ export namespace PonyEngine::Memory
 		[[nodiscard("Pure function")]]
 		std::size_t Capacity() const noexcept;
 
-		/// @brief Reserves memory.
-		/// @param reserve Byte count to reserve.
-		void Reserve(std::size_t reserve);
-		/// @brief Realigns the arena.
-		/// @param alignment New alignment.
-		/// @note It can only increase the alignment.
-		void Realign(std::size_t alignment);
-
-		/// @brief Gets a marker.
-		/// @details This marker can be used later to free the arena to a current point.
+		/// @brief Gets a current marker.
 		/// @return Marker.
 		[[nodiscard("Pure function")]]
 		Marker GetMarker() const noexcept;
-
-		/// @brief Gets an object.
-		/// @tparam T Object type.
-		/// @param pointer Data pointer.
-		/// @return Object.
-		template<ArenaCompatible T> [[nodiscard("Pure function")]]
-		T* Object(const Pointer<T>& pointer) noexcept;
-		/// @brief Gets an object.
-		/// @tparam T Object type.
-		/// @param pointer Data pointer.
-		/// @return Object.
-		template<ArenaCompatible T> [[nodiscard("Pure function")]]
-		const T* Object(const Pointer<T>& pointer) const noexcept;
-		/// @brief Gets a data span.
-		/// @tparam T Data type.
-		/// @param slice Data slice.
-		/// @return Data span.
-		template<ArenaCompatible T> [[nodiscard("Pure function")]]
-		std::span<T> Span(const Slice<T>& slice) noexcept;
-		/// @brief Gets a data span.
-		/// @tparam T Data type.
-		/// @param slice Data slice.
-		/// @return Data span.
-		template<ArenaCompatible T> [[nodiscard("Pure function")]]
-		std::span<const T> Span(const Slice<T>& slice) const noexcept;
-
-		/// @brief Gets the data pointer.
-		/// @return Data pointer.
+		/// @brief Gets a current scope.
+		/// @return Scope.
 		[[nodiscard("Pure function")]]
-		std::byte* Data() noexcept;
-		/// @brief Gets the data pointer.
-		/// @return Data pointer.
-		[[nodiscard("Pure function")]]
-		const std::byte* Data() const noexcept;
+		Scope GetScope() noexcept;
+		/// @brief Rewinds the arena to the marker.
+		/// @param marker Marker to rewind to.
+		void Rewind(Marker marker = Marker{}) noexcept;
 
-		/// @brief Allocates new data.
-		/// @param alignment Data alignment. It must be power of two and can't be more than the arena alignment.
-		/// @param size Data size.
-		/// @return Data pointer.
-		[[nodiscard("Weird call")]]
-		Pointer<std::byte> Allocate(std::size_t alignment, std::size_t size);
-		/// @brief Allocates new data.
-		/// @param alignment Data alignment. It must be power of two and can't be more than the arena alignment.
-		/// @param size Data size.
-		/// @param count Data count.
-		/// @return Data slice.
-		[[nodiscard("Weird call")]]
-		Slice<std::byte> Allocate(std::size_t alignment, std::size_t size, std::size_t count);
-		/// @brief Allocates new data.
-		/// @tparam T Data type.
-		/// @return Data pointer.
-		template<ArenaCompatible T> [[nodiscard("Weird call")]]
-		Pointer<T> Allocate();
-		/// @brief Allocates new data.
-		/// @tparam T Data type.
-		/// @param count Data count.
-		/// @return Data slice.
-		template<ArenaCompatible T> [[nodiscard("Weird call")]]
-		Slice<T> Allocate(std::size_t count);
+		/// @brief Allocates a memory for an object.
+		/// @param objectAlignment Object alignment.
+		/// @param objectSize Object size.
+		/// @return Object place.
+		void* AllocateObject(std::size_t objectAlignment, std::size_t objectSize);
+		/// @brief Allocates a memory for an object.
+		/// @tparam T Object type.
+		/// @return Object place.
+		template<typename T>
+		T* AllocateObject();
+		/// @brief Allocates a memory for an object and creates it there.
+		/// @tparam T Object type.
+		/// @tparam Args Object constructor argument types.
+		/// @param args Object constructor arguments.
+		/// @return Object.
+		template<typename T, typename... Args> requires std::constructible_from<T, Args...>
+		T* CreateObject(Args&&... args);
 
-		/// @brief Pushes the data to the arena.
-		/// @param data Data.
-		/// @param alignment Data alignment. It must be power of two and can't be more than the arena alignment.
-		/// @return Data slice.
-		Slice<std::byte> Push(std::span<const std::byte> data, std::size_t alignment);
-		/// @brief Pushes the data to the arena.
-		/// @tparam T Data type.
-		/// @param data Data object.
-		/// @return Data pointer.
-		template<ArenaCompatible T>
-		Pointer<T> Push(const T& data);
-		/// @brief Pushes the data to the arena.
-		/// @tparam T Data type.
-		/// @param data Data span.
-		/// @return Data slice.
-		template<ArenaCompatible T>
-		Slice<T> Push(std::span<const T> data);
+		/// @brief Allocates a memory for an array.
+		/// @param objectAlignment Array element alignment.
+		/// @param objectSize Array element size.
+		/// @param count Array element count.
+		/// @return Array place.
+		void* AllocateArray(std::size_t objectAlignment, std::size_t objectSize, std::size_t count);
+		/// @brief Allocates a memory for an array.
+		/// @tparam T Array element type.
+		/// @param count Array element count.
+		/// @return Array place.
+		template<typename T>
+		std::span<T> AllocateArray(std::size_t count);
+		/// @brief Allocates a memory for an array and creates its elements there.
+		/// @tparam T Array element type.
+		/// @tparam Args Array element constructor argument types.
+		/// @param count Array element count.
+		/// @param args Array element constructor arguments.
+		/// @return Array.
+		template<typename T, typename... Args> requires std::constructible_from<T, Args...>
+		std::span<T> CreateArray(std::size_t count, Args&&... args);
 
-		/// @brief Frees all the data.
-		void Free() noexcept;
-		/// @brief Frees data to the @p marker point.
-		/// @param marker Marker.
-		void Free(Marker marker) noexcept;
-
-		Arena& operator =(const Arena& other);
-		Arena& operator =(Arena&& other) noexcept = default;
+		Arena& operator =(const Arena&) = delete;
+		Arena& operator =(Arena&&) = delete;
 
 	private:
-		/// @brief Data deleter.
-		struct DataDeleter final
-		{
-			std::size_t alignment; ///< Data alignment.
-
-			void operator ()(std::byte* ptr) const noexcept;
-		};
-
-		/// @brief Creates data array.
-		/// @param alignment Data alignment.
-		/// @param size Data size.
-		/// @return Data array.
-		[[nodiscard("Pure function")]]
-		static std::unique_ptr<std::byte[], DataDeleter> CreateData(std::size_t alignment, std::size_t size);
-		/// @brief Allocates new data.
-		/// @param alignment Data alignment. It must be power of two and can't be more than the arena alignment.
-		/// @param size Data size.
-		/// @param count Data count.
-		/// @return Data slice.
-		[[nodiscard("Weird call")]]
-		Slice<std::byte> AllocateRaw(std::size_t alignment, std::size_t size, std::size_t count);
-
-		std::unique_ptr<std::byte[], DataDeleter> data; ///< Data array.
-		std::size_t capacity; ///< Data capacity.
+		std::span<std::byte> buffer; ///< Memory buffer.
 		std::size_t size; ///< Data size.
 	};
 }
 
 namespace PonyEngine::Memory
 {
-	Arena::Arena(const std::size_t alignment, const std::size_t reserve)
+	Arena::Scope::Scope() noexcept :
+		arena{nullptr}
 	{
-		const std::size_t actualAlignment = std::bit_ceil(std::max(alignment, alignof(std::max_align_t)));
-		data = CreateData(actualAlignment, reserve);
-		capacity = reserve;
-		size = 0uz;
 	}
 
-	Arena::Arena(const Arena& other) :
-		Arena(other.Alignment(), other.Size())
+	Arena::Scope::Scope(class Arena& arena, const struct Marker& marker) noexcept :
+		arena{&arena},
+		marker(marker)
 	{
-		std::memcpy(data.get(), other.Data(), Capacity());
-		size = Capacity();
 	}
 
-	std::size_t Arena::Alignment() const noexcept
+	Arena::Scope::Scope(Scope&& other) noexcept :
+		arena{other.arena},
+		marker(other.marker)
 	{
-		return data.get_deleter().alignment;
+		other.Forget();
+	}
+
+	Arena::Scope::~Scope() noexcept
+	{
+		Release();
+	}
+
+	const class Arena* Arena::Scope::Arena() const noexcept
+	{
+		return arena;
+	}
+
+	struct Arena::Marker Arena::Scope::Marker() const noexcept
+	{
+		return marker;
+	}
+
+	void Arena::Scope::Release() noexcept
+	{
+		if (arena)
+		{
+			arena->Rewind(marker);
+			Forget();
+		}
+	}
+
+	void Arena::Scope::Forget() noexcept
+	{
+		arena = nullptr;
+	}
+
+	Arena::Scope& Arena::Scope::operator =(Scope&& other) noexcept
+	{
+		Release();
+		arena = other.arena;
+		other.Forget();
+		return *this;
+	}
+
+	Arena::Arena(const std::span<std::byte> buffer) noexcept :
+		buffer(buffer),
+		size{0uz}
+	{
+	}
+
+	std::byte* Arena::Data() noexcept
+	{
+		return buffer.data();
+	}
+
+	const std::byte* Arena::Data() const noexcept
+	{
+		return buffer.data();
 	}
 
 	std::size_t Arena::Size() const noexcept
@@ -236,192 +235,98 @@ namespace PonyEngine::Memory
 
 	std::size_t Arena::Capacity() const noexcept
 	{
-		return capacity;
-	}
-
-	void Arena::Reserve(const std::size_t reserve)
-	{
-		if (reserve <= capacity)
-		{
-			return;
-		}
-
-		std::unique_ptr<std::byte[], DataDeleter> newData = CreateData(Alignment(), reserve);
-		std::memcpy(newData.get(), data.get(), size);
-		data = std::move(newData);
-		capacity = reserve;
-	}
-
-	void Arena::Realign(const std::size_t alignment)
-	{
-		if (alignment <= Alignment())
-		{
-			return;
-		}
-
-		std::unique_ptr<std::byte[], DataDeleter> newData = CreateData(alignment, capacity);
-		std::memcpy(newData.get(), data.get(), size);
-		data = std::move(newData);
+		return buffer.size();
 	}
 
 	Arena::Marker Arena::GetMarker() const noexcept
 	{
-		return Marker{.index = size};
+		return Marker{.mark = size};
 	}
 
-	template<ArenaCompatible T>
-	T* Arena::Object(const Pointer<T>& pointer) noexcept
+	Arena::Scope Arena::GetScope() noexcept
 	{
-		assert((pointer.byteOffset + sizeof(T) <= size) && "Out of range");
-		return reinterpret_cast<T*>(&data[pointer.byteOffset]);
+		return Scope(*this, GetMarker());
 	}
 
-	template<ArenaCompatible T>
-	const T* Arena::Object(const Pointer<T>& pointer) const noexcept
+	void Arena::Rewind(const Marker marker) noexcept
 	{
-		assert((pointer.byteOffset + sizeof(T) <= size) && "Out of range");
-		return reinterpret_cast<const T*>(&data[pointer.byteOffset]);
+		assert(marker.mark <= size && "Invalid rewind call.");
+		size = marker.mark;
 	}
 
-	template<ArenaCompatible T>
-	std::span<T> Arena::Span(const Slice<T>& slice) noexcept
+	void* Arena::AllocateObject(const std::size_t objectAlignment, const std::size_t objectSize)
 	{
-		assert((slice.byteOffset + sizeof(T) * slice.objectCount <= size) && "Out of range.");
-		return slice.objectCount > 0uz 
-			? std::span<T>(reinterpret_cast<T*>(&data[slice.byteOffset]), slice.objectCount)
-			: std::span<T>();
-	}
-
-	template<ArenaCompatible T>
-	std::span<const T> Arena::Span(const Slice<T>& slice) const noexcept
-	{
-		assert((slice.byteOffset + sizeof(T) * slice.objectCount <= size) && "Out of range.");
-		return slice.objectCount > 0uz
-			? std::span<const T>(reinterpret_cast<const T*>(&data[slice.byteOffset]), slice.objectCount)
-			: std::span<const T>();
-	}
-
-	std::byte* Arena::Data() noexcept
-	{
-		return data.get();
-	}
-
-	const std::byte* Arena::Data() const noexcept
-	{
-		return data.get();
-	}
-
-	Arena::Pointer<std::byte> Arena::Allocate(const std::size_t alignment, const std::size_t size)
-	{
-		const Slice<std::byte> data = Allocate(alignment, size, 1uz);
-		return Pointer<std::byte>{.byteOffset = data.byteOffset};
-	}
-
-	Arena::Slice<std::byte> Arena::Allocate(const std::size_t alignment, const std::size_t size, const std::size_t count)
-	{
-		if (alignment > Alignment()) [[unlikely]]
+		void* pointer = buffer.data() + size;
+		std::size_t space = buffer.size() - size;
+		if (!std::align(objectAlignment, objectSize, pointer, space)) [[unlikely]]
 		{
-			throw std::invalid_argument("Alignment of allocation is greater than alignment of arena");
-		}
-		if (!std::has_single_bit(alignment)) [[unlikely]]
-		{
-			throw std::invalid_argument("Alignment is not power of two");
-		}
-		if (size < alignment) [[unlikely]]
-		{
-			throw std::invalid_argument("Size doesn't match alignment");
+			throw std::bad_alloc();
 		}
 
-		return AllocateRaw(alignment, size, count);
-	}
+		size = buffer.size() - space + objectSize;
 
-	template<ArenaCompatible T>
-	Arena::Pointer<T> Arena::Allocate()
-	{
-		const Slice<T> data = Allocate<T>(1uz);
-		return Pointer<T>{.byteOffset = data.byteOffset};
-	}
-
-	template<ArenaCompatible T>
-	Arena::Slice<T> Arena::Allocate(const std::size_t count)
-	{
-		if (alignof(T) > Alignment()) [[unlikely]]
-		{
-			throw std::invalid_argument("Alignment of allocation is greater than alignment of arena");
-		}
-
-		const Slice<std::byte> byteSlice = AllocateRaw(alignof(T), sizeof(T), count);
-		return Slice<T>{.byteOffset = byteSlice.byteOffset, .objectCount = count};
-	}
-
-	Arena::Slice<std::byte> Arena::Push(const std::span<const std::byte> data, const std::size_t alignment)
-	{
-		const Slice<std::byte> slice = Allocate(alignment, data.size(), 1uz);
-		std::memcpy(Span(slice).data(), data.data(), data.size_bytes());
-		return slice;
-	}
-
-	template<ArenaCompatible T>
-	Arena::Pointer<T> Arena::Push(const T& data)
-	{
-		const Pointer<T> pointer = Allocate<T>();
-		std::memcpy(Object(pointer), &data, sizeof(T));
 		return pointer;
 	}
 
-	template<ArenaCompatible T>
-	Arena::Slice<T> Arena::Push(const std::span<const T> data)
+	template<typename T>
+	T* Arena::AllocateObject()
 	{
-		const Slice<T> slice = Allocate<T>(data.size());
-		std::memcpy(Span(slice).data(), data.data(), data.size_bytes());
-		return slice;
+		return static_cast<T*>(AllocateObject(alignof(T), sizeof(T)));
 	}
 
-	void Arena::Free() noexcept
+	template<typename T, typename... Args> requires std::constructible_from<T, Args...>
+	T* Arena::CreateObject(Args&&... args)
 	{
-		size = 0uz;
-	}
+		const std::size_t prevSize = size;
+		T* const object = AllocateObject<T>();
 
-	void Arena::Free(const Marker marker) noexcept
-	{
-		assert(marker.index <= size && "Out of range.");
-		size = marker.index;
-	}
-
-	Arena& Arena::operator =(const Arena& other)
-	{
-		Arena buffer = other;
-		return *this = std::move(buffer);
-	}
-
-	void Arena::DataDeleter::operator ()(std::byte* const ptr) const noexcept
-	{
-		operator delete[](ptr, std::align_val_t{alignment});
-	}
-
-	std::unique_ptr<std::byte[], Arena::DataDeleter> Arena::CreateData(const std::size_t alignment, const std::size_t size)
-	{
-		return std::unique_ptr<std::byte[], DataDeleter>(static_cast<std::byte*>(operator new[](size, std::align_val_t{alignment})), DataDeleter{.alignment = alignment});
-	}
-
-	Arena::Slice<std::byte> Arena::AllocateRaw(const std::size_t alignment, const std::size_t size, const std::size_t count)
-	{
-		const std::size_t byteCount = size * count;
-		if (byteCount == 0uz)
+		try
 		{
-			return Slice<std::byte>{};
+			return std::construct_at(object, std::forward<Args>(args)...);
+		}
+		catch (...)
+		{
+			size = prevSize;
+			throw;
+		}
+	}
+
+	void* Arena::AllocateArray(const std::size_t objectAlignment, const std::size_t objectSize, const std::size_t count)
+	{
+		return AllocateObject(objectAlignment, objectSize * count);
+	}
+
+	template<typename T>
+	std::span<T> Arena::AllocateArray(const std::size_t count)
+	{
+		return std::span<T>(static_cast<T*>(AllocateArray(alignof(T), sizeof(T), count)), count);
+	}
+
+	template<typename T, typename... Args> requires std::constructible_from<T, Args...>
+	std::span<T> Arena::CreateArray(const std::size_t count, Args&&... args)
+	{
+		const std::size_t prevSize = size;
+		const std::span<T> array = AllocateArray<T>(count);
+
+		std::size_t constructed = 0uz;
+		try
+		{
+			for (; constructed < count; ++constructed)
+			{
+				std::construct_at(&array[constructed], std::forward<Args>(args)...);
+			}
+		}
+		catch (...)
+		{
+			while (constructed-- > 0uz)
+			{
+				std::destroy_at(&array[constructed]);
+			}
+
+			size = prevSize;
+			throw;
 		}
 
-		const std::size_t offset = Math::Align(this->size, alignment);
-		const std::size_t newSize = offset + byteCount;
-		if (newSize > capacity)
-		{
-			const std::size_t alignedSize = newSize > 1uz << (std::numeric_limits<std::size_t>::digits - 1) ? std::numeric_limits<std::size_t>::max() : std::bit_ceil(newSize);
-			Reserve(alignedSize);
-		}
-
-		this->size = newSize;
-
-		return Slice<std::byte>{.byteOffset = offset, .objectCount = byteCount};
+		return array;
 	}
 }

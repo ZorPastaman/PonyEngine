@@ -109,6 +109,10 @@ export namespace PonyEngine::Application::Windows
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t FrameCount() const noexcept override;
 
+		[[nodiscard("Pure function")]] 
+		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment) override;
+		virtual void ReleaseTempBuffer(TempBuffer buffer) noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual HINSTANCE Instance() const noexcept override;
 		[[nodiscard("Pure function")]]
@@ -124,6 +128,7 @@ export namespace PonyEngine::Application::Windows
 		FlowManager flowManager; ///< Flow manager.
 		LoggerManager loggerManager; ///< Logger manager.
 		ThreadManager threadManager; ///< Thread manager.
+		MemoryManager memoryManager; ///< Memory manager.
 		AppDataManager appDataManager; ///< Application data manager.
 		PathManager pathManager; ///< Path manager.
 		ServiceManager serviceManager; ///< Service manager.
@@ -137,6 +142,7 @@ namespace PonyEngine::Application::Windows
 		flowManager(*this),
 		loggerManager(*this, defaultLogger),
 		threadManager(*this),
+		memoryManager(*this),
 		appDataManager(*this, instance, prevInstance, commandLine, showCommand),
 		pathManager(*this),
 		serviceManager(*this),
@@ -276,6 +282,16 @@ namespace PonyEngine::Application::Windows
 	std::uint64_t App::FrameCount() const noexcept
 	{
 		return flowManager.FrameCount();
+	}
+
+	TempBuffer App::AcquireTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
+	{
+		return memoryManager.AcquireTempBuffer(requiredSize, requiredAlignment);
+	}
+
+	void App::ReleaseTempBuffer(const TempBuffer buffer) noexcept
+	{
+		memoryManager.ReleaseTempBuffer(buffer);
 	}
 
 	HINSTANCE App::Instance() const noexcept

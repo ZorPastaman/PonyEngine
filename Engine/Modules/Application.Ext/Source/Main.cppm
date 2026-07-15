@@ -23,3 +23,4 @@ export import :ITickableServiceAdder;
 export import :LoggerHandle;
 export import :ModuleDataHandle;
 export import :ServiceHandle;
+export import :TempBuffer;

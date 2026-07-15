@@ -25,7 +25,6 @@ import PonyEngine.MessagePump;
 import PonyEngine.Surface.Windows;
 import PonyEngine.Type;
 
-import :MemoryManager;
 import :MessageHandler;
 import :RawInputManager;
 import :WindowClass;
@@ -86,8 +85,10 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure funtion")]]
 		virtual bool IsInFocus() const override;
 
+		[[nodiscard("Pure function")]] 
+		virtual std::size_t TitleLength() const override;
 		[[nodiscard("Pure function")]]
-		virtual std::string_view Title() const override;
+		virtual std::size_t Title(std::span<char> title = std::span<char>()) const override;
 		virtual void Title(std::string_view title) override;
 
 		[[nodiscard("Pure function")]]
@@ -293,7 +294,6 @@ export namespace PonyEngine::Surface::Windows
 		Math::Vector2<std::int32_t> lastMessageCursorPosition; ///< Last message cursor position.
 
 		std::shared_ptr<WindowClass> windowClass; ///< Window class.
-		MemoryManager memoryManager; ///< Memory manager.
 		RawInputManager rawInputManager; ///< Raw input manager.
 
 		HWND windowHandle; ///< Window handle.
@@ -316,8 +316,7 @@ namespace PonyEngine::Surface::Windows
 		windowInFocus{false},
 		windowRepositioning{false},
 		windowClass(windowClass),
-		memoryManager(0uz, 64uz),
-		rawInputManager(*this->application, *this, memoryManager)
+		rawInputManager(*this->application, *this)
 	{
 		assert(this->windowClass && "The window class is nullptr.");
 
@@ -621,7 +620,7 @@ namespace PonyEngine::Surface::Windows
 		return windowInFocus;
 	}
 
-	std::string_view SurfaceService::Title() const
+	std::size_t SurfaceService::TitleLength() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -637,24 +636,46 @@ namespace PonyEngine::Surface::Windows
 
 		SetLastError(DWORD{0});
 		const int length = GetWindowTextLengthA(windowHandle);
-		if (!length) [[unlikely]]
+		if (length <= 0) [[unlikely]]
 		{
 			if (const DWORD errorCode = GetLastError()) [[unlikely]]
 			{
 				throw std::runtime_error(std::format("Failed to get window title length: ErrorCode = '0x{:X}'", errorCode));
 			}
 
-			return std::string_view();
+			return 0uz;
 		}
 
-		const std::span<char> title = memoryManager.AllocateTemp<char>(length + 1);
-		const int copied = GetWindowTextA(windowHandle, title.data(), length + 1);
+		return static_cast<std::size_t>(length) + 1uz;
+	}
+
+	std::size_t SurfaceService::Title(std::span<char> title) const
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+
+		if (!IsAlive()) [[unlikely]]
+		{
+			throw std::logic_error("Window is dead");
+		}
+#endif
+
+		if (title.empty()) [[unlikely]]
+		{
+			return 0uz;
+		}
+
+		const int titleLength = static_cast<int>(std::min(title.size(), static_cast<std::size_t>(std::numeric_limits<int>::max())));
+		const int copied = GetWindowTextA(windowHandle, title.data(), titleLength);
 		if (!copied) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to get window title: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
-		return std::string_view(title.data(), copied);
+		return static_cast<std::size_t>(copied);
 	}
 
 	void SurfaceService::Title(const std::string_view title)
