@@ -28,30 +28,11 @@ export namespace PonyEngine::Platform::Windows
 	[[nodiscard("Pure function")]]
 	std::size_t GetWideStringSize(std::string_view source);
 
-	/// @brief Converts std::wstring_view to std::string with UTF-8 encoding.
-	/// @param source Source.
-	/// @return Converted string.
-	[[nodiscard("Pure function")]]
-	std::string ConvertToString(std::wstring_view source);
-	/// @brief Converts std::wstring_view to std::string with UTF-8 encoding.
-	/// @param source Source.
-	/// @param target Converted string.
-	void ConvertToString(std::wstring_view source, std::string& target);
 	/// @brief Converts std::wstring_view to char array with UTF-8 encoding.
 	/// @param source Source.
 	/// @param target Converted string. Must be enough size.
 	/// @return Actual target string size.
 	std::size_t ConvertToString(std::wstring_view source, std::span<char> target);
-
-	/// @brief Converts std::string_view to std::wstring.
-	/// @param source Source with UTF-8 encoding.
-	/// @return Converted string.
-	[[nodiscard("Pure function")]]
-	std::wstring ConvertToWideString(std::string_view source);
-	/// @brief Converts std::string_view to std::wstring.
-	/// @param source Source with UTF-8 encoding.
-	/// @param target Converted string.
-	void ConvertToWideString(std::string_view source, std::wstring& target);
 	/// @brief Converts std::string_view to std::wstring.
 	/// @param source Source with UTF-8 encoding.
 	/// @param target Converted string.
@@ -93,20 +74,6 @@ namespace PonyEngine::Platform::Windows
 		return static_cast<std::size_t>(length);
 	}
 
-	std::string ConvertToString(const std::wstring_view source)
-	{
-		std::string target;
-		ConvertToString(source, target);
-		return target;
-	}
-
-	void ConvertToString(const std::wstring_view source, std::string& target)
-	{
-		const std::size_t size = GetStringSize(source);
-		target.resize(size);
-		ConvertToString(source, std::span(target.data(), target.size()));
-	}
-
 	std::size_t ConvertToString(const std::wstring_view source, const std::span<char> target)
 	{
 		if (source.empty()) [[unlikely]]
@@ -121,20 +88,6 @@ namespace PonyEngine::Platform::Windows
 		}
 
 		return static_cast<std::size_t>(length);
-	}
-
-	std::wstring ConvertToWideString(const std::string_view source)
-	{
-		std::wstring target;
-		ConvertToWideString(source, target);
-		return target;
-	}
-
-	void ConvertToWideString(const std::string_view source, std::wstring& target)
-	{
-		const std::size_t size = GetWideStringSize(source);
-		target.resize(size);
-		ConvertToWideString(source, std::span(target.data(), target.size()));
 	}
 
 	std::size_t ConvertToWideString(const std::string_view source, const std::span<wchar_t> target)

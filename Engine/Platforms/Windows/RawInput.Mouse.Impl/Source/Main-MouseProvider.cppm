@@ -20,6 +20,7 @@ import std;
 
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
+import PonyEngine.Memory;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Mouse.Impl;
 import PonyEngine.Platform.Windows;
@@ -85,9 +86,9 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 		std::size_t GetOrCreateMouse(HANDLE mouseHandle);
 		/// @brief Gets a mouse name.
 		/// @param mouseHandle Mouse native handle.
-		/// @return Mouse index.
+		/// @return Buffer and mouse index.
 		[[nodiscard("Pure function")]]
-		std::string_view GetMouseName(HANDLE mouseHandle) const;
+		std::pair<Application::ScopedTempBuffer, std::string_view> GetMouseName(HANDLE mouseHandle) const;
 
 		/// @brief Updates button states.
 		/// @param source Input source.
@@ -111,8 +112,6 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 		std::size_t registeredDeviceCount; ///< Registered device count.
 		MouseContainer<HANDLE> mouseContainer; ///< Mouse container.
 		MouseEventQueue eventQueue; ///< Mouse event queue.
-
-		mutable std::string deviceNameTemp; ///< Temporary device name.
 	};
 }
 
@@ -181,7 +180,7 @@ namespace PonyEngine::RawInput::Mouse::Windows
 
 		if (isConnected)
 		{
-			const std::string_view name = GetMouseName(device);
+			const auto [buffer, name] = GetMouseName(device);
 			const std::size_t index = mouseContainer.IndexOf(name);
 			if (index < mouseContainer.Size())
 			{
@@ -366,7 +365,7 @@ namespace PonyEngine::RawInput::Mouse::Windows
 		}
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mouseHandle));
-		const std::string_view name = GetMouseName(mouseHandle);
+		const auto [buffer, name] = GetMouseName(mouseHandle);
 		mouseContainer.Add(mouseHandle, DeviceHandle{}, name, true);
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new mouse device done. Native handle: '0x{:X}'; Device name: '{}'.",
 			reinterpret_cast<std::uintptr_t>(mouseHandle), name);
@@ -374,10 +373,16 @@ namespace PonyEngine::RawInput::Mouse::Windows
 		return mouseContainer.Size() - 1uz;
 	}
 
-	std::string_view MouseProvider::GetMouseName(const HANDLE mouseHandle) const
+	std::pair<Application::ScopedTempBuffer, std::string_view> MouseProvider::GetMouseName(const HANDLE mouseHandle) const
 	{
-		Platform::Windows::GetDeviceName(mouseHandle, deviceNameTemp);
-		return deviceNameTemp;
+		const std::size_t nameSize = Platform::Windows::GetDeviceNameSize(mouseHandle);
+		Application::ScopedTempBuffer buffer = input->Application().AcquiredScopedTempBuffer(nameSize);
+		auto arena = Memory::Arena(*buffer);
+
+		std::span<char> name = arena.AllocateArray<char>(buffer->size_bytes());
+		Platform::Windows::GetDeviceName(mouseHandle, name);
+
+		return std::pair<Application::ScopedTempBuffer, std::string_view>(std::move(buffer), name);
 	}
 
 	void MouseProvider::UpdateButtons(const RAWMOUSE& source, const std::size_t mouseIndex)

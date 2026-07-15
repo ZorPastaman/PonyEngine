@@ -87,7 +87,6 @@ export namespace PonyEngine::Surface::Windows
 
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t TitleLength() const override;
-		[[nodiscard("Pure function")]]
 		virtual std::size_t Title(std::span<char> title = std::span<char>()) const override;
 		virtual void Title(std::string_view title) override;
 

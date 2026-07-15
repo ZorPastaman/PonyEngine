@@ -96,7 +96,6 @@ export namespace PonyEngine::Surface
 		/// @param title Title buffer. May be smaller than the actual title.
 		/// @return Count of copied chars.
 		/// @note Must be called on a main thread only.
-		[[nodiscard("Pure function")]]
 		virtual std::size_t Title(std::span<char> title) const = 0;
 		/// @brief Sets a client title.
 		/// @param title Client title.

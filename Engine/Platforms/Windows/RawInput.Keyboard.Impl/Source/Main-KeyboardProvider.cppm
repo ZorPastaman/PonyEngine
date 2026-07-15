@@ -21,6 +21,7 @@ import std;
 import PonyEngine.Application.Ext;
 import PonyEngine.Log;
 import PonyEngine.Math;
+import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Keyboard.Impl;
@@ -88,9 +89,9 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		std::size_t GetOrCreateKeyboard(HANDLE keyboardHandle);
 		/// @brief Gets a keyboard name.
 		/// @param keyboardHandle Keyboard native handle.
-		/// @return Keyboard name.
+		/// @return Buffer and keyboard name.
 		[[nodiscard("Pure function")]]
-		std::string_view GetKeyboardName(HANDLE keyboardHandle) const;
+		std::pair<Application::ScopedTempBuffer, std::string_view> GetKeyboardName(HANDLE keyboardHandle) const;
 
 		IRawInputContext* input; ///< Raw input context.
 		Surface::Windows::ISurfaceService* surface; ///< Surface service.
@@ -101,8 +102,6 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		std::size_t registeredDeviceCount; ///< Registered device count.
 		KeyboardContainer<HANDLE, WORD> keyboardContainer; ///< Keyboard container.
 		KeyboardEventQueue<WORD> eventQueue; ///< Keyboard event queue.
-
-		mutable std::string deviceNameTemp; ///< Temporary device name.
 	};
 }
 
@@ -194,7 +193,7 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 
 		if (isConnected)
 		{
-			const std::string_view name = GetKeyboardName(device);
+			const auto [buffer, name] = GetKeyboardName(device);
 			const std::size_t index = keyboardContainer.IndexOf(name);
 			if (index < keyboardContainer.Size())
 			{
@@ -350,7 +349,7 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 		}
 
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(keyboardHandle));
-		const std::string_view name = GetKeyboardName(keyboardHandle);
+		const auto [buffer, name] = GetKeyboardName(keyboardHandle);
 		keyboardContainer.Add(keyboardHandle, DeviceHandle{}, name, true);
 		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device done. Native handle: '0x{:X}'; Device name: '{}'.", 
 			reinterpret_cast<std::uintptr_t>(keyboardHandle), name);
@@ -358,9 +357,15 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 		return keyboardContainer.Size() - 1uz;
 	}
 
-	std::string_view KeyboardProvider::GetKeyboardName(const HANDLE keyboardHandle) const
+	std::pair<Application::ScopedTempBuffer, std::string_view> KeyboardProvider::GetKeyboardName(const HANDLE keyboardHandle) const
 	{
-		Platform::Windows::GetDeviceName(keyboardHandle, deviceNameTemp);
-		return deviceNameTemp;
+		const std::size_t nameSize = Platform::Windows::GetDeviceNameSize(keyboardHandle);
+		Application::ScopedTempBuffer buffer = input->Application().AcquiredScopedTempBuffer(nameSize);
+		auto arena = Memory::Arena(*buffer);
+
+		std::span<char> name = arena.AllocateArray<char>(buffer->size_bytes());
+		Platform::Windows::GetDeviceName(keyboardHandle, name);
+
+		return std::pair<Application::ScopedTempBuffer, std::string_view>(std::move(buffer), name);
 	}
 }

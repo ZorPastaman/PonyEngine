@@ -22,16 +22,6 @@ export namespace PonyEngine::Platform::Windows
 	/// @return Device name size.
 	[[nodiscard("Pure function")]]
 	std::size_t GetDeviceNameSize(HANDLE deviceHandle);
-
-	/// @brief Gets a device name.
-	/// @param deviceHandle Device handle.
-	/// @return Device name.
-	[[nodiscard("Pure function")]]
-	std::string GetDeviceName(HANDLE deviceHandle);
-	/// @brief Gets a device name.
-	/// @param deviceHandle Device handle.
-	/// @param deviceName Device name.
-	void GetDeviceName(HANDLE deviceHandle, std::string& deviceName);
 	/// @brief Gets a device name.
 	/// @param deviceHandle Device handle.
 	/// @param deviceName Device name. Must be enough size.
@@ -51,21 +41,6 @@ namespace PonyEngine::Platform::Windows
 		}
 
 		return size;
-	}
-
-	std::string GetDeviceName(const HANDLE deviceHandle)
-	{
-		std::string deviceName;
-		GetDeviceName(deviceHandle, deviceName);
-		return deviceName;
-	}
-
-	void GetDeviceName(const HANDLE deviceHandle, std::string& deviceName)
-	{
-		const std::size_t size = GetDeviceNameSize(deviceHandle);
-		deviceName.resize(size);
-		const std::size_t copied = GetDeviceName(deviceHandle, std::span<char>(deviceName.data(), deviceName.size()));
-		deviceName.resize(copied);
 	}
 
 	std::size_t GetDeviceName(const HANDLE deviceHandle, const std::span<char> deviceName)
