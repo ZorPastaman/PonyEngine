@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Object/Body.h"
 
 export module PonyEngine.Application.Ext:IApplicationContext;
@@ -19,9 +21,13 @@ import PonyEngine.Log;
 import PonyEngine.Meta;
 
 import :FlowState;
+import :TempBuffer;
 
 export namespace PonyEngine::Application
 {
+	/// @brief Temporary buffer that is released automatically when this struct goes out of scope.
+	class ScopedTempBuffer;
+
 	/// @brief Application context.
 	class IApplicationContext
 	{
@@ -191,6 +197,78 @@ export namespace PonyEngine::Application
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t FrameCount() const noexcept = 0;
+
+		/// @brief Acquires a temporary buffer.
+		/// @param requiredSize Required size.
+		/// @param requiredAlignment Required alignment. Must be a valid alignment value and at least alignof(std::max_align_t).
+		/// @return Temporary buffer.
+		/// @note Each thread has its own pool of buffers.
+		[[nodiscard("Pure function")]]
+		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment = alignof(std::max_align_t)) = 0;
+		/// @brief Releases the temporary buffer.
+		/// @param buffer Temporary buffer.
+		/// @note The buffer must be returned on the same thread it was acquired.
+		virtual void ReleaseTempBuffer(TempBuffer buffer) noexcept = 0;
+		/// @brief Acquires a scoped temporary buffer.
+		/// @param requiredSize Required size.
+		/// @param requiredAlignment Required alignment. Must be a valid alignment value and at least alignof(std::max_align_t).
+		/// @return Scoped temporary buffer.
+		/// @note Each thread has its own pool of buffers.
+		/// @note The buffer must be destroyed on the same thread it was acquired.
+		[[nodiscard("Pure function")]]
+		ScopedTempBuffer AcquiredScopedTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment = alignof(std::max_align_t));
+	};
+
+	class ScopedTempBuffer final
+	{
+	public:
+		/// @brief Creates an empty scoped temporary buffer.
+		[[nodiscard("Pure constructor")]]
+		ScopedTempBuffer() noexcept;
+		/// @brief Creates a scoped temporary buffer.
+		/// @param buffer Temporary buffer. Must be an alive buffer.
+		/// @param application Application.
+		[[nodiscard("Pure constructor")]]
+		ScopedTempBuffer(TempBuffer buffer, IApplicationContext& application) noexcept;
+		ScopedTempBuffer(const ScopedTempBuffer&) = delete;
+		[[nodiscard("Pure constructor")]]
+		ScopedTempBuffer(ScopedTempBuffer&& other) noexcept;
+
+		~ScopedTempBuffer() noexcept;
+
+		/// @brief Releases the temporary buffer.
+		void Release() noexcept;
+		/// @brief Forgets the temporary buffer.
+		void Forget() noexcept;
+
+		/// @brief Gets the buffer.
+		/// @return Buffer.
+		[[nodiscard("Pure function")]]
+		const std::span<std::byte>* Get() const noexcept;
+		/// @brief Gets the temp buffer.
+		/// @return Temp buffer.
+		[[nodiscard("Pure function")]]
+		const TempBuffer& Buffer() const noexcept;
+		/// @brief Gets the application.
+		/// @return Application.
+		[[nodiscard("Pure function")]]
+		IApplicationContext* Application() const noexcept;
+
+		/// @brief Checks if it has a valid buffer.
+		[[nodiscard("Pure operator")]]
+		explicit operator bool() const noexcept;
+
+		[[nodiscard("Pure operator")]]
+		const std::span<std::byte>& operator *() const noexcept;
+		[[nodiscard("Pure operator")]]
+		const std::span<std::byte>* operator ->() const noexcept;
+
+		ScopedTempBuffer& operator =(const ScopedTempBuffer&) = delete;
+		ScopedTempBuffer& operator =(ScopedTempBuffer&& other) noexcept;
+
+	private:
+		TempBuffer buffer; ///< Temporary buffer.
+		IApplicationContext* application; ///< Application.
 	};
 }
 
@@ -234,5 +312,89 @@ namespace PonyEngine::Application
 #endif
 
 		return *service;
+	}
+
+	ScopedTempBuffer IApplicationContext::AcquiredScopedTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
+	{
+		return ScopedTempBuffer(AcquireTempBuffer(requiredSize, requiredAlignment), *this);
+	}
+
+	ScopedTempBuffer::ScopedTempBuffer() noexcept :
+		application{nullptr}
+	{
+	}
+
+	ScopedTempBuffer::ScopedTempBuffer(const TempBuffer buffer, IApplicationContext& application) noexcept :
+		buffer(buffer),
+		application{&application}
+	{
+		assert(this->buffer.buffer.data() && "Invalid buffer.");
+	}
+
+	ScopedTempBuffer::ScopedTempBuffer(ScopedTempBuffer&& other) noexcept :
+		buffer(other.buffer),
+		application{other.application}
+	{
+		other.Forget();
+	}
+
+	ScopedTempBuffer::~ScopedTempBuffer() noexcept
+	{
+		Release();
+	}
+
+	void ScopedTempBuffer::Release() noexcept
+	{
+		if (application)
+		{
+			application->ReleaseTempBuffer(buffer);
+			Forget();
+		}
+	}
+
+	void ScopedTempBuffer::Forget() noexcept
+	{
+		buffer = TempBuffer{};
+		application = nullptr;
+	}
+
+	const std::span<std::byte>* ScopedTempBuffer::Get() const noexcept
+	{
+		return application ? &buffer.buffer : nullptr;
+	}
+
+	const TempBuffer& ScopedTempBuffer::Buffer() const noexcept
+	{
+		return buffer;
+	}
+
+	IApplicationContext* ScopedTempBuffer::Application() const noexcept
+	{
+		return application;
+	}
+
+	ScopedTempBuffer::operator bool() const noexcept
+	{
+		return application;
+	}
+
+	const std::span<std::byte>& ScopedTempBuffer::operator *() const noexcept
+	{
+		return *Get();
+	}
+
+	const std::span<std::byte>* ScopedTempBuffer::operator ->() const noexcept
+	{
+		return Get();
+	}
+
+	ScopedTempBuffer& ScopedTempBuffer::operator =(ScopedTempBuffer&& other) noexcept
+	{
+		Release();
+		buffer = other.buffer;
+		application = other.application;
+		other.Forget();
+
+		return *this;
 	}
 }

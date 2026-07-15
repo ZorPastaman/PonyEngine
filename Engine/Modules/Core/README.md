@@ -2,8 +2,6 @@
 
 Core utilities module.
 
-The engine uses a left-handed coordinate system where X is right, Y is up, and Z is forward. The rotation order is ZXY (roll-pitch-yaw). The matrices are column-major.
-
 The module requires a compiler specific implementation.
 
 ## C\++ modules
@@ -25,6 +23,9 @@ Hash algorithms:
 ### [PonyEngine.Math](Source/Math.cppm)
 
 Math utilities.
+
+The engine uses a left-handed coordinate system where X is right, Y is up, and Z is forward. 
+The rotation order is ZXY (roll-pitch-yaw). The matrices are column-major.
 
 Basic classes:
 - [Vector](Source/Math-Vector.cppm)
@@ -65,15 +66,7 @@ Utilities for memory management.
 
 Classes:
 - [Arena](Source/Memory-Arena.cppm) - arena memory allocator;
-- [Pool](Source/Memory-Pool.cppm) - object pool.
-
-### [PonyEngine.Serialization](Source/Serialization.cppm)
-
-Utilities for serialization/deserialization in binary and text formats.
-
-Utilities:
-- [Basic](Source/Serialization-Basic.cppm) - utilities for serialization/deserialization of unique values;
-- [Array](Source/Serialization-Array.cppm) - utilities for serialization/deserialization of value arrays.
+- [Utility](Source/Memory-Utility.cppm) - utilities for memory management.
 
 ### [PonyEngine.Type](Source/Type.cppm)
 

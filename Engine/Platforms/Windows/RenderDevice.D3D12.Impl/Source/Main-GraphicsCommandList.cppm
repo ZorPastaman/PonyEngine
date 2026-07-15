@@ -31,15 +31,17 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	public:
 		/// @brief Creates a graphics command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Graphics command list allocator.
 		/// @param commandList Graphics command list.
 		[[nodiscard("Pure constructor")]]
-		GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		GraphicsCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		/// @brief Creates a graphics command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Graphics command list allocator.
 		/// @param commandList Graphics command list.
 		[[nodiscard("Pure constructor")]]
-		GraphicsCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
+		GraphicsCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		GraphicsCommandList(const GraphicsCommandList&) = delete;
 		GraphicsCommandList(GraphicsCommandList&&) = delete;
 
@@ -119,14 +121,14 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 
 namespace PonyEngine::RenderDevice::D3D12::Windows
 {
-	GraphicsCommandList::GraphicsCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
-		commandList(allocator, commandList)
+	GraphicsCommandList::GraphicsCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
+		commandList(renderDevice, allocator, commandList)
 	{
 	}
 
-	GraphicsCommandList::GraphicsCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, 
+	GraphicsCommandList::GraphicsCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
-		commandList(std::move(allocator), std::move(commandList))
+		commandList(renderDevice, std::move(allocator), std::move(commandList))
 	{
 	}
 

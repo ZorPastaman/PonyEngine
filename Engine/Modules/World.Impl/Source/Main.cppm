@@ -9,4 +9,6 @@
 
 export module PonyEngine.World.Impl;
 
+export import PonyEngine.World;
+
 export import :WorldServiceModule;

@@ -11,6 +11,7 @@ export module PonyEngine.World.Impl:ObjectTable;
 
 import std;
 
+import PonyEngine.Application.Ext;
 import PonyEngine.Memory;
 import PonyEngine.World;
 
@@ -35,8 +36,10 @@ export namespace PonyEngine::World
 	class ObjectTable final
 	{
 	public:
+		/// @brief Creates an object table.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		ObjectTable() noexcept = default;
+		explicit ObjectTable(Application::IApplicationContext& application) noexcept;
 		ObjectTable(const ObjectTable&) = delete;
 		ObjectTable(ObjectTable&&) = delete;
 
@@ -75,9 +78,8 @@ export namespace PonyEngine::World
 		/// @param typeRegistry Type registry.
 		/// @param componentTables Component table.
 		/// @param componentTablesIndices Component table index map.
-		/// @param arena Arena.
 		void CollectGarbage(const TypeRegistry& typeRegistry, std::span<const ComponentTable> componentTables, 
-			const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices, Memory::Arena& arena);
+			const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices);
 
 		ObjectTable& operator =(const ObjectTable&) = delete;
 		ObjectTable& operator =(ObjectTable&&) = delete;
@@ -112,6 +114,8 @@ export namespace PonyEngine::World
 		/// @param handleId Object handle ID.
 		void KillObject(HandleID handleId);
 
+		Application::IApplicationContext* application; ///< Application.
+
 		std::vector<HandleID> objectsSparse; ///< Sparse.
 		std::vector<HandleVersion> handleVersions; ///< Handle versions. Synced with the @p objectsSparse by index.
 		std::vector<HandleID> objectsDense; ///< Dense.
@@ -125,6 +129,11 @@ export namespace PonyEngine::World
 
 namespace PonyEngine::World
 {
+	ObjectTable::ObjectTable(Application::IApplicationContext& application) noexcept :
+		application{&application}
+	{
+	}
+
 	TypelessObjectHandle ObjectTable::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
 	{
 		if (const std::optional<TypelessObjectHandle> fromExisting = TryFindObject(objectType, object))
@@ -183,7 +192,7 @@ namespace PonyEngine::World
 	}
 
 	void ObjectTable::CollectGarbage(const TypeRegistry& typeRegistry, const std::span<const ComponentTable> componentTables, 
-		const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices, Memory::Arena& arena)
+		const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices)
 	{
 		if (objectsDense.empty()) [[unlikely]]
 		{
@@ -191,12 +200,13 @@ namespace PonyEngine::World
 		}
 
 		const std::size_t denseSize = objectsDense.size();
-		const Memory::Arena::Slice<bool> aliveObjectFlagsSlice = arena.Allocate<bool>(denseSize + 1uz); // The last element is a fake flag to remove a branch in the loop.
-		const Memory::Arena::Slice<HandleID> objectsToRemoveSlice = arena.Allocate<HandleID>(denseSize);
-		const std::span<bool> aliveObjectFlags = arena.Span(aliveObjectFlagsSlice);
-		const std::span<HandleID> objectsToRemove = arena.Span(objectsToRemoveSlice);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<HandleID>(denseSize) + Memory::CalculateBufferSize<bool, HandleID>(denseSize);
+		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		auto arena = Memory::Arena(*buffer);
+		const std::span<HandleID> objectsToRemove = arena.AllocateArray<HandleID>(denseSize);
+		const std::span<bool> aliveObjectFlags = arena.AllocateArray<bool>(denseSize);
 
-		std::fill_n(aliveObjectFlags.data(), denseSize, false);
+		std::ranges::fill(aliveObjectFlags, false);
 
 		for (std::size_t foundCount = 0uz; const auto [componentType, componentTableIndex] : componentTablesIndices)
 		{
@@ -214,11 +224,13 @@ namespace PonyEngine::World
 				for (const auto [offset, objectType] : objectOffsets)
 				{
 					const TypelessObjectHandle handle = *reinterpret_cast<const TypelessObjectHandle*>(component + offset);
-					const bool isValid = IsObjectValid(objectType, handle);
-					const std::size_t validIndex = handle.id;
-					const std::size_t flagIndex = isValid ? validIndex : denseSize;
-					
-					foundCount += isValid && !aliveObjectFlags[flagIndex];
+					if (!IsObjectValid(objectType, handle)) [[unlikely]]
+					{
+						continue;
+					}
+
+					const HandleID flagIndex = objectsSparse[handle.id];
+					foundCount += !aliveObjectFlags[flagIndex];
 					aliveObjectFlags[flagIndex] = true;
 
 					if (foundCount >= denseSize) [[unlikely]]

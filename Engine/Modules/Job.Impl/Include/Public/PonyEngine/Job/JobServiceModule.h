@@ -16,7 +16,7 @@ import PonyEngine.Application.Ext;
 namespace PonyEngine::Job
 {
 	/// @brief Gets the job service module.
-	/// @return JOb service module.
+	/// @return Job service module.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT Application::IModule* GetJobServiceModule();
 }

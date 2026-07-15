@@ -30,15 +30,17 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	public:
 		/// @brief Creates a compute command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Compute command allocator.
 		/// @param commandList Compute command list.
 		[[nodiscard("Pure constructor")]]
-		ComputeCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
+		ComputeCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList);
 		/// @brief Creates a compute command list wrapper.
+		/// @param renderDevice Render device.
 		/// @param allocator Compute command allocator.
 		/// @param commandList Compute command list.
 		[[nodiscard("Pure constructor")]]
-		ComputeCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
+		ComputeCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		ComputeCommandList(const ComputeCommandList&) = delete;
 		ComputeCommandList(ComputeCommandList&&) = delete;
 
@@ -97,14 +99,14 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 
 namespace PonyEngine::RenderDevice::D3D12::Windows
 {
-	ComputeCommandList::ComputeCommandList(ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
-		commandList(allocator, commandList)
+	ComputeCommandList::ComputeCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
+		commandList(renderDevice, allocator, commandList)
 	{
 	}
 
-	ComputeCommandList::ComputeCommandList(Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
+	ComputeCommandList::ComputeCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
 		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
-		commandList(std::move(allocator), std::move(commandList))
+		commandList(renderDevice, std::move(allocator), std::move(commandList))
 	{
 	}
 

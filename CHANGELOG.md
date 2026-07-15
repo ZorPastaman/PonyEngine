@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 
 - Axis and DeviceType classes removed from raw input module. Now usual string views are used instead.
+- Serialization C/++ module from Core module.
 
 ## [0.1.1] - 2026-04-21
 

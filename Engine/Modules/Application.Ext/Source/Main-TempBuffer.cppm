@@ -7,7 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Serialization;
+export module PonyEngine.Application.Ext:TempBuffer;
 
-export import :Array;
-export import :Basic;
+import std;
+
+export namespace PonyEngine::Application
+{
+	/// @brief Temporary buffer.
+	struct TempBuffer final
+	{
+		std::span<std::byte> buffer; ///< Buffer.
+	};
+}
