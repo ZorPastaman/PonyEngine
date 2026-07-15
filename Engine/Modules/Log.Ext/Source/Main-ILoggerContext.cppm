@@ -15,7 +15,7 @@ export module PonyEngine.Log.Ext:ILoggerContext;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 export namespace PonyEngine::Log
@@ -25,18 +25,18 @@ export namespace PonyEngine::Log
 	{
 		PONY_INTERFACE_BODY(ILoggerContext)
 
-		/// @brief Gets the application context.
-		/// @return Application context.
-		/// @note Don't call the logger of the application context.
+		/// @brief Gets the application.
+		/// @return Application.
+		/// @note Don't call the logger of the application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept = 0;
-		/// @brief Gets the application context.
-		/// @return Application context.
-		/// @note Don't call the logger of the application context.
+		virtual Application::IApplication& Application() noexcept = 0;
+		/// @brief Gets the application.
+		/// @return Application.
+		/// @note Don't call the logger of the application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+		virtual const Application::IApplication& Application() const noexcept = 0;
 
 		/// @brief Logs a message to a console.
 		/// @param logType Log type.

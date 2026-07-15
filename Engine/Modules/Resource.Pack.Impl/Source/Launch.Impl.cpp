@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Resource/PackResourceProviderModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Resource.Pack.Impl;
 
 namespace PonyEngine::Resource::Pack

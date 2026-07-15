@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Job/JobServiceModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Job.Impl;
 
 namespace PonyEngine::Job

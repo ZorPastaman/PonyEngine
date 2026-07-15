@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Time/TimeServiceModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Time.Impl;
 
 namespace PonyEngine::Time

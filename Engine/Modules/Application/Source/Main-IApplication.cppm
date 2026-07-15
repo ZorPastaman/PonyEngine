@@ -13,7 +13,7 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application.Ext:IApplicationContext;
+export module PonyEngine.Application:IApplication;
 
 import std;
 
@@ -28,10 +28,10 @@ export namespace PonyEngine::Application
 	/// @brief Temporary buffer that is released automatically when this struct goes out of scope.
 	class ScopedTempBuffer;
 
-	/// @brief Application context.
-	class IApplicationContext
+	/// @brief Application.
+	class IApplication
 	{
-		PONY_INTERFACE_BODY(IApplicationContext)
+		PONY_INTERFACE_BODY(IApplication)
 
 		/// @brief Gets the engine name.
 		/// @return Engine name.
@@ -229,7 +229,7 @@ export namespace PonyEngine::Application
 		/// @param buffer Temporary buffer. Must be an alive buffer.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		ScopedTempBuffer(TempBuffer buffer, IApplicationContext& application) noexcept;
+		ScopedTempBuffer(TempBuffer buffer, IApplication& application) noexcept;
 		ScopedTempBuffer(const ScopedTempBuffer&) = delete;
 		[[nodiscard("Pure constructor")]]
 		ScopedTempBuffer(ScopedTempBuffer&& other) noexcept;
@@ -252,7 +252,7 @@ export namespace PonyEngine::Application
 		/// @brief Gets the application.
 		/// @return Application.
 		[[nodiscard("Pure function")]]
-		IApplicationContext* Application() const noexcept;
+		IApplication* Application() const noexcept;
 
 		/// @brief Checks if it has a valid buffer.
 		[[nodiscard("Pure operator")]]
@@ -268,26 +268,26 @@ export namespace PonyEngine::Application
 
 	private:
 		TempBuffer buffer; ///< Temporary buffer.
-		IApplicationContext* application; ///< Application.
+		IApplication* application; ///< Application.
 	};
 }
 
 namespace PonyEngine::Application
 {
 	template<typename T>
-	T* IApplicationContext::FindService() noexcept
+	T* IApplication::FindService() noexcept
 	{
 		return static_cast<T*>(FindService(typeid(T)));
 	}
 
 	template<typename T>
-	const T* IApplicationContext::FindService() const noexcept
+	const T* IApplication::FindService() const noexcept
 	{
 		return static_cast<const T*>(FindService(typeid(T)));
 	}
 
 	template<typename T>
-	T& IApplicationContext::GetService()
+	T& IApplication::GetService()
 	{
 		T* const service = FindService<T>();
 #ifndef NDEBUG
@@ -301,7 +301,7 @@ namespace PonyEngine::Application
 	}
 
 	template<typename T>
-	const T& IApplicationContext::GetService() const
+	const T& IApplication::GetService() const
 	{
 		const T* const service = FindService<T>();
 #ifndef NDEBUG
@@ -314,7 +314,7 @@ namespace PonyEngine::Application
 		return *service;
 	}
 
-	ScopedTempBuffer IApplicationContext::AcquiredScopedTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
+	ScopedTempBuffer IApplication::AcquiredScopedTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
 	{
 		return ScopedTempBuffer(AcquireTempBuffer(requiredSize, requiredAlignment), *this);
 	}
@@ -324,7 +324,7 @@ namespace PonyEngine::Application
 	{
 	}
 
-	ScopedTempBuffer::ScopedTempBuffer(const TempBuffer buffer, IApplicationContext& application) noexcept :
+	ScopedTempBuffer::ScopedTempBuffer(const TempBuffer buffer, IApplication& application) noexcept :
 		buffer(buffer),
 		application{&application}
 	{
@@ -368,7 +368,7 @@ namespace PonyEngine::Application
 		return buffer;
 	}
 
-	IApplicationContext* ScopedTempBuffer::Application() const noexcept
+	IApplication* ScopedTempBuffer::Application() const noexcept
 	{
 		return application;
 	}

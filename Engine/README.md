@@ -20,7 +20,7 @@ These modules are always added to a build.
 |:--------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------|
 | [PonyEngine.Core](Modules/Core)                         | Core utilities module: Math, Hash, Meta, Memory and Type utilities.                                 |
 | [PonyEngine.Log](Modules/Log)                           | Logging API module.                                                                                                |
-| [PonyEngine.Application.Ext](Modules/Application.Ext)   | Application extension API module. Provides interfaces access to engine services, logging, and application context. |
+| [PonyEngine.Application](Modules/Application)   | Application extension API module. Provides interfaces access to engine services, logging, and application. |
 
 ### Optional modules
 
@@ -75,7 +75,7 @@ The table of the module-platform compatibility:
 | Module name                                                                     | Requires platform implementation | [Windows](Platforms/Windows) |
 |:--------------------------------------------------------------------------------|:--------------------------------:|:---------------------------:|
 | [PonyEngine.Core](Modules/Core)                                                 | -                                | &check;                     |
-| [PonyEngine.Application.Ext](Modules/Application.Ext)                           | -                                | &check;                     |
+| [PonyEngine.Application](Modules/Application)                           | -                                | &check;                     |
 | [PonyEngine.Application.Impl](Modules/Application.Impl)                         | &check;                          | &check;                     |
 | [PonyEngine.Time](Modules/Time)                                                 | -                                | &check;                     |
 | [PonyEngine.Time.Impl](Modules/Time.Impl)                                       | -                                | &check;                     |
@@ -149,7 +149,7 @@ See [PonyEngine.Core docs](Modules/Core) for details.
 
 The engine allows adding custom game modules to the application. These modules are then executed as part of the application lifecycle.
 
-See the [Application.Ext docs](Modules/Application.Ext) for details.
+See the [Application docs](Modules/Application) for details.
 
 If the modules do not need to be referenced by the engine application, no special setup is required.
 

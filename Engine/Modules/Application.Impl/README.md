@@ -1,6 +1,6 @@
 # PonyEngine.Application.Impl module
 
-Application implementation module. Implements [PonyEngine.Application.Ext](../Application.Ext).
+Application implementation module. Implements [PonyEngine.Application](../Application).
 
 The module also has `main()` function.
 
@@ -10,7 +10,7 @@ The module requires a platform specific implementation.
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 
 ## CMake variables
 
@@ -23,7 +23,7 @@ These variables are used to configure the build of the module:
 
 ## For Pony Engine developers
 
-The module contains a bunch of platform-independent managers. The platform implementation must provide a `main()` function and `IApplicationContext` implementation.
+The module contains a bunch of platform-independent managers. The platform implementation must provide a `main()` function and `IApplication` implementation.
 The idea is that the application class is just an orchestrator for different managers. The `main()` function should create the application class and run it.
 
 ### Managers:

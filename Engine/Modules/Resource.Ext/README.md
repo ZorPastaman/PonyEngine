@@ -10,7 +10,7 @@ It allows to add different ways of resource delivery.
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Resource](../Resource)
 
 ## C\++ modules
@@ -25,7 +25,7 @@ Resource provider interface. Each resource provider added to the resource servic
 
 #### [IResourceContext](Source/Main-IResourceContext.cppm)
 
-Interface representing the resource service context. Provides access to the application context, logger and resource management functions.
+Interface representing the resource service context. Provides access to the application, logger and resource management functions.
 
 #### [IResourceModuleContext](Source/Main-IResourceModuleContext.cppm)
 

@@ -15,7 +15,7 @@ export module PonyEngine.Job.Impl:JobServiceModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 import :JobService;
 
@@ -48,7 +48,7 @@ namespace PonyEngine::Job
 	void JobServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(JobService).name());
-		jobServiceHandle = context.ServiceModuleContext().AddService([](Application::IApplicationContext& application)
+		jobServiceHandle = context.ServiceModuleContext().AddService([](Application::IApplication& application)
 		{
 			return std::make_shared<JobService>(application);
 		});

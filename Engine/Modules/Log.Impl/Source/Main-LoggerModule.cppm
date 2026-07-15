@@ -15,7 +15,7 @@ export module PonyEngine.Log.Impl:LoggerModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :Logger;

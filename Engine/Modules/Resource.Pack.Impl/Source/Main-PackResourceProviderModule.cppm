@@ -15,7 +15,7 @@ export module PonyEngine.Resource.Pack.Impl:PackResourceProviderModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Resource.Ext;
 

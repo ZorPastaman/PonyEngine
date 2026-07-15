@@ -18,7 +18,7 @@ export module PonyEngine.RawInput.XInput.Impl.Windows:XInputProvider;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;

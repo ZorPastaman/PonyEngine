@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Resource/ResourceServiceModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Resource.Impl;
 
 namespace PonyEngine::Resource

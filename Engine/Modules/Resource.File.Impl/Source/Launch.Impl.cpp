@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Resource/FileResourceProviderModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Resource.File.Impl;
 
 namespace PonyEngine::Resource::File

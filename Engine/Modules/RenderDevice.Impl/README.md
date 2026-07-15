@@ -6,7 +6,7 @@ Render device implementation module.
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.RenderDevice](../RenderDevice)
 - [PonyEngine.RenderDevice.Ext](../RenderDevice.Ext)
 

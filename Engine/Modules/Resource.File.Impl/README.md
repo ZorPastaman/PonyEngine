@@ -7,7 +7,7 @@ It's a provider where every resource corresponds to an individual file in a game
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.File](../File)
 - [PonyEngine.Resource](../Resource)
 - [PonyEngine.Resource.Ext](../Resource.Ext)

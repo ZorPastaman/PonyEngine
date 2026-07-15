@@ -14,7 +14,7 @@ if(NOT PONY_IS_SUBPROJECT)
 endif()
 
 add_subdirectory("Core")
-add_subdirectory("Application.Ext")
+add_subdirectory("Application")
 if(TARGET PonyEngine.Application.Impl)
 	add_subdirectory("Application.Impl")
 endif()

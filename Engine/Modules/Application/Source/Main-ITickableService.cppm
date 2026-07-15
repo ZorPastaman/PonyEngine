@@ -11,23 +11,17 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application.Ext:ITickableServiceAdder;
-
-import std;
-
-import :ITickableService;
+export module PonyEngine.Application:ITickableService;
 
 export namespace PonyEngine::Application
 {
-	/// @brief Tickable service adder.
-	class ITickableServiceAdder
+	/// @brief Tickable service.
+	class ITickableService
 	{
-		PONY_INTERFACE_BODY(ITickableServiceAdder)
+		PONY_INTERFACE_BODY(ITickableService)
 
-		/// @brief Adds a tickable service.
-		/// @param tickable Tickable service.
-		/// @param tickOrder Tick order.
-		/// @note The function must be called on a main thread.
-		virtual void Add(ITickableService& tickable, std::int32_t tickOrder) = 0;
+		/// @brief Ticks the service.
+		/// @note The function is always called on a main thread.
+		virtual void Tick() = 0;
 	};
 }

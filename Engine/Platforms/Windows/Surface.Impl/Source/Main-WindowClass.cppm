@@ -14,7 +14,7 @@ module;
 
 export module PonyEngine.Surface.Impl.Windows:WindowClass;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Platform.Windows;
 
@@ -27,12 +27,12 @@ export namespace PonyEngine::Surface::Windows
 	{
 	public:
 		/// @brief Creates a Windows class.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param mainIcon Main application icon.
 		/// @param smallIcon Small application icon.
 		/// @param cursor Cursor.
 		[[nodiscard("Pure constructor")]]
-		WindowClass(const Application::IApplicationContext& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor);
+		WindowClass(const Application::IApplication& application, HICON mainIcon, HICON smallIcon, HCURSOR cursor);
 		WindowClass(const WindowClass&) = delete;
 		WindowClass(WindowClass&&) = delete;
 
@@ -51,7 +51,7 @@ export namespace PonyEngine::Surface::Windows
 		WindowClass& operator =(WindowClass&&) = delete;
 
 	private:
-		const Application::IApplicationContext* application; ///< Application.
+		const Application::IApplication* application; ///< Application.
 
 		HMODULE moduleHandle; ///< Module instance handle.
 		ATOM classHandle; /// Registered class handle.
@@ -60,7 +60,7 @@ export namespace PonyEngine::Surface::Windows
 
 namespace PonyEngine::Surface::Windows
 {
-	WindowClass::WindowClass(const Application::IApplicationContext& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
+	WindowClass::WindowClass(const Application::IApplication& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
 		application{&application},
 		moduleHandle(Platform::Windows::GetModule())
 	{

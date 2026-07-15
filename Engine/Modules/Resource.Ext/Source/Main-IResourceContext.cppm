@@ -15,7 +15,7 @@ export module PonyEngine.Resource.Ext:IResourceContext;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Resource;
 
@@ -26,16 +26,16 @@ export namespace PonyEngine::Resource
 	{
 		PONY_INTERFACE_BODY(IResourceContext)
 
-		/// @brief Gets the application context.
-		/// @return Application context.
+		/// @brief Gets the application.
+		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept = 0;
-		/// @brief Gets the application context.
-		/// @return Application context.
+		virtual Application::IApplication& Application() noexcept = 0;
+		/// @brief Gets the application.
+		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+		virtual const Application::IApplication& Application() const noexcept = 0;
 
 		/// @brief Gets the logger.
 		/// @return Logger.

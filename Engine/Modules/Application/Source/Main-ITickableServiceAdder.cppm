@@ -7,15 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.Ext:TempBuffer;
+module;
+
+#include "PonyEngine/Object/Body.h"
+
+export module PonyEngine.Application:ITickableServiceAdder;
 
 import std;
 
+import :ITickableService;
+
 export namespace PonyEngine::Application
 {
-	/// @brief Temporary buffer.
-	struct TempBuffer final
+	/// @brief Tickable service adder.
+	class ITickableServiceAdder
 	{
-		std::span<std::byte> buffer; ///< Buffer.
+		PONY_INTERFACE_BODY(ITickableServiceAdder)
+
+		/// @brief Adds a tickable service.
+		/// @param tickable Tickable service.
+		/// @param tickOrder Tick order.
+		/// @note The function must be called on a main thread.
+		virtual void Add(ITickableService& tickable, std::int32_t tickOrder) = 0;
 	};
 }

@@ -9,7 +9,7 @@
 
 #include "PonyEngine/World/WorldServiceModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.World.Impl;
 
 namespace PonyEngine::World

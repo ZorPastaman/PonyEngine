@@ -16,7 +16,7 @@ export module PonyEngine.Application.Impl:ModuleManager;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :ModuleDataContainer;
@@ -28,11 +28,11 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a module manager.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param loggerModuleContext Logger module context.
 		/// @param serviceModuleContext Service module context.
 		[[nodiscard("Pure constructor")]]
-		ModuleManager(IApplicationContext& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext);
+		ModuleManager(IApplication& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext);
 		ModuleManager(const ModuleManager&) = delete;
 		ModuleManager(ModuleManager&&) = delete;
 
@@ -66,7 +66,7 @@ export namespace PonyEngine::Application
 		/// @brief Finalizes the modules.
 		void Finalize() noexcept;
 
-		IApplicationContext* application; ///< Application context.
+		IApplication* application; ///< Application.
 
 		ILoggerModuleContext* loggerModuleContext; ///< Logger module context.
 		IServiceModuleContext* serviceModuleContext; ///< Service module context.
@@ -86,7 +86,7 @@ namespace PonyEngine::Application
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) ModuleInterface FirstModule = nullptr; ///< Module begin pointer.
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) ModuleInterface LastModule = nullptr; ///< Module end pointer.
 
-	ModuleManager::ModuleManager(IApplicationContext& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext) :
+	ModuleManager::ModuleManager(IApplication& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext) :
 		application{&application},
 		loggerModuleContext{&loggerModuleContext},
 		serviceModuleContext{&serviceModuleContext},

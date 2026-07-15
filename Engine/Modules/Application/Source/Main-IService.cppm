@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application.Ext:IService;
+export module PonyEngine.Application:IService;
 
 import :IServiceInterfaceAdder;
 import :ITickableServiceAdder;

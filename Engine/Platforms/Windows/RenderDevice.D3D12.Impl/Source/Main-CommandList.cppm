@@ -17,7 +17,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:CommandList;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;

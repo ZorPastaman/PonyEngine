@@ -9,7 +9,7 @@
 
 #include "PonyEngine/RenderDevice/Windows/D3D12BackendModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.RenderDevice.D3D12.Impl.Windows;
 
 namespace PonyEngine::RenderDevice::D3D12::Windows

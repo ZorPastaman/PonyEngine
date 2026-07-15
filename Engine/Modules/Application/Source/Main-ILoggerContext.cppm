@@ -11,11 +11,11 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application.Ext:ILoggerContext;
+export module PonyEngine.Application:ILoggerContext;
 
 import PonyEngine.Log;
 
-import :IApplicationContext;
+import :IApplication;
 
 export namespace PonyEngine::Application
 {
@@ -24,16 +24,16 @@ export namespace PonyEngine::Application
 	{
 		PONY_INTERFACE_BODY(ILoggerContext)
 
-		/// @brief Gets the application context.
+		/// @brief Gets the application.
 		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual IApplicationContext& Application() noexcept = 0;
-		/// @brief Gets the application context.
+		virtual IApplication& Application() noexcept = 0;
+		/// @brief Gets the application.
 		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual const IApplicationContext& Application() const noexcept = 0;
+		virtual const IApplication& Application() const noexcept = 0;
 
 		/// @brief Logs to console.
 		/// @param logType Log type.

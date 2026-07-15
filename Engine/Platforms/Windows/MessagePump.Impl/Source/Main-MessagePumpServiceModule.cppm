@@ -46,7 +46,7 @@ namespace PonyEngine::MessagePump::Windows
 	void MessagePumpServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(MessagePumpService).name());
-		pumpServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+		pumpServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 		{
 			return std::make_shared<MessagePumpService>(application);
 		});

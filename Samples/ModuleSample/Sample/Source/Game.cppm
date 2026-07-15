@@ -2,7 +2,7 @@ export module Game;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 export namespace Game
 {

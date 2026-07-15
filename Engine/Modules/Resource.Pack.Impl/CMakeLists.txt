@@ -55,7 +55,7 @@ if(NOT TARGET PonyEngine.File)
 	message(FATAL_ERROR "PonyEngine.File wasn't configured")
 endif()
 target_link_libraries(PonyEngine.Resource.Pack.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.Resource.Pack.Impl PRIVATE
 	PonyEngine.Resource

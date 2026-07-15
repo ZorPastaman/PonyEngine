@@ -11,11 +11,11 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application.Ext:IServiceModuleContext;
+export module PonyEngine.Application:IServiceModuleContext;
 
 import std;
 
-import :IApplicationContext;
+import :IApplication;
 import :IService;
 import :ServiceHandle;
 
@@ -31,7 +31,7 @@ export namespace PonyEngine::Application
 		/// @return Service handle. Must be used to remove a service before a destruction of the application.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Must be used to remove")]]
-		virtual ServiceHandle AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory) = 0;
+		virtual ServiceHandle AddService(const std::function<std::shared_ptr<IService>(IApplication&)>& factory) = 0;
 		/// @brief Removes a service.
 		/// @param handle Service handle.
 		/// @note The function must be called on a main thread.

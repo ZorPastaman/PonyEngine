@@ -7,7 +7,7 @@ Log implementation module.
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
 - [PonyEngine.Log.Ext](../Log.Ext)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 
 ## CMake variables
 

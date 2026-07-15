@@ -11,7 +11,7 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 namespace PonyEngine::RenderDevice
 {

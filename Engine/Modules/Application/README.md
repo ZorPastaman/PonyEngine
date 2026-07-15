@@ -1,6 +1,6 @@
-# PonyEngine.Application.Ext module
+# PonyEngine.Application module
 
-Application extension API module. Provides interfaces to access to engine services, logging, and application context.
+Application extension API module. Provides interfaces to access to engine services, logging, and application.
 
 ## Dependencies
 
@@ -9,13 +9,13 @@ Application extension API module. Provides interfaces to access to engine servic
 
 ## C\++ modules
 
-### [PonyEngine.Application.Ext](Source/Main.cppm)
+### [PonyEngine.Application](Source/Main.cppm)
 
 Main interfaces:
 
-#### [IApplicationContext](Source/Main-IApplicationContext.cppm)
+#### [IApplication](Source/Main-IApplication.cppm)
 
-Interface representing the engine application context. Provides access to application metadata, environment information, and the current application state.
+Interface representing the engine application. Provides access to application metadata, environment information, and the current application state.
 
 Exposes the application logger and registered services, and allows control over the application lifecycle (e.g., stopping the application).
 
@@ -62,13 +62,13 @@ Application module utilities.
 
 How to get an application module:
 
-The [IApplicationContext](Source/Public/Main-IApplicationContext.cppm) has functions like `FindService<T>()` and `FindService(std::type_index_)` and their alternatives to find services.
+The [IApplication](Source/Public/Main-IApplication.cppm) has functions like `FindService<T>()` and `FindService(std::type_index_)` and their alternatives to find services.
 Those functions work with public interfaces of the services.
 
 How to add an application module:
 
-1. Add required engine dependencies to your module target: `target_link_libraries(<MyModule> PUBLIC PonyEngine.Core PonyEngine.Application.Ext)`;
-2. Make a class that inherits `PonyEngine::Application::IModule` from `PonyEngine.Application.Ext` C\++ module;
+1. Add required engine dependencies to your module target: `target_link_libraries(<MyModule> PUBLIC PonyEngine.Core PonyEngine.Application)`;
+2. Make a class that inherits `PonyEngine::Application::IModule` from `PonyEngine.Application` C\++ module;
 3. Make a function that returns a `PonyEngine::Application::IModule*` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h` The instance must live for the lifetime of the application;
 4. Include `PonyEngine/Application/Module.h` and use the macro `PONY_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)` in a public code file. Module initialization order is defined by letters and follows alphabetical order;
 5. Link your module target to the engine application target: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)`.
@@ -78,7 +78,7 @@ Example of `PONY_MODULE` usage in a `.cpp` file:
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Macro/Compiler.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 namespace MyGame
 {
@@ -109,7 +109,7 @@ The module context passed to `IModule.StartUp()` and `IModule.ShutDown()` mustn'
 How to add an application service:
 
 1. Call `IModuleContext.ServiceModuleContext().AddService()` in `IModule.StartUp()`. 
-The function takes a factory function `const std::function<std::shared_ptr<IService>(IApplicationContext&)>&` as an argument
+The function takes a factory function `const std::function<std::shared_ptr<IService>(IApplication&)>&` as an argument
 and returns `ServiceHandle`.
 2. Call `IModuleContext.ServiceModuleContext().RemoveService()` in `IModule.ShutDown()`.
 The function takes the `ServiceHandle` that was returned by `AddService()`.
@@ -119,7 +119,7 @@ Example:
 ```
 void ServiceModule::StartUp(Application::IModuleContext& context)
 {
-	serviceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+	serviceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 	{
 		return std::make_shared<Service>(application);
 	});
@@ -132,7 +132,7 @@ void ServiceModule::ShutDown(Application::IModuleContext& context)
 ```
 
 The factory function must return a correct newly created service. 
-The application context it takes mustn't be shared and must be used only by the service.
+The application it takes mustn't be shared and must be used only by the service.
 The module must remove all the services it added.
 
 ### Service lifecycle
@@ -141,7 +141,7 @@ The module must remove all the services it added.
 2. `IService.AddTickableServices(ITickableServiceAdder&)` is called. The service must add its tick functions via `ITickableServiceAdder.Add(ITickableService& tickable, std::int32_t tickOrder)`.
 All the tick functions are sorted by their tick order. Each tick function must have a unique tick order to avoid ambiguity.
 3. `IService.AddInterfaces(IServiceInterfaceAdder&)` is called. The service must add all its public interfaces via `IServiceInterfaceAdder.AddInterface()`.
-Each interface type must be unique. Those interfaces will be available via `IApplicationContext.FindService`.
+Each interface type must be unique. Those interfaces will be available via `IApplication.FindService`.
 4. After all the module start-up functions are called, the `IService.Begin()` is called on each service in the same order they were added.
 5. Each frame `ITickableService.Tick` is called in their custom order.
 6. Before the module shut-down functions are called, the `IService.End()` is called on each service in the reverse order.
@@ -187,4 +187,4 @@ The logger doesn't have a special lifecycle. It's constructed, added to the appl
 
 When the logger is added to the application, it will receive log calls.
 
-The logger context isn't `IApplicationContext` but `ILoggerContext`. The logger context has functions to get `IApplicationContext` and log to the standard and platform consoles.
+The logger context isn't `IApplication` but `ILoggerContext`. The logger context has functions to get `IApplication` and log to the standard and platform consoles.

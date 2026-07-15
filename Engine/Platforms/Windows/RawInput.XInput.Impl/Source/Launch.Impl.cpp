@@ -9,7 +9,7 @@
 
 #include "PonyEngine/RawInput/Windows/XInputProviderModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.RawInput.XInput.Impl.Windows;
 
 namespace PonyEngine::RawInput::XInput::Windows

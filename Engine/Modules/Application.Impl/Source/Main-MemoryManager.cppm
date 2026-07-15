@@ -17,7 +17,7 @@ export module PonyEngine.Application.Impl:MemoryManager;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 export namespace PonyEngine::Application
@@ -29,7 +29,7 @@ export namespace PonyEngine::Application
 		/// @brief Creates a memory manager.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit MemoryManager(IApplicationContext& application) noexcept;
+		explicit MemoryManager(IApplication& application) noexcept;
 		MemoryManager(const MemoryManager&) = delete;
 		MemoryManager(MemoryManager&&) = delete;
 
@@ -104,7 +104,7 @@ export namespace PonyEngine::Application
 			/// @brief Creates a buffer cache.
 			/// @param application Application.
 			[[nodiscard("Pure constructor")]]
-			explicit Cache(IApplicationContext& application) noexcept;
+			explicit Cache(IApplication& application) noexcept;
 			Cache(const Cache&) = delete;
 			Cache(Cache&&) = delete;
 
@@ -130,7 +130,7 @@ export namespace PonyEngine::Application
 			[[nodiscard("Pure function")]]
 			Buffer GetBuffer(std::size_t requiredAlignment);
 
-			IApplicationContext* application; ///< Application.
+			IApplication* application; ///< Application.
 
 			std::stack<Buffer> bufferCache; ///< Buffer cache.
 			std::unordered_map<const std::byte*, Buffer> usedBuffers; ///< Buffers that are in use now.
@@ -140,15 +140,15 @@ export namespace PonyEngine::Application
 		/// @param application Application.
 		/// @return Cache.
 		[[nodiscard("Pure function")]]
-		static Cache& GetCache(IApplicationContext& application);
+		static Cache& GetCache(IApplication& application);
 
-		IApplicationContext* application; ///< Application.
+		IApplication* application; ///< Application.
 	};
 }
 
 namespace PonyEngine::Application
 {
-	MemoryManager::MemoryManager(IApplicationContext& application) noexcept :
+	MemoryManager::MemoryManager(IApplication& application) noexcept :
 		application{&application}
 	{
 	}
@@ -163,7 +163,7 @@ namespace PonyEngine::Application
 		GetCache(*application).ReleaseTempBuffer(buffer);
 	}
 
-	MemoryManager::Cache::Cache(IApplicationContext& application) noexcept :
+	MemoryManager::Cache::Cache(IApplication& application) noexcept :
 		application{&application}
 	{
 	}
@@ -229,7 +229,7 @@ namespace PonyEngine::Application
 		return buffer;
 	}
 
-	MemoryManager::Cache& MemoryManager::GetCache(IApplicationContext& application)
+	MemoryManager::Cache& MemoryManager::GetCache(IApplication& application)
 	{
 		thread_local auto cache = std::make_unique<Cache>(application);
 		return *cache;

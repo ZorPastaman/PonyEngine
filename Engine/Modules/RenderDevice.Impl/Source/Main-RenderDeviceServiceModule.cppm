@@ -15,7 +15,7 @@ export module PonyEngine.RenderDevice.Impl:RenderDeviceServiceModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :RenderDeviceService;
@@ -52,7 +52,7 @@ namespace PonyEngine::RenderDevice
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(RenderDeviceService).name());
 		try
 		{
-			renderServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+			renderServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 			{
 				const auto render = std::make_shared<RenderDeviceService>(application);
 				renderServiceModuleHandle = context.AddData(std::shared_ptr<IRenderDeviceModuleContext>(render, render.get()));

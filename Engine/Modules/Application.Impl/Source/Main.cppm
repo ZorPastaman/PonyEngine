@@ -9,7 +9,7 @@
 
 export module PonyEngine.Application.Impl;
 
-export import PonyEngine.Application.Ext;
+export import PonyEngine.Application;
 
 export import :ConsoleUtility;
 export import :DefaultLogger;

@@ -6,7 +6,7 @@ Resource implementation module.
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Resource](../Resource)
 - [PonyEngine.Resource.Ext](../Resource.Ext)
 

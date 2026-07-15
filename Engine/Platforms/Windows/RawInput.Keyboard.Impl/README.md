@@ -5,7 +5,7 @@ Platform independent module: [PonyEngine.RawInput.Keyboard.Impl](../../../Module
 ## Dependencies
 
 - [PonyEngine.Log](../../../Modules/Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Surface](../Surface)
 
 ## CMake variables

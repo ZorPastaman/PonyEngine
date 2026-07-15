@@ -23,6 +23,6 @@ message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.RenderDevice.Ext PUBLIC
 	PonyEngine.RenderDevice
 	PonyEngine.Core
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 	PonyEngine.Log
 )

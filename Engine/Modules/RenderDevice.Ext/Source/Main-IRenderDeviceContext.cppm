@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.RenderDevice.Ext:IRenderDeviceContext;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.RenderDevice;
 
@@ -24,16 +24,16 @@ export namespace PonyEngine::RenderDevice
 	{
 		PONY_INTERFACE_BODY(IRenderDeviceContext)
 
-		/// @brief Gets the application context.
-		/// @return Application context.
+		/// @brief Gets the application.
+		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept = 0;
-		/// @brief Gets the application context.
-		/// @return Application context.
+		virtual Application::IApplication& Application() noexcept = 0;
+		/// @brief Gets the application.
+		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+		virtual const Application::IApplication& Application() const noexcept = 0;
 
 		/// @brief Gets the logger.
 		/// @return Logger.

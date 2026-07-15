@@ -7,7 +7,7 @@ export module Game:GameService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput;
@@ -23,7 +23,7 @@ export namespace Game
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit GameService(PonyEngine::Application::IApplicationContext& application);
+		explicit GameService(PonyEngine::Application::IApplication& application);
 		GameService(const GameService&) = delete;
 		GameService(GameService&&) = delete;
 
@@ -70,7 +70,7 @@ export namespace Game
 			PonyEngine::Math::ColorRGBA<float> color;
 		};
 
-		PonyEngine::Application::IApplicationContext* application;
+		PonyEngine::Application::IApplication* application;
 		PonyEngine::Resource::IResourceService* resourceService;
 		PonyEngine::RenderDevice::IRenderDeviceService* renderDevice;
 		PonyEngine::RawInput::IRawInputService* rawInput;
@@ -136,7 +136,7 @@ export namespace Game
 
 namespace Game
 {
-	GameService::GameService(PonyEngine::Application::IApplicationContext& application) :
+	GameService::GameService(PonyEngine::Application::IApplication& application) :
 		application{&application},
 		resourceService{&this->application->GetService<PonyEngine::Resource::IResourceService>()},
 		renderDevice{&this->application->GetService<PonyEngine::RenderDevice::IRenderDeviceService>()},

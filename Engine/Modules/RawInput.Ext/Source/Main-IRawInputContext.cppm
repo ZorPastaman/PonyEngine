@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.RawInput.Ext:IRawInputContext;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.RawInput;
 
@@ -24,16 +24,16 @@ export namespace PonyEngine::RawInput
 	{
 		PONY_INTERFACE_BODY(IRawInputContext)
 
-		/// @brief Gets the application context.
-		/// @return Application context.
+		/// @brief Gets the application.
+		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept = 0;
-		/// @brief Gets the application context.
-		/// @return Application context.
+		virtual Application::IApplication& Application() noexcept = 0;
+		/// @brief Gets the application.
+		/// @return Application.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+		virtual const Application::IApplication& Application() const noexcept = 0;
 
 		/// @brief Gets the logger.
 		/// @return Logger.

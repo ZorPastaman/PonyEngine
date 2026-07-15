@@ -9,7 +9,7 @@
 
 #include "PonyEngine/RenderDevice/RenderDeviceServiceModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.RenderDevice.Impl;
 
 namespace PonyEngine::RenderDevice

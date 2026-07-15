@@ -45,7 +45,7 @@ if(NOT TARGET PonyEngine.Log.Ext)
 	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
 endif()
 target_link_libraries(PonyEngine.Log.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.Log.Impl PRIVATE
 	PonyEngine.Log

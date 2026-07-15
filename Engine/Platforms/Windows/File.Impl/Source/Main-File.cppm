@@ -16,7 +16,7 @@ export module PonyEngine.File.Impl.Windows:File;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.File.Impl;
 import PonyEngine.Log;
 
@@ -31,12 +31,12 @@ export namespace PonyEngine::File::Windows
 	{
 	public:
 		/// @brief Opens a file.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param worker Worker.
 		/// @param path File path
 		/// @param params File parameters.
 		[[nodiscard("Pure constructor")]]
-		File(const Application::IApplicationContext& application, const Worker& worker, const std::filesystem::path& path, FileParams params);
+		File(const Application::IApplication& application, const Worker& worker, const std::filesystem::path& path, FileParams params);
 		File(const File&) = delete;
 		File(File&&) = delete;
 
@@ -58,7 +58,7 @@ export namespace PonyEngine::File::Windows
 		File& operator =(File&&) = delete;
 
 	private:
-		const Application::IApplicationContext* application; ///< Application context.
+		const Application::IApplication* application; ///< Application.
 		const Worker* worker; ///< Worker.
 
 		FileInfo fileInfo; ///< File info.
@@ -83,7 +83,7 @@ namespace PonyEngine::File::Windows
 		static constexpr auto Value = &CreateFileW; ///< @p CreateFileW.
 	};
 
-	File::File(const Application::IApplicationContext& application, const Worker& worker, const std::filesystem::path& path, const FileParams params) :
+	File::File(const Application::IApplication& application, const Worker& worker, const std::filesystem::path& path, const FileParams params) :
 		application{&application},
 		worker{&worker},
 		fileInfo(path, params.access, params.flags)

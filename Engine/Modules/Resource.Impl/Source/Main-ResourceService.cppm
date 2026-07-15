@@ -15,7 +15,7 @@ export module PonyEngine.Resource.Impl:ResourceService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.Resource.Ext;
@@ -35,9 +35,9 @@ export namespace PonyEngine::Resource
 	{
 	public:
 		/// @brief Creates a resource service.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit ResourceService(Application::IApplicationContext& application);
+		explicit ResourceService(Application::IApplication& application);
 		ResourceService(const ResourceService&) = delete;
 		ResourceService(ResourceService&&) = delete;
 
@@ -60,9 +60,9 @@ export namespace PonyEngine::Resource
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]] 
-		virtual Application::IApplicationContext& Application() noexcept override;
+		virtual Application::IApplication& Application() noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual const Application::IApplicationContext& Application() const noexcept override;
+		virtual const Application::IApplication& Application() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual Log::ILogger& Logger() noexcept override;
 		[[nodiscard("Pure function")]] 
@@ -179,7 +179,7 @@ export namespace PonyEngine::Resource
 		static std::shared_ptr<ResourceT> GetResourceFromCacheUnsafe(ResourceID resourceId, 
 			const std::unordered_map<ResourceID, std::weak_ptr<ResourceT>>& map) noexcept;
 
-		Application::IApplicationContext* application; ///< Application context.
+		Application::IApplication* application; ///< Application.
 
 		ResourceProviderContainer providers; ///< Resource provider container.
 
@@ -207,7 +207,7 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
-	ResourceService::ResourceService(Application::IApplicationContext& application) :
+	ResourceService::ResourceService(Application::IApplication& application) :
 		application{&application},
 		nextProviderHandle{.id = 1u},
 		nextResourceHandle{.id = 1ull}
@@ -351,12 +351,12 @@ namespace PonyEngine::Resource
 		}
 	}
 
-	Application::IApplicationContext& ResourceService::Application() noexcept
+	Application::IApplication& ResourceService::Application() noexcept
 	{
 		return *application;
 	}
 
-	const Application::IApplicationContext& ResourceService::Application() const noexcept
+	const Application::IApplication& ResourceService::Application() const noexcept
 	{
 		return *application;
 	}

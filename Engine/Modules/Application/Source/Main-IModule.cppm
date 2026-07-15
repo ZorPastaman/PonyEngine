@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application.Ext:IModule;
+export module PonyEngine.Application:IModule;
 
 import std;
 

@@ -2,7 +2,7 @@ export module Game:GameService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 export namespace Game
 {
@@ -10,7 +10,7 @@ export namespace Game
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit GameService(PonyEngine::Application::IApplicationContext& application) noexcept;
+		explicit GameService(PonyEngine::Application::IApplication& application) noexcept;
 		GameService(const GameService&) = delete;
 		GameService(GameService&&) = delete;
 
@@ -27,13 +27,13 @@ export namespace Game
 
 		virtual void Tick() override;
 
-		PonyEngine::Application::IApplicationContext* application;
+		PonyEngine::Application::IApplication* application;
 	};
 }
 
 namespace Game
 {
-	GameService::GameService(PonyEngine::Application::IApplicationContext& application) noexcept :
+	GameService::GameService(PonyEngine::Application::IApplication& application) noexcept :
 		application{&application}
 	{
 		// Constructor logic can be added here.

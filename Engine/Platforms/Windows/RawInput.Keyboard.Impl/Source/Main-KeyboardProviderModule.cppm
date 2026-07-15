@@ -15,7 +15,7 @@ export module PonyEngine.RawInput.Keyboard.Impl.Windows:KeyboardProviderModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.RawInput.Ext;
 

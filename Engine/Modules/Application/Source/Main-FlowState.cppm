@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Type/Enum.h"
 
-export module PonyEngine.Application.Ext:FlowState;
+export module PonyEngine.Application:FlowState;
 
 import std;
 

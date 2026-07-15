@@ -29,6 +29,6 @@ endif()
 target_link_libraries(PonyEngine.RawInput.Ext PUBLIC
 	PonyEngine.RawInput
 	PonyEngine.Core
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 	PonyEngine.Log
 )

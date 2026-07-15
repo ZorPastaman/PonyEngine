@@ -11,7 +11,7 @@ export module PonyEngine.Log.Impl:LogFiller;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log.Ext;
 
 import :LogTypeSymbol;

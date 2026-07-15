@@ -62,13 +62,13 @@ public:
 	mutable bool logExceptionCalled = false;
 
 	[[nodiscard("Pure function")]]
-	virtual PonyEngine::Application::IApplicationContext& Application() noexcept override
+	virtual PonyEngine::Application::IApplication& Application() noexcept override
 	{
 		std::exit(1);
 	}
 
 	[[nodiscard("Pure function")]]
-	virtual const PonyEngine::Application::IApplicationContext& Application() const noexcept override
+	virtual const PonyEngine::Application::IApplication& Application() const noexcept override
 	{
 		std::exit(1);
 	}

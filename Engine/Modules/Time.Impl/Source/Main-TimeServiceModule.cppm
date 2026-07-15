@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Time.Impl:TimeServiceModule;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :TimeService;
@@ -47,7 +47,7 @@ namespace PonyEngine::Time
 	void TimeServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(TimeService).name());
-		timeServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+		timeServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 		{
 			return std::make_shared<TimeService>(application);
 		});

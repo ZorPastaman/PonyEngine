@@ -35,7 +35,7 @@ if(NOT TARGET PonyEngine.MessagePump)
 	message(FATAL_ERROR "PonyEngine.MessagePump wasn't configured")
 endif()
 target_link_libraries(PonyEngine.MessagePump.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.MessagePump.Impl PRIVATE
 	PonyEngine.Core

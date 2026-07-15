@@ -17,7 +17,7 @@ export module PonyEngine.Application.Impl:ServiceManager;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :InterfaceContainer;
@@ -31,9 +31,9 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a service manager.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit ServiceManager(IApplicationContext& application) noexcept;
+		explicit ServiceManager(IApplication& application) noexcept;
 		ServiceManager(const ServiceManager&) = delete;
 		ServiceManager(ServiceManager&&) = delete;
 
@@ -58,7 +58,7 @@ export namespace PonyEngine::Application
 		void Tick();
 
 		[[nodiscard("Must be used to remove")]]
-		virtual ServiceHandle AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory) override;
+		virtual ServiceHandle AddService(const std::function<std::shared_ptr<IService>(IApplication&)>& factory) override;
 		virtual void RemoveService(ServiceHandle handle) override;
 
 		ServiceManager& operator =(const ServiceManager&) = delete;
@@ -70,10 +70,10 @@ export namespace PonyEngine::Application
 		{
 		public:
 			/// @brief Creates a tickable service adder.
-			/// @param application Application context.
+			/// @param application Application.
 			/// @param container Tickable service container.
 			[[nodiscard("Pure constructor")]]
-			TickableServiceAdder(const IApplicationContext& application, std::vector<TickableServiceInfo>& container) noexcept;
+			TickableServiceAdder(const IApplication& application, std::vector<TickableServiceInfo>& container) noexcept;
 			TickableServiceAdder(const TickableServiceAdder&) = delete;
 			TickableServiceAdder(TickableServiceAdder&&) = delete;
 
@@ -85,7 +85,7 @@ export namespace PonyEngine::Application
 			TickableServiceAdder& operator =(TickableServiceAdder&&) = delete;
 
 		private:
-			const IApplicationContext* application; ///< Application context.
+			const IApplication* application; ///< Application.
 
 			std::vector<TickableServiceInfo>* container; ///< Tickable service container.
 		};
@@ -94,11 +94,11 @@ export namespace PonyEngine::Application
 		{
 		public:
 			/// @brief Creates a service interface adder.
-			/// @param application Application context.
+			/// @param application Application.
 			/// @param container Service interface container.
 			/// @param globalContainer Global interface container.
 			[[nodiscard("Pure constructor")]]
-			ServiceInterfaceAdder(const IApplicationContext& application, InterfaceContainer& container, std::unordered_map<std::type_index, void*>& globalContainer) noexcept;
+			ServiceInterfaceAdder(const IApplication& application, InterfaceContainer& container, std::unordered_map<std::type_index, void*>& globalContainer) noexcept;
 			ServiceInterfaceAdder(const ServiceInterfaceAdder&) = delete;
 			ServiceInterfaceAdder(ServiceInterfaceAdder&&) = delete;
 
@@ -110,7 +110,7 @@ export namespace PonyEngine::Application
 			ServiceInterfaceAdder& operator =(ServiceInterfaceAdder&&) = delete;
 
 		private:
-			const IApplicationContext* application; ///< Application context.
+			const IApplication* application; ///< Application.
 
 			InterfaceContainer* container; ///< Service interface container.
 			std::unordered_map<std::type_index, void*>* globalContainer; ///< Global interface container.
@@ -126,7 +126,7 @@ export namespace PonyEngine::Application
 		/// @param count How many services to end.
 		void End(std::size_t count) noexcept;
 
-		IApplicationContext* application; ///< Application context.
+		IApplication* application; ///< Application.
 
 		ServiceContainer serviceContainer; ///< Service container.
 
@@ -139,7 +139,7 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	ServiceManager::ServiceManager(IApplicationContext& application) noexcept :
+	ServiceManager::ServiceManager(IApplication& application) noexcept :
 		application{&application},
 		nextServiceHandle{.id = 1u}
 	{
@@ -222,7 +222,7 @@ namespace PonyEngine::Application
 		}
 	}
 
-	ServiceHandle ServiceManager::AddService(const std::function<std::shared_ptr<IService>(IApplicationContext&)>& factory)
+	ServiceHandle ServiceManager::AddService(const std::function<std::shared_ptr<IService>(IApplication&)>& factory)
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -338,7 +338,7 @@ namespace PonyEngine::Application
 		}
 	}
 
-	ServiceManager::TickableServiceAdder::TickableServiceAdder(const IApplicationContext& application, std::vector<TickableServiceInfo>& container) noexcept :
+	ServiceManager::TickableServiceAdder::TickableServiceAdder(const IApplication& application, std::vector<TickableServiceInfo>& container) noexcept :
 		application{&application},
 		container{&container}
 	{
@@ -357,7 +357,7 @@ namespace PonyEngine::Application
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Tickable of type '{}' added.", typeid(tickable).name());
 	}
 
-	ServiceManager::ServiceInterfaceAdder::ServiceInterfaceAdder(const IApplicationContext& application, InterfaceContainer& container, 
+	ServiceManager::ServiceInterfaceAdder::ServiceInterfaceAdder(const IApplication& application, InterfaceContainer& container, 
 		std::unordered_map<std::type_index, void*>& globalContainer) noexcept :
 		application{&application},
 		container{&container},

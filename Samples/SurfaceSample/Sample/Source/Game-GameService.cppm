@@ -6,7 +6,7 @@ export module Game:GameService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput;
@@ -18,7 +18,7 @@ export namespace Game
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit GameService(PonyEngine::Application::IApplicationContext& application) noexcept;
+		explicit GameService(PonyEngine::Application::IApplication& application) noexcept;
 		GameService(const GameService&) = delete;
 		GameService(GameService&&) = delete;
 
@@ -41,7 +41,7 @@ export namespace Game
 
 		std::int32_t moveSpeed;
 
-		PonyEngine::Application::IApplicationContext* application;
+		PonyEngine::Application::IApplication* application;
 		PonyEngine::RawInput::IRawInputService* input;
 		PonyEngine::Surface::ISurfaceService* surface;
 
@@ -63,7 +63,7 @@ export namespace Game
 
 namespace Game
 {
-	GameService::GameService(PonyEngine::Application::IApplicationContext& application) noexcept :
+	GameService::GameService(PonyEngine::Application::IApplication& application) noexcept :
 		defaultPosition(100, 160),
 		defaultSize(320, 240),
 		moveSpeed{30},

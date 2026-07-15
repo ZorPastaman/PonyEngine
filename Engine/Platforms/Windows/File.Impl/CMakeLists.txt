@@ -34,7 +34,7 @@ target_compile_definitions(PonyEngine.File.Impl PUBLIC
 
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.File.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.File.Impl PRIVATE
 	PonyEngine.Core

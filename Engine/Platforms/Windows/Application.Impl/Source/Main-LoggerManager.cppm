@@ -22,7 +22,7 @@ export namespace PonyEngine::Application::Windows
 	{
 	public:
 		[[nodiscard("Pure constuctor")]]
-		LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
+		LoggerManager(IApplication& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
 		LoggerManager(const LoggerManager&) = delete;
 		LoggerManager(LoggerManager&&) = delete;
 
@@ -37,7 +37,7 @@ export namespace PonyEngine::Application::Windows
 
 namespace PonyEngine::Application::Windows
 {
-	LoggerManager::LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
+	LoggerManager::LoggerManager(IApplication& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
 		Application::LoggerManager(application, defaultLogger)
 	{
 	}

@@ -35,7 +35,7 @@ option(PONY_ENGINE_WORLD_IMPL "Enable PonyEngine.World.Impl module" OFF)
 
 add_subdirectory("Core")
 add_subdirectory("Log")
-add_subdirectory("Application.Ext")
+add_subdirectory("Application")
 if(PONY_ENGINE_APPLICATION_IMPL)
 	add_subdirectory("Application.Impl")
 endif()

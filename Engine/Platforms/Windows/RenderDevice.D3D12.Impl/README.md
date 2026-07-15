@@ -6,7 +6,7 @@ Platform independent module: [PonyEngine.RenderDevice.D3D12.Impl](../../../Modul
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../../../Modules/Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Surface](../Surface)
 - d3d12.lib (Windows SDK)
 - dxgi.lib (Windows SDK)

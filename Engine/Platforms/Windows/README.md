@@ -11,7 +11,7 @@ The Windows support mutates engine modules, adding code and defines to them.
 | Engine module                                                                         | Windows platform module                                                         |
 |:--------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------|
 | [PonyEngine.Core](../../Modules/Core)                                                 | [PonyEngine.Core.Windows](Core)                                                 |
-| [PonyEngine.Application.Ext](../../Modules/Application.Ext)                           | [PonyEngine.Application.Ext.Windows](Application.Ext)                           |
+| [PonyEngine.Application](../../Modules/Application)                           | [PonyEngine.Application.Windows](Application)                           |
 | [PonyEngine.Application.Impl](../../Modules/Application.Impl)                         | [PonyEngine.Application.Impl.Windows](Application.Impl)                         |
 | [PonyEngine.File.Impl](../../Modules/File.Impl)                                       | [PonyEngine.File.Impl.Windows](File.Impl)                                       |
 | [PonyEngine.MessagePump.Impl](../../Modules/MessagePump.Impl)                         | [PonyEngine.MessagePump.Impl.Windows](MessagePump.Impl)                         |

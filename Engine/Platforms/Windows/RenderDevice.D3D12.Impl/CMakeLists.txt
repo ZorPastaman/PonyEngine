@@ -87,7 +87,7 @@ if(NOT TARGET PonyEngine.Surface)
 	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
 endif()
 target_link_libraries(PonyEngine.RenderDevice.D3D12.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.RenderDevice.D3D12.Impl PRIVATE
 	PonyEngine.Core

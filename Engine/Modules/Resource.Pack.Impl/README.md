@@ -7,7 +7,7 @@ It's a provider that manages resource packs - files that contain many resources.
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.File](../File)
 - [PonyEngine.Resource](../Resource)
 - [PonyEngine.Resource.Ext](../Resource.Ext)

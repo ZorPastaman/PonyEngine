@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Application.Ext:ILoggerModuleContext;
+export module PonyEngine.Application:ILoggerModuleContext;
 
 import std;
 

@@ -8,7 +8,7 @@ The raw input service doesn't know about specific devices, it's just a middle se
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.RawInput](../RawInput)
 
 ## C\++ modules
@@ -23,7 +23,7 @@ Input provider interface. Each input provider added to the raw input service mus
 
 #### [IRawInputContext](Source/Main-IRawInputContext.cppm)
 
-Interface representing the raw input service context. Provides access to the application context, logger and input management functions.
+Interface representing the raw input service context. Provides access to the application, logger and input management functions.
 
 #### [IRawInputModuleContext](Source/Main-IRawInputModuleContext.cppm)
 

@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.World.Impl:WorldServiceModule;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :WorldService;
@@ -47,7 +47,7 @@ namespace PonyEngine::World
 	void WorldServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(WorldService).name());
-		worldServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+		worldServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 		{
 			return std::make_shared<WorldService>(application);
 		});

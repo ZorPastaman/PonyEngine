@@ -46,7 +46,7 @@ if(NOT TARGET PonyEngine.RenderDevice.Ext)
 	message(FATAL_ERROR "PonyEngine.RenderDevice.Ext wasn't configured")
 endif()
 target_link_libraries(PonyEngine.RenderDevice.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.RenderDevice.Impl PRIVATE
 	PonyEngine.RenderDevice

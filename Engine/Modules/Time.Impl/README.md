@@ -5,7 +5,7 @@ Time service implementation module.
 ## Dependencies
 
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Time](../Time)
 
 ## CMake variables

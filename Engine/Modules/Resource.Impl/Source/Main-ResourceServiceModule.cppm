@@ -15,7 +15,7 @@ export module PonyEngine.Resource.Impl:ResourceServiceModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :ResourceService;
@@ -52,7 +52,7 @@ namespace PonyEngine::Resource
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(ResourceService).name());
 		try
 		{
-			inputServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+			inputServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 			{
 				const auto input = std::make_shared<ResourceService>(application);
 				inputServiceModuleHandle = context.AddData(std::shared_ptr<IResourceModuleContext>(input, input.get()));

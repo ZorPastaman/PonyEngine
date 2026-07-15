@@ -18,7 +18,7 @@ export module PonyEngine.Surface.Impl.Windows:SurfaceService;
 
 import std;
 
-import PonyEngine.Application.Ext.Windows;
+import PonyEngine.Application.Windows;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.MessagePump;
@@ -36,11 +36,11 @@ export namespace PonyEngine::Surface::Windows
 	{
 	public:
 		/// @brief Creates a Windows surface service.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param windowClass Window class.
 		/// @param title Window title.
 		[[nodiscard("Pure constructor")]]
-		SurfaceService(Application::Windows::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title);
+		SurfaceService(Application::Windows::IApplication& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title);
 		SurfaceService(const SurfaceService&) = delete;
 		SurfaceService(SurfaceService&&) = delete;
 
@@ -124,9 +124,9 @@ export namespace PonyEngine::Surface::Windows
 		virtual void RemoveRawInputObserver(IRawInputObserver& observer) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept override;
+		virtual Application::IApplication& Application() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept override;
+		virtual const Application::IApplication& Application() const noexcept override;
 
 		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept override;
 
@@ -275,7 +275,7 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
 
-		Application::Windows::IApplicationContext* application; ///< Application context.
+		Application::Windows::IApplication* application; ///< Application.
 		const MessagePump::IMessagePumpService* pumpService; ///< Message pump service.
 
 		Surface::RectStyle rectStyle; ///< Client rectangle style.
@@ -303,7 +303,7 @@ export namespace PonyEngine::Surface::Windows
 
 namespace PonyEngine::Surface::Windows
 {
-	SurfaceService::SurfaceService(Application::Windows::IApplicationContext& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
+	SurfaceService::SurfaceService(Application::Windows::IApplication& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
 		application{&application},
 		pumpService{&this->application->GetService<MessagePump::IMessagePumpService>()},
 		rectStyle(FullscreenRectStyle{.alwaysOnTop = false}),
@@ -895,12 +895,12 @@ namespace PonyEngine::Surface::Windows
 		rawInputManager.RemoveRawInputObserver(observer);
 	}
 
-	Application::IApplicationContext& SurfaceService::Application() noexcept
+	Application::IApplication& SurfaceService::Application() noexcept
 	{
 		return *application;
 	}
 
-	const Application::IApplicationContext& SurfaceService::Application() const noexcept
+	const Application::IApplication& SurfaceService::Application() const noexcept
 	{
 		return *application;
 	}

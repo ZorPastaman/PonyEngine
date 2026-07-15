@@ -49,7 +49,7 @@ if(NOT TARGET PonyEngine.Job)
 	message(FATAL_ERROR "PonyEngine.Job wasn't configured")
 endif()
 target_link_libraries(PonyEngine.Job.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.Job.Impl PRIVATE
 	PonyEngine.Job

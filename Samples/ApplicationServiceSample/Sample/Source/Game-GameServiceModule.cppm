@@ -2,7 +2,7 @@ export module Game:GameServiceModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 import :GameService;
 
@@ -23,7 +23,7 @@ namespace Game
 {
 	void GameServiceModule::StartUp(PonyEngine::Application::IModuleContext& context)
 	{
-		gameServiceHandle = context.ServiceModuleContext().AddService([&](PonyEngine::Application::IApplicationContext& application)
+		gameServiceHandle = context.ServiceModuleContext().AddService([&](PonyEngine::Application::IApplication& application)
 		{
 			return std::make_shared<GameService>(application);
 		});

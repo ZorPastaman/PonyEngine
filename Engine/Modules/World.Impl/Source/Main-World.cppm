@@ -11,7 +11,7 @@ export module PonyEngine.World.Impl:World;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.World;
@@ -30,7 +30,7 @@ export namespace PonyEngine::World
 		/// @param application Application.
 		/// @param typeRegistry Type registry.
 		[[nodiscard("Pure constructor")]]
-		World(Application::IApplicationContext& application, const TypeRegistry& typeRegistry) noexcept;
+		World(Application::IApplication& application, const TypeRegistry& typeRegistry) noexcept;
 		World(const World&) = delete;
 		World(World&&) = delete;
 
@@ -228,7 +228,7 @@ export namespace PonyEngine::World
 		/// @param secondTypes Second types.
 		static void CheckForDuplicates(std::span<const std::type_index> firstTypes, std::span<const std::type_index> secondTypes);
 
-		Application::IApplicationContext* application; ///< Application.
+		Application::IApplication* application; ///< Application.
 		const TypeRegistry* typeRegistry; ///< Type registry.
 
 		std::vector<EntityGeneration> entityGenerations; ///< Entity generations.
@@ -245,7 +245,7 @@ export namespace PonyEngine::World
 
 namespace PonyEngine::World
 {
-	World::World(Application::IApplicationContext& application, const TypeRegistry& typeRegistry) noexcept :
+	World::World(Application::IApplication& application, const TypeRegistry& typeRegistry) noexcept :
 		application{&application},
 		typeRegistry{&typeRegistry},
 		objectTable(*this->application)

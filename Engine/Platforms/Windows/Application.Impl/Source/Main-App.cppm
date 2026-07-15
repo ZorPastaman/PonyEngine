@@ -15,7 +15,7 @@ export module PonyEngine.Application.Impl.Windows:App;
 
 import std;
 
-import PonyEngine.Application.Ext.Windows;
+import PonyEngine.Application.Windows;
 import PonyEngine.Application.Impl;
 import PonyEngine.Log;
 import PonyEngine.Meta;
@@ -27,7 +27,7 @@ import :PathManager;
 export namespace PonyEngine::Application::Windows
 {
 	/// @brief Windows application.
-	class App final : private IApplicationContext
+	class App final : private IApplication
 	{
 	public:
 		/// @brief Creates a Windows application.

@@ -15,7 +15,7 @@ export module PonyEngine.RawInput.Impl:RawInputService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.RawInput.Ext;
@@ -32,9 +32,9 @@ export namespace PonyEngine::RawInput
 	{
 	public:
 		/// @brief Creates an input service.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit RawInputService(Application::IApplicationContext& application);
+		explicit RawInputService(Application::IApplication& application);
 		RawInputService(const RawInputService&) = delete;
 		RawInputService(RawInputService&&) = delete;
 
@@ -57,9 +57,9 @@ export namespace PonyEngine::RawInput
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept override;
+		virtual Application::IApplication& Application() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept override;
+		virtual const Application::IApplication& Application() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& Logger() noexcept override;
@@ -200,7 +200,7 @@ export namespace PonyEngine::RawInput
 		/// @param device Device.
 		void ObserveDeviceRemoved(DeviceHandle device) const noexcept;
 
-		Application::IApplicationContext* application; ///< Application context.
+		Application::IApplication* application; ///< Application.
 
 		InputProviderContainer providers; ///< Input providers.
 		InputDeviceContainer devices; ///< Input devices.
@@ -220,7 +220,7 @@ export namespace PonyEngine::RawInput
 		DeviceHandle nextDeviceHandle; ///< Next device handle.
 	};
 
-	RawInputService::RawInputService(Application::IApplicationContext& application) :
+	RawInputService::RawInputService(Application::IApplication& application) :
 		application{&application},
 		lastInputDevice{.id = 0u},
 		nextProviderHandle{.id = 1u},
@@ -359,12 +359,12 @@ export namespace PonyEngine::RawInput
 		ProcessInputQueue();
 	}
 
-	Application::IApplicationContext& RawInputService::Application() noexcept
+	Application::IApplication& RawInputService::Application() noexcept
 	{
 		return *application;
 	}
 
-	const Application::IApplicationContext& RawInputService::Application() const noexcept
+	const Application::IApplication& RawInputService::Application() const noexcept
 	{
 		return *application;
 	}

@@ -15,7 +15,7 @@ export module PonyEngine.Time.Impl:TimeService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Chrono;
 import PonyEngine.Log;
 import PonyEngine.Time;
@@ -28,7 +28,7 @@ export namespace PonyEngine::Time
 	public:
 		/// @brief Creates a time service.
 		[[nodiscard("Pure constructor")]]
-		explicit TimeService(const Application::IApplicationContext& application) noexcept;
+		explicit TimeService(const Application::IApplication& application) noexcept;
 		TimeService(const TimeService&) = delete;
 		TimeService(TimeService&&) = delete;
 
@@ -108,7 +108,7 @@ export namespace PonyEngine::Time
 		/// @param now Now time point.
 		void UpdateTimes(std::chrono::time_point<std::chrono::steady_clock> now) noexcept;
 
-		const Application::IApplicationContext* application;
+		const Application::IApplication* application;
 
 		std::chrono::nanoseconds deltaTimeCap; ///< Delta time cap.
 		double timeScale; ///< Time scale.
@@ -143,7 +143,7 @@ export namespace PonyEngine::Time
 
 namespace PonyEngine::Time
 {
-	TimeService::TimeService(const Application::IApplicationContext& application) noexcept :
+	TimeService::TimeService(const Application::IApplication& application) noexcept :
 		application{&application},
 		deltaTimeCap(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_DELTA_TIME_CAP}), std::chrono::nanoseconds(1))),
 		timeScale{std::max(PONY_ENGINE_TIME_SCALE, 0.)},

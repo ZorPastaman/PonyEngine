@@ -9,7 +9,7 @@
 
 #include "PonyEngine/RawInput/Windows/MouseProviderModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.RawInput.Mouse.Impl.Windows;
 
 namespace PonyEngine::RawInput::Mouse::Windows

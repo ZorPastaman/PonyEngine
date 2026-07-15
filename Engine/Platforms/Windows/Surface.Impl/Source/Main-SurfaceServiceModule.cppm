@@ -14,7 +14,7 @@ module;
 
 export module PonyEngine.Surface.Impl.Windows:SurfaceServiceModule;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Platform.Windows;
 
@@ -51,10 +51,10 @@ namespace PonyEngine::Surface::Windows
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(SurfaceService).name());
-		surfaceServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+		surfaceServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 		{
 			PONY_LOG(context.Logger(), Log::LogType::Debug, "Getting surface parameters.");
-			auto& nativeApplication = static_cast<Application::Windows::IApplicationContext&>(application);
+			auto& nativeApplication = static_cast<Application::Windows::IApplication&>(application);
 			const std::string_view title = application.ProjectTitle();
 			const HICON mainIcon = nativeApplication.AppIcon();
 			const HCURSOR mainCursor = nativeApplication.AppCursor() ? nativeApplication.AppCursor() : GetDefaultCursor();

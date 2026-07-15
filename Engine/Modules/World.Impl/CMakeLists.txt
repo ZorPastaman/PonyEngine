@@ -46,7 +46,7 @@ if(NOT TARGET PonyEngine.World)
 	message(FATAL_ERROR "PonyEngine.World wasn't configured")
 endif()
 target_link_libraries(PonyEngine.World.Impl PUBLIC
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.World.Impl PRIVATE
 	PonyEngine.World

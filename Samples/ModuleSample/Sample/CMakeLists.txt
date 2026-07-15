@@ -24,7 +24,7 @@ set_target_properties(Sample PROPERTIES
 
 # Set PonyEngine dependencies.
 target_link_libraries(Sample PUBLIC 
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 target_link_libraries(Sample PRIVATE
 	PonyEngine.Core

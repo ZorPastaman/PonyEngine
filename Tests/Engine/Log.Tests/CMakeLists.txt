@@ -28,7 +28,7 @@ target_link_libraries(PonyEngine.Log.Tests PRIVATE
 	Catch2::Catch2WithMain
 	PonyEngine.Log
 	PonyEngine.Core
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )
 
 message(VERBOSE "Discovering tests")

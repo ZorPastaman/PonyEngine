@@ -18,7 +18,7 @@ export module PonyEngine.RawInput.Mouse.Impl.Windows:MouseProvider;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Memory;
 import PonyEngine.RawInput.Ext;

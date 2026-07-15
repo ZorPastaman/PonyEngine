@@ -15,7 +15,7 @@ export module PonyEngine.Application.Impl:ThreadManager;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 export namespace PonyEngine::Application
@@ -25,9 +25,9 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a thread manager.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit ThreadManager(IApplicationContext& application) noexcept;
+		explicit ThreadManager(IApplication& application) noexcept;
 		ThreadManager(const ThreadManager&) = delete;
 		ThreadManager(ThreadManager&&) = delete;
 
@@ -48,7 +48,7 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	ThreadManager::ThreadManager(IApplicationContext& application) noexcept :
+	ThreadManager::ThreadManager(IApplication& application) noexcept :
 		mainThreadId(std::this_thread::get_id())
 	{
 		PONY_LOG(application.Logger(), Log::LogType::Info, "Main thread id: '{}'.", mainThreadId);

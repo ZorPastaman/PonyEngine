@@ -15,7 +15,7 @@ export module PonyEngine.RawInput.Impl:RawInputServiceModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :RawInputService;
@@ -52,7 +52,7 @@ namespace PonyEngine::RawInput
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(RawInputService).name());
 		try
 		{
-			inputServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplicationContext& application)
+			inputServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 			{
 				const auto input = std::make_shared<RawInputService>(application);
 				inputServiceModuleHandle = context.AddData(std::shared_ptr<IRawInputModuleContext>(input, input.get()));

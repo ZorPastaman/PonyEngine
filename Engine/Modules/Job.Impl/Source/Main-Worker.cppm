@@ -17,7 +17,7 @@ export module PonyEngine.Job.Impl:Worker;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Job;
 import PonyEngine.Log;
 
@@ -31,12 +31,12 @@ export namespace PonyEngine::Job
 	{
 	public:
 		/// @brief Creates a worker.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param workers All workers.
 		/// @param myIndex This worker index in the @p workers.
 		/// @param jobQueueVersion Shared job queue version.
 		[[nodiscard("Pure constructor")]]
-		Worker(const Application::IApplicationContext& application, std::span<const std::unique_ptr<Worker>> workers, std::size_t myIndex, std::atomic_size_t* jobQueueVersion) noexcept;
+		Worker(const Application::IApplication& application, std::span<const std::unique_ptr<Worker>> workers, std::size_t myIndex, std::atomic_size_t* jobQueueVersion) noexcept;
 		Worker(const Worker&) = delete;
 		Worker(Worker&&) = delete;
 
@@ -108,7 +108,7 @@ export namespace PonyEngine::Job
 		/// @brief Increments the global job queue version.
 		void IncrementJobQueueVersion() const noexcept;
 
-		const Application::IApplicationContext* application; ///< Application context.
+		const Application::IApplication* application; ///< Application.
 
 		std::atomic_bool running; ///< Is the worker running?
 
@@ -131,7 +131,7 @@ export namespace PonyEngine::Job
 
 namespace PonyEngine::Job
 {
-	Worker::Worker(const Application::IApplicationContext& application, const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex, 
+	Worker::Worker(const Application::IApplication& application, const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex, 
 		std::atomic_size_t* const jobQueueVersion) noexcept :
 		application{&application},
 		running{true},

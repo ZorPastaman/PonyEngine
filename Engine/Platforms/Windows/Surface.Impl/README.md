@@ -6,7 +6,7 @@ Platform independent module: [PonyEngine.Surface.Impl](../../../Modules/Surface.
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../../../Modules/Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.MessagePump](../../../Modules/MessagePump)
 
 ## CMake variables

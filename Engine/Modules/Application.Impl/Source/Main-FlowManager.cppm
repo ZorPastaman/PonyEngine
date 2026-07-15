@@ -17,7 +17,7 @@ export module PonyEngine.Application.Impl:FlowManager;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 import :ExitCodes;
@@ -29,9 +29,9 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a flow manager.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit FlowManager(const IApplicationContext& application) noexcept;
+		explicit FlowManager(const IApplication& application) noexcept;
 		FlowManager(const FlowManager&) = delete;
 		FlowManager(FlowManager&&) = delete;
 
@@ -93,7 +93,7 @@ export namespace PonyEngine::Application
 			enum FlowState flowState; ///< Flow state.
 		};
 
-		const IApplicationContext* application; ///< Application context.
+		const IApplication* application; ///< Application.
 
 		std::atomic<std::uint64_t> frameCount; ///< Frame count.
 		std::atomic<FlowInfo> flowInfo; ///< Flow info.
@@ -105,7 +105,7 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	FlowManager::FlowManager(const IApplicationContext& application) noexcept :
+	FlowManager::FlowManager(const IApplication& application) noexcept :
 		application{&application},
 		frameCount{0ull},
 		flowInfo(FlowInfo{.exitCode = ExitCodes::InitialExitCode, .flowState = FlowState::StartingUp})

@@ -16,7 +16,7 @@ export module PonyEngine.MessagePump.Impl.Windows:MessagePumpService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.MessagePump;
 
@@ -27,9 +27,9 @@ export namespace PonyEngine::MessagePump::Windows
 	{
 	public:
 		/// @brief Creates a pump service.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit MessagePumpService(Application::IApplicationContext& application) noexcept;
+		explicit MessagePumpService(Application::IApplication& application) noexcept;
 		MessagePumpService(const MessagePumpService&) = delete;
 		MessagePumpService(MessagePumpService&&) = delete;
 
@@ -59,7 +59,7 @@ export namespace PonyEngine::MessagePump::Windows
 		/// @param newMessageTime New message time.
 		void UpdateTime(DWORD newMessageTime) noexcept;
 
-		Application::IApplicationContext* application; ///< Application context.
+		Application::IApplication* application; ///< Application.
 
 		std::chrono::time_point<std::chrono::steady_clock> messageTime; ///< Time of the last message.
 		DWORD rawMessageTime; ///< Raw time of the last message.
@@ -69,7 +69,7 @@ export namespace PonyEngine::MessagePump::Windows
 
 namespace PonyEngine::MessagePump::Windows
 {
-	MessagePumpService::MessagePumpService(Application::IApplicationContext& application) noexcept :
+	MessagePumpService::MessagePumpService(Application::IApplication& application) noexcept :
 		application{&application},
 		messageTime(std::chrono::steady_clock::now()),
 		rawMessageTime(GetTickCount())

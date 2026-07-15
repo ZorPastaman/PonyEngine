@@ -17,7 +17,7 @@ export module PonyEngine.Application.Impl.Windows:AppDataManager;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Platform.Windows;
 
@@ -28,13 +28,13 @@ export namespace PonyEngine::Application::Windows
 	{
 	public:
 		/// @brief Creates an application data manager.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param instance Instance.
 		/// @param prevInstance Previous instance.
 		/// @param commandLine Command line.
 		/// @param showCommand Show command.
 		[[nodiscard("Pure constructor")]]
-		AppDataManager(IApplicationContext& application, HINSTANCE instance, HINSTANCE prevInstance, PSTR commandLine, int showCommand);
+		AppDataManager(IApplication& application, HINSTANCE instance, HINSTANCE prevInstance, PSTR commandLine, int showCommand);
 		AppDataManager(const AppDataManager&) = delete;
 		AppDataManager(AppDataManager&&) = delete;
 
@@ -82,7 +82,7 @@ export namespace PonyEngine::Application::Windows
 
 namespace PonyEngine::Application::Windows
 {
-	AppDataManager::AppDataManager(IApplicationContext& application, const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand) :
+	AppDataManager::AppDataManager(IApplication& application, const HINSTANCE instance, const HINSTANCE prevInstance, const PSTR commandLine, const int showCommand) :
 		instance(instance),
 		prevInstance(prevInstance),
 		commandLine(commandLine),

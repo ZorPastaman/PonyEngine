@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Log/FileSubLoggerModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log.File.Impl;
 
 namespace PonyEngine::Log::File

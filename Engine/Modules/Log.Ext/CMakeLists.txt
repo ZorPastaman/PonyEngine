@@ -30,5 +30,5 @@ message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Ext PUBLIC
 	PonyEngine.Log
 	PonyEngine.Core
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 )

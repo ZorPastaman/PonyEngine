@@ -9,7 +9,7 @@
 
 #include "PonyEngine/Surface/Windows/SurfaceServiceModule.h"
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Surface.Impl.Windows;
 
 namespace PonyEngine::Surface::Windows

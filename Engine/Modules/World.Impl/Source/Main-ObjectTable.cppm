@@ -11,7 +11,7 @@ export module PonyEngine.World.Impl:ObjectTable;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Memory;
 import PonyEngine.World;
 
@@ -39,7 +39,7 @@ export namespace PonyEngine::World
 		/// @brief Creates an object table.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit ObjectTable(Application::IApplicationContext& application) noexcept;
+		explicit ObjectTable(Application::IApplication& application) noexcept;
 		ObjectTable(const ObjectTable&) = delete;
 		ObjectTable(ObjectTable&&) = delete;
 
@@ -114,7 +114,7 @@ export namespace PonyEngine::World
 		/// @param handleId Object handle ID.
 		void KillObject(HandleID handleId);
 
-		Application::IApplicationContext* application; ///< Application.
+		Application::IApplication* application; ///< Application.
 
 		std::vector<HandleID> objectsSparse; ///< Sparse.
 		std::vector<HandleVersion> handleVersions; ///< Handle versions. Synced with the @p objectsSparse by index.
@@ -129,7 +129,7 @@ export namespace PonyEngine::World
 
 namespace PonyEngine::World
 {
-	ObjectTable::ObjectTable(Application::IApplicationContext& application) noexcept :
+	ObjectTable::ObjectTable(Application::IApplication& application) noexcept :
 		application{&application}
 	{
 	}

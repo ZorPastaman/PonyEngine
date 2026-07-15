@@ -32,6 +32,6 @@ endif()
 target_link_libraries(PonyEngine.Resource.Ext PUBLIC
 	PonyEngine.Resource
 	PonyEngine.Core
-	PonyEngine.Application.Ext
+	PonyEngine.Application
 	PonyEngine.Log
 )

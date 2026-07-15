@@ -9,7 +9,7 @@ The log file is created in a local data folder. If a file with the same name exi
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
 - [PonyEngine.Log.Ext](../Log.Ext)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 
 ## CMake variables
 

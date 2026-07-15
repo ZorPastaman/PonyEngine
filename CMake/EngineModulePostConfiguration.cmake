@@ -45,7 +45,7 @@ set(PONY_LOGIC_MODULES "")
 message(VERBOSE "Post-configuring")
 pony_apply_flags(PonyEngine.Core TRUE)
 pony_apply_flags(PonyEngine.Log TRUE)
-pony_apply_flags(PonyEngine.Application.Ext TRUE)
+pony_apply_flags(PonyEngine.Application TRUE)
 pony_apply_flags(PonyEngine.Application.Impl TRUE)
 
 pony_apply_flags(PonyEngine.Time TRUE)

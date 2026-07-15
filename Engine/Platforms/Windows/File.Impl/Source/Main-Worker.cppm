@@ -16,7 +16,7 @@ export module PonyEngine.File.Impl.Windows:Worker;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.File.Impl;
 import PonyEngine.Log;
 
@@ -29,9 +29,9 @@ export namespace PonyEngine::File::Windows
 	{
 	public:
 		/// @brief Creates a worker.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit Worker(const Application::IApplicationContext& application);
+		explicit Worker(const Application::IApplication& application);
 		Worker(const Worker&) = delete;
 		Worker(Worker&&) = delete;
 
@@ -64,7 +64,7 @@ export namespace PonyEngine::File::Windows
 		/// @brief Work function.
 		void Work() const noexcept;
 
-		const Application::IApplicationContext* application; ///< Application context.
+		const Application::IApplication* application; ///< Application.
 
 		HANDLE iocp; ///< IO completion port.
 		std::atomic_bool running; ///< Should the worker run?
@@ -81,7 +81,7 @@ export namespace PonyEngine::File::Windows
 
 namespace PonyEngine::File::Windows
 {
-	Worker::Worker(const Application::IApplicationContext& application) :
+	Worker::Worker(const Application::IApplication& application) :
 		application{&application},
 		running(true),
 		requestAllocator(&requestPool)

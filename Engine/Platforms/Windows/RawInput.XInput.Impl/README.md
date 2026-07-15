@@ -6,7 +6,7 @@ Platform independent module: [PonyEngine.RawInput.XInput.Impl](../../../Modules/
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../../../Modules/Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Surface](../Surface)
 - Xinput.lib (Windows SDK)
 

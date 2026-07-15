@@ -15,7 +15,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:BackendModule;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.RenderDevice.Ext;
 

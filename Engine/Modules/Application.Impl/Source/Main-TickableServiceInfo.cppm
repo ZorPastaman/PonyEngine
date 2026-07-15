@@ -11,7 +11,7 @@ export module PonyEngine.Application.Impl:TickableServiceInfo;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 export namespace PonyEngine::Application
 {

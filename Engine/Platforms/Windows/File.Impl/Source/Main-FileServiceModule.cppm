@@ -46,7 +46,7 @@ namespace PonyEngine::File::Windows
 	void FileServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(FileService).name());
-		fileServiceHandle = context.ServiceModuleContext().AddService([](Application::IApplicationContext& application)
+		fileServiceHandle = context.ServiceModuleContext().AddService([](Application::IApplication& application)
 		{
 			return std::make_shared<FileService>(application);
 		});

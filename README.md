@@ -80,9 +80,9 @@ There are these module types:
 | Extension API  | .Ext        | Modules that contain interfaces for extensions of implementation modules. They also may contain some utilities.              |
 
 The engine runtime is built around services.
-Modules register services in a global application context, and the application ticks them every frame.
+Modules register services in a global application, and the application ticks them every frame.
 Services interact with each other via interfaces only.
-See more in the [Application.Ext](Modules/Application.Ext) readme.
+See more in the [Application](Modules/Application) readme.
 
 The key idea behind cross-service interaction is strict separation of interfaces and implementations.
 Services communicate only through interfaces, while implementations live in separate modules.

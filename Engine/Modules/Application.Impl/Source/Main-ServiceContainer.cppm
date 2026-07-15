@@ -15,7 +15,7 @@ export module PonyEngine.Application.Impl:ServiceContainer;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 import :InterfaceContainer;
 import :TickableServiceInfo;

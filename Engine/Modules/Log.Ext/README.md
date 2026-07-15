@@ -8,7 +8,7 @@ By default, the engine logger logs only to the console. For additional log outpu
 
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application.Ext](../Application.Ext)
+- [PonyEngine.Application](../Application)
 
 ## C\++ modules
 
@@ -28,7 +28,7 @@ But if your sub-logger needs initial info, `LogEntry` contains it as well.
 
 #### [ILoggerContext](Source/Main-ILoggerContext.cppm)
 
-Interface representing the logger context. Provides access to the application context and functions that allow to log to the console.
+Interface representing the logger context. Provides access to the application and functions that allow to log to the console.
 Sub-loggers may use those functions to log errors, warnings, and other things. It's useful because sub-loggers can't throw.
 
 #### [ILoggerModuleContext](Source/Main-ILoggerModuleContext.cppm)

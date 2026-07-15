@@ -15,7 +15,7 @@ export module PonyEngine.RenderDevice.Impl:RenderDeviceService;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.Meta;
@@ -30,9 +30,9 @@ export namespace PonyEngine::RenderDevice
 	{
 	public:
 		/// @brief Creates a render device service.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit RenderDeviceService(Application::IApplicationContext& application) noexcept;
+		explicit RenderDeviceService(Application::IApplication& application) noexcept;
 		RenderDeviceService(const RenderDeviceService&) = delete;
 		RenderDeviceService(RenderDeviceService&&) = delete;
 
@@ -155,9 +155,9 @@ export namespace PonyEngine::RenderDevice
 		virtual void RemoveObserver(IRenderDeviceServiceObserver& observer) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept override;
+		virtual Application::IApplication& Application() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept override;
+		virtual const Application::IApplication& Application() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& Logger() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -189,7 +189,7 @@ export namespace PonyEngine::RenderDevice
 		[[nodiscard("Pure function")]]
 		const IBackend& GetBackend(std::size_t index) const;
 
-		Application::IApplicationContext* application; ///< Application context.
+		Application::IApplication* application; ///< Application.
 
 		BackendContainer backends; ///< Backends.
 		std::optional<std::size_t> activeBackendIndex; ///< Active backend index.
@@ -205,7 +205,7 @@ export namespace PonyEngine::RenderDevice
 
 namespace PonyEngine::RenderDevice
 {
-	RenderDeviceService::RenderDeviceService(Application::IApplicationContext& application) noexcept :
+	RenderDeviceService::RenderDeviceService(Application::IApplication& application) noexcept :
 		application{&application},
 		nextBackendHandle{.id = 1u}
 	{
@@ -691,12 +691,12 @@ namespace PonyEngine::RenderDevice
 		}
 	}
 
-	Application::IApplicationContext& RenderDeviceService::Application() noexcept
+	Application::IApplication& RenderDeviceService::Application() noexcept
 	{
 		return *application;
 	}
 
-	const Application::IApplicationContext& RenderDeviceService::Application() const noexcept
+	const Application::IApplication& RenderDeviceService::Application() const noexcept
 	{
 		return *application;
 	}

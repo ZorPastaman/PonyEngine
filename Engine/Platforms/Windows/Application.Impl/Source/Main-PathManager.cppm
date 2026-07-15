@@ -29,9 +29,9 @@ export namespace PonyEngine::Application::Windows
 	{
 	public:
 		/// @brief Creates a path manager.
-		/// @param application Application context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit PathManager(IApplicationContext& application);
+		explicit PathManager(IApplication& application);
 		PathManager(const PathManager&) = delete;
 		PathManager(PathManager&&) = delete;
 
@@ -77,7 +77,7 @@ export namespace PonyEngine::Application::Windows
 
 namespace PonyEngine::Application::Windows
 {
-	PathManager::PathManager(IApplicationContext& application)
+	PathManager::PathManager(IApplication& application)
 	{
 		PONY_LOG(application.Logger(), Log::LogType::Info, "Getting executable file...");
 		executableFile = Platform::Windows::GetModulePath(nullptr).lexically_normal();

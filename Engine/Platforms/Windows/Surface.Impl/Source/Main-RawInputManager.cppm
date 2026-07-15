@@ -16,7 +16,7 @@ module;
 
 export module PonyEngine.Surface.Impl.Windows:RawInputManager;
 
-import PonyEngine.Application.Ext.Windows;
+import PonyEngine.Application.Windows;
 import PonyEngine.Log;
 import PonyEngine.Surface.Windows;
 
@@ -29,10 +29,10 @@ export namespace PonyEngine::Surface::Windows
 	{
 	public:
 		/// @brief Creates a raw input manager.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param surface Surface service.
 		[[nodiscard("Pure constructor")]]
-		RawInputManager(Application::Windows::IApplicationContext& application, ISurfaceService& surface) noexcept;
+		RawInputManager(Application::Windows::IApplication& application, ISurfaceService& surface) noexcept;
 		RawInputManager(const RawInputManager&) = delete;
 		RawInputManager(RawInputManager&&) = delete;
 
@@ -108,7 +108,7 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("Pure function")]]
 		static constexpr std::pair<USHORT, USHORT> Unpack(DWORD value) noexcept;
 
-		Application::Windows::IApplicationContext* application; ///< Application context.
+		Application::Windows::IApplication* application; ///< Application.
 		ISurfaceService* surface; ///< Surface service.
 
 		RawInputDeviceContainer deviceContainer; ///< Device container.
@@ -119,7 +119,7 @@ export namespace PonyEngine::Surface::Windows
 
 namespace PonyEngine::Surface::Windows
 {
-	RawInputManager::RawInputManager(Application::Windows::IApplicationContext& application, ISurfaceService& surface) noexcept :
+	RawInputManager::RawInputManager(Application::Windows::IApplication& application, ISurfaceService& surface) noexcept :
 		application{&application},
 		surface{&surface}
 	{

@@ -7,14 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.Ext:LoggerHandle;
+export module PonyEngine.Application:ModuleDataHandle;
 
 import std;
 
 export namespace PonyEngine::Application
 {
-	/// @brief Logger handle.
-	struct LoggerHandle final
+	/// @brief Module data handle.
+	struct ModuleDataHandle final
 	{
 		std::uint32_t id = 0u; ///< ID. It's used only by the owner.
 
@@ -29,15 +29,15 @@ export namespace PonyEngine::Application
 		explicit constexpr operator bool() const noexcept;
 
 		[[nodiscard("Pure operator")]]
-		constexpr auto operator <=>(const LoggerHandle& other) const noexcept = default;
+		constexpr auto operator <=>(const ModuleDataHandle& other) const noexcept = default;
 	};
 }
 
 export template<>
-struct std::hash<PonyEngine::Application::LoggerHandle> final
+struct std::hash<PonyEngine::Application::ModuleDataHandle> final
 {
 	[[nodiscard("Pure function")]]
-	size_t operator ()(const PonyEngine::Application::LoggerHandle handle) const noexcept
+	size_t operator ()(const PonyEngine::Application::ModuleDataHandle handle) const noexcept
 	{
 		return std::hash<std::uint32_t>()(handle.id);
 	}
@@ -45,12 +45,12 @@ struct std::hash<PonyEngine::Application::LoggerHandle> final
 
 namespace PonyEngine::Application
 {
-	constexpr bool LoggerHandle::IsValid() const noexcept
+	constexpr bool ModuleDataHandle::IsValid() const noexcept
 	{
 		return id;
 	}
 
-	constexpr LoggerHandle::operator bool() const noexcept
+	constexpr ModuleDataHandle::operator bool() const noexcept
 	{
 		return IsValid();
 	}

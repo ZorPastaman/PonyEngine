@@ -12,16 +12,16 @@ module;
 #include "PonyEngine/Object/Body.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Application.Ext.Windows:IApplicationContext;
+export module PonyEngine.Application.Windows:IApplication;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Windows application context.
-	class IApplicationContext : public Application::IApplicationContext
+	/// @brief Windows application.
+	class IApplication : public Application::IApplication
 	{
-		PONY_INTERFACE_BODY(IApplicationContext)
+		PONY_INTERFACE_BODY(IApplication)
 
 		/// @brief Gets the instance handle of the application.
 		/// @return Instance handle of the application.

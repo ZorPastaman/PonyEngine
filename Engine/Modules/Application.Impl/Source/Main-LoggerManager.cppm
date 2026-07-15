@@ -17,7 +17,7 @@ export module PonyEngine.Application.Impl:LoggerManager;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log;
 
 export namespace PonyEngine::Application
@@ -49,19 +49,19 @@ export namespace PonyEngine::Application
 
 	protected:
 		/// @brief Creates a logger manager.
-		/// @param application Application context.
+		/// @param application Application.
 		/// @param defaultLogger Default logger.
 		/// @remark Sets a default logger as a current logger.
 		[[nodiscard("Pure constructor")]]
-		LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
+		LoggerManager(IApplication& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept;
 
 	private:
 		[[nodiscard("Pure function")]]
-		virtual IApplicationContext& Application() noexcept override final;
+		virtual IApplication& Application() noexcept override final;
 		[[nodiscard("Pure function")]]
-		virtual const IApplicationContext& Application() const noexcept override final;
+		virtual const IApplication& Application() const noexcept override final;
 
-		IApplicationContext* application; ///< Application context.
+		IApplication* application; ///< Application.
 
 		std::shared_ptr<Log::ILogger> defaultLogger; ///< Default logger.
 		std::shared_ptr<Log::ILogger> externalLogger; ///< External logger.
@@ -161,7 +161,7 @@ namespace PonyEngine::Application
 		externalLogger = nullptr;
 	}
 
-	LoggerManager::LoggerManager(IApplicationContext& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
+	LoggerManager::LoggerManager(IApplication& application, const std::shared_ptr<Log::ILogger>& defaultLogger) noexcept :
 		application{&application},
 		defaultLogger(defaultLogger),
 		logger{defaultLogger.get()},
@@ -171,12 +171,12 @@ namespace PonyEngine::Application
 		assert(this->defaultLogger && "The default logger is nullptr.");
 	}
 
-	IApplicationContext& LoggerManager::Application() noexcept
+	IApplication& LoggerManager::Application() noexcept
 	{
 		return *application;
 	}
 
-	const IApplicationContext& LoggerManager::Application() const noexcept
+	const IApplication& LoggerManager::Application() const noexcept
 	{
 		return *application;
 	}

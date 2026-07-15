@@ -15,7 +15,7 @@ export module PonyEngine.Log.Impl:Logger;
 
 import std;
 
-import PonyEngine.Application.Ext;
+import PonyEngine.Application;
 import PonyEngine.Log.Ext;
 
 import :LogFiller;
@@ -57,9 +57,9 @@ export namespace PonyEngine::Log
 
 	private:
 		[[nodiscard("Pure function")]]
-		virtual Application::IApplicationContext& Application() noexcept override;
+		virtual Application::IApplication& Application() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const Application::IApplicationContext& Application() const noexcept override;
+		virtual const Application::IApplication& Application() const noexcept override;
 
 		virtual void LogToConsole(LogType logType, std::string_view message) const noexcept override;
 		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override;
@@ -255,12 +255,12 @@ namespace PonyEngine::Log
 		}
 	}
 
-	Application::IApplicationContext& Logger::Application() noexcept
+	Application::IApplication& Logger::Application() noexcept
 	{
 		return loggerContext->Application();
 	}
 
-	const Application::IApplicationContext& Logger::Application() const noexcept
+	const Application::IApplication& Logger::Application() const noexcept
 	{
 		return loggerContext->Application();
 	}
