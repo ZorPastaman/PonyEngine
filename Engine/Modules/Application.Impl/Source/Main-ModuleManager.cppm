@@ -62,16 +62,16 @@ export namespace PonyEngine::Application
 		virtual void RemoveData(ModuleDataHandle handle) override;
 
 		/// @brief Initializes the modules.
-		/// @param lastModule Last module pointer.
-		void Initialize(std::uintptr_t& lastModule);
+		void Initialize();
 		/// @brief Finalizes the modules.
-		/// @param lastModule Last module pointer.
-		void Finalize(std::uintptr_t lastModule) noexcept;
+		void Finalize() noexcept;
 
 		IApplicationContext* application; ///< Application context.
 
 		ILoggerModuleContext* loggerModuleContext; ///< Logger module context.
 		IServiceModuleContext* serviceModuleContext; ///< Service module context.
+
+		std::vector<IModule*> appModules; ///< Application modules.
 
 		ModuleDataContainer dataContainer; ///< Data container.
 
@@ -81,8 +81,10 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) IModule** FirstModule = nullptr; ///< Module begin pointer.
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) IModule** LastModule = nullptr; ///< Module end pointer.
+	using ModuleInterface = IModule*(*)();
+
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) ModuleInterface FirstModule = nullptr; ///< Module begin pointer.
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) ModuleInterface LastModule = nullptr; ///< Module end pointer.
 
 	ModuleManager::ModuleManager(IApplicationContext& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext) :
 		application{&application},
@@ -90,21 +92,20 @@ namespace PonyEngine::Application
 		serviceModuleContext{&serviceModuleContext},
 		nextDataHandle{.id = 1u}
 	{
-		std::uintptr_t lastModule = reinterpret_cast<std::uintptr_t>(&FirstModule);
 		try
 		{
-			Initialize(lastModule);
+			Initialize();
 		}
 		catch (...)
 		{
-			Finalize(lastModule);
+			Finalize();
 			throw;
 		}
 	}
 
 	ModuleManager::~ModuleManager() noexcept
 	{
-		Finalize(reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(IModule**));
+		Finalize();
 
 		if (dataContainer.Size() > 0uz) [[unlikely]]
 		{
@@ -222,63 +223,63 @@ namespace PonyEngine::Application
 		}
 	}
 
-	void ModuleManager::Initialize(std::uintptr_t& lastModule)
+	void ModuleManager::Initialize()
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up modules...")
-
-		for (std::uintptr_t current = reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(IModule**); 
-			current < reinterpret_cast<std::uintptr_t>(&LastModule); 
-			current += sizeof(IModule**))
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Getting modules...")
+		for (std::uintptr_t current = reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(ModuleInterface);
+			current < reinterpret_cast<std::uintptr_t>(&LastModule);
+			current += sizeof(ModuleInterface))
 		{
-			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
+			if (const auto moduleGetter = *reinterpret_cast<ModuleInterface*>(current))
 			{
-				IModule* const appModule = *modulePtr;
+				IModule* const appModule = moduleGetter();
 #ifndef NDEBUG
 				if (!appModule) [[unlikely]]
 				{
 					throw std::logic_error("Module is nullptr");
 				}
 #endif
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*&*appModule).name());
-				try
-				{
-					appModule->StartUp(*this);
-				}
-				catch (...)
-				{
-					PONY_LOG_X(application->Logger(), std::current_exception(), "On starting up '{}' module.", typeid(*&*appModule).name());
-					throw;
-				}
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module done.", typeid(*&*appModule).name());
-				lastModule = current;
+				appModules.push_back(appModule);
 			}
+		}
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Getting modules done.")
+
+		PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up modules...")
+		for (IModule* const appModule : appModules)
+		{
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*appModule).name());
+			try
+			{
+				appModule->StartUp(*this);
+			}
+			catch (...)
+			{
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On starting up '{}' module.", typeid(*appModule).name());
+				throw;
+			}
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module done.", typeid(*appModule).name());
 		}
 
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up modules done.")
 	}
 
-	void ModuleManager::Finalize(const std::uintptr_t lastModule) noexcept
+	void ModuleManager::Finalize() noexcept
 	{
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down modules...")
 
-		for (std::uintptr_t current = lastModule; 
-			current > reinterpret_cast<std::uintptr_t>(&FirstModule); 
-			current -= sizeof(IModule**))
+		for (std::size_t i = appModules.size(); i-- > 0uz; )
 		{
-			if (const auto modulePtr = *reinterpret_cast<IModule***>(current))
+			IModule* const appModule = appModules[i];
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module...", typeid(*appModule).name());
+			try
 			{
-				IModule* const appModule = *modulePtr;
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module...", typeid(*&*appModule).name());
-				try
-				{
-					appModule->ShutDown(*this);
-				}
-				catch (...)
-				{
-					PONY_LOG_X(application->Logger(), std::current_exception(), "On shutting down '{}' module.", typeid(*&*appModule).name());
-				}
-				PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module done.", typeid(*&*appModule).name());
+				appModule->ShutDown(*this);
 			}
+			catch (...)
+			{
+				PONY_LOG_X(application->Logger(), std::current_exception(), "On shutting down '{}' module.", typeid(*appModule).name());
+			}
+			PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module done.", typeid(*appModule).name());
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down modules done.")
 	}

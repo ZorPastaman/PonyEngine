@@ -22,14 +22,10 @@
 /// @param order Segment order.
 /// @note For internal use only.
 #define PONY_MODULE_ALLOCATE(order) PONY_ALLOCATE(PONY_MODULE_SECTION_NAME(order))
-/// @brief Creates a module pointer name.
-/// @param moduleName Target module name.
-/// @note For internal use only.
-#define PONY_MODULE_POINTER_NAME(moduleName) PONY_CONCAT_VALUES(PonyPointer, moduleName)
 /// @brief Creates a module interface name.
 /// @param moduleName Target module name.
 /// @note For internal use only.
-#define PONY_MODULE_INTERFACE_NAME(moduleName) PONY_CONCAT_VALUES(PonyInterface, moduleName)
+#define PONY_MODULE_INTERFACE_NAME(moduleName) PONY_CONCAT_VALUES(PonyModule, moduleName)
 
 /// @brief Used by the application to find a start point.
 /// @note For internal use only.
@@ -53,8 +49,6 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 	PONY_SECTION(PONY_MODULE_SECTION_NAME(order)) \
 	extern "C" \
 	{ \
-		PONY_DLL_EXPORT PonyEngine::Application::IModule* PONY_MODULE_POINTER_NAME(moduleName) = function(); \
-		PONY_MODULE_ALLOCATE(order) PonyEngine::Application::IModule** PONY_MODULE_INTERFACE_NAME(moduleName) = &PONY_MODULE_POINTER_NAME(moduleName); \
-		PONY_PRESERVE(PONY_MODULE_POINTER_NAME(moduleName)); \
+		PONY_MODULE_ALLOCATE(order) PonyEngine::Application::IModule* (*PONY_MODULE_INTERFACE_NAME(moduleName))() = function; \
 		PONY_PRESERVE(PONY_MODULE_INTERFACE_NAME(moduleName)); \
 	} \
