@@ -1,10 +1,10 @@
 # Sets log defines.
 # target_name - Target name.
-# log_level - Log level. Allowed values: Verbose, Debug, Info, Warning, Error, Exception. "" means no logs.
-# stacktrace_level - Log stacktrace level. Allowed values: Verbose, Debug, Info, Warning, Error, Exception. "" means no log stracktraces.
+# log_level - Log level. Allowed values: Verbose, Debug, Info, Warning, Error, Fatal. "" means no logs.
+# stacktrace_level - Log stacktrace level. Allowed values: Verbose, Debug, Info, Warning, Error, Fatal. "" means no log stracktraces.
 function(pony_set_log_defines target_name log_level stacktrace_level)
 	function(get_sublist log_level sublist)
-		set(LOG_LEVELS Verbose Debug Info Warning Error Exception)
+		set(LOG_LEVELS Verbose Debug Info Warning Error Fatal)
 		set(LOG_INDEX -1)
 		set(i 0)
 		foreach(LEVEL IN LISTS LOG_LEVELS)
@@ -39,8 +39,8 @@ function(pony_set_log_defines target_name log_level stacktrace_level)
 					target_compile_definitions(${target_name} PRIVATE PONY_LOG_WARNING)
 				elseif(LEVEL STREQUAL Error)
 					target_compile_definitions(${target_name} PRIVATE PONY_LOG_ERROR)
-				elseif(LEVEL STREQUAL Exception)
-					target_compile_definitions(${target_name} PRIVATE PONY_LOG_EXCEPTION)
+				elseif(LEVEL STREQUAL Fatal)
+					target_compile_definitions(${target_name} PRIVATE PONY_LOG_FATAL)
 				endif()
 			endforeach()
 		endif()
@@ -61,8 +61,8 @@ function(pony_set_log_defines target_name log_level stacktrace_level)
 					target_compile_definitions(${target_name} PRIVATE PONY_LOG_STACKTRACE_WARNING)
 				elseif(LEVEL STREQUAL Error)
 					target_compile_definitions(${target_name} PRIVATE PONY_LOG_STACKTRACE_ERROR)
-				elseif(LEVEL STREQUAL Exception)
-					target_compile_definitions(${target_name} PRIVATE PONY_LOG_STACKTRACE_EXCEPTION)
+				elseif(LEVEL STREQUAL Fatal)
+					target_compile_definitions(${target_name} PRIVATE PONY_LOG_STACKTRACE_FATAL)
 				endif()
 			endforeach()
 		endif()

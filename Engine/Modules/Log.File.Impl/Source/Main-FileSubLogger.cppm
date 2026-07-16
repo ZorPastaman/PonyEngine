@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Console.h"
-
 export module PonyEngine.Log.File.Impl:FileSubLogger;
 
 import std;
@@ -33,7 +29,7 @@ export namespace PonyEngine::Log::File
 
 		~FileSubLogger() noexcept = default;
 
-		virtual void Log(const LogEntry& logEntry) noexcept override;
+		virtual void Log(std::string_view formattedMessage, const LogEntry& logEntry) noexcept override;
 
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
@@ -57,15 +53,14 @@ namespace PonyEngine::Log::File
 		}
 	}
 
-	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
+	void FileSubLogger::Log(const std::string_view formattedMessage, const LogEntry& logEntry) noexcept
 	{
 		try
 		{
-			logFile << logEntry.formattedMessage;
+			logFile << formattedMessage;
 		}
 		catch (...)
 		{
-			PONY_CONSOLE_X(*logger, std::current_exception(), "On writing to log file.");
 		}
 	}
 }

@@ -58,7 +58,7 @@ namespace PonyEngine::Application
 		case Log::LogType::Warning:
 			return std::clog;
 		case Log::LogType::Error:
-		case Log::LogType::Exception:
+		case Log::LogType::Fatal:
 			return std::cerr;
 		default: [[unlikely]]
 			assert(false && "Invalid log type.");

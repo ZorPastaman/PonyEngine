@@ -32,7 +32,7 @@ namespace PonyEngine::Log
 		'I',
 		'W',
 		'E',
-		'X',
+		'F',
 		'U'
 	};
 

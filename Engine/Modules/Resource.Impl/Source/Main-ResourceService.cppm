@@ -345,7 +345,7 @@ namespace PonyEngine::Resource
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ticking '{}' provider.", typeid(provider).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On ticking '{}' provider.", typeid(provider).name());
 				throw;
 			}
 		}
@@ -528,7 +528,7 @@ namespace PonyEngine::Resource
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On beginning '{}' resource provider.", typeid(provider).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On beginning '{}' resource provider.", typeid(provider).name());
 				throw;
 			}
 		}
@@ -551,7 +551,7 @@ namespace PonyEngine::Resource
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ending '{}' resource provider.", typeid(provider).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On ending '{}' resource provider.", typeid(provider).name());
 			}
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending resource providers done.");

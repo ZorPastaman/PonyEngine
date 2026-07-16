@@ -139,7 +139,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On registering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On registering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 				observers.pop_back();
 
 				throw;
@@ -183,7 +183,7 @@ namespace PonyEngine::Surface::Windows
 					}
 					catch (...)
 					{
-						PONY_LOG_X(application->Logger(), std::current_exception(), "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+						PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 					}
 				}
 
@@ -222,7 +222,7 @@ namespace PonyEngine::Surface::Windows
 					}
 					catch (...)
 					{
-						PONY_LOG_X(application->Logger(), std::current_exception(), "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
+						PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On unregistering raw input type. Usage page: '{}'; Usage: '{}'.", usagePage, usage);
 					}
 				}
 			}
@@ -252,7 +252,7 @@ namespace PonyEngine::Surface::Windows
 		}
 		catch (...)
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On allocating raw input cache.");
+			PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On allocating raw input cache.");
 			return 0;
 		}
 
@@ -277,7 +277,7 @@ namespace PonyEngine::Surface::Windows
 					}
 					catch (...)
 					{
-						PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' raw input observer.", typeid(*observer).name());
+						PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On calling '{}' raw input observer.", typeid(*observer).name());
 					}
 				}
 			}
@@ -337,14 +337,14 @@ namespace PonyEngine::Surface::Windows
 					}
 					catch (...)
 					{
-						PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' raw input observer on input device change.", typeid(*observer).name());
+						PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On calling '{}' raw input observer on input device change.", typeid(*observer).name());
 					}
 				}
 			}
 		}
 		catch (...)
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On updating device connection state. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(deviceHandle));
+			PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On updating device connection state. Device handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(deviceHandle));
 		}
 
 		return 0;

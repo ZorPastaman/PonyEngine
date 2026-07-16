@@ -93,12 +93,12 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	}
 	catch (const std::exception& e)
 	{
-		PONY_LOG_X(*logger, std::current_exception(), "On creating application.");
+		PONY_LOG(*logger, PonyEngine::Log::LogType::Error, std::current_exception(), "On creating application.");
 		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, std::format("Exception on creating application:\n{}.", e.what()));
 	}
 	catch (...)
 	{
-		PONY_LOG_X(*logger, std::current_exception(), "On creating application.");
+		PONY_LOG(*logger, PonyEngine::Log::LogType::Error, std::current_exception(), "On creating application.");
 		return std::pair(PonyEngine::Application::ExitCodes::InitializationException, "Unknown exception on creating application.");
 	}
 	PONY_LOG(*logger, PonyEngine::Log::LogType::Info, "Constructing application done.");
@@ -110,12 +110,12 @@ std::pair<int, std::string> Execute(const HINSTANCE hInstance, const HINSTANCE h
 	}
 	catch (const std::exception& e)
 	{
-		PONY_LOG_X(*logger, std::current_exception(), "On application running.");
+		PONY_LOG(*logger, PonyEngine::Log::LogType::Error, std::current_exception(), "On application running.");
 		return std::pair(PonyEngine::Application::ExitCodes::RunningException, std::format("Exception on application running:\n{}.", e.what()));
 	}
 	catch (...)
 	{
-		PONY_LOG_X(*logger, std::current_exception(), "On application running.");
+		PONY_LOG(*logger, PonyEngine::Log::LogType::Error, std::current_exception(), "On application running.");
 		return std::pair(PonyEngine::Application::ExitCodes::RunningException, "Unknown exception on application running.");
 	}
 	PONY_LOG(*logger, PonyEngine::Log::LogType::Info, "Running application done. Exit code: '{}'.", exitCode);

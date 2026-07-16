@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Log/Console.h"
+#include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Log.Impl:Logger;
 
@@ -41,12 +41,12 @@ export namespace PonyEngine::Log
 		virtual void Log(LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
 		virtual void Log(LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
 
-		virtual void Log(const std::exception_ptr& exception) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view message) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void Log(LogType logType, const std::exception_ptr& exception) const noexcept override;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view message) const noexcept override;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
 
 		[[nodiscard("Must be used to remove")]]
 		virtual SubLoggerHandle AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory) override;
@@ -61,28 +61,16 @@ export namespace PonyEngine::Log
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplication& Application() const noexcept override;
 
-		virtual void LogToConsole(LogType logType, std::string_view message) const noexcept override;
-		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override;
-		virtual void LogToConsole(LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void LogToConsole(LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
-
-		virtual void LogToConsole(const std::exception_ptr& exception) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
-		virtual void LogToConsole(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override;
-
 		/// @brief Logs the entry.
+		/// @param formattedMessage Formatted message.
 		/// @param logEntry Log entry to log.
-		void Log(const LogEntry& logEntry) const noexcept;
+		void Log(std::string_view formattedMessage, const LogEntry& logEntry) const noexcept;
 
 		Application::ILoggerContext* loggerContext; ///< Logger context.
 
 		SubLoggerContainer subLoggerContainer; ///< Sub-logger container.
 
-		inline static thread_local std::string logStringTemp; ///< Temporal log string.
-		inline static thread_local std::string consoleStringTemp; ///< Temporal log string that is used in @p LogToString().
+		inline static thread_local std::string logString; ///< Log string.
 
 		SubLoggerHandle nextSubLoggerHandle; ///< Next sub-logger handle.
 
@@ -100,94 +88,97 @@ namespace PonyEngine::Log
 
 	Logger::~Logger() noexcept
 	{
+#if PONY_LOG_ERROR
 		if (subLoggerContainer.Size() > 0uz) [[unlikely]]
 		{
-			PONY_CONSOLE(*this, LogType::Error, "Sub-loggers weren't removed:");
+			loggerContext->LogToConsole(LogType::Error, "Sub-loggers weren't removed:");
 			for (std::size_t i = 0uz; i < subLoggerContainer.Size(); ++i)
 			{
-				PONY_CONSOLE(*this, LogType::Error, "Sub-logger: '{}'.", typeid(subLoggerContainer.SubLogger(i)).name());
+				loggerContext->LogToConsole(LogType::Error, typeid(subLoggerContainer.SubLogger(i)).name());
 			}
 		}
+#endif
 	}
 
 	void Logger::Log(const LogType logType, const std::string_view message) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, logType, message, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, message);
+		Log(logString, logEntry);
 	}
 
 	void Logger::Log(const LogType logType, const std::string_view format, const std::format_args formatArgs) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, logType, format, formatArgs, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, format, formatArgs);
+		Log(logString, logEntry);
 	}
 
 	void Logger::Log(const LogType logType, const std::string_view message, const std::stacktrace& stacktrace) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, logType, message, stacktrace, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, message, stacktrace);
+		Log(logString, logEntry);
 	}
 
 	void Logger::Log(const LogType logType, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, logType, format, formatArgs, stacktrace, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, format, formatArgs, stacktrace);
+		Log(logString, logEntry);
 	}
 
-	void Logger::Log(const std::exception_ptr& exception) const noexcept
+	void Logger::Log(const LogType logType, const std::exception_ptr& exception) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, exception, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, exception);
+		Log(logString, logEntry);
 	}
 
-	void Logger::Log(const std::exception_ptr& exception, const std::string_view message) const noexcept
+	void Logger::Log(const LogType logType, const std::exception_ptr& exception, const std::string_view message) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, exception, message, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, exception, message);
+		Log(logString, logEntry);
 	}
 
-	void Logger::Log(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs) const noexcept
+	void Logger::Log(const LogType logType, const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, exception, format, formatArgs, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, exception, format, formatArgs);
+		Log(logString, logEntry);
 	}
 
-	void Logger::Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept
+	void Logger::Log(const LogType logType, const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, exception, stacktrace, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, exception, stacktrace);
+		Log(logString, logEntry);
 	}
 
-	void Logger::Log(const std::exception_ptr& exception, const std::string_view message, const std::stacktrace& stacktrace) const noexcept
+	void Logger::Log(const LogType logType, const std::exception_ptr& exception, const std::string_view message, const std::stacktrace& stacktrace) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, exception, message, stacktrace, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, exception, message, stacktrace);
+		Log(logString, logEntry);
 	}
 
-	void Logger::Log(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept
+	void Logger::Log(const LogType logType, const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs, 
+		const std::stacktrace& stacktrace) const noexcept
 	{
-		logStringTemp.clear();
+		logString.clear();
 		LogEntry logEntry;
-		FillData(logEntry, logStringTemp, exception, format, formatArgs, stacktrace, *loggerContext);
-		Log(logEntry);
+		FillData(logEntry, logString, logType, exception, format, formatArgs, stacktrace);
+		Log(logString, logEntry);
 	}
 
 	SubLoggerHandle Logger::AddSubLogger(const std::function<std::shared_ptr<ISubLogger>(ILoggerContext&)>& factory)
@@ -265,85 +256,15 @@ namespace PonyEngine::Log
 		return loggerContext->Application();
 	}
 
-	void Logger::LogToConsole(const LogType logType, const std::string_view message) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, logType, message, *loggerContext);
-		loggerContext->LogToConsole(logType, log);
-	}
-
-	void Logger::LogToConsole(const LogType logType, const std::string_view format, const std::format_args formatArgs) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, logType, format, formatArgs, *loggerContext);
-		loggerContext->LogToConsole(logType, log);
-	}
-
-	void Logger::LogToConsole(const LogType logType, const std::string_view message, const std::stacktrace& stacktrace) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, logType, message, stacktrace, *loggerContext);
-		loggerContext->LogToConsole(logType, log);
-	}
-
-	void Logger::LogToConsole(const LogType logType, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, logType, format, formatArgs, stacktrace, *loggerContext);
-		loggerContext->LogToConsole(logType, log);
-	}
-
-	void Logger::LogToConsole(const std::exception_ptr& exception) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, exception, *loggerContext);
-		loggerContext->LogToConsole(LogType::Exception, log);
-	}
-
-	void Logger::LogToConsole(const std::exception_ptr& exception, const std::string_view message) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, exception, message, *loggerContext);
-		loggerContext->LogToConsole(LogType::Exception, log);
-	}
-
-	void Logger::LogToConsole(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, exception, format, formatArgs, *loggerContext);
-		loggerContext->LogToConsole(LogType::Exception, log);
-	}
-
-	void Logger::LogToConsole(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, exception, stacktrace, *loggerContext);
-		loggerContext->LogToConsole(LogType::Exception, log);
-	}
-
-	void Logger::LogToConsole(const std::exception_ptr& exception, const std::string_view message, const std::stacktrace& stacktrace) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, exception, message, stacktrace, *loggerContext);
-		loggerContext->LogToConsole(LogType::Exception, log);
-	}
-
-	void Logger::LogToConsole(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept
-	{
-		consoleStringTemp.clear();
-		const std::string_view log = FillData(consoleStringTemp, exception, format, formatArgs, stacktrace, *loggerContext);
-		loggerContext->LogToConsole(LogType::Exception, log);
-	}
-
-	void Logger::Log(const LogEntry& logEntry) const noexcept
+	void Logger::Log(const std::string_view formattedMessage, const LogEntry& logEntry) const noexcept
 	{
 		const auto lock = std::lock_guard(logMutex);
 
-		loggerContext->LogToConsole(logEntry.logType, logEntry.formattedMessage);
+		loggerContext->LogToConsole(logEntry.logType, formattedMessage);
 
 		for (std::size_t i = 0uz; i < subLoggerContainer.Size(); ++i)
 		{
-			subLoggerContainer.SubLogger(i).Log(logEntry);
+			subLoggerContainer.SubLogger(i).Log(formattedMessage, logEntry);
 		}
 	}
 }

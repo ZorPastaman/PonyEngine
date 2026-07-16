@@ -35,41 +35,6 @@ Sub-loggers may use those functions to log errors, warnings, and other things. I
 
 Interface representing the logger module context. This interface is used by modules to add sub-loggers. It may be accessed via module data after the logger module initialization.
 
-## C\++ headers
-
-### [PonyEngine/Log/Console.h](Include/Public/PonyEngine/Log/Console.h)
-
-Provides helper macros with conditionally compiled code, controlled by the configured log level and stacktrace level defines.
-The configuration macros are inherited from [PonyEngine.Log](../Log).
-
-Helpers:
-
-| Define                                                   | Description                                                                          |
-|:---------------------------------------------------------|:-------------------------------------------------------------------------------------|
-| `PONY_CONSOLE_PUSH(logger, type, message, ...)`          | Pushes the log to a console without a level check.                                   |
-| `PONY_CONSOLE_PUSH_X(logger, exception, ...)`            | Pushes the exception log to a console without a level check.                         |
-| `PONY_CONSOLE(logger, type, message, ...)`               | Logs the log to a console with a level check.                                        |
-| `PONY_CONSOLE_IF(condition, logger, type, message, ...)` | Logs the log to a console with a level check if the `condition` is `true`.           |
-| `PONY_CONSOLE_X(logger, exception, ...)`                 | Logs the exception log to a console with a level check.                              |
-| `PONY_CONSOLE_X_IF(condition, logger, exception, ...)`   | Logs the exception log to a console with a level check if the `condition` is `true`. |
-
-All the helper macros support string formatting.
-
-```
-PonyEngine::Log::ILoggerContext& logger = GetLogger();
-int value = 42;
-bool condition = false;
-
-PONY_CONSOLE(logger, PonyEngine::Log::LogType::Info, "Info message.");
-PONY_CONSOLE(logger, PonyEngine::Log::LogType::Warning, "Unexpected value: {}.", value);
-PONY_CONSOLE_IF(condition, logger, PonyEngine::Log::LogType::Info, "Info message.");
-
-PONY_CONSOLE_X(logger, std::current_exception());
-PONY_CONSOLE_X(logger, std::current_exception(), "On validating.");
-PONY_CONSOLE_X(logger, std::current_exception(), "On validating value: {}.", value);
-PONY_CONSOLE_X(condition, logger, std::current_exception(), "On validating value: {}.", value);
-```
-
 ## Custom sub-logger
 
 How to add a custom sub-logger.

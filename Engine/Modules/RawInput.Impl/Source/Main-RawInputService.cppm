@@ -675,7 +675,7 @@ export namespace PonyEngine::RawInput
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On beginning '{}' input provider.", typeid(provider).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On beginning '{}' input provider.", typeid(provider).name());
 				throw;
 			}
 		}
@@ -697,7 +697,7 @@ export namespace PonyEngine::RawInput
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ending '{}' input provider.", typeid(provider).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On ending '{}' input provider.", typeid(provider).name());
 			}
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending input providers done.");
@@ -717,7 +717,7 @@ export namespace PonyEngine::RawInput
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ticking '{}' provider.", typeid(provider).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On ticking '{}' provider.", typeid(provider).name());
 				throw;
 			}
 		}
@@ -857,7 +857,7 @@ export namespace PonyEngine::RawInput
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' device observer on connection change.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On calling '{}' device observer on connection change.", typeid(*observer).name());
 			}
 		}
 	}
@@ -872,7 +872,7 @@ export namespace PonyEngine::RawInput
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' raw input observer.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On calling '{}' raw input observer.", typeid(*observer).name());
 			}
 		}
 	}
@@ -887,7 +887,7 @@ export namespace PonyEngine::RawInput
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' device observer on device added.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On calling '{}' device observer on device added.", typeid(*observer).name());
 			}
 		}
 	}
@@ -902,7 +902,7 @@ export namespace PonyEngine::RawInput
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On calling '{}' device observer on device removed.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On calling '{}' device observer on device removed.", typeid(*observer).name());
 			}
 		}
 	}

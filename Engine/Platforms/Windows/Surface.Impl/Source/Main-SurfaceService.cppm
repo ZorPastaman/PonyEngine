@@ -358,7 +358,7 @@ namespace PonyEngine::Surface::Windows
 				}
 				catch (...)
 				{
-					PONY_LOG_X(application->Logger(), std::current_exception(), "On freeing cursor.");
+					PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On freeing cursor.");
 				}
 			}
 			if (!cursorVisible)
@@ -967,7 +967,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing focus change. Observer: '{}'.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On observing focus change. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 	}
@@ -1198,7 +1198,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On updating cursor clipping.");
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On updating cursor clipping.");
 				cursorClippingRect = std::nullopt;
 			}
 		}
@@ -1231,7 +1231,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing active change. Observer: '{}'.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On observing active change. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -1273,7 +1273,7 @@ namespace PonyEngine::Surface::Windows
 		}
 		catch (...)
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On getting min max info.");
+			PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On getting min max info.");
 		}
 
 		return 0;
@@ -1323,7 +1323,7 @@ namespace PonyEngine::Surface::Windows
 		}
 		catch (...)
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On window position changing.");
+			PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On window position changing.");
 		}
 
 		return 0;
@@ -1350,7 +1350,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing move. Observer: '{}'.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On observing move. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -1371,7 +1371,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing resize. Observer: '{}'.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On observing resize. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -1392,7 +1392,7 @@ namespace PonyEngine::Surface::Windows
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing display change. Observer: '{}'.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On observing display change. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -1409,7 +1409,7 @@ namespace PonyEngine::Surface::Windows
 				}
 				catch (...)
 				{
-					PONY_LOG_X(application->Logger(), std::current_exception(), "On window display change.");
+					PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On window display change.");
 					cursorClippingRect = std::nullopt;
 				}
 			},

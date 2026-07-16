@@ -350,7 +350,7 @@ namespace PonyEngine::RenderDevice
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing before backend switch. Observer: '{}'.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On observing before backend switch. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
@@ -363,7 +363,7 @@ namespace PonyEngine::RenderDevice
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On deactivating '{}' backend.", typeid(backends.Backend(*activeBackendIndex)).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On deactivating '{}' backend.", typeid(backends.Backend(*activeBackendIndex)).name());
 				throw;
 			}
 		}
@@ -377,7 +377,7 @@ namespace PonyEngine::RenderDevice
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On activating '{}' backend.", typeid(backends.Backend(*backendIndex)).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On activating '{}' backend.", typeid(backends.Backend(*backendIndex)).name());
 				throw;
 			}
 		}
@@ -391,7 +391,7 @@ namespace PonyEngine::RenderDevice
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On observing after backend switch. Observer: '{}'.", typeid(*observer).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On observing after backend switch. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 	}

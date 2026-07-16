@@ -109,7 +109,7 @@ namespace PonyEngine::Surface::Windows
 		}
 		catch (...)
 		{
-			PONY_LOG_X(windowProc->Application().Logger(), std::current_exception(), "On setting message handler.");
+			PONY_LOG(windowProc->Application().Logger(), Log::LogType::Error, std::current_exception(), "On setting message handler.");
 			return -1;
 		}
 

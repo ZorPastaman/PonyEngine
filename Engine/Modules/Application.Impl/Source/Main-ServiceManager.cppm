@@ -216,7 +216,7 @@ namespace PonyEngine::Application
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ticking '{}' service.", typeid(*tickableService).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On ticking '{}' service.", typeid(*tickableService).name());
 				throw;
 			}
 		}
@@ -269,7 +269,7 @@ namespace PonyEngine::Application
 		}
 		catch (...)
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On adding tickable services. Service: '{}'.", typeid(*service).name());
+			PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On adding tickable services. Service: '{}'.", typeid(*service).name());
 			serviceContainer.Remove(serviceIndex);
 
 			throw;
@@ -284,7 +284,7 @@ namespace PonyEngine::Application
 		}
 		catch (...)
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On adding service interfaces. Service: '{}'.", typeid(*service).name());
+			PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On adding service interfaces. Service: '{}'.", typeid(*service).name());
 			for (const std::type_index type : serviceContainer.Interfaces(serviceIndex).Types())
 			{
 				serviceInterfaces.erase(type);
@@ -451,7 +451,7 @@ namespace PonyEngine::Application
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On beginning '{}' service.", typeid(service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On beginning '{}' service.", typeid(service).name());
 				throw;
 			}
 		}
@@ -472,7 +472,7 @@ namespace PonyEngine::Application
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On ending '{}' service.", typeid(service).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On ending '{}' service.", typeid(service).name());
 			}
 		}
 		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending application services done.");

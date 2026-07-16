@@ -50,37 +50,43 @@ export namespace PonyEngine::Log
 		virtual void Log(LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept = 0;
 
 		/// @brief Logs the exception.
+		/// @param logType Log type.
 		/// @param exception Exception.
 		/// @note The function is thread-safe.
-		virtual void Log(const std::exception_ptr& exception) const noexcept = 0;
+		virtual void Log(LogType logType, const std::exception_ptr& exception) const noexcept = 0;
 		/// @brief Logs the exception with a message.
+		/// @param logType Log type.
 		/// @param exception Exception.
 		/// @param message Log message.
 		/// @note The function is thread-safe.
-		virtual void Log(const std::exception_ptr& exception, std::string_view message) const noexcept = 0;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view message) const noexcept = 0;
 		/// @brief Logs the exception with a formatted message.
+		/// @param logType Log type.
 		/// @param exception Exception.
 		/// @param format Log message format.
 		/// @param formatArgs Log message format arguments.
 		/// @note The function is thread-safe.
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept = 0;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept = 0;
 		/// @brief Logs the exception with a stacktrace.
+		/// @param logType Log type.
 		/// @param exception Exception.
 		/// @param stacktrace Stacktrace.
 		/// @note The function is thread-safe.
-		virtual void Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept = 0;
 		/// @brief Logs the exception with a message and a stacktrace.
+		/// @param logType Log type.
 		/// @param exception Exception.
 		/// @param message Log message.
 		/// @param stacktrace Stacktrace.
 		/// @note The function is thread-safe.
-		virtual void Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept = 0;
 		/// @brief Logs the exception with a formatted message and a stacktrace.
+		/// @param logType Log type.
 		/// @param exception Exception.
 		/// @param format Log message format.
 		/// @param formatArgs Log message format arguments.
 		/// @param stacktrace Stacktrace.
 		/// @note The function is thread-safe.
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept = 0;
+		virtual void Log(LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept = 0;
 	};
 }

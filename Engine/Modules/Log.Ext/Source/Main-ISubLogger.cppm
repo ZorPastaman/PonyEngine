@@ -25,8 +25,9 @@ export namespace PonyEngine::Log
 		PONY_INTERFACE_BODY(ISubLogger)
 
 		/// @brief Logs the @p logEntry.
-		/// @param logEntry Log entry to log.
+		/// @param formattedMessage Formatted message.
+		/// @param logEntry Source data of the log.
 		/// @note The function may be called on different threads, but it is guaranteed that it will not be executed concurrently.
-		virtual void Log(const LogEntry& logEntry) noexcept = 0;
+		virtual void Log(std::string_view formattedMessage, const LogEntry& logEntry) noexcept = 0;
 	};
 }

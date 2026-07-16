@@ -29,12 +29,12 @@ export namespace PonyEngine::Application
 		virtual void Log(Log::LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override final;
 		virtual void Log(Log::LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override final;
 
-		virtual void Log(const std::exception_ptr& exception) const noexcept override final;
-		virtual void Log(const std::exception_ptr& exception, std::string_view message) const noexcept override final;
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override final;
-		virtual void Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override final;
-		virtual void Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override final;
-		virtual void Log(const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override final;
+		virtual void Log(Log::LogType logType, const std::exception_ptr& exception) const noexcept override final;
+		virtual void Log(Log::LogType logType, const std::exception_ptr& exception, std::string_view message) const noexcept override final;
+		virtual void Log(Log::LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) const noexcept override final;
+		virtual void Log(Log::LogType logType, const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept override final;
+		virtual void Log(Log::LogType logType, const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept override final;
+		virtual void Log(Log::LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept override final;
 
 		DefaultLogger& operator =(const DefaultLogger&) = delete;
 		DefaultLogger& operator =(DefaultLogger&&) = delete;
@@ -133,7 +133,7 @@ namespace PonyEngine::Application
 #endif
 	}
 
-	void DefaultLogger::Log(const std::exception_ptr& exception) const noexcept
+	void DefaultLogger::Log(Log::LogType logType, const std::exception_ptr& exception) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
 		try
@@ -141,8 +141,8 @@ namespace PonyEngine::Application
 			if (!exception) [[unlikely]]
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {}\n", Log::LogType::Exception, NullptrException);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {}\n", Log::LogType::Error, NullptrException);
+				LogToConsole(Log::LogType::Error, stringTemp);
 				return;
 			}
 
@@ -153,24 +153,24 @@ namespace PonyEngine::Application
 			catch (const std::exception& e)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {}\n", Log::LogType::Exception, e.what());
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {}\n", Log::LogType::Error, e.what());
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 			catch (...)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {}\n", Log::LogType::Exception, UnknownException);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {}\n", Log::LogType::Error, UnknownException);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 		}
 		catch (...)
 		{
-			LogInternal(Log::LogType::Exception, AllocationError);
+			LogInternal(Log::LogType::Error, AllocationError);
 		}
 #endif
 	}
 
-	void DefaultLogger::Log(const std::exception_ptr& exception, std::string_view message) const noexcept
+	void DefaultLogger::Log(Log::LogType logType, const std::exception_ptr& exception, std::string_view message) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
 		try
@@ -178,8 +178,8 @@ namespace PonyEngine::Application
 			if (!exception) [[unlikely]]
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n", Log::LogType::Exception, NullptrException, message);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n", Log::LogType::Error, NullptrException, message);
+				LogToConsole(Log::LogType::Error, stringTemp);
 				return;
 			}
 
@@ -190,24 +190,24 @@ namespace PonyEngine::Application
 			catch (const std::exception& e)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n", Log::LogType::Exception, e.what(), message);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n", Log::LogType::Error, e.what(), message);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 			catch (...)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n", Log::LogType::Exception, UnknownException, message);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n", Log::LogType::Error, UnknownException, message);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 		}
 		catch (...)
 		{
-			LogInternal(Log::LogType::Exception, AllocationError);
+			LogInternal(Log::LogType::Error, AllocationError);
 		}
 #endif
 	}
 
-	void DefaultLogger::Log(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs) const noexcept
+	void DefaultLogger::Log(Log::LogType logType, const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
 		try
@@ -215,10 +215,10 @@ namespace PonyEngine::Application
 			if (!exception) [[unlikely]]
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Exception, NullptrException);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Error, NullptrException);
 				std::vformat_to(std::back_inserter(stringTemp), format, formatArgs);
 				stringTemp.push_back('\n');
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				LogToConsole(Log::LogType::Error, stringTemp);
 				return;
 			}
 
@@ -229,28 +229,28 @@ namespace PonyEngine::Application
 			catch (const std::exception& e)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Exception, e.what());
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Error, e.what());
 				std::vformat_to(std::back_inserter(stringTemp), format, formatArgs);
 				stringTemp.push_back('\n');
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 			catch (...)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Exception, UnknownException);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Error, UnknownException);
 				std::vformat_to(std::back_inserter(stringTemp), format, formatArgs);
 				stringTemp.push_back('\n');
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 		}
 		catch (...)
 		{
-			LogInternal(Log::LogType::Exception, AllocationError);
+			LogInternal(Log::LogType::Error, AllocationError);
 		}
 #endif
 	}
 
-	void DefaultLogger::Log(const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept
+	void DefaultLogger::Log(Log::LogType logType, const std::exception_ptr& exception, const std::stacktrace& stacktrace) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
 		try
@@ -258,8 +258,8 @@ namespace PonyEngine::Application
 			if (!exception) [[unlikely]]
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {}\n{}\n", Log::LogType::Exception, NullptrException, stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {}\n{}\n", Log::LogType::Error, NullptrException, stacktrace);
+				LogToConsole(Log::LogType::Error, stringTemp);
 				return;
 			}
 
@@ -270,24 +270,24 @@ namespace PonyEngine::Application
 			catch (const std::exception& e)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {}\n{}\n", Log::LogType::Exception, e.what(), stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {}\n{}\n", Log::LogType::Error, e.what(), stacktrace);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 			catch (...)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {}\n{}\n", Log::LogType::Exception, UnknownException, stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {}\n{}\n", Log::LogType::Error, UnknownException, stacktrace);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 		}
 		catch (...)
 		{
-			LogInternal(Log::LogType::Exception, AllocationError);
+			LogInternal(Log::LogType::Error, AllocationError);
 		}
 #endif
 	}
 
-	void DefaultLogger::Log(const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept
+	void DefaultLogger::Log(Log::LogType logType, const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
 		try
@@ -295,8 +295,8 @@ namespace PonyEngine::Application
 			if (!exception) [[unlikely]]
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n{}\n", Log::LogType::Exception, NullptrException, message, stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n{}\n", Log::LogType::Error, NullptrException, message, stacktrace);
+				LogToConsole(Log::LogType::Error, stringTemp);
 				return;
 			}
 
@@ -307,24 +307,24 @@ namespace PonyEngine::Application
 			catch (const std::exception& e)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n{}\n", Log::LogType::Exception, e.what(), message, stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n{}\n", Log::LogType::Error, e.what(), message, stacktrace);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 			catch (...)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n{}\n", Log::LogType::Exception, UnknownException, message, stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - {}\n{}\n", Log::LogType::Error, UnknownException, message, stacktrace);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 		}
 		catch (...)
 		{
-			LogInternal(Log::LogType::Exception, AllocationError);
+			LogInternal(Log::LogType::Error, AllocationError);
 		}
 #endif
 	}
 
-	void DefaultLogger::Log(const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept
+	void DefaultLogger::Log(Log::LogType logType, const std::exception_ptr& exception, const std::string_view format, const std::format_args formatArgs, const std::stacktrace& stacktrace) const noexcept
 	{
 #if PONY_ENGINE_DEFAULT_LOGGER
 		try
@@ -332,10 +332,10 @@ namespace PonyEngine::Application
 			if (!exception) [[unlikely]]
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Exception, NullptrException);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Error, NullptrException);
 				std::vformat_to(std::back_inserter(stringTemp), format, formatArgs);
 				std::format_to(std::back_inserter(stringTemp), "\n{}\n", stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				LogToConsole(Log::LogType::Error, stringTemp);
 				return;
 			}
 
@@ -346,23 +346,23 @@ namespace PonyEngine::Application
 			catch (const std::exception& e)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Exception, e.what());
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Error, e.what());
 				std::vformat_to(std::back_inserter(stringTemp), format, formatArgs);
 				std::format_to(std::back_inserter(stringTemp), "\n{}\n", stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 			catch (...)
 			{
 				stringTemp.clear();
-				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Exception, UnknownException);
+				std::format_to(std::back_inserter(stringTemp), "{}: {} - ", Log::LogType::Error, UnknownException);
 				std::vformat_to(std::back_inserter(stringTemp), format, formatArgs);
 				std::format_to(std::back_inserter(stringTemp), "\n{}\n", stacktrace);
-				LogToConsole(Log::LogType::Exception, stringTemp);
+				LogToConsole(Log::LogType::Error, stringTemp);
 			}
 		}
 		catch (...)
 		{
-			LogInternal(Log::LogType::Exception, AllocationError);
+			LogInternal(Log::LogType::Error, AllocationError);
 		}
 #endif
 	}

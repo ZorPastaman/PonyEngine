@@ -227,7 +227,7 @@ namespace PonyEngine::Job
 				}
 				catch (...)
 				{
-					PONY_LOG_X(application->Logger(), std::current_exception(), "On adding job to worker queue. Worker thread: '{}'.", ThreadID());
+					PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On adding job to worker queue. Worker thread: '{}'.", ThreadID());
 					Execute(dependent); // Out of order execution because of memory shortage.
 				}
 			}
@@ -242,7 +242,7 @@ namespace PonyEngine::Job
 		}
 		catch (...)
 		{
-			PONY_LOG_X(application->Logger(), std::current_exception(), "On adding job to job pool. Worker thread: '{}'.", ThreadID());
+			PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On adding job to job pool. Worker thread: '{}'.", ThreadID());
 			// Unfortunately, the job will be kept alive but not used anymore. May happen on memory shortage.
 		}
 	}

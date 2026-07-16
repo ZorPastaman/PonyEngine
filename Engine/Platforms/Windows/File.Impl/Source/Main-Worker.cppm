@@ -232,7 +232,7 @@ namespace PonyEngine::File::Windows
 				catch (...)
 				{
 					const std::exception_ptr exception = std::current_exception();
-					PONY_LOG_X(application->Logger(), exception);
+					PONY_LOG(application->Logger(), Log::LogType::Error, exception);
 
 					if (overlapped) [[likely]]
 					{

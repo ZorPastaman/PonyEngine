@@ -25,7 +25,7 @@ namespace PonyEngine::Log
 		"Info",
 		"Warning",
 		"Error",
-		"Exception"
+		"Fatal"
 	};
 }
 
@@ -39,7 +39,7 @@ export namespace PonyEngine::Log
 		Info, ///< Log a normal program execution.
 		Warning, ///< Log a non-critical error or suspicious program execution.
 		Error, ///< Log an error.
-		Exception ///< Log an exception.
+		Fatal ///< Log a fatal error.
 	};
 
 	/// @brief Severity of a log as a mask.
@@ -51,8 +51,8 @@ export namespace PonyEngine::Log
 		Info = 1 << 2, ///< Log a normal program execution.
 		Warning = 1 << 3, ///< Log a non-critical error or suspicious program execution.
 		Error = 1 << 4, ///< Log an error.
-		Exception = 1 << 5, ///< Log an exception.
-		All = Verbose | Debug | Info | Warning | Error | Exception
+		Fatal = 1 << 5, ///< Log a fatal error.
+		All = (1 << 6) - 1
 	};
 
 	PONY_ENUM_VALUE_MASK_FEATURES(LogType, LogTypeMask)

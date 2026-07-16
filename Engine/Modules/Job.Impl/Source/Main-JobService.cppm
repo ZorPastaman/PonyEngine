@@ -138,7 +138,7 @@ namespace PonyEngine::Job
 			}
 			catch (...)
 			{
-				PONY_LOG_X(this->application->Logger(), std::current_exception(), "On starting worker thread.");
+				PONY_LOG(this->application->Logger(), Log::LogType::Error, std::current_exception(), "On starting worker thread.");
 				Finish(i);
 				throw;
 			}

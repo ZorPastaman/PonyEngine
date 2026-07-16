@@ -199,7 +199,7 @@ namespace PonyEngine::Application
 		const auto position = usedBuffers.find(buffer.buffer.data());
 		if (position == usedBuffers.cend()) [[unlikely]]
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Exception, "TempBuffer memory corruption detected. Terminating.");
+			PONY_LOG(application->Logger(), Log::LogType::Fatal, "TempBuffer memory corruption detected. Terminating.");
 			std::terminate();
 		}
 

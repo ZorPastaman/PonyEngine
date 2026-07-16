@@ -1815,7 +1815,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		}
 		catch (...)
 		{
-			PONY_LOG_X(renderDevice->Logger(), std::current_exception(), "On setting device name.");
+			PONY_LOG(renderDevice->Logger(), Log::LogType::Error, std::current_exception(), "On setting device name.");
 		}
 
 		return device;
@@ -1833,7 +1833,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		}
 		catch (...)
 		{
-			PONY_LOG_X(renderDevice->Logger(), std::current_exception(), "On setting command queue name. Type: '{}'.", std::to_underlying(commandListType));
+			PONY_LOG(renderDevice->Logger(), Log::LogType::Error, std::current_exception(), "On setting command queue name. Type: '{}'.", std::to_underlying(commandListType));
 		}
 
 		PONY_LOG(renderDevice->Logger(), Log::LogType::Info, "Creating D3D12 command queue done. Type: '{}'.", std::to_underlying(commandListType));

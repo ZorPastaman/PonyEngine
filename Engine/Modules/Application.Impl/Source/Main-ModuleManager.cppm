@@ -254,7 +254,7 @@ namespace PonyEngine::Application
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On starting up '{}' module.", typeid(*appModule).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On starting up '{}' module.", typeid(*appModule).name());
 				throw;
 			}
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Starting up '{}' module done.", typeid(*appModule).name());
@@ -277,7 +277,7 @@ namespace PonyEngine::Application
 			}
 			catch (...)
 			{
-				PONY_LOG_X(application->Logger(), std::current_exception(), "On shutting down '{}' module.", typeid(*appModule).name());
+				PONY_LOG(application->Logger(), Log::LogType::Error, std::current_exception(), "On shutting down '{}' module.", typeid(*appModule).name());
 			}
 			PONY_LOG(application->Logger(), Log::LogType::Info, "Shutting down '{}' module done.", typeid(*appModule).name());
 		}

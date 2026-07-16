@@ -364,8 +364,8 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 		auto arena = Memory::Arena(*buffer);
 
 		std::span<char> name = arena.AllocateArray<char>(buffer->size_bytes());
-		Platform::Windows::GetDeviceName(keyboardHandle, name);
+		const std::size_t copied = Platform::Windows::GetDeviceName(keyboardHandle, name);
 
-		return std::pair<Application::ScopedTempBuffer, std::string_view>(std::move(buffer), name);
+		return std::pair<Application::ScopedTempBuffer, std::string_view>(std::move(buffer), std::string_view(name.data(), copied));
 	}
 }

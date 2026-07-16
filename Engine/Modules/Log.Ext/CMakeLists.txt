@@ -3,11 +3,6 @@ message(STATUS "Configuring PonyEngine.Log.Ext")
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Log.Ext STATIC)
 
-message(VERBOSE "Configuring headers")
-target_include_directories(PonyEngine.Log.Ext PUBLIC
-	"Include/Public"
-)
-
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Ext PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
@@ -15,7 +10,6 @@ target_sources(PonyEngine.Log.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-ILoggerModuleContext.cppm"
 	"Source/Main-ISubLogger.cppm"
 	"Source/Main-LogEntry.cppm"
-	"Source/Main-LogHelper.cppm"
 	"Source/Main-SubLoggerHandle.cppm"
 )
 
