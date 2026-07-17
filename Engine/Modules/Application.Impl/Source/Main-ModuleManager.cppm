@@ -83,8 +83,8 @@ namespace PonyEngine::Application
 {
 	using ModuleInterface = IModule*(*)();
 
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) ModuleInterface FirstModule = nullptr; ///< Module begin pointer.
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) ModuleInterface LastModule = nullptr; ///< Module end pointer.
+	PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) ModuleInterface FirstModule = nullptr; ///< Module begin pointer.
+	PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) ModuleInterface LastModule = nullptr; ///< Module end pointer.
 
 	ModuleManager::ModuleManager(IApplication& application, ILoggerModuleContext& loggerModuleContext, IServiceModuleContext& serviceModuleContext) :
 		application{&application},

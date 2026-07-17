@@ -21,7 +21,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 	"Source/Main-AppDataManager.cppm"
 	"Source/Main-Console.cppm"
 	"Source/Main-DefaultLogger.cppm"
-	"Source/Main-LoggerManager.cppm"
+	
 	"Source/Main-PathManager.cppm"
 	"Source/Main-Process.cppm"
 )

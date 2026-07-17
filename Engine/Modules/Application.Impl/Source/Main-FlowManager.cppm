@@ -20,7 +20,8 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Log;
 
-import :ExitCodes;
+import :LoggerManager;
+import :ThreadManager;
 
 export namespace PonyEngine::Application
 {
@@ -29,9 +30,10 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a flow manager.
-		/// @param application Application.
+		/// @param loggerManager Logger manager.
+		/// @param threadManager Thread manager.
 		[[nodiscard("Pure constructor")]]
-		explicit FlowManager(const IApplication& application) noexcept;
+		FlowManager(const LoggerManager& loggerManager, const ThreadManager& threadManager) noexcept;
 		FlowManager(const FlowManager&) = delete;
 		FlowManager(FlowManager&&) = delete;
 
@@ -93,7 +95,8 @@ export namespace PonyEngine::Application
 			enum FlowState flowState; ///< Flow state.
 		};
 
-		const IApplication* application; ///< Application.
+		const LoggerManager* loggerManager; ///< Logger manager.
+		const ThreadManager* threadManager; ///< Thread manager.
 
 		std::atomic<std::uint64_t> frameCount; ///< Frame count.
 		std::atomic<FlowInfo> flowInfo; ///< Flow info.
@@ -105,10 +108,11 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	FlowManager::FlowManager(const IApplication& application) noexcept :
-		application{&application},
+	FlowManager::FlowManager(const LoggerManager& loggerManager, const ThreadManager& threadManager) noexcept :
+		loggerManager{&loggerManager},
+		threadManager{&threadManager},
 		frameCount{0ull},
-		flowInfo(FlowInfo{.exitCode = ExitCodes::InitialExitCode, .flowState = FlowState::StartingUp})
+		flowInfo(FlowInfo{.exitCode = 0, .flowState = FlowState::StartingUp})
 	{
 	}
 
@@ -130,19 +134,23 @@ namespace PonyEngine::Application
 	int FlowManager::Run(const std::function<void()>& begin, const std::function<void()>& end, const std::function<void()>& tick)
 	{
 		assert(FlowState() == FlowState::StartingUp && "The flow state is incorrect for running.");
+		assert(std::this_thread::get_id() == threadManager->MainThreadID() && "The run thread isn't main.");
+		assert(static_cast<bool>(begin) && "The begin function is invalid.");
+		assert(static_cast<bool>(end) && "The end function is invalid.");
+		assert(static_cast<bool>(tick) && "The tick function is invalid.");
 
 		Begin(begin);
 
 		try
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Starting application main loop.");
+			PONY_LOG(loggerManager->Logger(), Log::LogType::Info, "Starting application main loop.");
 			for (StartRun(); IsRunning(); NextFrame())
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Verbose, "Starting application frame: '{}'.", FrameCount());
+				PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Starting application frame: '{}'.", FrameCount());
 				tick();
-				PONY_LOG(application->Logger(), Log::LogType::Verbose, "Finishing application frame: '{}'.", FrameCount());
+				PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Finishing application frame: '{}'.", FrameCount());
 			}
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Finishing application main loop. Exit code: '{}'.", FrameCount());
+			PONY_LOG(loggerManager->Logger(), Log::LogType::Info, "Finishing application main loop. Exit code: '{}'.", FrameCount());
 		}
 		catch (...)
 		{
@@ -158,7 +166,7 @@ namespace PonyEngine::Application
 	void FlowManager::Stop(const int exitCode)
 	{
 #ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
+		if (std::this_thread::get_id() != threadManager->MainThreadID()) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
@@ -167,17 +175,17 @@ namespace PonyEngine::Application
 		if (FlowState() == FlowState::Running)
 		{
 			flowInfo.store(FlowInfo{.exitCode = exitCode, .flowState = FlowState::Stopped}, std::memory_order::relaxed);
-			PONY_LOG(application->Logger(), Log::LogType::Info, "Application stopped. Exit code: '{}'.", ExitCode());
+			PONY_LOG(loggerManager->Logger(), Log::LogType::Info, "Application stopped. Exit code: '{}'.", ExitCode());
 		}
 		else
 		{
 			if (FlowState() == FlowState::Stopped) [[likely]]
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Debug, "Tried to stop already stopped Application. Ignoring.");
+				PONY_LOG(loggerManager->Logger(), Log::LogType::Debug, "Tried to stop already stopped application. Ignoring.");
 			}
 			else [[unlikely]]
 			{
-				PONY_LOG(application->Logger(), Log::LogType::Warning, "Tried to stop Application in inappropriate state. Ignoring. Current flow state: '{}'.", FlowState());
+				PONY_LOG(loggerManager->Logger(), Log::LogType::Warning, "Tried to stop application in inappropriate state. Ignoring. Current flow state: '{}'.", FlowState());
 			}
 		}
 	}
@@ -189,18 +197,18 @@ namespace PonyEngine::Application
 
 	void FlowManager::Begin(const std::function<void()>& begin)
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning application...");
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Info, "Beginning application...");
 		FlowState(FlowState::Beginning);
 		begin();
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Beginning application done.");
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Info, "Beginning application done.");
 	}
 
 	void FlowManager::End(const std::function<void()>& end) noexcept
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending application...");
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Info, "Ending application...");
 		FlowState(FlowState::Ending);
 		end();
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Ending application done.");
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Info, "Ending application done.");
 	}
 
 	void FlowManager::StartRun()

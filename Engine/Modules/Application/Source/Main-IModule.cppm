@@ -13,8 +13,6 @@ module;
 
 export module PonyEngine.Application:IModule;
 
-import std;
-
 import :IModuleContext;
 
 export namespace PonyEngine::Application

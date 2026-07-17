@@ -13,21 +13,17 @@ add_executable(PonyEngine.Application.Impl)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
-	"Source/Main-ConsoleUtility.cppm"
-	"Source/Main-DefaultLogger.cppm"
-	"Source/Main-ExitCodes.cppm"
+	"Source/Main-EmptyLogger.cppm"
 	"Source/Main-FlowManager.cppm"
 	"Source/Main-IdentityUtility.cppm"
-	"Source/Main-InterfaceContainer.cppm"
+	"Source/Main-InterfaceManager.cppm"
 	"Source/Main-LoggerManager.cppm"
 	"Source/Main-MemoryManager.cppm"
-	"Source/Main-ModuleDataContainer.cppm"
 	"Source/Main-ModuleManager.cppm"
 	"Source/Main-PathUtility.cppm"
-	"Source/Main-ServiceContainer.cppm"
 	"Source/Main-ServiceManager.cppm"
 	"Source/Main-ThreadManager.cppm"
-	"Source/Main-TickableServiceInfo.cppm"
+	"Source/Main-TickableManager.cppm"
 )
 
 message(VERBOSE "Configuring defines")

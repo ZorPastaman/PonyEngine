@@ -17,7 +17,7 @@ export namespace PonyEngine::Application
 {
 	/// @brief Adds a tail to the path.
 	/// @param path Path.
-	/// @return Path with a tail.
+	/// @return Path with a tail. It's not lexically_normal.
 	[[nodiscard("Pure function")]]
 	std::filesystem::path AddTail(const std::filesystem::path& path);
 }

@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/World/WorldServiceModule.h"
 
-PONY_MODULE(PonyEngine::World::GetWorldServiceModule, PonyEngineWorldService, PONY_ENGINE_WORLD_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::World::GetWorldServiceModule, PonyEngineWorldService, PONY_ENGINE_WORLD_ORDER);

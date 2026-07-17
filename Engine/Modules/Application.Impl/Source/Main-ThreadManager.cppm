@@ -7,16 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.Application.Impl:ThreadManager;
 
 import std;
-
-import PonyEngine.Application;
-import PonyEngine.Log;
 
 export namespace PonyEngine::Application
 {
@@ -25,9 +18,9 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a thread manager.
-		/// @param application Application.
+		/// @note Must be created on a main thread.
 		[[nodiscard("Pure constructor")]]
-		explicit ThreadManager(IApplication& application) noexcept;
+		explicit ThreadManager() noexcept;
 		ThreadManager(const ThreadManager&) = delete;
 		ThreadManager(ThreadManager&&) = delete;
 
@@ -48,10 +41,9 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	ThreadManager::ThreadManager(IApplication& application) noexcept :
+	ThreadManager::ThreadManager() noexcept :
 		mainThreadId(std::this_thread::get_id())
 	{
-		PONY_LOG(application.Logger(), Log::LogType::Info, "Main thread id: '{}'.", mainThreadId);
 	}
 
 	std::thread::id ThreadManager::MainThreadID() const noexcept

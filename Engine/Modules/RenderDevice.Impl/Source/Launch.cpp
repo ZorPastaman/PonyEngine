@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/RenderDevice/RenderDeviceServiceModule.h"
 
-PONY_MODULE(PonyEngine::RenderDevice::GetRenderDeviceServiceModule, PonyEngineRenderDeviceService, PONY_ENGINE_RENDER_DEVICE_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::RenderDevice::GetRenderDeviceServiceModule, PonyEngineRenderDeviceService, PONY_ENGINE_RENDER_DEVICE_ORDER);

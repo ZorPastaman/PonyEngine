@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Resource/PackResourceProviderModule.h"
 
-PONY_MODULE(PonyEngine::Resource::Pack::GetPackResourceProviderModule, PonyEnginePackResourceProvider, PONY_ENGINE_RESOURCE_PACK_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::Resource::Pack::GetPackResourceProviderModule, PonyEnginePackResourceProvider, PONY_ENGINE_RESOURCE_PACK_ORDER);

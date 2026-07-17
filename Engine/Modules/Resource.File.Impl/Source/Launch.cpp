@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Resource/FileResourceProviderModule.h"
 
-PONY_MODULE(PonyEngine::Resource::File::GetFileResourceProviderModule, PonyEngineFileResourceProvider, PONY_ENGINE_RESOURCE_FILE_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::Resource::File::GetFileResourceProviderModule, PonyEngineFileResourceProvider, PONY_ENGINE_RESOURCE_FILE_ORDER);

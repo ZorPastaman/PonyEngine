@@ -11,16 +11,8 @@ export module PonyEngine.Application;
 
 export import :FlowState;
 export import :IApplication;
-export import :ILoggerContext;
-export import :ILoggerModuleContext;
 export import :IModule;
 export import :IModuleContext;
 export import :IService;
-export import :IServiceInterfaceAdder;
-export import :IServiceModuleContext;
-export import :ITickableService;
-export import :ITickableServiceAdder;
-export import :LoggerHandle;
-export import :ModuleDataHandle;
-export import :ServiceHandle;
+export import :ITickable;
 export import :TempBuffer;

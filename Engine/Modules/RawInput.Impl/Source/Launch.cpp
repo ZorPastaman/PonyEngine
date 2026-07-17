@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/RawInput/RawInputServiceModule.h"
 
-PONY_MODULE(PonyEngine::RawInput::GetRawInputServiceModule, PonyEngineRawInputService, PONY_ENGINE_RAW_INPUT_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::RawInput::GetRawInputServiceModule, PonyEngineRawInputService, PONY_ENGINE_RAW_INPUT_ORDER);

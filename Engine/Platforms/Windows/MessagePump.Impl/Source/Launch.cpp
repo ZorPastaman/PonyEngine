@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/MessagePump/Windows/MessagePumpServiceModule.h"
 
-PONY_MODULE(PonyEngine::MessagePump::Windows::GetMessagePumpServiceModule, PonyEngineMessagePumpService, PONY_ENGINE_MESSAGE_PUMP_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::MessagePump::Windows::GetMessagePumpServiceModule, PonyEngineMessagePumpService, PONY_ENGINE_MESSAGE_PUMP_ORDER);

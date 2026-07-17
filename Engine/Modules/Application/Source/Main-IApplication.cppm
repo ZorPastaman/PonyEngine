@@ -120,60 +120,36 @@ export namespace PonyEngine::Application
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::thread::id MainThreadID() const noexcept = 0;
-
-		/// @brief Gets the command line excluding an executable name.
+		/// @brief Gets the command line.
 		/// @return Command line.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view CommandLine() const noexcept = 0;
+		virtual std::span<const std::string_view> CommandLine() const noexcept = 0;
 
 		/// @brief Gets the logger.
 		/// @return Logger.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
+		/// @note The function is thread-safe between start-up and shut-down.
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& Logger() noexcept = 0;
-		/// @brief Gets the logger.
-		/// @return Logger.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
-		[[nodiscard("Pure function")]]
-		virtual const Log::ILogger& Logger() const noexcept = 0;
+		virtual Log::ILogger& Logger() const noexcept = 0;
 
-		/// @brief Tries to find a service by its type.
-		/// @param type Service type. Must be a public service interface.
-		/// @return Pointer to the service if it's found; nullptr if it's not found.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
+		/// @brief Tries to find an interface by its type.
+		/// @param type Interface type.
+		/// @return Pointer to the interface if it's found; nullptr if it's not found.
+		/// @note The function is thread-safe between start-up and shut-down.
 		[[nodiscard("Pure function")]]
-		virtual void* FindService(std::type_index type) noexcept = 0;
-		/// @brief Tries to find a service by its type.
-		/// @tparam T Service type. Must be a public service interface.
-		/// @return Pointer to the service if it's found; nullptr if it's not found.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
+		virtual void* FindInterface(std::type_index type) const noexcept = 0;
+		/// @brief Tries to find an interface by its type.
+		/// @tparam T Interface type.
+		/// @return Pointer to the interface if it's found; nullptr if it's not found.
+		/// @note The function is thread-safe between start-up and shut-down.
 		template<typename T> [[nodiscard("Pure function")]]
-		T* FindService() noexcept;
-		/// @brief Tries to find a service by its type.
-		/// @param type Service type. Must be a public service interface.
-		/// @return Pointer to the service if it's found; nullptr if it's not found.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
-		[[nodiscard("Pure function")]]
-		virtual const void* FindService(std::type_index type) const noexcept = 0;
-		/// @brief Tries to find a service by its type.
-		/// @tparam T Service type. Must be a public service interface.
-		/// @return Pointer to the service if it's found; nullptr if it's not found.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
+		T* FindInterface() const noexcept;
+		/// @brief Gets an interface by its type or throws an exception.
+		/// @tparam T Interface type.
+		/// @return Reference to the interface.
+		/// @note The function is thread-safe between start-up and shut-down.
 		template<typename T> [[nodiscard("Pure function")]]
-		const T* FindService() const noexcept;
-		/// @brief Gets a service by its type or throws an exception.
-		/// @tparam T Service type. Must be a public service interface.
-		/// @return Reference to the service.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
-		template<typename T> [[nodiscard("Pure function")]]
-		T& GetService();
-		/// @brief Gets a service by its type or throws an exception.
-		/// @tparam T Service type. Must be a public service interface.
-		/// @return Reference to the service.
-		/// @note The function is thread-safe between Begin() and End() of the engine but must be accessed only from a main thread before Begin() and after End().
-		template<typename T> [[nodiscard("Pure function")]]
-		const T& GetService() const;
+		T& GetInterface() const;
 
 		/// @brief Gets the flow state.
 		/// @return Flow state.
@@ -182,10 +158,10 @@ export namespace PonyEngine::Application
 		virtual FlowState FlowState() const noexcept = 0;
 		/// @brief Gets the exit code.
 		/// @note Mustn't be called if @p FlowState() returns Running or less.
-		/// @return Exit code.
+		/// @return Exit code or std::nullopt if the engine wasn't stopped.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual int ExitCode() const noexcept = 0;
+		virtual std::optional<int> ExitCode() const noexcept = 0;
 		/// @brief Stops the application with the @p exitCode.
 		/// @remark If the application is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
@@ -275,43 +251,21 @@ export namespace PonyEngine::Application
 namespace PonyEngine::Application
 {
 	template<typename T>
-	T* IApplication::FindService() noexcept
+	T* IApplication::FindInterface() const noexcept
 	{
-		return static_cast<T*>(FindService(typeid(T)));
+		return static_cast<T*>(FindInterface(typeid(T)));
 	}
 
 	template<typename T>
-	const T* IApplication::FindService() const noexcept
+	T& IApplication::GetInterface() const
 	{
-		return static_cast<const T*>(FindService(typeid(T)));
-	}
-
-	template<typename T>
-	T& IApplication::GetService()
-	{
-		T* const service = FindService<T>();
-#ifndef NDEBUG
-		if (!service) [[unlikely]]
+		T* const interface = FindInterface<T>();
+		if (!interface) [[unlikely]]
 		{
-			throw std::logic_error("Service not found");
+			throw std::logic_error("Interface not found");
 		}
-#endif
 
-		return *service;
-	}
-
-	template<typename T>
-	const T& IApplication::GetService() const
-	{
-		const T* const service = FindService<T>();
-#ifndef NDEBUG
-		if (!service) [[unlikely]]
-		{
-			throw std::logic_error("Service not found");
-		}
-#endif
-
-		return *service;
+		return *interface;
 	}
 
 	ScopedTempBuffer IApplication::AcquiredScopedTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)

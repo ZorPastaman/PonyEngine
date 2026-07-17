@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Application.Impl:MemoryManager;
@@ -20,6 +18,8 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Log;
 
+import :LoggerManager;
+
 export namespace PonyEngine::Application
 {
 	/// @brief Memory manager.
@@ -27,9 +27,9 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a memory manager.
-		/// @param application Application.
+		/// @param loggerManager Logger manager.
 		[[nodiscard("Pure constructor")]]
-		explicit MemoryManager(IApplication& application) noexcept;
+		explicit MemoryManager(const LoggerManager& loggerManager) noexcept;
 		MemoryManager(const MemoryManager&) = delete;
 		MemoryManager(MemoryManager&&) = delete;
 
@@ -102,9 +102,9 @@ export namespace PonyEngine::Application
 			using Buffer = std::vector<std::byte, AlignedAllocator<std::byte>>;
 
 			/// @brief Creates a buffer cache.
-			/// @param application Application.
+			/// @param loggerManager Logger manager.
 			[[nodiscard("Pure constructor")]]
-			explicit Cache(IApplication& application) noexcept;
+			explicit Cache(const LoggerManager& loggerManager) noexcept;
 			Cache(const Cache&) = delete;
 			Cache(Cache&&) = delete;
 
@@ -130,47 +130,47 @@ export namespace PonyEngine::Application
 			[[nodiscard("Pure function")]]
 			Buffer GetBuffer(std::size_t requiredAlignment);
 
-			IApplication* application; ///< Application.
+			const LoggerManager* loggerManager; ///< Logger manager.
 
 			std::stack<Buffer> bufferCache; ///< Buffer cache.
 			std::unordered_map<const std::byte*, Buffer> usedBuffers; ///< Buffers that are in use now.
 		};
 
 		/// @brief Gets a cache for a current thread.
-		/// @param application Application.
+		/// @param loggerManager Logger manager.
 		/// @return Cache.
 		[[nodiscard("Pure function")]]
-		static Cache& GetCache(IApplication& application);
+		static Cache& GetCache(const LoggerManager& loggerManager);
 
-		IApplication* application; ///< Application.
+		const LoggerManager* loggerManager; ///< Logger manager.
 	};
 }
 
 namespace PonyEngine::Application
 {
-	MemoryManager::MemoryManager(IApplication& application) noexcept :
-		application{&application}
+	MemoryManager::MemoryManager(const LoggerManager& loggerManager) noexcept :
+		loggerManager{&loggerManager}
 	{
 	}
 
 	TempBuffer MemoryManager::AcquireTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment) const
 	{
-		return GetCache(*application).AcquireTempBuffer(requiredSize, requiredAlignment);
+		return GetCache(*loggerManager).AcquireTempBuffer(requiredSize, requiredAlignment);
 	}
 
 	void MemoryManager::ReleaseTempBuffer(const TempBuffer buffer) const noexcept
 	{
-		GetCache(*application).ReleaseTempBuffer(buffer);
+		GetCache(*loggerManager).ReleaseTempBuffer(buffer);
 	}
 
-	MemoryManager::Cache::Cache(IApplication& application) noexcept :
-		application{&application}
+	MemoryManager::Cache::Cache(const LoggerManager& loggerManager) noexcept :
+		loggerManager{&loggerManager}
 	{
 	}
 
 	TempBuffer MemoryManager::Cache::AcquireTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Acquiring temp buffer... Size: '{}'; Alignment: '{}'.", requiredSize, requiredAlignment);
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Acquiring temp buffer... Size: '{}'; Alignment: '{}'.", requiredSize, requiredAlignment);
 
 		if (requiredAlignment < alignof(std::max_align_t) || !std::has_single_bit(requiredAlignment)) [[unlikely]]
 		{
@@ -180,40 +180,40 @@ namespace PonyEngine::Application
 		Buffer buffer = GetBuffer(requiredAlignment);
 		if (const std::size_t size = std::max(requiredSize, 1024uz); buffer.size() < size) [[unlikely]]
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Growing temp buffer.");
+			PONY_LOG(loggerManager->Logger(), Log::LogType::Debug, "Growing temp buffer.");
 			buffer.resize(size);
 		}
 
 		const auto tempBuffer = TempBuffer{.buffer = std::span(buffer.data(), buffer.size())};
 		usedBuffers.emplace(buffer.data(), std::move(buffer));
 
-		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Acquiring temp buffer done. Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Acquiring temp buffer done. Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
 
 		return tempBuffer;
 	}
 
 	void MemoryManager::Cache::ReleaseTempBuffer(const TempBuffer buffer) noexcept
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Releasing temp buffer... Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(buffer.buffer.data()));
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Releasing temp buffer... Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(buffer.buffer.data()));
 
 		const auto position = usedBuffers.find(buffer.buffer.data());
 		if (position == usedBuffers.cend()) [[unlikely]]
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Fatal, "TempBuffer memory corruption detected. Terminating.");
+			PONY_LOG(loggerManager->Logger(), Log::LogType::Fatal, "TempBuffer memory corruption detected. Terminating.");
 			std::terminate();
 		}
 
 		bufferCache.push(std::move(position->second));
 		usedBuffers.erase(position);
 
-		PONY_LOG(application->Logger(), Log::LogType::Verbose, "Releasing temp buffer done.");
+		PONY_LOG(loggerManager->Logger(), Log::LogType::Verbose, "Releasing temp buffer done.");
 	}
 
 	MemoryManager::Cache::Buffer MemoryManager::Cache::GetBuffer(const std::size_t requiredAlignment)
 	{
 		if (bufferCache.empty()) [[unlikely]]
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Creating new temp buffer.");
+			PONY_LOG(loggerManager->Logger(), Log::LogType::Debug, "Creating new temp buffer.");
 			return Buffer(AlignedAllocator<std::byte>(requiredAlignment));
 		}
 
@@ -222,16 +222,16 @@ namespace PonyEngine::Application
 
 		if (buffer.get_allocator().Alignment() < requiredAlignment) [[unlikely]]
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Debug, "Realigning temp buffer.");
+			PONY_LOG(loggerManager->Logger(), Log::LogType::Debug, "Realigning temp buffer.");
 			buffer = Buffer(AlignedAllocator<std::byte>(requiredAlignment));
 		}
 
 		return buffer;
 	}
 
-	MemoryManager::Cache& MemoryManager::GetCache(IApplication& application)
+	MemoryManager::Cache& MemoryManager::GetCache(const LoggerManager& loggerManager)
 	{
-		thread_local auto cache = std::make_unique<Cache>(application);
+		thread_local auto cache = std::make_unique<Cache>(loggerManager);
 		return *cache;
 	}
 
