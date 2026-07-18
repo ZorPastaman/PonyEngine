@@ -9,14 +9,13 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Object/Body.h"
 
 export module PonyEngine.Application:IApplication;
 
 import std;
 
+import PonyEngine.Chrono;
 import PonyEngine.Log;
 import PonyEngine.Meta;
 
@@ -25,9 +24,6 @@ import :TempBuffer;
 
 export namespace PonyEngine::Application
 {
-	/// @brief Temporary buffer that is released automatically when this struct goes out of scope.
-	class ScopedTempBuffer;
-
 	/// @brief Application.
 	class IApplication
 	{
@@ -151,21 +147,15 @@ export namespace PonyEngine::Application
 		template<typename T> [[nodiscard("Pure function")]]
 		T& GetInterface() const;
 
-		/// @brief Gets the flow state.
-		/// @return Flow state.
+		/// @brief Gets the flow info.
+		/// @return Flow info.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual FlowState FlowState() const noexcept = 0;
-		/// @brief Gets the exit code.
-		/// @note Mustn't be called if @p FlowState() returns Running or less.
-		/// @return Exit code or std::nullopt if the engine wasn't stopped.
-		/// @note The function is thread-safe.
-		[[nodiscard("Pure function")]]
-		virtual std::optional<int> ExitCode() const noexcept = 0;
+		virtual FlowInfo Flow() const noexcept = 0;
 		/// @brief Stops the application with the @p exitCode.
 		/// @remark If the application is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
-		/// @note Must be called on a main thread only.
+		/// @note The function must be called on a main thread.
 		virtual void Stop(int exitCode = 0) = 0;
 
 		/// @brief Gets the current frame count.
@@ -173,6 +163,91 @@ export namespace PonyEngine::Application
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t FrameCount() const noexcept = 0;
+		/// @brief Gets a time point when the application started.
+		/// @return Time point.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> StartTimePoint() const noexcept = 0;
+		/// @brief Gets a time point when a previous frame started.
+		/// @return Time point.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const noexcept = 0;
+		/// @brief Gets a time point when this frame started.
+		/// @return Time point.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> FrameTimePoint() const noexcept = 0;
+		/// @brief Gets a now time point.
+		/// @return Time point.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> NowTimePoint() const noexcept = 0;
+		/// @brief Gets a time elapsed between the application start and a previous frame start.
+		/// @return Time.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds PrevFrameTime() const noexcept = 0;
+		/// @brief Gets a time elapsed between the application start and a previous frame start.
+		/// @tparam T Return value type.
+		/// @return Time in seconds.
+		/// @note The function is thread-safe.
+		template<std::floating_point T = double> [[nodiscard("Pure function")]]
+		std::chrono::nanoseconds PrevFrameTimeSeconds() const noexcept;
+		/// @brief Gets a time elapsed between the application start and this frame start.
+		/// @return Time.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds FrameTime() const noexcept = 0;
+		/// @brief Gets a time elapsed between the application start and this frame start.
+		/// @tparam T Return value type.
+		/// @return Time in seconds.
+		/// @note The function is thread-safe.
+		template<std::floating_point T = double> [[nodiscard("Pure function")]]
+		std::chrono::nanoseconds FrameTimeSeconds() const noexcept;
+		/// @brief Gets a time elapsed since the application start.
+		/// @return Time.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds NowTime() const noexcept = 0;
+		/// @brief Gets a time elapsed since the application start.
+		/// @tparam T Return value type.
+		/// @return Time in seconds.
+		/// @note The function is thread-safe.
+		template<std::floating_point T = double> [[nodiscard("Pure function")]]
+		std::chrono::nanoseconds NowTimeSeconds() const noexcept;
+		/// @brief Gets a time elapsed between the previous frame and this frame start.
+		/// @return Time.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds DeltaTime() const noexcept = 0;
+		/// @brief Gets a time elapsed between the previous frame and this frame start.
+		/// @tparam T Return value type.
+		/// @return Time in seconds.
+		/// @note The function is thread-safe.
+		template<std::floating_point T = double> [[nodiscard("Pure function")]]
+		std::chrono::nanoseconds DeltaTimeSeconds() const noexcept;
+		/// @brief Gets the target frame time.
+		/// @return Target frame time. 0 or less means no target frame time (it's not restricted).
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds TargetFrameTime() const noexcept = 0;
+		/// @brief Gets the target frame time.
+		/// @tparam T Return value type.
+		/// @return Target frame time in seconds.
+		/// @note The function is thread-safe.
+		template<std::floating_point T = double> [[nodiscard("Pure function")]]
+		std::chrono::nanoseconds TargetFrameTimeSeconds() const noexcept;
+		/// @brief Sets the target frame time.
+		/// @param frameTime Target frame time. 0 or less means no target frame time (it's not restricted).
+		/// @note The function is thread-safe.
+		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) noexcept = 0;
+		/// @brief Sets the target frame time.
+		/// @tparam T Second type.
+		/// @param frameTime Target frame time. 0 or less means no target frame time (it's not restricted).
+		/// @note The function is thread-safe.
+		template<std::floating_point T> [[nodiscard("Pure function")]]
+		void TargetFrameTimeSeconds(T frameTime) noexcept;
 
 		/// @brief Acquires a temporary buffer.
 		/// @param requiredSize Required size.
@@ -182,69 +257,9 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment = alignof(std::max_align_t)) = 0;
 		/// @brief Releases the temporary buffer.
-		/// @param buffer Temporary buffer.
+		/// @param tempBuffer Temporary buffer.
 		/// @note The buffer must be returned on the same thread it was acquired.
-		virtual void ReleaseTempBuffer(TempBuffer buffer) noexcept = 0;
-		/// @brief Acquires a scoped temporary buffer.
-		/// @param requiredSize Required size.
-		/// @param requiredAlignment Required alignment. Must be a valid alignment value and at least alignof(std::max_align_t).
-		/// @return Scoped temporary buffer.
-		/// @note Each thread has its own pool of buffers.
-		/// @note The buffer must be destroyed on the same thread it was acquired.
-		[[nodiscard("Pure function")]]
-		ScopedTempBuffer AcquiredScopedTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment = alignof(std::max_align_t));
-	};
-
-	class ScopedTempBuffer final
-	{
-	public:
-		/// @brief Creates an empty scoped temporary buffer.
-		[[nodiscard("Pure constructor")]]
-		ScopedTempBuffer() noexcept;
-		/// @brief Creates a scoped temporary buffer.
-		/// @param buffer Temporary buffer. Must be an alive buffer.
-		/// @param application Application.
-		[[nodiscard("Pure constructor")]]
-		ScopedTempBuffer(TempBuffer buffer, IApplication& application) noexcept;
-		ScopedTempBuffer(const ScopedTempBuffer&) = delete;
-		[[nodiscard("Pure constructor")]]
-		ScopedTempBuffer(ScopedTempBuffer&& other) noexcept;
-
-		~ScopedTempBuffer() noexcept;
-
-		/// @brief Releases the temporary buffer.
-		void Release() noexcept;
-		/// @brief Forgets the temporary buffer.
-		void Forget() noexcept;
-
-		/// @brief Gets the buffer.
-		/// @return Buffer.
-		[[nodiscard("Pure function")]]
-		const std::span<std::byte>* Get() const noexcept;
-		/// @brief Gets the temp buffer.
-		/// @return Temp buffer.
-		[[nodiscard("Pure function")]]
-		const TempBuffer& Buffer() const noexcept;
-		/// @brief Gets the application.
-		/// @return Application.
-		[[nodiscard("Pure function")]]
-		IApplication* Application() const noexcept;
-
-		/// @brief Checks if it has a valid buffer.
-		[[nodiscard("Pure operator")]]
-		explicit operator bool() const noexcept;
-
-		[[nodiscard("Pure operator")]]
-		const std::span<std::byte>& operator *() const noexcept;
-		[[nodiscard("Pure operator")]]
-		const std::span<std::byte>* operator ->() const noexcept;
-
-		ScopedTempBuffer& operator =(const ScopedTempBuffer&) = delete;
-		ScopedTempBuffer& operator =(ScopedTempBuffer&& other) noexcept;
-
-	private:
-		TempBuffer buffer; ///< Temporary buffer.
-		IApplication* application; ///< Application.
+		virtual void ReleaseTempBuffer(TempBuffer tempBuffer) noexcept = 0;
 	};
 }
 
@@ -268,87 +283,39 @@ namespace PonyEngine::Application
 		return *interface;
 	}
 
-	ScopedTempBuffer IApplication::AcquiredScopedTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
+	template<std::floating_point T>
+	std::chrono::nanoseconds IApplication::PrevFrameTimeSeconds() const noexcept
 	{
-		return ScopedTempBuffer(AcquireTempBuffer(requiredSize, requiredAlignment), *this);
+		return Chrono::ToSeconds<T>(PrevFrameTime());
 	}
 
-	ScopedTempBuffer::ScopedTempBuffer() noexcept :
-		application{nullptr}
+	template<std::floating_point T>
+	std::chrono::nanoseconds IApplication::FrameTimeSeconds() const noexcept
 	{
+		return Chrono::ToSeconds<T>(FrameTime());
 	}
 
-	ScopedTempBuffer::ScopedTempBuffer(const TempBuffer buffer, IApplication& application) noexcept :
-		buffer(buffer),
-		application{&application}
+	template<std::floating_point T>
+	std::chrono::nanoseconds IApplication::NowTimeSeconds() const noexcept
 	{
-		assert(this->buffer.buffer.data() && "Invalid buffer.");
+		return Chrono::ToSeconds<T>(NowTime());
 	}
 
-	ScopedTempBuffer::ScopedTempBuffer(ScopedTempBuffer&& other) noexcept :
-		buffer(other.buffer),
-		application{other.application}
+	template<std::floating_point T>
+	std::chrono::nanoseconds IApplication::DeltaTimeSeconds() const noexcept
 	{
-		other.Forget();
+		return Chrono::ToSeconds<T>(DeltaTime());
 	}
 
-	ScopedTempBuffer::~ScopedTempBuffer() noexcept
+	template<std::floating_point T>
+	std::chrono::nanoseconds IApplication::TargetFrameTimeSeconds() const noexcept
 	{
-		Release();
+		return Chrono::ToSeconds<T>(TargetFrameTime());
 	}
 
-	void ScopedTempBuffer::Release() noexcept
+	template<std::floating_point T>
+	void IApplication::TargetFrameTimeSeconds(const T frameTime) noexcept
 	{
-		if (application)
-		{
-			application->ReleaseTempBuffer(buffer);
-			Forget();
-		}
-	}
-
-	void ScopedTempBuffer::Forget() noexcept
-	{
-		buffer = TempBuffer{};
-		application = nullptr;
-	}
-
-	const std::span<std::byte>* ScopedTempBuffer::Get() const noexcept
-	{
-		return application ? &buffer.buffer : nullptr;
-	}
-
-	const TempBuffer& ScopedTempBuffer::Buffer() const noexcept
-	{
-		return buffer;
-	}
-
-	IApplication* ScopedTempBuffer::Application() const noexcept
-	{
-		return application;
-	}
-
-	ScopedTempBuffer::operator bool() const noexcept
-	{
-		return application;
-	}
-
-	const std::span<std::byte>& ScopedTempBuffer::operator *() const noexcept
-	{
-		return *Get();
-	}
-
-	const std::span<std::byte>* ScopedTempBuffer::operator ->() const noexcept
-	{
-		return Get();
-	}
-
-	ScopedTempBuffer& ScopedTempBuffer::operator =(ScopedTempBuffer&& other) noexcept
-	{
-		Release();
-		buffer = other.buffer;
-		application = other.application;
-		other.Forget();
-
-		return *this;
+		TargetFrameTime(Chrono::ToDuration<std::chrono::nanoseconds>(frameTime));
 	}
 }

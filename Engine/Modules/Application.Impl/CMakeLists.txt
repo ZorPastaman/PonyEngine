@@ -4,8 +4,7 @@ message(VERBOSE "Configuring environment")
 include("CMake/Module.cmake")
 
 message(VERBOSE "Configuring parameters")
-option(PONY_ENGINE_DEFAULT_LOGGER "Enable default logger. It logs everything to a console." ON)
-option(PONY_ENGINE_CONSOLE_LOG "Enable standard C++ console." ON)
+set(PONY_ENGINE_ROOT_PATH "" CACHE STRING "Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid.")
 
 message(VERBOSE "Configuring target")
 add_executable(PonyEngine.Application.Impl)
@@ -13,20 +12,20 @@ add_executable(PonyEngine.Application.Impl)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
+	"Source/Main-App.cppm"
 	"Source/Main-EmptyLogger.cppm"
-	"Source/Main-FlowManager.cppm"
 	"Source/Main-IdentityUtility.cppm"
-	"Source/Main-InterfaceManager.cppm"
-	"Source/Main-LoggerManager.cppm"
-	"Source/Main-MemoryManager.cppm"
+	
 	"Source/Main-ModuleManager.cppm"
 	"Source/Main-PathUtility.cppm"
-	"Source/Main-ServiceManager.cppm"
-	"Source/Main-ThreadManager.cppm"
-	"Source/Main-TickableManager.cppm"
 )
 
 message(VERBOSE "Configuring defines")
+if(DEFINED PONY_ENGINE_ROOT_PATH AND NOT PONY_ENGINE_ROOT_PATH STREQUAL "")
+	pony_validate_path(PONY_ENGINE_ROOT_PATH CAN_BE_RELATIVE)
+else()
+	set(PONY_ENGINE_ROOT_PATH "")
+endif()
 target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_ENGINE_NAME=${PONY_ENGINE_NAME}
 	PONY_ENGINE_VERSION_MAJOR=${PONY_ENGINE_VERSION_MAJOR}
@@ -42,8 +41,7 @@ target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_PROJECT_VERSION_TWEAK=${PONY_PROJECT_VERSION_TWEAK}
 	PONY_COMPANY_TITLE=${PONY_COMPANY_TITLE} 
 	PONY_PROJECT_TITLE=${PONY_PROJECT_TITLE}
-	$<$<BOOL:${PONY_ENGINE_DEFAULT_LOGGER}>:PONY_ENGINE_DEFAULT_LOGGER>
-	$<$<BOOL:${PONY_ENGINE_CONSOLE_LOG}>:PONY_ENGINE_CONSOLE_LOG>
+	PONY_ENGINE_ROOT_PATH=${PONY_ENGINE_ROOT_PATH}
 )
 
 message(VERBOSE "Setting properties")

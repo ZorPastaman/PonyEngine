@@ -18,14 +18,16 @@ import std;
 namespace PonyEngine::Application
 {
 	/// @brief Flow state names.
-	constexpr std::array<std::string_view, 6> FlowStateNames
+	constexpr std::array<std::string_view, 8> FlowStateNames
 	{
+		"NotInitialized",
 		"StartingUp",
 		"Beginning",
 		"Running",
 		"Stopped",
 		"Ending",
-		"ShuttingDown"
+		"ShuttingDown",
+		"Finalized"
 	};
 }
 
@@ -34,12 +36,21 @@ export namespace PonyEngine::Application
 	/// @brief Flow state.
 	enum class FlowState : std::uint8_t
 	{
+		NotInitialized,
 		StartingUp,
 		Beginning,
 		Running,
 		Stopped,
 		Ending,
-		ShuttingDown
+		ShuttingDown,
+		Finalized
+	};
+
+	/// @brief Flow info.
+	struct FlowInfo final
+	{
+		int exitCode; ///< Exit code. Has a valid value only if the @p flowState >= Stopped.
+		FlowState flowState; ///< Flow state.
 	};
 }
 

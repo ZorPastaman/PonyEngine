@@ -20,6 +20,7 @@ target_sources(PonyEngine.Application PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IModuleContext.cppm"
 	"Source/Main-IService.cppm"
 	"Source/Main-ITickable.cppm"
+	"Source/Main-ScopedTempBuffer.cppm"
 	"Source/Main-TempBuffer.cppm"
 )
 

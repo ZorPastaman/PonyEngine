@@ -70,9 +70,9 @@ PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
 PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 
 /// @brief Adds the early module.
-/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object must be alive till the end of an application.
 /// @param moduleName Module name. Must be unique across the whole application.
-/// @param order Execution order. It may be any string of letters but mustn't start with a or z.
+/// @param order Execution order. It may be any string of small letters but mustn't start with a or z.
 #define PONY_EARLY_MODULE(function, moduleName, order) \
 	PONY_SECTION(PONY_EARLY_MODULE_SECTION_NAME(order)) \
 	extern "C" \
@@ -81,9 +81,9 @@ PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 		PONY_PRESERVE(PONY_MODULE_INTERFACE_NAME(moduleName)); \
 	} \
 /// @brief Adds the normal module.
-/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object must be alive till the end of an application.
 /// @param moduleName Module name. Must be unique across the whole application.
-/// @param order Execution order. It may be any string of letters but mustn't start with a or z.
+/// @param order Execution order. It may be any string of small letters but mustn't start with a or z.
 #define PONY_NORMAL_MODULE(function, moduleName, order) \
 	PONY_SECTION(PONY_NORMAL_MODULE_SECTION_NAME(order)) \
 	extern "C" \
@@ -92,9 +92,9 @@ PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 		PONY_PRESERVE(PONY_MODULE_INTERFACE_NAME(moduleName)); \
 	} \
 /// @brief Adds the late module.
-/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object must be alive till the end of an application.
 /// @param moduleName Module name. Must be unique across the whole application.
-/// @param order Execution order. It may be any string of letters but mustn't start with a or z.
+/// @param order Execution order. It may be any string of small letters but mustn't start with a or z.
 #define PONY_LATE_MODULE(function, moduleName, order) \
 	PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(order)) \
 	extern "C" \
@@ -104,17 +104,17 @@ PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 	} \
 
 /// @brief Adds the normal module.
-/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object must be alive till the end of an application.
 /// @param moduleName Module name. Must be unique across the whole application.
-/// @param order Execution order. It may be any string of letters but mustn't start with a or z.
+/// @param order Execution order. It may be any string of small letters but mustn't start with a or z.
 #define PONY_LOG_MODULE(function, moduleName, order) PONY_EARLY_MODULE(function, moduleName, order)
 /// @brief Adds the normal module.
-/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object must be alive till the end of an application.
 /// @param moduleName Module name. Must be unique across the whole application.
-/// @param order Execution order. It may be any string of letters but mustn't start with a or z.
+/// @param order Execution order. It may be any string of small letters but mustn't start with a or z.
 #define PONY_ENGINE_MODULE(function, moduleName, order) PONY_NORMAL_MODULE(function, moduleName, order)
 /// @brief Adds the late module.
-/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object's lifetime must match the module's lifetime.
+/// @param function Module getter function of type PonyEngine::Application::ModuleGetter. Must return a valid pointer to a module object. The returned object must be alive till the end of an application.
 /// @param moduleName Module name. Must be unique across the whole application.
-/// @param order Execution order. It may be any string of letters but mustn't start with a or z.
-#define PONY_GAME_MODULE(function, moduleName, order) PONY_LATE_MODULE(function, moduleName, order)
+/// @param order Execution order. It may be any string of small letters but mustn't start with a or z.
+#define PONY_PROJECT_MODULE(function, moduleName, order) PONY_LATE_MODULE(function, moduleName, order)
