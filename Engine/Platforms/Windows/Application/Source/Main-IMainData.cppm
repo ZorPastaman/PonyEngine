@@ -12,16 +12,14 @@ module;
 #include "PonyEngine/Object/Body.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Application.Windows:IApplication;
-
-import PonyEngine.Application;
+export module PonyEngine.Application.Windows:IMainData;
 
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Windows application.
-	class IApplication : public Application::IApplication
+	/// @brief Provides data from @p WinMain().
+	class IMainData
 	{
-		PONY_INTERFACE_BODY(IApplication)
+		PONY_INTERFACE_BODY(IMainData)
 
 		/// @brief Gets the instance handle of the application.
 		/// @return Instance handle of the application.
@@ -33,21 +31,15 @@ export namespace PonyEngine::Application::Windows
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual HINSTANCE PrevInstance() const noexcept = 0;
+		/// @brief Gets the command line.
+		/// @return Command line.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual PSTR CommandLine() const noexcept = 0;
 		/// @brief Gets the show command for the application.
 		/// @return Show command.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual int ShowCommand() const noexcept = 0;
-
-		/// @brief Gets the application icon.
-		/// @return Application icon.
-		/// @note The function is thread-safe.
-		[[nodiscard("Pure function")]]
-		virtual HICON AppIcon() const noexcept = 0;
-		/// @brief Gets the application cursor.
-		/// @return Application cursor.
-		/// @note The function is thread-safe.
-		[[nodiscard("Pure function")]]
-		virtual HCURSOR AppCursor() const noexcept = 0;
 	};
 }

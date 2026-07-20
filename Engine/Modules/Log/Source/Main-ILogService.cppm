@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Log:ILogger;
+export module PonyEngine.Log:ILogService;
 
 import std;
 
@@ -19,10 +19,10 @@ import :LogType;
 
 export namespace PonyEngine::Log
 {
-	/// @brief Logger.
-	class ILogger
+	/// @brief Log service.
+	class ILogService
 	{
-		PONY_INTERFACE_BODY(ILogger)
+		PONY_INTERFACE_BODY(ILogService)
 
 		/// @brief Logs a message.
 		/// @param logType Log type.

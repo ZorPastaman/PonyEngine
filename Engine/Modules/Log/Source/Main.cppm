@@ -9,6 +9,6 @@
 
 export module PonyEngine.Log;
 
-export import :ILogger;
+export import :ILogService;
 export import :LogHelper;
 export import :LogType;

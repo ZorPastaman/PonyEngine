@@ -7,7 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module PonyEngine.Format;
 
-#define IDI_APP_ICON 101
-#define IDC_APP_CURSOR 201
+export import :Optional;

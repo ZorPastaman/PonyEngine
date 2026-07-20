@@ -113,46 +113,55 @@
 #define PONY_LOG_STACKTRACE_MASK (PONY_LOG_STACKTRACE_VERBOSE_MASK | PONY_LOG_STACKTRACE_DEBUG_MASK | PONY_LOG_STACKTRACE_INFO_MASK | PONY_LOG_STACKTRACE_WARNING_MASK | PONY_LOG_STACKTRACE_ERROR_MASK | PONY_LOG_STACKTRACE_FATAL_MASK)
 
 /// @brief Pushes the log without a level check.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logService const PonyEngine::Log::ILogService* or const PonyEngine::Log::ILogService&.
 /// @param type PonyEngine::Log::LogType value.
-/// @param message std::string_view as a message or format string or exception.
-/// @param ... Format arguments or format string and format arguments.
+/// @param message std::string_view for a message or std::string_view for a format string or std::exception_ptr.
+/// @param ... Depends on the @p message.
+///            If the @p message is a message, this must be empty.
+///            If the @p message is a format string, this must be format arguments.
+///            If the @p message is an exception, this must be std::string_view for a message or std::string_view view for a format string and format arguments.
 /// @note The function is thread-safe.
-#define PONY_LOG_PUSH(logger, type, message, ...) \
+#define PONY_LOG_PUSH(logService, type, message, ...) \
 	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_STACKTRACE_MASK)) \
 	{ \
 		const std::stacktrace stacktrace = std::stacktrace::current(); \
-		PonyEngine::Log::LogToLogger(logger, type, stacktrace, message __VA_OPT__(,) __VA_ARGS__); \
+		PonyEngine::Log::LogToLogService(logService, type, stacktrace, message __VA_OPT__(,) __VA_ARGS__); \
 	} \
 	else \
 	{ \
-		PonyEngine::Log::LogToLogger(logger, type, message __VA_OPT__(,) __VA_ARGS__); \
+		PonyEngine::Log::LogToLogService(logService, type, message __VA_OPT__(,) __VA_ARGS__); \
 	} \
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logService const PonyEngine::Log::ILogService* or const PonyEngine::Log::ILogService&.
 /// @param type PonyEngine::Log::LogType value.
-/// @param message std::string_view as a message or format string or exception.
-/// @param ... Format arguments or format string and format arguments.
+/// @param message std::string_view for a message or std::string_view for a format string or std::exception_ptr.
+/// @param ... Depends on the @p message.
+///            If the @p message is a message, this must be empty.
+///            If the @p message is a format string, this must be format arguments.
+///            If the @p message is an exception, this must be std::string_view for a message or std::string_view view for a format string and format arguments.
 /// @note The function is thread-safe.
-#define PONY_LOG(logger, type, message, ...) \
+#define PONY_LOG(logService, type, message, ...) \
 	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_MASK)) \
 	{ \
-		PONY_LOG_PUSH(logger, type, message __VA_OPT__(,) __VA_ARGS__) \
+		PONY_LOG_PUSH(logService, type, message __VA_OPT__(,) __VA_ARGS__) \
 	} \
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param condition Log condition.
-/// @param logger PonyEngine::Log::ILogger reference.
+/// @param condition Log condition. Must be @a bool.
+/// @param logService const PonyEngine::Log::ILogService* or const PonyEngine::Log::ILogService&.
 /// @param type PonyEngine::Log::LogType value.
-/// @param message std::string_view as a message or format string or exception.
-/// @param ... Format arguments or format string and format arguments.
+/// @param message std::string_view for a message or std::string_view for a format string or std::exception_ptr.
+/// @param ... Depends on the @p message.
+///            If the @p message is a message, this must be empty.
+///            If the @p message is a format string, this must be format arguments.
+///            If the @p message is an exception, this must be std::string_view for a message or std::string_view view for a format string and format arguments.
 /// @note The function is thread-safe.
-#define PONY_LOG_IF(condition, logger, type, message, ...) \
+#define PONY_LOG_IF(condition, logService, type, message, ...) \
 	if constexpr (PonyEngine::Log::IsInMask(type, PONY_LOG_MASK)) \
 	{ \
 		if (condition) \
 		{ \
-			PONY_LOG_PUSH(logger, type, message __VA_OPT__(,) __VA_ARGS__) \
+			PONY_LOG_PUSH(logService, type, message __VA_OPT__(,) __VA_ARGS__) \
 		} \
 	} \

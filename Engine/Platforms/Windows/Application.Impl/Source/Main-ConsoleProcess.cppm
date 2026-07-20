@@ -7,10 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.Impl.Windows;
+module;
 
-export import PonyEngine.Application.Windows;
-export import PonyEngine.Application.Impl;
+#include "PonyEngine/Platform/Windows/Framework.h"
 
-export import :ConsoleProcess;
-export import :GUIProcess;
+export module PonyEngine.Application.Impl.Windows:ConsoleProcess;
+
+export namespace PonyEngine::Application::Windows
+{
+	class ConsoleProcess final
+	{
+	public:
+		[[nodiscard("Pure constructor")]]
+		ConsoleProcess(int argc, const char* const argv[]);
+
+		[[nodiscard("Must be returned from main")]]
+		int Run();
+
+	private:
+	};
+}

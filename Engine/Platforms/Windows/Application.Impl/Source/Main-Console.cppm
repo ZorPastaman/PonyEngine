@@ -19,9 +19,9 @@ import std;
 
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Logs to output debug string.
-	/// @param message Log message.
-	void LogToOutputDebugString(std::string_view message) noexcept;
+	/// @brief Sets both the input and output code pages of the console.
+	/// @param codePageID Code page ID.
+	void SetConsoleCodePage(UINT codePageID) noexcept;
 
 	/// @brief Creates a console.
 	void CreateConsole();
@@ -31,15 +31,10 @@ export namespace PonyEngine::Application::Windows
 
 namespace PonyEngine::Application::Windows
 {
-	/// @brief Sets both the input and output code pages of the console.
-	/// @param codePageID Code page ID.
-	void SetConsoleCodePage(UINT codePageID);
-
-	void LogToOutputDebugString(const std::string_view message) noexcept
+	void SetConsoleCodePage(const UINT codePageID) noexcept
 	{
-#if PONY_ENGINE_PLATFORM_CONSOLE_LOG
-		OutputDebugStringA(message.data());
-#endif
+		SetConsoleCP(codePageID);
+		SetConsoleOutputCP(codePageID);
 	}
 
 	void CreateConsole()
@@ -48,8 +43,6 @@ namespace PonyEngine::Application::Windows
 		{
 			throw std::runtime_error(std::format("Failed to allocate console: ErrorCode = '0x{:X}'", GetLastError()));
 		}
-
-		SetConsoleCodePage(CP_UTF8);
 
 		FILE* fp;
 		if (const errno_t error = freopen_s(&fp, "CONOUT$", "w", stdout)) [[unlikely]]
@@ -85,18 +78,6 @@ namespace PonyEngine::Application::Windows
 		if (!FreeConsole()) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to free console: ErrorCode = '0x{:X}'", GetLastError()));
-		}
-	}
-
-	void SetConsoleCodePage(const UINT codePageID)
-	{
-		if (!SetConsoleCP(codePageID)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to set console code page to '{}': ErrorCode = '0x{:X}'", codePageID, GetLastError()));
-		}
-		if (!SetConsoleOutputCP(codePageID)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to set console output code page to '{}': ErrorCode = '0x{:X}'", codePageID, GetLastError()));
 		}
 	}
 }

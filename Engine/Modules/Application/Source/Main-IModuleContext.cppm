@@ -13,51 +13,26 @@ module;
 
 export module PonyEngine.Application:IModuleContext;
 
-import PonyEngine.Log;
-
 import :IApplication;
-import :IService;
 import :ITickable;
+import :TickOrder;
 
 export namespace PonyEngine::Application
 {
 	/// @brief Module context. It's a context used by modules.
-	/// exitCode
+	/// @note All the function in the module context must be called only on a main thread.
 	class IModuleContext
 	{
 		PONY_INTERFACE_BODY(IModuleContext)
 
 		/// @brief Gets the application.
-		/// @return Application. It's stable and can be saved and used between start-up and shut-down.
+		/// @return Application. Its reference is stable and can be used till the module shut-down.
 		[[nodiscard("Pure function")]]
 		virtual IApplication& Application() noexcept = 0;
 		/// @brief Gets the application.
-		/// @return Application. It's stable and can be saved and used between start-up and shut-down.
+		/// @return Application. Its reference is stable and can be used till the module shut-down.
 		[[nodiscard("Pure function")]]
 		virtual const IApplication& Application() const noexcept = 0;
-
-		/// @brief Checks if the engine has a set logger.
-		/// @return @a True if it has; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool HasLogger() const noexcept = 0;
-		/// @brief Sets the logger.
-		/// @param logger Logger to set. Must be alive till it's unset.
-		/// @note Only one logger may be set.
-		/// @note The function may be called only during start-up.
-		virtual void SetLogger(Log::ILogger& logger) = 0;
-		/// @brief Unsets the logger.
-		/// @param logger Logger to unset. Must be a previously set logger.
-		/// @note The function may be called only during start-up or shut-down.
-		virtual void UnsetLogger(Log::ILogger& logger) = 0;
-
-		/// @brief Adds the service.
-		/// @param service Service to add. Must be unique. Must be alive till it's removed.
-		/// @note The function may be called only during start-up.
-		virtual void AddService(IService& service) = 0;
-		/// @brief Removes the service.
-		/// @param service Service to remove. Must be previously added.
-		/// @note The function may be called only during start-up or shut-down.
-		virtual void RemoveService(IService& service) = 0;
 
 		/// @brief Adds the interface.
 		/// @param type Interface type. Must be unique.
@@ -84,14 +59,15 @@ export namespace PonyEngine::Application
 
 		/// @brief Adds the tickable.
 		/// @param tickable Tickable to add. Must be alive till it's removed.
-		/// @param order Tickable order.
+		/// @param tickableOrder Tickable order.
 		/// @note The function may be called only during start-up.
-		virtual void AddTickable(ITickable& tickable, std::int32_t order) = 0;
+		/// @remark The same tickable may be added many times.
+		virtual void AddTickable(ITickable& tickable, const TickableOrder& tickableOrder) = 0;
 		/// @brief Removes the tickable.
 		/// @param tickable Tickable. Must be previously added.
-		/// @param order Tickable order.
+		/// @param tickableOrder Tickable order.
 		/// @note The function may be called only during start-up or shut-down.
-		virtual void RemoveTickable(ITickable& tickable, std::int32_t order) = 0;
+		virtual void RemoveTickable(ITickable& tickable, const TickableOrder& tickableOrder) = 0;
 	};
 }
 

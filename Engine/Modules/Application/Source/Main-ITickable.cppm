@@ -20,8 +20,16 @@ export namespace PonyEngine::Application
 	{
 		PONY_INTERFACE_BODY(ITickable)
 
-		/// @brief Ticks the object.
+		/// @brief Begins the tickable.
+		/// @details It's called once before a first application tick.
 		/// @note The function is always called on a main thread.
-		virtual void Tick() = 0;
+		virtual void Begin() {}
+		/// @brief Ends the tickable.
+		/// @details It's called once after a last application tick.
+		/// @note The function is always called on a main thread.
+		virtual void End() {}
+		/// @brief Ticks the tickable.
+		/// @note The function is always called on a main thread.
+		virtual void Tick() {}
 	};
 }

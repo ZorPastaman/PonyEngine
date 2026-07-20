@@ -1,5 +1,9 @@
 message(STATUS "Configuring PonyEngine.Application")
 
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+
 message(VERBOSE "Configuring environment")
 include("CMake/Module.cmake")
 
@@ -14,14 +18,13 @@ target_include_directories(PonyEngine.Application PUBLIC
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-FlowState.cppm"
 	"Source/Main-IApplication.cppm"
 	"Source/Main-IModule.cppm"
 	"Source/Main-IModuleContext.cppm"
-	"Source/Main-IService.cppm"
 	"Source/Main-ITickable.cppm"
 	"Source/Main-ScopedTempBuffer.cppm"
 	"Source/Main-TempBuffer.cppm"
+	"Source/Main-TickOrder.cppm"
 )
 
 message(VERBOSE "Setting properties")
@@ -34,5 +37,4 @@ set_target_properties(PonyEngine.Application PROPERTIES
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Application PUBLIC
 	PonyEngine.Core
-	PonyEngine.Log
 )

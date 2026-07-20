@@ -21,9 +21,9 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Container;
+import PonyEngine.Format;
 import PonyEngine.Log;
 
-import :EmptyLogger;
 import :IdentityUtility;
 import :PathUtility;
 
@@ -76,56 +76,52 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const std::string_view> CommandLine() const noexcept override;
 
-		[[nodiscard("Pure function")]] 
-		virtual Log::ILogger& Logger() const noexcept override;
-
-		[[nodiscard("Pure function")]] 
-		virtual void* FindInterface(std::type_index type) const noexcept override;
-
-		[[nodiscard("Pure function")]] 
-		virtual FlowInfo Flow() const noexcept override;
-		virtual void Stop(int exitCode) override;
-
-		[[nodiscard("Pure function")]] 
-		virtual std::uint64_t FrameCount() const noexcept override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
+		virtual std::optional<int> ExitCode() const override;
+		virtual void Stop(int exitCode = 0) override;
+		[[nodiscard("Pure function")]]
+		virtual std::uint64_t FrameCount() const override;
+		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> StartTimePoint() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::chrono::time_point<std::chrono::steady_clock> FrameTimePoint() const noexcept override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const override;
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> ThisFrameTimePoint() const override;
+		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> NowTimePoint() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::chrono::nanoseconds PrevFrameTime() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::chrono::nanoseconds FrameTime() const noexcept override;
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds PrevFrameTime() const override;
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds ThisFrameTime() const override;
+		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds NowTime() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds DeltaTime() const override;
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds TargetFrameTime() const override;
+		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) override;
+
 		[[nodiscard("Pure function")]] 
-		virtual std::chrono::nanoseconds DeltaTime() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::chrono::nanoseconds TargetFrameTime() const noexcept override;
-		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) noexcept override;
+		virtual void* FindInterface(std::type_index type) const override;
 
 		[[nodiscard("Pure function")]] 
 		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment) override;
 		virtual void ReleaseTempBuffer(TempBuffer tempBuffer) noexcept override;
 
-		void Initialize();
-		void Finalize() noexcept;
+		void InitializeEarly();
+		void FinalizeEarly() noexcept;
+		void InitializeNormal();
+		void FinalizeNormal() noexcept;
+		void InitializeLate();
+		void FinalizeLate() noexcept;
 		void Begin();
 		void End() noexcept;
-		int Run();
+		void BeginFrame();
+		void EndFrame();
+		void Tick();
 
-		[[nodiscard("Pure function")]]
-		bool HasLogger() const noexcept;
-		void SetLogger(Log::ILogger& logger);
-		void UnsetLogger(const Log::ILogger& logger);
-
-		void AddService(IService& service);
-		void RemoveService(IService& service);
-
+		template<typename T>
+		T* FindInterface() const;
 		void AddInterface(std::type_index type, void* interface);
 		template<typename T>
 		void AddInterface(T& interface);
@@ -133,8 +129,11 @@ export namespace PonyEngine::Application
 		template<typename T>
 		void RemoveInterface(T& interface);
 
-		void AddTickable(ITickable& tickable, std::int32_t order);
-		void RemoveTickable(ITickable& tickable, std::int32_t order);
+		void AddTickable(ITickable& tickable, const TickableOrder& tickableOrder);
+		void RemoveTickable(ITickable& tickable, const TickableOrder& tickableOrder);
+
+		[[nodiscard("Pure function")]]
+		const Log::ILogService* LogService() const noexcept;
 
 		App& operator =(const App&) = delete;
 		App& operator =(App&) = delete;
@@ -157,52 +156,74 @@ export namespace PonyEngine::Application
 			std::unordered_map<const std::byte*, Buffer> usedBuffers; ///< Buffers that are in use now.
 		};
 
-		class ModuleContext final : public IModuleContext
+		class StartUpModuleContext final : public IModuleContext
 		{
 		public:
 			[[nodiscard("Pure constructor")]]
-			explicit ModuleContext(App& application) noexcept;
-			ModuleContext(const ModuleContext&) = delete;
-			ModuleContext(ModuleContext&&) = delete;
+			explicit StartUpModuleContext(App& application) noexcept;
+			StartUpModuleContext(const StartUpModuleContext&) = delete;
+			StartUpModuleContext(StartUpModuleContext&&) = delete;
 
-			~ModuleContext() noexcept = default;
+			~StartUpModuleContext() noexcept = default;
 
 			[[nodiscard("Pure function")]]
 			virtual IApplication& Application() noexcept override;
 			[[nodiscard("Pure function")]]
 			virtual const IApplication& Application() const noexcept override;
 
-			[[nodiscard("Pure function")]]
-			virtual bool HasLogger() const noexcept override;
-			virtual void SetLogger(Log::ILogger& logger) override;
-			virtual void UnsetLogger(Log::ILogger& logger) override;
-
-			virtual void AddService(IService& service) override;
-			virtual void RemoveService(IService& service) override;
-
 			virtual void AddInterface(std::type_index type, void* interface) override;
 			virtual void RemoveInterface(std::type_index type, void* interface) override;
 
-			virtual void AddTickable(ITickable& tickable, std::int32_t order) override;
-			virtual void RemoveTickable(ITickable& tickable, std::int32_t order) override;
+			virtual void AddTickable(ITickable& tickable, const TickableOrder& tickOrder) override;
+			virtual void RemoveTickable(ITickable& tickable, const TickableOrder& tickOrder) override;
 
-			ModuleContext& operator =(const ModuleContext&) = delete;
-			ModuleContext& operator =(ModuleContext&&) = delete;
+			StartUpModuleContext& operator =(const StartUpModuleContext&) = delete;
+			StartUpModuleContext& operator =(StartUpModuleContext&&) = delete;
 
 		private:
 			App* application;
 		};
 
-		struct FrameInfo final
+		class ShutDownModuleContext final : public IModuleContext
 		{
-			std::chrono::time_point<std::chrono::steady_clock> prevFrameTimePoint;
-			std::chrono::time_point<std::chrono::steady_clock> thisFrameTimePoint;
+		public:
+			[[nodiscard("Pure constructor")]]
+			explicit ShutDownModuleContext(App& application) noexcept;
+			ShutDownModuleContext(const ShutDownModuleContext&) = delete;
+			ShutDownModuleContext(ShutDownModuleContext&&) = delete;
+
+			~ShutDownModuleContext() noexcept = default;
+
+			[[nodiscard("Pure function")]]
+			virtual IApplication& Application() noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const IApplication& Application() const noexcept override;
+
+			virtual void AddInterface(std::type_index type, void* interface) override;
+			virtual void RemoveInterface(std::type_index type, void* interface) override;
+
+			virtual void AddTickable(ITickable& tickable, const TickableOrder& tickOrder) override;
+			virtual void RemoveTickable(ITickable& tickable, const TickableOrder& tickOrder) override;
+
+			ShutDownModuleContext& operator =(const ShutDownModuleContext&) = delete;
+			ShutDownModuleContext& operator =(ShutDownModuleContext&&) = delete;
+
+		private:
+			App* application;
 		};
 
-		void Initialize(std::size_t& earlyCount, std::size_t& normalCount, std::size_t& lateCount);
-		void Finalize(std::size_t earlyCount, std::size_t normalCount, std::size_t lateCount) noexcept;
+		void LogBasicInfo() noexcept;
 
-		void Begin(std::size_t& count);
+		void GetModules(ModuleInterface firstModule, ModuleInterface lastModule, std::vector<IModule*>& modules) const;
+		void StartUpModules(std::span<IModule* const> modules, std::size_t& count);
+		void ShutDownModules(std::span<IModule* const> modules, std::size_t count) noexcept;
+
+		void UpdateBeginTickables();
+		void UpdateTickTickables();
+		void UpdateTickables(std::vector<ITickable*>& targetTickables, const std::function<std::optional<std::int32_t>(const TickableOrder&)>& tickableOrderGetter);
+		void LogTickableList(std::span<const ITickable* const> tickables) const noexcept;
+
+		void Begin(std::size_t& count) const;
 		void End(std::size_t count) noexcept;
 
 		[[nodiscard("Pure function")]]
@@ -214,13 +235,6 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		Buffer GetBuffer(TempBufferCache& cache, std::size_t requiredAlignment) const;
 
-		void GetModules(ModuleInterface firstModule, ModuleInterface lastModule, std::vector<IModule*>& modules) const;
-		void StartUpModules(std::span<IModule* const> modules, std::size_t& count, ModuleContext& context) const;
-		void ShutDownModules(std::span<IModule* const> modules, std::size_t count, ModuleContext& context) const noexcept;
-
-		[[nodiscard("Pure function")]]
-		FrameInfo ThisFrameInfo() const noexcept;
-
 		std::thread::id mainThreadId;
 		std::span<const std::string_view> commandLine;
 
@@ -231,27 +245,23 @@ export namespace PonyEngine::Application
 		std::filesystem::path userDataDirectory; ///< User data directory.
 		std::filesystem::path tempDataDirectory; ///< Temporal data directory.
 
-		EmptyLogger emptyLogger;
-		Log::ILogger* logger;
-
-		std::atomic<FlowInfo> flow;
-
-		std::atomic<std::uint64_t> frameCount;
+		std::optional<int> exitCode;
+		std::uint64_t frameCount;
 		std::chrono::time_point<std::chrono::steady_clock> startTimePoint;
-		std::array<FrameInfo, 2> frameInfos;
-		std::atomic<std::chrono::nanoseconds> targetFrameTime;
-
-		std::vector<IService*> services;
-		std::unordered_map<std::type_index, void*> interfaces; ///< Interfaces.
-		std::vector<std::pair<ITickable*, std::int32_t>> tickables; ///< Tickables.
+		std::chrono::time_point<std::chrono::steady_clock> prevFrameTimePoint;
+		std::chrono::time_point<std::chrono::steady_clock> thisFrameTimePoint;
+		std::chrono::nanoseconds targetFrameTime;
 
 		std::vector<IModule*> earlyModules;
 		std::vector<IModule*> normalModules;
 		std::vector<IModule*> lateModules;
 
-		static_assert(std::atomic<std::uint64_t>::is_always_lock_free, "Uint64 is not lock-free");
-		static_assert(std::atomic<FlowInfo>::is_always_lock_free, "FlowInfo is not lock-free");
-		static_assert(std::atomic<std::chrono::nanoseconds>::is_always_lock_free, "std::chrono::nanoseconds is not lock-free");
+		Log::ILogService* logService;
+
+		std::unordered_map<std::type_index, void*> interfaces; ///< Interfaces.
+		std::vector<std::pair<ITickable*, TickableOrder>> tickables; ///< Tickables.
+		std::vector<ITickable*> beginTickables; ///< Tickables with Begin() and End() functions.
+		std::vector<ITickable*> tickTickables; ///< Tickables with Tick() function.
 	};
 }
 
@@ -267,13 +277,20 @@ namespace PonyEngine::Application
 		localDataDirectory(localDataDirectory),
 		userDataDirectory(userDataDirectory),
 		tempDataDirectory(tempDataDirectory),
-		logger{&emptyLogger},
-		flow(FlowInfo{.exitCode = 0, .flowState = FlowState::NotInitialized}),
+		exitCode(std::nullopt),
 		frameCount(0ull),
 		startTimePoint(NowTimePoint()),
-		frameInfos{FrameInfo{.prevFrameTimePoint = startTimePoint, .thisFrameTimePoint = startTimePoint}, FrameInfo{.prevFrameTimePoint = startTimePoint, .thisFrameTimePoint = startTimePoint}},
-		targetFrameTime(std::chrono::nanoseconds(0))
+		prevFrameTimePoint(startTimePoint),
+		thisFrameTimePoint(startTimePoint),
+		targetFrameTime(std::chrono::nanoseconds(0)),
+		logService{nullptr}
 	{
+	}
+
+	App::~App() noexcept
+	{
+		assert(interfaces.size() == 0uz && "Some interfaces weren't removed.");
+		assert(tickables.size() == 0uz && "Some tickables weren't removed.");
 	}
 
 	std::string_view App::EngineName() const noexcept
@@ -356,24 +373,16 @@ namespace PonyEngine::Application
 		return commandLine;
 	}
 
-	Log::ILogger& App::Logger() const noexcept
+	std::optional<int> App::ExitCode() const
 	{
-		return *logger;
-	}
-
-	void* App::FindInterface(const std::type_index type) const noexcept
-	{
-		if (const auto position = interfaces.find(type); position != interfaces.cend()) [[likely]]
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
 		{
-			return position->second;
+			throw std::logic_error("Must be called on main thread");
 		}
+#endif
 
-		return nullptr;
-	}
-
-	FlowInfo App::Flow() const noexcept
-	{
-		return flow.load(std::memory_order::relaxed);
+		return exitCode;
 	}
 
 	void App::Stop(const int exitCode)
@@ -385,27 +394,27 @@ namespace PonyEngine::Application
 		}
 #endif
 
-		FlowInfo currentFlow = flow.load(std::memory_order::relaxed);
-		if (currentFlow.flowState == FlowState::Running && flow.compare_exchange_strong(currentFlow, FlowInfo{.exitCode = exitCode, .flowState = FlowState::Stopped}, std::memory_order::relaxed))
+		if (this->exitCode)
 		{
-			PONY_LOG(Logger(), Log::LogType::Info, "Application stopped. Exit code: '{}'.", exitCode);
+			PONY_LOG(logService, Log::LogType::Debug, "Tried to stop already stopped application. Ignoring.");
 		}
 		else
 		{
-			if (currentFlow.flowState == FlowState::Stopped) [[likely]]
-			{
-				PONY_LOG(Logger(), Log::LogType::Debug, "Tried to stop already stopped application. Ignoring.");
-			}
-			else [[unlikely]]
-			{
-				PONY_LOG(Logger(), Log::LogType::Warning, "Tried to stop application in inappropriate state. Ignoring. Current flow state: '{}'.", currentFlow.flowState);
-			}
+			this->exitCode = exitCode;
+			PONY_LOG(logService, Log::LogType::Info, "Application stopped. Exit code: '{}'.", *this->exitCode);
 		}
 	}
 
-	std::uint64_t App::FrameCount() const noexcept
+	std::uint64_t App::FrameCount() const
 	{
-		return frameCount.load(std::memory_order::relaxed);
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		return frameCount;
 	}
 
 	std::chrono::time_point<std::chrono::steady_clock> App::StartTimePoint() const noexcept
@@ -413,14 +422,28 @@ namespace PonyEngine::Application
 		return startTimePoint;
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> App::PrevFrameTimePoint() const noexcept
+	std::chrono::time_point<std::chrono::steady_clock> App::PrevFrameTimePoint() const
 	{
-		return ThisFrameInfo().prevFrameTimePoint;
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		return prevFrameTimePoint;
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> App::FrameTimePoint() const noexcept
+	std::chrono::time_point<std::chrono::steady_clock> App::ThisFrameTimePoint() const
 	{
-		return ThisFrameInfo().thisFrameTimePoint;
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		return thisFrameTimePoint;
 	}
 
 	std::chrono::time_point<std::chrono::steady_clock> App::NowTimePoint() const noexcept
@@ -428,14 +451,14 @@ namespace PonyEngine::Application
 		return std::chrono::steady_clock::now();
 	}
 
-	std::chrono::nanoseconds App::PrevFrameTime() const noexcept
+	std::chrono::nanoseconds App::PrevFrameTime() const
 	{
 		return PrevFrameTimePoint() - startTimePoint;
 	}
 
-	std::chrono::nanoseconds App::FrameTime() const noexcept
+	std::chrono::nanoseconds App::ThisFrameTime() const
 	{
-		return FrameTimePoint() - startTimePoint;
+		return ThisFrameTimePoint() - startTimePoint;
 	}
 
 	std::chrono::nanoseconds App::NowTime() const noexcept
@@ -443,25 +466,57 @@ namespace PonyEngine::Application
 		return NowTimePoint() - startTimePoint;
 	}
 
-	std::chrono::nanoseconds App::DeltaTime() const noexcept
+	std::chrono::nanoseconds App::DeltaTime() const
 	{
-		const FrameInfo info = ThisFrameInfo();
-		return info.thisFrameTimePoint - info.prevFrameTimePoint;
+		return ThisFrameTimePoint() - PrevFrameTimePoint();
 	}
 
-	std::chrono::nanoseconds App::TargetFrameTime() const noexcept
+	std::chrono::nanoseconds App::TargetFrameTime() const
 	{
-		return targetFrameTime.load(std::memory_order::relaxed);
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		return targetFrameTime;
 	}
 
-	void App::TargetFrameTime(const std::chrono::nanoseconds frameTime) noexcept
+	void App::TargetFrameTime(const std::chrono::nanoseconds frameTime)
 	{
-		targetFrameTime.store(frameTime, std::memory_order::relaxed);
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		targetFrameTime = std::max(frameTime, std::chrono::nanoseconds(0));
+
+		PONY_LOG(logService, Log::LogType::Info, "Target frame time changed to: '{}'.", targetFrameTime);
+	}
+
+	void* App::FindInterface(const std::type_index type) const
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		if (const auto position = interfaces.find(type); position != interfaces.cend()) [[likely]]
+		{
+			return position->second;
+		}
+
+		return nullptr;
 	}
 
 	TempBuffer App::AcquireTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
 	{
-		PONY_LOG(Logger(), Log::LogType::Verbose, "Acquiring temp buffer... Size: '{}'; Alignment: '{}'.", requiredSize, requiredAlignment);
+		PONY_LOG(logService, Log::LogType::Verbose, "Acquiring temp buffer... Size: '{}'; Alignment: '{}'.", requiredSize, requiredAlignment);
 
 		if (requiredAlignment < alignof(std::max_align_t) || !std::has_single_bit(requiredAlignment)) [[unlikely]]
 		{
@@ -472,27 +527,27 @@ namespace PonyEngine::Application
 		Buffer buffer = GetBuffer(cache, requiredAlignment);
 		if (const std::size_t size = std::max(requiredSize, 1024uz); buffer.size() < size) [[unlikely]]
 		{
-			PONY_LOG(Logger(), Log::LogType::Debug, "Growing temp buffer.");
+			PONY_LOG(logService, Log::LogType::Debug, "Growing temp buffer.");
 			buffer.resize(size);
 		}
 
 		const auto tempBuffer = TempBuffer{.buffer = std::span(buffer.data(), buffer.size())};
 		cache.usedBuffers.emplace(buffer.data(), std::move(buffer));
 
-		PONY_LOG(Logger(), Log::LogType::Verbose, "Acquiring temp buffer done. Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
+		PONY_LOG(logService, Log::LogType::Verbose, "Acquiring temp buffer done. Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
 
 		return tempBuffer;
 	}
 
 	void App::ReleaseTempBuffer(const TempBuffer tempBuffer) noexcept
 	{
-		PONY_LOG(Logger(), Log::LogType::Verbose, "Releasing temp buffer... Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
+		PONY_LOG(logService, Log::LogType::Verbose, "Releasing temp buffer... Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
 
 		TempBufferCache& cache = GetCache();
 		const auto position = cache.usedBuffers.find(tempBuffer.buffer.data());
 		if (position == cache.usedBuffers.cend()) [[unlikely]]
 		{
-			PONY_LOG(Logger(), Log::LogType::Fatal, "TempBuffer memory corruption detected. Terminating.");
+			PONY_LOG(logService, Log::LogType::Fatal, "TempBuffer memory corruption detected. Terminating.");
 			std::terminate();
 		}
 
@@ -504,52 +559,126 @@ namespace PonyEngine::Application
 		}
 		catch (...)
 		{
-			PONY_LOG(Logger(), Log::LogType::Error, std::current_exception(), "On moving temp buffer from used to cache.");
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On moving temp buffer from used to cache.");
 		}
 
-		PONY_LOG(Logger(), Log::LogType::Verbose, "Releasing temp buffer done.");
+		PONY_LOG(logService, Log::LogType::Verbose, "Releasing temp buffer done.");
 	}
 
-	void App::Initialize()
+	void App::InitializeEarly()
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up application...");
+		PONY_LOG(logService, Log::LogType::Info, "Initializing early modules...");
 
-		std::size_t earlyCount = 0uz;
-		std::size_t normalCount = 0uz;
-		std::size_t lateCount = 0uz;
+		std::size_t count = 0uz;
 		try
 		{
-			Initialize(earlyCount, normalCount, lateCount);
+			PONY_LOG(logService, Log::LogType::Info, "Getting early modules...");
+			GetModules(firstEarlyModule, lastEarlyModule, earlyModules);
+			PONY_LOG(logService, Log::LogType::Info, "Getting early modules done.");
+			PONY_LOG(logService, Log::LogType::Info, "Starting up early modules...");
+			StartUpModules(earlyModules, count);
+			PONY_LOG(logService, Log::LogType::Info, "Starting up early modules done.");
 		}
 		catch (...)
 		{
-			Finalize(earlyCount, normalCount, lateCount);
+			ShutDownModules(earlyModules, count);
 			throw;
 		}
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up application done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "{} {}", EngineName(), EngineVersion());
-		PONY_LOG(Logger(), Log::LogType::Info, "Main thread: '{}'.", mainThreadId);
-		PONY_LOG(Logger(), Log::LogType::Info, "Executable file: '{}'; Executable directory: '{}'; Root directory: '{}'.",
-			executableFile.string(), executableDirectory.string(), rootDirectory.string());
-		PONY_LOG(Logger(), Log::LogType::Info, "Local data directory: '{}'; User data directory: '{}'; Temp data directory: '{}'.",
-			localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
+		PONY_LOG(logService, Log::LogType::Info, "Initializing early modules done.");
+
+		logService = FindInterface<Log::ILogService>();
+		LogBasicInfo();
 	}
 
-	void App::Finalize() noexcept
+	void App::FinalizeEarly() noexcept
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down application...");
-		Finalize(earlyModules.size(), normalModules.size(), lateModules.size());
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down application done.");
+		logService = nullptr;
+
+		PONY_LOG(logService, Log::LogType::Info, "Shutting down early modules...");
+		ShutDownModules(earlyModules, earlyModules.size());
+		PONY_LOG(logService, Log::LogType::Info, "Shutting down early modules done.");
+	}
+
+	void App::InitializeNormal()
+	{
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+
+		PONY_LOG(logService, Log::LogType::Info, "Initializing normal modules...");
+
+		std::size_t count = 0uz;
+		try
+		{
+			PONY_LOG(logService, Log::LogType::Info, "Getting normal modules...");
+			GetModules(firstNormalModule, lastNormalModule, normalModules);
+			PONY_LOG(logService, Log::LogType::Info, "Getting normal modules done.");
+			PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules...");
+			StartUpModules(normalModules, count);
+			PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules done.");
+		}
+		catch (...)
+		{
+			ShutDownModules(normalModules, count);
+			throw;
+		}
+
+		PONY_LOG(logService, Log::LogType::Info, "Initializing normal modules done.");
+	}
+
+	void App::FinalizeNormal() noexcept
+	{
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+
+		PONY_LOG(logService, Log::LogType::Info, "Shutting down normal modules...");
+		ShutDownModules(normalModules, normalModules.size());
+		PONY_LOG(logService, Log::LogType::Info, "Shutting down normal modules done.");
+	}
+
+	void App::InitializeLate()
+	{
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+
+		PONY_LOG(logService, Log::LogType::Info, "Initializing late modules...");
+
+		std::size_t count = 0uz;
+		try
+		{
+			PONY_LOG(logService, Log::LogType::Info, "Getting late modules...");
+			GetModules(firstLateModule, lastLateModule, lateModules);
+			PONY_LOG(logService, Log::LogType::Info, "Getting late modules done.");
+			PONY_LOG(logService, Log::LogType::Info, "Starting up late modules...");
+			StartUpModules(lateModules, count);
+			PONY_LOG(logService, Log::LogType::Info, "Starting up late modules done.");
+		}
+		catch (...)
+		{
+			ShutDownModules(lateModules, count);
+			throw;
+		}
+
+		PONY_LOG(logService, Log::LogType::Info, "Initializing late modules done.");
+	}
+
+	void App::FinalizeLate() noexcept
+	{
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+
+		PONY_LOG(logService, Log::LogType::Info, "Shutting down late modules...");
+		ShutDownModules(lateModules, lateModules.size());
+		PONY_LOG(logService, Log::LogType::Info, "Shutting down late modules done.");
 	}
 
 	void App::Begin()
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+
+		tickables.shrink_to_fit();
+		UpdateBeginTickables();
+		UpdateTickTickables();
 
 		std::size_t count = 0uz;
 		try
@@ -566,103 +695,44 @@ namespace PonyEngine::Application
 	void App::End() noexcept
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
-		End(services.size());
+
+		End(beginTickables.size());
 	}
 
-	bool App::HasLogger() const noexcept
+	void App::BeginFrame()
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
-		return logger != &emptyLogger;
+		++frameCount;
+
+		prevFrameTimePoint = thisFrameTimePoint;
+		std::chrono::time_point<std::chrono::steady_clock> now;
+		do
+		{
+			now = NowTimePoint();
+		} while (now - prevFrameTimePoint < targetFrameTime);
+		thisFrameTimePoint = now;
+
+		PONY_LOG(logService, Log::LogType::Verbose, "New frame began. Frame: '{}'; Time point: '{}'.", frameCount, thisFrameTimePoint.time_since_epoch());
 	}
 
-	void App::SetLogger(Log::ILogger& logger)
+	void App::EndFrame()
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
-		if (HasLogger()) [[unlikely]]
-		{
-			throw std::logic_error("Logger was already added");
-		}
-#endif
-
-		this->logger = &logger;
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 	}
 
-	void App::UnsetLogger(const Log::ILogger& logger)
+	void App::Tick()
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
-		if (this->logger != &logger) [[unlikely]]
+		PONY_LOG(logService, Log::LogType::Verbose, "Ticking tickables...");
+		for (ITickable* const tickable : tickTickables)
 		{
-			throw std::logic_error("Another logger is set");
+			PONY_LOG(logService, Log::LogType::Verbose, "Ticking '{}'...", typeid(*tickable).name());
+			tickable->Tick();
+			PONY_LOG(logService, Log::LogType::Verbose, "Ticking '{}' done.", typeid(*tickable).name());
 		}
-#endif
-
-		this->logger = &emptyLogger;
-	}
-
-	void App::AddService(IService& service)
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
-		if (Flow().flowState > FlowState::StartingUp) [[unlikely]]
-		{
-			throw std::logic_error("Invalid flow state");
-		}
-
-		if (std::ranges::find(services, &service) != services.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Service was already added");
-		}
-#endif
-
-		PONY_LOG(Logger(), Log::LogType::Info, "Adding service. Service: '{}'.", typeid(service).name());
-		services.push_back(&service);
-	}
-
-	void App::RemoveService(IService& service)
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-
-		if (const FlowState flowState = Flow().flowState; flowState > FlowState::StartingUp && flowState < FlowState::ShuttingDown) [[unlikely]]
-		{
-			throw std::logic_error("Invalid flow state");
-		}
-#endif
-
-		PONY_LOG(Logger(), Log::LogType::Info, "Removing service. Service: '{}'.", typeid(service).name());
-		if (const auto position = std::ranges::find(services, &service); position != services.cend()) [[likely]]
-		{
-			services.erase(position);
-		}
-#ifndef NDEBUG
-		else [[unlikely]]
-		{
-			throw std::invalid_argument("Service wasn't added");
-		}
-#endif
+		PONY_LOG(logService, Log::LogType::Verbose, "Ticking tickables done.");
 	}
 
 	void App::AddInterface(const std::type_index type, void* const interface)
@@ -672,14 +742,9 @@ namespace PonyEngine::Application
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
-
-		if (Flow().flowState > FlowState::StartingUp) [[unlikely]]
-		{
-			throw std::logic_error("Invalid flow state");
-		}
 #endif
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Adding interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
+		PONY_LOG(logService, Log::LogType::Info, "Adding interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
 		const auto [iterator, added] = interfaces.try_emplace(type, interface);
 #ifndef NDEBUG
 		if (!added) [[unlikely]]
@@ -687,6 +752,12 @@ namespace PonyEngine::Application
 			throw std::invalid_argument("Interface is already added");
 		}
 #endif
+	}
+
+	template<typename T>
+	T* App::FindInterface() const
+	{
+		return static_cast<T*>(FindInterface(typeid(T)));
 	}
 
 	template<typename T>
@@ -702,14 +773,9 @@ namespace PonyEngine::Application
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
-
-		if (const FlowState flowState = Flow().flowState; flowState > FlowState::StartingUp && flowState < FlowState::ShuttingDown) [[unlikely]]
-		{
-			throw std::logic_error("Invalid flow state");
-		}
 #endif
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Removing interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
+		PONY_LOG(logService, Log::LogType::Info, "Removing interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
 		if (const auto position = interfaces.find(type); position != interfaces.cend() && position->second == interface) [[likely]]
 		{
 			interfaces.erase(position);
@@ -728,40 +794,32 @@ namespace PonyEngine::Application
 		RemoveInterface(typeid(T), &interface);
 	}
 
-	void App::AddTickable(ITickable& tickable, const std::int32_t order)
+	void App::AddTickable(ITickable& tickable, const TickableOrder& tickableOrder)
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
-
-		if (Flow().flowState > FlowState::StartingUp) [[unlikely]]
-		{
-			throw std::logic_error("Invalid flow state");
-		}
 #endif
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Adding tickable. Tickable: '{}'; Order: '{}'.", typeid(tickable).name(), order);
-		tickables.emplace_back(&tickable, order);
+		PONY_LOG(logService, Log::LogType::Info, "Adding tickable. Tickable: '{}'; Begin order: '{}'; Tick order: '{}'.", typeid(tickable).name(), 
+			tickableOrder.beginOrder, tickableOrder.tickOrder);
+		tickables.emplace_back(&tickable, tickableOrder);
 	}
 
-	void App::RemoveTickable(ITickable& tickable, const std::int32_t order)
+	void App::RemoveTickable(ITickable& tickable, const TickableOrder& tickableOrder)
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
 		{
 			throw std::logic_error("Must be called on main thread");
 		}
-
-		if (const FlowState flowState = Flow().flowState; flowState > FlowState::StartingUp && flowState < FlowState::ShuttingDown) [[unlikely]]
-		{
-			throw std::logic_error("Invalid flow state");
-		}
 #endif
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Removing tickable. Tickable: '{}'; Order: '{}'.", typeid(tickable).name(), order);
-		if (const auto position = std::ranges::find(tickables, std::pair(&tickable, order)); position != tickables.cend()) [[likely]]
+		PONY_LOG(logService, Log::LogType::Info, "Removing tickable. Tickable: '{}'; Begin order: '{}'; Tick order: '{}'.", typeid(tickable).name(),
+			tickableOrder.beginOrder, tickableOrder.tickOrder);
+		if (const auto position = std::ranges::find(tickables, std::pair(&tickable, tickableOrder)); position != tickables.cend()) [[likely]]
 		{
 			tickables.erase(position);
 		}
@@ -773,203 +831,106 @@ namespace PonyEngine::Application
 #endif
 	}
 
-	App::ModuleContext::ModuleContext(App& application) noexcept :
+	const Log::ILogService* App::LogService() const noexcept
+	{
+		return logService;
+	}
+
+	App::StartUpModuleContext::StartUpModuleContext(App& application) noexcept :
 		application{&application}
 	{
 	}
 
-	IApplication& App::ModuleContext::Application() noexcept
+	IApplication& App::StartUpModuleContext::Application() noexcept
 	{
 		return *application;
 	}
 
-	const IApplication& App::ModuleContext::Application() const noexcept
+	const IApplication& App::StartUpModuleContext::Application() const noexcept
 	{
 		return *application;
 	}
 
-	bool App::ModuleContext::HasLogger() const noexcept
-	{
-		return application->HasLogger();
-	}
-
-	void App::ModuleContext::SetLogger(Log::ILogger& logger)
-	{
-		application->SetLogger(logger);
-	}
-
-	void App::ModuleContext::UnsetLogger(Log::ILogger& logger)
-	{
-		application->UnsetLogger(logger);
-	}
-
-	void App::ModuleContext::AddService(IService& service)
-	{
-		application->AddService(service);
-	}
-
-	void App::ModuleContext::RemoveService(IService& service)
-	{
-		application->RemoveService(service);
-	}
-
-	void App::ModuleContext::AddInterface(const std::type_index type, void* const interface)
+	void App::StartUpModuleContext::AddInterface(const std::type_index type, void* const interface)
 	{
 		application->AddInterface(type, interface);
 	}
 
-	void App::ModuleContext::RemoveInterface(const std::type_index type, void* const interface)
+	void App::StartUpModuleContext::RemoveInterface(const std::type_index type, void* const interface)
 	{
 		application->RemoveInterface(type, interface);
 	}
 
-	void App::ModuleContext::AddTickable(ITickable& tickable, const std::int32_t order)
+	void App::StartUpModuleContext::AddTickable(ITickable& tickable, const TickableOrder& tickOrder)
 	{
-		application->AddTickable(tickable, order);
+		application->AddTickable(tickable, tickOrder);
 	}
 
-	void App::ModuleContext::RemoveTickable(ITickable& tickable, const std::int32_t order)
+	void App::StartUpModuleContext::RemoveTickable(ITickable& tickable, const TickableOrder& tickOrder)
 	{
-		application->RemoveTickable(tickable, order);
+		application->RemoveTickable(tickable, tickOrder);
 	}
 
-	void App::Initialize(std::size_t& earlyCount, std::size_t& normalCount, std::size_t& lateCount)
+	App::ShutDownModuleContext::ShutDownModuleContext(App& application) noexcept :
+		application{&application}
 	{
-		const FlowInfo currentFlow = flow.load(std::memory_order::relaxed);
-		assert(currentFlow.flowState == FlowState::NotInitialized && "Invalid state.");
-		flow.store(FlowInfo{.exitCode = currentFlow.exitCode, .flowState = FlowState::StartingUp}, std::memory_order::relaxed);
-
-		auto context = ModuleContext(*this);
-
-		PONY_LOG(Logger(), Log::LogType::Info, "Getting early modules...");
-		GetModules(firstEarlyModule, lastEarlyModule, earlyModules);
-		PONY_LOG(Logger(), Log::LogType::Info, "Getting early modules done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up early modules...");
-		StartUpModules(earlyModules, earlyCount, context);
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up early modules done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "Getting normal modules...");
-		GetModules(firstNormalModule, lastNormalModule, normalModules);
-		PONY_LOG(Logger(), Log::LogType::Info, "Getting normal modules done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up normal modules...");
-		StartUpModules(normalModules, normalCount, context);
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up normal modules done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "Getting late modules...");
-		GetModules(firstLateModule, lastLateModule, lateModules);
-		PONY_LOG(Logger(), Log::LogType::Info, "Getting late modules done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up late modules...");
-		StartUpModules(lateModules, lateCount, context);
-		PONY_LOG(Logger(), Log::LogType::Info, "Starting up late modules done.");
-
-		flow.store(FlowInfo{.exitCode = currentFlow.exitCode, .flowState = FlowState::Beginning}, std::memory_order::relaxed);
 	}
 
-	void App::Finalize(const std::size_t earlyCount, const std::size_t normalCount, const std::size_t lateCount) noexcept
+	IApplication& App::ShutDownModuleContext::Application() noexcept
 	{
-		const FlowInfo currentFlow = flow.load(std::memory_order::relaxed);
-		assert(currentFlow.flowState <= FlowState::Ending && "Invalid state.");
-		flow.store(FlowInfo{.exitCode = currentFlow.exitCode, .flowState = FlowState::ShuttingDown}, std::memory_order::relaxed);
-		
-		auto context = ModuleContext(*this);
-
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down late modules...");
-		ShutDownModules(lateModules, lateCount, context);
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down late modules done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down normal modules...");
-		ShutDownModules(normalModules, normalCount, context);
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down normal modules done.");
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down early modules...");
-		ShutDownModules(earlyModules, earlyCount, context);
-		PONY_LOG(Logger(), Log::LogType::Info, "Shutting down early modules done.");
-
-		flow.store(FlowInfo{.exitCode = currentFlow.exitCode, .flowState = FlowState::Finalized}, std::memory_order::relaxed);
+		return *application;
 	}
 
-	void App::Begin(std::size_t& count)
+	const IApplication& App::ShutDownModuleContext::Application() const noexcept
 	{
-		const FlowInfo currentFlow = flow.load(std::memory_order::relaxed);
-		assert(currentFlow.flowState == FlowState::Beginning && "Invalid state.");
-		flow.store(FlowInfo{.exitCode = currentFlow.exitCode, .flowState = FlowState::Beginning}, std::memory_order::relaxed);
+		return *application;
+	}
 
-		PONY_LOG(Logger(), Log::LogType::Info, "Beginning services...");
-		for (IService* const service : services)
+	void App::ShutDownModuleContext::AddInterface(const std::type_index type, void* const interface)
+	{
+		throw std::logic_error("Can't add interface during shut-down");
+	}
+
+	void App::ShutDownModuleContext::RemoveInterface(const std::type_index type, void* const interface)
+	{
+		application->RemoveInterface(type, interface);
+	}
+
+	void App::ShutDownModuleContext::AddTickable(ITickable& tickable, const TickableOrder& tickOrder)
+	{
+		throw std::logic_error("Can't add tickable during shut-down");
+	}
+
+	void App::ShutDownModuleContext::RemoveTickable(ITickable& tickable, const TickableOrder& tickOrder)
+	{
+		application->RemoveTickable(tickable, tickOrder);
+	}
+
+	void App::LogBasicInfo() noexcept
+	{
+		try
 		{
-			PONY_LOG(Logger(), Log::LogType::Info, "Beginning service... Service: '{}'.", typeid(*service).name());
-			service->Begin();
-			PONY_LOG(Logger(), Log::LogType::Info, "Beginning service done. Service: '{}'.", typeid(*service).name());
-			++count;
-		}
-		PONY_LOG(Logger(), Log::LogType::Info, "Beginning services done.");
-
-		PONY_LOG(Logger(), Log::LogType::Info, "Sorting tickables...");
-		std::ranges::sort(tickables, std::less<std::int32_t>(), &std::pair<ITickable*, std::int32_t>::second);
-		PONY_LOG(Logger(), Log::LogType::Info, "Sorting tickables done.");
-		PONY_LOG(Logger(), Log::LogType::Debug, "Tickables order:");
-		for (const auto [tickable, order] : tickables)
-		{
-			PONY_LOG(Logger(), Log::LogType::Debug, "{} : {}", typeid(*tickable).name(), order);
-		}
-		for (std::size_t i = 1uz; i < tickables.size(); ++i)
-		{
-			PONY_LOG_IF(tickables[i].second == tickables[i - 1uz].second, Logger(), Log::LogType::Warning,
-				"Tickables '{}' and '{}' have the same order: '{}'.", typeid(*tickables[i].first).name(),
-				typeid(*tickables[i - 1uz].first).name(), tickables[i].second);
-		}
-		PONY_LOG(Logger(), Log::LogType::Debug, "Tickables order end.");
-
-		flow.store(FlowInfo{.exitCode = currentFlow.exitCode, .flowState = FlowState::Running}, std::memory_order::relaxed);
-	}
-
-	void App::End(const std::size_t count) noexcept
-	{
-		const FlowInfo currentFlow = flow.load(std::memory_order::relaxed);
-		assert(currentFlow.flowState <= FlowState::Ending && "Invalid state.");
-		flow.store(FlowInfo{.exitCode = currentFlow.exitCode, .flowState = FlowState::Ending}, std::memory_order::relaxed);
-
-		PONY_LOG(Logger(), Log::LogType::Info, "Ending services...");
-		for (std::size_t i = count; i-- > 0uz; )
-		{
-			IService* const service = services[i];
-
-			try
+			PONY_LOG(logService, Log::LogType::Info, "{} v{}", EngineTitle(), EngineVersion());
+			PONY_LOG(logService, Log::LogType::Info, "{} v{}", ProjectTitle(), ProjectVersion());
+			PONY_LOG(logService, Log::LogType::Info, "Main thread ID: '{}'.", mainThreadId);
+			PONY_LOG(logService, Log::LogType::Info, "Command line:");
+			for (const std::string_view command : commandLine)
 			{
-				PONY_LOG(Logger(), Log::LogType::Info, "Ending service... Service: '{}'.", typeid(*service).name());
-				service->End();
-				PONY_LOG(Logger(), Log::LogType::Info, "Ending service done. Service: '{}'.", typeid(*service).name());
+				PONY_LOG(logService, Log::LogType::Info, command);
 			}
-			catch (...)
-			{
-				PONY_LOG(Logger(), Log::LogType::Error, std::current_exception(), "On ending service. Service: '{}'.", typeid(*service).name());
-			}
+
+			PONY_LOG(logService, Log::LogType::Info, "Executable path: '{}'; Executable directory: '{}'; Root directory: '{}'.",
+				executableFile.string(), executableDirectory.string(), rootDirectory.string());
+			PONY_LOG(logService, Log::LogType::Info, "Local data directory: '{}'; User data directory: '{}'; Temp data directory: '{}'.",
+				localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
+			PONY_LOG(logService, Log::LogType::Info, "Working directory: '{}'.", std::filesystem::current_path().string());
+
+			PONY_LOG(logService, Log::LogType::Info, "Engine start time point: '{}'.", startTimePoint.time_since_epoch());
 		}
-		PONY_LOG(Logger(), Log::LogType::Info, "Ending services done.");
-
-		flow.store(FlowInfo{ .exitCode = currentFlow.exitCode, .flowState = FlowState::ShuttingDown}, std::memory_order::relaxed);
-	}
-
-	App::TempBufferCache& App::GetCache()
-	{
-		thread_local auto cache = std::make_unique<TempBufferCache>();
-		return *cache;
-	}
-
-	App::Buffer App::GetBuffer(TempBufferCache& cache, const std::size_t requiredAlignment) const
-	{
-		if (cache.bufferCache.empty()) [[unlikely]]
+		catch (...)
 		{
-			PONY_LOG(Logger(), Log::LogType::Debug, "Creating new temp buffer.");
-			return Buffer(Container::AlignedAllocator<std::byte>(requiredAlignment));
+			// Strange but it's ok to ignore.
 		}
-
-		Buffer buffer = std::move(cache.bufferCache.top());
-		cache.bufferCache.pop();
-
-		if (buffer.get_allocator().Alignment() < requiredAlignment) [[unlikely]]
-		{
-			PONY_LOG(Logger(), Log::LogType::Debug, "Realigning temp buffer.");
-			buffer = Buffer(Container::AlignedAllocator<std::byte>(requiredAlignment));
-		}
-
-		return buffer;
 	}
 
 	void App::GetModules(const ModuleInterface firstModule, const ModuleInterface lastModule, std::vector<IModule*>& modules) const
@@ -987,50 +948,181 @@ namespace PonyEngine::Application
 					throw std::logic_error("Module is nullptr");
 				}
 #endif
-				PONY_LOG(Logger(), Log::LogType::Info, "Gotten module: '{}'.", typeid(*appModule).name());
+				PONY_LOG(logService, Log::LogType::Info, "Gotten module: '{}'.", typeid(*appModule).name());
 				modules.push_back(appModule);
 			}
 		}
+
+		modules.shrink_to_fit();
 	}
 
-	void App::StartUpModules(const std::span<IModule* const> modules, std::size_t& count, ModuleContext& context) const
+	void App::StartUpModules(const std::span<IModule* const> modules, std::size_t& count)
 	{
-		for (IModule* const appModule : modules)
+		for (auto context = StartUpModuleContext(*this); IModule* const appModule : modules)
 		{
-			PONY_LOG(Logger(), Log::LogType::Info, "Starting up '{}' module...", typeid(*appModule).name());
+			PONY_LOG(logService, Log::LogType::Info, "Starting up '{}' module...", typeid(*appModule).name());
 			try
 			{
 				appModule->StartUp(context);
 			}
 			catch (...)
 			{
-				PONY_LOG(Logger(), Log::LogType::Error, std::current_exception(), "On starting up '{}' module.", typeid(*appModule).name());
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On starting up '{}' module.", typeid(*appModule).name());
 				throw;
 			}
-			PONY_LOG(Logger(), Log::LogType::Info, "Starting up '{}' module done.", typeid(*appModule).name());
+			PONY_LOG(logService, Log::LogType::Info, "Starting up '{}' module done.", typeid(*appModule).name());
 		}
 	}
 
-	void App::ShutDownModules(const std::span<IModule* const> modules, const std::size_t count, ModuleContext& context) const noexcept
+	void App::ShutDownModules(const std::span<IModule* const> modules, const std::size_t count) noexcept
 	{
+		auto context = ShutDownModuleContext(*this);
 		for (std::size_t i = modules.size(); i-- > 0uz; )
 		{
 			IModule* const appModule = modules[i];
-			PONY_LOG(Logger(), Log::LogType::Info, "Shutting down '{}' module...", typeid(*appModule).name());
+			PONY_LOG(logService, Log::LogType::Info, "Shutting down '{}' module...", typeid(*appModule).name());
 			try
 			{
 				appModule->ShutDown(context);
 			}
 			catch (...)
 			{
-				PONY_LOG(Logger(), Log::LogType::Error, std::current_exception(), "On shutting down '{}' module.", typeid(*appModule).name());
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On shutting down '{}' module.", typeid(*appModule).name());
 			}
-			PONY_LOG(Logger(), Log::LogType::Info, "Shutting down '{}' module done.", typeid(*appModule).name());
+			PONY_LOG(logService, Log::LogType::Info, "Shutting down '{}' module done.", typeid(*appModule).name());
 		}
 	}
 
-	App::FrameInfo App::ThisFrameInfo() const noexcept
+	void App::UpdateBeginTickables()
 	{
-		return frameInfos[FrameCount() % frameInfos.size()];
+		PONY_LOG(logService, Log::LogType::Info, "Updating begin order...");
+		UpdateTickables(beginTickables, [](const TickableOrder& order) { return order.beginOrder; });
+		PONY_LOG(logService, Log::LogType::Info, "Updating begin order done. Order:");
+		LogTickableList(beginTickables);
+	}
+
+	void App::UpdateTickTickables()
+	{
+		PONY_LOG(logService, Log::LogType::Info, "Updating tick order...");
+		UpdateTickables(tickTickables, [](const TickableOrder& order) { return order.tickOrder; });
+		PONY_LOG(logService, Log::LogType::Info, "Updating tick order done. Order:");
+		LogTickableList(tickTickables);
+	}
+
+	void App::UpdateTickables(std::vector<ITickable*>& targetTickables, const std::function<std::optional<std::int32_t>(const TickableOrder&)>& tickableOrderGetter)
+	{
+		auto indices = std::vector<std::size_t>();
+		indices.reserve(tickables.size());
+		for (std::size_t i = 0uz; i < tickables.size(); ++i)
+		{
+			if (tickableOrderGetter(tickables[i].second))
+			{
+				indices.push_back(i);
+			}
+		}
+
+		std::ranges::sort(indices, [&](const std::size_t lhs, const std::size_t rhs)
+		{
+			return *tickableOrderGetter(tickables[lhs].second) < *tickableOrderGetter(tickables[rhs].second);
+		});
+
+		for (std::size_t i = 1uz; i < indices.size(); ++i)
+		{
+			const auto [tickableLhs, orderLhs] = tickables[indices[i]];
+			const auto [tickableRhs, orderRhs] = tickables[indices[i - 1uz]];
+			const std::int32_t orderNumberLhs = *tickableOrderGetter(orderLhs);
+			const std::int32_t orderNumberRhs = *tickableOrderGetter(orderRhs);
+
+			PONY_LOG_IF(orderNumberLhs == orderNumberRhs, logService, Log::LogType::Warning,
+				"Tickables '{}' and '{}' have the same order: '{}'.", typeid(*tickableLhs).name(), typeid(*tickableRhs).name(), orderNumberLhs);
+		}
+
+		targetTickables.clear();
+		targetTickables.reserve(indices.size());
+		for (const std::size_t i : indices)
+		{
+			targetTickables.push_back(tickables[i].first);
+		}
+	}
+
+	void App::LogTickableList(const std::span<const ITickable* const> tickables) const noexcept
+	{
+		for (const ITickable* const tickable : tickables)
+		{
+			PONY_LOG(logService, Log::LogType::Info, "{}", typeid(*tickable).name());
+		}
+	}
+
+	void App::Begin(std::size_t& count) const
+	{
+		PONY_LOG(logService, Log::LogType::Info, "Beginning tickables...")
+
+		for (ITickable* const tickable : beginTickables)
+		{
+			try
+			{
+				PONY_LOG(logService, Log::LogType::Info, "Beginning '{}'...", typeid(*tickable).name());
+				tickable->Begin();
+				PONY_LOG(logService, Log::LogType::Info, "Beginning '{}' done.", typeid(*tickable).name());
+				++count;
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On beginning tickable '{}'.", typeid(*tickable).name());
+				throw;
+			}
+		}
+
+		PONY_LOG(logService, Log::LogType::Info, "Beginning tickables done.")
+	}
+
+	void App::End(const std::size_t count) noexcept
+	{
+		PONY_LOG(logService, Log::LogType::Info, "Ending tickables...")
+
+		for (std::size_t i = count; i-- > 0uz; )
+		{
+			ITickable* const tickable = beginTickables[i];
+
+			try
+			{
+				tickable->End();
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On ending tickable '{}'.", typeid(*tickable).name());
+			}
+		}
+
+		PONY_LOG(logService, Log::LogType::Info, "Ending tickables done.")
+
+		beginTickables.clear();
+		tickTickables.clear();
+	}
+
+	App::TempBufferCache& App::GetCache()
+	{
+		thread_local auto cache = std::make_unique<TempBufferCache>();
+		return *cache;
+	}
+
+	App::Buffer App::GetBuffer(TempBufferCache& cache, const std::size_t requiredAlignment) const
+	{
+		if (cache.bufferCache.empty()) [[unlikely]]
+		{
+			PONY_LOG(logService, Log::LogType::Debug, "Creating new temp buffer.");
+			return Buffer(Container::AlignedAllocator<std::byte>(requiredAlignment));
+		}
+
+		Buffer buffer = std::move(cache.bufferCache.top());
+		cache.bufferCache.pop();
+
+		if (buffer.get_allocator().Alignment() < requiredAlignment) [[unlikely]]
+		{
+			PONY_LOG(logService, Log::LogType::Debug, "Realigning temp buffer.");
+			buffer = Buffer(Container::AlignedAllocator<std::byte>(requiredAlignment));
+		}
+
+		return buffer;
 	}
 }

@@ -24,7 +24,7 @@ import :SubLoggerContainer;
 export namespace PonyEngine::Log
 {
 	/// @brief Logger.
-	class Logger final : public ILogger, public ILoggerModuleContext, private ILoggerContext
+	class Logger final : public ILogService, public ILoggerModuleContext, private ILoggerContext
 	{
 	public:
 		/// @brief Creates a logger.

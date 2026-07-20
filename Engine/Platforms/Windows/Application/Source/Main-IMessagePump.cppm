@@ -9,29 +9,26 @@
 
 module;
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Object/Body.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Application.Impl.Windows:Process;
+export module PonyEngine.Application.Windows:IMessagePump;
 
 import std;
 
-import PonyEngine.Log;
-
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Sets the process priority.
-	/// @param priority Process priority.
-	void SetProcessPriority(DWORD priority);
-}
-
-namespace PonyEngine::Application::Windows
-{
-	void SetProcessPriority(const DWORD priority)
+	class IMessagePump
 	{
-		if (!SetPriorityClass(GetCurrentProcess(), priority)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to set process priority to '0x{:X}': ErrorCode = '0x{:X}'", priority, GetLastError()));
-		}
-	}
+		PONY_INTERFACE_BODY(IMessagePump)
+
+		[[nodiscard("Pure function")]]
+		virtual UINT LastMessageType() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual DWORD LastMessageRawTime() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const = 0;
+		[[nodiscard("Pure function")]]
+		virtual POINT LastMessagePoint() const = 0;
+	};
 }

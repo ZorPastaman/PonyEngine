@@ -9,11 +9,10 @@
 
 export module PonyEngine.Application;
 
-export import :FlowState;
 export import :IApplication;
 export import :IModule;
 export import :IModuleContext;
-export import :IService;
 export import :ITickable;
 export import :ScopedTempBuffer;
 export import :TempBuffer;
+export import :TickOrder;

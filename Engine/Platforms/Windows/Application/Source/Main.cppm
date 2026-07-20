@@ -11,4 +11,6 @@ export module PonyEngine.Application.Windows;
 
 export import PonyEngine.Application;
 
-export import :IApplication;
+export import :IMainData;
+export import :IMessagePump;
+export import :IResourceProvider;

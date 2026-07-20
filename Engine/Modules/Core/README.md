@@ -20,6 +20,13 @@ Utilities for standard containers.
 Allocators:
 - [AlignedAllocator](Source/Container-AlignedAllocator.cppm) - aligned allocator.
 
+### [PonyEngine.Format](Source/Format.cppm)
+
+Utilities for std::format.
+
+Utilities:
+- [Optional](Source/Format-Optional.cppm) - std::optional formatter.
+
 ### [PonyEngine.Hash](Source/Hash.cppm)
 
 Utilities for calculating hashes.

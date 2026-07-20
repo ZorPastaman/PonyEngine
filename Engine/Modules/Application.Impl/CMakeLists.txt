@@ -1,5 +1,15 @@
 message(STATUS "Configuring PonyEngine.Application.Impl")
 
+if(NOT TARGET PonyEngine.Application)
+	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Log)
+	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
+endif()
+
 message(VERBOSE "Configuring environment")
 include("CMake/Module.cmake")
 
@@ -13,10 +23,7 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-App.cppm"
-	"Source/Main-EmptyLogger.cppm"
 	"Source/Main-IdentityUtility.cppm"
-	
-	"Source/Main-ModuleManager.cppm"
 	"Source/Main-PathUtility.cppm"
 )
 
