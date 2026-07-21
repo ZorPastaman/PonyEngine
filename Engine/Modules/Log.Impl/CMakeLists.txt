@@ -1,5 +1,18 @@
 message(STATUS "Configuring PonyEngine.Log.Impl")
 
+if(NOT TARGET PonyEngine.Application)
+	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Log)
+	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Log.Ext)
+	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
+endif()
+
 message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_LOG_ORDER "p" CACHE STRING "PonyEngine.Log.Impl module initialization order. Its first character must be in range [b-y].")
 
@@ -21,10 +34,9 @@ target_sources(PonyEngine.Log.Impl PRIVATE
 target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-LogFiller.cppm"
-	"Source/Main-Logger.cppm"
+	"Source/Main-LogService.cppm"
 	"Source/Main-LoggerModule.cppm"
 	"Source/Main-LogTypeSymbol.cppm"
-	"Source/Main-SubLoggerContainer.cppm"
 )
 
 message(VERBOSE "Configuring defines")
@@ -41,14 +53,11 @@ set_target_properties(PonyEngine.Log.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-if(NOT TARGET PonyEngine.Log.Ext)
-	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
-endif()
 target_link_libraries(PonyEngine.Log.Impl PUBLIC
 	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.Log.Impl PRIVATE
+	PonyEngine.Core
 	PonyEngine.Log
 	PonyEngine.Log.Ext
-	PonyEngine.Core
 )

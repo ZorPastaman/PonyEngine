@@ -15,8 +15,8 @@ import PonyEngine.Application;
 
 namespace PonyEngine::Log
 {
-	/// @brief Gets the logger module.
-	/// @return Logger module.
+	/// @brief Gets the log service module.
+	/// @return Log service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetLoggerModule();
+	PONY_DLL_EXPORT Application::IModule* GetLogServiceModule();
 }

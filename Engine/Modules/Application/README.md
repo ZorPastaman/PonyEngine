@@ -43,14 +43,14 @@ Tickable interface. A tickable is an object that reacts to the application main 
 
 Application module utilities.
 
-| Define                                            | Description                                                                                                                                         |
-|:--------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `PONY_EARLY_MODULE(function, moduleName, order)`  | Makes an application module with an early registration. It's a group for log modules. The application tries to find a log service after this group. |
-| `PONY_NORMAL_MODULE(function, moduleName, order)` | Makes an application module with a normal registration. It's a group for engine modules.                                                            |
-| `PONY_LATE_MODULE(function, moduleName, order)`   | Makes an application module with a late registration. It's a group for game modules.                                                                |
-| `PONY_LOG_MODULE(function, moduleName, order)`    | Synonym to `PONY_EARLY_MODULE(function, moduleName, order)`.                                                                                        |
-| `PONY_ENGINE_MODULE(function, moduleName, order)` | Synonym to `PONY_NORMAL_MODULE(function, moduleName, order)`.                                                                                       |
-| `PONY_GAME_MODULE(function, moduleName, order)`   | Synonym to `PONY_LATE_MODULE(function, moduleName, order)`.                                                                                         |
+| Define                                             | Description                                                                                                                                         |
+|:---------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `PONY_EARLY_MODULE(function, moduleName, order)`   | Makes an application module with an early registration. It's a group for log modules. The application tries to find a log service after this group. |
+| `PONY_NORMAL_MODULE(function, moduleName, order)`  | Makes an application module with a normal registration. It's a group for engine modules.                                                            |
+| `PONY_LATE_MODULE(function, moduleName, order)`    | Makes an application module with a late registration. It's a group for game modules.                                                                |
+| `PONY_LOG_MODULE(function, moduleName, order)`     | Synonym to `PONY_EARLY_MODULE(function, moduleName, order)`.                                                                                        |
+| `PONY_ENGINE_MODULE(function, moduleName, order)`  | Synonym to `PONY_NORMAL_MODULE(function, moduleName, order)`.                                                                                       |
+| `PONY_PROJECT_MODULE(function, moduleName, order)` | Synonym to `PONY_LATE_MODULE(function, moduleName, order)`.                                                                                         |
 
 ## CMake functions
 
@@ -84,7 +84,7 @@ namespace MyGame
 	}
 }
 
-PONY_GAME_MODULE(MyGame::GetGameModule, MyGame, yz)
+PONY_PROJECT_MODULE(MyGame::GetGameModule, MyGame, yz)
 ```
 
 Make sure that your module order contains latin letters only and its first letter isn't `a` or `z`.

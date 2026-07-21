@@ -182,6 +182,15 @@ export namespace PonyEngine::Application
 		/// @brief Logs basic application info.
 		void LogBasicInfo() const noexcept;
 
+		/// @brief Gets the interfaces.
+		/// @return Interfaces.
+		[[nodiscard("Pure function")]]
+		const std::unordered_map<std::type_index, void*>& Interfaces() const noexcept;
+		/// @brief Gets the tickables.
+		/// @return Tickables.
+		[[nodiscard("Pure function")]]
+		std::span<const std::pair<ITickable*, TickableOrder>> Tickables() const noexcept;
+
 		App& operator =(const App&) = delete;
 		App& operator =(App&) = delete;
 
@@ -933,6 +942,16 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On logging basic info.");
 			// Strange but it's ok to ignore.
 		}
+	}
+
+	const std::unordered_map<std::type_index, void*>& App::Interfaces() const noexcept
+	{
+		return interfaces;
+	}
+
+	std::span<const std::pair<ITickable*, TickableOrder>> App::Tickables() const noexcept
+	{
+		return tickables;
 	}
 
 	App::StartUpModuleContext::StartUpModuleContext(App& application) noexcept :

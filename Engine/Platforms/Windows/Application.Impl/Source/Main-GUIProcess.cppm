@@ -307,6 +307,18 @@ namespace PonyEngine::Application::Windows
 		RemoveProcessInterfaces();
 		DestroyConsole();
 		application->FinalizeEarly();
+
+#ifndef NDEBUG
+		for (const std::type_index type : std::views::keys(application->Interfaces()))
+		{
+			MessageBoxA(nullptr, std::format("Interface of type {} wasn't removed from application.", type.name()).c_str(), "Interface not removed", MB_OK | MB_ICONERROR | MB_TOPMOST);
+		}
+
+		for (const ITickable* const tickable : std::views::keys(application->Tickables()))
+		{
+			MessageBoxA(nullptr, std::format("Tickable of type {} wasn't removed from application.", typeid(*tickable).name()).c_str(), "Tickable not removed", MB_OK | MB_ICONERROR | MB_TOPMOST);
+		}
+#endif
 	}
 
 	void GUIProcess::CreateConsole() noexcept

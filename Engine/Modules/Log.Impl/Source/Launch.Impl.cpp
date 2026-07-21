@@ -7,16 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/LoggerModule.h"
+#include "PonyEngine/Log/LogServiceModule.h"
 
 import PonyEngine.Application;
 import PonyEngine.Log.Impl;
 
 namespace PonyEngine::Log
 {
-	Application::IModule* GetLoggerModule()
+	Application::IModule* GetLogServiceModule()
 	{
-		static LoggerModule loggerModule;
+		static LogServiceModule loggerModule;
 		return &loggerModule;
 	}
 }

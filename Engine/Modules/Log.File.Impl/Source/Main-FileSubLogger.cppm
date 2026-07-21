@@ -16,7 +16,7 @@ import PonyEngine.Log.Ext;
 export namespace PonyEngine::Log::File
 {
 	/// @brief Sub-logger that writes logs to a file.
-	class FileSubLogger final : public ISubLogger
+	class FileSubLogger final : public ILogger
 	{
 	public:
 		/// @brief Creates a file sub-logger.

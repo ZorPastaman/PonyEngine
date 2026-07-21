@@ -28,8 +28,8 @@
 				"PONY_ENGINE_APPLICATION": true,
 				"PONY_ENGINE_APPLICATION_IMPL": true,
 				"PONY_ENGINE_LOG": true,
-				"PONY_ENGINE_LOG_EXT": false,
-				"PONY_ENGINE_LOG_IMPL": false,
+				"PONY_ENGINE_LOG_EXT": true,
+				"PONY_ENGINE_LOG_IMPL": true,
 				"PONY_ENGINE_LOG_CONSOLE_IMPL": false,
 				"PONY_ENGINE_LOG_PCONSOLE_IMPL": false,
 				"PONY_ENGINE_LOG_FILE_IMPL": false,
@@ -55,7 +55,7 @@
 				"PONY_ENGINE_RESOURCE_PACK_IMPL": false,
 				"PONY_ENGINE_WORLD": false,
 				"PONY_ENGINE_WORLD_IMPL": false,
-				"PONY_ENGINE_LOG_ORDER": "ba",
+				"PONY_ENGINE_LOG_ORDER": "b",
 				"PONY_ENGINE_LOG_FILE_ORDER": "bb",
 				"PONY_ENGINE_FILE_ORDER": "ca",
 				"PONY_ENGINE_TIME_ORDER": "ea",
@@ -165,7 +165,7 @@
 		},
 		{
 			"name": "Runtime-Desktop",
-			"hidden": false,
+			"hidden": true,
 			"cacheVariables": {
 				"PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL": false,
 				"PONY_ENGINE_RAW_INPUT_MOUSE_IMPL": false,
@@ -176,7 +176,7 @@
 		{
 			"name": "Runtime-Windows",
 			"inherits": "Runtime-Desktop",
-			"hidden": false,
+			"hidden": true,
 			"cacheVariables": {
 				"PONY_ENGINE_RAW_INPUT_XINPUT_IMPL": false,
 				"PONY_ENGINE_RENDER_DEVICE_D3D12_IMPL": false,

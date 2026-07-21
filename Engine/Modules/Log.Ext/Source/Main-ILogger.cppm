@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Log.Ext:ISubLogger;
+export module PonyEngine.Log.Ext:ILogger;
 
 import std;
 
@@ -19,10 +19,10 @@ import :LogEntry;
 
 export namespace PonyEngine::Log
 {
-	/// @brief Sub-logger.
-	class ISubLogger
+	/// @brief Logger.
+	class ILogger
 	{
-		PONY_INTERFACE_BODY(ISubLogger)
+		PONY_INTERFACE_BODY(ILogger)
 
 		/// @brief Logs the @p logEntry.
 		/// @param formattedMessage Formatted message.

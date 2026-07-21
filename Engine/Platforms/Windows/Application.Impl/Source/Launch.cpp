@@ -23,7 +23,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 	}
 	catch (const std::exception& e)
 	{
-		MessageBoxA(nullptr, "Exception", std::format("{}:\n{}", typeid(e).name(), e.what()).c_str(), MB_OK | MB_ICONERROR | MB_TOPMOST);
+		MessageBoxA(nullptr, std::format("{}:\n{}", typeid(e).name(), e.what()).c_str(), "Exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
 		return -1;
 	}
 	catch (...)
