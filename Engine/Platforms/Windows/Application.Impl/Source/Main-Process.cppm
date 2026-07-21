@@ -9,14 +9,11 @@
 
 module;
 
-#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Application.Impl.Windows:Process;
 
 import std;
-
-import PonyEngine.Log;
 
 export namespace PonyEngine::Application::Windows
 {

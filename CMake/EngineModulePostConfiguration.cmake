@@ -66,10 +66,6 @@ pony_apply_flags(PonyEngine.File TRUE)
 pony_apply_flags(PonyEngine.File.Impl TRUE)
 pony_add_to_module_list(PonyEngine.File.Impl PONY_PLATFORM_MODULES)
 
-pony_apply_flags(PonyEngine.MessagePump TRUE)
-pony_apply_flags(PonyEngine.MessagePump.Impl TRUE)
-pony_add_to_module_list(PonyEngine.MessagePump.Impl PONY_PLATFORM_MODULES)
-
 pony_apply_flags(PonyEngine.Surface TRUE)
 pony_apply_flags(PonyEngine.Surface.Impl TRUE)
 pony_add_to_module_list(PonyEngine.Surface.Impl PONY_PLATFORM_MODULES)

@@ -21,7 +21,6 @@ target_sources(PonyEngine.Application.Impl PRIVATE
 )
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/Main.cppm"
-	"Source/Main-Console.cppm"
 	"Source/Main-ConsoleProcess.cppm"
 	"Source/Main-GUIProcess.cppm"
 	"Source/Main-Path.cppm"
@@ -29,10 +28,9 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 )
 
 message(VERBOSE "Configuring data")
-configure_file("Data/Application.manifest.in" "${CMAKE_CURRENT_BINARY_DIR}/Generated/Data/Application.manifest")
-target_sources(PonyEngine.Application.Impl PRIVATE 
-	"${CMAKE_CURRENT_BINARY_DIR}/Generated/Data/Application.manifest"
-)
+set(MANIFEST_PATH "${CMAKE_CURRENT_BINARY_DIR}/Generated//Data/Application.manifest")
+configure_file("Data/Application.manifest.in" "${MANIFEST_PATH}")
+target_sources(PonyEngine.Application.Impl PRIVATE "${MANIFEST_PATH}")
 
 message(VERBOSE "Configuring defines")
 target_compile_definitions(PonyEngine.Application.Impl PRIVATE

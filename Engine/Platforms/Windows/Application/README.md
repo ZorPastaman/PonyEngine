@@ -2,18 +2,23 @@
 
 Platform independent module: [PonyEngine.Application](../../../Modules/Application).
 
+The application has a message pump on all hwnd. It's called right in the beginning of a frame.
+
 ## C\++ modules
 
 ### [PonyEngine.Application.Windows](Source/Main.cppm)
 
 Main interfaces:
 
-#### [IApplication](Source/Main-IApplication.cppm)
+#### [IMainData](Source/Main-IMainData.cppm)
 
-Windows specific application, inherits the platform independent interface. 
-The application implementation on Windows must implement this interface.
+Provides the data that was passed into `WinMain()`.
 
-Users may simply cast platform independent interface to this one via `static_cast`.
+#### [IMessagePump](Source/Main-IMessagePump.cppm)
 
-This interface exposes Windows-only features: additional `main()` arguments, an application icon and an application cursor.
-Only one icon and one cursor can be assigned. Both are optional.
+Provides the message data that was gotten in message pump function.
+The data is updated before dispathing. So, you can use it in your message handlers.
+
+#### [IResourceProvider](Source/Main-IResourceProvider.cppm)
+
+Provides data from .rc files.

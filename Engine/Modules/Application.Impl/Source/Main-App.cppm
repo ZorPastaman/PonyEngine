@@ -29,16 +29,24 @@ import :PathUtility;
 
 export namespace PonyEngine::Application
 {
+	/// @brief Application.
+	/// @note The user must control the flow in a correct way. This class doesn't enforce it.
 	class App final : public IApplication
 	{
 	public:
+		/// @brief Creates an application.
+		/// @param commandLine Command line.
+		/// @param executableFile Executable file path.
+		/// @param localDataDirectory Local data directory.
+		/// @param userDataDirectory User data directory.
+		/// @param tempDataDirectory Temporary data directory.
 		[[nodiscard("Pure constructor")]]
 		App(std::span<const std::string_view> commandLine, const std::filesystem::path& executableFile, const std::filesystem::path& localDataDirectory,
 			const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory);
 		App(const App&) = delete;
 		App(App&&) = delete;
 
-		~App() noexcept;
+		~App() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
 		virtual std::string_view EngineName() const noexcept override;
@@ -108,46 +116,85 @@ export namespace PonyEngine::Application
 		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment) override;
 		virtual void ReleaseTempBuffer(TempBuffer tempBuffer) noexcept override;
 
+		/// @brief Initializes early modules.
 		void InitializeEarly();
+		/// @brief Finalizes early modules.
 		void FinalizeEarly() noexcept;
+		/// @brief Initializes normal modules.
 		void InitializeNormal();
+		/// @brief Finalizes normal modules.
 		void FinalizeNormal() noexcept;
+		/// @brief Initializes late modules.
 		void InitializeLate();
+		/// @brief Finalizes late modules.
 		void FinalizeLate() noexcept;
+		/// @brief Begins the main loop.
 		void Begin();
+		/// @brief Ends the main loop.
 		void End() noexcept;
+		/// @brief Begins a next frame.
 		void BeginFrame();
+		/// @brief Ends a current frame.
 		void EndFrame();
+		/// @brief Ticks a current frame.
 		void Tick();
 
+		/// @brief Tries to find an interface.
+		/// @tparam T Interface type.
+		/// @return Interface or nullptr if not found.
+		/// @note Must be called on a main thread.
 		template<typename T>
 		T* FindInterface() const;
+		/// @brief Adds the interface.
+		/// @param type Interface type.
+		/// @param interface Interface. Mustn't be nullptr.
+		/// @note Must be called on a main thread.
 		void AddInterface(std::type_index type, void* interface);
+		/// @brief Adds the interface.
+		/// @tparam T Interface type.
+		/// @param interface Interface.
+		/// @note Must be called on a main thread.
 		template<typename T>
 		void AddInterface(T& interface);
+		/// @brief Removes the interface.
+		/// @param type Interface type. Must be previously added.
+		/// @param interface Interface.
 		void RemoveInterface(std::type_index type, const void* interface);
+		/// @brief Removes the interface.
+		/// @tparam T Interface type. Must be previously added.
+		/// @param interface Interface.
 		template<typename T>
 		void RemoveInterface(T& interface);
 
+		/// @brief Adds the tickable.
+		/// @param tickable Tickable.
+		/// @param tickableOrder Tickable order.
 		void AddTickable(ITickable& tickable, const TickableOrder& tickableOrder);
+		/// @brief Removes the tickable.
+		/// @param tickable Tickable. Must be previously added.
+		/// @param tickableOrder Tickable order.
 		void RemoveTickable(ITickable& tickable, const TickableOrder& tickableOrder);
 
+		/// @brief Gets the log service.
+		/// @return Log service.
 		[[nodiscard("Pure function")]]
 		const Log::ILogService* LogService() const noexcept;
+		/// @brief Logs basic application info.
+		void LogBasicInfo() const noexcept;
 
 		App& operator =(const App&) = delete;
 		App& operator =(App&) = delete;
 
 	private:
 		using Buffer = std::vector<std::byte, Container::AlignedAllocator<std::byte>>; ///< Buffer type.
-		using ModuleInterface = IModule*(*)();
+		using ModuleGetter = IModule*(*)(); ///< Module getter function.
 
-		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleInterface firstEarlyModule = nullptr; ///< Early module begin pointer.
-		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleInterface lastEarlyModule = nullptr; ///< Early module end pointer.
-		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleInterface firstNormalModule = nullptr; ///< Normal module begin pointer.
-		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleInterface lastNormalModule = nullptr; ///< Normal module end pointer.
-		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleInterface firstLateModule = nullptr; ///< Late module begin pointer.
-		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleInterface lastLateModule = nullptr; ///< Late module end pointer.
+		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstEarlyModule = nullptr; ///< Early module begin pointer.
+		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleGetter lastEarlyModule = nullptr; ///< Early module end pointer.
+		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstNormalModule = nullptr; ///< Normal module begin pointer.
+		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleGetter lastNormalModule = nullptr; ///< Normal module end pointer.
+		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstLateModule = nullptr; ///< Late module begin pointer.
+		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleGetter lastLateModule = nullptr; ///< Late module end pointer.
 
 		/// @brief Temp buffer cache.
 		struct TempBufferCache final
@@ -156,9 +203,12 @@ export namespace PonyEngine::Application
 			std::unordered_map<const std::byte*, Buffer> usedBuffers; ///< Buffers that are in use now.
 		};
 
+		/// @brief Module context that is used during start-up.
 		class StartUpModuleContext final : public IModuleContext
 		{
 		public:
+			/// @brief Creates a module context.
+			/// @param application Application.
 			[[nodiscard("Pure constructor")]]
 			explicit StartUpModuleContext(App& application) noexcept;
 			StartUpModuleContext(const StartUpModuleContext&) = delete;
@@ -181,12 +231,15 @@ export namespace PonyEngine::Application
 			StartUpModuleContext& operator =(StartUpModuleContext&&) = delete;
 
 		private:
-			App* application;
+			App* application; ///< Application.
 		};
 
+		/// @brief Module context that is used during shut-down.
 		class ShutDownModuleContext final : public IModuleContext
 		{
 		public:
+			/// @brief Creates a module context.
+			/// @param application Application.
 			[[nodiscard("Pure constructor")]]
 			explicit ShutDownModuleContext(App& application) noexcept;
 			ShutDownModuleContext(const ShutDownModuleContext&) = delete;
@@ -209,23 +262,49 @@ export namespace PonyEngine::Application
 			ShutDownModuleContext& operator =(ShutDownModuleContext&&) = delete;
 
 		private:
-			App* application;
+			App* application; ///< Application.
 		};
 
-		void LogBasicInfo() noexcept;
+		/// @brief Make a single string out of the command line arguments.
+		/// @return Command line string. It starts with a space.
+		[[nodiscard("Pure function")]]
+		std::string MakeCommandLineString() const;
 
-		void GetModules(ModuleInterface firstModule, ModuleInterface lastModule, std::vector<IModule*>& modules) const;
+		/// @brief Gets modules.
+		/// @param firstModule First module getter.
+		/// @param lastModule Last module getter.
+		/// @param modules Module list to add to.
+		void GetModules(ModuleGetter firstModule, ModuleGetter lastModule, std::vector<IModule*>& modules) const;
+		/// @brief Starts up the modules.
+		/// @param modules Modules to start-up.
+		/// @param count How many modules are started-up.
 		void StartUpModules(std::span<IModule* const> modules, std::size_t& count);
+		/// @brief Shuts down the modules.
+		/// @param modules Modules to shut down.
+		/// @param count How many modules to shut down.
 		void ShutDownModules(std::span<IModule* const> modules, std::size_t count) noexcept;
 
+		/// @brief Updates the list of begin tickables.
 		void UpdateBeginTickables();
+		/// @brief Updates the list of tick tickables.
 		void UpdateTickTickables();
+		/// @brief Updates the tickables.
+		/// @param targetTickables Target tickable list.
+		/// @param tickableOrderGetter Tickable order getter.
 		void UpdateTickables(std::vector<ITickable*>& targetTickables, const std::function<std::optional<std::int32_t>(const TickableOrder&)>& tickableOrderGetter);
+		/// @brief Logs the tickable list.
+		/// @param tickables Tickable list to log.
 		void LogTickableList(std::span<const ITickable* const> tickables) const noexcept;
 
+		/// @brief Begins the tickables.
+		/// @param count How many tickables were begun.
 		void Begin(std::size_t& count) const;
+		/// @brief Ends the tickables.
+		/// @param count How many tickables to end.
 		void End(std::size_t count) noexcept;
 
+		/// @brief Gets a temp buffer cache for this thread.
+		/// @return Temp buffer cache.
 		[[nodiscard("Pure function")]]
 		static TempBufferCache& GetCache();
 		/// @brief Gets a suitable buffer.
@@ -235,8 +314,8 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		Buffer GetBuffer(TempBufferCache& cache, std::size_t requiredAlignment) const;
 
-		std::thread::id mainThreadId;
-		std::span<const std::string_view> commandLine;
+		std::thread::id mainThreadId; ///< Main thread ID. It's a thread on which this class was created.
+		std::span<const std::string_view> commandLine; ///< Command line.
 
 		std::filesystem::path executableFile; ///< Path to the executable.
 		std::filesystem::path executableDirectory; ///< Executable directory.
@@ -245,18 +324,18 @@ export namespace PonyEngine::Application
 		std::filesystem::path userDataDirectory; ///< User data directory.
 		std::filesystem::path tempDataDirectory; ///< Temporal data directory.
 
-		std::optional<int> exitCode;
-		std::uint64_t frameCount;
-		std::chrono::time_point<std::chrono::steady_clock> startTimePoint;
-		std::chrono::time_point<std::chrono::steady_clock> prevFrameTimePoint;
-		std::chrono::time_point<std::chrono::steady_clock> thisFrameTimePoint;
-		std::chrono::nanoseconds targetFrameTime;
+		std::optional<int> exitCode; ///< Exit code.
+		std::uint64_t frameCount; ///< Frame count.
+		std::chrono::time_point<std::chrono::steady_clock> startTimePoint; ///< Start time point.
+		std::chrono::time_point<std::chrono::steady_clock> prevFrameTimePoint; ///< Previous frame time point.
+		std::chrono::time_point<std::chrono::steady_clock> thisFrameTimePoint; ///< This frame time point.
+		std::chrono::nanoseconds targetFrameTime; ///< Target frame time. It's the minimum time that must pass between frame begins.
 
-		std::vector<IModule*> earlyModules;
-		std::vector<IModule*> normalModules;
-		std::vector<IModule*> lateModules;
+		std::vector<IModule*> earlyModules; ///< Early modules.
+		std::vector<IModule*> normalModules; ///< Normal modules.
+		std::vector<IModule*> lateModules; ///< Late modules.
 
-		Log::ILogService* logService;
+		Log::ILogService* logService; ///< Log service.
 
 		std::unordered_map<std::type_index, void*> interfaces; ///< Interfaces.
 		std::vector<std::pair<ITickable*, TickableOrder>> tickables; ///< Tickables.
@@ -278,19 +357,13 @@ namespace PonyEngine::Application
 		userDataDirectory(userDataDirectory),
 		tempDataDirectory(tempDataDirectory),
 		exitCode(std::nullopt),
-		frameCount(0ull),
+		frameCount{0ull},
 		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
 		targetFrameTime(std::chrono::nanoseconds(0)),
 		logService{nullptr}
 	{
-	}
-
-	App::~App() noexcept
-	{
-		assert(interfaces.size() == 0uz && "Some interfaces weren't removed.");
-		assert(tickables.size() == 0uz && "Some tickables weren't removed.");
 	}
 
 	std::string_view App::EngineName() const noexcept
@@ -702,6 +775,7 @@ namespace PonyEngine::Application
 	void App::BeginFrame()
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+		assert(!exitCode && "The exit code is set.");
 
 		++frameCount;
 
@@ -724,6 +798,7 @@ namespace PonyEngine::Application
 	void App::Tick()
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+		assert(!exitCode && "The exit code is set.");
 
 		PONY_LOG(logService, Log::LogType::Verbose, "Ticking tickables...");
 		for (ITickable* const tickable : tickTickables)
@@ -836,6 +911,30 @@ namespace PonyEngine::Application
 		return logService;
 	}
 
+	void App::LogBasicInfo() const noexcept
+	{
+		try
+		{
+			PONY_LOG(logService, Log::LogType::Info, "{} v{}", EngineTitle(), EngineVersion());
+			PONY_LOG(logService, Log::LogType::Info, "{} v{}", ProjectTitle(), ProjectVersion());
+			PONY_LOG(logService, Log::LogType::Info, "Main thread ID: '{}'.", mainThreadId);
+			PONY_LOG(logService, Log::LogType::Info, "Command line:{}", MakeCommandLineString());
+
+			PONY_LOG(logService, Log::LogType::Info, "Executable path: '{}'; Executable directory: '{}'; Root directory: '{}'.",
+				executableFile.string(), executableDirectory.string(), rootDirectory.string());
+			PONY_LOG(logService, Log::LogType::Info, "Local data directory: '{}'; User data directory: '{}'; Temp data directory: '{}'.",
+				localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
+			PONY_LOG(logService, Log::LogType::Info, "Working directory: '{}'.", std::filesystem::current_path().string());
+
+			PONY_LOG(logService, Log::LogType::Info, "Engine start time point: '{}'.", startTimePoint.time_since_epoch());
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On logging basic info.");
+			// Strange but it's ok to ignore.
+		}
+	}
+
 	App::StartUpModuleContext::StartUpModuleContext(App& application) noexcept :
 		application{&application}
 	{
@@ -906,40 +1005,35 @@ namespace PonyEngine::Application
 		application->RemoveTickable(tickable, tickOrder);
 	}
 
-	void App::LogBasicInfo() noexcept
+	std::string App::MakeCommandLineString() const
 	{
-		try
+		std::string commandLineString;
+		for (const std::string_view command : commandLine)
 		{
-			PONY_LOG(logService, Log::LogType::Info, "{} v{}", EngineTitle(), EngineVersion());
-			PONY_LOG(logService, Log::LogType::Info, "{} v{}", ProjectTitle(), ProjectVersion());
-			PONY_LOG(logService, Log::LogType::Info, "Main thread ID: '{}'.", mainThreadId);
-			PONY_LOG(logService, Log::LogType::Info, "Command line:");
-			for (const std::string_view command : commandLine)
+			const bool hasSpaces = command.find(' ') != std::string_view::npos;
+
+			commandLineString += ' ';
+			if (hasSpaces)
 			{
-				PONY_LOG(logService, Log::LogType::Info, command);
+				commandLineString += '"';
 			}
-
-			PONY_LOG(logService, Log::LogType::Info, "Executable path: '{}'; Executable directory: '{}'; Root directory: '{}'.",
-				executableFile.string(), executableDirectory.string(), rootDirectory.string());
-			PONY_LOG(logService, Log::LogType::Info, "Local data directory: '{}'; User data directory: '{}'; Temp data directory: '{}'.",
-				localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
-			PONY_LOG(logService, Log::LogType::Info, "Working directory: '{}'.", std::filesystem::current_path().string());
-
-			PONY_LOG(logService, Log::LogType::Info, "Engine start time point: '{}'.", startTimePoint.time_since_epoch());
+			commandLineString += command;
+			if (hasSpaces)
+			{
+				commandLineString += '"';
+			}
 		}
-		catch (...)
-		{
-			// Strange but it's ok to ignore.
-		}
+
+		return commandLineString;
 	}
 
-	void App::GetModules(const ModuleInterface firstModule, const ModuleInterface lastModule, std::vector<IModule*>& modules) const
+	void App::GetModules(const ModuleGetter firstModule, const ModuleGetter lastModule, std::vector<IModule*>& modules) const
 	{
-		for (std::uintptr_t current = reinterpret_cast<std::uintptr_t>(&firstModule) + sizeof(ModuleInterface);
+		for (std::uintptr_t current = reinterpret_cast<std::uintptr_t>(&firstModule) + sizeof(ModuleGetter);
 			current < reinterpret_cast<std::uintptr_t>(&lastModule);
-			current += sizeof(ModuleInterface))
+			current += sizeof(ModuleGetter))
 		{
-			if (const auto moduleGetter = *reinterpret_cast<ModuleInterface*>(current))
+			if (const auto moduleGetter = *reinterpret_cast<ModuleGetter*>(current))
 			{
 				IModule* const appModule = moduleGetter();
 #ifndef NDEBUG

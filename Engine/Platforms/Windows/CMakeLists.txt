@@ -27,10 +27,6 @@ if(TARGET PonyEngine.File.Impl)
 	add_subdirectory("File.Impl")
 endif()
 
-if(TARGET PonyEngine.MessagePump.Impl)
-	add_subdirectory("MessagePump.Impl")
-endif()
-
 if(TARGET PonyEngine.Surface)
 	add_subdirectory("Surface")
 endif()

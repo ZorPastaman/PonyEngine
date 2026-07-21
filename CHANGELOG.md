@@ -23,11 +23,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - IRawInputContext doesn't have functions for registering/unregistering devices and adding input any more. Now IInputProvider gets special interfaces for that in its Begin(), End() and Tick().
 - PonyEngine.Application.Impl is an optional module now.
+- Application architecture was simplified. Now it doesn't have services but have tickables and interfaces.
 
 ### Removed
 
 - Axis and DeviceType classes removed from raw input module. Now usual string views are used instead.
 - Serialization C/++ module from Core module.
+- Message pump module.
 
 ## [0.1.1] - 2026-04-21
 

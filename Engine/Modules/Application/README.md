@@ -1,11 +1,11 @@
 # PonyEngine.Application module
 
-Application extension API module. Provides interfaces to access to engine services, logging, and application.
+Application API module. Provides interfaces to access main engine info, to register interfaces and tickables.
+It also controls the engine initialization and main loop.
 
 ## Dependencies
 
 - [PonyEngine.Core](../Core)
-- [PonyEngine.Log](../Log)
 
 ## C\++ modules
 
@@ -17,7 +17,7 @@ Main interfaces:
 
 Interface representing the engine application. Provides access to application metadata, environment information, and the current application state.
 
-Exposes the application logger and registered services, and allows control over the application lifecycle (e.g., stopping the application).
+Exposes the registered interfaces, and allows control over the application lifecycle (e.g., stopping the application).
 
 #### [IModule](Source/Main-IModule.cppm)
 
@@ -31,15 +31,11 @@ See [Module lifecycle](#module-lifecycle) for details.
 
 Interface representing a module context. It's passed as an argument to `IModule.StartUp()` and `IModule.ShuftDown()`.
 
-Exposes the application logger, logger module context, service module context, and allows to get and set application module data.
-That data can be used by other modules which is useful when a module needs to provide a custom initialization interface.
+Exposes functions to register interfaces and tickables.
 
-#### [IService](Source/Main-IService.cppm)
+#### [ITickable](Source/Main-ITickable.cppm)
 
-Interface representing an engine service. Services are the primary building blocks of the engine, while the application itself provides only minimal functionality.
-Its main responsibility is to tick services, which define the game’s behavior.
-
-See [Service lifecycle](#service-lifecycle) for details.
+Tickable interface. A tickable is an object that reacts to the application main loop: `Begin()`, `End()` and `Tick()` functions.
 
 ## C\++ headers
 
@@ -47,9 +43,14 @@ See [Service lifecycle](#service-lifecycle) for details.
 
 Application module utilities.
 
-| Define                                     | Description                                                                                   |
-|:-------------------------------------------|:----------------------------------------------------------------------------------------------|
-| `PONY_MODULE(function, moduleName, order)` | Makes an application module. See [docs below](#how-to-add-an-application-module) for details. |
+| Define                                            | Description                                                                                                                                         |
+|:--------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `PONY_EARLY_MODULE(function, moduleName, order)`  | Makes an application module with an early registration. It's a group for log modules. The application tries to find a log service after this group. |
+| `PONY_NORMAL_MODULE(function, moduleName, order)` | Makes an application module with a normal registration. It's a group for engine modules.                                                            |
+| `PONY_LATE_MODULE(function, moduleName, order)`   | Makes an application module with a late registration. It's a group for game modules.                                                                |
+| `PONY_LOG_MODULE(function, moduleName, order)`    | Synonym to `PONY_EARLY_MODULE(function, moduleName, order)`.                                                                                        |
+| `PONY_ENGINE_MODULE(function, moduleName, order)` | Synonym to `PONY_NORMAL_MODULE(function, moduleName, order)`.                                                                                       |
+| `PONY_GAME_MODULE(function, moduleName, order)`   | Synonym to `PONY_LATE_MODULE(function, moduleName, order)`.                                                                                         |
 
 ## CMake functions
 
@@ -60,20 +61,14 @@ Application module utilities.
 
 ## Custom application module
 
-How to get an application module:
-
-The [IApplication](Source/Public/Main-IApplication.cppm) has functions like `FindService<T>()` and `FindService(std::type_index_)` and their alternatives to find services.
-Those functions work with public interfaces of the services.
-
 How to add an application module:
 
-1. Add required engine dependencies to your module target: `target_link_libraries(<MyModule> PUBLIC PonyEngine.Core PonyEngine.Application)`;
-2. Make a class that inherits `PonyEngine::Application::IModule` from `PonyEngine.Application` C\++ module;
-3. Make a function that returns a `PonyEngine::Application::IModule*` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h` The instance must live for the lifetime of the application;
-4. Include `PonyEngine/Application/Module.h` and use the macro `PONY_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)` in a public code file. Module initialization order is defined by letters and follows alphabetical order;
-5. Link your module target to the engine application target: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)`.
+1. Make a class that inherits `PonyEngine::Application::IModule`;
+2. Make a function that returns a `PonyEngine::Application::IModule*` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h` The instance must live for the lifetime of the application;
+3. Include `PonyEngine/Application/Module.h` and use the macro `PONY_<GROUP>_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)` in a public code file. Module initialization order is defined by letters and follows alphabetical order;
+4. Link your module target to the engine application target. The default implementation is [PonyEngine.Application.Impl](../Application.Impl).
 
-Example of `PONY_MODULE` usage in a `.cpp` file:
+Example of `PONY_GAME_MODULE` usage in a `.cpp` file:
 ```
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Macro/Compiler.h"
@@ -89,102 +84,35 @@ namespace MyGame
 	}
 }
 
-PONY_MODULE(MyGame::GetGameModule, MyGame, yz)
+PONY_GAME_MODULE(MyGame::GetGameModule, MyGame, yz)
 ```
 
 Make sure that your module order contains latin letters only and its first letter isn't `a` or `z`.
-`PONY_MODULE` must be used in a public `.cpp` file.
+`PONY_<GROUP>_MODULE` must be used in a public `.cpp` file.
 
 ## Module lifecycle
 
-1. On the application start-up `IModule.StartUp()` is invoked on each added module. The order depends on a module initialization order passed to `PONY_MODULE` macro.
+1. On the application start-up `IModule.StartUp()` is invoked on each added module. The order depends on a module initialization order passed to `PONY_<GROUP>_MODULE` macro and on a chosen group.
 2. On the application shut-down `IModule.ShutDown()` is invoked on each added module. The order is reverse from start-up order.
 
-The module must do nothing before its start-up and after its shut-down. Also, during start-up and shut-down phases it's recommended to access the engine API only on a main thread.
+The module must do nothing with the application before its start-up and after its shut-down. Also, during start-up and shut-down phases the application and module context are single-threaded and their API can be used only on a main thread.
 
 The module context passed to `IModule.StartUp()` and `IModule.ShutDown()` mustn't be used out of those functions.
 
-## Custom service
+## Tickables
 
-How to add an application service:
+Tickables are object that get main loop callbacks. They have 3 main functions:
 
-1. Call `IModuleContext.ServiceModuleContext().AddService()` in `IModule.StartUp()`. 
-The function takes a factory function `const std::function<std::shared_ptr<IService>(IApplication&)>&` as an argument
-and returns `ServiceHandle`.
-2. Call `IModuleContext.ServiceModuleContext().RemoveService()` in `IModule.ShutDown()`.
-The function takes the `ServiceHandle` that was returned by `AddService()`.
+- Begin() - is called before a first tick.
+- End() - is called after a last tick.
+- Tick() - is called each tick.
 
-Example:
+Tickables must be registered during start-up in modules. Call `IModuleContext.AddTickable()`. You also pass a begin and tick orders. The end order is always a reverse to begin.
+All the added tickables must be removed during shut-down via `IModuleContext.RemoveTickable()`.
 
-```
-void ServiceModule::StartUp(Application::IModuleContext& context)
-{
-	serviceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
-	{
-		return std::make_shared<Service>(application);
-	});
-}
+## Interfaces
 
-void ServiceModule::ShutDown(Application::IModuleContext& context)
-{
-	context.ServiceModuleContext().RemoveService(serviceHandle);
-}
-```
+Interfaces are just pointers to some classes. Modules may provide different services to other modules via them.
 
-The factory function must return a correct newly created service. 
-The application it takes mustn't be shared and must be used only by the service.
-The module must remove all the services it added.
-
-### Service lifecycle
-
-1. The service is constructed inside its module start-up. The service must be fully initialized in its constructor.
-2. `IService.AddTickableServices(ITickableServiceAdder&)` is called. The service must add its tick functions via `ITickableServiceAdder.Add(ITickableService& tickable, std::int32_t tickOrder)`.
-All the tick functions are sorted by their tick order. Each tick function must have a unique tick order to avoid ambiguity.
-3. `IService.AddInterfaces(IServiceInterfaceAdder&)` is called. The service must add all its public interfaces via `IServiceInterfaceAdder.AddInterface()`.
-Each interface type must be unique. Those interfaces will be available via `IApplication.FindService`.
-4. After all the module start-up functions are called, the `IService.Begin()` is called on each service in the same order they were added.
-5. Each frame `ITickableService.Tick` is called in their custom order.
-6. Before the module shut-down functions are called, the `IService.End()` is called on each service in the reverse order.
-7. The service is destructed inside its module shut-down.
-
-## Custom logger
-
-How to add a custom logger:
-
-1. Call `IModuleContext.LoggerModuleContext().SetLogger()` in `IModule.StartUp()`.
-The function takes a factory function `const std::function<std::shared_ptr<Log::ILogger>(ILoggerContext&)>&` as an argument
-and returns `LoggerHandle`.
-2. Call `IModuleContext.LoggerModuleContext().UnsetLogger()` in `IModule.ShutDown()`.
-The function takes the `LoggerHandle` that was return be `SetLogger()`.
-
-Example:
-```
-void LoggerModule::StartUp(Application::IModuleContext& context)
-{
-	loggerHandle = context.LoggerModuleContext().SetLogger([&](Application::ILoggerContext& loggerContext)
-	{
-		return std::make_shared<Logger>(loggerContext);
-	});
-}
-
-void LoggerModule::ShutDown(Application::IModuleContext& context)
-{
-	context.LoggerModuleContext().UnsetLogger(loggerHandle);
-}
-```
-
-The factory function must return a correct newly created logger.
-The logger context it takes mustn't be shared and must be used only by the logger.
-The module must remove its logger it added.
-Only one custom logger may be set at a time.
-If no custom logger is set, the application uses a default logger.
-
-The default logger just writes to a standard and a platform consoles.
-
-### Logger lifecycle
-
-The logger doesn't have a special lifecycle. It's constructed, added to the application, removed from the application and destructed.
-
-When the logger is added to the application, it will receive log calls.
-
-The logger context isn't `IApplication` but `ILoggerContext`. The logger context has functions to get `IApplication` and log to the standard and platform consoles.
+Add interfaces via `IModuleContext.AddInterface()` during start-up and remove them via `IModuleContext.RemoveInterface()` during shut-down.
+To find other interfaces use `IApplication.FindInterface()` or `IApplication.GetInterface()`.

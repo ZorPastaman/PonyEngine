@@ -6,49 +6,30 @@ Platform independent module: [PonyEngine.Application.Impl](../../../Modules/Appl
 
 These variables are used to configure the build of the module:
 
-| Variable name                      | Default value | Description                                                                                                           |
-|:-----------------------------------|:-------------:|:----------------------------------------------------------------------------------------------------------------------|
-| `PONY_ENGINE_CREATE_CONSOLE`       | OFF           | Enable console.                                                                                                       |
-| `PONY_ENGINE_PLATFORM_CONSOLE_LOG` | ON            | Enable logging to the platform console.                                                                               |
-| `PONY_ENGINE_ROOT_PATH`            |               | Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid. |
-| `PONY_ENGINE_APPLICATION_ICON`     |               | Application icon path. Must be .ico file. If it's '<Default>', the engine icon is used.                               |
-| `PONY_ENGINE_APPLICATION_CURSOR`   |               | Application cursor path. Must be .cur file. If not set, the Surface module is expected to create a default cursor.    |
+| Variable name                  | Default value | Description                                     |
+|:-------------------------------|:-------------:|:------------------------------------------------|
+| `PONY_ENGINE_APPLICATION_MODE` | "GUI"         | Application mode. Must be Console or GUI.       |
+| `PONY_ENGINE_CREATE_CONSOLE`   | OFF           | Enable console. Can be used only in GUI builds. |
 
 ## For Pony Engine developers
 
-### Main submodules:
+## C\++ modules
 
-#### [App](Source/Main-App.cppm)
+### [PonyEngine.Application.Impl.Windows](Source/Main.cppm)
 
-Main application class. Controls the managers and loggers.
+Main submodules:
 
-#### [AppDataManager](Source/Main-AppDataManager.cppm)
+#### [ConsoleProcess](Source/Main-ConsoleProcess.cppm)
 
-Windows specific application data manager.
+Console process implementation.
 
-#### [LoggerManager](Source/Main-LoggerManager.cppm)
+#### [GUIProcess](Source/Main-GUIProcess.cppm)
 
-Windows logger manager. On logging to a console, it logs to both a standard C\++ console and Windows console.
+GUI process implementation.
 
-#### [PathManager](Source/Main-PathManager.cppm)
+## [Launch](Source/Launch.cpp)
 
-Gets and provides application paths.
-
-#### [DefaultLogger](Source/Main-DefaultLogger.cppm)
-
-Default Windows logger.
-
-#### [Console](Source/Main-Console.cppm)
-
-Utilities to control a Windows console.
-
-#### [Process](Source/Main-Process.cppm)
-
-Utilities to control the application process.
-
-### [main()](Source/Launch.cpp)
-
-Main function.
+C\++ main() function.
 
 ### Data:
 

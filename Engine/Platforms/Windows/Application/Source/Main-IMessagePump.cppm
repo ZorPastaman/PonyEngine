@@ -18,17 +18,34 @@ import std;
 
 export namespace PonyEngine::Application::Windows
 {
+	/// @brief Message pump data provider.
 	class IMessagePump
 	{
 		PONY_INTERFACE_BODY(IMessagePump)
 
+		/// @brief Gets a last message type.
+		/// @return Message type.
+		/// @note Must be called on a main thread.
+		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
 		virtual UINT LastMessageType() const = 0;
+		/// @brief Gets a last message native time point.
+		/// @return Message native time point.
+		/// @note Must be called on a main thread.
+		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
-		virtual DWORD LastMessageRawTime() const = 0;
+		virtual DWORD LastMessageNativeTimePoint() const = 0;
+		/// @brief Gets a last message time point.
+		/// @return Message time point.
+		/// @note Must be called on a main thread.
+		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const = 0;
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTimePoint() const = 0;
+		/// @brief Gets a last message cursor point.
+		/// @return Message cursor point.
+		/// @note Must be called on a main thread.
+		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
-		virtual POINT LastMessagePoint() const = 0;
+		virtual POINT LastMessageCursorPoint() const = 0;
 	};
 }

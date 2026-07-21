@@ -65,7 +65,7 @@ export namespace PonyEngine::Application
 		virtual void AddTickable(ITickable& tickable, const TickableOrder& tickableOrder) = 0;
 		/// @brief Removes the tickable.
 		/// @param tickable Tickable. Must be previously added.
-		/// @param tickableOrder Tickable order.
+		/// @param tickableOrder Tickable order. Must be previously added.
 		/// @note The function may be called only during start-up or shut-down.
 		virtual void RemoveTickable(ITickable& tickable, const TickableOrder& tickableOrder) = 0;
 	};

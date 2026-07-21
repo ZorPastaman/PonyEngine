@@ -10,6 +10,7 @@
 module;
 
 #include <cassert>
+#include <stdio.h>
 
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
@@ -23,22 +24,29 @@ import PonyEngine.Application.Windows;
 import PonyEngine.Log;
 import PonyEngine.Platform.Windows;
 
-import :Console;
 import :Path;
 import :Process;
 
 export namespace PonyEngine::Application::Windows
 {
+	/// @brief GUI process.
 	class GUIProcess final : private IMainData, private IResourceProvider, private IMessagePump
 	{
 	public:
+		/// @brief Creates a GUI process.
+		/// @param hInstance Instance from WinMain().
+		/// @param hPrevInstance Previous instance from WinMain().
+		/// @param lpCmdLine Command line from WinMain().
+		/// @param nShowCmd Show command from WinMain().
 		[[nodiscard("Pure constructor")]]
 		GUIProcess(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nShowCmd);
 		GUIProcess(const GUIProcess&) = delete;
 		GUIProcess(GUIProcess&&) = delete;
 
-		~GUIProcess() noexcept;
+		~GUIProcess() noexcept = default;
 
+		/// @brief Runs the process.
+		/// @return Exit code.
 		[[nodiscard("Must be returned from main")]]
 		int Run();
 
@@ -61,38 +69,58 @@ export namespace PonyEngine::Application::Windows
 		[[nodiscard("Pure function")]] 
 		virtual UINT LastMessageType() const override;
 		[[nodiscard("Pure function")]] 
-		virtual DWORD LastMessageRawTime() const override;
+		virtual DWORD LastMessageNativeTimePoint() const override;
 		[[nodiscard("Pure function")]] 
-		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTime() const override;
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTimePoint() const override;
 		[[nodiscard("Pure function")]] 
-		virtual POINT LastMessagePoint() const override;
+		virtual POINT LastMessageCursorPoint() const override;
 
+		/// @brief Updates the command line.
 		void UpdateCommandLine();
-		void AddApplicationInterfaces();
-		void RemoveApplicationInterfaces();
 
+		/// @brief Initializes the application.
 		void Initialize();
+		/// @brief Finalizes the application.
 		void Finalize();
 
+		/// @brief Creates a console if needed.
+		void CreateConsole() noexcept;
+		/// @brief Destroys a console if it was created.
+		void DestroyConsole() noexcept;
+
+		/// @brief Sets the process priority.
+		void SetPriority() const noexcept;
+		/// @brief Adds the process interfaces to the application.
+		void AddProcessInterfaces();
+		/// @brief Removes the process interfaces from the application.
+		void RemoveProcessInterfaces();
+
+		/// @brief Runs the main loop.
+		/// @return Exit code.
 		[[nodiscard("Pure function")]]
 		int RunMainLoop();
+		/// @brief Ticks message pump.
 		void TickMessagePump();
+		/// @brief Update the message time.
+		/// @param newMessageTime New message native time.
 		void UpdateMessageTime(DWORD newMessageTime) noexcept;
 
-		HINSTANCE instance;
-		HINSTANCE prevInstance;
-		PSTR cmdLine;
-		int showCmd;
+		HINSTANCE instance; ///< Instance.
+		HINSTANCE prevInstance; ///< Previous instance.
+		PSTR cmdLine; ///< Command line.
+		int showCmd; ///< Show command.
 
-		std::vector<std::string> commandLineSource;
-		std::vector<std::string_view> commandLine;
+		bool hasConsole; ///< Does the process have a console?
 
-		std::chrono::time_point<std::chrono::steady_clock> lastMessageTime; ///< Time of the last message.
-		DWORD lastMessageRawTime; ///< Raw time of the last message.
-		UINT lastMessageType;
-		POINT lastMessagePoint;
+		std::vector<std::string> commandLineSource; ///< Command line strings.
+		std::vector<std::string_view> commandLine; ///< Command line.
 
-		std::unique_ptr<App> application;
+		std::chrono::time_point<std::chrono::steady_clock> lastMessageTime; ///< Time of a last message.
+		DWORD lastMessageNativeTime; ///< Native time of a last message.
+		UINT lastMessageType; ///< Type of a last message.
+		POINT lastMessageCursorPoint; ///< Cursor point of a last message.
+
+		std::unique_ptr<App> application; ///< Application.
 	};
 }
 
@@ -103,44 +131,14 @@ namespace PonyEngine::Application::Windows
 		prevInstance{hPrevInstance},
 		cmdLine{lpCmdLine},
 		showCmd{nShowCmd},
+		hasConsole{false},
 		lastMessageTime(std::chrono::steady_clock::now()),
-		lastMessageRawTime(GetTickCount()),
+		lastMessageNativeTime(GetTickCount()),
 		lastMessageType{0u},
-		lastMessagePoint{.x = 0l, .y = 0l}
+		lastMessageCursorPoint{.x = 0l, .y = 0l}
 	{
-		SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 		UpdateCommandLine();
-
 		application = std::make_unique<App>(commandLine, GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), GetTempDataDirectory());
-		AddApplicationInterfaces();
-
-#ifdef PONY_ENGINE_CREATE_CONSOLE
-		CreateConsole();
-		SetConsoleCodePage(CP_UTF8);
-#endif
-	}
-
-	GUIProcess::~GUIProcess() noexcept
-	{
-#ifdef PONY_ENGINE_CREATE_CONSOLE
-		try
-		{
-			DestroyConsole();
-		}
-		catch (...)
-		{
-			// Highly unlikely and doesn't matter.
-		}
-#endif
-
-		try
-		{
-			RemoveApplicationInterfaces();
-		}
-		catch (...)
-		{
-			// Highly unlikely and doesn't matter.
-		}
 	}
 
 	int GUIProcess::Run()
@@ -198,7 +196,7 @@ namespace PonyEngine::Application::Windows
 		return lastMessageType;
 	}
 
-	DWORD GUIProcess::LastMessageRawTime() const
+	DWORD GUIProcess::LastMessageNativeTimePoint() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -207,10 +205,10 @@ namespace PonyEngine::Application::Windows
 		}
 #endif
 
-		return lastMessageRawTime;
+		return lastMessageNativeTime;
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> GUIProcess::LastMessageTime() const
+	std::chrono::time_point<std::chrono::steady_clock> GUIProcess::LastMessageTimePoint() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -222,7 +220,7 @@ namespace PonyEngine::Application::Windows
 		return lastMessageTime;
 	}
 
-	POINT GUIProcess::LastMessagePoint() const
+	POINT GUIProcess::LastMessageCursorPoint() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -231,7 +229,7 @@ namespace PonyEngine::Application::Windows
 		}
 #endif
 
-		return lastMessagePoint;
+		return lastMessageCursorPoint;
 	}
 
 	void GUIProcess::UpdateCommandLine()
@@ -259,7 +257,140 @@ namespace PonyEngine::Application::Windows
 		}
 	}
 
-	void GUIProcess::AddApplicationInterfaces()
+	void GUIProcess::Initialize()
+	{
+		bool early = false;
+		bool normal = false;
+		bool late = false;
+		bool console = false;
+		try
+		{
+			application->InitializeEarly();
+			early = true;
+			CreateConsole();
+			console = true;
+			application->LogBasicInfo();
+			SetPriority();
+			AddProcessInterfaces();
+			application->InitializeNormal();
+			normal = true;
+			application->InitializeLate();
+			late = true;
+		}
+		catch (...)
+		{
+			if (late)
+			{
+				application->FinalizeLate();
+			}
+			if (normal)
+			{
+				application->FinalizeNormal();
+			}
+			if (console)
+			{
+				DestroyConsole();
+			}
+			if (early)
+			{
+				application->FinalizeEarly();
+			}
+
+			throw;
+		}
+	}
+
+	void GUIProcess::Finalize()
+	{
+		application->FinalizeLate();
+		application->FinalizeNormal();
+		RemoveProcessInterfaces();
+		DestroyConsole();
+		application->FinalizeEarly();
+	}
+
+	void GUIProcess::CreateConsole() noexcept
+	{
+#ifdef PONY_ENGINE_CREATE_CONSOLE
+		if (!AllocConsole()) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to allocate console. ErrorCode = '0x{:X}'.", GetLastError());
+			return;
+		}
+		hasConsole = true;
+
+		if (!SetConsoleCP(CP_UTF8)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to set console CP. ErrorCode = '0x{:X}'.", GetLastError());
+		}
+		if (!SetConsoleOutputCP(CP_UTF8)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to set output console CP. ErrorCode = '0x{:X}'.", GetLastError());
+		}
+
+		FILE* fp;
+		if (const errno_t error = freopen_s(&fp, "CONOUT$", "w", stdout)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to reassign stdout to console. ErrorCode = '0x{:X}'.", error);
+		}
+		if (const errno_t error = freopen_s(&fp, "CONOUT$", "w", stderr)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to reassign stderr to console. ErrorCode = '0x{:X}'.", error);
+		}
+		if (const errno_t error = freopen_s(&fp, "CONIN$", "r", stdin)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to reassign stdin to console. ErrorCode = '0x{:X}'.", error);
+		}
+#endif
+	}
+
+	void GUIProcess::DestroyConsole() noexcept
+	{
+#ifdef PONY_ENGINE_CREATE_CONSOLE
+		if (!hasConsole)
+		{
+			return;
+		}
+
+		FILE* fp;
+		if (const errno_t error = freopen_s(&fp, "NUL", "w", stdout)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to reassign stdout back to nul. ErrorCode = '0x{:X}'.", error);
+		}
+		if (const errno_t error = freopen_s(&fp, "NUL", "w", stderr)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to reassign stderr back to nul. ErrorCode = '0x{:X}'.", error);
+		}
+		if (const errno_t error = freopen_s(&fp, "NUL", "r", stdin)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to reassign stdin back to nul. ErrorCode = '0x{:X}'.", error);
+		}
+
+		if (!FreeConsole()) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to free console. ErrorCode = '0x{:X}'.", GetLastError());
+		}
+		hasConsole = false;
+#endif
+	}
+
+	void GUIProcess::SetPriority() const noexcept
+	{
+		constexpr DWORD priority = ABOVE_NORMAL_PRIORITY_CLASS;
+
+		PONY_LOG(application->LogService(), Log::LogType::Info, "Setting process priority. Priority: '{}'.", priority);
+		try
+		{
+			SetProcessPriority(priority);
+		}
+		catch (...)
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "Failed to set process priority.");
+			// The application should keep working.
+		}
+	}
+
+	void GUIProcess::AddProcessInterfaces()
 	{
 		bool mainDataAdded = false;
 		bool resourceProviderAdded = false;
@@ -292,51 +423,11 @@ namespace PonyEngine::Application::Windows
 		}
 	}
 
-	void GUIProcess::RemoveApplicationInterfaces()
+	void GUIProcess::RemoveProcessInterfaces()
 	{
 		application->RemoveInterface<IMessagePump>(*this);
 		application->RemoveInterface<IResourceProvider>(*this);
 		application->RemoveInterface<IMainData>(*this);
-	}
-
-	void GUIProcess::Initialize()
-	{
-		bool early = false;
-		bool normal = false;
-		bool late = false;
-		try
-		{
-			application->InitializeEarly();
-			early = true;
-			application->InitializeNormal();
-			normal = true;
-			application->InitializeLate();
-			late = true;
-		}
-		catch (...)
-		{
-			if (late)
-			{
-				application->FinalizeLate();
-			}
-			if (normal)
-			{
-				application->FinalizeNormal();
-			}
-			if (early)
-			{
-				application->FinalizeEarly();
-			}
-
-			throw;
-		}
-	}
-
-	void GUIProcess::Finalize()
-	{
-		application->FinalizeLate();
-		application->FinalizeNormal();
-		application->FinalizeEarly();
 	}
 
 	int GUIProcess::RunMainLoop()
@@ -361,7 +452,7 @@ namespace PonyEngine::Application::Windows
 		{
 			lastMessageType = message.message;
 			UpdateMessageTime(message.time);
-			lastMessagePoint = message.pt;
+			lastMessageCursorPoint = message.pt;
 
 			if (message.message == WM_QUIT) [[unlikely]]
 			{
@@ -377,10 +468,10 @@ namespace PonyEngine::Application::Windows
 
 	void GUIProcess::UpdateMessageTime(const DWORD newMessageTime) noexcept
 	{
-		const DWORD prevToNowDiff = newMessageTime - lastMessageRawTime;
-		const DWORD nowToPrevDiff = lastMessageRawTime - newMessageTime;
+		const DWORD prevToNowDiff = newMessageTime - lastMessageNativeTime;
+		const DWORD nowToPrevDiff = lastMessageNativeTime - newMessageTime;
 
-		if (newMessageTime < lastMessageRawTime && prevToNowDiff > nowToPrevDiff) [[unlikely]]
+		if (newMessageTime < lastMessageNativeTime && prevToNowDiff > nowToPrevDiff) [[unlikely]]
 		{
 			lastMessageTime -= std::chrono::milliseconds(nowToPrevDiff);
 		}
@@ -389,6 +480,6 @@ namespace PonyEngine::Application::Windows
 			lastMessageTime += std::chrono::milliseconds(prevToNowDiff);
 		}
 
-		lastMessageRawTime = newMessageTime;
+		lastMessageNativeTime = newMessageTime;
 	}
 }

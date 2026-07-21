@@ -12,9 +12,9 @@ Log API module. Provides interfaces for logging.
 
 Main sub-modules:
 
-#### [ILogger](Source/Main-ILogger.cppm)
+#### [ILogService](Source/Main-ILogService.cppm)
 
-Logger interface. It has functions to log messages and exceptions.
+Log service interface. It has functions to log messages and exceptions.
 
 #### [LogType](Source/Main-LogType.cppm)
 
@@ -25,7 +25,7 @@ Log types (from lowest to highest level):
 - Info
 - Warning
 - Error
-- Exception
+- Fatal
 
 ## C\++ headers
 
