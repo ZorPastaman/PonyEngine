@@ -1,15 +1,15 @@
 # PonyEngine.Log.File.Impl module
 
-Sub-logger implementation module. The sub-logger logs to a log file.
+Logger implementation that logs to a standard console.
 
 The log file is created in a local data folder. If a file with the same name exists, it will be renamed to `<file_name>_prev.<file_extension>`.
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
 - [PonyEngine.Log.Ext](../Log.Ext)
-- [PonyEngine.Application](../Application)
 
 ## CMake variables
 
@@ -24,5 +24,5 @@ These variables are used to configure the build of the module:
 
 The module has a simple implementation:
 
-- [FileSubLogger](Source/Main-FileSubLogger.cppm) - sub-logger;
-- [FileSubLoggerModule](Source/Main-FileSubLoggerModule.cppm) - sub-logger module.
+- [FileLogger](Source/Main-FileLogger.cppm) - file logger;
+- [FileLoggerModule](Source/Main-FileLoggerModule.cppm) - file logger module.

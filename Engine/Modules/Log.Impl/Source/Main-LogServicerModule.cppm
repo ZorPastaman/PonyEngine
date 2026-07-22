@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Impl:LoggerModule;
+export module PonyEngine.Log.Impl:LogServiceModule;
 
 import std;
 
@@ -36,7 +36,7 @@ export namespace PonyEngine::Log
 		LogServiceModule& operator =(LogServiceModule&&) = delete;
 
 	private:
-		std::unique_ptr<LogService> logService;
+		std::unique_ptr<LogService> logService; ///< Log service.
 	};
 }
 
@@ -46,16 +46,18 @@ namespace PonyEngine::Log
 	{
 		logService = std::make_unique<LogService>();
 
+		bool logServiceAdded = false;
 		try
 		{
-			context.AddInterface(logService->GetLogService());
-			context.AddInterface(logService->GetLogHub());
+			context.AddInterface<ILogService>(*logService);
+			logServiceAdded = true;
+			context.AddInterface<ILogHub>(*logService);
 		}
 		catch (...)
 		{
-			if (context.Application().FindInterface(typeid(logService->GetLogService())) == &logService->GetLogService())
+			if (logServiceAdded)
 			{
-				context.RemoveInterface(logService->GetLogService());
+				context.RemoveInterface<ILogService>(*logService);
 			}
 
 			logService.reset();
@@ -66,8 +68,8 @@ namespace PonyEngine::Log
 
 	void LogServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		context.RemoveInterface(logService->GetLogHub());
-		context.RemoveInterface(logService->GetLogService());
+		context.RemoveInterface<ILogHub>(*logService);
+		context.RemoveInterface<ILogService>(*logService);
 		logService.reset();
 	}
 }

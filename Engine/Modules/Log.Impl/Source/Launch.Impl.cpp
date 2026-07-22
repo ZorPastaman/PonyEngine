@@ -9,14 +9,12 @@
 
 #include "PonyEngine/Log/LogServiceModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.Log.Impl;
 
 namespace PonyEngine::Log
 {
-	Application::IModule* GetLogServiceModule()
+	std::shared_ptr<Application::IModule> CreateLogServiceModule()
 	{
-		static LogServiceModule loggerModule;
-		return &loggerModule;
+		return std::make_shared<LogServiceModule>();
 	}
 }

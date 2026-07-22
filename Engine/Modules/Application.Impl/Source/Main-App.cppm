@@ -27,6 +27,25 @@ import PonyEngine.Log;
 import :IdentityUtility;
 import :PathUtility;
 
+/// @brief Begins an early section declaration.
+/// @note For internal use only.
+PONY_SECTION(PONY_EARLY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
+/// @brief Ends an early section declaration.
+/// @note For internal use only.
+PONY_SECTION(PONY_EARLY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
+/// @brief Begins a normal section declaration.
+/// @note For internal use only.
+PONY_SECTION(PONY_NORMAL_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
+/// @brief Ends a normal section declaration.
+/// @note For internal use only.
+PONY_SECTION(PONY_NORMAL_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
+/// @brief Begins a late section declaration.
+/// @note For internal use only.
+PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
+/// @brief Ends a late section declaration.
+/// @note For internal use only.
+PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
+
 export namespace PonyEngine::Application
 {
 	/// @brief Application.
@@ -196,7 +215,7 @@ export namespace PonyEngine::Application
 
 	private:
 		using Buffer = std::vector<std::byte, Container::AlignedAllocator<std::byte>>; ///< Buffer type.
-		using ModuleGetter = IModule*(*)(); ///< Module getter function.
+		using ModuleGetter = std::shared_ptr<IModule>(*)(); ///< Module getter function.
 
 		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstEarlyModule = nullptr; ///< Early module begin pointer.
 		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleGetter lastEarlyModule = nullptr; ///< Early module end pointer.
@@ -279,19 +298,22 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		std::string MakeCommandLineString() const;
 
-		/// @brief Gets modules.
+		/// @brief Creates modules.
 		/// @param firstModule First module getter.
 		/// @param lastModule Last module getter.
 		/// @param modules Module list to add to.
-		void GetModules(ModuleGetter firstModule, ModuleGetter lastModule, std::vector<IModule*>& modules) const;
+		void CreateModules(std::uintptr_t firstModule, std::uintptr_t lastModule, std::vector<std::shared_ptr<IModule>>& modules) const;
+		/// @brief Destroys the modules.
+		/// @param modules Modules to destroy.
+		void DestroyModules(std::vector<std::shared_ptr<IModule>>& modules) const noexcept;
 		/// @brief Starts up the modules.
 		/// @param modules Modules to start-up.
 		/// @param count How many modules are started-up.
-		void StartUpModules(std::span<IModule* const> modules, std::size_t& count);
+		void StartUpModules(std::span<const std::shared_ptr<IModule>> modules, std::size_t& count);
 		/// @brief Shuts down the modules.
 		/// @param modules Modules to shut down.
 		/// @param count How many modules to shut down.
-		void ShutDownModules(std::span<IModule* const> modules, std::size_t count) noexcept;
+		void ShutDownModules(std::span<const std::shared_ptr<IModule>> modules, std::size_t count) noexcept;
 
 		/// @brief Updates the list of begin tickables.
 		void UpdateBeginTickables();
@@ -340,9 +362,9 @@ export namespace PonyEngine::Application
 		std::chrono::time_point<std::chrono::steady_clock> thisFrameTimePoint; ///< This frame time point.
 		std::chrono::nanoseconds targetFrameTime; ///< Target frame time. It's the minimum time that must pass between frame begins.
 
-		std::vector<IModule*> earlyModules; ///< Early modules.
-		std::vector<IModule*> normalModules; ///< Normal modules.
-		std::vector<IModule*> lateModules; ///< Late modules.
+		std::vector<std::shared_ptr<IModule>> earlyModules; ///< Early modules.
+		std::vector<std::shared_ptr<IModule>> normalModules; ///< Normal modules.
+		std::vector<std::shared_ptr<IModule>> lateModules; ///< Late modules.
 
 		Log::ILogService* logService; ///< Log service.
 
@@ -656,9 +678,9 @@ namespace PonyEngine::Application
 		std::size_t count = 0uz;
 		try
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Getting early modules...");
-			GetModules(firstEarlyModule, lastEarlyModule, earlyModules);
-			PONY_LOG(logService, Log::LogType::Info, "Getting early modules done.");
+			PONY_LOG(logService, Log::LogType::Info, "Creating early modules...");
+			CreateModules(reinterpret_cast<std::uintptr_t>(&firstEarlyModule), reinterpret_cast<std::uintptr_t>(&lastEarlyModule), earlyModules);
+			PONY_LOG(logService, Log::LogType::Info, "Creating early modules done.");
 			PONY_LOG(logService, Log::LogType::Info, "Starting up early modules...");
 			StartUpModules(earlyModules, count);
 			PONY_LOG(logService, Log::LogType::Info, "Starting up early modules done.");
@@ -666,13 +688,13 @@ namespace PonyEngine::Application
 		catch (...)
 		{
 			ShutDownModules(earlyModules, count);
+			DestroyModules(earlyModules);
 			throw;
 		}
 
 		PONY_LOG(logService, Log::LogType::Info, "Initializing early modules done.");
 
 		logService = FindInterface<Log::ILogService>();
-		LogBasicInfo();
 	}
 
 	void App::FinalizeEarly() noexcept
@@ -684,6 +706,9 @@ namespace PonyEngine::Application
 		PONY_LOG(logService, Log::LogType::Info, "Shutting down early modules...");
 		ShutDownModules(earlyModules, earlyModules.size());
 		PONY_LOG(logService, Log::LogType::Info, "Shutting down early modules done.");
+		PONY_LOG(logService, Log::LogType::Info, "Destroying early modules...");
+		DestroyModules(earlyModules);
+		PONY_LOG(logService, Log::LogType::Info, "Destroying early modules done.");
 	}
 
 	void App::InitializeNormal()
@@ -695,9 +720,9 @@ namespace PonyEngine::Application
 		std::size_t count = 0uz;
 		try
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Getting normal modules...");
-			GetModules(firstNormalModule, lastNormalModule, normalModules);
-			PONY_LOG(logService, Log::LogType::Info, "Getting normal modules done.");
+			PONY_LOG(logService, Log::LogType::Info, "Creating normal modules...");
+			CreateModules(reinterpret_cast<std::uintptr_t>(&firstNormalModule), reinterpret_cast<std::uintptr_t>(&lastNormalModule), normalModules);
+			PONY_LOG(logService, Log::LogType::Info, "Creating normal modules done.");
 			PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules...");
 			StartUpModules(normalModules, count);
 			PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules done.");
@@ -705,6 +730,7 @@ namespace PonyEngine::Application
 		catch (...)
 		{
 			ShutDownModules(normalModules, count);
+			DestroyModules(normalModules);
 			throw;
 		}
 
@@ -718,6 +744,9 @@ namespace PonyEngine::Application
 		PONY_LOG(logService, Log::LogType::Info, "Shutting down normal modules...");
 		ShutDownModules(normalModules, normalModules.size());
 		PONY_LOG(logService, Log::LogType::Info, "Shutting down normal modules done.");
+		PONY_LOG(logService, Log::LogType::Info, "Destroying normal modules...");
+		DestroyModules(normalModules);
+		PONY_LOG(logService, Log::LogType::Info, "Destroying normal modules done.");
 	}
 
 	void App::InitializeLate()
@@ -729,9 +758,9 @@ namespace PonyEngine::Application
 		std::size_t count = 0uz;
 		try
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Getting late modules...");
-			GetModules(firstLateModule, lastLateModule, lateModules);
-			PONY_LOG(logService, Log::LogType::Info, "Getting late modules done.");
+			PONY_LOG(logService, Log::LogType::Info, "Creating late modules...");
+			CreateModules(reinterpret_cast<std::uintptr_t>(&firstLateModule), reinterpret_cast<std::uintptr_t>(&lastLateModule), lateModules);
+			PONY_LOG(logService, Log::LogType::Info, "Creating late modules done.");
 			PONY_LOG(logService, Log::LogType::Info, "Starting up late modules...");
 			StartUpModules(lateModules, count);
 			PONY_LOG(logService, Log::LogType::Info, "Starting up late modules done.");
@@ -739,6 +768,7 @@ namespace PonyEngine::Application
 		catch (...)
 		{
 			ShutDownModules(lateModules, count);
+			DestroyModules(lateModules);
 			throw;
 		}
 
@@ -752,6 +782,9 @@ namespace PonyEngine::Application
 		PONY_LOG(logService, Log::LogType::Info, "Shutting down late modules...");
 		ShutDownModules(lateModules, lateModules.size());
 		PONY_LOG(logService, Log::LogType::Info, "Shutting down late modules done.");
+		PONY_LOG(logService, Log::LogType::Info, "Destroying late modules...");
+		DestroyModules(lateModules);
+		PONY_LOG(logService, Log::LogType::Info, "Destroying late modules done.");
 	}
 
 	void App::Begin()
@@ -1046,32 +1079,43 @@ namespace PonyEngine::Application
 		return commandLineString;
 	}
 
-	void App::GetModules(const ModuleGetter firstModule, const ModuleGetter lastModule, std::vector<IModule*>& modules) const
+	void App::CreateModules(const std::uintptr_t firstModule, const std::uintptr_t lastModule, std::vector<std::shared_ptr<IModule>>& modules) const
 	{
-		for (std::uintptr_t current = reinterpret_cast<std::uintptr_t>(&firstModule) + sizeof(ModuleGetter);
-			current < reinterpret_cast<std::uintptr_t>(&lastModule);
-			current += sizeof(ModuleGetter))
+		for (std::uintptr_t current = firstModule + sizeof(ModuleGetter); current < lastModule; current += sizeof(ModuleGetter))
 		{
 			if (const auto moduleGetter = *reinterpret_cast<ModuleGetter*>(current))
 			{
-				IModule* const appModule = moduleGetter();
+				std::shared_ptr<IModule> appModule = moduleGetter();
 #ifndef NDEBUG
 				if (!appModule) [[unlikely]]
 				{
 					throw std::logic_error("Module is nullptr");
 				}
 #endif
-				PONY_LOG(logService, Log::LogType::Info, "Gotten module: '{}'.", typeid(*appModule).name());
-				modules.push_back(appModule);
+				PONY_LOG(logService, Log::LogType::Info, "Module created: '{}'.", typeid(*appModule).name());
+				modules.push_back(std::move(appModule));
 			}
 		}
 
 		modules.shrink_to_fit();
 	}
 
-	void App::StartUpModules(const std::span<IModule* const> modules, std::size_t& count)
+	void App::DestroyModules(std::vector<std::shared_ptr<IModule>>& modules) const noexcept
 	{
-		for (auto context = StartUpModuleContext(*this); IModule* const appModule : modules)
+		for (std::size_t i = modules.size(); i-- > 0uz; )
+		{
+			std::shared_ptr<IModule>& appModule = modules[i];
+			PONY_LOG(logService, Log::LogType::Info, "Destroying module: '{}'.", typeid(*appModule).name());
+			appModule.reset();
+		}
+
+		modules.clear();
+		modules.shrink_to_fit();
+	}
+
+	void App::StartUpModules(const std::span<const std::shared_ptr<IModule>> modules, std::size_t& count)
+	{
+		for (auto context = StartUpModuleContext(*this); const std::shared_ptr<IModule>& appModule : modules)
 		{
 			PONY_LOG(logService, Log::LogType::Info, "Starting up '{}' module...", typeid(*appModule).name());
 			try
@@ -1087,12 +1131,12 @@ namespace PonyEngine::Application
 		}
 	}
 
-	void App::ShutDownModules(const std::span<IModule* const> modules, const std::size_t count) noexcept
+	void App::ShutDownModules(const std::span<const std::shared_ptr<IModule>> modules, const std::size_t count) noexcept
 	{
 		auto context = ShutDownModuleContext(*this);
 		for (std::size_t i = modules.size(); i-- > 0uz; )
 		{
-			IModule* const appModule = modules[i];
+			const std::shared_ptr<IModule>& appModule = modules[i];
 			PONY_LOG(logService, Log::LogType::Info, "Shutting down '{}' module...", typeid(*appModule).name());
 			try
 			{

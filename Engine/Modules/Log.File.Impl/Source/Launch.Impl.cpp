@@ -7,16 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/FileSubLoggerModule.h"
+#include "PonyEngine/Log/FileLoggerModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.Log.File.Impl;
 
 namespace PonyEngine::Log::File
 {
-	Application::IModule* GetFileSubLoggerModule()
+	std::shared_ptr<Application::IModule> CreateFileLoggerModule()
 	{
-		static FileSubLoggerModule fileSubLoggerModule;
-		return &fileSubLoggerModule;
+		return std::make_shared<FileLoggerModule>();
 	}
 }

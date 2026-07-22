@@ -7,8 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Impl;
+#include "PonyEngine/Log/PlatformConsoleLoggerModule.h"
 
-export import PonyEngine.Log.Ext;
+import PonyEngine.Log.PlatformConsole.Impl;
 
-export import :LogServiceModule;
+namespace PonyEngine::Log::PlatformConsole
+{
+	std::shared_ptr<Application::IModule> CreatePlatformConsoleLoggerModule()
+	{
+		return std::make_shared<PlatformConsoleLoggerModule>();
+	}
+}

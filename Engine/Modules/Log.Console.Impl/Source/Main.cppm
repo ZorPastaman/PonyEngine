@@ -7,8 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Impl;
+export module PonyEngine.Log.Console.Impl;
 
 export import PonyEngine.Log.Ext;
 
-export import :LogServiceModule;
+export import :ConsoleLoggerModule;

@@ -23,7 +23,7 @@ import :LogFiller;
 export namespace PonyEngine::Log
 {
 	/// @brief Log hub.
-	class LogService final : private ILogService, private ILogHub
+	class LogService final : public ILogService, public ILogHub
 	{
 	public:
 		[[nodiscard("Pure constuctor")]]
@@ -33,15 +33,6 @@ export namespace PonyEngine::Log
 
 		~LogService() noexcept;
 
-		[[nodiscard("Pure function")]]
-		ILogService& GetLogService() noexcept;
-		[[nodiscard("Pure function")]]
-		ILogHub& GetLogHub() noexcept;
-
-		LogService& operator =(const LogService&) = delete;
-		LogService& operator =(LogService&&) = delete;
-
-	private:
 		virtual void Log(LogType logType, std::string_view message) const noexcept override;
 		virtual void Log(LogType logType, std::string_view format, std::format_args formatArgs) const noexcept override;
 		virtual void Log(LogType logType, std::string_view message, const std::stacktrace& stacktrace) const noexcept override;
@@ -57,6 +48,10 @@ export namespace PonyEngine::Log
 		virtual void AddLogger(ILogger& logger) override;
 		virtual void RemoveLogger(ILogger& logger) override;
 
+		LogService& operator =(const LogService&) = delete;
+		LogService& operator =(LogService&&) = delete;
+
+	private:
 		/// @brief Logs the entry.
 		/// @param formattedMessage Formatted message.
 		/// @param logEntry Log entry to log.
@@ -74,16 +69,6 @@ namespace PonyEngine::Log
 	LogService::~LogService() noexcept
 	{
 		assert(loggers.size() == 0uz && "Some loggers weren't removed.");
-	}
-
-	ILogService& LogService::GetLogService() noexcept
-	{
-		return *this;
-	}
-
-	ILogHub& LogService::GetLogHub() noexcept
-	{
-		return *this;
 	}
 
 	void LogService::Log(const LogType logType, const std::string_view message) const noexcept

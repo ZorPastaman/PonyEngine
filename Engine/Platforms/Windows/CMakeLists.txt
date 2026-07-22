@@ -23,6 +23,10 @@ if(TARGET PonyEngine.Application.Impl)
 	add_subdirectory("Application.Impl")
 endif()
 
+if(TARGET PonyEngine.Log.PlatformConsole.Impl)
+	add_subdirectory("Log.PlatformConsole.Impl")
+endif()
+
 if(TARGET PonyEngine.File.Impl)
 	add_subdirectory("File.Impl")
 endif()

@@ -88,6 +88,9 @@ export namespace PonyEngine::Application::Windows
 		/// @brief Destroys a console if it was created.
 		void DestroyConsole() noexcept;
 
+		/// @brief Logs basic info.
+		void LogProcessBasicInfo() const noexcept;
+
 		/// @brief Sets the process priority.
 		void SetPriority() const noexcept;
 		/// @brief Adds the process interfaces to the application.
@@ -270,6 +273,7 @@ namespace PonyEngine::Application::Windows
 			CreateConsole();
 			console = true;
 			application->LogBasicInfo();
+			LogProcessBasicInfo();
 			SetPriority();
 			AddProcessInterfaces();
 			application->InitializeNormal();
@@ -314,9 +318,9 @@ namespace PonyEngine::Application::Windows
 			MessageBoxA(nullptr, std::format("Interface of type {} wasn't removed from application.", type.name()).c_str(), "Interface not removed", MB_OK | MB_ICONERROR | MB_TOPMOST);
 		}
 
-		for (const ITickable* const tickable : std::views::keys(application->Tickables()))
+		if (const std::size_t count = application->Tickables().size(); count != 0uz) [[unlikely]]
 		{
-			MessageBoxA(nullptr, std::format("Tickable of type {} wasn't removed from application.", typeid(*tickable).name()).c_str(), "Tickable not removed", MB_OK | MB_ICONERROR | MB_TOPMOST);
+			MessageBoxA(nullptr, std::format("{} tickables weren't removed from application.", count).c_str(), "Tickables not removed", MB_OK | MB_ICONERROR | MB_TOPMOST);
 		}
 #endif
 	}
@@ -384,6 +388,11 @@ namespace PonyEngine::Application::Windows
 		}
 		hasConsole = false;
 #endif
+	}
+
+	void GUIProcess::LogProcessBasicInfo() const noexcept
+	{
+		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
 	}
 
 	void GUIProcess::SetPriority() const noexcept

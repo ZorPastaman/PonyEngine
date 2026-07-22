@@ -7,16 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module PonyEngine.Log.PlatformConsole.Impl;
 
-#include "PonyEngine/Macro/Compiler.h"
-
-import PonyEngine.Application;
-
-namespace PonyEngine::Log::File
-{
-	/// @brief Gets the file sub-logger module.
-	/// @return File sub-logger module.
-	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetFileSubLoggerModule();
-}
+export import :PlatformConsoleLoggerModule;

@@ -1,4 +1,4 @@
-message(STATUS "Configuring engine compiler: '${CMAKE_CXX_COMPILER_ID}'")
+message(STATUS "Configuring engine compiler: ${CMAKE_CXX_COMPILER_ID}")
 
 if(MSVC)
 	add_subdirectory("MSVC")

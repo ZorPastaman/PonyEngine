@@ -34,8 +34,8 @@ if(NOT TARGET PonyEngine.Application.Impl)
 	message(FATAL_ERROR "PonyEngine.Application.Impl wasn't added to the engine build")
 endif()
 
-set(PONY_BASE_MODULES "")
 set(PONY_LOG_MODULES "")
+set(PONY_BASE_MODULES "")
 set(PONY_PLATFORM_MODULES "")
 set(PONY_INPUT_MODULES "")
 set(PONY_RENDER_MODULES "")
@@ -48,6 +48,16 @@ pony_apply_flags(PonyEngine.Log TRUE)
 pony_apply_flags(PonyEngine.Application TRUE)
 pony_apply_flags(PonyEngine.Application.Impl TRUE)
 
+pony_apply_flags(PonyEngine.Log.Ext TRUE)
+pony_apply_flags(PonyEngine.Log.Impl TRUE)
+pony_add_to_module_list(PonyEngine.Log.Impl PONY_LOG_MODULES)
+pony_apply_flags(PonyEngine.Log.Console.Impl TRUE)
+pony_add_to_module_list(PonyEngine.Log.Console.Impl PONY_LOG_MODULES)
+pony_apply_flags(PonyEngine.Log.PlatformConsole.Impl TRUE)
+pony_add_to_module_list(PonyEngine.Log.PlatformConsole.Impl PONY_LOG_MODULES)
+pony_apply_flags(PonyEngine.Log.File.Impl TRUE)
+pony_add_to_module_list(PonyEngine.Log.File.Impl PONY_LOG_MODULES)
+
 pony_apply_flags(PonyEngine.Time TRUE)
 pony_apply_flags(PonyEngine.Time.Impl TRUE)
 pony_add_to_module_list(PonyEngine.Time.Impl PONY_BASE_MODULES)
@@ -55,12 +65,6 @@ pony_add_to_module_list(PonyEngine.Time.Impl PONY_BASE_MODULES)
 pony_apply_flags(PonyEngine.Job TRUE)
 pony_apply_flags(PonyEngine.Job.Impl TRUE)
 pony_add_to_module_list(PonyEngine.Job.Impl PONY_BASE_MODULES)
-
-pony_apply_flags(PonyEngine.Log.Ext TRUE)
-pony_apply_flags(PonyEngine.Log.Impl TRUE)
-pony_add_to_module_list(PonyEngine.Log.Impl PONY_LOG_MODULES)
-pony_apply_flags(PonyEngine.Log.File.Impl TRUE)
-pony_add_to_module_list(PonyEngine.Log.File.Impl PONY_LOG_MODULES)
 
 pony_apply_flags(PonyEngine.File TRUE)
 pony_apply_flags(PonyEngine.File.Impl TRUE)
@@ -113,8 +117,8 @@ pony_add_to_module_list(Sample PONY_GAME_MODULES)
 set(PONY_INSTALL_TARGETS PonyEngine.Application.Impl)
 if(PONY_MAKE_GROUPS)
 	message(VERBOSE "Making application module groups")
-	pony_manage_module_group(PONY_BASE_MODULES PonyModule.Base TRUE PONY_INSTALL_TARGETS)
 	pony_manage_module_group(PONY_LOG_MODULES PonyModule.Log TRUE PONY_INSTALL_TARGETS)
+	pony_manage_module_group(PONY_BASE_MODULES PonyModule.Base TRUE PONY_INSTALL_TARGETS)
 	pony_manage_module_group(PONY_PLATFORM_MODULES PonyModule.Platform TRUE PONY_INSTALL_TARGETS)
 	pony_manage_module_group(PONY_INPUT_MODULES PonyModule.Input TRUE PONY_INSTALL_TARGETS)
 	pony_manage_module_group(PONY_RENDER_MODULES PonyModule.Render TRUE PONY_INSTALL_TARGETS)
@@ -124,8 +128,8 @@ if(PONY_MAKE_GROUPS)
 else()
 	message(VERBOSE "Adding application modules")
 	pony_add_application_modules(
-		${PONY_BASE_MODULES}
 		${PONY_LOG_MODULES}
+		${PONY_BASE_MODULES}
 		${PONY_PLATFORM_MODULES}
 		${PONY_INPUT_MODULES}
 		${PONY_RENDER_MODULES}

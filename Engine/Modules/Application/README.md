@@ -43,14 +43,14 @@ Tickable interface. A tickable is an object that reacts to the application main 
 
 Application module utilities.
 
-| Define                                             | Description                                                                                                                                         |
-|:---------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `PONY_EARLY_MODULE(function, moduleName, order)`   | Makes an application module with an early registration. It's a group for log modules. The application tries to find a log service after this group. |
-| `PONY_NORMAL_MODULE(function, moduleName, order)`  | Makes an application module with a normal registration. It's a group for engine modules.                                                            |
-| `PONY_LATE_MODULE(function, moduleName, order)`    | Makes an application module with a late registration. It's a group for game modules.                                                                |
-| `PONY_LOG_MODULE(function, moduleName, order)`     | Synonym to `PONY_EARLY_MODULE(function, moduleName, order)`.                                                                                        |
-| `PONY_ENGINE_MODULE(function, moduleName, order)`  | Synonym to `PONY_NORMAL_MODULE(function, moduleName, order)`.                                                                                       |
-| `PONY_PROJECT_MODULE(function, moduleName, order)` | Synonym to `PONY_LATE_MODULE(function, moduleName, order)`.                                                                                         |
+| Define                                                         | Description                                                                                                                                         |
+|:---------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `PONY_EARLY_MODULE(function, moduleName, order)`               | Makes an application module with an early registration. It's a group for log modules. The application tries to find a log service after this group. |
+| `PONY_NORMAL_MODULE(function, moduleName, order)`              | Makes an application module with a normal registration. It's a group for engine modules.                                                            |
+| `PONY_LATE_MODULE(function, moduleName, order)`                | Makes an application module with a late registration. It's a group for game modules.                                                                |
+| `PONY_LOG_MODULE(function, moduleName, order)`                 | Synonym to `PONY_EARLY_MODULE(function, moduleName, order)`.                                                                                        |
+| `PONY_ENGINE_MODULE(function, moduleName, order)`              | Synonym to `PONY_NORMAL_MODULE(function, moduleName, order)`.                                                                                       |
+| `PONY_PROJECT_MODULE(function, moduleName, order)`             | Synonym to `PONY_LATE_MODULE(function, moduleName, order)`.                                                                                         |
 
 ## CMake functions
 
@@ -64,7 +64,7 @@ Application module utilities.
 How to add an application module:
 
 1. Make a class that inherits `PonyEngine::Application::IModule`;
-2. Make a function that returns a `PonyEngine::Application::IModule*` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h` The instance must live for the lifetime of the application;
+2. Make a function that returns an `std::shared_ptr<PonyEngine::Application::IModule>` to an instance of your module class and takes no argument. The function must have the attribute `PONY_DLL_EXPORT` from `PonyEngine/Macro/Compiler.h`;
 3. Include `PonyEngine/Application/Module.h` and use the macro `PONY_<GROUP>_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)` in a public code file. Module initialization order is defined by letters and follows alphabetical order;
 4. Link your module target to the engine application target. The default implementation is [PonyEngine.Application.Impl](../Application.Impl).
 
@@ -73,18 +73,19 @@ Example of `PONY_GAME_MODULE` usage in a `.cpp` file:
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace MyGame
 {
-	PONY_DLL_EXPORT PonyEngine::Application::IModule* GetGameModule()
+	PONY_DLL_EXPORT std::shared_ptr<PonyEngine::Application::IModule> CreateGameModule()
 	{
-		static GameModule gameModule;
-		return &gameModule;
+		return std::make_shared<GameModule>();
 	}
 }
 
-PONY_PROJECT_MODULE(MyGame::GetGameModule, MyGame, yz)
+PONY_PROJECT_MODULE(MyGame::CreateGameModule, MyGame, yz)
 ```
 
 Make sure that your module order contains latin letters only and its first letter isn't `a` or `z`.

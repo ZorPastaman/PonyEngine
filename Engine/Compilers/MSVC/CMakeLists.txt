@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Core for MSVC-compatible compiler")
+message(STATUS "Configuring PonyEngine.Core for MSVC")
 
 message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Core PUBLIC 

@@ -16,40 +16,144 @@ import PonyEngine.Log.Ext;
 
 import :LogTypeSymbol;
 
-using namespace std::literals::string_view_literals;
-
 export namespace PonyEngine::Log
 {
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param message Log message.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, std::string_view message) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param format Log format.
+	/// @param formatArgs Format arguments.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, std::string_view format, std::format_args formatArgs) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, std::string_view message, const std::stacktrace& stacktrace) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param format Log format.
+	/// @param formatArgs Format arguments.
+	/// @param stacktrace Stacktrace.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) noexcept;
 
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param exception Exception.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, const std::exception_ptr& exception) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param exception Exception.
+	/// @param message Log message.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, const std::exception_ptr& exception, std::string_view message) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param exception Exception.
+	/// @param format Log format.
+	/// @param formatArgs Format arguments.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param exception Exception.
+	/// @param stacktrace Stacktrace.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, const std::exception_ptr& exception, const std::stacktrace& stacktrace) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param exception Exception.
+	/// @param message Log message.
+	/// @param stacktrace Stacktrace.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, const std::exception_ptr& exception, std::string_view message, const std::stacktrace& stacktrace) noexcept;
+	/// @brief Fills log data.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param logType Log type.
+	/// @param exception Exception.
+	/// @param format Log format.
+	/// @param formatArgs Format arguments.
+	/// @param stacktrace Stacktrace.
 	void FillData(LogEntry& logEntry, std::string& formattedMessage, LogType logType, const std::exception_ptr& exception, std::string_view format, std::format_args formatArgs, const std::stacktrace& stacktrace) noexcept;
 }
 
 namespace PonyEngine::Log
 {
+	/// @brief Fills the log entry.
+	/// @param logEntry Log entry to fill.
+	/// @param logType Log type.
 	void FillLogEntry(LogEntry& logEntry, LogType logType) noexcept;
+	/// @brief Fills the log entry.
+	/// @param logEntry Log entry to fill.
+	/// @param logType Log type.
+	/// @param stacktrace Stacktrace.
 	void FillLogEntry(LogEntry& logEntry, LogType logType, const std::stacktrace& stacktrace) noexcept;
+	/// @brief Fills the log entry.
+	/// @param logEntry Log entry to fill.
+	/// @param logType Log type.
+	/// @param exception Exception
 	void FillLogEntry(LogEntry& logEntry, LogType logType, const std::exception_ptr& exception) noexcept;
+	/// @brief Fills the log entry.
+	/// @param logEntry Log entry to fill.
+	/// @param logType Log type.
+	/// @param exception Exception
+	/// @param stacktrace Stacktrace.
 	void FillLogEntry(LogEntry& logEntry, LogType logType, const std::exception_ptr& exception, const std::stacktrace& stacktrace) noexcept;
 
+	/// @brief Fills the log header.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted log message.
 	void FillHeader(const LogEntry& logEntry, std::string& formattedMessage);
 
+	/// @brief Fills the log message.
+	/// @param formattedMessage Formatted log message.
+	/// @param message Message to fill with.
+	/// @return Start and end points of the filled message.
 	std::pair<std::size_t, std::size_t> FillMessage(std::string& formattedMessage, std::string_view message);
+	/// @brief Fills the log message.
+	/// @param formattedMessage Formatted log message.
+	/// @param format Message format.
+	/// @param formatArgs Format arguments.
+	/// @return Start and end points of the filled message.
 	std::pair<std::size_t, std::size_t> FillMessage(std::string& formattedMessage, std::string_view format, std::format_args formatArgs);
+	/// @brief Fills the exception description.
+	/// @param formattedMessage Formatted log message.
+	/// @param exception Exception.
+	/// @return Start and end points of the filled message.
 	std::pair<std::size_t, std::size_t> FillException(std::string& formattedMessage, const std::exception_ptr& exception);
 	
+	/// @brief Fills the stacktrace.
+	/// @param formattedMessage Formatted log message.
+	/// @param stacktrace Stacktrace.
 	void FillStacktrace(std::string& formattedMessage, const std::stacktrace& stacktrace);
 
+	/// @brief Sets the main message view into the log entry.
+	/// @param logEntry Log entry.
+	/// @param formattedMessage Formatted message.
+	/// @param messageBounds Message bounds.
 	void SetMainMessage(LogEntry& logEntry, const std::string& formattedMessage, const std::pair<std::size_t, std::size_t>& messageBounds) noexcept;
 
+	/// @brief Merges bounds.
+	/// @param exceptionBounds Exception bounds.
+	/// @param messageBounds Message bounds.
+	/// @return Merged bounds.
 	[[nodiscard("Pure function")]]
 	std::pair<std::size_t, std::size_t> MergeBounds(const std::pair<std::size_t, std::size_t>& exceptionBounds, const std::pair<std::size_t, std::size_t>& messageBounds) noexcept;
 

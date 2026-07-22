@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Log.Impl")
+message(STATUS "Configuring PonyEngine.Log.Console.Impl")
 
 if(NOT TARGET PonyEngine.Application)
 	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
@@ -14,49 +14,47 @@ if(NOT TARGET PonyEngine.Log.Ext)
 endif()
 
 message(VERBOSE "Configuring parameters")
-set(PONY_ENGINE_LOG_ORDER "p" CACHE STRING "PonyEngine.Log.Impl module initialization order. Its first character must be in range [b-y].")
+set(PONY_ENGINE_LOG_CONSOLE_ORDER "p" CACHE STRING "PonyEngine.Log.Console.Impl module initialization order. Its first character must be in range [b-y].")
 
 message(VERBOSE "Configuring target")
-add_library(PonyEngine.Log.Impl STATIC)
+add_library(PonyEngine.Log.Console.Impl STATIC)
 
 message(VERBOSE "Configuring headers")
-target_include_directories(PonyEngine.Log.Impl PUBLIC
+target_include_directories(PonyEngine.Log.Console.Impl PUBLIC
 	"Include/Public"
 )
 
 message(VERBOSE "Configuring sources")
-target_sources(PonyEngine.Log.Impl PUBLIC
+target_sources(PonyEngine.Log.Console.Impl PUBLIC
 	"Source/Launch.cpp"
 )
-target_sources(PonyEngine.Log.Impl PRIVATE
+target_sources(PonyEngine.Log.Console.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
-target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
+target_sources(PonyEngine.Log.Console.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-LogFiller.cppm"
-	"Source/Main-LogService.cppm"
-	"Source/Main-LogServicerModule.cppm"
-	"Source/Main-LogTypeSymbol.cppm"
+	"Source/Main-ConsoleLogger.cppm"
+	"Source/Main-ConsoleLoggerModule.cppm"
 )
 
 message(VERBOSE "Configuring defines")
-pony_validate_module_order(PONY_ENGINE_LOG_ORDER)
-target_compile_definitions(PonyEngine.Log.Impl PUBLIC 
-	PONY_ENGINE_LOG_ORDER=${PONY_ENGINE_LOG_ORDER}
+pony_validate_module_order(PONY_ENGINE_LOG_CONSOLE_ORDER)
+target_compile_definitions(PonyEngine.Log.Console.Impl PUBLIC 
+	PONY_ENGINE_LOG_CONSOLE_ORDER=${PONY_ENGINE_LOG_CONSOLE_ORDER}
 )
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Log.Impl PROPERTIES 
+set_target_properties(PonyEngine.Log.Console.Impl PROPERTIES 
 	CXX_STANDARD 23
 	CXX_STANDARD_REQUIRED ON
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.Impl PUBLIC
+target_link_libraries(PonyEngine.Log.Console.Impl PUBLIC
 	PonyEngine.Application
 )
-target_link_libraries(PonyEngine.Log.Impl PRIVATE
+target_link_libraries(PonyEngine.Log.Console.Impl PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
 	PonyEngine.Log.Ext

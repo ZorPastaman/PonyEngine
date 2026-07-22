@@ -7,8 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Impl;
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/Log/PlatformConsoleLoggerModule.h"
 
-export import PonyEngine.Log.Ext;
-
-export import :LogServiceModule;
+PONY_LOG_MODULE(PonyEngine::Log::PlatformConsole::CreatePlatformConsoleLoggerModule, PonyEnginePlatformConsoleLogger, PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER)

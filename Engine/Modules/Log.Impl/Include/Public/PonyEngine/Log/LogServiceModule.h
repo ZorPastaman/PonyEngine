@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::Log
 {
-	/// @brief Gets the log service module.
+	/// @brief Creates a log service module.
 	/// @return Log service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetLogServiceModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateLogServiceModule();
 }

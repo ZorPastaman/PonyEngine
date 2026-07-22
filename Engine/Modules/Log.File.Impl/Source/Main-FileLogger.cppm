@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.File.Impl:FileSubLogger;
+export module PonyEngine.Log.File.Impl:FileLogger;
 
 import std;
 
@@ -15,45 +15,41 @@ import PonyEngine.Log.Ext;
 
 export namespace PonyEngine::Log::File
 {
-	/// @brief Sub-logger that writes logs to a file.
-	class FileSubLogger final : public ILogger
+	/// @brief Logger that logs to a file.
+	class FileLogger final : public ILogger
 	{
 	public:
-		/// @brief Creates a file sub-logger.
-		/// @param logger Logger context.
+		/// @brief Creates a file logger.
 		/// @param path Log file path.
 		[[nodiscard("Pure constructor")]]
-		FileSubLogger(const ILoggerContext& logger, const std::filesystem::path& path);
-		FileSubLogger(const FileSubLogger&) = delete;
-		FileSubLogger(FileSubLogger&&) = delete;
+		explicit FileLogger(const std::filesystem::path& path);
+		FileLogger(const FileLogger&) = delete;
+		FileLogger(FileLogger&&) = delete;
 
-		~FileSubLogger() noexcept = default;
+		~FileLogger() noexcept = default;
 
 		virtual void Log(std::string_view formattedMessage, const LogEntry& logEntry) noexcept override;
 
-		FileSubLogger& operator =(const FileSubLogger&) = delete;
-		FileSubLogger& operator =(FileSubLogger&&) = delete;
+		FileLogger& operator =(const FileLogger&) = delete;
+		FileLogger& operator =(FileLogger&&) = delete;
 
 	private:
-		const ILoggerContext* logger; ///< Logger context.
-
 		std::ofstream logFile; ///< Log file.
 	};
 }
 
 namespace PonyEngine::Log::File
 {
-	FileSubLogger::FileSubLogger(const ILoggerContext& logger, const std::filesystem::path& path) :
-		logger{&logger},
+	FileLogger::FileLogger(const std::filesystem::path& path) :
 		logFile(path)
 	{
-		if (!logFile.is_open()) [[unlikely]]
+		if (!logFile) [[unlikely]]
 		{
 			throw std::runtime_error("Failed to open log file");
 		}
 	}
 
-	void FileSubLogger::Log(const std::string_view formattedMessage, const LogEntry& logEntry) noexcept
+	void FileLogger::Log(const std::string_view formattedMessage, const LogEntry& logEntry) noexcept
 	{
 		try
 		{
@@ -61,6 +57,7 @@ namespace PonyEngine::Log::File
 		}
 		catch (...)
 		{
+			// Strange but nothing to do.
 		}
 	}
 }
