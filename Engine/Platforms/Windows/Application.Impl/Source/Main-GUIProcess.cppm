@@ -19,6 +19,8 @@ module;
 
 export module PonyEngine.Application.Impl.Windows:GUIProcess;
 
+#ifdef PONY_ENGINE_APPLICATION_MODE_GUI
+
 import PonyEngine.Application.Impl;
 import PonyEngine.Application.Windows;
 import PonyEngine.Log;
@@ -528,3 +530,5 @@ namespace PonyEngine::Application::Windows
 		lastMessageNativeTime = newMessageTime;
 	}
 }
+
+#endif

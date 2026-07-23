@@ -31,6 +31,8 @@ GUI process implementation.
 
 C\++ main() function.
 
+It returns 0 on success and -1 on any uncaught exception.
+
 ### Data:
 
 #### [Manifest](Data/Application.manifest.in)
