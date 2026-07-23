@@ -1,5 +1,6 @@
 message(STATUS "Configuring PonyEngine.Application.Impl for Windows")
 
+message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_APPLICATION_MODE "GUI" CACHE STRING "Application mode. Must be Console or GUI.")
 option(PONY_ENGINE_CREATE_CONSOLE "Enable console. Can be used only in GUI builds." OFF)
 
@@ -10,10 +11,8 @@ if(PONY_ENGINE_APPLICATION_MODE STREQUAL "Console" AND PONY_ENGINE_CREATE_CONSOL
 	message(FATAL_ERROR "PONY_ENGINE_CREATE_CONSOLE can't be TRUE if PONY_ENGINE_APPLICATION_MODE = Console")
 endif()
 
-message(VERBOSE "Configuring headers")
-target_include_directories(PonyEngine.Application.Impl PRIVATE
-	"Include/Private"
-)
+message(VERBOSE "Configuring environment")
+include("CMake/Resource.cmake")
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE
@@ -28,7 +27,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 )
 
 message(VERBOSE "Configuring data")
-set(MANIFEST_PATH "${CMAKE_CURRENT_BINARY_DIR}/Generated//Data/Application.manifest")
+set(MANIFEST_PATH "${CMAKE_CURRENT_BINARY_DIR}/Generated/Data/Application.manifest")
 configure_file("Data/Application.manifest.in" "${MANIFEST_PATH}")
 target_sources(PonyEngine.Application.Impl PRIVATE "${MANIFEST_PATH}")
 

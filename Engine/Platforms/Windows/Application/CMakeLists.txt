@@ -5,5 +5,4 @@ target_sources(PonyEngine.Application PUBLIC FILE_SET CXX_MODULES BASE_DIRS "${C
 	"Source/Main.cppm"
 	"Source/Main-IMainData.cppm"
 	"Source/Main-IMessagePump.cppm"
-	"Source/Main-IResourceProvider.cppm"
 )

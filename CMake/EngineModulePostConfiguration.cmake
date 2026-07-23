@@ -106,6 +106,10 @@ pony_apply_flags(PonyEngine.World TRUE)
 pony_apply_flags(PonyEngine.World.Impl TRUE)
 pony_add_to_module_list(PonyEngine.World.Impl PONY_LOGIC_MODULES)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	include("CMake/EngineModulePostConfigurationWindows.cmake")
+endif()
+
 if(PONY_ENGINE_ADD_SAMPLE)
 	message(VERBOSE "Adding sample")
 	add_subdirectory("Samples/${PONY_ENGINE_SAMPLE_NAME}/Sample")

@@ -32,7 +32,7 @@ import :Process;
 export namespace PonyEngine::Application::Windows
 {
 	/// @brief GUI process.
-	class GUIProcess final : private IMainData, private IResourceProvider, private IMessagePump
+	class GUIProcess final : private IMainData, private IMessagePump
 	{
 	public:
 		/// @brief Creates a GUI process.
@@ -64,9 +64,6 @@ export namespace PonyEngine::Application::Windows
 		virtual PSTR CommandLine() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual int ShowCommand() const noexcept override;
-
-		[[nodiscard("Pure function")]] 
-		virtual HICON MainIcon() const override;
 
 		[[nodiscard("Pure function")]] 
 		virtual UINT LastMessageType() const override;
@@ -189,18 +186,6 @@ namespace PonyEngine::Application::Windows
 		return showCmd;
 	}
 
-	HICON GUIProcess::MainIcon() const
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
-		return nullptr; // TODO: Implement
-	}
-
 	UINT GUIProcess::LastMessageType() const
 	{
 #ifndef NDEBUG
@@ -276,44 +261,37 @@ namespace PonyEngine::Application::Windows
 
 	void GUIProcess::Initialize()
 	{
-		bool early = false;
-		bool normal = false;
-		bool late = false;
-		bool console = false;
+		application->InitializeEarly();
+		CreateConsole();
+		application->LogBasicInfo();
+		LogProcessBasicInfo();
+		SetPriority();
 		try
 		{
-			application->InitializeEarly();
-			early = true;
-			CreateConsole();
-			console = true;
-			application->LogBasicInfo();
-			LogProcessBasicInfo();
-			SetPriority();
 			AddProcessInterfaces();
-			application->InitializeNormal();
-			normal = true;
-			application->InitializeLate();
-			late = true;
+			try
+			{
+				application->InitializeNormal();
+				try
+				{
+					application->InitializeLate();
+				}
+				catch (...)
+				{
+					application->FinalizeNormal();
+					throw;
+				}
+			}
+			catch (...)
+			{
+				RemoveProcessInterfaces();
+				throw;
+			}
 		}
 		catch (...)
 		{
-			if (late)
-			{
-				application->FinalizeLate();
-			}
-			if (normal)
-			{
-				application->FinalizeNormal();
-			}
-			if (console)
-			{
-				DestroyConsole();
-			}
-			if (early)
-			{
-				application->FinalizeEarly();
-			}
-
+			DestroyConsole();
+			application->FinalizeEarly();
 			throw;
 		}
 	}
@@ -427,33 +405,14 @@ namespace PonyEngine::Application::Windows
 
 	void GUIProcess::AddProcessInterfaces()
 	{
-		bool mainDataAdded = false;
-		bool resourceProviderAdded = false;
-		bool messagePumpAdded = false;
+		application->AddInterface<IMainData>(*this);
 		try
 		{
-			application->AddInterface<IMainData>(*this);
-			mainDataAdded = true;
-			application->AddInterface<IResourceProvider>(*this);
-			resourceProviderAdded = true;
 			application->AddInterface<IMessagePump>(*this);
-			messagePumpAdded = true;
 		}
 		catch (...)
 		{
-			if (messagePumpAdded)
-			{
-				application->RemoveInterface<IMessagePump>(*this);
-			}
-			if (resourceProviderAdded)
-			{
-				application->RemoveInterface<IResourceProvider>(*this);
-			}
-			if (mainDataAdded)
-			{
-				application->RemoveInterface<IResourceProvider>(*this);
-			}
-
+			application->RemoveInterface<IMainData>(*this);
 			throw;
 		}
 	}
@@ -461,7 +420,6 @@ namespace PonyEngine::Application::Windows
 	void GUIProcess::RemoveProcessInterfaces()
 	{
 		application->RemoveInterface<IMessagePump>(*this);
-		application->RemoveInterface<IResourceProvider>(*this);
 		application->RemoveInterface<IMainData>(*this);
 	}
 

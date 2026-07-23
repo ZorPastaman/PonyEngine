@@ -13,4 +13,3 @@ export import PonyEngine.Application;
 
 export import :IMainData;
 export import :IMessagePump;
-export import :IResourceProvider;

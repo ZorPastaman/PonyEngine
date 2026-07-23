@@ -2,7 +2,8 @@
 
 Platform independent module: [PonyEngine.Application](../../../Modules/Application).
 
-The application has a message pump on all hwnd. It's called right in the beginning of a frame.
+In GUI modie, the application has a message pump on all hwnd. It's called right in the beginning of a frame.
+On WM_QUIT the application sets an exit code and exits after the end of frame.
 
 ## C\++ modules
 
@@ -12,13 +13,13 @@ Main interfaces:
 
 #### [IMainData](Source/Main-IMainData.cppm)
 
-Provides the data that was passed into `WinMain()`.
+Provides the data that was passed into `WinMain()`. 
+
+Exits only in GUI mode.
 
 #### [IMessagePump](Source/Main-IMessagePump.cppm)
 
-Provides the message data that was gotten in message pump function.
+Provides the message data that was gotten in the message pump function.
 The data is updated before dispathing. So, you can use it in your message handlers.
 
-#### [IResourceProvider](Source/Main-IResourceProvider.cppm)
-
-Provides data from .rc files.
+Exits only in GUI mode.

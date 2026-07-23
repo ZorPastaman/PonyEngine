@@ -2,6 +2,8 @@
 
 Platform independent module: [PonyEngine.Application.Impl](../../../Modules/Application.Impl).
 
+The main() function returns an application exit code or -1 on any uncaught exception.
+
 ## CMake variables
 
 These variables are used to configure the build of the module:
@@ -10,6 +12,14 @@ These variables are used to configure the build of the module:
 |:-------------------------------|:-------------:|:------------------------------------------------|
 | `PONY_ENGINE_APPLICATION_MODE` | "GUI"         | Application mode. Must be Console or GUI.       |
 | `PONY_ENGINE_CREATE_CONSOLE`   | OFF           | Enable console. Can be used only in GUI builds. |
+
+## CMake functions
+
+| Function name              | Script file                  | Description                              |
+|:---------------------------|:-----------------------------|:-----------------------------------------|
+| `pony_add_winapi_resource` | [File](CMake/Resource.cmake) | Adds a resource to a generated .rc file. |
+| `pony_add_winapi_icon`     | [File](CMake/Resource.cmake) | Adds an icon to a generated .rc file.    |
+| `pony_add_winapi_cursor`   | [File](CMake/Resource.cmake) | Adds a cursor to a generated .rc file.   |
 
 ## For Pony Engine developers
 
@@ -30,8 +40,6 @@ GUI process implementation.
 ## [Launch](Source/Launch.cpp)
 
 C\++ main() function.
-
-It returns 0 on success and -1 on any uncaught exception.
 
 ### Data:
 

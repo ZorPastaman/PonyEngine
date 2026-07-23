@@ -110,36 +110,26 @@ namespace PonyEngine::Application::Windows
 
 	void ConsoleProcess::Initialize()
 	{
-		bool early = false;
-		bool normal = false;
-		bool late = false;
+		application->InitializeEarly();
+		application->LogBasicInfo();
+		LogProcessBasicInfo();
+		SetPriority();
 		try
 		{
-			application->InitializeEarly();
-			early = true;
-			application->LogBasicInfo();
-			LogProcessBasicInfo();
-			SetPriority();
 			application->InitializeNormal();
-			normal = true;
-			application->InitializeLate();
-			late = true;
+			try
+			{
+				application->InitializeLate();
+			}
+			catch (...)
+			{
+				application->FinalizeNormal();
+				throw;
+			}
 		}
 		catch (...)
 		{
-			if (late)
-			{
-				application->FinalizeLate();
-			}
-			if (normal)
-			{
-				application->FinalizeNormal();
-			}
-			if (early)
-			{
-				application->FinalizeEarly();
-			}
-
+			application->FinalizeEarly();
 			throw;
 		}
 	}

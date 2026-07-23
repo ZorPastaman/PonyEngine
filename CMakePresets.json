@@ -78,7 +78,6 @@
 				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
 				"PONY_ENGINE_RESOURCE_FILE_MANIFEST_DIR": "Manifests/Resource/File",
 				"PONY_ENGINE_RESOURCE_PACK_MANIFEST_DIR": "Manifests/Resource/Pack",
-				"PONY_ENGINE_APPLICATION_ICON_MODE": "Default",
 				"PONY_ENGINE_ADD_SAMPLE": false,
 				"PONY_ENGINE_SAMPLE_NAME": "RenderDeviceSample",
 				"PONY_ENGINE_TESTING": false,

@@ -51,3 +51,5 @@ endif()
 if(TARGET PonyEngine.RenderDevice.D3D12.Impl)
 	add_subdirectory("RenderDevice.D3D12.Impl")
 endif()
+
+set(PONY_ENGINE_APPLICATION_DEFAULT_ICON "${PONY_ENGINE_APPLICATION_ICON_COLLECTION_PATH}/Windows/Logo.ico" CACHE PATH "Default application icon for Windows." FORCE)
