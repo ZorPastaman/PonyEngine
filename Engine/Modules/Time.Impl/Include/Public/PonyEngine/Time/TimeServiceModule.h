@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::Time
 {
-	/// @brief Gets the time service module.
+	/// @brief Creates the time service module.
 	/// @return Time service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetTimeServiceModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateTimeServiceModule();
 }

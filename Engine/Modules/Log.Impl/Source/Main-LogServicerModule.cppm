@@ -12,7 +12,7 @@ export module PonyEngine.Log.Impl:LogServiceModule;
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
+import PonyEngine.Log.Ext;
 
 import :LogService;
 
@@ -46,22 +46,22 @@ namespace PonyEngine::Log
 	{
 		logService = std::make_unique<LogService>();
 
-		bool logServiceAdded = false;
 		try
 		{
 			context.AddInterface<ILogService>(*logService);
-			logServiceAdded = true;
-			context.AddInterface<ILogHub>(*logService);
+			try
+			{
+				context.AddInterface<ILogHub>(*logService);
+			}
+			catch (...)
+			{
+				context.RemoveInterface<ILogService>(*logService);
+				throw;
+			}
 		}
 		catch (...)
 		{
-			if (logServiceAdded)
-			{
-				context.RemoveInterface<ILogService>(*logService);
-			}
-
 			logService.reset();
-
 			throw;
 		}
 	}

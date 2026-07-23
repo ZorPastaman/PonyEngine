@@ -148,8 +148,20 @@ namespace PonyEngine::Application::Windows
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Wrong thread.");
 
+		int exitCode;
+
 		Initialize();
-		const int exitCode = RunMainLoop();
+
+		try
+		{
+			exitCode = RunMainLoop();
+		}
+		catch (...)
+		{
+			Finalize();
+			throw;
+		}
+
 		Finalize();
 
 		return exitCode;
@@ -455,13 +467,25 @@ namespace PonyEngine::Application::Windows
 	{
 		std::optional<int> exitCode;
 
-		for (exitCode = application->ExitCode(); !exitCode; exitCode = application->ExitCode())
+		application->Begin();
+
+		try
 		{
-			application->BeginFrame();
-			TickMessagePump();
-			application->Tick();
-			application->EndFrame();
+			for (exitCode = application->ExitCode(); !exitCode; exitCode = application->ExitCode())
+			{
+				application->BeginFrame();
+				TickMessagePump();
+				application->Tick();
+				application->EndFrame();
+			}
 		}
+		catch (...)
+		{
+			application->End();
+			throw;
+		}
+		
+		application->End();
 
 		return *exitCode;
 	}

@@ -7,14 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.Time.Impl:TimeServiceModule;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
+import PonyEngine.Time;
 
 import :TimeService;
 
@@ -38,7 +34,7 @@ export namespace PonyEngine::Time
 		TimeServiceModule& operator =(TimeServiceModule&&) = delete;
 
 	private:
-		Application::ServiceHandle timeServiceHandle; ///< Time service handle.
+		std::unique_ptr<TimeService> timeService; ///< Time service.
 	};
 }
 
@@ -46,18 +42,32 @@ namespace PonyEngine::Time
 {
 	void TimeServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(TimeService).name());
-		timeServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
+		timeService = std::make_unique<TimeService>(context.Application());
+
+		try
 		{
-			return std::make_shared<TimeService>(application);
-		});
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(TimeService).name());
+			context.AddInterface<ITimeService>(*timeService);
+			try
+			{
+				context.AddTickable(timeService->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_TIME_TICK_ORDER});
+			}
+			catch (...)
+			{
+				context.RemoveInterface<ITimeService>(*timeService);
+				throw;
+			}
+		}
+		catch (...)
+		{
+			timeService.reset();
+			throw;
+		}
 	}
 
 	void TimeServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(TimeService).name());
-		context.ServiceModuleContext().RemoveService(timeServiceHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(TimeService).name());
+		context.RemoveTickable(timeService->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_TIME_TICK_ORDER});
+		context.RemoveInterface<ITimeService>(*timeService);
+		timeService.reset();
 	}
 }

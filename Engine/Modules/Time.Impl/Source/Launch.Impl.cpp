@@ -14,9 +14,8 @@ import PonyEngine.Time.Impl;
 
 namespace PonyEngine::Time
 {
-	Application::IModule* GetTimeServiceModule()
+	std::shared_ptr<Application::IModule> CreateTimeServiceModule()
 	{
-		static TimeServiceModule timeModule;
-		return &timeModule;
+		return std::make_shared<TimeServiceModule>();
 	}
 }

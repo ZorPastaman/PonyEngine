@@ -1,5 +1,9 @@
 message(STATUS "Configuring PonyEngine.Time")
 
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Time STATIC)
 
