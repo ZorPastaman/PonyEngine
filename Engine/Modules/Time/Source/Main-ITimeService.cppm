@@ -40,21 +40,21 @@ export namespace PonyEngine::Time
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds UnscaledVirtualTime() const = 0;
 
-		/// @brief Gets a real fixed step count elapsed since the start.
-		/// @return Real fixed step count.
+		/// @brief Gets a real step count elapsed since the start.
+		/// @return Real step count.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealFixedStepCount() const = 0;
-		/// @brief Gets a virtual fixed step count elapsed since the start.
-		/// @return Virtual fixed step count.
+		virtual std::uint64_t RealStepCount() const = 0;
+		/// @brief Gets a virtual step count elapsed since the start.
+		/// @return Virtual step count.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualFixedStepCount() const = 0;
-		/// @brief Gets an unscaled virtual fixed step count elapsed since the start.
-		/// @return Unscaled virtual fixed step count.
+		virtual std::uint64_t VirtualStepCount() const = 0;
+		/// @brief Gets an unscaled virtual step count elapsed since the start.
+		/// @return Unscaled virtual step count.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualFixedStepCount() const = 0;
+		virtual std::uint64_t UnscaledVirtualStepCount() const = 0;
 
 		/// @brief Gets a real time elapsed since a previous tick.
 		/// @return Real delta time.
@@ -72,21 +72,21 @@ export namespace PonyEngine::Time
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds UnscaledVirtualDeltaTime() const = 0;
 
-		/// @brief Gets a real fixed step count elapsed since a previous tick.
-		/// @return Real delta fixed step count.
+		/// @brief Gets a real step count elapsed since a previous tick.
+		/// @return Real delta step count.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealDeltaFixedStepCount() const = 0;
-		/// @brief Gets a virtual fixed step count elapsed since a previous tick.
-		/// @return Virtual delta fixed step count.
+		virtual std::uint64_t RealDeltaStepCount() const = 0;
+		/// @brief Gets a virtual step count elapsed since a previous tick.
+		/// @return Virtual delta step count.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualDeltaFixedStepCount() const = 0;
-		/// @brief Gets an unscaled virtual fixed step count elapsed since a previous tick.
-		/// @return Unscaled virtual delta fixed step count.
+		virtual std::uint64_t VirtualDeltaStepCount() const = 0;
+		/// @brief Gets an unscaled virtual step count elapsed since a previous tick.
+		/// @return Unscaled virtual delta step count.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualDeltaFixedStepCount() const = 0;
+		virtual std::uint64_t UnscaledVirtualDeltaStepCount() const = 0;
 
 		/// @brief Gets the delta time cap.
 		/// @details It affects a virtual time only. Its delta can't exceed this value.
@@ -112,17 +112,17 @@ export namespace PonyEngine::Time
 		/// @note The function must be called on a main thread.
 		virtual void TimeScale(double scale) = 0;
 
-		/// @brief Gets the fixed step period.
-		/// @details Every such period elapsed increments a delta fixed step count.
-		/// @return Fixed step period.
+		/// @brief Gets the step period.
+		/// @details Every such period elapsed increments a delta step count.
+		/// @return Step period.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds FixedStepPeriod() const = 0;
-		/// @brief Sets the fixed step period.
-		/// @details Every such period elapsed increments a delta fixed step count.
-		/// @param period Fixed step period to set.
+		virtual std::chrono::nanoseconds StepPeriod() const = 0;
+		/// @brief Sets the step period.
+		/// @details Every such period elapsed increments a delta step count.
+		/// @param period Step period to set.
 		/// @note The function must be called on a main thread.
-		virtual void FixedStepPeriod(std::chrono::nanoseconds period) = 0;
+		virtual void StepPeriod(std::chrono::nanoseconds period) = 0;
 
 		/// @brief Gets a real time elapsed since the start.
 		/// @tparam T Value type.
@@ -191,20 +191,20 @@ export namespace PonyEngine::Time
 		template<std::floating_point T>
 		void TimeScale(T scale);
 
-		/// @brief Gets the fixed step period.
-		/// @details Every such period elapsed increments a delta fixed step count.
+		/// @brief Gets the step period.
+		/// @details Every such period elapsed increments a delta step count.
 		/// @tparam T Value type.
-		/// @return Fixed step period in seconds.
+		/// @return Step period in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		T FixedStepPeriodSeconds() const;
-		/// @brief Sets the fixed step period.
-		/// @details Every such period elapsed increments a delta fixed step count.
+		T StepPeriodSeconds() const;
+		/// @brief Sets the step period.
+		/// @details Every such period elapsed increments a delta step count.
 		/// @tparam T Value type.
-		/// @param period Fixed step period in seconds to set.
+		/// @param period Step period in seconds to set.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T>
-		void FixedStepPeriodSeconds(T period);
+		void StepPeriodSeconds(T period);
 	};
 }
 
@@ -271,14 +271,14 @@ namespace PonyEngine::Time
 	}
 
 	template<std::floating_point T>
-	T ITimeService::FixedStepPeriodSeconds() const
+	T ITimeService::StepPeriodSeconds() const
 	{
-		return Chrono::ToSeconds<T>(FixedStepPeriod());
+		return Chrono::ToSeconds<T>(StepPeriod());
 	}
 
 	template<std::floating_point T>
-	void ITimeService::FixedStepPeriodSeconds(const T period)
+	void ITimeService::StepPeriodSeconds(const T period)
 	{
-		FixedStepPeriod(Chrono::ToDuration<std::chrono::nanoseconds>(period));
+		StepPeriod(Chrono::ToDuration<std::chrono::nanoseconds>(period));
 	}
 }

@@ -18,7 +18,7 @@ set(PONY_ENGINE_TIME_ORDER "p" CACHE STRING "PonyEngine.Time.Impl module initial
 set(PONY_ENGINE_TIME_TICK_ORDER "0" CACHE STRING "PonyEngine.Time.Impl service tick order. It must be an int32 number.")
 set(PONY_ENGINE_TIME_DELTA_TIME_CAP "1.0" CACHE STRING "PonyEngine.Time.Impl service initial delta time cap in seconds. It must be a double number.")
 set(PONY_ENGINE_TIME_SCALE "1.0" CACHE STRING "PonyEngine.Time.Impl service initial scale. It must be a double number.")
-set(PONY_ENGINE_TIME_FIXED_STEP_PERIOD "1.0 / 60.0" CACHE STRING "PonyEngine.Time.Impl service initial fixed step period in seconds. It must be a double number.")
+set(PONY_ENGINE_TIME_STEP_PERIOD "1.0 / 60.0" CACHE STRING "PonyEngine.Time.Impl service initial step period in seconds. It must be a double number.")
 
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.Time.Impl STATIC)
@@ -49,7 +49,7 @@ target_compile_definitions(PonyEngine.Time.Impl PUBLIC
 	PONY_ENGINE_TIME_TICK_ORDER=${PONY_ENGINE_TIME_TICK_ORDER}
 	PONY_ENGINE_TIME_DELTA_TIME_CAP=${PONY_ENGINE_TIME_DELTA_TIME_CAP}
 	PONY_ENGINE_TIME_SCALE=${PONY_ENGINE_TIME_SCALE}
-	PONY_ENGINE_TIME_FIXED_STEP_PERIOD=${PONY_ENGINE_TIME_FIXED_STEP_PERIOD}
+	PONY_ENGINE_TIME_STEP_PERIOD=${PONY_ENGINE_TIME_STEP_PERIOD}
 )
 
 message(VERBOSE "Setting properties")

@@ -35,16 +35,6 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Type/Limits.cpp"
 )
 
-if(PONY_WINDOWS)
-	message(VERBOSE "Configuring sources")
-	target_sources(PonyEngine.Core.Tests PRIVATE
-		"Platform/Windows.Cursor.cpp"
-		"Platform/Windows.File.cpp"
-		"Platform/Windows.GUID.cpp"
-		"Platform/Windows.Text.cpp"
-	)
-endif()
-
 message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 target_compile_definitions(PonyEngine.Core.Tests PRIVATE 

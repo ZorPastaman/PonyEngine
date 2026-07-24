@@ -165,7 +165,7 @@ export namespace PonyEngine::Application
 		/// @return Time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		std::chrono::nanoseconds PrevFrameTimeSeconds() const;
+		T PrevFrameTimeSeconds() const;
 		/// @brief Gets a time elapsed between the application start and this frame start.
 		/// @return Time.
 		/// @note The function must be called on a main thread.
@@ -176,7 +176,7 @@ export namespace PonyEngine::Application
 		/// @return Time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		std::chrono::nanoseconds ThisFrameTimeSeconds() const;
+		T ThisFrameTimeSeconds() const;
 		/// @brief Gets a time elapsed since the application start.
 		/// @return Time.
 		/// @note The function is thread-safe.
@@ -187,7 +187,7 @@ export namespace PonyEngine::Application
 		/// @return Time in seconds.
 		/// @note The function is thread-safe.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		std::chrono::nanoseconds NowTimeSeconds() const noexcept;
+		T NowTimeSeconds() const noexcept;
 		/// @brief Gets a time elapsed between the previous frame and this frame start.
 		/// @return Time.
 		/// @note The function must be called on a main thread.
@@ -198,7 +198,7 @@ export namespace PonyEngine::Application
 		/// @return Time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		std::chrono::nanoseconds DeltaTimeSeconds() const;
+		T DeltaTimeSeconds() const;
 		/// @brief Gets the target frame time.
 		/// @return Target frame time. 0 or less means no target frame time (it's not restricted).
 		/// @note The function must be called on a main thread.
@@ -209,7 +209,7 @@ export namespace PonyEngine::Application
 		/// @return Target frame time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		std::chrono::nanoseconds TargetFrameTimeSeconds() const;
+		T TargetFrameTimeSeconds() const;
 		/// @brief Sets the target frame time.
 		/// @param frameTime Target frame time. 0 or less means no target frame time (it's not restricted).
 		/// @note The function must be called on a main thread.
@@ -257,31 +257,31 @@ export namespace PonyEngine::Application
 namespace PonyEngine::Application
 {
 	template<std::floating_point T>
-	std::chrono::nanoseconds IApplication::PrevFrameTimeSeconds() const
+	T IApplication::PrevFrameTimeSeconds() const
 	{
 		return Chrono::ToSeconds<T>(PrevFrameTime());
 	}
 
 	template<std::floating_point T>
-	std::chrono::nanoseconds IApplication::ThisFrameTimeSeconds() const
+	T IApplication::ThisFrameTimeSeconds() const
 	{
 		return Chrono::ToSeconds<T>(ThisFrameTime());
 	}
 
 	template<std::floating_point T>
-	std::chrono::nanoseconds IApplication::NowTimeSeconds() const noexcept
+	T IApplication::NowTimeSeconds() const noexcept
 	{
 		return Chrono::ToSeconds<T>(NowTime());
 	}
 
 	template<std::floating_point T>
-	std::chrono::nanoseconds IApplication::DeltaTimeSeconds() const
+	T IApplication::DeltaTimeSeconds() const
 	{
 		return Chrono::ToSeconds<T>(DeltaTime());
 	}
 
 	template<std::floating_point T>
-	std::chrono::nanoseconds IApplication::TargetFrameTimeSeconds() const
+	T IApplication::TargetFrameTimeSeconds() const
 	{
 		return Chrono::ToSeconds<T>(TargetFrameTime());
 	}

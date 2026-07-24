@@ -42,11 +42,11 @@ export namespace PonyEngine::Time
 		virtual std::chrono::nanoseconds UnscaledVirtualTime() const override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealFixedStepCount() const override;
+		virtual std::uint64_t RealStepCount() const override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualFixedStepCount() const override;
+		virtual std::uint64_t VirtualStepCount() const override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualFixedStepCount() const override;
+		virtual std::uint64_t UnscaledVirtualStepCount() const override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds RealDeltaTime() const override;
@@ -56,11 +56,11 @@ export namespace PonyEngine::Time
 		virtual std::chrono::nanoseconds UnscaledVirtualDeltaTime() const override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealDeltaFixedStepCount() const override;
+		virtual std::uint64_t RealDeltaStepCount() const override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualDeltaFixedStepCount() const override;
+		virtual std::uint64_t VirtualDeltaStepCount() const override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualDeltaFixedStepCount() const override;
+		virtual std::uint64_t UnscaledVirtualDeltaStepCount() const override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds DeltaTimeCap() const override;
@@ -71,8 +71,8 @@ export namespace PonyEngine::Time
 		virtual void TimeScale(double scale) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds FixedStepPeriod() const override;
-		virtual void FixedStepPeriod(std::chrono::nanoseconds period) override;
+		virtual std::chrono::nanoseconds StepPeriod() const override;
+		virtual void StepPeriod(std::chrono::nanoseconds period) override;
 
 		/// @brief Gets the tickable.
 		/// @return Tickable.
@@ -90,23 +90,23 @@ export namespace PonyEngine::Time
 
 		std::chrono::nanoseconds deltaTimeCap; ///< Delta time cap.
 		double timeScale; ///< Time scale.
-		std::chrono::nanoseconds fixedStepPeriod; ///< Fixed step period.
+		std::chrono::nanoseconds stepPeriod; ///<  step period.
 
 		std::chrono::nanoseconds realTime; ///< Real time elapsed since the start.
 		std::chrono::nanoseconds unscaledVirtualTime; ///< Unscaled virtual time elapsed since the start.
 		std::chrono::nanoseconds virtualTime; ///< Virtual time elapsed since the start.
 
-		std::uint64_t realFixedStepCount; ///< Real fixed step count since the start.
-		std::uint64_t unscaledVirtualFixedStepCount; ///< Unscaled virtual fixed step count since the start.
-		std::uint64_t virtualFixedStepCount; ///< Virtual fixed step count since the start.
+		std::uint64_t realStepCount; ///< Real  step count since the start.
+		std::uint64_t unscaledVirtualStepCount; ///< Unscaled virtual  step count since the start.
+		std::uint64_t virtualStepCount; ///< Virtual  step count since the start.
 
 		std::chrono::nanoseconds realDeltaTime; ///< Real delta time.
 		std::chrono::nanoseconds unscaledVirtualDeltaTime; ///< Unscaled virtual delta time.
 		std::chrono::nanoseconds virtualDeltaTime; ///< Virtual delta time.
 
-		std::uint64_t realDeltaFixedStepCount; ///< Real delta fixed step count.
-		std::uint64_t unscaledVirtualDeltaFixedStepCount; ///< Unscaled virtual delta fixed step count.
-		std::uint64_t virtualDeltaFixedStepCount; ///< Virtual delta fixed step count.
+		std::uint64_t realDeltaStepCount; ///< Real delta  step count.
+		std::uint64_t unscaledVirtualDeltaStepCount; ///< Unscaled virtual delta  step count.
+		std::uint64_t virtualDeltaStepCount; ///< Virtual delta  step count.
 
 		std::chrono::nanoseconds realTimeAccumulator; ///< Real time accumulator.
 		std::chrono::nanoseconds unscaledVirtualTimeAccumulator; ///< Unscaled virtual time accumulator.
@@ -121,19 +121,19 @@ namespace PonyEngine::Time
 		logService{this->application->FindInterface<Log::ILogService>()},
 		deltaTimeCap(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_DELTA_TIME_CAP}), std::chrono::nanoseconds(1))),
 		timeScale{std::max(PONY_ENGINE_TIME_SCALE, 0.)},
-		fixedStepPeriod(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_FIXED_STEP_PERIOD}), std::chrono::nanoseconds(1))),
+		stepPeriod(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_TIME_STEP_PERIOD}), std::chrono::nanoseconds(1))),
 		realTime(0),
 		unscaledVirtualTime(0),
 		virtualTime(0),
-		realFixedStepCount{0ull},
-		unscaledVirtualFixedStepCount{0ull},
-		virtualFixedStepCount{0ull},
+		realStepCount{0ull},
+		unscaledVirtualStepCount{0ull},
+		virtualStepCount{0ull},
 		realDeltaTime(0),
 		unscaledVirtualDeltaTime(0),
 		virtualDeltaTime(0),
-		realDeltaFixedStepCount{0ull},
-		unscaledVirtualDeltaFixedStepCount{0ull},
-		virtualDeltaFixedStepCount{0ull},
+		realDeltaStepCount{0ull},
+		unscaledVirtualDeltaStepCount{0ull},
+		virtualDeltaStepCount{0ull},
 		realTimeAccumulator(0),
 		unscaledVirtualTimeAccumulator(0),
 		virtualTimeAccumulator(0)
@@ -176,7 +176,7 @@ namespace PonyEngine::Time
 		return unscaledVirtualTime;
 	}
 
-	std::uint64_t TimeService::RealFixedStepCount() const
+	std::uint64_t TimeService::RealStepCount() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -185,10 +185,10 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		return realFixedStepCount;
+		return realStepCount;
 	}
 
-	std::uint64_t TimeService::VirtualFixedStepCount() const
+	std::uint64_t TimeService::VirtualStepCount() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -197,10 +197,10 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		return virtualFixedStepCount;
+		return virtualStepCount;
 	}
 
-	std::uint64_t TimeService::UnscaledVirtualFixedStepCount() const
+	std::uint64_t TimeService::UnscaledVirtualStepCount() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -209,7 +209,7 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		return unscaledVirtualFixedStepCount;
+		return unscaledVirtualStepCount;
 	}
 
 	std::chrono::nanoseconds TimeService::RealDeltaTime() const
@@ -248,7 +248,7 @@ namespace PonyEngine::Time
 		return unscaledVirtualDeltaTime;
 	}
 
-	std::uint64_t TimeService::RealDeltaFixedStepCount() const
+	std::uint64_t TimeService::RealDeltaStepCount() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -257,10 +257,10 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		return realDeltaFixedStepCount;
+		return realDeltaStepCount;
 	}
 
-	std::uint64_t TimeService::VirtualDeltaFixedStepCount() const
+	std::uint64_t TimeService::VirtualDeltaStepCount() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -269,10 +269,10 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		return virtualDeltaFixedStepCount;
+		return virtualDeltaStepCount;
 	}
 
-	std::uint64_t TimeService::UnscaledVirtualDeltaFixedStepCount() const
+	std::uint64_t TimeService::UnscaledVirtualDeltaStepCount() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -281,7 +281,7 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		return unscaledVirtualDeltaFixedStepCount;
+		return unscaledVirtualDeltaStepCount;
 	}
 
 	std::chrono::nanoseconds TimeService::DeltaTimeCap() const
@@ -334,7 +334,7 @@ namespace PonyEngine::Time
 		PONY_LOG(logService, Log::LogType::Debug, "Time scale changed to '{}'.", timeScale);
 	}
 
-	std::chrono::nanoseconds TimeService::FixedStepPeriod() const
+	std::chrono::nanoseconds TimeService::StepPeriod() const
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -343,10 +343,10 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		return fixedStepPeriod;
+		return stepPeriod;
 	}
 
-	void TimeService::FixedStepPeriod(const std::chrono::nanoseconds period)
+	void TimeService::StepPeriod(const std::chrono::nanoseconds period)
 	{
 #ifndef NDEBUG
 		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
@@ -355,8 +355,8 @@ namespace PonyEngine::Time
 		}
 #endif
 
-		fixedStepPeriod = std::max(period, std::chrono::nanoseconds(1));
-		PONY_LOG(logService, Log::LogType::Debug, "Frame period changed to '{}'.", fixedStepPeriod);
+		stepPeriod = std::max(period, std::chrono::nanoseconds(1));
+		PONY_LOG(logService, Log::LogType::Debug, "Frame period changed to '{}'.", stepPeriod);
 	}
 
 	Application::ITickable& TimeService::Tickable() noexcept
@@ -378,16 +378,16 @@ namespace PonyEngine::Time
 		unscaledVirtualTimeAccumulator += unscaledVirtualDeltaTime;
 		virtualTimeAccumulator += virtualDeltaTime;
 
-		realDeltaFixedStepCount = realTimeAccumulator / fixedStepPeriod;
-		unscaledVirtualDeltaFixedStepCount = unscaledVirtualTimeAccumulator / fixedStepPeriod;
-		virtualDeltaFixedStepCount = virtualTimeAccumulator / fixedStepPeriod;
+		realDeltaStepCount = realTimeAccumulator / stepPeriod;
+		unscaledVirtualDeltaStepCount = unscaledVirtualTimeAccumulator / stepPeriod;
+		virtualDeltaStepCount = virtualTimeAccumulator / stepPeriod;
 
-		realTimeAccumulator %= fixedStepPeriod;
-		unscaledVirtualTimeAccumulator %= fixedStepPeriod;
-		virtualTimeAccumulator %= fixedStepPeriod;
+		realTimeAccumulator %= stepPeriod;
+		unscaledVirtualTimeAccumulator %= stepPeriod;
+		virtualTimeAccumulator %= stepPeriod;
 
-		realFixedStepCount += realDeltaFixedStepCount;
-		unscaledVirtualFixedStepCount += unscaledVirtualDeltaFixedStepCount;
-		virtualFixedStepCount += virtualDeltaFixedStepCount;
+		realStepCount += realDeltaStepCount;
+		unscaledVirtualStepCount += unscaledVirtualDeltaStepCount;
+		virtualStepCount += virtualDeltaStepCount;
 	}
 }
