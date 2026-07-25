@@ -4,10 +4,10 @@ Job implementation module.
 
 ## Dependencies
 
-- [PonyEngine.Core](../Core)
-- [PonyEngine.Log](../Log)
 - [PonyEngine.Application](../Application)
+- [PonyEngine.Core](../Core)
 - [PonyEngine.Job](../Job)
+- [PonyEngine.Log](../Log)
 
 ## CMake variables
 
@@ -18,6 +18,7 @@ These variables are used to configure the build of the module:
 | `PONY_ENGINE_JOB_ORDER`                 | p             | PonyEngine.Job.Impl module initialization order.                                                  |
 | `PONY_ENGINE_JOB_RESERVED_THREAD_COUNT` | 3             | PonyEngine.Job.Impl service reserved thread count. Those are threads reserved for other purposes. |
 | `PONY_ENGINE_JOB_MIN_THREAD_COUNT`      | 2             | PonyEngine.Job.Impl service minimal thread count.                                                 |
+| `PONY_ENGINE_JOB_POOL_SIZE`             | 64            | PonyEngine.Job.Impl pool size of jobs per thread.                                                 |
 
 ## For Pony Engine developers
 

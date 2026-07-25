@@ -17,6 +17,8 @@ import std;
 
 import PonyEngine.Job;
 
+import :JobID;
+
 export namespace PonyEngine::Job
 {
 	/// @brief Job.
@@ -51,7 +53,7 @@ export namespace PonyEngine::Job
 		void Task(ITask* task) noexcept;
 		/// @brief Executes a current task.
 		/// @note The job must have a task, otherwise the call is not allowed.
-		void Execute() noexcept;
+		void Execute() const noexcept;
 
 		/// @brief Decrements the block count.
 		/// @return @a True if the job is fully unlocked (block count has reached 0); @a false otherwise.
@@ -70,11 +72,11 @@ export namespace PonyEngine::Job
 		/// @param version Waited version of this job.
 		/// @return @a True if the dependent was added; @a false otherwise - the job has a different version.
 		[[nodiscard("Must be used")]]
-		bool AddDependent(Job& dependent, std::size_t version) const;
+		bool AddDependent(const JobID& dependent, std::size_t version) noexcept;
 		/// @brief Process dependents.
 		/// @param func Process function.
 		/// @note The function clears the dependent list after processing.
-		void ProcessDependents(const std::function<void(Job&)>& func);
+		void ProcessDependents(const std::function<void(const JobID&)>& func);
 
 		Job& operator =(const Job&) = delete;
 		Job& operator =(Job&&) = delete;
@@ -84,8 +86,8 @@ export namespace PonyEngine::Job
 		ITask* task; ///< Job task.
 
 		std::atomic_size_t blockCount; ///< Block count. How many dependencies must be completed before starting this job.
-		mutable std::vector<Job*> dependents; ///< Dependents.
-		mutable std::mutex dependentMutex; ///< Mutex that must be used while working with the @p dependents.
+		std::vector<JobID> dependents; ///< Dependents.
+		std::mutex dependentMutex; ///< Mutex that must be used while working with the @p dependents.
 
 		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
 	};
@@ -102,7 +104,7 @@ namespace PonyEngine::Job
 
 	std::size_t Job::Version() const noexcept
 	{
-		return version.load(std::memory_order::relaxed);
+		return version.load(std::memory_order::acquire);
 	}
 
 	void Job::IncrementVersion() noexcept
@@ -129,7 +131,7 @@ namespace PonyEngine::Job
 		this->task = task;
 	}
 
-	void Job::Execute() noexcept
+	void Job::Execute() const noexcept
 	{
 		assert(task && "The task is nullptr.");
 		task->Execute();
@@ -159,7 +161,7 @@ namespace PonyEngine::Job
 		this->blockCount.store(blockCount, std::memory_order::release);
 	}
 
-	bool Job::AddDependent(Job& dependent, const std::size_t version) const
+	bool Job::AddDependent(const JobID& dependent, const std::size_t version) noexcept // It may throw, but it's intentionally noexcept to fail the program
 	{
 		if (Version() != version)
 		{
@@ -173,17 +175,17 @@ namespace PonyEngine::Job
 			return false;
 		}
 
-		dependents.push_back(&dependent);
+		dependents.push_back(dependent);
 		return true;
 	}
 
-	void Job::ProcessDependents(const std::function<void(Job&)>& func)
+	void Job::ProcessDependents(const std::function<void(const JobID&)>& func)
 	{
 		const auto lock = std::lock_guard(dependentMutex);
 
-		for (Job* const dependent : dependents)
+		for (const JobID& dependent : dependents)
 		{
-			func(*dependent);
+			func(dependent);
 		}
 
 		dependents.clear();

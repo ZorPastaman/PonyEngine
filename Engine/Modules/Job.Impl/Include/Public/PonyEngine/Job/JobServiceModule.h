@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::Job
 {
-	/// @brief Gets the job service module.
+	/// @brief Creates a job service module.
 	/// @return Job service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetJobServiceModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateJobServiceModule();
 }

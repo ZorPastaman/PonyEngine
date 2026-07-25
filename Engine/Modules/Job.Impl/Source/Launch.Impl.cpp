@@ -9,14 +9,12 @@
 
 #include "PonyEngine/Job/JobServiceModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.Job.Impl;
 
 namespace PonyEngine::Job
 {
-	Application::IModule* GetJobServiceModule()
+	std::shared_ptr<Application::IModule> CreateJobServiceModule()
 	{
-		static JobServiceModule jobServiceModule;
-		return &jobServiceModule;
+		return std::make_shared<JobServiceModule>();
 	}
 }

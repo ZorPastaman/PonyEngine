@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Job/JobServiceModule.h"
 
-PONY_ENGINE_MODULE(PonyEngine::Job::GetJobServiceModule, PonyEngineJobService, PONY_ENGINE_JOB_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::Job::CreateJobServiceModule, PonyEngineJobService, PONY_ENGINE_JOB_ORDER);

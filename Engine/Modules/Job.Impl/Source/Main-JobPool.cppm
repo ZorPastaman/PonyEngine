@@ -23,60 +23,85 @@ export namespace PonyEngine::Job
 	class JobPool final
 	{
 	public:
+		/// @brief Creates a job pool
 		[[nodiscard("Pure constructor")]]
-		JobPool() noexcept = default;
+		JobPool();
 		JobPool(const JobPool&) = delete;
 		JobPool(JobPool&&) = delete;
 
 		~JobPool() noexcept = default;
 
-		/// @brief Acquires a job.
-		/// @return Job and a flag that tells if the job is newly created (if @a true).
+		/// @brief Tries to acquire a job.
+		/// @return Job index or std::nullopt if the pool is empty.
 		[[nodiscard("Must be used")]]
-		Job* Acquire();
-		/// @brief Releases the job.
-		/// @param job Job to release.
-		void Release(Job& job);
-		/// @brief Releases the job without locking the pool.
-		/// @param job Job to release.
-		void ReleaseUnsafe(Job& job);
+		std::optional<std::size_t> AcquireJob() noexcept;
+		/// @brief Releases a job.
+		/// @param index Job index.
+		void ReleaseJob(std::size_t index) noexcept;
+
+		/// @brief Gets a job.
+		/// @param index Job index.
+		/// @return Job.
+		[[nodiscard("Pure function")]]
+		Job& GetJob(std::size_t index) noexcept;
 
 		JobPool& operator =(const JobPool&) = delete;
 		JobPool& operator =(JobPool&&) = delete;
 
 	private:
-		std::stack<Job*> pool;
-		std::mutex poolMutex;
+		/// @brief Checks if a job at @p index is free.
+		/// @param index Job index.
+		/// @return @a True if it's free; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsFree(std::size_t index) const noexcept;
+
+		std::array<Job, PONY_ENGINE_JOB_POOL_SIZE> jobs; ///< Jobs.
+		std::array<std::size_t, PONY_ENGINE_JOB_POOL_SIZE> freeJobs; ///< Indices of free jobs.
+		std::size_t freeJobCount; ///< Free job count.
+		std::mutex poolMutex; ///< Pool mutex.
 	};
 }
 
 namespace PonyEngine::Job
 {
-	Job* JobPool::Acquire()
+	JobPool::JobPool() :
+		freeJobCount{PONY_ENGINE_JOB_POOL_SIZE}
+	{
+		std::ranges::iota(freeJobs, 0uz);
+	}
+
+	std::optional<std::size_t> JobPool::AcquireJob() noexcept
 	{
 		if (const auto lock = std::unique_lock(poolMutex, std::try_to_lock))
 		{
-			if (!pool.empty())
-			{
-				Job* const job = pool.top();
-				pool.pop();
+			return freeJobCount > 0uz ? std::optional(freeJobs[--freeJobCount]) : std::nullopt;
+		}
 
-				return job;
+		return std::nullopt;
+	}
+
+	void JobPool::ReleaseJob(const std::size_t index) noexcept
+	{
+		const auto lock = std::lock_guard(poolMutex);
+		assert(!IsFree(index) && "Tried to release invalid job.");
+		freeJobs[freeJobCount++] = index;
+	}
+
+	Job& JobPool::GetJob(const std::size_t index) noexcept
+	{
+		return jobs[index];
+	}
+
+	bool JobPool::IsFree(const std::size_t index) const noexcept
+	{
+		for (std::size_t i = 0uz; i < freeJobCount; ++i)
+		{
+			if (freeJobs[i] == index)
+			{
+				return true;
 			}
 		}
 
-		return nullptr;
-	}
-
-	void JobPool::Release(Job& job)
-	{
-		const auto lock = std::lock_guard(poolMutex);
-		ReleaseUnsafe(job);
-	}
-
-	void JobPool::ReleaseUnsafe(Job& job)
-	{
-		assert(!job.HasTask() && "The job has a task.");
-		pool.push(&job);
+		return false;
 	}
 }

@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.Job.Impl:JobServiceModule;
 
 import std;
@@ -39,7 +35,7 @@ export namespace PonyEngine::Job
 		JobServiceModule& operator =(JobServiceModule&&) = delete;
 
 	private:
-		Application::ServiceHandle jobServiceHandle; ///< Job service handle.
+		std::unique_ptr<JobService> jobService; ///< Job service.
 	};
 }
 
@@ -47,18 +43,13 @@ namespace PonyEngine::Job
 {
 	void JobServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(JobService).name());
-		jobServiceHandle = context.ServiceModuleContext().AddService([](Application::IApplication& application)
-		{
-			return std::make_shared<JobService>(application);
-		});
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(JobService).name());
+		jobService = std::make_unique<JobService>(context.Application());
+		context.AddInterface<IJobService>(*jobService);
 	}
 
 	void JobServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(JobService).name());
-		context.ServiceModuleContext().RemoveService(jobServiceHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(JobService).name());
+		context.RemoveInterface<IJobService>(*jobService);
+		jobService.reset();
 	}
 }
