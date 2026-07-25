@@ -840,7 +840,6 @@ namespace PonyEngine::Application
 	void App::Tick()
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
-		assert(!exitCode && "The exit code is set.");
 
 		PONY_LOG(logService, Log::LogType::Verbose, "Ticking tickables...");
 		for (ITickable* const tickable : tickTickables)

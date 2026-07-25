@@ -74,8 +74,16 @@ export namespace PonyEngine::Application::Windows
 
 namespace PonyEngine::Application::Windows
 {
+	std::atomic_bool CtrlExit = false; ///< Is CTRL+C received?
+	BOOL WINAPI CtrlHandler(DWORD ctrlType);
+
 	ConsoleProcess::ConsoleProcess(const int argc, const char* const argv[])
 	{
+		if (!SetConsoleCtrlHandler(&CtrlHandler, TRUE)) [[unlikely]]
+		{
+			std::println(std::cerr, "Failed to set console ctrl handler.");
+		}
+
 		commandLine.reserve(argc);
 		for (int i = 0; i < argc; ++i)
 		{
@@ -143,12 +151,12 @@ namespace PonyEngine::Application::Windows
 #ifndef NDEBUG
 		for (const std::type_index type : std::views::keys(application->Interfaces()))
 		{
-			std::cerr << std::format("Interface of type {} wasn't removed from application.", type.name());
+			std::println(std::cerr, "Interface of type {} wasn't removed from application.", type.name());
 		}
 
 		if (const std::size_t count = application->Tickables().size(); count != 0uz) [[unlikely]]
 		{
-			std::cerr << std::format("{} tickables weren't removed from application.", count);
+			std::println(std::cerr, "{} tickables weren't removed from application.", count);
 		}
 #endif
 	}
@@ -185,6 +193,11 @@ namespace PonyEngine::Application::Windows
 			for (exitCode = application->ExitCode(); !exitCode; exitCode = application->ExitCode())
 			{
 				application->BeginFrame();
+				if (CtrlExit.load(std::memory_order::relaxed)) [[unlikely]]
+				{
+					PONY_LOG(application->LogService(), Log::LogType::Info, "CTRL+C message received. Stopping application.");
+					application->Stop();
+				}
 				application->Tick();
 				application->EndFrame();
 			}
@@ -198,6 +211,18 @@ namespace PonyEngine::Application::Windows
 		application->End();
 
 		return *exitCode;
+	}
+
+	BOOL CtrlHandler(const DWORD ctrlType)
+	{
+		switch (ctrlType)
+		{
+		case CTRL_C_EVENT:
+			CtrlExit.store(true, std::memory_order::relaxed);
+			return TRUE;
+		default:
+			return FALSE;
+		}
 	}
 }
 

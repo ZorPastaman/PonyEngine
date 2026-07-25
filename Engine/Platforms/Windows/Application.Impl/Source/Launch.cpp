@@ -43,12 +43,12 @@ int main(const int argc, const char* const argv[])
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << std::format("{}:\n{}\n", typeid(e).name(), e.what());
+		std::println(std::cerr, "{}:\n{}", typeid(e).name(), e.what());
 		return -1;
 	}
 	catch (...)
 	{
-		std::cerr << "Unexpected exception";
+		std::println(std::cerr, "Unexpected exception");
 		return -1;
 	}
 }
