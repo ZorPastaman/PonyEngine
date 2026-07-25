@@ -2,8 +2,11 @@
 
 Platform independent module: [PonyEngine.Application](../../../Modules/Application).
 
-In GUI modie, the application has a message pump on all hwnd. It's called right in the beginning of a frame.
+In GUI mode, the application has a message pump on all hwnd. It's called right in the beginning of a frame.
 On WM_QUIT the application sets an exit code and exits after the end of frame.
+
+In Console mode, the application listens to CTRL+C combination and sets the application to stop so that it can exit in a correct way.
+Other stop combinations aren't handled.
 
 ## C\++ modules
 
