@@ -66,6 +66,13 @@ export namespace PonyEngine::Job
 		[[nodiscard("Must be used")]]
 		Job& GetJob(const JobID& id) const noexcept;
 
+		/// @brief Validates the job handles.
+		/// @param handles Job handle to validate.
+		void ValidateJobHandles(std::span<const JobHandle> handles) const;
+		/// @brief Validates the job ID.
+		/// @param jobId Job ID to validate.
+		void ValidateJobID(const JobID& jobId) const;
+
 		const Log::ILogService* logService; ///< Log service.
 
 		std::vector<std::unique_ptr<Worker>> workers; ///< Workers.
@@ -125,6 +132,8 @@ namespace PonyEngine::Job
 
 	JobHandle JobService::Schedule(ITask& task, const std::span<const JobHandle> dependencies)
 	{
+		ValidateJobHandles(dependencies);
+
 		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
 		const JobID jobId = GetFreeJob(workerIndex);
 		Worker& worker = *workers[jobId.poolIndex];
@@ -162,6 +171,7 @@ namespace PonyEngine::Job
 		for (const JobHandle& handle : handles)
 		{
 			const JobID id = ToJobID(handle);
+			ValidateJobID(id);
 			GetJob(id).Wait(handle.version);
 		}
 	}
@@ -169,6 +179,7 @@ namespace PonyEngine::Job
 	bool JobService::IsCompleted(const JobHandle& handle) const
 	{
 		const JobID id = ToJobID(handle);
+		ValidateJobID(id);
 		Job& job = GetJob(id);
 
 		if (job.Version() == handle.version)
@@ -213,5 +224,25 @@ namespace PonyEngine::Job
 	Job& JobService::GetJob(const JobID& id) const noexcept
 	{
 		return workers[id.poolIndex]->GetJob(id.jobIndex);
+	}
+
+	void JobService::ValidateJobHandles(const std::span<const JobHandle> handles) const
+	{
+#ifndef NDEBUG
+		for (const JobHandle& handle : handles)
+		{
+			ValidateJobID(ToJobID(handle));
+		}
+#endif
+	}
+
+	void JobService::ValidateJobID(const JobID& jobId) const
+	{
+#ifndef NDEBUG
+		if (jobId.poolIndex >= workers.size() || jobId.jobIndex >= PONY_ENGINE_JOB_POOL_SIZE) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid job handle");
+		}
+#endif
 	}
 }
