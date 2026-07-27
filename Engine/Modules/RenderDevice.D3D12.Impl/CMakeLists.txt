@@ -4,9 +4,7 @@ message(VERBOSE "Configuring target")
 add_library(PonyEngine.RenderDevice.D3D12.Impl STATIC)
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.RenderDevice.D3D12.Impl PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.RenderDevice.D3D12.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

@@ -41,16 +41,6 @@ target_compile_definitions(PonyEngine.Core.Tests PRIVATE
 	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
 )
 
-message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Core.Tests PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
-	POSITION_INDEPENDENT_CODE TRUE
-)
-
-message(VERBOSE "Setting build options")
-pony_set_build_options(PonyEngine.Core.Tests ${PONY_ENGINE_OPTIMIZATION})
-
 message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Core.Tests PRIVATE 
 	Catch2::Catch2WithMain

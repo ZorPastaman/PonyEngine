@@ -68,7 +68,7 @@ How to add an application module:
 3. Include `PonyEngine/Application/Module.h` and use the macro `PONY_<GROUP>_MODULE(<Module_Function>, <Unique_Module_Name>, <Module_Initialization_Order>)` in a public code file. Module initialization order is defined by letters and follows alphabetical order;
 4. Link your module target to the engine application target. The default implementation is [PonyEngine.Application.Impl](../Application.Impl).
 
-Example of `PONY_GAME_MODULE` usage in a `.cpp` file:
+Example of `PONY_PROJECT_MODULE` usage in a `.cpp` file:
 ```
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Macro/Compiler.h"
@@ -88,7 +88,7 @@ namespace MyGame
 PONY_PROJECT_MODULE(MyGame::CreateGameModule, MyGame, yz)
 ```
 
-Make sure that your module order contains latin letters only and its first letter isn't `a` or `z`.
+Make sure that your module order contains small latin letters only and its first letter isn't `a` or `z`.
 `PONY_<GROUP>_MODULE` must be used in a public `.cpp` file.
 
 ## Module lifecycle

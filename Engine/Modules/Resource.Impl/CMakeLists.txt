@@ -40,9 +40,7 @@ target_compile_definitions(PonyEngine.Resource.Impl PUBLIC
 )
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Resource.Impl PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Resource.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

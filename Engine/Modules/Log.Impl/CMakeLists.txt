@@ -46,9 +46,7 @@ target_compile_definitions(PonyEngine.Log.Impl PUBLIC
 )
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Log.Impl PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Log.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

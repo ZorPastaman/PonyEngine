@@ -11,9 +11,7 @@ target_sources(PonyEngine.Shader PUBLIC FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Shader PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Shader PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 	PONY_ENGINE_SHADER_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/ShaderInclude"
 )

@@ -4,9 +4,7 @@ message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface.Impl STATIC)
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Surface.Impl PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Surface.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

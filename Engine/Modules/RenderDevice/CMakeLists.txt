@@ -140,9 +140,7 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.RenderDevice PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.RenderDevice PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

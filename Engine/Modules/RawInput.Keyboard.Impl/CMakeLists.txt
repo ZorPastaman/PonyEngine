@@ -12,9 +12,7 @@ target_sources(PonyEngine.RawInput.Keyboard.Impl PRIVATE FILE_SET CXX_MODULES FI
 )
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.RawInput.Keyboard.Impl PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.RawInput.Keyboard.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 

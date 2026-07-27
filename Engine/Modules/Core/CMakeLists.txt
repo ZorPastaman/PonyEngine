@@ -51,8 +51,6 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Core PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Core PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )

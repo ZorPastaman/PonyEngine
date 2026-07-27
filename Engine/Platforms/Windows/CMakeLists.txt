@@ -23,8 +23,8 @@ if(TARGET PonyEngine.Application.Impl)
 	add_subdirectory("Application.Impl")
 endif()
 
-if(TARGET PonyEngine.Log.PlatformConsole.Impl)
-	add_subdirectory("Log.PlatformConsole.Impl")
+if(TARGET PonyEngine.Log.PConsole.Impl)
+	add_subdirectory("Log.PConsole.Impl")
 endif()
 
 if(TARGET PonyEngine.File.Impl)
@@ -38,6 +38,10 @@ if(TARGET PonyEngine.Surface.Impl)
 	add_subdirectory("Surface.Impl")
 endif()
 
+if(TARGET PonyEngine.RenderDevice.D3D12.Impl)
+	add_subdirectory("RenderDevice.D3D12.Impl")
+endif()
+
 if(TARGET PonyEngine.RawInput.Keyboard.Impl)
 	add_subdirectory("RawInput.Keyboard.Impl")
 endif()
@@ -46,10 +50,6 @@ if(TARGET PonyEngine.RawInput.Mouse.Impl)
 endif()
 if(TARGET PonyEngine.RawInput.XInput.Impl)
 	add_subdirectory("RawInput.XInput.Impl")
-endif()
-
-if(TARGET PonyEngine.RenderDevice.D3D12.Impl)
-	add_subdirectory("RenderDevice.D3D12.Impl")
 endif()
 
 set(PONY_ENGINE_APPLICATION_DEFAULT_ICON "${PONY_ENGINE_APPLICATION_ICON_COLLECTION_PATH}/Windows/Logo.ico" CACHE PATH "Default application icon for Windows." FORCE)

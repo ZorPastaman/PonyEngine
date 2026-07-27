@@ -2,9 +2,8 @@
 # group_target - target name for the module group.
 # MODULES - list of engine modules.
 # GROUP_NAME - output name for the module group. By default it will have a name of the group_target.
-# CXX_STANDARD - C++ standard. By default, C++ 23.
 function(pony_make_module_group group_target)
-	set(oneValueArgs GROUP_NAME CXX_STANDARD)
+	set(oneValueArgs GROUP_NAME)
 	set(multiValueArgs MODULES)
 	cmake_parse_arguments(module_arg "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -18,16 +17,7 @@ function(pony_make_module_group group_target)
 	message(VERBOSE "Configuring target")
 	add_library(${group_target} SHARED)
 
-	if(NOT module_arg_CXX_STANDARD)
-		set(module_arg_CXX_STANDARD 23)
-	endif()
-
 	message(VERBOSE "Setting properties")
-	set_target_properties(${group_target} PROPERTIES 
-		CXX_STANDARD ${module_arg_CXX_STANDARD}
-		CXX_STANDARD_REQUIRED ON
-		POSITION_INDEPENDENT_CODE TRUE
-	)
 	if(module_arg_GROUP_NAME)
 		set_target_properties(${group_target} PROPERTIES OUTPUT_NAME "${module_arg_GROUP_NAME}")
 	endif()

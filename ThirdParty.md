@@ -7,7 +7,7 @@ This repo uses the following third-party libraries:
 - Repo: https://github.com/catchorg/Catch2/tree/v3.8.1
 - License: https://github.com/catchorg/Catch2/blob/v3.8.1/LICENSE.txt
 - Integration: CMake Git dependency.
-- Modules that use it: none, only unit tests use it.
+- Modules that use it: none, only [unit tests](Tests) use it.
 
 ## TOML++
 - Version: v3.4.0

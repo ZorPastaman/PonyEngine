@@ -1,65 +1,58 @@
 # Engine build
 
 Pony Engine is very modular. Game developers decide what modules they need and pass required build flags.
-To build a game, create your own project, add Pony Engine as a dependency and then add your game targets.
+To build a game, create your own project, set Pony Engine module variables, add Pony Engine as a dependency and then add your game targets.
 
 ## Tools
 
 Some modules or cmake functions require tools built for a host platform. Build them first, and then build the engine and a game.
 See [Tools](../Tools) docs for more info.
 
+Path to built tools must be assigned to `PONY_TOOLS_INSTALL_DIR`.
+
 ## Modules
 
 Each module is a separate CMake target. A module name is its target name in CMake scripts as well.
 
-### Core modules
+To a module to a build, a specific CMake flag must be `true`.
 
-These modules are always added to a build.
-
-| Module name                                             | Description                                                                                                        |
-|:--------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------|
-| [PonyEngine.Core](Modules/Core)                         | Core utilities module: Math, Hash, Meta, Memory and Type utilities.                                 |
-| [PonyEngine.Log](Modules/Log)                           | Logging API module.                                                                                                |
-| [PonyEngine.Application](Modules/Application)   | Application extension API module. Provides interfaces access to engine services, logging, and application. |
-
-### Optional modules
-
-These modules are optional. To add them to a build, a specific CMake flag must be `true`.
-
-| Module name                                                                     | Build flag                                  | Description                                                                                                                   |
-|:--------------------------------------------------------------------------------|:--------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------|
-| [PonyEngine.Application.Impl](Modules/Application.Impl)                         | `PONY_ENGINE_APPLICATION_IMPL`              | Application implementation module. Contains `main()` and a default logger as well.                                            |
-| [PonyEngine.Time](Modules/Time)                                                 | `PONY_ENGINE_TIME`                          | Time service API module. The service provides info about delta time, fixed time step and other time info.                     |
-| [PonyEngine.Time.Impl](Modules/Time.Impl)                                       | `PONY_ENGINE_TIME_IMPL`                     | Time service implementation module.                                                                                           |
-| [PonyEngine.Job](Modules/Job)                                                   | `PONY_ENGINE_JOB`                           | Job service API module. The job service is a simple way to utilize multi-threaded CPUs.                                       |
-| [PonyEngine.Job.Impl](Modules/Job.Impl)                                         | `PONY_ENGINE_JOB_IMPL`                      | Job service implementation module.                                                                                            |
-| [PonyEngine.Log.Ext](Modules/Log.Ext)                                           | `PONY_ENGINE_LOG_EXT`                       | Logger extension API module. Provides interfaces for the logger extensions.                                                   |
-| [PonyEngine.Log.Impl](Modules/Log.Impl)                                         | `PONY_ENGINE_LOG_IMPL`                      | Logger module. Replaces the default logger. Logs to a console and sub-loggers that are added as extensions.                   |
-| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                               | `PONY_ENGINE_LOG_FILE_IMPL`                 | File sub-logger module. That sub-logger logs to a log file.                                                                   |
-| [PonyEngine.File](Modules/File)                                                 | `PONY_ENGINE_FILE`                          | File service API module. The file service is a simple way to utilize modern SSDs with totally async read/write operations.    |
-| [PonyEngine.File.Impl](Modules/File.Impl)                                       | `PONY_ENGINE_FILE_IMPL`                     | File service implementation module.                                                                                           |
-| [PonyEngine.MessagePump](Modules/MessagePump)                                   | `PONY_ENGINE_MESSAGE_PUMP`                  | Message pump service API module. The service reads platform messages and provides info about them.                            |
-| [PonyEngine.MessagePump.Impl](Modules/MessagePump.Impl)                         | `PONY_ENGINE_MESSAGE_PUMP_IMPL`             | Message pump service implementation module.                                                                                   |
-| [PonyEngine.Surface](Modules/Surface)                                           | `PONY_ENGINE_SURFACE`                       | Surface service API module. The service controls an output video surface.                                                     |
-| [PonyEngine.Surface.Impl](Modules/Surface.Impl)                                 | `PONY_ENGINE_SURFACE_IMPL`                  | Surface service implementation module.                                                                                        |
-| [PonyEngine.RawInput](Modules/RawInput)                                         | `PONY_ENGINE_RAW_INPUT`                     | Raw input service API module. The service provides input from different devices via input providers.                          |
-| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                                 | `PONY_ENGINE_RAW_INPUT_EXT`                 | Raw input service extension API module. Provides interfaces for input providers that implement support for different devices. |
-| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                               | `PONY_ENGINE_RAW_INPUT_IMPL`                | Raw input service implementation module. Gets input from input providers that are added as extensions.                        |
-| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)             | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL`       | Raw input keyboard provider module. Reads input from keyboard devices and provides it to a raw input service.                 |
-| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)                   | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`          | Raw input mouse provider module. Reads input from mouse devices and provides it to a raw input service.                       |
-| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)                 | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`         | Raw input XInput provider module. Reads input from XInput devices and provides it to a raw input service.                     |
-| [PonyEngine.Shader](Modules/Shader)                                             | `PONY_ENGINE_SHADER`                        | Shader utilities module. Provides utility functions and classes for both C\++ and hlsl.                                       |
-| [PonyEngine.RenderDevice](Modules/RenderDevice)                                 | `PONY_ENGINE_RENDER_DEVICE`                 | Render device service API module. The service provides a low level access to a GPU.                                           |
-| [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)                         | `PONY_ENGINE_RENDER_DEVICE_EXT`             | Render device service extension API module. Provides interfaces for backends.                                                 |
-| [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)                       | `PONY_ENGINE_RENDER_DEVICE_IMPL`            | Render device service implementation module. Provides a low level access to a GPU via added backends.                         |
-| [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl)           | `PONY_ENGINE_RENDER_DEVICE_D3D12_IMPL`      | Direct3D12 backend implementation.                                                                                            |
-| [PonyEngine.Resource](Modules/Resource)                                         | `PONY_ENGINE_RESOURCE`                      | Resource service API module. The service provides resources.                                                                  |
-| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                                 | `PONY_ENGINE_RESOURCE_EXT`                  | Resource service extension API module. Provides interfaces for resource providers.                                            |
-| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                               | `PONY_ENGINE_RESOURCE_IMPL`                 | Resource service implementation module.                                                                                       |
-| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)                     | `PONY_ENGINE_RESOURCE_FILE_IMPL`            | File resource provider module. Provides resources that are individual files.                                                  |
-| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)                     | `PONY_ENGINE_RESOURCE_PACK_IMPL`            | Pack resource provider module. Provides resources that are stored in binary containers.                                       |
-| [PonyEngine.World](Modules/World)                                               | `PONY_ENGINE_WORLD`                         | World service API module. The service manages game worlds.                                                                    |
-| [PonyEngine.World.Impl](Modules/World.Impl)                                     | `PONY_ENGINE_WORLD_IMPL`                    | World service implementation module.                                                                                          |
+| Module name                                                             | Build flag                              | Description                                                                                                                   |
+|:------------------------------------------------------------------------|:----------------------------------------|:------------------------------------------------------------------------------------------------------------------------------|
+| [PonyEngine.Application](Modules/Application)                           | `PONY_ENGINE_APPLICATION`               | Application API module. Provides interfaces to access main engine info, to register interfaces and tickables.                 |
+| [PonyEngine.Application.Impl](Modules/Application.Impl)                 | `PONY_ENGINE_APPLICATION_IMPL`          | Application implementation module. Contains `main()` and a default logger as well.                                            |
+| [PonyEngine.Core](Modules/Core)                                         | `PONY_ENGINE_CORE`                      | Core utilities module: Math, Hash, Meta, Memory and Type utilities.                                                           |
+| [PonyEngine.File](Modules/File)                                         | `PONY_ENGINE_FILE`                      | File service API module. The file service is a simple way to utilize modern SSDs with totally async read/write operations.    |
+| [PonyEngine.File.Impl](Modules/File.Impl)                               | `PONY_ENGINE_FILE_IMPL`                 | File service implementation module.                                                                                           |
+| [PonyEngine.Job](Modules/Job)                                           | `PONY_ENGINE_JOB`                       | Job service API module. The job service is a simple way to utilize multi-threaded CPUs.                                       |
+| [PonyEngine.Job.Impl](Modules/Job.Impl)                                 | `PONY_ENGINE_JOB_IMPL`                  | Job service implementation module.                                                                                            |
+| [PonyEngine.Log](Modules/Log)                                           | `PONY_ENGINE_LOG`                       | Logging API module.                                                                                                           |
+| [PonyEngine.Log.Ext](Modules/Log.Ext)                                   | `PONY_ENGINE_LOG_EXT`                   | Logger extension API module. Provides interfaces for the logger extensions.                                                   |
+| [PonyEngine.Log.Impl](Modules/Log.Impl)                                 | `PONY_ENGINE_LOG_IMPL`                  | Logger module. Replaces the default logger. Logs to a console and sub-loggers that are added as extensions.                   |
+| [PonyEngine.Log.Console.Impl](Modules/Log.Console.Impl)                 | `PONY_ENGINE_LOG_CONSOLE_IMPL`          | Logger implementation that logs to a standard console.                                                                        |
+| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                       | `PONY_ENGINE_LOG_FILE_IMPL`             | File sub-logger module. That sub-logger logs to a log file.                                                                   |
+| [PonyEngine.Log.PConsole.Impl](Modules/Log.PConsole.Impl)               | `PONY_ENGINE_LOG_PCONSOLE_IMPL`         | Logger implementation that logs to a platform console.                                                                        |
+| [PonyEngine.RawInput](Modules/RawInput)                                 | `PONY_ENGINE_RAW_INPUT`                 | Raw input service API module. The service provides input from different devices via input providers.                          |
+| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                         | `PONY_ENGINE_RAW_INPUT_EXT`             | Raw input service extension API module. Provides interfaces for input providers that implement support for different devices. |
+| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                       | `PONY_ENGINE_RAW_INPUT_IMPL`            | Raw input service implementation module. Gets input from input providers that are added as extensions.                        |
+| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)     | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL`   | Raw input keyboard provider module. Reads input from keyboard devices and provides it to a raw input service.                 |
+| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)           | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`      | Raw input mouse provider module. Reads input from mouse devices and provides it to a raw input service.                       |
+| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)         | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`     | Raw input XInput provider module. Reads input from XInput devices and provides it to a raw input service.                     |
+| [PonyEngine.RenderDevice](Modules/RenderDevice)                         | `PONY_ENGINE_RENDER_DEVICE`             | Render device service API module. The service provides a low level access to a GPU.                                           |
+| [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)                 | `PONY_ENGINE_RENDER_DEVICE_EXT`         | Render device service extension API module. Provides interfaces for backends.                                                 |
+| [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)               | `PONY_ENGINE_RENDER_DEVICE_IMPL`        | Render device service implementation module. Provides a low level access to a GPU via added backends.                         |
+| [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl)   | `PONY_ENGINE_RENDER_DEVICE_D3D12_IMPL`  | Direct3D12 backend implementation.                                                                                            |
+| [PonyEngine.Resource](Modules/Resource)                                 | `PONY_ENGINE_RESOURCE`                  | Resource service API module. The service provides resources.                                                                  |
+| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                         | `PONY_ENGINE_RESOURCE_EXT`              | Resource service extension API module. Provides interfaces for resource providers.                                            |
+| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                       | `PONY_ENGINE_RESOURCE_IMPL`             | Resource service implementation module.                                                                                       |
+| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)             | `PONY_ENGINE_RESOURCE_FILE_IMPL`        | File resource provider module. Provides resources that are individual files.                                                  |
+| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)             | `PONY_ENGINE_RESOURCE_PACK_IMPL`        | Pack resource provider module. Provides resources that are stored in binary containers.                                       |
+| [PonyEngine.Shader](Modules/Shader)                                     | `PONY_ENGINE_SHADER`                    | Shader utilities module. Provides utility functions and classes for both C\++ and hlsl.                                       |
+| [PonyEngine.Surface](Modules/Surface)                                   | `PONY_ENGINE_SURFACE`                   | Surface service API module. The service controls an output video surface.                                                     |
+| [PonyEngine.Surface.Impl](Modules/Surface.Impl)                         | `PONY_ENGINE_SURFACE_IMPL`              | Surface service implementation module.                                                                                        |
+| [PonyEngine.Time](Modules/Time)                                         | `PONY_ENGINE_TIME`                      | Time service API module. The service provides info about delta time, fixed time step and other time info.                     |
+| [PonyEngine.Time.Impl](Modules/Time.Impl)                               | `PONY_ENGINE_TIME_IMPL`                 | Time service implementation module.                                                                                           |
+| [PonyEngine.World](Modules/World)                                       | `PONY_ENGINE_WORLD`                     | World service API module. The service manages game worlds.                                                                    |
+| [PonyEngine.World.Impl](Modules/World.Impl)                             | `PONY_ENGINE_WORLD_IMPL`                | World service implementation module.                                                                                          |
 
 ### Platform modules
 
@@ -72,43 +65,43 @@ Supported platforms:
 
 The table of the module-platform compatibility:
 
-| Module name                                                                     | Requires platform implementation | [Windows](Platforms/Windows) |
-|:--------------------------------------------------------------------------------|:--------------------------------:|:---------------------------:|
-| [PonyEngine.Core](Modules/Core)                                                 | -                                | &check;                     |
-| [PonyEngine.Application](Modules/Application)                           | -                                | &check;                     |
-| [PonyEngine.Application.Impl](Modules/Application.Impl)                         | &check;                          | &check;                     |
-| [PonyEngine.Time](Modules/Time)                                                 | -                                | &check;                     |
-| [PonyEngine.Time.Impl](Modules/Time.Impl)                                       | -                                | &check;                     |
-| [PonyEngine.Job](Modules/Job)                                                   | -                                | &check;                     |
-| [PonyEngine.Job.Impl](Modules/Job.Impl)                                         | -                                | &check;                     |
-| [PonyEngine.Log](Modules/Log)                                                   | -                                | &check;                     |
-| [PonyEngine.Log.Ext](Modules/Log.Ext)                                           | -                                | &check;                     |
-| [PonyEngine.Log.Impl](Modules/Log.Impl)                                         | -                                | &check;                     |
-| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                               | -                                | &check;                     |
-| [PonyEngine.File](Modules/File)                                                 | -                                | &check;                     |
-| [PonyEngine.File.Impl](Modules/File.Impl)                                       | &check;                          | &check;                     |
-| [PonyEngine.MessagePump](Modules/MessagePump)                                   | -                                | &check;                     |
-| [PonyEngine.MessagePump.Impl](Modules/MessagePump.Impl)                         | &check;                          | &check;                     |
-| [PonyEngine.Surface](Modules/Surface)                                           | -                                | &check;                     |
-| [PonyEngine.Surface.Impl](Modules/Surface.Impl)                                 | &check;                          | &check;                     |
-| [PonyEngine.RawInput](Modules/RawInput)                                         | -                                | &check;                     |
-| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                                 | -                                | &check;                     |
-| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                               | -                                | &check;                     |
-| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)             | &check;                          | &check;                     |
-| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)                   | &check;                          | &check;                     |
-| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)                 | &check;                          | &check;                     |
-| [PonyEngine.Shader](Modules/Shader)                                             | -                                | &check;                     |
-| [PonyEngine.RenderDevice](Modules/RenderDevice)                                 | -                                | &check;                     |
-| [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)                         | -                                | &check;                     |
-| [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)                       | -                                | &check;                     |
-| [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl)           | &check;                          | &check;                     |
-| [PonyEngine.Resource](Modules/Resource)                                         | -                                | &check;                     |
-| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                                 | -                                | &check;                     |
-| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                               | -                                | &check;                     |
-| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)                     | -                                | &check;                     |
-| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)                     | -                                | &check;                     |
-| [PonyEngine.World](Modules/World)                                               | -                                | &check;                     |
-| [PonyEngine.World.Impl](Modules/World.Impl)                                     | -                                | &check;                     |
+| Module name                                                           | Requires platform implementation | [Windows](Platforms/Windows) |
+|:----------------------------------------------------------------------|:--------------------------------:|:----------------------------:|
+| [PonyEngine.Application](Modules/Application)                         | -                                | &check;                      |
+| [PonyEngine.Application.Impl](Modules/Application.Impl)               | &check;                          | &check;                      |
+| [PonyEngine.Core](Modules/Core)                                       | -                                | &check;                      |
+| [PonyEngine.File](Modules/File)                                       | -                                | &check;                      |
+| [PonyEngine.File.Impl](Modules/File.Impl)                             | &check;                          | &check;                      |
+| [PonyEngine.Job](Modules/Job)                                         | -                                | &check;                      |
+| [PonyEngine.Job.Impl](Modules/Job.Impl)                               | -                                | &check;                      |
+| [PonyEngine.Log](Modules/Log)                                         | -                                | &check;                      |
+| [PonyEngine.Log.Ext](Modules/Log.Ext)                                 | -                                | &check;                      |
+| [PonyEngine.Log.Impl](Modules/Log.Impl)                               | -                                | &check;                      |
+| [PonyEngine.Log.Console.Impl](Modules/Log.Console.Impl)               | -                                | &check;                      |
+| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                     | -                                | &check;                      |
+| [PonyEngine.Log.PConsole.Impl](Modules/Log.PConsole.Impl)             | &check;                          | &check;                      |
+| [PonyEngine.RawInput](Modules/RawInput)                               | -                                | &check;                      |
+| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                       | -                                | &check;                      |
+| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                     | -                                | &check;                      |
+| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)   | &check;                          | &check;                      |
+| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)         | &check;                          | &check;                      |
+| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)       | &check;                          | &check;                      |
+| [PonyEngine.RenderDevice](Modules/RenderDevice)                       | -                                | &check;                      |
+| [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)               | -                                | &check;                      |
+| [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)             | -                                | &check;                      |
+| [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl) | &check;                          | &check;                      |
+| [PonyEngine.Resource](Modules/Resource)                               | -                                | &check;                      |
+| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                       | -                                | &check;                      |
+| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                     | -                                | &check;                      |
+| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)           | -                                | &check;                      |
+| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)           | -                                | &check;                      |
+| [PonyEngine.Shader](Modules/Shader)                                   | -                                | &check;                      |
+| [PonyEngine.Surface](Modules/Surface)                                 | -                                | &check;                      |
+| [PonyEngine.Surface.Impl](Modules/Surface.Impl)                       | &check;                          | &check;                      |
+| [PonyEngine.Time](Modules/Time)                                       | -                                | &check;                      |
+| [PonyEngine.Time.Impl](Modules/Time.Impl)                             | -                                | &check;                      |
+| [PonyEngine.World](Modules/World)                                     | -                                | &check;                      |
+| [PonyEngine.World.Impl](Modules/World.Impl)                           | -                                | &check;                      |
 
 The engine automatically applies platform-specific configuration based on `CMAKE_SYSTEM_NAME`. The value must match one of the supported platforms.
 Users can provide their own platform implementations by setting the CMake flag `PONY_ENGINE_CUSTOM_PLATFORM` to `true`. In this case, the built-in platform configuration is disabled, and users are responsible for configuring the modules themselves.
@@ -131,7 +124,7 @@ The engine does not automatically link application modules—including its own. Th
 
 To link an application module, explicitly add it in your CMake scripts: `target_link_libraries(PonyEngine.Application.Impl PRIVATE <MyModule>)` where `<MyModule>` can be either a game module or an engine module (for example, `PonyEngine.RawInput.Impl`).
 
-You can also use a shortcut like this: `pony_add_application_modules(<Application module list>)`.
+If you use a default application implementation module, you can also use a shortcut like this: `pony_add_application_modules(<Application module list>)`.
 
 Only implementation modules need to be linked.
 
@@ -157,46 +150,11 @@ If the modules do not need to be referenced by the engine application, no specia
 
 By default, the engine modules don't have compile and link flags. Users must set them manually. Example: `target_compile_options(PonyEngine.Core PRIVATE /fp:fast)`, `target_link_options(PonyEngine.Core PRIVATE /LTCG)`
 
-Also, by default, the engine modules don't have log defines. Users must set them manually. Example: `pony_set_log_defines(PonyEngine.Application.Impl "Warning" "Error)`. See the [PonyEngine.Log docs](Modules/Log) for details.
-
-### Essential examples
-
-These are the main examples of how to configure a project to build a game on Pony Engine with built-in and custom modules:
-
-- [ModuleSample](../Samples/ModuleSample) - how to build a custom module;
-- [ApplicationServiceSample](../Samples/ApplicationServiceSample) - how to build a custom module that adds a service.
-
-## Math
-
-The engine uses a left-handed coordinate system where X is right, Y is up, and Z is forward. The rotation order is ZXY (roll-pitch-yaw). The matrices are column-major.
-The surfaces like windows and textures use a coordinate system where X is right, and Y is down.
-
-## Render
-
-The engine render modules are mesh-shader based. The traditional render pipeline isn't supported.
-Only HLSL shaders are currently supported.
-
-Because the engine supports different render APIs, some features of HLSL are limited.
-The register types are shared and not divided into `b, t, u, s`. The engine treats spaces as descriptor set indices. The normal indices are treated as indices.
+Also, by default, the engine modules don't have log defines. Users must set them manually. Example: `pony_set_log_defines(PonyEngine.Application.Impl "Warning" "Error")`. See the [PonyEngine.Log docs](Modules/Log) for details.
 
 ## Text
 
 The engine exclusively uses char and std::string with UTF-8 encoding, except where platform APIs require different types or encodings.
-
-## Multi-threading
-
-The engine tries to utilize modern multi-threaded CPUs as much as possible keeping the ease of use of a single-threaded logic.
-To achieve it, it follows the paradigm single-threaded logic, multi-threaded computations.
-
-It means that cross-service interaction should be done only on a main thread and only from a service tick. But any service may use jobs or dedicated threads to compute something 
-if they don't interact with other services.
-Some services may allow to interact with them from other threads. But usually a service should access that service only inside its own tick.
-Your service may create jobs that access another service in its tick and wait for their completion inside the same tick function.
-
-Some services create objects that can be accessed on other threads. But usually the same object can be accessed only on one thread.
-
-In any case, the paradigm is just a target, and you have to check the docs of a service and follow them. Some may be more strict, some may be less.
-By default, read functions are safe, write functions are not.
 
 ## Build
 
@@ -231,14 +189,6 @@ Input parameters for the engine CMake scripts. These variables are initialized w
 | `PONY_PROJECT_VERSION_TWEAK` | 0                  | Project tweak version.                                                                                                           |
 | `PONY_COMPANY_TITLE`         | "Pony Engine"      | Company title. It's used in GUI only. May be any non-empty string.                                                               |
 | `PONY_PROJECT_TITLE`         | "Pony Engine Game" | Project title. It's used in GUI only. May be any non-empty string.                                                               |
-
-##### Icon
-
-There are 3 modes to set the application icon:
-
-1. `PONY_ENGINE_APPLICATION_ICON_MODE` = any CMake false constant. The application will not have an icon at all;
-2. `PONY_ENGINE_APPLICATION_ICON_MODE` = `Default`. The application will use the engine icon.
-3. `PONY_ENGINE_APPLICATION_ICON_MODE` = `Custom`. The application will use a custom icon.
 
 ### CMake functions
 

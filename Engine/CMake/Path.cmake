@@ -3,11 +3,14 @@
 # CAN_BE_ABSOLUTE - the path can be absolute.
 # CAN_BE_RELATIVE - the path can be relative.
 function(pony_validate_path path)
-	set(options CAN_BE_ABSOLUTE CAN_BE_RELATIVE)
+	set(options CAN_BE_ABSOLUTE CAN_BE_RELATIVE CAN_BE_EMPTY)
 	cmake_parse_arguments(path_arg "${options}" "" "" ${ARGN})
 
 	if(NOT DEFINED ${path} OR ${path} STREQUAL "")
-		message(FATAL_ERROR "'${path}' isn't set")
+		if(NOT path_arg_CAN_BE_EMPTY)
+			message(FATAL_ERROR "'${path}' isn't set")
+		endif()
+		return()
 	endif()
 
 	if(IS_ABSOLUTE ${${path}})
