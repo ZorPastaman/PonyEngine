@@ -7,14 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.World.Impl:WorldServiceModule;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
 
 import :WorldService;
 
@@ -38,7 +33,7 @@ export namespace PonyEngine::World
 		WorldServiceModule& operator =(WorldServiceModule&&) = delete;
 
 	private:
-		Application::ServiceHandle worldServiceHandle; ///< World service handle.
+		std::unique_ptr<WorldService> worldService; ///< World service.
 	};
 }
 
@@ -46,18 +41,21 @@ namespace PonyEngine::World
 {
 	void WorldServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(WorldService).name());
-		worldServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
+		worldService = std::make_unique<WorldService>(context.Application());
+		try
 		{
-			return std::make_shared<WorldService>(application);
-		});
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(WorldService).name());
+			context.AddInterface<IWorldService>(*worldService);
+		}
+		catch (...)
+		{
+			worldService.reset();
+			throw;
+		}
 	}
 
 	void WorldServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(WorldService).name());
-		context.ServiceModuleContext().RemoveService(worldServiceHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(WorldService).name());
+		context.RemoveInterface<IWorldService>(*worldService);
+		worldService.reset();
 	}
 }

@@ -24,8 +24,7 @@ export namespace PonyEngine::World
 		[[nodiscard("Pure constructor")]]
 		TypeRegistry() noexcept = default;
 		TypeRegistry(const TypeRegistry&) = delete;
-		[[nodiscard("Pure constructor")]]
-		TypeRegistry(TypeRegistry&& other) noexcept = default;
+		TypeRegistry(TypeRegistry&&) = delete;
 
 		~TypeRegistry() noexcept = default;
 
@@ -53,11 +52,16 @@ export namespace PonyEngine::World
 		/// @brief Gets object handle offsets.
 		/// @param componentType Component type.
 		/// @return Offsets in the format <offset, object type>.
+		/// @note Use @p Lock() if you access this function and keep it till you end working with the return value.
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::size_t, std::type_index>> ObjectOffsets(std::type_index componentType) const noexcept;
+		/// @brief Locks the registry.
+		/// @return Registry lock.
+		[[nodiscard("Pure function")]]
+		std::shared_lock<std::shared_mutex> Lock() const noexcept;
 
 		TypeRegistry& operator =(const TypeRegistry&) = delete;
-		TypeRegistry& operator =(TypeRegistry&& other) noexcept = default;
+		TypeRegistry& operator =(TypeRegistry&&) = delete;
 
 	private:
 		/// @brief Component info.
@@ -69,6 +73,7 @@ export namespace PonyEngine::World
 
 		std::unordered_map<std::type_index, ComponentInfo> components; ///< Component infos. <component type, info>.
 		std::unordered_map<std::type_index, std::vector<std::pair<std::size_t, std::type_index>>> objectOffsets; /// Object offsets. <componentType, <offset, objectType>>.
+		mutable std::shared_mutex mutex; ///< Mutex.
 	};
 }
 
@@ -76,15 +81,18 @@ namespace PonyEngine::World
 {
 	void TypeRegistry::AddComponentType(const std::type_index componentType, const std::size_t size, const std::size_t alignment)
 	{
+		const auto lock = std::unique_lock(mutex);
 		components[componentType] = ComponentInfo{.size = size, .alignment = std::max(alignment, alignof(std::max_align_t))};
 	}
 
 	void TypeRegistry::RegisterComponentObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
 	{
+		const auto lock = std::unique_lock(mutex);
+
 		std::vector<std::pair<std::size_t, std::type_index>>& offsets = objectOffsets[componentType];
 
 		std::size_t index = 0uz;
-		for (; index < offsets.size() && offsets[index].first < componentOffset; ++index) // Sorted offsets.S
+		for (; index < offsets.size() && offsets[index].first < componentOffset; ++index) // Sorting offsets
 		{
 		}
 
@@ -93,11 +101,14 @@ namespace PonyEngine::World
 
 	bool TypeRegistry::IsValidComponent(const std::type_index componentType) const noexcept
 	{
+		const auto lock = std::shared_lock(mutex);
 		return components.contains(componentType);
 	}
 
 	ComponentTable TypeRegistry::CreateComponentTable(const std::type_index componentType) const
 	{
+		const auto lock = std::shared_lock(mutex);
+
 		if (const auto position = components.find(componentType); position != components.cend()) [[likely]]
 		{
 			return ComponentTable(position->second.size, position->second.alignment);
@@ -114,5 +125,10 @@ namespace PonyEngine::World
 		}
 
 		return std::span<const std::pair<std::size_t, std::type_index>>();
+	}
+
+	std::shared_lock<std::shared_mutex> TypeRegistry::Lock() const noexcept
+	{
+		return std::shared_lock(mutex);
 	}
 }

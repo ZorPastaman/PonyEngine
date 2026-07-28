@@ -14,9 +14,8 @@ import PonyEngine.World.Impl;
 
 namespace PonyEngine::World
 {
-	Application::IModule* GetWorldServiceModule()
+	std::shared_ptr<Application::IModule> CreateWorldServiceModule()
 	{
-		static WorldServiceModule worldModule;
-		return &worldModule;
+		return std::make_shared<WorldServiceModule>();
 	}
 }

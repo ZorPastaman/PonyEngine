@@ -24,6 +24,7 @@ export namespace PonyEngine::World
 {
 	/// @brief World. Contains entities and their components.
 	/// @note All read operations are thread-safe but write operations are not.
+	/// @note The worlds are independent and different worlds can be managed on different threads.
 	class IWorld
 	{
 		PONY_INTERFACE_BODY(IWorld)

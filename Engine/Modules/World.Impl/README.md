@@ -4,9 +4,9 @@ World service implementation module.
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application](../Application)
 - [PonyEngine.World](../World)
 
 ## CMake variables

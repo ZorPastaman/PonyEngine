@@ -65,7 +65,7 @@ export namespace PonyEngine::Application
 		App(const App&) = delete;
 		App(App&&) = delete;
 
-		~App() noexcept = default;
+		~App() noexcept;
 
 		[[nodiscard("Pure function")]] 
 		virtual std::string_view EngineName() const noexcept override;
@@ -372,6 +372,12 @@ export namespace PonyEngine::Application
 		std::vector<std::pair<ITickable*, TickableOrder>> tickables; ///< Tickables.
 		std::vector<ITickable*> beginTickables; ///< Tickables with Begin() and End() functions.
 		std::vector<ITickable*> tickTickables; ///< Tickables with Tick() function.
+
+#ifndef NDEBUG
+		std::atomic_size_t bufferCount; ///< Buffer count.
+#endif
+
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::atomic_size_t is not lock free.");
 	};
 }
 
@@ -379,6 +385,9 @@ namespace PonyEngine::Application
 {
 	App::App(const std::span<const std::string_view> commandLine, const std::filesystem::path& executableFile, const std::filesystem::path& localDataDirectory,
 		const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory) :
+#ifndef NDEBUG
+		bufferCount(0uz),
+#endif
 		mainThreadId(std::this_thread::get_id()),
 		commandLine(commandLine),
 		executableFile(executableFile),
@@ -395,6 +404,13 @@ namespace PonyEngine::Application
 		targetFrameTime(std::chrono::nanoseconds(0)),
 		logService{nullptr}
 	{
+	}
+
+	App::~App() noexcept
+	{
+#ifndef NDEBUG
+		assert(bufferCount.load(std::memory_order::relaxed) == 0uz && "Temp buffer count in use isn't zero.");
+#endif
 	}
 
 	std::string_view App::EngineName() const noexcept
@@ -640,6 +656,10 @@ namespace PonyEngine::Application
 
 		PONY_LOG(logService, Log::LogType::Verbose, "Acquiring temp buffer done. Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
 
+#ifndef NDEBUG
+		bufferCount.fetch_add(1uz, std::memory_order::relaxed);
+#endif
+
 		return tempBuffer;
 	}
 
@@ -654,6 +674,10 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Fatal, "TempBuffer memory corruption detected. Terminating.");
 			std::terminate();
 		}
+
+#ifndef NDEBUG
+		bufferCount.fetch_sub(1uz, std::memory_order::relaxed);
+#endif
 
 		try
 		{

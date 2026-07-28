@@ -27,7 +27,7 @@ export namespace PonyEngine::World
 
 		/// @brief Registers the component type.
 		/// @tparam T Component type.
-		/// @note The function is not thread-safe and mustn't be used concurrently with @p IWorld functions.
+		/// @note The function is thread-safe.
 		template<Component T>
 		void RegisterComponent();
 		/// @brief Registers the component object handle member.
@@ -35,7 +35,7 @@ export namespace PonyEngine::World
 		/// @tparam Object Object type.
 		/// @param member Member pointer. Mustn't be nullptr.
 		/// @remark It's used for correct garbage collection.
-		/// @note The function is not thread-safe and mustn't be used concurrently with @p IWorld functions.
+		/// @note The function is thread-safe.
 		template<Component Component, typename Object>
 		void RegisterComponentObjectHandleMember(ObjectHandle<Object> Component::* member);
 

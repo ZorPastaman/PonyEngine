@@ -11,13 +11,15 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::World
 {
-	/// @brief Gets the world service module.
+	/// @brief Creates the world service module.
 	/// @return World service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetWorldServiceModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateWorldServiceModule();
 }
 

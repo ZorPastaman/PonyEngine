@@ -1,5 +1,18 @@
 message(STATUS "Configuring PonyEngine.World.Impl")
 
+if(NOT TARGET PonyEngine.Application)
+	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Log)
+	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.World)
+	message(FATAL_ERROR "PonyEngine.World wasn't configured")
+endif()
+
 message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_WORLD_ORDER "p" CACHE STRING "PonyEngine.World.Impl module initialization order. Its first character must be in range [b-y].")
 
@@ -22,6 +35,7 @@ target_sources(PonyEngine.World.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-ComponentTable.cppm"
 	"Source/Main-ObjectTable.cppm"
+	"Source/Main-ServiceContext.cppm"
 	"Source/Main-TypeRegistry.cppm"
 	"Source/Main-World.cppm"
 	"Source/Main-WorldService.cppm"
@@ -40,14 +54,11 @@ set_target_properties(PonyEngine.World.Impl PROPERTIES
 )
 
 message(VERBOSE "Configuring dependencies")
-if(NOT TARGET PonyEngine.World)
-	message(FATAL_ERROR "PonyEngine.World wasn't configured")
-endif()
 target_link_libraries(PonyEngine.World.Impl PUBLIC
 	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.World.Impl PRIVATE
-	PonyEngine.World
 	PonyEngine.Core
 	PonyEngine.Log
+	PonyEngine.World
 )

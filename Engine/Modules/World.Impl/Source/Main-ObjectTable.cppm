@@ -16,6 +16,7 @@ import PonyEngine.Memory;
 import PonyEngine.World;
 
 import :ComponentTable;
+import :ServiceContext;
 import :TypeRegistry;
 
 template<>
@@ -37,9 +38,8 @@ export namespace PonyEngine::World
 	{
 	public:
 		/// @brief Creates an object table.
-		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit ObjectTable(Application::IApplication& application) noexcept;
+		ObjectTable() noexcept = default;
 		ObjectTable(const ObjectTable&) = delete;
 		ObjectTable(ObjectTable&&) = delete;
 
@@ -75,10 +75,10 @@ export namespace PonyEngine::World
 		const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const;
 
 		/// @brief Collects garbage.
-		/// @param typeRegistry Type registry.
+		/// @param context World service context.
 		/// @param componentTables Component table.
 		/// @param componentTablesIndices Component table index map.
-		void CollectGarbage(const TypeRegistry& typeRegistry, std::span<const ComponentTable> componentTables, 
+		void CollectGarbage(const ServiceContext& context, std::span<const ComponentTable> componentTables, 
 			const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices);
 
 		ObjectTable& operator =(const ObjectTable&) = delete;
@@ -114,8 +114,6 @@ export namespace PonyEngine::World
 		/// @param handleId Object handle ID.
 		void KillObject(HandleID handleId);
 
-		Application::IApplication* application; ///< Application.
-
 		std::vector<HandleID> objectsSparse; ///< Sparse.
 		std::vector<HandleVersion> handleVersions; ///< Handle versions. Synced with the @p objectsSparse by index.
 		std::vector<HandleID> objectsDense; ///< Dense.
@@ -129,11 +127,6 @@ export namespace PonyEngine::World
 
 namespace PonyEngine::World
 {
-	ObjectTable::ObjectTable(Application::IApplication& application) noexcept :
-		application{&application}
-	{
-	}
-
 	TypelessObjectHandle ObjectTable::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
 	{
 		if (const std::optional<TypelessObjectHandle> fromExisting = TryFindObject(objectType, object))
@@ -191,7 +184,7 @@ namespace PonyEngine::World
 		return objects[objectsSparse[handle.id]].object;
 	}
 
-	void ObjectTable::CollectGarbage(const TypeRegistry& typeRegistry, const std::span<const ComponentTable> componentTables, 
+	void ObjectTable::CollectGarbage(const ServiceContext& context, const std::span<const ComponentTable> componentTables,
 		const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices)
 	{
 		if (objectsDense.empty()) [[unlikely]]
@@ -201,41 +194,43 @@ namespace PonyEngine::World
 
 		const std::size_t denseSize = objectsDense.size();
 		const std::size_t bufferSize = Memory::CalculateBufferSize<HandleID>(denseSize) + Memory::CalculateBufferSize<bool, HandleID>(denseSize);
-		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		const auto buffer = Application::ScopedTempBuffer(context.Application(), bufferSize);
 		auto arena = Memory::Arena(*buffer);
 		const std::span<HandleID> objectsToRemove = arena.AllocateArray<HandleID>(denseSize);
 		const std::span<bool> aliveObjectFlags = arena.AllocateArray<bool>(denseSize);
-
 		std::ranges::fill(aliveObjectFlags, false);
 
-		for (std::size_t foundCount = 0uz; const auto [componentType, componentTableIndex] : componentTablesIndices)
 		{
-			const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = typeRegistry.ObjectOffsets(componentType);
-			if (objectOffsets.empty())
+			const std::shared_lock<std::shared_mutex> typeRegistryLock = context.TypeRegistry().Lock();
+			for (std::size_t foundCount = 0uz; const auto [componentType, componentTableIndex] : componentTablesIndices)
 			{
-				continue;
-			}
-
-			const ComponentTable& componentTable = componentTables[componentTableIndex];
-			for (EntityID entityIndex = 0uz; entityIndex < componentTable.Size(); ++entityIndex)
-			{
-				const auto component = static_cast<std::byte*>(componentTable.Component(entityIndex));
-
-				for (const auto [offset, objectType] : objectOffsets)
+				const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = context.TypeRegistry().ObjectOffsets(componentType);
+				if (objectOffsets.empty())
 				{
-					const TypelessObjectHandle handle = *reinterpret_cast<const TypelessObjectHandle*>(component + offset);
-					if (!IsObjectValid(objectType, handle)) [[unlikely]]
-					{
-						continue;
-					}
+					continue;
+				}
 
-					const HandleID flagIndex = objectsSparse[handle.id];
-					foundCount += !aliveObjectFlags[flagIndex];
-					aliveObjectFlags[flagIndex] = true;
+				const ComponentTable& componentTable = componentTables[componentTableIndex];
+				for (EntityID entityIndex = 0uz; entityIndex < componentTable.Size(); ++entityIndex)
+				{
+					const auto component = static_cast<const std::byte*>(componentTable.Component(entityIndex));
 
-					if (foundCount >= denseSize) [[unlikely]]
+					for (const auto [offset, objectType] : objectOffsets)
 					{
-						return;
+						const TypelessObjectHandle handle = *reinterpret_cast<const TypelessObjectHandle*>(component + offset);
+						if (!IsObjectValid(objectType, handle)) [[unlikely]]
+						{
+							continue;
+						}
+
+						const HandleID flagIndex = objectsSparse[handle.id];
+						foundCount += !aliveObjectFlags[flagIndex];
+						aliveObjectFlags[flagIndex] = true;
+
+						if (foundCount >= denseSize) [[unlikely]]
+						{
+							return;
+						}
 					}
 				}
 			}

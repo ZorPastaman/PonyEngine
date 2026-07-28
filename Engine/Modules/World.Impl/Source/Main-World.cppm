@@ -17,6 +17,7 @@ import PonyEngine.Memory;
 import PonyEngine.World;
 
 import :ComponentTable;
+import :ServiceContext;
 import :ObjectTable;
 import :TypeRegistry;
 
@@ -27,14 +28,13 @@ export namespace PonyEngine::World
 	{
 	public:
 		/// @brief Creates a world.
-		/// @param application Application.
-		/// @param typeRegistry Type registry.
+		/// @param context World service context.
 		[[nodiscard("Pure constructor")]]
-		World(Application::IApplication& application, const TypeRegistry& typeRegistry) noexcept;
+		explicit World(const ServiceContext& context) noexcept;
 		World(const World&) = delete;
 		World(World&&) = delete;
 
-		~World() noexcept = default;
+		~World() noexcept;
 
 		[[nodiscard("Pure function")]]
 		virtual std::size_t EntityCount() const noexcept override;
@@ -228,10 +228,9 @@ export namespace PonyEngine::World
 		/// @param secondTypes Second types.
 		static void CheckForDuplicates(std::span<const std::type_index> firstTypes, std::span<const std::type_index> secondTypes);
 
-		Application::IApplication* application; ///< Application.
-		const TypeRegistry* typeRegistry; ///< Type registry.
+		const ServiceContext* context; ///< World service context.
 
-		std::vector<EntityGeneration> entityGenerations; ///< Entity generations.
+		std::vector<EntityGeneration> entityGenerations; ///< Entity generations. Even generation means dead, odd generation means alive.
 		std::vector<EntityID> deadEntities; ///< Dead entities.
 
 		std::vector<ComponentTable> componentTables; ///< Component tables.
@@ -245,11 +244,15 @@ export namespace PonyEngine::World
 
 namespace PonyEngine::World
 {
-	World::World(Application::IApplication& application, const TypeRegistry& typeRegistry) noexcept :
-		application{&application},
-		typeRegistry{&typeRegistry},
-		objectTable(*this->application)
+	World::World(const ServiceContext& context) noexcept :
+		context{&context}
 	{
+		this->context->IncrementWorldCount();
+	}
+
+	World::~World() noexcept
+	{
+		context->DecrementWorldCount();
 	}
 
 	std::size_t World::EntityCount() const noexcept
@@ -330,7 +333,7 @@ namespace PonyEngine::World
 		deadEntities.reserve(deadEntities.size() + entities.size());
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
-		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
 		auto arena = Memory::Arena(*buffer);
 		const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 
@@ -395,7 +398,7 @@ namespace PonyEngine::World
 		if (ComponentTable* const table = FindComponentTable(componentType))
 		{
 			const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
-			const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+			const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
 			auto arena = Memory::Arena(*buffer);
 			const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 			RemoveComponents(*table, entities, tableEntities);
@@ -513,6 +516,13 @@ namespace PonyEngine::World
 
 	std::size_t World::CountQuery(const QueryParams& params) const
 	{
+		CheckForDuplicates(params.requiredComponentTypes);
+		CheckForDuplicates(params.excludedComponentTypes);
+		CheckForDuplicates(params.optionalComponentTypes);
+		CheckForDuplicates(params.requiredComponentTypes, params.excludedComponentTypes);
+		CheckForDuplicates(params.requiredComponentTypes, params.optionalComponentTypes);
+		CheckForDuplicates(params.excludedComponentTypes, params.optionalComponentTypes);
+
 		std::size_t count = EntityCount();
 		for (const std::type_index tableType : params.requiredComponentTypes)
 		{
@@ -538,25 +548,22 @@ namespace PonyEngine::World
 		}
 #endif
 
-		const std::size_t bufferSize = Memory::CalculateBufferSize<void*>(params.requiredComponentTypes.size()) + 
-			Memory::CalculateBufferSize<void*, void*>(params.optionalComponentTypes.size()) +
-			Memory::CalculateBufferSize<const ComponentTable*, void*>(params.requiredComponentTypes.size()) +
-			Memory::CalculateBufferSize<const ComponentTable*, const ComponentTable*>(params.excludedComponentTypes.size()) +
-			Memory::CalculateBufferSize<const ComponentTable*, const ComponentTable*>(params.optionalComponentTypes.size()) +
-			Memory::CalculateBufferSize<std::size_t, const ComponentTable*>(params.optionalComponentTypes.size());
-		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<void*>((params.requiredComponentTypes.size() + params.optionalComponentTypes.size()) * 2uz + params.excludedComponentTypes.size()) +
+			Memory::CalculateBufferSize<std::size_t, void*>(params.optionalComponentTypes.size());
+		const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
 		auto arena = Memory::Arena(*buffer);
-		const std::span<void*> requiredComponents = arena.AllocateArray<void*>(params.requiredComponentTypes.size());
-		const std::span<void*> optionalComponents = arena.AllocateArray<void*>(params.optionalComponentTypes.size());
-		const std::span<const ComponentTable*> requiredComponentTables = arena.AllocateArray<const ComponentTable*>(params.requiredComponentTypes.size());
-		const std::span<const ComponentTable*> excludedComponentTablesProto = arena.AllocateArray<const ComponentTable*>(params.excludedComponentTypes.size());
-		const std::span<const ComponentTable*> optionalComponentTablesProto = arena.AllocateArray<const ComponentTable*>(params.optionalComponentTypes.size());
-		const std::span<std::size_t> optionalOutputIndicesProto = arena.AllocateArray<std::size_t>(params.optionalComponentTypes.size());
 
+		const std::span<const ComponentTable*> requiredComponentTables = arena.AllocateArray<const ComponentTable*>(params.requiredComponentTypes.size());
 		if (!FindRequired(params.requiredComponentTypes, requiredComponentTables))
 		{
 			return;
 		}
+
+		const std::span<const ComponentTable*> excludedComponentTablesProto = arena.AllocateArray<const ComponentTable*>(params.excludedComponentTypes.size());
+		const std::span<const ComponentTable*> optionalComponentTablesProto = arena.AllocateArray<const ComponentTable*>(params.optionalComponentTypes.size());
+		const std::span<void*> requiredComponents = arena.AllocateArray<void*>(params.requiredComponentTypes.size());
+		const std::span<void*> optionalComponents = arena.AllocateArray<void*>(params.optionalComponentTypes.size());
+		const std::span<std::size_t> optionalOutputIndicesProto = arena.AllocateArray<std::size_t>(params.optionalComponentTypes.size());
 
 		const std::span<const ComponentTable*> excludedComponentTables = FindExcluded(params.excludedComponentTypes, excludedComponentTablesProto);
 		const auto [optionalComponentTables, optionalOutputIndices] = FindOptional(params.optionalComponentTypes, optionalComponentTablesProto, optionalOutputIndicesProto);
@@ -576,7 +583,7 @@ namespace PonyEngine::World
 
 	void World::CollectGarbage()
 	{
-		objectTable.CollectGarbage(*typeRegistry, componentTables, componentTablesIndices);
+		objectTable.CollectGarbage(*context, componentTables, componentTablesIndices);
 	}
 
 	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
@@ -647,7 +654,7 @@ namespace PonyEngine::World
 			return &componentTables[position->second];
 		}
 #ifndef NDEBUG
-		if (!typeRegistry->IsValidComponent(componentType)) [[unlikely]]
+		if (!context->TypeRegistry().IsValidComponent(componentType)) [[unlikely]]
 		{
 			throw std::invalid_argument("Component type is not registered");
 		}
@@ -663,7 +670,7 @@ namespace PonyEngine::World
 			return componentTables[position->second];
 		}
 		
-		ComponentTable table = typeRegistry->CreateComponentTable(componentType);
+		ComponentTable table = context->TypeRegistry().CreateComponentTable(componentType);
 		componentTables.push_back(std::move(table));
 		try
 		{
@@ -683,7 +690,7 @@ namespace PonyEngine::World
 		CheckIfValid(entities);
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
-		const Application::ScopedTempBuffer buffer = application->AcquiredScopedTempBuffer(bufferSize);
+		const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
 		auto arena = Memory::Arena(*buffer);
 		const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 

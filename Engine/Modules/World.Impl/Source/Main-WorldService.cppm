@@ -20,13 +20,14 @@ import PonyEngine.Log;
 import PonyEngine.World;
 
 import :ObjectTable;
+import :ServiceContext;
 import :TypeRegistry;
 import :World;
 
 export namespace PonyEngine::World
 {
 	/// @brief World service.
-	class WorldService final : public Application::IService, private IWorldService
+	class WorldService final : public IWorldService
 	{
 	public:
 		/// @brief Creates a world service.
@@ -36,64 +37,56 @@ export namespace PonyEngine::World
 		WorldService(const WorldService&) = delete;
 		WorldService(WorldService&&) = delete;
 
-		~WorldService() noexcept = default;
+		~WorldService() noexcept;
 
-		virtual void Begin() override;
-		virtual void End() override;
+		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) override;
+		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) override;
 
-		virtual void AddInterfaces(Application::IServiceInterfaceAdder& adder) override;
+		[[nodiscard("Weird call")]]
+		virtual std::shared_ptr<IWorld> CreateWorld() override;
 
 		WorldService& operator =(const WorldService&) = delete;
 		WorldService& operator =(WorldService&&) = delete;
 
 	private:
-		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) override;
-		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) override;
-
-		[[nodiscard("Weird call")]] 
-		virtual std::shared_ptr<IWorld> CreateWorld() override;
-
 		Application::IApplication* application; ///< Application.
+		const Log::ILogService* logService; ///< Log service.
 
 		TypeRegistry typeRegistry; ///< Type registry.
+
+		ServiceContext context; ///< World service context.
 	};
 }
 
 namespace PonyEngine::World
 {
 	WorldService::WorldService(Application::IApplication& application) noexcept :
-		application{&application}
+		application{&application},
+		logService{this->application->FindInterface<Log::ILogService>()},
+		context(*this->application, typeRegistry)
 	{
 	}
 
-	void WorldService::Begin()
+	WorldService::~WorldService() noexcept
 	{
-	}
-
-	void WorldService::End()
-	{
-	}
-
-	void WorldService::AddInterfaces(Application::IServiceInterfaceAdder& adder)
-	{
-		adder.AddInterface<IWorldService>(*this);
+		context.EnsureZeroCounts();
 	}
 
 	void WorldService::RegisterComponent(const std::type_index componentType, const std::size_t componentSize, const std::size_t componentAlignment)
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Registering component type. Type name: '{}'; size: '{}'; alignment: '{}'.", 
+		PONY_LOG(logService, Log::LogType::Info, "Registering component type. Type name: '{}'; size: '{}'; alignment: '{}'.", 
 			componentType.name(), componentSize, componentAlignment);
 		typeRegistry.AddComponentType(componentType, componentSize, componentAlignment);
 	}
 
 	std::shared_ptr<IWorld> WorldService::CreateWorld()
 	{
-		return std::make_shared<World>(*application, typeRegistry);
+		return std::make_shared<World>(context);
 	}
 
 	void WorldService::RegisterComponentObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
 	{
-		PONY_LOG(application->Logger(), Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
+		PONY_LOG(logService, Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
 			componentType.name(), objectType.name(), componentOffset);
 		typeRegistry.RegisterComponentObjectHandleMember(objectType, componentType, componentOffset);
 	}
