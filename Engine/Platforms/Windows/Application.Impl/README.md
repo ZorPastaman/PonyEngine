@@ -8,10 +8,12 @@ The main() function returns an application exit code or -1 on any uncaught excep
 
 These variables are used to configure the build of the module:
 
-| Variable name                  | Default value | Description                                     |
-|:-------------------------------|:-------------:|:------------------------------------------------|
-| `PONY_ENGINE_APPLICATION_MODE` | "GUI"         | Application mode. Must be Console or GUI.       |
-| `PONY_ENGINE_CREATE_CONSOLE`   | OFF           | Enable console. Can be used only in GUI builds. |
+| Variable name                                         | Default value               | Description                                                                                                                |
+|:------------------------------------------------------|:---------------------------:|:---------------------------------------------------------------------------------------------------------------------------|
+| `PONY_ENGINE_APPLICATION_MODE`                        | GUI                         | Application mode. Must be Console or GUI.                                                                                  |
+| `PONY_ENGINE_CREATE_CONSOLE`                          | OFF                         | Enable console. Can be used only in GUI builds.                                                                            |
+| `PONY_ENGINE_APPLICATION_PROCESS_PRIORITY`            | ABOVE_NORMAL_PRIORITY_CLASS | Application process priority. Must be DWORD or predefined priority class.                                                  |
+| `PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH` | 0.001                       | Amount of time in seconds that is waited on busy spin. All other time before it is waited on thread sleep. Must be double. |
 
 ## CMake functions
 

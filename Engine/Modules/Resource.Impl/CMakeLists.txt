@@ -36,6 +36,8 @@ pony_validate_module_order(PONY_ENGINE_RESOURCE_ORDER)
 pony_validate_tick_order(PONY_ENGINE_RESOURCE_TICK_ORDER)
 target_compile_definitions(PonyEngine.Resource.Impl PUBLIC
 	PONY_ENGINE_RESOURCE_ORDER=${PONY_ENGINE_RESOURCE_ORDER}
+)
+target_compile_definitions(PonyEngine.Resource.Impl PRIVATE
 	PONY_ENGINE_RESOURCE_TICK_ORDER=${PONY_ENGINE_RESOURCE_TICK_ORDER}
 )
 

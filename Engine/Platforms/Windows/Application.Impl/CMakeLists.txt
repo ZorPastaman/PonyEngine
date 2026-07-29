@@ -3,6 +3,8 @@ message(STATUS "Configuring PonyEngine.Application.Impl for Windows")
 message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_APPLICATION_MODE "GUI" CACHE STRING "Application mode. Must be Console or GUI.")
 option(PONY_ENGINE_CREATE_CONSOLE "Enable console. Can be used only in GUI builds." OFF)
+set(PONY_ENGINE_APPLICATION_PROCESS_PRIORITY "ABOVE_NORMAL_PRIORITY_CLASS" CACHE STRING "Application process priority. Must be DWORD or predefined priority class.")
+set(PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH "0.001" CACHE STRING "Amount of time in seconds that is waited on busy spin. All other time before it is waited on thread sleep. Must be double.")
 
 if(NOT PONY_ENGINE_APPLICATION_MODE STREQUAL "Console" AND NOT PONY_ENGINE_APPLICATION_MODE STREQUAL "GUI")
 	message(FATAL_ERROR "Invalid PONY_ENGINE_APPLICATION_MODE: ${PONY_ENGINE_APPLICATION_MODE}. Must be Console or GUI")
@@ -24,6 +26,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 	"Source/Main-GUIProcess.cppm"
 	"Source/Main-Path.cppm"
 	"Source/Main-Process.cppm"
+	"Source/Main-Timer.cppm"
 )
 
 message(VERBOSE "Configuring data")
@@ -36,6 +39,8 @@ target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	$<$<BOOL:${PONY_ENGINE_CREATE_CONSOLE}>:PONY_ENGINE_CREATE_CONSOLE>
 	$<$<STREQUAL:${PONY_ENGINE_APPLICATION_MODE},Console>:PONY_ENGINE_APPLICATION_MODE_CONSOLE>
 	$<$<STREQUAL:${PONY_ENGINE_APPLICATION_MODE},GUI>:PONY_ENGINE_APPLICATION_MODE_GUI>
+	PONY_ENGINE_APPLICATION_PROCESS_PRIORITY=${PONY_ENGINE_APPLICATION_PROCESS_PRIORITY}
+	PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH=${PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH}
 )
 
 message(VERBOSE "Setting properties")

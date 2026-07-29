@@ -28,6 +28,7 @@ import PonyEngine.Platform.Windows;
 
 import :Path;
 import :Process;
+import :Timer;
 
 export namespace PonyEngine::Application::Windows
 {
@@ -90,8 +91,6 @@ export namespace PonyEngine::Application::Windows
 		/// @brief Logs basic info.
 		void LogProcessBasicInfo() const noexcept;
 
-		/// @brief Sets the process priority.
-		void SetPriority() const noexcept;
 		/// @brief Adds the process interfaces to the application.
 		void AddProcessInterfaces();
 		/// @brief Removes the process interfaces from the application.
@@ -123,6 +122,8 @@ export namespace PonyEngine::Application::Windows
 		POINT lastMessageCursorPoint; ///< Cursor point of a last message.
 
 		std::unique_ptr<App> application; ///< Application.
+
+		HANDLE timer; ///< Timer handle.
 	};
 }
 
@@ -137,7 +138,8 @@ namespace PonyEngine::Application::Windows
 		lastMessageTime(std::chrono::steady_clock::now()),
 		lastMessageNativeTime(GetTickCount()),
 		lastMessageType{0u},
-		lastMessageCursorPoint{.x = 0l, .y = 0l}
+		lastMessageCursorPoint{.x = 0l, .y = 0l},
+		timer{nullptr}
 	{
 		UpdateCommandLine();
 		application = std::make_unique<App>(commandLine, GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), GetTempDataDirectory());
@@ -265,7 +267,8 @@ namespace PonyEngine::Application::Windows
 		CreateConsole();
 		application->LogBasicInfo();
 		LogProcessBasicInfo();
-		SetPriority();
+		SetProcessPriority(*application);
+		timer = CreateTimer(*application);
 		try
 		{
 			AddProcessInterfaces();
@@ -290,6 +293,7 @@ namespace PonyEngine::Application::Windows
 		}
 		catch (...)
 		{
+			DestroyTimer(timer, *application);
 			DestroyConsole();
 			application->FinalizeEarly();
 			throw;
@@ -301,6 +305,7 @@ namespace PonyEngine::Application::Windows
 		application->FinalizeLate();
 		application->FinalizeNormal();
 		RemoveProcessInterfaces();
+		DestroyTimer(timer, *application);
 		DestroyConsole();
 		application->FinalizeEarly();
 
@@ -387,22 +392,6 @@ namespace PonyEngine::Application::Windows
 		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
 	}
 
-	void GUIProcess::SetPriority() const noexcept
-	{
-		constexpr DWORD priority = ABOVE_NORMAL_PRIORITY_CLASS;
-
-		PONY_LOG(application->LogService(), Log::LogType::Info, "Setting process priority. Priority: '{}'.", priority);
-		try
-		{
-			SetProcessPriority(priority);
-		}
-		catch (...)
-		{
-			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "Failed to set process priority.");
-			// The application should keep working.
-		}
-	}
-
 	void GUIProcess::AddProcessInterfaces()
 	{
 		application->AddInterface<IMainData>(*this);
@@ -431,13 +420,15 @@ namespace PonyEngine::Application::Windows
 
 		try
 		{
-			for (exitCode = application->ExitCode(); !exitCode; exitCode = application->ExitCode())
+			do
 			{
+				WaitForNextFrame(timer, *application);
 				application->BeginFrame();
 				TickMessagePump();
 				application->Tick();
 				application->EndFrame();
-			}
+				exitCode = application->ExitCode();
+			} while (!exitCode);
 		}
 		catch (...)
 		{

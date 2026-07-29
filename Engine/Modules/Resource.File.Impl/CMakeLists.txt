@@ -34,6 +34,8 @@ pony_validate_module_order(PONY_ENGINE_RESOURCE_FILE_ORDER)
 pony_validate_path(PONY_ENGINE_RESOURCE_FILE_MANIFEST_DIR CAN_BE_RELATIVE)
 target_compile_definitions(PonyEngine.Resource.File.Impl PUBLIC
 	PONY_ENGINE_RESOURCE_FILE_ORDER=${PONY_ENGINE_RESOURCE_FILE_ORDER}
+)
+target_compile_definitions(PonyEngine.Resource.File.Impl PRIVATE
 	PONY_ENGINE_RESOURCE_FILE_MANIFEST_DIR=${PONY_ENGINE_RESOURCE_FILE_MANIFEST_DIR}
 )
 

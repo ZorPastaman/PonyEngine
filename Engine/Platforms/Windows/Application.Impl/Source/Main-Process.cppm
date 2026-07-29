@@ -9,26 +9,31 @@
 
 module;
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Application.Impl.Windows:Process;
 
 import std;
 
+import PonyEngine.Application.Impl;
+import PonyEngine.Log;
+
 export namespace PonyEngine::Application::Windows
 {
-	/// @brief Sets the process priority.
-	/// @param priority Process priority.
-	void SetProcessPriority(DWORD priority);
+	/// @brief Sets this process priority.
+	/// @param application Application.
+	void SetProcessPriority(const App& application) noexcept;
 }
 
 namespace PonyEngine::Application::Windows
 {
-	void SetProcessPriority(const DWORD priority)
+	void SetProcessPriority(const App& application) noexcept
 	{
-		if (!SetPriorityClass(GetCurrentProcess(), priority)) [[unlikely]]
+		PONY_LOG(application.LogService(), Log::LogType::Info, "Setting process priority. Priority: '{}'.", PONY_ENGINE_APPLICATION_PROCESS_PRIORITY);
+		if (!SetPriorityClass(GetCurrentProcess(), PONY_ENGINE_APPLICATION_PROCESS_PRIORITY)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to set process priority to '0x{:X}': ErrorCode = '0x{:X}'", priority, GetLastError()));
+			PONY_LOG(application.LogService(), Log::LogType::Error, std::current_exception(), "Failed to set process priority. ErrorCode: '0x{:X}'.", GetLastError());
 		}
 	}
 }

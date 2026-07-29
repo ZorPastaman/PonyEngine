@@ -27,6 +27,7 @@ import PonyEngine.Platform.Windows;
 
 import :Path;
 import :Process;
+import :Timer;
 
 export namespace PonyEngine::Application::Windows
 {
@@ -58,9 +59,6 @@ export namespace PonyEngine::Application::Windows
 		/// @brief Logs basic info.
 		void LogProcessBasicInfo() const noexcept;
 
-		/// @brief Sets the process priority.
-		void SetPriority() const noexcept;
-
 		/// @brief Runs the main loop.
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
@@ -69,6 +67,7 @@ export namespace PonyEngine::Application::Windows
 		std::vector<std::string_view> commandLine; ///< Command line.
 
 		std::unique_ptr<App> application; ///< Application.
+		HANDLE timer; ///< Timer handle.
 	};
 }
 
@@ -77,11 +76,21 @@ namespace PonyEngine::Application::Windows
 	std::atomic_bool CtrlExit = false; ///< Is CTRL+C received?
 	BOOL WINAPI CtrlHandler(DWORD ctrlType);
 
-	ConsoleProcess::ConsoleProcess(const int argc, const char* const argv[])
+	ConsoleProcess::ConsoleProcess(const int argc, const char* const argv[]) :
+		timer{nullptr}
 	{
 		if (!SetConsoleCtrlHandler(&CtrlHandler, TRUE)) [[unlikely]]
 		{
 			std::println(std::cerr, "Failed to set console ctrl handler.");
+		}
+
+		if (!SetConsoleCP(CP_UTF8)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to set console CP. ErrorCode = '0x{:X}'.", GetLastError());
+		}
+		if (!SetConsoleOutputCP(CP_UTF8)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to set output console CP. ErrorCode = '0x{:X}'.", GetLastError());
 		}
 
 		commandLine.reserve(argc);
@@ -121,7 +130,8 @@ namespace PonyEngine::Application::Windows
 		application->InitializeEarly();
 		application->LogBasicInfo();
 		LogProcessBasicInfo();
-		SetPriority();
+		SetProcessPriority(*application);
+		timer = CreateTimer(*application);
 		try
 		{
 			application->InitializeNormal();
@@ -137,6 +147,7 @@ namespace PonyEngine::Application::Windows
 		}
 		catch (...)
 		{
+			DestroyTimer(timer, *application);
 			application->FinalizeEarly();
 			throw;
 		}
@@ -146,6 +157,7 @@ namespace PonyEngine::Application::Windows
 	{
 		application->FinalizeLate();
 		application->FinalizeNormal();
+		DestroyTimer(timer, *application);
 		application->FinalizeEarly();
 
 #ifndef NDEBUG
@@ -166,22 +178,6 @@ namespace PonyEngine::Application::Windows
 		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
 	}
 
-	void ConsoleProcess::SetPriority() const noexcept
-	{
-		constexpr DWORD priority = ABOVE_NORMAL_PRIORITY_CLASS;
-
-		PONY_LOG(application->LogService(), Log::LogType::Info, "Setting process priority. Priority: '{}'.", priority);
-		try
-		{
-			SetProcessPriority(priority);
-		}
-		catch (...)
-		{
-			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "Failed to set process priority.");
-			// The application should keep working.
-		}
-	}
-
 	int ConsoleProcess::RunMainLoop()
 	{
 		std::optional<int> exitCode;
@@ -190,8 +186,9 @@ namespace PonyEngine::Application::Windows
 
 		try
 		{
-			for (exitCode = application->ExitCode(); !exitCode; exitCode = application->ExitCode())
+			do
 			{
+				WaitForNextFrame(timer, *application);
 				application->BeginFrame();
 				if (CtrlExit.load(std::memory_order::relaxed)) [[unlikely]]
 				{
@@ -200,7 +197,8 @@ namespace PonyEngine::Application::Windows
 				}
 				application->Tick();
 				application->EndFrame();
-			}
+				exitCode = application->ExitCode();
+			} while (!exitCode);
 		}
 		catch (...)
 		{

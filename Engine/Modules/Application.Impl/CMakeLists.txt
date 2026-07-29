@@ -14,7 +14,8 @@ message(VERBOSE "Configuring environment")
 include("CMake/Module.cmake")
 
 message(VERBOSE "Configuring parameters")
-set(PONY_ENGINE_ROOT_PATH "" CACHE STRING "Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid.")
+set(PONY_ENGINE_APPLICATION_ROOT_PATH "" CACHE STRING "Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid.")
+set(PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD "0.0" CACHE STRING "Application target frame period in seconds. Must be double.")
 
 message(VERBOSE "Configuring target")
 add_executable(PonyEngine.Application.Impl)
@@ -28,7 +29,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 message(VERBOSE "Configuring defines")
-pony_validate_path(PONY_ENGINE_ROOT_PATH CAN_BE_RELATIVE CAN_BE_EMPTY)
+pony_validate_path(PONY_ENGINE_APPLICATION_ROOT_PATH CAN_BE_RELATIVE CAN_BE_EMPTY)
 target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_ENGINE_NAME=${PONY_ENGINE_NAME}
 	PONY_ENGINE_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
@@ -44,7 +45,8 @@ target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_PROJECT_VERSION_TWEAK=${PONY_PROJECT_VERSION_TWEAK}
 	PONY_COMPANY_TITLE=${PONY_COMPANY_TITLE} 
 	PONY_PROJECT_TITLE=${PONY_PROJECT_TITLE}
-	PONY_ENGINE_ROOT_PATH=${PONY_ENGINE_ROOT_PATH}
+	PONY_ENGINE_APPLICATION_ROOT_PATH=${PONY_ENGINE_APPLICATION_ROOT_PATH}
+	PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD=${PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD}
 )
 
 message(VERBOSE "Setting properties")

@@ -20,6 +20,7 @@ export module PonyEngine.Application.Impl:App;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Chrono;
 import PonyEngine.Container;
 import PonyEngine.Format;
 import PonyEngine.Log;
@@ -114,12 +115,16 @@ export namespace PonyEngine::Application
 		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> ThisFrameTimePoint() const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::chrono::time_point<std::chrono::steady_clock> NextFrameTimePoint() const override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> NowTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds PrevFrameTime() const override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds ThisFrameTime() const override;
+		[[nodiscard("Pure function")]] 
+		virtual std::chrono::nanoseconds NextFrameTime() const override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds NowTime() const noexcept override;
 		[[nodiscard("Pure function")]]
@@ -151,6 +156,7 @@ export namespace PonyEngine::Application
 		void Begin();
 		/// @brief Ends the main loop.
 		void End() noexcept;
+
 		/// @brief Begins a next frame.
 		void BeginFrame();
 		/// @brief Ends a current frame.
@@ -392,7 +398,7 @@ namespace PonyEngine::Application
 		commandLine(commandLine),
 		executableFile(executableFile),
 		executableDirectory(this->executableFile.parent_path()),
-		rootDirectory((this->executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_ROOT_PATH)).lexically_normal()),
+		rootDirectory((this->executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_APPLICATION_ROOT_PATH)).lexically_normal()),
 		localDataDirectory(localDataDirectory),
 		userDataDirectory(userDataDirectory),
 		tempDataDirectory(tempDataDirectory),
@@ -401,7 +407,7 @@ namespace PonyEngine::Application
 		startTimePoint(NowTimePoint()),
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
-		targetFrameTime(std::chrono::nanoseconds(0)),
+		targetFrameTime(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD}), std::chrono::nanoseconds(0))),
 		logService{nullptr}
 	{
 	}
@@ -566,6 +572,18 @@ namespace PonyEngine::Application
 		return thisFrameTimePoint;
 	}
 
+	std::chrono::time_point<std::chrono::steady_clock> App::NextFrameTimePoint() const
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
+
+		return thisFrameTimePoint + targetFrameTime;
+	}
+
 	std::chrono::time_point<std::chrono::steady_clock> App::NowTimePoint() const noexcept
 	{
 		return std::chrono::steady_clock::now();
@@ -579,6 +597,11 @@ namespace PonyEngine::Application
 	std::chrono::nanoseconds App::ThisFrameTime() const
 	{
 		return ThisFrameTimePoint() - startTimePoint;
+	}
+
+	std::chrono::nanoseconds App::NextFrameTime() const
+	{
+		return NextFrameTimePoint() - startTimePoint;
 	}
 
 	std::chrono::nanoseconds App::NowTime() const noexcept
@@ -843,14 +866,15 @@ namespace PonyEngine::Application
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 		assert(!exitCode && "The exit code is set.");
 
-		++frameCount;
-
-		prevFrameTimePoint = thisFrameTimePoint;
+		const std::chrono::time_point<std::chrono::steady_clock> target = NextFrameTimePoint();
 		std::chrono::time_point<std::chrono::steady_clock> now;
 		do
 		{
 			now = NowTimePoint();
-		} while (now - prevFrameTimePoint < targetFrameTime);
+		} while (now < target);
+
+		++frameCount;
+		prevFrameTimePoint = thisFrameTimePoint;
 		thisFrameTimePoint = now;
 
 		PONY_LOG(logService, Log::LogType::Verbose, "New frame began. Frame: '{}'; Time point: '{}'.", frameCount, thisFrameTimePoint.time_since_epoch());

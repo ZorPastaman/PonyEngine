@@ -150,6 +150,12 @@ export namespace PonyEngine::Application
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> ThisFrameTimePoint() const = 0;
+		/// @brief Gets the earliest time point when a next frame will start.
+		/// @return Time point.
+		/// @note The function must be called on a main thread.
+		/// @remark The value is evaluated based on a current target frame time.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::time_point<std::chrono::steady_clock> NextFrameTimePoint() const = 0;
 		/// @brief Gets a now time point.
 		/// @return Time point.
 		/// @note The function is thread-safe.
@@ -177,6 +183,19 @@ export namespace PonyEngine::Application
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
 		T ThisFrameTimeSeconds() const;
+		/// @brief Gets a minimal time that will elapse between the application start and a next frame start.
+		/// @return Time.
+		/// @note The function must be called on a main thread.
+		/// @remark The value is evaluated based on a current target frame time.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds NextFrameTime() const = 0;
+		/// @brief Gets a minimal time that will elapse between the application start and a next frame start.
+		/// @tparam T Return value type.
+		/// @return Time in seconds.
+		/// @note The function must be called on a main thread.
+		/// @remark The value is evaluated based on a current target frame time.
+		template<std::floating_point T = double> [[nodiscard("Pure function")]]
+		T NextFrameTimeSeconds() const;
 		/// @brief Gets a time elapsed since the application start.
 		/// @return Time.
 		/// @note The function is thread-safe.
@@ -266,6 +285,12 @@ namespace PonyEngine::Application
 	T IApplication::ThisFrameTimeSeconds() const
 	{
 		return Chrono::ToSeconds<T>(ThisFrameTime());
+	}
+
+	template<std::floating_point T>
+	T IApplication::NextFrameTimeSeconds() const
+	{
+		return Chrono::ToSeconds<T>(NextFrameTime());
 	}
 
 	template<std::floating_point T>

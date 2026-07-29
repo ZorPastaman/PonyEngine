@@ -34,6 +34,8 @@ pony_validate_module_order(PONY_ENGINE_RAW_INPUT_ORDER)
 pony_validate_tick_order(PONY_ENGINE_RAW_INPUT_TICK_ORDER)
 target_compile_definitions(PonyEngine.RawInput.Impl PUBLIC
 	PONY_ENGINE_RAW_INPUT_ORDER=${PONY_ENGINE_RAW_INPUT_ORDER}
+)
+target_compile_definitions(PonyEngine.RawInput.Impl PRIVATE
 	PONY_ENGINE_RAW_INPUT_TICK_ORDER=${PONY_ENGINE_RAW_INPUT_TICK_ORDER}
 )
 
