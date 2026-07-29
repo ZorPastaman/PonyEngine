@@ -23,9 +23,9 @@ Main sub-modules:
 
 Raw input service public interface.
 
-#### [AxisID](Source/Main-AxisID.cppm)
+#### [Axis](Source/Main-Axis.cppm)
 
-Input axis ID. It's a hash value of a axis string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
+Input axis. It's a hash value of a axis string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Axes](#axes) for details details.
 
@@ -33,9 +33,9 @@ See [Axes](#axes) for details details.
 
 Device handle. It's an integer, and it's a special handle that is used to access an input device.
 
-#### [DeviceTypeID](Source/Main-DeviceTypeID.cppm)
+#### [DeviceType](Source/Main-DeviceType.cppm)
 
-Device type ID. It's a hash value of a device type string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
+Device type. It's a hash value of a device type string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Devices](#devices) for details details.
 
@@ -56,16 +56,15 @@ Device feature interface for vibration control.
 ## Axes
 
 Axes are represented as strings. That allows to add as many axes at runtime as possible.
-However, working directly with strings is inefficient, so axes are hashed internally. The [AxisID](Source/Main-AxisID.cppm) wrapper simplifies working with these hash values.
+However, working directly with strings is inefficient, so axes are hashed internally. The [Axis](Source/Main-Axis.cppm) wrapper simplifies working with these hash values.
 The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing axes, retrieving original strings from hash values, and validating those hashes. It also provides additional utility functions for working with axes.
 
 Example of usage:
 
 ```
 PonyEngine::RawInput::IRawInputService* rawInputService = GetRawInputService();
-PonyEngine::RawInput::AxisID axisId = rawInputService->HashAxis("Gamepad/D-Pad/Up");
-std::string_view axisOriginName = rawInputService->UnhashAxis(axisId);
-float value = rawInputService->Value(axisId);
+PonyEngine::RawInput::Axis axis = rawInputService->MakeAxis("Gamepad/D-Pad/Up");
+float value = rawInputService->Value(axis);
 ```
 
 ## Devices
@@ -76,7 +75,7 @@ The raw input service provides info about devices via different functions.
 The devices may be enumerated via these functions: `IRawInputService.DeviceCount()` and `IRawInputService.Device(deviceIndex)`.
 
 The devices have types that are represented as strings. That allows to add as many device types at runtime as possible.
-However, working directly with strings is inefficient, so device types are hashed internally. The [DeviceTypeID](Source/Main-DeviceTypeID.cppm) wrapper simplifies working with these hash values.
+However, working directly with strings is inefficient, so device types are hashed internally. The [DeviceType](Source/Main-DeviceType.cppm) wrapper simplifies working with these hash values.
 The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing device types, retrieving original strings from hash values, and validating those hashes.
 
 The devices may have custom features. Those may be accessed via `IRawInputService.FindFeature()` functions.

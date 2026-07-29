@@ -9,12 +9,11 @@
 
 export module PonyEngine.RawInput;
 
-export import :AxisID;
+export import :Axis;
 export import :ConnectionEvent;
 export import :DeviceHandle;
-export import :DeviceTypeID;
+export import :DeviceType;
 export import :Gamepad;
-export import :IDeviceObserver;
 export import :InputEventType;
 export import :IRawInputObserver;
 export import :IRawInputService;

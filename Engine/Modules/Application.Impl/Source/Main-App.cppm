@@ -351,6 +351,9 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		Buffer GetBuffer(TempBufferCache& cache, std::size_t requiredAlignment) const;
 
+		/// @brief Validates that a current thread is main.
+		void ValidateMainThread() const;
+
 		std::thread::id mainThreadId; ///< Main thread ID. It's a thread on which this class was created.
 		std::span<const std::string_view> commandLine; ///< Command line.
 
@@ -417,6 +420,8 @@ namespace PonyEngine::Application
 #ifndef NDEBUG
 		assert(bufferCount.load(std::memory_order::relaxed) == 0uz && "Temp buffer count in use isn't zero.");
 #endif
+		assert(tickables.size() == 0uz && "Some tickables weren't removed.");
+		assert(interfaces.size() == 0uz && "Some interfaces weren't removed.");
 	}
 
 	std::string_view App::EngineName() const noexcept
@@ -501,24 +506,13 @@ namespace PonyEngine::Application
 
 	std::optional<int> App::ExitCode() const
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		ValidateMainThread();
 		return exitCode;
 	}
 
 	void App::Stop(const int exitCode)
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
+		ValidateMainThread();
 
 		if (this->exitCode)
 		{
@@ -533,13 +527,7 @@ namespace PonyEngine::Application
 
 	std::uint64_t App::FrameCount() const
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		ValidateMainThread();
 		return frameCount;
 	}
 
@@ -550,37 +538,19 @@ namespace PonyEngine::Application
 
 	std::chrono::time_point<std::chrono::steady_clock> App::PrevFrameTimePoint() const
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		ValidateMainThread();
 		return prevFrameTimePoint;
 	}
 
 	std::chrono::time_point<std::chrono::steady_clock> App::ThisFrameTimePoint() const
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		ValidateMainThread();
 		return thisFrameTimePoint;
 	}
 
 	std::chrono::time_point<std::chrono::steady_clock> App::NextFrameTimePoint() const
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		ValidateMainThread();
 		return thisFrameTimePoint + targetFrameTime;
 	}
 
@@ -616,38 +586,20 @@ namespace PonyEngine::Application
 
 	std::chrono::nanoseconds App::TargetFrameTime() const
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		ValidateMainThread();
 		return targetFrameTime;
 	}
 
 	void App::TargetFrameTime(const std::chrono::nanoseconds frameTime)
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		ValidateMainThread();
 		targetFrameTime = std::max(frameTime, std::chrono::nanoseconds(0));
-
 		PONY_LOG(logService, Log::LogType::Info, "Target frame time changed to: '{}'.", targetFrameTime);
 	}
 
 	void* App::FindInterface(const std::type_index type) const
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
+		ValidateMainThread();
 
 		if (const auto position = interfaces.find(type); position != interfaces.cend()) [[likely]]
 		{
@@ -901,12 +853,7 @@ namespace PonyEngine::Application
 
 	void App::AddInterface(const std::type_index type, void* const interface)
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
+		ValidateMainThread();
 
 		PONY_LOG(logService, Log::LogType::Info, "Adding interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
 		const auto [iterator, added] = interfaces.try_emplace(type, interface);
@@ -932,12 +879,7 @@ namespace PonyEngine::Application
 
 	void App::RemoveInterface(const std::type_index type, const void* const interface)
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
+		ValidateMainThread();
 
 		PONY_LOG(logService, Log::LogType::Info, "Removing interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
 		if (const auto position = interfaces.find(type); position != interfaces.cend() && position->second == interface) [[likely]]
@@ -960,12 +902,7 @@ namespace PonyEngine::Application
 
 	void App::AddTickable(ITickable& tickable, const TickableOrder& tickableOrder)
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
+		ValidateMainThread();
 
 		PONY_LOG(logService, Log::LogType::Info, "Adding tickable. Tickable: '{}'; Begin order: '{}'; Tick order: '{}'.", typeid(tickable).name(), 
 			tickableOrder.beginOrder, tickableOrder.tickOrder);
@@ -974,12 +911,7 @@ namespace PonyEngine::Application
 
 	void App::RemoveTickable(ITickable& tickable, const TickableOrder& tickableOrder)
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
+		ValidateMainThread();
 
 		PONY_LOG(logService, Log::LogType::Info, "Removing tickable. Tickable: '{}'; Begin order: '{}'; Tick order: '{}'.", typeid(tickable).name(),
 			tickableOrder.beginOrder, tickableOrder.tickOrder);
@@ -1328,5 +1260,15 @@ namespace PonyEngine::Application
 		}
 
 		return buffer;
+	}
+
+	void App::ValidateMainThread() const
+	{
+#ifndef NDEBUG
+		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
+		{
+			throw std::logic_error("Must be called on main thread");
+		}
+#endif
 	}
 }

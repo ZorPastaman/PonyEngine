@@ -1,5 +1,9 @@
 message(STATUS "Configuring PonyEngine.RawInput")
 
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+
 message(VERBOSE "Configuring target")
 add_library(PonyEngine.RawInput STATIC)
 
@@ -11,12 +15,11 @@ target_include_directories(PonyEngine.RawInput PUBLIC
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
-	"Source/Main-AxisID.cppm"
+	"Source/Main-Axis.cppm"
 	"Source/Main-ConnectionEvent.cppm"
 	"Source/Main-DeviceHandle.cppm"
-	"Source/Main-DeviceTypeID.cppm"
+	"Source/Main-DeviceType.cppm"
 	"Source/Main-Gamepad.cppm"
-	"Source/Main-IDeviceObserver.cppm"
 	"Source/Main-InputEventType.cppm"
 	"Source/Main-IRawInputObserver.cppm"
 	"Source/Main-IRawInputService.cppm"

@@ -17,8 +17,6 @@ import std;
 
 import PonyEngine.RawInput.Ext;
 
-import :DeviceFeatureContainer;
-
 export namespace PonyEngine::RawInput
 {
 	/// @brief Input device container.
@@ -45,6 +43,11 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(DeviceHandle handle) const noexcept;
 
+		/// @brief Gets a device controller at the @p index.
+		/// @param index Index.
+		/// @return Device controller.
+		[[nodiscard("Pure function")]]
+		IDeviceController& Controller(std::size_t index) const noexcept;
 		/// @brief Gets a device handle at the @p index.
 		/// @param index Index.
 		/// @return Device handle.
@@ -59,12 +62,7 @@ export namespace PonyEngine::RawInput
 		/// @param index Device index.
 		/// @return Device type.
 		[[nodiscard("Pure function")]]
-		DeviceTypeID DeviceType(std::size_t index) const noexcept;
-		/// @brief Gets device features.
-		/// @param index Device index.
-		/// @return Device features.
-		[[nodiscard("Pure function")]]
-		const DeviceFeatureContainer& DeviceFeatures(std::size_t index) const noexcept;
+		struct DeviceType DeviceType(std::size_t index) const noexcept;
 		/// @brief Check if a device at the @p index is connected.
 		/// @param index Device index.
 		/// @return @a True if it's connected; @a false otherwise.
@@ -79,31 +77,30 @@ export namespace PonyEngine::RawInput
 		/// @param axis Axis.
 		/// @return Axis value.
 		[[nodiscard("Pure function")]]
-		float Value(AxisID axis) const noexcept;
+		float Value(Axis axis) const noexcept;
 		/// @brief Gets the axis value of the given device.
 		/// @param axis Axis.
-		/// @param device Device.
+		/// @param deviceIndex Device index.
 		/// @return Axis value.
 		[[nodiscard("Pure function")]]
-		float Value(AxisID axis, DeviceHandle device) const noexcept;
+		float Value(Axis axis, std::size_t deviceIndex) const noexcept;
 		/// @brief Sets the device axis value.
 		/// @param deviceIndex Device index.
 		/// @param axis Axis.
 		/// @param value Axis value.
 		/// @param type Event type.
-		void Value(std::size_t deviceIndex, AxisID axis, float value, InputEventType type);
+		void Value(std::size_t deviceIndex, Axis axis, float value, InputEventType type);
 
 		/// @brief Clears deltas.
 		void ClearDeltas() noexcept;
 
 		/// @brief Adds a new device.
+		/// @param controller Device controller.
 		/// @param handle Device handle.
-		/// @param deviceType Device type.
 		/// @param deviceName Device name.
+		/// @param deviceType Device type.
 		/// @param isConnected Is the device connected?
-		/// @param features Device features.
-		void Add(DeviceHandle handle, DeviceTypeID deviceType, std::string_view deviceName, bool isConnected,
-			std::span<const FeatureEntry> features);
+		void Add(IDeviceController& controller, DeviceHandle handle, std::string_view deviceName, struct DeviceType deviceType, bool isConnected);
 		/// @brief Removes a device.
 		/// @param index Device index.
 		void Remove(std::size_t index) noexcept;
@@ -114,18 +111,12 @@ export namespace PonyEngine::RawInput
 		InputDeviceContainer& operator =(InputDeviceContainer&& other) noexcept = default;
 
 	private:
-		/// @brief Finds an index of the device axis.
-		/// @param handle Device handle.
-		/// @param axis Axis.
-		/// @return Axis index or axes size if not found.
-		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(DeviceHandle handle, AxisID axis) const noexcept;
 		/// @brief Finds an index of the axis among the axis indices.
 		/// @param axisIndices Axis indices.
 		/// @param axis Axis.
 		/// @return Axis index or axes size if not found.
 		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(std::span<const std::size_t> axisIndices, AxisID axis) const noexcept;
+		std::size_t IndexOf(std::span<const std::size_t> axisIndices, Axis axis) const noexcept;
 
 		/// @brief Gets an axis value.
 		/// @param axisIndex Axis index.
@@ -137,17 +128,17 @@ export namespace PonyEngine::RawInput
 		/// @param deviceIndex Device index.
 		/// @param axis Axis.
 		/// @return Axis index.
-		std::size_t AddAxis(std::size_t deviceIndex, AxisID axis);
+		std::size_t AddAxis(std::size_t deviceIndex, Axis axis);
 
+		std::vector<IDeviceController*> controllers; ///< Device controller.
 		std::vector<DeviceHandle> handles; ///< Device handles.
 		std::vector<std::string> deviceNames; ///< Device names.
-		std::vector<DeviceTypeID> deviceTypes; ///< Device types.
-		std::vector<DeviceFeatureContainer> deviceFeatures; ///< Device features.
+		std::vector<struct DeviceType> deviceTypes; ///< Device types.
 		std::vector<bool> connections; ///< Device connection statuses
 		std::vector<std::vector<std::size_t>> axisIndices; ///< Device axes indices. These indices point to the @p axes, @p states and @p deltas.
 
 		// These 3 vectors are synced by index.
-		std::vector<AxisID> axes; ///< Axes.
+		std::vector<Axis> axes; ///< Axes.
 		std::vector<float> states; ///< State values.
 		std::vector<float> deltas; ///< Delta values.
 	};
@@ -165,6 +156,11 @@ namespace PonyEngine::RawInput
 		return std::ranges::find(handles, handle) - handles.cbegin();
 	}
 
+	IDeviceController& InputDeviceContainer::Controller(const std::size_t index) const noexcept
+	{
+		return *controllers[index];
+	}
+
 	DeviceHandle InputDeviceContainer::Handle(const std::size_t index) const noexcept
 	{
 		return handles[index];
@@ -175,14 +171,9 @@ namespace PonyEngine::RawInput
 		return deviceNames[index];
 	}
 
-	DeviceTypeID InputDeviceContainer::DeviceType(const std::size_t index) const noexcept
+	struct DeviceType InputDeviceContainer::DeviceType(const std::size_t index) const noexcept
 	{
 		return deviceTypes[index];
-	}
-
-	const DeviceFeatureContainer& InputDeviceContainer::DeviceFeatures(const std::size_t index) const noexcept
-	{
-		return deviceFeatures[index];
 	}
 
 	bool InputDeviceContainer::IsConnected(const std::size_t index) const noexcept
@@ -197,7 +188,7 @@ namespace PonyEngine::RawInput
 		connections[index] = value;
 	}
 
-	float InputDeviceContainer::Value(const AxisID axis) const noexcept
+	float InputDeviceContainer::Value(const Axis axis) const noexcept
 	{
 		float value = 0.f;
 		for (std::size_t i = 0uz; i < axes.size(); ++i)
@@ -211,13 +202,13 @@ namespace PonyEngine::RawInput
 		return value;
 	}
 
-	float InputDeviceContainer::Value(const AxisID axis, const DeviceHandle device) const noexcept
+	float InputDeviceContainer::Value(const Axis axis, const std::size_t deviceIndex) const noexcept
 	{
-		const std::size_t axisIndex = IndexOf(device, axis);
+		const std::size_t axisIndex = IndexOf(axisIndices[deviceIndex], axis);
 		return axisIndex < axes.size() ? Value(axisIndex) : 0.f;
 	}
 
-	void InputDeviceContainer::Value(const std::size_t deviceIndex, const AxisID axis, const float value, const InputEventType type)
+	void InputDeviceContainer::Value(const std::size_t deviceIndex, const Axis axis, const float value, const InputEventType type)
 	{
 		assert(deviceIndex < Size() && "Incorrect device.");
 
@@ -246,68 +237,29 @@ namespace PonyEngine::RawInput
 		std::ranges::fill(deltas, 0.f);
 	}
 
-	void InputDeviceContainer::Add(const DeviceHandle handle, const DeviceTypeID deviceType, const std::string_view deviceName, const bool isConnected,
-		const std::span<const FeatureEntry> features)
+	void InputDeviceContainer::Add(IDeviceController& controller, const DeviceHandle handle, const std::string_view deviceName, const struct DeviceType deviceType,
+		const bool isConnected)
 	{
-		handles.push_back(handle);
+		const std::size_t initialSize = Size();
+
 		try
 		{
-			deviceNames.emplace_back(deviceName);
-			try
-			{
-				deviceTypes.push_back(deviceType);
-				try
-				{
-					auto featureContainer = DeviceFeatureContainer();
-					for (const FeatureEntry& featureEntry : features)
-					{
-#ifndef NDEBUG
-						if (featureContainer.IndexOf(featureEntry.featureType) < featureContainer.Size())
-						{
-							throw std::invalid_argument(std::format("Feature of type '{}' is added twice", featureEntry.featureType.name()));
-						}
-						if (!featureEntry.feature) [[unlikely]]
-						{
-							throw std::invalid_argument("Feature is nullptr");
-						}
-#endif
-						featureContainer.Add(featureEntry.featureType, featureEntry.feature);
-					}
-					deviceFeatures.push_back(std::move(featureContainer));
-					try
-					{
-						connections.push_back(isConnected);
-						try
-						{
-							axisIndices.push_back(std::vector<std::size_t>());
-						}
-						catch (...)
-						{
-							connections.pop_back();
-							throw;
-						}
-					}
-					catch (...)
-					{
-						deviceFeatures.pop_back();
-						throw;
-					}
-				}
-				catch (...)
-				{
-					deviceTypes.pop_back();
-					throw;
-				}
-			}
-			catch (...)
-			{
-				deviceNames.pop_back();
-				throw;
-			}
+			controllers.push_back(&controller);
+			handles.push_back(handle);
+			deviceNames.push_back(std::string(deviceName));
+			deviceTypes.push_back(deviceType);
+			connections.push_back(isConnected);
+			axisIndices.push_back(std::vector<std::size_t>());
 		}
 		catch (...)
 		{
-			handles.pop_back();
+			axisIndices.resize(initialSize);
+			connections.resize(initialSize);
+			deviceTypes.resize(initialSize);
+			deviceNames.resize(initialSize);
+			handles.resize(initialSize);
+			controllers.resize(initialSize);
+
 			throw;
 		}
 	}
@@ -343,18 +295,18 @@ namespace PonyEngine::RawInput
 
 		axisIndices.erase(axisIndices.cbegin() + index);
 		connections.erase(connections.cbegin() + index);
-		deviceFeatures.erase(deviceFeatures.cbegin() + index);
 		deviceTypes.erase(deviceTypes.cbegin() + index);
 		deviceNames.erase(deviceNames.cbegin() + index);
 		handles.erase(handles.cbegin() + index);
+		controllers.erase(controllers.cbegin() + index);
 	}
 
 	void InputDeviceContainer::Clear() noexcept
 	{
+		controllers.clear();
 		handles.clear();
 		deviceNames.clear();
 		deviceTypes.clear();
-		deviceFeatures.clear();
 		connections.clear();
 		axisIndices.clear();
 
@@ -363,18 +315,7 @@ namespace PonyEngine::RawInput
 		deltas.clear();
 	}
 
-	std::size_t InputDeviceContainer::IndexOf(const DeviceHandle handle, const AxisID axis) const noexcept
-	{
-		const std::size_t deviceIndex = IndexOf(handle);
-		if (deviceIndex >= Size()) [[unlikely]]
-		{
-			return axes.size();
-		}
-
-		return IndexOf(axisIndices[deviceIndex], axis);
-	}
-
-	std::size_t InputDeviceContainer::IndexOf(const std::span<const std::size_t> axisIndices, const AxisID axis) const noexcept
+	std::size_t InputDeviceContainer::IndexOf(const std::span<const std::size_t> axisIndices, const Axis axis) const noexcept
 	{
 		const std::size_t axisIndex = std::ranges::find_if(axisIndices, [&](const std::size_t index) { return axes[index] == axis; }) - axisIndices.cbegin();
 		return axisIndex < axisIndices.size() ? axisIndices[axisIndex] : axes.size();
@@ -385,37 +326,25 @@ namespace PonyEngine::RawInput
 		return states[axisIndex] + deltas[axisIndex];
 	}
 
-	std::size_t InputDeviceContainer::AddAxis(const std::size_t deviceIndex, const AxisID axis)
+	std::size_t InputDeviceContainer::AddAxis(const std::size_t deviceIndex, const Axis axis)
 	{
 		const std::size_t axisIndex = axes.size();
-
 		std::vector<std::size_t>& deviceAxes = axisIndices[deviceIndex];
-		deviceAxes.push_back(axisIndex);
+
+		const std::size_t initialAxisCount = deviceAxes.size();
 		try
 		{
+			deviceAxes.push_back(axisIndex);
 			axes.push_back(axis);
-			try
-			{
-				states.push_back(0.f);
-				try
-				{
-					deltas.push_back(0.f);
-				}
-				catch (...)
-				{
-					states.pop_back();
-					throw;
-				}
-			}
-			catch (...)
-			{
-				axes.pop_back();
-				throw;
-			}
+			states.push_back(0.f);
+			deltas.push_back(0.f);
 		}
 		catch (...)
 		{
-			deviceAxes.pop_back();
+			deltas.resize(initialAxisCount);
+			states.resize(initialAxisCount);
+			axes.resize(initialAxisCount);
+			deviceAxes.resize(initialAxisCount);
 			throw;
 		}
 

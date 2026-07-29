@@ -4,9 +4,9 @@ Raw input implementation module.
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application](../Application)
 - [PonyEngine.RawInput](../RawInput)
 - [PonyEngine.RawInput.Ext](../RawInput.Ext)
 
@@ -29,6 +29,6 @@ Main sub-modules:
 The raw input service's tick steps:
 
 1. Clear temporary data;
-2. Tick providers;
+2. Tick controllers;
 3. Sort input by time stamps;
 4. Process the sorted input - update the internal state and send events.

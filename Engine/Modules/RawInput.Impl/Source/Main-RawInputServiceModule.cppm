@@ -7,16 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.RawInput.Impl:RawInputServiceModule;
 
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
+import PonyEngine.RawInput.Ext;
 
 import :RawInputService;
 
@@ -40,8 +36,7 @@ export namespace PonyEngine::RawInput
 		RawInputServiceModule& operator =(RawInputServiceModule&&) = delete;
 
 	private:
-		Application::ModuleDataHandle inputServiceModuleHandle; ///< Input service module handle.
-		Application::ServiceHandle inputServiceHandle; ///< Input service handle.
+		std::unique_ptr<RawInputService> rawInput; ///< Raw input service.
 	};
 }
 
@@ -49,33 +44,41 @@ namespace PonyEngine::RawInput
 {
 	void RawInputServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(RawInputService).name());
+		rawInput = std::make_unique<RawInputService>(context.Application());
 		try
 		{
-			inputServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
+			context.AddInterface<IRawInputService>(*rawInput);
+			try
 			{
-				const auto input = std::make_shared<RawInputService>(application);
-				inputServiceModuleHandle = context.AddData(std::shared_ptr<IRawInputModuleContext>(input, input.get()));
-				
-				return input;
-			});
+				context.AddInterface<IDeviceHub>(*rawInput);
+				try
+				{
+					context.AddTickable(rawInput->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_RAW_INPUT_TICK_ORDER});
+				}
+				catch (...)
+				{
+					context.RemoveInterface<IDeviceHub>(*rawInput);
+					throw;
+				}
+			}
+			catch (...)
+			{
+				context.RemoveInterface<IRawInputService>(*rawInput);
+				throw;
+			}
 		}
 		catch (...)
 		{
-			if (inputServiceModuleHandle.IsValid())
-			{
-				context.RemoveData(inputServiceModuleHandle);
-			}
+			rawInput.reset();
 			throw;
 		}
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(RawInputService).name());
 	}
 
 	void RawInputServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(RawInputService).name());
-		context.ServiceModuleContext().RemoveService(inputServiceHandle);
-		context.RemoveData(inputServiceModuleHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(RawInputService).name());
+		context.RemoveTickable(rawInput->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_RAW_INPUT_TICK_ORDER});
+		context.RemoveInterface<IDeviceHub>(*rawInput);
+		context.RemoveInterface<IRawInputService>(*rawInput);
+		rawInput.reset();
 	}
 }

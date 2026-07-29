@@ -13,7 +13,7 @@ import std;
 
 import PonyEngine.Math;
 
-import :AxisID;
+import :Axis;
 import :InputEventType;
 
 export namespace PonyEngine::RawInput
@@ -21,7 +21,7 @@ export namespace PonyEngine::RawInput
 	/// @brief Raw input event.
 	struct RawInputEvent final
 	{
-		std::span<const AxisID> axes; ///< Axes. It's synced by index with the @p values.
+		std::span<const Axis> axes; ///< Axes. It's synced by index with the @p values.
 		std::span<const float> values; ///< Values. It's synced by index with the @p axes.
 		InputEventType eventType = InputEventType::State; ///< Event type.
 

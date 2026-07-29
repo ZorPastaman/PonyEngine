@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::RawInput
 {
-	/// @brief Gets the raw input service module.
+	/// @brief Creates the raw input service module.
 	/// @return Raw input service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetRawInputServiceModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateRawInputServiceModule();
 }

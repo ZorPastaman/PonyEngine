@@ -1,5 +1,18 @@
 message(STATUS "Configuring PonyEngine.RawInput.Impl")
 
+if(NOT TARGET PonyEngine.Application)
+	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.RawInput)
+	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.RawInput.Ext)
+	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
+endif()
+
 message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_RAW_INPUT_ORDER "p" CACHE STRING "PonyEngine.RawInput.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_RAW_INPUT_TICK_ORDER "0" CACHE STRING "PonyEngine.RawInput.Impl service tick order. It must be an int32 number.")
@@ -21,9 +34,7 @@ target_sources(PonyEngine.RawInput.Impl PRIVATE
 )
 target_sources(PonyEngine.RawInput.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-DeviceFeatureContainer.cppm"
 	"Source/Main-InputDeviceContainer.cppm"
-	"Source/Main-InputProviderContainer.cppm"
 	"Source/Main-RawInputQueue.cppm"
 	"Source/Main-RawInputService.cppm"
 	"Source/Main-RawInputServiceModule.cppm"
@@ -55,8 +66,8 @@ target_link_libraries(PonyEngine.RawInput.Impl PUBLIC
 	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.RawInput.Impl PRIVATE
-	PonyEngine.RawInput
-	PonyEngine.RawInput.Ext
 	PonyEngine.Core
 	PonyEngine.Log
+	PonyEngine.RawInput
+	PonyEngine.RawInput.Ext
 )

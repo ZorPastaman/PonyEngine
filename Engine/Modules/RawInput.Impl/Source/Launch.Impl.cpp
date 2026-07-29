@@ -14,9 +14,8 @@ import PonyEngine.RawInput.Impl;
 
 namespace PonyEngine::RawInput
 {
-	Application::IModule* GetRawInputServiceModule()
+	std::shared_ptr<Application::IModule> CreateRawInputServiceModule()
 	{
-		static RawInputServiceModule inputModule;
-		return &inputModule;
+		return std::make_shared<RawInputServiceModule>();
 	}
 }
