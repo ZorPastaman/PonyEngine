@@ -27,17 +27,15 @@ export namespace PonyEngine::RawInput
 		PONY_INTERFACE_BODY(IDeviceController)
 
 		/// @brief Ticks the controller.
-		/// @param device Device handle.
 		/// @param inputRegistry Input registry.
 		/// @note The function is always called on a main thread.
-		virtual void Tick(DeviceHandle device, IInputRegistry& inputRegistry) = 0;
+		virtual void Tick(IInputRegistry& inputRegistry) = 0;
 
 		/// @brief Tries to find a feature of the type @p featureType.
-		/// @param device Device handle.
 		/// @param featureType Feature type.
 		/// @return Feature or nullptr if not found.
 		/// @note The function is always called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual void* FindFeature(DeviceHandle device, std::type_index featureType) = 0;
+		virtual void* FindFeature(std::type_index featureType) = 0;
 	};
 }

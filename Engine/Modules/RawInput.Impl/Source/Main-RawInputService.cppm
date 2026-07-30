@@ -256,7 +256,7 @@ namespace PonyEngine::RawInput
 	void* RawInputService::FindFeature(const DeviceHandle deviceHandle, const std::type_index type) const
 	{
 		ValidateMainThread();
-		return devices.Controller(DeviceIndex(deviceHandle)).FindFeature(deviceHandle, type);
+		return devices.Controller(DeviceIndex(deviceHandle)).FindFeature(type);
 	}
 
 	Axis RawInputService::MakeAxis(const std::string_view axis)
@@ -367,10 +367,12 @@ namespace PonyEngine::RawInput
 		{
 			inputObservers.erase(position);
 		}
+#ifndef NDEBUG
 		else [[unlikely]]
 		{
-			PONY_LOG(logService, Log::LogType::Warning, "Tried to remove raw input observer that hadn't been added.");
+			throw std::invalid_argument("Observer wasn't added");
 		}
+#endif
 	}
 
 	DeviceHandle RawInputService::RegisterDevice(IDeviceController& deviceController, const std::string_view deviceName, const struct DeviceType deviceType, 
@@ -471,7 +473,7 @@ namespace PonyEngine::RawInput
 			const DeviceHandle deviceHandle = devices.Handle(i);
 			auto registry = InputRegistry(*this, deviceHandle);
 			PONY_LOG(logService, Log::LogType::Verbose, "Ticking '{}' input device controller.", typeid(controller).name());
-			controller.Tick(deviceHandle, registry);
+			controller.Tick(registry);
 		}
 	}
 

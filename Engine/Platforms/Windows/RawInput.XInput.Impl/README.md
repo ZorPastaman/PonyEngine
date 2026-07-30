@@ -4,10 +4,9 @@ Platform independent module: [PonyEngine.RawInput.XInput.Impl](../../../Modules/
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../../../Modules/Log)
-- [PonyEngine.Application](../Application)
-- [PonyEngine.Surface](../Surface)
 - Xinput.lib (Windows SDK)
 
 ## CMake variables
@@ -22,6 +21,5 @@ These variables are used to configure the build of the module:
 
 Main submodules:
 
-- [GamepadAxisMap](Source/Main-GamepadAxisMap.cppm) - map of the XInput gamepad axes to the engine input axes;
 - [XInputProvider](Source/Main-XInputProvider.cppm) - XInput provider;
 - [XInputProviderModule](Source/Main-XInputProviderModule.cppm) - XInput provider module.

@@ -40,5 +40,42 @@ export namespace PonyEngine::RawInput
 		/// @param deviceHandle Device handle.
 		/// @note @note Must be called on a main thread.
 		virtual void UnregisterDevice(IDeviceController& deviceController, DeviceHandle deviceHandle) = 0;
+
+		/// @brief Makes an axis from the axis string.
+		/// @param axis Axis string.
+		/// @return Axis.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual Axis MakeAxis(std::string_view axis) = 0;
+		/// @brief Checks if the @p axis is valid.
+		/// @param axis Axis id.
+		/// @return @a true if it's valid; @a false otherwise.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual bool IsAxisValid(Axis axis) const = 0;
+		/// @brief Gets an original axis string.
+		/// @param axis Axis. Must be valid.
+		/// @return Axis string.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view GetAxisString(Axis axis) const = 0;
+		/// @brief Makes a device type from the device type string.
+		/// @param deviceType Device type string.
+		/// @return Device type.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual struct DeviceType MakeDeviceType(std::string_view deviceType) = 0;
+		/// @brief Checks if the @p deviceType is valid.
+		/// @param deviceType Device type.
+		/// @return @a true if it's valid; @a false otherwise.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual bool IsDeviceTypeValid(struct DeviceType deviceType) const = 0;
+		/// @brief Gets an original device type string.
+		/// @param deviceType Device type. Must be valid.
+		/// @return Device type string.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view GetDeviceTypeString(struct DeviceType deviceType) const = 0;
 	};
 }

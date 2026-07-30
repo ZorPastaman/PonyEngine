@@ -1,6 +1,6 @@
 # PonyEngine.RawInput.XInput.Impl module
 
-Raw input XInput provider module. It reads XInput input and pushes it into a raw input service.
+Raw input XInput provider module. It reads XInput input and pushes it into a raw input device hub.
 
 The module requires a platform specific implementation.
 

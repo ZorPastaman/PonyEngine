@@ -9,7 +9,6 @@
 
 #include "PonyEngine/RawInput/RawInputServiceModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.RawInput.Impl;
 
 namespace PonyEngine::RawInput

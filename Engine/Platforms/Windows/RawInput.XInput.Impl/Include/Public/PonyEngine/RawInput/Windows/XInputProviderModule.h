@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::RawInput::XInput::Windows
 {
-	/// @brief Gets the XInput provider module.
+	/// @brief Creates the XInput provider module.
 	/// @return XInput provider module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetXInputProviderModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateXInputProviderModule();
 }

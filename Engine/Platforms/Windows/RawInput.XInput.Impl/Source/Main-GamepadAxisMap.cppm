@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 #include <xinput.h>
@@ -47,9 +45,9 @@ export namespace PonyEngine::RawInput::XInput::Windows
 		};
 
 		/// @brief Creates an XInput gamepad axis map.
-		/// @param input Raw input context.
+		/// @param hub Device hub.
 		[[nodiscard("Pure constructor")]]
-		explicit GamepadAxisMap(IRawInputContext& input);
+		explicit GamepadAxisMap(IDeviceHub& hub);
 		GamepadAxisMap(const GamepadAxisMap&) = delete;
 		GamepadAxisMap(GamepadAxisMap&&) = delete;
 
@@ -59,23 +57,23 @@ export namespace PonyEngine::RawInput::XInput::Windows
 		/// @param button Native button.
 		/// @return Button axis.
 		[[nodiscard("Pure function")]]
-		AxisID Button(WORD button) const noexcept;
+		Axis Button(WORD button) const noexcept;
 		/// @brief Gets a trigger axis.
 		/// @param trigger Trigger axis type.
 		/// @return Trigger axis.
 		[[nodiscard("Pure function")]]
-		AxisID Trigger(TriggerAxis trigger) const noexcept;
+		Axis Trigger(TriggerAxis trigger) const noexcept;
 		/// @brief Gets a stick axis.
 		/// @param placement Stick placement.
 		/// @param direction Stick direction.
 		/// @return Stick axis.
 		[[nodiscard("Pure function")]]
-		AxisID Stick(StickPlacement placement, StickDirection direction) const noexcept;
+		Axis Stick(StickPlacement placement, StickDirection direction) const noexcept;
 		/// @brief Gets stick axes in both directions.
 		/// @param placement Stick placement.
 		/// @return Horizontal and vertical stick axes.
 		[[nodiscard("Pure function")]]
-		std::span<const AxisID, 2> Stick(StickPlacement placement) const noexcept;
+		std::span<const Axis, 2> Stick(StickPlacement placement) const noexcept;
 
 		GamepadAxisMap& operator =(const GamepadAxisMap&) = delete;
 		GamepadAxisMap& operator =(GamepadAxisMap&&) = delete;
@@ -87,30 +85,30 @@ export namespace PonyEngine::RawInput::XInput::Windows
 		/// @param index Button index.
 		/// @param nativeAxis Button native axis.
 		/// @param axis Button axis.
-		/// @param input Raw input context.
-		void Bind(std::size_t index, WORD nativeAxis, std::string_view axis, IRawInputContext& input);
+		/// @param hub Device hub.
+		void Bind(std::size_t index, WORD nativeAxis, std::string_view axis, IDeviceHub& hub);
 		/// @brief Binds a trigger.
 		/// @param trigger Trigger axis type.
 		/// @param axis Trigger axis.
-		/// @param input Raw input context.
-		void Bind(TriggerAxis trigger, std::string_view axis, IRawInputContext& input);
+		/// @param hub Device hub.
+		void Bind(TriggerAxis trigger, std::string_view axis, IDeviceHub& hub);
 		/// @brief Binds a stick.
 		/// @param placement Stick placement.
 		/// @param direction Stick direction.
 		/// @param axis Stick axis.
-		/// @param input Raw input context.
-		void Bind(StickPlacement placement, StickDirection direction, std::string_view axis, IRawInputContext& input);
+		/// @param hub Device hub.
+		void Bind(StickPlacement placement, StickDirection direction, std::string_view axis, IDeviceHub& hub);
 
 		std::array<WORD, ButtonCount> nativeAxes; ///< Native button axes.
-		std::array<AxisID, ButtonCount> buttonAxes; ///< Button axes.
-		std::array<AxisID, 2> triggerAxes; ///< Trigger axes. Order: [left, right]
-		std::array<std::array<AxisID, 2>, 2> stickAxes; ///< Stick axes. Order: [left, right][horizontal, vertical].
+		std::array<Axis, ButtonCount> buttonAxes; ///< Button axes.
+		std::array<Axis, 2> triggerAxes; ///< Trigger axes. Order: [left, right]
+		std::array<std::array<Axis, 2>, 2> stickAxes; ///< Stick axes. Order: [left, right][horizontal, vertical].
 	};
 }
 
 namespace PonyEngine::RawInput::XInput::Windows
 {
-	GamepadAxisMap::GamepadAxisMap(IRawInputContext& input)
+	GamepadAxisMap::GamepadAxisMap(IDeviceHub& hub)
 	{
 		constexpr auto buttonMap = std::array<std::pair<WORD, std::string_view>, ButtonCount>
 		{
@@ -131,54 +129,52 @@ namespace PonyEngine::RawInput::XInput::Windows
 		};
 		for (std::size_t i = 0; i < ButtonCount; ++i)
 		{
-			Bind(i, buttonMap[i].first, buttonMap[i].second, input);
+			Bind(i, buttonMap[i].first, buttonMap[i].second, hub);
 		}
 
-		Bind(TriggerAxis::Left, GamepadLayout::TriggerLeftPath, input);
-		Bind(TriggerAxis::Right, GamepadLayout::TriggerRightPath, input);
+		Bind(TriggerAxis::Left, GamepadLayout::TriggerLeftPath, hub);
+		Bind(TriggerAxis::Right, GamepadLayout::TriggerRightPath, hub);
 
-		Bind(StickPlacement::Left, StickDirection::Horizontal, GamepadLayout::LeftStickHorizontalPath, input);
-		Bind(StickPlacement::Left, StickDirection::Vertical, GamepadLayout::LeftStickVerticalPath, input);
-		Bind(StickPlacement::Right, StickDirection::Horizontal, GamepadLayout::RightStickHorizontalPath, input);
-		Bind(StickPlacement::Right, StickDirection::Vertical, GamepadLayout::RightStickVerticalPath, input);
+		Bind(StickPlacement::Left, StickDirection::Horizontal, GamepadLayout::LeftStickHorizontalPath, hub);
+		Bind(StickPlacement::Left, StickDirection::Vertical, GamepadLayout::LeftStickVerticalPath, hub);
+		Bind(StickPlacement::Right, StickDirection::Horizontal, GamepadLayout::RightStickHorizontalPath, hub);
+		Bind(StickPlacement::Right, StickDirection::Vertical, GamepadLayout::RightStickVerticalPath, hub);
 	}
 
-	AxisID GamepadAxisMap::Button(const WORD button) const noexcept
+	Axis GamepadAxisMap::Button(const WORD button) const noexcept
 	{
 		const std::size_t index = std::ranges::find(nativeAxes, button) - nativeAxes.cbegin();
-		assert(index < ButtonCount && "Invalid native button.");
-
 		return buttonAxes[index];
 	}
 
-	AxisID GamepadAxisMap::Trigger(const TriggerAxis trigger) const noexcept
+	Axis GamepadAxisMap::Trigger(const TriggerAxis trigger) const noexcept
 	{
 		return triggerAxes[static_cast<std::size_t>(trigger)];
 	}
 
-	AxisID GamepadAxisMap::Stick(const StickPlacement placement, const StickDirection direction) const noexcept
+	Axis GamepadAxisMap::Stick(const StickPlacement placement, const StickDirection direction) const noexcept
 	{
 		return stickAxes[static_cast<std::size_t>(placement)][static_cast<std::size_t>(direction)];
 	}
 
-	std::span<const AxisID, 2> GamepadAxisMap::Stick(const StickPlacement placement) const noexcept
+	std::span<const Axis, 2> GamepadAxisMap::Stick(const StickPlacement placement) const noexcept
 	{
 		return stickAxes[static_cast<std::size_t>(placement)];
 	}
 
-	void GamepadAxisMap::Bind(const std::size_t index, const WORD nativeAxis, const std::string_view axis, IRawInputContext& input)
+	void GamepadAxisMap::Bind(const std::size_t index, const WORD nativeAxis, const std::string_view axis, IDeviceHub& hub)
 	{
 		nativeAxes[index] = nativeAxis;
-		buttonAxes[index] = input.HashAxis(axis);
+		buttonAxes[index] = hub.MakeAxis(axis);
 	}
 
-	void GamepadAxisMap::Bind(const TriggerAxis trigger, const std::string_view axis, IRawInputContext& input)
+	void GamepadAxisMap::Bind(const TriggerAxis trigger, const std::string_view axis, IDeviceHub& hub)
 	{
-		triggerAxes[static_cast<std::size_t>(trigger)] = input.HashAxis(axis);
+		triggerAxes[static_cast<std::size_t>(trigger)] = hub.MakeAxis(axis);
 	}
 
-	void GamepadAxisMap::Bind(const StickPlacement placement, const StickDirection direction, const std::string_view axis, IRawInputContext& input)
+	void GamepadAxisMap::Bind(const StickPlacement placement, const StickDirection direction, const std::string_view axis, IDeviceHub& hub)
 	{
-		stickAxes[static_cast<std::size_t>(placement)][static_cast<std::size_t>(direction)] = input.HashAxis(axis);
+		stickAxes[static_cast<std::size_t>(placement)][static_cast<std::size_t>(direction)] = hub.MakeAxis(axis);
 	}
 }

@@ -9,14 +9,12 @@
 
 #include "PonyEngine/RawInput/Windows/XInputProviderModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.RawInput.XInput.Impl.Windows;
 
 namespace PonyEngine::RawInput::XInput::Windows
 {
-	Application::IModule* GetXInputProviderModule()
+	std::shared_ptr<Application::IModule> CreateXInputProviderModule()
 	{
-		static XInputProviderModule controllerProviderModule;
-		return &controllerProviderModule;
+		return std::make_shared<XInputProviderModule>();
 	}
 }
