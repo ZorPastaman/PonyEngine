@@ -18,6 +18,7 @@ target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-Axis.cppm"
 	"Source/Main-ConnectionEvent.cppm"
 	"Source/Main-DeviceHandle.cppm"
+	"Source/Main-DeviceStyle.cppm"
 	"Source/Main-DeviceType.cppm"
 	"Source/Main-Gamepad.cppm"
 	"Source/Main-InputEventType.cppm"
@@ -28,6 +29,7 @@ target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-Layout.cppm"
 	"Source/Main-Mouse.cppm"
 	"Source/Main-RawInputEvent.cppm"
+	"Source/Main-Style.cppm"
 )
 
 message(VERBOSE "Setting properties")

@@ -43,16 +43,16 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(DeviceHandle handle) const noexcept;
 
-		/// @brief Gets a device controller at the @p index.
-		/// @param index Index.
-		/// @return Device controller.
-		[[nodiscard("Pure function")]]
-		IDeviceController& Controller(std::size_t index) const noexcept;
 		/// @brief Gets a device handle at the @p index.
 		/// @param index Index.
 		/// @return Device handle.
 		[[nodiscard("Pure function")]]
 		DeviceHandle Handle(std::size_t index) const noexcept;
+		/// @brief Gets a device controller at the @p index.
+		/// @param index Index.
+		/// @return Device controller.
+		[[nodiscard("Pure function")]]
+		IDeviceController& Controller(std::size_t index) const noexcept;
 		/// @brief Gets a device name.
 		/// @param index Device index.
 		/// @return Device name.
@@ -63,6 +63,17 @@ export namespace PonyEngine::RawInput
 		/// @return Device type.
 		[[nodiscard("Pure function")]]
 		struct DeviceType DeviceType(std::size_t index) const noexcept;
+		/// @brief Gets a device style.
+		/// @param index Device index.
+		/// @return Device style.
+		[[nodiscard("Pure function")]]
+		struct DeviceStyle DeviceStyle(std::size_t index) const noexcept;
+		/// @brief Tries to find a feature.
+		/// @param index Device index.
+		/// @param type Feature type.
+		/// @return Feature or nullptr if not found.
+		[[nodiscard("Pure function")]]
+		void* FindFeature(std::size_t index, std::type_index type) const noexcept;
 		/// @brief Check if a device at the @p index is connected.
 		/// @param index Device index.
 		/// @return @a True if it's connected; @a false otherwise.
@@ -97,10 +108,9 @@ export namespace PonyEngine::RawInput
 		/// @brief Adds a new device.
 		/// @param controller Device controller.
 		/// @param handle Device handle.
-		/// @param deviceName Device name.
-		/// @param deviceType Device type.
 		/// @param isConnected Is the device connected?
-		void Add(IDeviceController& controller, DeviceHandle handle, std::string_view deviceName, struct DeviceType deviceType, bool isConnected);
+		/// @param params Device parameters.
+		void Add(DeviceHandle handle, IDeviceController& controller, bool isConnected, const DeviceParams& params);
 		/// @brief Removes a device.
 		/// @param index Device index.
 		void Remove(std::size_t index) noexcept;
@@ -130,10 +140,12 @@ export namespace PonyEngine::RawInput
 		/// @return Axis index.
 		std::size_t AddAxis(std::size_t deviceIndex, Axis axis);
 
-		std::vector<IDeviceController*> controllers; ///< Device controller.
 		std::vector<DeviceHandle> handles; ///< Device handles.
+		std::vector<IDeviceController*> controllers; ///< Device controller.
 		std::vector<std::string> deviceNames; ///< Device names.
 		std::vector<struct DeviceType> deviceTypes; ///< Device types.
+		std::vector<struct DeviceStyle> deviceStyles; ///< Device styles.
+		std::vector<std::vector<FeatureEntry>> features; ///< Device features.
 		std::vector<bool> connections; ///< Device connection statuses
 		std::vector<std::vector<std::size_t>> axisIndices; ///< Device axes indices. These indices point to the @p axes, @p states and @p deltas.
 
@@ -174,6 +186,22 @@ namespace PonyEngine::RawInput
 	struct DeviceType InputDeviceContainer::DeviceType(const std::size_t index) const noexcept
 	{
 		return deviceTypes[index];
+	}
+
+	struct DeviceStyle InputDeviceContainer::DeviceStyle(const std::size_t index) const noexcept
+	{
+		return deviceStyles[index];
+	}
+
+	void* InputDeviceContainer::FindFeature(const std::size_t index, const std::type_index type) const noexcept
+	{
+		const std::span<const FeatureEntry> featureEntries = features[index];
+		if (const auto position = std::ranges::find(featureEntries, type, &FeatureEntry::featureType); position != featureEntries.cend())
+		{
+			return position->feature;
+		}
+
+		return nullptr;
 	}
 
 	bool InputDeviceContainer::IsConnected(const std::size_t index) const noexcept
@@ -237,17 +265,18 @@ namespace PonyEngine::RawInput
 		std::ranges::fill(deltas, 0.f);
 	}
 
-	void InputDeviceContainer::Add(IDeviceController& controller, const DeviceHandle handle, const std::string_view deviceName, const struct DeviceType deviceType,
-		const bool isConnected)
+	void InputDeviceContainer::Add(const DeviceHandle handle, IDeviceController& controller, const bool isConnected, const DeviceParams& params)
 	{
 		const std::size_t initialSize = Size();
 
 		try
 		{
-			controllers.push_back(&controller);
 			handles.push_back(handle);
-			deviceNames.push_back(std::string(deviceName));
-			deviceTypes.push_back(deviceType);
+			controllers.push_back(&controller);
+			deviceNames.push_back(std::string(params.name));
+			deviceTypes.push_back(params.type);
+			deviceStyles.push_back(params.style);
+			features.push_back(std::vector(params.features.cbegin(), params.features.cend()));
 			connections.push_back(isConnected);
 			axisIndices.push_back(std::vector<std::size_t>());
 		}
@@ -255,10 +284,12 @@ namespace PonyEngine::RawInput
 		{
 			axisIndices.resize(initialSize);
 			connections.resize(initialSize);
+			features.resize(initialSize);
+			deviceStyles.resize(initialSize);
 			deviceTypes.resize(initialSize);
 			deviceNames.resize(initialSize);
-			handles.resize(initialSize);
 			controllers.resize(initialSize);
+			handles.resize(initialSize);
 
 			throw;
 		}
@@ -295,18 +326,22 @@ namespace PonyEngine::RawInput
 
 		axisIndices.erase(axisIndices.cbegin() + index);
 		connections.erase(connections.cbegin() + index);
+		features.erase(features.cbegin() + index);
+		deviceStyles.erase(deviceStyles.cbegin() + index);
 		deviceTypes.erase(deviceTypes.cbegin() + index);
 		deviceNames.erase(deviceNames.cbegin() + index);
-		handles.erase(handles.cbegin() + index);
 		controllers.erase(controllers.cbegin() + index);
+		handles.erase(handles.cbegin() + index);
 	}
 
 	void InputDeviceContainer::Clear() noexcept
 	{
-		controllers.clear();
 		handles.clear();
+		controllers.clear();
 		deviceNames.clear();
 		deviceTypes.clear();
+		deviceStyles.clear();
+		features.clear();
 		connections.clear();
 		axisIndices.clear();
 

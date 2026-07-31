@@ -7,16 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.RawInput.Keyboard.Impl.Windows:KeyboardProviderModule;
 
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
 import PonyEngine.RawInput.Ext;
 
 import :KeyboardProvider;
@@ -41,7 +36,7 @@ export namespace PonyEngine::RawInput::Keyboard
 		KeyboardProviderModule& operator =(KeyboardProviderModule&&) = delete;
 
 	private:
-		InputProviderHandle keyboardProviderHandle; ///< Keyboard provider handle.
+		std::unique_ptr<KeyboardProvider> keyboardProvider; ///< Keyboard provider.
 	};
 }
 
@@ -49,34 +44,11 @@ namespace PonyEngine::RawInput::Keyboard
 {
 	void KeyboardProviderModule::StartUp(Application::IModuleContext& context)
 	{
-		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
-#ifndef NDEBUG
-		if (!inputModuleContext) [[unlikely]]
-		{
-			throw std::logic_error("Raw input module context not found");
-		}
-#endif
-
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(KeyboardProvider).name());
-		keyboardProviderHandle = inputModuleContext->AddProvider([&](IRawInputContext& input)
-		{
-			return std::make_shared<KeyboardProvider>(input);
-		});
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(KeyboardProvider).name());
+		keyboardProvider = std::make_unique<KeyboardProvider>(context.Application());
 	}
 
 	void KeyboardProviderModule::ShutDown(Application::IModuleContext& context)
 	{
-		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
-#ifndef NDEBUG
-		if (!inputModuleContext) [[unlikely]]
-		{
-			throw std::logic_error("Raw input module context not found");
-		}
-#endif
-
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(KeyboardProvider).name());
-		inputModuleContext->RemoveProvider(keyboardProviderHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(KeyboardProvider).name());
+		keyboardProvider.reset();
 	}
 }

@@ -1,5 +1,18 @@
 message(STATUS "Configuring PonyEngine.RawInput.Keyboard.Impl for Windows")
 
+if(NOT TARGET PonyEngine.Application)
+	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Log)
+	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.WinAPIInput)
+	message(FATAL_ERROR "PonyEngine.WinAPIInput wasn't configured")
+endif()
+
 message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_RAW_INPUT_KEYBOARD_ORDER "p" CACHE STRING "PonyEngine.RawInput.Keyboard.Impl module initialization order. Its first character must be in range [b-y].")
 
@@ -29,13 +42,11 @@ target_compile_definitions(PonyEngine.RawInput.Keyboard.Impl PUBLIC
 )
 
 message(VERBOSE "Configuring dependencies")
-if(NOT TARGET PonyEngine.Surface)
-	message(FATAL_ERROR "PonyEngine.Surface wasn't configured")
-endif()
 target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PUBLIC
 	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PRIVATE
+	PonyEngine.Core
 	PonyEngine.Log
-	PonyEngine.Surface
+	PonyEngine.WinAPIInput
 )

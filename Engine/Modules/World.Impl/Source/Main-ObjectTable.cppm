@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.World.Impl:ObjectTable;
 
 import std;
@@ -72,7 +76,7 @@ export namespace PonyEngine::World
 		/// @param handle Object handle.
 		/// @return Object.
 		[[nodiscard("Pure function")]]
-		const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const;
+		const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept;
 
 		/// @brief Collects garbage.
 		/// @param context World service context.
@@ -144,24 +148,20 @@ namespace PonyEngine::World
 
 	void ObjectTable::UnregisterObject(const std::type_index objectType, const TypelessObjectHandle handle)
 	{
-#ifndef NDEBUG
 		if (!IsObjectValid(objectType, handle)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid handle");
 		}
-#endif
 
 		KillObject(handle.id);
 	}
 
 	void ObjectTable::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, const std::shared_ptr<void>& object)
 	{
-#ifndef NDEBUG
 		if (!IsObjectValid(objectType, handle)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid handle");
 		}
-#endif
 
 		objects[objectsSparse[handle.id]].object = object;
 	}
@@ -172,15 +172,9 @@ namespace PonyEngine::World
 			handleVersions[handle.id] == handle.version && objects[objectsSparse[handle.id]].type == objectType;
 	}
 
-	const std::shared_ptr<void>& ObjectTable::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const
+	const std::shared_ptr<void>& ObjectTable::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
 	{
-#ifndef NDEBUG
-		if (!IsObjectValid(objectType, handle)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid handle");
-		}
-#endif
-
+		assert(IsObjectValid(objectType, handle) && "Invalid handle.");
 		return objects[objectsSparse[handle.id]].object;
 	}
 

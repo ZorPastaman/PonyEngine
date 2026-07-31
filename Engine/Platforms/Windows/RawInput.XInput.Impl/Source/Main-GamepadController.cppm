@@ -27,7 +27,7 @@ import :GamepadAxisMap;
 export namespace PonyEngine::RawInput::XInput
 {
 	/// @brief XInput gamepad controller.
-	class GamepadController final : public IDeviceController, private IVibrating
+	class GamepadController final : public IVibrating, private IDeviceController
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -45,21 +45,23 @@ export namespace PonyEngine::RawInput::XInput
 
 		~GamepadController() noexcept = default;
 
-		virtual void Tick(IInputRegistry& inputRegistry) override;
-
-		[[nodiscard("Pure function")]] 
-		virtual void* FindFeature(std::type_index featureType) override;
+		virtual void Vibrate(float lowFrequency, float highFrequency) override;
 
 		/// @brief Checks if a gamepad is connected.
 		/// @return @a True if it's connected; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsConnected() const noexcept;
 
+		/// @brief Gets the device controller.
+		/// @return Device controller.
+		[[nodiscard("Pure function")]]
+		IDeviceController& Controller() noexcept;
+
 		GamepadController& operator =(const GamepadController& other) noexcept = default;
 		GamepadController& operator =(GamepadController&& other) noexcept = default;
 
 	private:
-		virtual void Vibrate(float lowFrequency, float highFrequency) override;
+		virtual void Tick(IInputRegistry& inputRegistry) override;
 
 		/// @brief Updates a connection state.
 		/// @param isConnected Is a gamepad connected now?
@@ -126,6 +128,29 @@ namespace PonyEngine::RawInput::XInput
 	{
 	}
 
+	void GamepadController::Vibrate(const float lowFrequency, const float highFrequency)
+	{
+		auto vibration = XINPUT_VIBRATION
+		{
+			.wLeftMotorSpeed = Math::RoundToIntegral<WORD>(std::clamp(lowFrequency, 0.f, 1.f) * std::numeric_limits<WORD>::max()),
+			.wRightMotorSpeed = Math::RoundToIntegral<WORD>(std::clamp(highFrequency, 0.f, 1.f) * std::numeric_limits<WORD>::max())
+		};
+		const DWORD result = XInputSetState(gamepadIndex, &vibration);
+
+		PONY_LOG_IF(result != ERROR_SUCCESS && result != ERROR_DEVICE_NOT_CONNECTED, logService, Log::LogType::Error,
+			"Failed to set XInput device vibration. Error code: '0x{:X}'.", result);
+	}
+
+	bool GamepadController::IsConnected() const noexcept
+	{
+		return isConnected;
+	}
+
+	IDeviceController& GamepadController::Controller() noexcept
+	{
+		return *this;
+	}
+
 	void GamepadController::Tick(IInputRegistry& inputRegistry)
 	{
 		const std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
@@ -141,34 +166,6 @@ namespace PonyEngine::RawInput::XInput
 				"Failed to get XInput gamepad state. X user index: '{}'; Error code: '0x{:X}'.", gamepadIndex, stateResult);
 			UpdateConnection(false, now, inputRegistry);
 		}
-	}
-
-	void* GamepadController::FindFeature(const std::type_index featureType)
-	{
-		if (featureType == typeid(IVibrating))
-		{
-			return static_cast<IVibrating*>(this);
-		}
-
-		return nullptr;
-	}
-
-	bool GamepadController::IsConnected() const noexcept
-	{
-		return isConnected;
-	}
-
-	void GamepadController::Vibrate(const float lowFrequency, const float highFrequency)
-	{
-		auto vibration = XINPUT_VIBRATION
-		{
-			.wLeftMotorSpeed = Math::RoundToIntegral<WORD>(std::clamp(lowFrequency, 0.f, 1.f) * std::numeric_limits<WORD>::max()),
-			.wRightMotorSpeed = Math::RoundToIntegral<WORD>(std::clamp(highFrequency, 0.f, 1.f) * std::numeric_limits<WORD>::max())
-		};
-		const DWORD result = XInputSetState(gamepadIndex, &vibration);
-
-		PONY_LOG_IF(result != ERROR_SUCCESS && result != ERROR_DEVICE_NOT_CONNECTED, logService, Log::LogType::Error,
-			"Failed to set XInput device vibration. Error code: '0x{:X}'.", result);
 	}
 
 	void GamepadController::UpdateConnection(const bool isConnected, const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry)

@@ -9,7 +9,6 @@
 
 #pragma once
 
-#ifndef NDEBUG
 /// @brief Adds format checks in debug builds. For internal use only.
 #define PONY_ENUM_FORMATTER_ERROR_CHECK \
 	if (context.begin() == context.end()) [[unlikely]] \
@@ -20,10 +19,6 @@
 	{ \
 		throw std::format_error("Unexpected format specifier."); \
 	}
-#else
- /// @brief Adds format checks in debug builds. For internal use only.
-#define PONY_ENUM_FORMATTER_ERROR_CHECK
-#endif
 
 /// @brief Creates a formatter for an enum value.
 /// @note This define must be used in a global namespace.

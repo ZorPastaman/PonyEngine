@@ -67,13 +67,13 @@ export namespace PonyEngine::Application
 		virtual int ShowCommand() const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual UINT LastMessageType() const override;
+		virtual UINT LastMessageType() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual DWORD LastMessageNativeTimePoint() const override;
+		virtual DWORD LastMessageNativeTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTimePoint() const override;
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual POINT LastMessageCursorPoint() const override;
+		virtual POINT LastMessageCursorPoint() const noexcept override;
 
 		/// @brief Updates the command line.
 		void UpdateCommandLine();
@@ -188,51 +188,27 @@ namespace PonyEngine::Application
 		return showCmd;
 	}
 
-	UINT GUIProcess::LastMessageType() const
+	UINT GUIProcess::LastMessageType() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return lastMessageType;
 	}
 
-	DWORD GUIProcess::LastMessageNativeTimePoint() const
+	DWORD GUIProcess::LastMessageNativeTimePoint() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return lastMessageNativeTime;
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> GUIProcess::LastMessageTimePoint() const
+	std::chrono::time_point<std::chrono::steady_clock> GUIProcess::LastMessageTimePoint() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return lastMessageTime;
 	}
 
-	POINT GUIProcess::LastMessageCursorPoint() const
+	POINT GUIProcess::LastMessageCursorPoint() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return lastMessageCursorPoint;
 	}
 

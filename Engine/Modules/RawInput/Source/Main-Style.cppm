@@ -10,25 +10,21 @@
 module;
 
 #include "PonyEngine/Object/Body.h"
+#include "PonyEngine/RawInput/Brand.h"
 
-export module PonyEngine.RawInput.Ext:IDeviceController;
+export module PonyEngine.RawInput:Style;
 
 import std;
 
-import PonyEngine.RawInput;
-
-import :IInputRegistry;
-
 export namespace PonyEngine::RawInput
 {
-	/// @brief Device controller.
-	class IDeviceController
+	/// @brief Predefined styles.
+	struct Style final
 	{
-		PONY_INTERFACE_BODY(IDeviceController)
+		PONY_NON_CONSTRUCTIBLE_BODY(Style)
 
-		/// @brief Ticks the controller.
-		/// @param inputRegistry Input registry.
-		/// @note The function is always called on a main thread.
-		virtual void Tick(IInputRegistry& inputRegistry) = 0;
+		static constexpr std::string_view None = "None"; ///< No style.
+		static constexpr std::string_view Xbox = PONY_INPUT_XBOX; ///< Xbox brand.
+		static constexpr std::string_view PlayStation = PONY_INPUT_PLAYSTATION; ///< PlayStation brand.
 	};
 }

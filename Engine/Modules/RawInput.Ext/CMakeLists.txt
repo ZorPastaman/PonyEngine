@@ -13,6 +13,8 @@ add_library(PonyEngine.RawInput.Ext STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
+	"Source/Main-DeviceParams.cppm"
+	"Source/Main-FeatureEntry.cppm"
 	"Source/Main-IDeviceController.cppm"
 	"Source/Main-IDeviceHub.cppm"
 	"Source/Main-IInputRegistry.cppm"

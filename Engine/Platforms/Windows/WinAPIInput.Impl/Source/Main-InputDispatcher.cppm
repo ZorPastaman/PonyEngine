@@ -93,9 +93,6 @@ export namespace PonyEngine::WinAPIInput
 		[[nodiscard("Pure function")]]
 		static constexpr UINT ToUsageKey(USHORT usagePage, USHORT usage) noexcept;
 
-		/// @brief Validates if the current thread is main.
-		void ValidateMainThread() const;
-
 		Application::IApplication* application; ///< Application.
 		Log::ILogService* logService; ///< Log service.
 
@@ -193,7 +190,7 @@ namespace PonyEngine::WinAPIInput
 
 	void InputDispatcher::AddObserver(IRawInputObserver& observer, const USHORT usagePage, const USHORT usage)
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 
 		const UINT usageKey = ToUsageKey(usagePage, usage);
 		std::vector<IRawInputObserver*>& usageObservers = rawInputObservers[usageKey];
@@ -208,7 +205,7 @@ namespace PonyEngine::WinAPIInput
 
 	void InputDispatcher::RemoveObserver(IRawInputObserver& observer, const USHORT usagePage, const USHORT usage)
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 
 		const UINT usageKey = ToUsageKey(usagePage, usage);
 		if (const auto usagePosition = rawInputObservers.find(usageKey); usagePosition != rawInputObservers.cend()) [[likely]]
@@ -227,9 +224,7 @@ namespace PonyEngine::WinAPIInput
 			}
 		}
 
-#ifndef NDEBUG
-		throw std::invalid_argument("Observer wasn't added");
-#endif
+		assert(false && "Observer wasn't added");
 	}
 
 	void InputDispatcher::ObserveRawInput(const WPARAM wParam, const LPARAM lParam) noexcept
@@ -381,15 +376,5 @@ namespace PonyEngine::WinAPIInput
 	constexpr UINT InputDispatcher::ToUsageKey(const USHORT usagePage, const USHORT usage) noexcept
 	{
 		return static_cast<UINT>(usagePage) << 16 | usage;
-	}
-
-	void InputDispatcher::ValidateMainThread() const
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
 	}
 }

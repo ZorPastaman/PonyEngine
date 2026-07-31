@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.RawInput;
 
+import :DeviceParams;
 import :IDeviceController;
 
 export namespace PonyEngine::RawInput
@@ -28,18 +29,17 @@ export namespace PonyEngine::RawInput
 
 		/// @brief Registers a new device.
 		/// @param deviceController Device controller. Must be kept alive till the device is unregistered. The same controller may be used for many devices.
-		/// @param deviceName Device name.
-		/// @param deviceType Device type.
 		/// @param isConnected Is the device connected?
+		/// @param params Device parameters.
 		/// @return Device handle. Must be used to unregister a device before a destruction of the raw input service.
 		/// @note @note Must be called on a main thread.
 		[[nodiscard("Must be used to unregister")]]
-		virtual DeviceHandle RegisterDevice(IDeviceController& deviceController, std::string_view deviceName, DeviceType deviceType, bool isConnected) = 0;
+		virtual DeviceHandle RegisterDevice(IDeviceController& deviceController, bool isConnected, const DeviceParams& params) = 0;
 		/// @brief Unregisters a device.
-		/// @param deviceController Device controller.
 		/// @param deviceHandle Device handle.
+		/// @param deviceController Device controller.
 		/// @note @note Must be called on a main thread.
-		virtual void UnregisterDevice(IDeviceController& deviceController, DeviceHandle deviceHandle) = 0;
+		virtual void UnregisterDevice(DeviceHandle deviceHandle, IDeviceController& deviceController) = 0;
 
 		/// @brief Makes an axis from the axis string.
 		/// @param axis Axis string.
@@ -77,5 +77,23 @@ export namespace PonyEngine::RawInput
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
 		virtual std::string_view GetDeviceTypeString(struct DeviceType deviceType) const = 0;
+		/// @brief Makes a device style from the device style string.
+		/// @param deviceStyle Device style string.
+		/// @return Device style.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual struct DeviceStyle MakeDeviceStyle(std::string_view deviceStyle) = 0;
+		/// @brief Checks if the @p deviceStyle is valid.
+		/// @param deviceStyle Device style.
+		/// @return @a true if it's valid; @a false otherwise.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual bool IsDeviceStyleValid(struct DeviceStyle deviceStyle) const = 0;
+		/// @brief Gets an original device style string.
+		/// @param deviceStyle Device style. Must be valid.
+		/// @return Device style string.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view GetDeviceStyleString(struct DeviceStyle deviceStyle) const = 0;
 	};
 }

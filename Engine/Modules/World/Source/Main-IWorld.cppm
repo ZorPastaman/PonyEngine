@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Object/Body.h"
 
 export module PonyEngine.World:IWorld;
@@ -59,7 +61,7 @@ export namespace PonyEngine::World
 		/// @param entities Entities to check.
 		/// @param valid Entity validity. @a True if an entity is valid; @a false otherwise. 
 		///              Synced with the @p entities by index. Its size must be the same as the size of the @p entities.
-		virtual void AreValid(std::span<const Entity> entities, std::span<bool> valid) const = 0;
+		virtual void AreValid(std::span<const Entity> entities, std::span<bool> valid) const noexcept = 0;
 		/// @brief Creates new entities.
 		/// @param entities New entities. Its size defines how many entities to create.
 		virtual void CreateEntities(std::span<Entity> entities) = 0;
@@ -145,49 +147,49 @@ export namespace PonyEngine::World
 		/// @param entity Entity. Must be valid.
 		/// @return @a True if it has; @p false otherwise.
 		template<Component T> [[nodiscard("Pure function")]]
-		bool HasComponent(Entity entity) const;
+		bool HasComponent(Entity entity) const noexcept;
 		/// @brief Checks if the entity has a component.
 		/// @param entity Entity. Must be valid.
 		/// @param componentType Component type.
 		/// @return @a True if it has; @p false otherwise.
 		[[nodiscard("Pure function")]]
-		bool HasComponent(Entity entity, std::type_index componentType) const;
+		bool HasComponent(Entity entity, std::type_index componentType) const noexcept;
 		/// @brief Checks if all the entities have components.
 		/// @tparam T Component type.
 		/// @param entities Entities. Must be valid.
 		/// @return @a True if they have; @p false otherwise.
 		template<Component T> [[nodiscard("Pure function")]]
-		bool HasComponents(std::span<const Entity> entities) const;
+		bool HasComponents(std::span<const Entity> entities) const noexcept;
 		/// @brief Checks if all the entities have components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @return @a True if they have; @p false otherwise.
 		[[nodiscard("Pure function")]]
-		virtual bool HasComponents(std::span<const Entity> entities, std::type_index componentType) const = 0;
+		virtual bool HasComponents(std::span<const Entity> entities, std::type_index componentType) const noexcept = 0;
 		/// @brief Checks if the entities have components.
 		/// @tparam T Component type.
 		/// @param entities Entities. Must be valid.
 		/// @param has Has flags. @a True if an entity has a component; @a false otherwise.
 		///            Synced with the @p entities by index. Its size must be the same as the size of the @p entities.
 		template<Component T>
-		void HasComponents(std::span<const Entity> entities, std::span<bool> has) const;
+		void HasComponents(std::span<const Entity> entities, std::span<bool> has) const noexcept;
 		/// @brief Checks if the entities have components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param has Has flags. @a True if an entity has a component; @a false otherwise.
 		///            Synced with the @p entities by index. Its size must be the same as the size of the @p entities.
-		virtual void HasComponents(std::span<const Entity> entities, std::type_index componentType, std::span<bool> has) const = 0;
+		virtual void HasComponents(std::span<const Entity> entities, std::type_index componentType, std::span<bool> has) const noexcept = 0;
 
 		/// @brief Gets a component table size.
 		/// @tparam T Component type.
 		/// @return Component table size.
 		template<Component T> [[nodiscard("Pure function")]]
-		std::size_t CountComponents() const;
+		std::size_t CountComponents() const noexcept;
 		/// @brief Gets a component table size.
 		/// @param componentType Component type.
 		/// @return Component table size.
 		[[nodiscard("Pure function")]]
-		virtual std::size_t CountComponents(std::type_index componentType) const = 0;
+		virtual std::size_t CountComponents(std::type_index componentType) const noexcept = 0;
 
 		/// @brief Gets all the entities that have a component of type @p T.
 		/// @tparam T Component type.
@@ -195,26 +197,26 @@ export namespace PonyEngine::World
 		/// @return Count of entities written to the @p entities.
 		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
 		template<Component T>
-		std::size_t GetEntities(std::span<Entity> entities) const;
+		std::size_t GetEntities(std::span<Entity> entities) const noexcept;
 		/// @brief Gets all the entities that have a component of type @p componentType.
 		/// @param componentType Component type.
 		/// @param entities Entities.
 		/// @return Count of entities written to the @p entities.
 		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
-		virtual std::size_t GetEntities(std::type_index componentType, std::span<Entity> entities) const = 0;
+		virtual std::size_t GetEntities(std::type_index componentType, std::span<Entity> entities) const noexcept = 0;
 		/// @brief Gets all the components of type @p T.
 		/// @tparam T Component type.
 		/// @param componentData Component data.
 		/// @return Count of components written to the @p componentData.
 		/// @note If the world has more components than the @p componentData size, only @p componentData.size() first components will be written.
 		template<Component T>
-		std::size_t GetComponents(std::span<T*> componentData) const;
+		std::size_t GetComponents(std::span<T*> componentData) const noexcept;
 		/// @brief Gets all the components of type @p componentType.
 		/// @param componentType Component type.
 		/// @param componentData Component data.
 		/// @return Count of components written to the @p componentData.
 		/// @note If the world has more components than the @p componentData size, only @p componentData.size() first components will be written.
-		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> componentData) const = 0;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> componentData) const noexcept = 0;
 		/// @brief Gets all the entities and components of type @p T.
 		/// @tparam T Component type.
 		/// @param entities Entities.
@@ -222,14 +224,14 @@ export namespace PonyEngine::World
 		/// @return Count of entities written to the @p entities.
 		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
 		template<Component T>
-		std::size_t GetEntitiesAndComponents(std::span<Entity> entities, std::span<T*> componentData) const;
+		std::size_t GetEntitiesAndComponents(std::span<Entity> entities, std::span<T*> componentData) const noexcept;
 		/// @brief Gets all the entities and components of type @p componentType.
 		/// @param componentType Component type.
 		/// @param entities Entities.
 		/// @param componentData Component data. Its size must be synced with the @p entities.
 		/// @return Count of entities written to the @p entities.
 		/// @note If the world has more entities than the @p entities size, only @p entities.size() first entities will be written.
-		virtual std::size_t GetEntitiesAndComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> componentData) const = 0;
+		virtual std::size_t GetEntitiesAndComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> componentData) const noexcept = 0;
 
 		/// @brief Removes all the components of the type @p T.
 		/// @tparam T Component type.
@@ -243,7 +245,7 @@ export namespace PonyEngine::World
 		/// @param params Query parameters.
 		/// @return Maximum possible number of entities.
 		[[nodiscard("Pure function")]]
-		virtual std::size_t CountQuery(const QueryParams& params) const = 0;
+		virtual std::size_t CountQuery(const QueryParams& params) const noexcept = 0;
 		/// @brief Runs the entity query.
 		/// @param params Query parameters.
 		/// @param callback Query callback. It's called on each entity that satisfies the query parameters.
@@ -280,13 +282,13 @@ export namespace PonyEngine::World
 		/// @param handle Object handle. Must be valid.
 		/// @return Object pointer.
 		template<typename T> [[nodiscard("Pure function")]]
-		T* GetObject(ObjectHandle<T> handle) const;
+		T* GetObject(ObjectHandle<T> handle) const noexcept;
 		/// @brief Gets an object shared pointer.
 		/// @tparam T Object type.
 		/// @param handle Object handle. Must be valid.
 		/// @return Object shared pointer.
 		template<typename T> [[nodiscard("Pure function")]]
-		std::shared_ptr<T> GetSharedObject(ObjectHandle<T> handle) const;
+		std::shared_ptr<T> GetSharedObject(ObjectHandle<T> handle) const noexcept;
 
 		/// @brief Collects garbage objects and removes them.
 		virtual void CollectGarbage() = 0;
@@ -319,7 +321,7 @@ export namespace PonyEngine::World
 		/// @param handle Object handle. Must be valid.
 		/// @return Object.
 		[[nodiscard("Pure function")]]
-		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const = 0;
+		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
 	};
 }
 
@@ -375,13 +377,7 @@ namespace PonyEngine::World
 	template<Component T>
 	void IWorld::AddComponents(const std::span<const Entity> entities, const std::span<const T> componentData)
 	{
-#ifndef NDEBUG
-		if (entities.size() != componentData.size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Entity and component span sizes are mismatched");
-		}
-#endif
-
+		assert(entities.size() == componentData.size() && "Entity and component span sizes are mismatched");
 		AddComponents(entities, typeid(T), componentData.data());
 	}
 
@@ -409,48 +405,48 @@ namespace PonyEngine::World
 	}
 
 	template<Component T>
-	bool IWorld::HasComponent(const Entity entity) const
+	bool IWorld::HasComponent(const Entity entity) const noexcept
 	{
 		return HasComponent(entity, typeid(T));
 	}
 
-	bool IWorld::HasComponent(const Entity entity, const std::type_index componentType) const
+	bool IWorld::HasComponent(const Entity entity, const std::type_index componentType) const noexcept
 	{
 		return HasComponents(std::span(&entity, 1uz), componentType);
 	}
 
 	template<Component T>
-	bool IWorld::HasComponents(const std::span<const Entity> entities) const
+	bool IWorld::HasComponents(const std::span<const Entity> entities) const noexcept
 	{
 		return HasComponents(entities, typeid(T));
 	}
 
 	template<Component T>
-	void IWorld::HasComponents(const std::span<const Entity> entities, const std::span<bool> has) const
+	void IWorld::HasComponents(const std::span<const Entity> entities, const std::span<bool> has) const noexcept
 	{
 		HasComponents(entities, typeid(T), has);
 	}
 
 	template<Component T>
-	std::size_t IWorld::CountComponents() const
+	std::size_t IWorld::CountComponents() const noexcept
 	{
 		return CountComponents(typeid(T));
 	}
 
 	template<Component T>
-	std::size_t IWorld::GetEntities(const std::span<Entity> entities) const
+	std::size_t IWorld::GetEntities(const std::span<Entity> entities) const noexcept
 	{
 		return GetEntities(typeid(T), entities);
 	}
 
 	template<Component T>
-	std::size_t IWorld::GetComponents(const std::span<T*> componentData) const
+	std::size_t IWorld::GetComponents(const std::span<T*> componentData) const noexcept
 	{
 		return GetComponents(typeid(T), std::span(reinterpret_cast<void**>(componentData.data()), componentData.size()));
 	}
 
 	template<Component T>
-	std::size_t IWorld::GetEntitiesAndComponents(const std::span<Entity> entities, const std::span<T*> componentData) const
+	std::size_t IWorld::GetEntitiesAndComponents(const std::span<Entity> entities, const std::span<T*> componentData) const noexcept
 	{
 		return GetEntitiesAndComponents(typeid(T), entities, std::span(reinterpret_cast<void**>(componentData.data()), componentData.size()));
 	}
@@ -486,13 +482,13 @@ namespace PonyEngine::World
 	}
 
 	template<typename T>
-	T* IWorld::GetObject(const ObjectHandle<T> handle) const
+	T* IWorld::GetObject(const ObjectHandle<T> handle) const noexcept
 	{
 		return static_cast<T*>(GetObject(typeid(T), handle.typeless).get());
 	}
 
 	template<typename T>
-	std::shared_ptr<T> IWorld::GetSharedObject(const ObjectHandle<T> handle) const
+	std::shared_ptr<T> IWorld::GetSharedObject(const ObjectHandle<T> handle) const noexcept
 	{
 		return std::static_pointer_cast<T>(GetObject(typeid(T), handle.typeless));
 	}

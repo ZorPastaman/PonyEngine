@@ -24,11 +24,13 @@ export namespace PonyEngine::WinAPIInput
 		/// @brief Invoked on an input event.
 		/// @param rawInput Raw input.
 		/// @note The function is always called on a main thread.
+		/// @note It's called inside message pump queue.
 		virtual void OnInput(const RAWINPUT& rawInput) {}
 		/// @brief Invoked on a device connection change.
 		/// @param device Device handle.
 		/// @param isConnected Is the device connected?
 		/// @note The function is always called on a main thread.
+		/// @note It's called inside message pump queue.
 		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) {}
 	};
 }

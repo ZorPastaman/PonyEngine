@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Time.Impl:TimeService;
@@ -35,44 +37,44 @@ export namespace PonyEngine::Time
 		~TimeService() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds RealTime() const override;
+		virtual std::chrono::nanoseconds RealTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds VirtualTime() const override;
+		virtual std::chrono::nanoseconds VirtualTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds UnscaledVirtualTime() const override;
+		virtual std::chrono::nanoseconds UnscaledVirtualTime() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealStepCount() const override;
+		virtual std::uint64_t RealStepCount() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualStepCount() const override;
+		virtual std::uint64_t VirtualStepCount() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualStepCount() const override;
+		virtual std::uint64_t UnscaledVirtualStepCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds RealDeltaTime() const override;
+		virtual std::chrono::nanoseconds RealDeltaTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds VirtualDeltaTime() const override;
+		virtual std::chrono::nanoseconds VirtualDeltaTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds UnscaledVirtualDeltaTime() const override;
+		virtual std::chrono::nanoseconds UnscaledVirtualDeltaTime() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t RealDeltaStepCount() const override;
+		virtual std::uint64_t RealDeltaStepCount() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t VirtualDeltaStepCount() const override;
+		virtual std::uint64_t VirtualDeltaStepCount() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t UnscaledVirtualDeltaStepCount() const override;
+		virtual std::uint64_t UnscaledVirtualDeltaStepCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds DeltaTimeCap() const override;
-		virtual void DeltaTimeCap(std::chrono::nanoseconds cap) override;
+		virtual std::chrono::nanoseconds DeltaTimeCap() const noexcept override;
+		virtual void DeltaTimeCap(std::chrono::nanoseconds cap) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual double TimeScale() const override;
-		virtual void TimeScale(double scale) override;
+		virtual double TimeScale() const noexcept override;
+		virtual void TimeScale(double scale) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds StepPeriod() const override;
-		virtual void StepPeriod(std::chrono::nanoseconds period) override;
+		virtual std::chrono::nanoseconds StepPeriod() const noexcept override;
+		virtual void StepPeriod(std::chrono::nanoseconds period) noexcept override;
 
 		/// @brief Gets the tickable.
 		/// @return Tickable.
@@ -140,221 +142,113 @@ namespace PonyEngine::Time
 	{
 	}
 
-	std::chrono::nanoseconds TimeService::RealTime() const
+	std::chrono::nanoseconds TimeService::RealTime() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return realTime;
 	}
 
-	std::chrono::nanoseconds TimeService::VirtualTime() const
+	std::chrono::nanoseconds TimeService::VirtualTime() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return virtualTime;
 	}
 
-	std::chrono::nanoseconds TimeService::UnscaledVirtualTime() const
+	std::chrono::nanoseconds TimeService::UnscaledVirtualTime() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return unscaledVirtualTime;
 	}
 
-	std::uint64_t TimeService::RealStepCount() const
+	std::uint64_t TimeService::RealStepCount() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return realStepCount;
 	}
 
-	std::uint64_t TimeService::VirtualStepCount() const
+	std::uint64_t TimeService::VirtualStepCount() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return virtualStepCount;
 	}
 
-	std::uint64_t TimeService::UnscaledVirtualStepCount() const
+	std::uint64_t TimeService::UnscaledVirtualStepCount() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return unscaledVirtualStepCount;
 	}
 
-	std::chrono::nanoseconds TimeService::RealDeltaTime() const
+	std::chrono::nanoseconds TimeService::RealDeltaTime() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return realDeltaTime;
 	}
 
-	std::chrono::nanoseconds TimeService::VirtualDeltaTime() const
+	std::chrono::nanoseconds TimeService::VirtualDeltaTime() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return virtualDeltaTime;
 	}
 
-	std::chrono::nanoseconds TimeService::UnscaledVirtualDeltaTime() const
+	std::chrono::nanoseconds TimeService::UnscaledVirtualDeltaTime() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return unscaledVirtualDeltaTime;
 	}
 
-	std::uint64_t TimeService::RealDeltaStepCount() const
+	std::uint64_t TimeService::RealDeltaStepCount() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return realDeltaStepCount;
 	}
 
-	std::uint64_t TimeService::VirtualDeltaStepCount() const
+	std::uint64_t TimeService::VirtualDeltaStepCount() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return virtualDeltaStepCount;
 	}
 
-	std::uint64_t TimeService::UnscaledVirtualDeltaStepCount() const
+	std::uint64_t TimeService::UnscaledVirtualDeltaStepCount() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return unscaledVirtualDeltaStepCount;
 	}
 
-	std::chrono::nanoseconds TimeService::DeltaTimeCap() const
+	std::chrono::nanoseconds TimeService::DeltaTimeCap() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return deltaTimeCap;
 	}
 
-	void TimeService::DeltaTimeCap(const std::chrono::nanoseconds cap)
+	void TimeService::DeltaTimeCap(const std::chrono::nanoseconds cap) noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		deltaTimeCap = std::max(cap, std::chrono::nanoseconds(1));
 		PONY_LOG(logService, Log::LogType::Debug, "Delta time cap changed to '{}'.", deltaTimeCap);
 	}
 
-	double TimeService::TimeScale() const
+	double TimeService::TimeScale() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return timeScale;
 	}
 
-	void TimeService::TimeScale(const double scale)
+	void TimeService::TimeScale(const double scale) noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		timeScale = std::max(scale, 0.);
 		PONY_LOG(logService, Log::LogType::Debug, "Time scale changed to '{}'.", timeScale);
 	}
 
-	std::chrono::nanoseconds TimeService::StepPeriod() const
+	std::chrono::nanoseconds TimeService::StepPeriod() const noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		return stepPeriod;
 	}
 
-	void TimeService::StepPeriod(const std::chrono::nanoseconds period)
+	void TimeService::StepPeriod(const std::chrono::nanoseconds period) noexcept
 	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != application->MainThreadID()) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
-
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		stepPeriod = std::max(period, std::chrono::nanoseconds(1));
 		PONY_LOG(logService, Log::LogType::Debug, "Frame period changed to '{}'.", stepPeriod);
 	}

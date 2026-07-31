@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.World.Impl:World;
 
 import std;
@@ -41,7 +45,7 @@ export namespace PonyEngine::World
 		virtual std::size_t GetEntities(std::span<Entity> entities) const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual bool AreValid(std::span<const Entity> entities) const noexcept override;
-		virtual void AreValid(std::span<const Entity> entities, std::span<bool> valid) const override;
+		virtual void AreValid(std::span<const Entity> entities, std::span<bool> valid) const noexcept override;
 		virtual void CreateEntities(std::span<Entity> entities) override;
 		virtual void DestroyEntities(std::span<const Entity> entities) override;
 
@@ -52,20 +56,20 @@ export namespace PonyEngine::World
 		virtual void RemoveComponents(std::span<const Entity> entities, std::type_index componentType) override;
 
 		[[nodiscard("Pure function")]] 
-		virtual bool HasComponents(std::span<const Entity> entities, std::type_index componentType) const override;
-		virtual void HasComponents(std::span<const Entity> entities, std::type_index componentType, std::span<bool> has) const override;
+		virtual bool HasComponents(std::span<const Entity> entities, std::type_index componentType) const noexcept override;
+		virtual void HasComponents(std::span<const Entity> entities, std::type_index componentType, std::span<bool> has) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual std::size_t CountComponents(std::type_index componentType) const override;
+		virtual std::size_t CountComponents(std::type_index componentType) const noexcept override;
 
-		virtual std::size_t GetEntities(std::type_index componentType, std::span<Entity> entities) const override;
-		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> componentData) const override;
-		virtual std::size_t GetEntitiesAndComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> componentData) const override;
+		virtual std::size_t GetEntities(std::type_index componentType, std::span<Entity> entities) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> componentData) const noexcept override;
+		virtual std::size_t GetEntitiesAndComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> componentData) const noexcept override;
 
 		virtual void DropComponents(std::type_index componentType) override;
 
 		[[nodiscard("Pure function")]] 
-		virtual std::size_t CountQuery(const QueryParams& params) const override;
+		virtual std::size_t CountQuery(const QueryParams& params) const noexcept override;
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const override;
 
 		virtual void CollectGarbage() override;
@@ -82,7 +86,7 @@ export namespace PonyEngine::World
 		[[nodiscard("Pure function")]] 
 		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const override;
+		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 
 	private:
 		/// @brief Checks if the entity is invalid.
@@ -286,14 +290,9 @@ namespace PonyEngine::World
 		return true;
 	}
 
-	void World::AreValid(const std::span<const Entity> entities, const std::span<bool> valid) const
+	void World::AreValid(const std::span<const Entity> entities, const std::span<bool> valid) const noexcept
 	{
-#ifndef NDEBUG
-		if (entities.size() != valid.size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Entity and valid span sizes are mismatched");
-		}
-#endif
+		assert(entities.size() == valid.size() && "Entity and valid span sizes are mismatched");
 
 		for (std::size_t i = 0; i < entities.size(); ++i)
 		{
@@ -355,12 +354,7 @@ namespace PonyEngine::World
 
 	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const void* const componentData)
 	{
-#ifndef NDEBUG
-		if (!componentData) [[unlikely]]
-		{
-			throw std::invalid_argument("Component data is nullptr");
-		}
-#endif
+		assert(componentData && "Component data is nullptr");
 
 		const ComponentTable& table = UpdateComponents(entities, componentType);
 
@@ -375,12 +369,7 @@ namespace PonyEngine::World
 
 	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> componentData)
 	{
-#ifndef NDEBUG
-		if (entities.size() != componentData.size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Entity and component data span sizes are mismatched");
-		}
-#endif
+		assert(entities.size() == componentData.size() && "Entity and component data span sizes are mismatched");
 
 		const ComponentTable& table = UpdateComponents(entities, componentType);
 
@@ -405,7 +394,7 @@ namespace PonyEngine::World
 		}
 	}
 
-	bool World::HasComponents(const std::span<const Entity> entities, const std::type_index componentType) const
+	bool World::HasComponents(const std::span<const Entity> entities, const std::type_index componentType) const noexcept
 	{
 		CheckIfValid(entities);
 
@@ -425,16 +414,11 @@ namespace PonyEngine::World
 		return false;
 	}
 
-	void World::HasComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<bool> has) const
+	void World::HasComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<bool> has) const noexcept
 	{
 		CheckIfValid(entities);
 
-#ifndef NDEBUG
-		if (entities.size() != has.size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Entity and has span sizes are mismatched");
-		}
-#endif
+		assert(entities.size() == has.size() && "Entity and has span sizes are mismatched");
 
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
@@ -449,7 +433,7 @@ namespace PonyEngine::World
 		}
 	}
 
-	std::size_t World::CountComponents(const std::type_index componentType) const
+	std::size_t World::CountComponents(const std::type_index componentType) const noexcept
 	{
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
@@ -459,7 +443,7 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
-	std::size_t World::GetEntities(const std::type_index componentType, const std::span<Entity> entities) const
+	std::size_t World::GetEntities(const std::type_index componentType, const std::span<Entity> entities) const noexcept
 	{
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
@@ -472,7 +456,7 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
-	std::size_t World::GetComponents(const std::type_index componentType, const std::span<void*> componentData) const
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<void*> componentData) const noexcept
 	{
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
@@ -485,14 +469,9 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
-	std::size_t World::GetEntitiesAndComponents(const std::type_index componentType, const std::span<Entity> entities, const std::span<void*> componentData) const
+	std::size_t World::GetEntitiesAndComponents(const std::type_index componentType, const std::span<Entity> entities, const std::span<void*> componentData) const noexcept
 	{
-#ifndef NDEBUG
-		if (entities.size() != componentData.size())
-		{
-			throw std::invalid_argument("Entity and component data span sizes are mismatched");
-		}
-#endif
+		assert(entities.size() == componentData.size() && "Entity and component data span sizes are mismatched");
 
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
@@ -514,7 +493,7 @@ namespace PonyEngine::World
 		}
 	}
 
-	std::size_t World::CountQuery(const QueryParams& params) const
+	std::size_t World::CountQuery(const QueryParams& params) const noexcept
 	{
 		CheckForDuplicates(params.requiredComponentTypes);
 		CheckForDuplicates(params.excludedComponentTypes);
@@ -540,13 +519,7 @@ namespace PonyEngine::World
 		CheckForDuplicates(params.requiredComponentTypes, params.excludedComponentTypes);
 		CheckForDuplicates(params.requiredComponentTypes, params.optionalComponentTypes);
 		CheckForDuplicates(params.excludedComponentTypes, params.optionalComponentTypes);
-
-#ifndef NDEBUG
-		if (!callback) [[unlikely]]
-		{
-			throw std::invalid_argument("Callback is nullptr");
-		}
-#endif
+		assert(callback && "Callback is nullptr");
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<void*>((params.requiredComponentTypes.size() + params.optionalComponentTypes.size()) * 2uz + params.excludedComponentTypes.size()) +
 			Memory::CalculateBufferSize<std::size_t, void*>(params.optionalComponentTypes.size());
@@ -606,7 +579,7 @@ namespace PonyEngine::World
 		return objectTable.IsObjectValid(objectType, handle);
 	}
 
-	const std::shared_ptr<void>& World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const
+	const std::shared_ptr<void>& World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
 	{
 		return objectTable.GetObject(objectType, handle);
 	}
@@ -653,12 +626,7 @@ namespace PonyEngine::World
 		{
 			return &componentTables[position->second];
 		}
-#ifndef NDEBUG
-		if (!context->TypeRegistry().IsValidComponent(componentType)) [[unlikely]]
-		{
-			throw std::invalid_argument("Component type is not registered");
-		}
-#endif
+		assert(context->TypeRegistry().IsValidComponent(componentType) && "Component type is not registered");
 
 		return nullptr;
 	}
@@ -889,60 +857,39 @@ namespace PonyEngine::World
 	void World::CheckIfValid(const std::span<const Entity> entities) const
 	{
 		CheckForDuplicates(entities);
-
-#ifndef NDEBUG
-		if (!AreValid(entities)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid entity");
-		}
-#endif
+		assert(AreValid(entities) && "Invalid entity");
 	}
 
 	void World::CheckForDuplicates(const std::span<const Entity> entities)
 	{
-#ifndef NDEBUG
 		for (std::size_t i = 1uz; i < entities.size(); ++i)
 		{
 			for (std::size_t j = 0uz; j < i; ++j)
 			{
-				if (entities[i].id == entities[j].id) [[unlikely]]
-				{
-					throw std::invalid_argument("Duplicate entity");
-				}
+				assert(entities[i].id != entities[j].id && "Duplicate entity");
 			}
 		}
-#endif
 	}
 
 	void World::CheckForDuplicates(const std::span<const std::type_index> types)
 	{
-#ifndef NDEBUG
 		for (std::size_t i = 1uz; i < types.size(); ++i)
 		{
 			for (std::size_t j = 0uz; j < i; ++j)
 			{
-				if (types[i] == types[j]) [[unlikely]]
-				{
-					throw std::invalid_argument("Duplicate type");
-				}
+				assert(types[i] != types[j] && "Duplicate type");
 			}
 		}
-#endif
 	}
 
 	void World::CheckForDuplicates(const std::span<const std::type_index> firstTypes, const std::span<const std::type_index> secondTypes)
 	{
-#ifndef NDEBUG
 		for (const std::type_index firstType : firstTypes)
 		{
 			for (const std::type_index secondType : secondTypes)
 			{
-				if (firstType == secondType) [[unlikely]]
-				{
-					throw std::invalid_argument("Duplicate type");
-				}
+				assert(firstType != secondType && "Duplicate type");
 			}
 		}
-#endif
 	}
 }

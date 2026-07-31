@@ -4,10 +4,11 @@ Platform independent module: [PonyEngine.RawInput.Keyboard.Impl](../../../Module
 
 ## Dependencies
 
-- [PonyEngine.Log](../../../Modules/Log)
 - [PonyEngine.Application](../Application)
-- [PonyEngine.Surface](../Surface)
-
+- [PonyEngine.Core](../Core)
+- [PonyEngine.Log](../../../Modules/Log)
+- [PonyEngine.WinAPIInput](../WinAPIInput)
+ 
 ## CMake variables
 
 These variables are used to configure the build of the module:

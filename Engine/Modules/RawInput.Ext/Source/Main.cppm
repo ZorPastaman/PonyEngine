@@ -11,6 +11,8 @@ export module PonyEngine.RawInput.Ext;
 
 export import PonyEngine.RawInput;
 
+export import :DeviceParams;
+export import :FeatureEntry;
 export import :IDeviceController;
 export import :IDeviceHub;
 export import :IInputRegistry;

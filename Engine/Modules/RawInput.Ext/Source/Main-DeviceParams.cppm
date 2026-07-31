@@ -7,8 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput.Keyboard.Impl;
+export module PonyEngine.RawInput.Ext:DeviceParams;
 
-export import PonyEngine.RawInput.Ext;
+import std;
 
-export import :KeyboardController;
+import PonyEngine.RawInput;
+
+import :FeatureEntry;
+
+export namespace PonyEngine::RawInput
+{
+	/// @brief Device parameters.
+	struct DeviceParams final
+	{
+		std::string_view name; ///< Device name.
+		DeviceType type; ///< Device type.
+		DeviceStyle style; ///< Device style.
+		std::span<const FeatureEntry> features; ///< Device features.
+	};
+}

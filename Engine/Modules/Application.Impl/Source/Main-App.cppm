@@ -105,36 +105,36 @@ export namespace PonyEngine::Application
 		virtual std::span<const std::string_view> CommandLine() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::optional<int> ExitCode() const override;
-		virtual void Stop(int exitCode = 0) override;
+		virtual std::optional<int> ExitCode() const noexcept override;
+		virtual void Stop(int exitCode = 0) noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t FrameCount() const override;
+		virtual std::uint64_t FrameCount() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> StartTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const override;
+		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> ThisFrameTimePoint() const override;
+		virtual std::chrono::time_point<std::chrono::steady_clock> ThisFrameTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::chrono::time_point<std::chrono::steady_clock> NextFrameTimePoint() const override;
+		virtual std::chrono::time_point<std::chrono::steady_clock> NextFrameTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::time_point<std::chrono::steady_clock> NowTimePoint() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds PrevFrameTime() const override;
+		virtual std::chrono::nanoseconds PrevFrameTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds ThisFrameTime() const override;
+		virtual std::chrono::nanoseconds ThisFrameTime() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::chrono::nanoseconds NextFrameTime() const override;
+		virtual std::chrono::nanoseconds NextFrameTime() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::chrono::nanoseconds NowTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds DeltaTime() const override;
+		virtual std::chrono::nanoseconds DeltaTime() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds TargetFrameTime() const override;
-		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) override;
+		virtual std::chrono::nanoseconds TargetFrameTime() const noexcept override;
+		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual void* FindInterface(std::type_index type) const override;
+		virtual void* FindInterface(std::type_index type) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
 		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment) override;
@@ -351,9 +351,6 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		Buffer GetBuffer(TempBufferCache& cache, std::size_t requiredAlignment) const;
 
-		/// @brief Validates that a current thread is main.
-		void ValidateMainThread() const;
-
 		std::thread::id mainThreadId; ///< Main thread ID. It's a thread on which this class was created.
 		std::span<const std::string_view> commandLine; ///< Command line.
 
@@ -504,15 +501,15 @@ namespace PonyEngine::Application
 		return commandLine;
 	}
 
-	std::optional<int> App::ExitCode() const
+	std::optional<int> App::ExitCode() const noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 		return exitCode;
 	}
 
-	void App::Stop(const int exitCode)
+	void App::Stop(const int exitCode) noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 
 		if (this->exitCode)
 		{
@@ -525,9 +522,9 @@ namespace PonyEngine::Application
 		}
 	}
 
-	std::uint64_t App::FrameCount() const
+	std::uint64_t App::FrameCount() const noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 		return frameCount;
 	}
 
@@ -536,21 +533,21 @@ namespace PonyEngine::Application
 		return startTimePoint;
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> App::PrevFrameTimePoint() const
+	std::chrono::time_point<std::chrono::steady_clock> App::PrevFrameTimePoint() const noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 		return prevFrameTimePoint;
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> App::ThisFrameTimePoint() const
+	std::chrono::time_point<std::chrono::steady_clock> App::ThisFrameTimePoint() const noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 		return thisFrameTimePoint;
 	}
 
-	std::chrono::time_point<std::chrono::steady_clock> App::NextFrameTimePoint() const
+	std::chrono::time_point<std::chrono::steady_clock> App::NextFrameTimePoint() const noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 		return thisFrameTimePoint + targetFrameTime;
 	}
 
@@ -559,17 +556,17 @@ namespace PonyEngine::Application
 		return std::chrono::steady_clock::now();
 	}
 
-	std::chrono::nanoseconds App::PrevFrameTime() const
+	std::chrono::nanoseconds App::PrevFrameTime() const noexcept
 	{
 		return PrevFrameTimePoint() - startTimePoint;
 	}
 
-	std::chrono::nanoseconds App::ThisFrameTime() const
+	std::chrono::nanoseconds App::ThisFrameTime() const noexcept
 	{
 		return ThisFrameTimePoint() - startTimePoint;
 	}
 
-	std::chrono::nanoseconds App::NextFrameTime() const
+	std::chrono::nanoseconds App::NextFrameTime() const noexcept
 	{
 		return NextFrameTimePoint() - startTimePoint;
 	}
@@ -579,27 +576,27 @@ namespace PonyEngine::Application
 		return NowTimePoint() - startTimePoint;
 	}
 
-	std::chrono::nanoseconds App::DeltaTime() const
+	std::chrono::nanoseconds App::DeltaTime() const noexcept
 	{
 		return ThisFrameTimePoint() - PrevFrameTimePoint();
 	}
 
-	std::chrono::nanoseconds App::TargetFrameTime() const
+	std::chrono::nanoseconds App::TargetFrameTime() const noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 		return targetFrameTime;
 	}
 
-	void App::TargetFrameTime(const std::chrono::nanoseconds frameTime)
+	void App::TargetFrameTime(const std::chrono::nanoseconds frameTime) noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 		targetFrameTime = std::max(frameTime, std::chrono::nanoseconds(0));
 		PONY_LOG(logService, Log::LogType::Info, "Target frame time changed to: '{}'.", targetFrameTime);
 	}
 
-	void* App::FindInterface(const std::type_index type) const
+	void* App::FindInterface(const std::type_index type) const noexcept
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 
 		if (const auto position = interfaces.find(type); position != interfaces.cend()) [[likely]]
 		{
@@ -612,11 +609,7 @@ namespace PonyEngine::Application
 	TempBuffer App::AcquireTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
 	{
 		PONY_LOG(logService, Log::LogType::Verbose, "Acquiring temp buffer... Size: '{}'; Alignment: '{}'.", requiredSize, requiredAlignment);
-
-		if (!std::has_single_bit(requiredAlignment)) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid alignment");
-		}
+		assert(std::has_single_bit(requiredAlignment) && "Invalid alignment");
 
 		TempBufferCache& cache = GetCache();
 		Buffer buffer = GetBuffer(cache, std::max(requiredAlignment, alignof(std::max_align_t)));
@@ -853,16 +846,11 @@ namespace PonyEngine::Application
 
 	void App::AddInterface(const std::type_index type, void* const interface)
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 
 		PONY_LOG(logService, Log::LogType::Info, "Adding interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
 		const auto [iterator, added] = interfaces.try_emplace(type, interface);
-#ifndef NDEBUG
-		if (!added) [[unlikely]]
-		{
-			throw std::invalid_argument("Interface is already added");
-		}
-#endif
+		assert(added && "Interface is already added");
 	}
 
 	template<typename T>
@@ -879,19 +867,12 @@ namespace PonyEngine::Application
 
 	void App::RemoveInterface(const std::type_index type, const void* const interface)
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 
 		PONY_LOG(logService, Log::LogType::Info, "Removing interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
-		if (const auto position = interfaces.find(type); position != interfaces.cend() && position->second == interface) [[likely]]
-		{
-			interfaces.erase(position);
-		}
-#ifndef NDEBUG
-		else [[unlikely]]
-		{
-			throw std::invalid_argument("Interface wasn't added");
-		}
-#endif
+		const auto position = interfaces.find(type);
+		assert(position != interfaces.cend() && position->second == interface && "Interface wasn't added");
+		interfaces.erase(position);
 	}
 
 	template<typename T>
@@ -902,7 +883,7 @@ namespace PonyEngine::Application
 
 	void App::AddTickable(ITickable& tickable, const TickableOrder& tickableOrder)
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 
 		PONY_LOG(logService, Log::LogType::Info, "Adding tickable. Tickable: '{}'; Begin order: '{}'; Tick order: '{}'.", typeid(tickable).name(), 
 			tickableOrder.beginOrder, tickableOrder.tickOrder);
@@ -911,20 +892,13 @@ namespace PonyEngine::Application
 
 	void App::RemoveTickable(ITickable& tickable, const TickableOrder& tickableOrder)
 	{
-		ValidateMainThread();
+		assert(std::this_thread::get_id() == mainThreadId && "Must be called on main thread");
 
 		PONY_LOG(logService, Log::LogType::Info, "Removing tickable. Tickable: '{}'; Begin order: '{}'; Tick order: '{}'.", typeid(tickable).name(),
 			tickableOrder.beginOrder, tickableOrder.tickOrder);
-		if (const auto position = std::ranges::find(tickables, std::pair(&tickable, tickableOrder)); position != tickables.cend()) [[likely]]
-		{
-			tickables.erase(position);
-		}
-#ifndef NDEBUG
-		else [[unlikely]]
-		{
-			throw std::invalid_argument("Tickable wasn't added");
-		}
-#endif
+		const auto position = std::ranges::find(tickables, std::pair(&tickable, tickableOrder));
+		assert(position != tickables.cend() && "Tickable wasn't added");
+		tickables.erase(position);
 	}
 
 	const Log::ILogService* App::LogService() const noexcept
@@ -1018,7 +992,7 @@ namespace PonyEngine::Application
 
 	void App::ShutDownModuleContext::AddInterface(const std::type_index type, void* const interface)
 	{
-		throw std::logic_error("Can't add interface during shut-down");
+		assert(false && "Can't add interface during shut-down");
 	}
 
 	void App::ShutDownModuleContext::RemoveInterface(const std::type_index type, void* const interface)
@@ -1028,7 +1002,7 @@ namespace PonyEngine::Application
 
 	void App::ShutDownModuleContext::AddTickable(ITickable& tickable, const TickableOrder& tickOrder)
 	{
-		throw std::logic_error("Can't add tickable during shut-down");
+		assert(false && "Can't add tickable during shut-down");
 	}
 
 	void App::ShutDownModuleContext::RemoveTickable(ITickable& tickable, const TickableOrder& tickOrder)
@@ -1065,12 +1039,7 @@ namespace PonyEngine::Application
 			if (const auto moduleGetter = *reinterpret_cast<ModuleGetter*>(current))
 			{
 				std::shared_ptr<IModule> appModule = moduleGetter();
-#ifndef NDEBUG
-				if (!appModule) [[unlikely]]
-				{
-					throw std::logic_error("Module is nullptr");
-				}
-#endif
+				assert(appModule && "Module is nullptr");
 				PONY_LOG(logService, Log::LogType::Info, "Module created: '{}'.", typeid(*appModule).name());
 				modules.push_back(std::move(appModule));
 			}
@@ -1260,15 +1229,5 @@ namespace PonyEngine::Application
 		}
 
 		return buffer;
-	}
-
-	void App::ValidateMainThread() const
-	{
-#ifndef NDEBUG
-		if (std::this_thread::get_id() != mainThreadId) [[unlikely]]
-		{
-			throw std::logic_error("Must be called on main thread");
-		}
-#endif
 	}
 }

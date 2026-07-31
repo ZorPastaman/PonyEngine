@@ -24,12 +24,6 @@ export namespace PonyEngine::RawInput
 		PONY_NON_CONSTRUCTIBLE_BODY(GamepadDevice)
 
 		static constexpr std::string_view GenericType = PONY_INPUT_GAMEPAD; ///< Generic gamepad type. A gamepad device supports the @p GamepadLayout.
-
-		static constexpr std::string_view Xbox = PONY_INPUT_XBOX; ///< Xbox name.
-		static constexpr std::string_view XboxType = PONY_INPUT_GAMEPAD_XBOX; ///< Xbox gamepad type. An Xbox gamepad device supports the @p GamepadLayout.
-
-		static constexpr std::string_view PlayStation = PONY_INPUT_PLAYSTATION; ///< PlayStation name.
-		static constexpr std::string_view PlayStationType = PONY_INPUT_GAMEPAD_PLAYSTATION; ///< PlayStation gamepad type. A PlayStation gamepad device supports the @p GamepadLayout.
 	};
 
 	/// @brief Gamepad layout.

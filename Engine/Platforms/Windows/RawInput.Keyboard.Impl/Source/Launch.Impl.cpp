@@ -9,14 +9,12 @@
 
 #include "PonyEngine/RawInput/Windows/KeyboardProviderModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.RawInput.Keyboard.Impl.Windows;
 
 namespace PonyEngine::RawInput::Keyboard
 {
-	Application::IModule* GetKeyboardProviderModule()
+	std::shared_ptr<Application::IModule> CreateKeyboardProviderModule()
 	{
-		static KeyboardProviderModule keyboardProviderModule;
-		return &keyboardProviderModule;
+		return std::make_shared<KeyboardProviderModule>();
 	}
 }

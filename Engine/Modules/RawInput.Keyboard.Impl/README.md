@@ -6,14 +6,15 @@ The module requires a platform specific implementation.
 
 ## Dependencies
 
-- [PonyEngine.Core](../Core)
 - [PonyEngine.RawInput](../RawInput)
 - [PonyEngine.RawInput.Ext](../RawInput.Ext)
 
 ## For Pony Engine developers
 
-The module contains some utilities that can be useful for keyboard implementations on any platform:
+Main modules:
 
-- [KeyboardContainer](Source/Main-KeyboardContainer.cppm);
-- [KeyboardEvent](Source/Main-KeyboardEvent.cppm);
-- [KeyboardEventQueue](Source/Main-KeyboardEventQueue.cppm).
+### [PonyEngine.RawInput.Keyboard.Impl](Source/Main.cppm)
+
+#### [KeyboardController](Source/Main-KeyboardController.cppm)
+
+Platform independent keyboard controller.

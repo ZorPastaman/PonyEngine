@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::RawInput::Keyboard
 {
-	/// @brief Gets the keyboard provider module.
+	/// @brief Creates the keyboard provider module.
 	/// @return Keyboard provider module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetKeyboardProviderModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateKeyboardProviderModule();
 }

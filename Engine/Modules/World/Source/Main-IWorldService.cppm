@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Object/Body.h"
 
 export module PonyEngine.World:IWorldService;
@@ -70,12 +72,7 @@ namespace PonyEngine::World
 	template<Component Component, typename Object>
 	void IWorldService::RegisterComponentObjectHandleMember(ObjectHandle<Object> Component::* const member)
 	{
-#ifndef NDEBUG
-		if (!member) [[unlikely]]
-		{
-			throw std::invalid_argument("Member is nullptr");
-		}
-#endif
+		assert(member && "Member is nullptr");
 
 		Component dummy{};
 		const std::size_t offset = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(&(dummy.*member).typeless) - reinterpret_cast<std::uintptr_t>(&dummy));

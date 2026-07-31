@@ -65,18 +65,28 @@ namespace PonyEngine::RawInput::XInput
 			gamepadControllers[i] = GamepadController(gamepadAxisMap, logService, i);
 		}
 
-		const DeviceType type = deviceHub->MakeDeviceType(GamepadDevice::XboxType);
+		const DeviceType type = deviceHub->MakeDeviceType(GamepadDevice::GenericType);
+		const DeviceStyle style = deviceHub->MakeDeviceStyle(Style::Xbox);
 		for (DWORD i = 0u; i < XUSER_MAX_COUNT; ++i)
 		{
 			try
 			{
-				deviceHandles[i] = deviceHub->RegisterDevice(gamepadControllers[i], std::format("XInput_{}", i), type, gamepadControllers[i].IsConnected());
+				GamepadController& controller = gamepadControllers[i];
+				const std::string name = std::format("XInput_{}", i);
+				const auto vibratingFeature = FeatureEntry::Make<IVibrating>(controller);
+				deviceHandles[i] = deviceHub->RegisterDevice(controller.Controller(), controller.IsConnected(), DeviceParams
+				{
+					.name = name,
+					.type = type,
+					.style = style,
+					.features = std::span(&vibratingFeature, 1uz)
+				});
 			}
 			catch (...)
 			{
 				while (i-- > 0u)
 				{
-					deviceHub->UnregisterDevice(gamepadControllers[i], deviceHandles[i]);
+					deviceHub->UnregisterDevice(deviceHandles[i], gamepadControllers[i].Controller());
 				}
 
 				throw;
@@ -90,7 +100,7 @@ namespace PonyEngine::RawInput::XInput
 		{
 			try
 			{
-				deviceHub->UnregisterDevice(gamepadControllers[i], deviceHandles[i]);
+				deviceHub->UnregisterDevice(deviceHandles[i], gamepadControllers[i].Controller());
 			}
 			catch (...)
 			{

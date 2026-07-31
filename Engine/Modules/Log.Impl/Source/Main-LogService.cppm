@@ -155,31 +155,16 @@ namespace PonyEngine::Log
 	void LogService::AddLogger(ILogger& logger)
 	{
 		const auto lock = std::lock_guard(logMutex);
-
-#ifndef NDEBUG
-		if (std::ranges::find(loggers, &logger) != loggers.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Logger is already added");
-		}
-#endif
-
+		assert(std::ranges::find(loggers, &logger) == loggers.cend() && "Logger is already added");
 		loggers.push_back(&logger);
 	}
 
 	void LogService::RemoveLogger(ILogger& logger)
 	{
 		const auto lock = std::lock_guard(logMutex);
-
-		if (const auto position = std::ranges::find(loggers, &logger); position != loggers.cend()) [[likely]]
-		{
-			loggers.erase(position);
-		}
-#ifndef NDEBUG
-		else [[unlikely]]
-		{
-			throw std::invalid_argument("Logger wasn't added");
-		}
-#endif
+		const auto position = std::ranges::find(loggers, &logger);
+		assert(position != loggers.cend() && "Logger wasn't added");
+		loggers.erase(position);
 	}
 
 	void LogService::Log(const std::string_view formattedMessage, const LogEntry& logEntry) const noexcept

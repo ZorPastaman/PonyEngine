@@ -18,354 +18,160 @@ export module PonyEngine.RawInput.Keyboard.Impl.Windows:KeyboardProvider;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Application.Windows;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Platform.Windows;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Keyboard.Impl;
-import PonyEngine.Surface.Windows;
-import PonyEngine.Type;
+import PonyEngine.WinAPIInput.Windows;
 
 import :KeyboardAxisMap;
 
 export namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Windows keyboard provider.
-	class KeyboardProvider final : public IInputProvider, private Surface::IRawInputObserver, private Surface::ISurfaceObserver
+	class KeyboardProvider final : private WinAPIInput::IRawInputObserver
 	{
 	public:
 		/// @brief Creates a keyboard provider.
-		/// @param input Raw input context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit KeyboardProvider(IRawInputContext& input);
+		explicit KeyboardProvider(Application::IApplication& application);
 		KeyboardProvider(const KeyboardProvider&) = delete;
 		KeyboardProvider(KeyboardProvider&&) = delete;
 
-		~KeyboardProvider() noexcept = default;
-
-		virtual void Begin(IDeviceRegistry& deviceRegistry) override;
-		virtual void End(IDeviceRegistry& deviceRegistry) override;
-		virtual void Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry) override;
+		~KeyboardProvider() noexcept;
 
 		KeyboardProvider& operator =(const KeyboardProvider&) = delete;
 		KeyboardProvider& operator =(KeyboardProvider&&) = delete;
 
 	private:
-		virtual void Observe(const RAWINPUT& rawInput) override;
+		virtual void OnInput(const RAWINPUT& rawInput) override;
 		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) override;
 
-		virtual void OnFocusChanged(bool isInFocus) override;
+		Application::IApplication* application; ///< Application.
+		IDeviceHub* hub; ///< Device hub.
+		Log::ILogService* logService; ///< Log service.
+		WinAPIInput::IInputDispatcher* inputDispatcher; ///< WinAPI input dispatcher.
+		Application::IMessagePump* messagePump; ///< WinAPI message pump.
 
-		/// @brief Resets a keyboard input.
-		/// @param keyboardIndex Keyboard index.
-		/// @param eventTime Event time.
-		/// @param cursorPosition Cursor position.
-		void ResetInput(std::size_t keyboardIndex, std::chrono::time_point<std::chrono::steady_clock> eventTime, const Math::Vector2<std::int32_t>& cursorPosition);
-
-		/// @brief Subscribes to platform messages.
-		void Subscribe();
-		/// @brief Unsubscribes to platform messages.
-		void Unsubscribe() noexcept;
-
-		/// @brief Unregisters all the devices.
-		/// @param deviceRegistry Device registry.
-		void UnregisterDevices(IDeviceRegistry& deviceRegistry);
-		/// @brief Clears all the data.
-		void Clear() noexcept;
-
-		/// @brief Register devices that are not registered yet.
-		/// @param deviceRegistry Device registry.
-		void RegisterDevices(IDeviceRegistry& deviceRegistry);
-		/// @brief Updates input.
-		/// @param inputRegistry Input registry.
-		void UpdateInput(IInputRegistry& inputRegistry);
-
-		/// @brief Gets or creates a keyboard.
-		/// @param keyboardHandle Keyboard native handle.
-		/// @return Keyboard index.
-		[[nodiscard("Weird call")]]
-		std::size_t GetOrCreateKeyboard(HANDLE keyboardHandle);
-		/// @brief Gets a keyboard name.
-		/// @param keyboardHandle Keyboard native handle.
-		/// @return Buffer and keyboard name.
-		[[nodiscard("Pure function")]]
-		std::pair<Application::ScopedTempBuffer, std::string_view> GetKeyboardName(HANDLE keyboardHandle) const;
-
-		IRawInputContext* input; ///< Raw input context.
-		Surface::ISurfaceService* surface; ///< Surface service.
-
-		DeviceTypeID deviceType; ///< Keyboard device type.
+		DeviceType deviceType; ///< Keyboard device type.
+		DeviceStyle deviceStyle; ///< Keyboard device style.
 		KeyboardAxisMap axisMap; ///< Axis map.
 
-		std::size_t registeredDeviceCount; ///< Registered device count.
-		KeyboardContainer<HANDLE, WORD> keyboardContainer; ///< Keyboard container.
-		KeyboardEventQueue<WORD> eventQueue; ///< Keyboard event queue.
+		std::vector<HANDLE> nativeHandles; ///< Native handles.
+		std::vector<std::unique_ptr<KeyboardController>> keyboardControllers; ///< Keyboard controller.
+		std::vector<DeviceHandle> deviceHandles; ///< Device handles.
 	};
 }
 
 namespace PonyEngine::RawInput::Keyboard
 {
-	KeyboardProvider::KeyboardProvider(IRawInputContext& input) :
-		input{&input},
-		surface{&this->input->Application().GetService<Surface::ISurfaceService>()},
-		deviceType(this->input->HashDeviceType(KeyboardDevice::GenericType)),
-		axisMap(*this->input),
-		registeredDeviceCount{0uz}
+	KeyboardProvider::KeyboardProvider(Application::IApplication& application) :
+		application{&application},
+		hub{&this->application->GetInterface<IDeviceHub>()},
+		logService{this->application->FindInterface<Log::ILogService>()},
+		inputDispatcher{&this->application->GetInterface<WinAPIInput::IInputDispatcher>()},
+		messagePump{&this->application->GetInterface<Application::IMessagePump>()},
+		deviceType(hub->MakeDeviceType(KeyboardDevice::GenericType)),
+		deviceStyle(hub->MakeDeviceStyle(Style::None)),
+		axisMap(*hub)
 	{
+		inputDispatcher->AddObserver(*this, HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_KEYBOARD);
 	}
 
-	void KeyboardProvider::Begin(IDeviceRegistry& deviceRegistry)
+	KeyboardProvider::~KeyboardProvider() noexcept
 	{
-		Subscribe();
-	}
-
-	void KeyboardProvider::End(IDeviceRegistry& deviceRegistry)
-	{
-		Unsubscribe();
-		UnregisterDevices(deviceRegistry);
-		Clear();
-	}
-
-	void KeyboardProvider::Tick(IDeviceRegistry& deviceRegistry, IInputRegistry& inputRegistry)
-	{
-		RegisterDevices(deviceRegistry);
-		UpdateInput(inputRegistry);
-	}
-
-	void KeyboardProvider::Observe(const RAWINPUT& rawInput)
-	{
-#ifndef NDEBUG
-		if (rawInput.header.dwType != RIM_TYPEKEYBOARD) [[unlikely]]
+		try
 		{
-			throw std::logic_error("Not keyboard input");
+			inputDispatcher->RemoveObserver(*this, HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_KEYBOARD);
 		}
-#endif
-
-		if (rawInput.data.keyboard.MakeCode == 0u || rawInput.data.keyboard.MakeCode == KEYBOARD_OVERRUN_MAKE_CODE || 
-			rawInput.data.keyboard.VKey >= std::numeric_limits<unsigned char>::max()) [[unlikely]]
+		catch (...)
 		{
-			return;
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On unregistering WinAPI raw input keyboard observer.");
 		}
 
-		const std::size_t index = GetOrCreateKeyboard(rawInput.header.hDevice);
-		const WORD key = axisMap.ScanCode(rawInput.data.keyboard);
+		for (std::size_t i = keyboardControllers.size(); i-- > 0uz; )
+		{
+			try
+			{
+				hub->UnregisterDevice(deviceHandles[i], keyboardControllers[i]->Controller());
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On unregistering keyboard device.");
+			}
+		}
+	}
+
+	void KeyboardProvider::OnInput(const RAWINPUT& rawInput)
+	{
+		const HANDLE handle = rawInput.header.hDevice;
+		const std::size_t keyboardIndex = std::ranges::find(nativeHandles, handle) - nativeHandles.cbegin();
+
+		if (const std::size_t initialCount = nativeHandles.size(); keyboardIndex == initialCount) [[unlikely]]
+		{
+			const std::size_t nameLength = Platform::GetDeviceNameSize(handle);
+			const auto buffer = Application::ScopedTempBuffer(*application, nameLength);
+			auto arena = Memory::Arena(*buffer);
+			const std::span<char> name = arena.AllocateArray<char>(nameLength);
+			const std::size_t nameSize = Platform::GetDeviceName(handle, name);
+
+			try
+			{
+				nativeHandles.push_back(handle);
+				keyboardControllers.push_back(std::make_unique<KeyboardController>(true));
+				const DeviceHandle deviceHandle = hub->RegisterDevice(keyboardControllers[keyboardIndex]->Controller(), true, DeviceParams
+				{
+					.name = std::string_view(name.data(), nameSize),
+					.type = deviceType,
+					.style = deviceStyle
+				});
+				try
+				{
+					deviceHandles.push_back(deviceHandle);
+				}
+				catch (...)
+				{
+					hub->UnregisterDevice(deviceHandles[keyboardIndex], keyboardControllers[keyboardIndex]->Controller());
+					throw;
+				}
+			}
+			catch (...)
+			{
+				keyboardControllers.resize(initialCount);
+				nativeHandles.resize(initialCount);
+				throw;
+			}
+		}
+
+		const Axis axis = axisMap.EngineAxis(*hub, rawInput.data.keyboard);
 		const bool pressed = !(rawInput.data.keyboard.Flags & RI_KEY_BREAK);
-
-		if (keyboardContainer.IsPressed(index, key) != pressed)
-		{
-			keyboardContainer.Press(index, key, pressed);
-
-			const auto inputEvent = KeyboardInputEvent<WORD>
-			{
-				.key = key,
-				.state = pressed,
-				.cursorPosition = surface->LastMessageCursorPosition()
-			};
-			const auto event = KeyboardEvent<WORD>
-			{
-				.event = inputEvent,
-				.timePoint = surface->LastMessageTime()
-			};
-			eventQueue.Add(index, event);
-		}
+		const std::chrono::time_point<std::chrono::steady_clock> time = messagePump->LastMessageTimePoint();
+		const POINT nativeCursor = messagePump->LastMessageCursorPoint();
+		const auto cursor = Math::Vector2<std::int32_t>(static_cast<std::int32_t>(nativeCursor.x), static_cast<std::int32_t>(nativeCursor.y));
+		keyboardControllers[keyboardIndex]->SetInput(axis, pressed, time, cursor);
 	}
 
 	void KeyboardProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)
 	{
-		const auto addConnectionEvent = [&](const std::size_t index)
-		{
-			if (keyboardContainer.IsConnected(index) == isConnected)
-			{
-				return;
-			}
-
-			keyboardContainer.Connect(index, isConnected);
-
-			const auto connectionEvent = KeyboardConnectionEvent{.connected = isConnected};
-			const auto event = KeyboardEvent<WORD>{.event = connectionEvent, .timePoint = surface->LastMessageTime()};
-			eventQueue.Add(index, event);
-
-			PONY_LOG(input->Logger(), Log::LogType::Info, "Keyboard device connection changed to '{}'. Native handle: '0x{:X}'.",
-				isConnected, reinterpret_cast<std::uintptr_t>(device));
-		};
-
 		if (isConnected)
-		{
-			const auto [buffer, name] = GetKeyboardName(device);
-			const std::size_t index = keyboardContainer.IndexOf(name);
-			if (index < keyboardContainer.Size())
-			{
-				keyboardContainer.NativeHandle(index) = device;
-				addConnectionEvent(index);
-			}
-		}
-		else
-		{
-			const std::size_t index = keyboardContainer.IndexOf(device);
-			if (index < keyboardContainer.Size())
-			{
-				ResetInput(index, surface->LastMessageTime(), surface->LastMessageCursorPosition());
-				keyboardContainer.NativeHandle(index) = INVALID_HANDLE_VALUE;
-				addConnectionEvent(index);
-			}
-		}
-	}
-
-	void KeyboardProvider::OnFocusChanged(const bool isInFocus)
-	{
-		if (isInFocus)
 		{
 			return;
 		}
 
-		const std::chrono::time_point<std::chrono::steady_clock> time = surface->LastMessageTime();
-		const Math::Vector2<std::int32_t> cursorPosition = surface->LastMessageCursorPosition();
-
-		for (std::size_t i = 0uz; i < keyboardContainer.Size(); ++i)
+		const std::size_t keyboardIndex = std::ranges::find(nativeHandles, device) - nativeHandles.cbegin();
+		if (keyboardIndex >= nativeHandles.size())
 		{
-			ResetInput(i, time, cursorPosition);
-		}
-	}
-
-	void KeyboardProvider::ResetInput(const std::size_t keyboardIndex, const std::chrono::time_point<std::chrono::steady_clock> eventTime, 
-		const Math::Vector2<std::int32_t>& cursorPosition)
-	{
-		for (const WORD key : keyboardContainer.PressedKeys(keyboardIndex))
-		{
-			const auto inputEvent = KeyboardInputEvent<WORD>
-			{
-				.key = key,
-				.state = false,
-				.cursorPosition = cursorPosition
-			};
-			const auto event = KeyboardEvent<WORD>
-			{
-				.event = inputEvent,
-				.timePoint = eventTime
-			};
-			eventQueue.Add(keyboardIndex, event);
+			return;
 		}
 
-		keyboardContainer.ResetKeys(keyboardIndex);
-	}
+		hub->UnregisterDevice(deviceHandles[keyboardIndex], keyboardControllers[keyboardIndex]->Controller());
 
-	void KeyboardProvider::Subscribe()
-	{
-		surface->AddObserver(*this);
-		try
-		{
-			surface->AddRawInputObserver(*this, HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_KEYBOARD);
-		}
-		catch (...)
-		{
-			surface->RemoveObserver(*this);
-			throw;
-		}
-	}
-
-	void KeyboardProvider::Unsubscribe() noexcept
-	{
-		surface->RemoveRawInputObserver(*this, HID_USAGE_PAGE_GENERIC, HID_USAGE_GENERIC_KEYBOARD);
-		surface->RemoveObserver(*this);
-	}
-
-	void KeyboardProvider::UnregisterDevices(IDeviceRegistry& deviceRegistry)
-	{
-		for (std::size_t i = 0uz; i < registeredDeviceCount; ++i)
-		{
-			const DeviceHandle handle = keyboardContainer.DeviceHandle(i);
-			PONY_LOG(input->Logger(), Log::LogType::Info, "Unregistering keyboard device. Handle: '0x{:X}'.", handle.id);
-			deviceRegistry.UnregisterDevice(handle);
-		}
-	}
-
-	void KeyboardProvider::Clear() noexcept
-	{
-		keyboardContainer.Clear();
-		eventQueue.Clear();
-	}
-
-	void KeyboardProvider::RegisterDevices(IDeviceRegistry& deviceRegistry)
-	{
-		for (; registeredDeviceCount < keyboardContainer.Size(); ++registeredDeviceCount)
-		{
-			const HANDLE nativeHandle = keyboardContainer.NativeHandle(registeredDeviceCount);
-			const std::string_view name = keyboardContainer.DeviceName(registeredDeviceCount);
-			const bool isConnected = keyboardContainer.IsConnected(registeredDeviceCount);
-
-			PONY_LOG(input->Logger(), Log::LogType::Info, "Registering keyboard device... NativeHandle: '0x{:X}'; Name: '{}'.", 
-				reinterpret_cast<std::uintptr_t>(nativeHandle), name);
-			const DeviceHandle deviceHandle = keyboardContainer.DeviceHandle(registeredDeviceCount) = deviceRegistry.RegisterDevice(deviceType, name, isConnected);
-			PONY_LOG(input->Logger(), Log::LogType::Info, "Registering keyboard device done. NativeHandle: '0x{:X}'; Name: '{}'; DeviceHandle.",
-				reinterpret_cast<std::uintptr_t>(nativeHandle), name, deviceHandle.id);
-		}
-	}
-
-	void KeyboardProvider::UpdateInput(IInputRegistry& inputRegistry)
-	{
-		for (std::size_t i = 0uz; i < eventQueue.Size(); ++i)
-		{
-			const std::size_t deviceIndex = eventQueue.DeviceIndex(i);
-			const KeyboardEvent<WORD>& event = eventQueue.Event(i);
-			const DeviceHandle deviceHandle = keyboardContainer.DeviceHandle(deviceIndex);
-
-			std::visit(Type::Overload
-			{
-				[&](const KeyboardInputEvent<WORD>& keyboardInput)
-				{
-					const AxisID axis = axisMap.Axis(keyboardInput.key);
-					const float value = keyboardInput.state;
-
-					inputRegistry.AddInput(deviceHandle, RawInputEvent
-					{
-						.axes = std::span<const AxisID>(&axis, 1uz),
-						.values = std::span<const float>(&value, 1uz),
-						.eventType = InputEventType::State,
-						.timePoint = event.timePoint,
-						.cursorPosition = keyboardInput.cursorPosition
-					});
-				},
-				[&](const KeyboardConnectionEvent& keyboardConnection)
-				{
-					inputRegistry.Connect(deviceHandle, ConnectionEvent
-					{
-						.isConnected = keyboardConnection.connected,
-						.timePoint = event.timePoint
-					});
-				}
-			}, event.event);
-		}
-
-		eventQueue.Clear();
-	}
-
-	std::size_t KeyboardProvider::GetOrCreateKeyboard(const HANDLE keyboardHandle)
-	{
-		if (const std::size_t index = keyboardContainer.IndexOf(keyboardHandle); index < keyboardContainer.Size()) [[likely]]
-		{
-			return index;
-		}
-
-		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device... Native handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(keyboardHandle));
-		const auto [buffer, name] = GetKeyboardName(keyboardHandle);
-		keyboardContainer.Add(keyboardHandle, DeviceHandle{}, name, true);
-		PONY_LOG(input->Logger(), Log::LogType::Info, "Creating new keyboard device done. Native handle: '0x{:X}'; Device name: '{}'.", 
-			reinterpret_cast<std::uintptr_t>(keyboardHandle), name);
-
-		return keyboardContainer.Size() - 1uz;
-	}
-
-	std::pair<Application::ScopedTempBuffer, std::string_view> KeyboardProvider::GetKeyboardName(const HANDLE keyboardHandle) const
-	{
-		const std::size_t nameSize = Platform::GetDeviceNameSize(keyboardHandle);
-		Application::ScopedTempBuffer buffer = input->Application().AcquiredScopedTempBuffer(nameSize);
-		auto arena = Memory::Arena(*buffer);
-
-		std::span<char> name = arena.AllocateArray<char>(buffer->size_bytes());
-		const std::size_t copied = Platform::GetDeviceName(keyboardHandle, name);
-
-		return std::pair<Application::ScopedTempBuffer, std::string_view>(std::move(buffer), std::string_view(name.data(), copied));
+		deviceHandles.erase(deviceHandles.cbegin() + keyboardIndex);
+		keyboardControllers.erase(keyboardControllers.cbegin() + keyboardIndex);
+		nativeHandles.erase(nativeHandles.cbegin() + keyboardIndex);
 	}
 }

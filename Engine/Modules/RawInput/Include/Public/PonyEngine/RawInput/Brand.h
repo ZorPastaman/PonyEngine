@@ -7,8 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput.Keyboard.Impl;
+#pragma once
 
-export import PonyEngine.RawInput.Ext;
-
-export import :KeyboardController;
+#define PONY_INPUT_XBOX "Xbox"
+#define PONY_INPUT_PLAYSTATION "PlayStation"

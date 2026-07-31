@@ -124,17 +124,17 @@ export namespace PonyEngine::Application
 		/// @return Exit code; @a std::nullopt if the application isn't stopped.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::optional<int> ExitCode() const = 0;
+		virtual std::optional<int> ExitCode() const noexcept = 0;
 		/// @brief Stops the application with the @p exitCode.
 		/// @remark If the application is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
 		/// @note The function must be called on a main thread.
-		virtual void Stop(int exitCode = 0) = 0;
+		virtual void Stop(int exitCode = 0) noexcept = 0;
 		/// @brief Gets the current frame count.
 		/// @return Current frame count.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::uint64_t FrameCount() const = 0;
+		virtual std::uint64_t FrameCount() const noexcept = 0;
 		/// @brief Gets a time point when the application started.
 		/// @return Time point.
 		/// @note The function is thread-safe.
@@ -144,18 +144,18 @@ export namespace PonyEngine::Application
 		/// @return Time point.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const = 0;
+		virtual std::chrono::time_point<std::chrono::steady_clock> PrevFrameTimePoint() const noexcept = 0;
 		/// @brief Gets a time point when this frame started.
 		/// @return Time point.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> ThisFrameTimePoint() const = 0;
+		virtual std::chrono::time_point<std::chrono::steady_clock> ThisFrameTimePoint() const noexcept = 0;
 		/// @brief Gets the earliest time point when a next frame will start.
 		/// @return Time point.
 		/// @note The function must be called on a main thread.
 		/// @remark The value is evaluated based on a current target frame time.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> NextFrameTimePoint() const = 0;
+		virtual std::chrono::time_point<std::chrono::steady_clock> NextFrameTimePoint() const noexcept = 0;
 		/// @brief Gets a now time point.
 		/// @return Time point.
 		/// @note The function is thread-safe.
@@ -165,37 +165,37 @@ export namespace PonyEngine::Application
 		/// @return Time.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds PrevFrameTime() const = 0;
+		virtual std::chrono::nanoseconds PrevFrameTime() const noexcept = 0;
 		/// @brief Gets a time elapsed between the application start and a previous frame start.
 		/// @tparam T Return value type.
 		/// @return Time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		T PrevFrameTimeSeconds() const;
+		T PrevFrameTimeSeconds() const noexcept;
 		/// @brief Gets a time elapsed between the application start and this frame start.
 		/// @return Time.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds ThisFrameTime() const = 0;
+		virtual std::chrono::nanoseconds ThisFrameTime() const noexcept = 0;
 		/// @brief Gets a time elapsed between the application start and this frame start.
 		/// @tparam T Return value type.
 		/// @return Time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		T ThisFrameTimeSeconds() const;
+		T ThisFrameTimeSeconds() const noexcept;
 		/// @brief Gets a minimal time that will elapse between the application start and a next frame start.
 		/// @return Time.
 		/// @note The function must be called on a main thread.
 		/// @remark The value is evaluated based on a current target frame time.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds NextFrameTime() const = 0;
+		virtual std::chrono::nanoseconds NextFrameTime() const noexcept = 0;
 		/// @brief Gets a minimal time that will elapse between the application start and a next frame start.
 		/// @tparam T Return value type.
 		/// @return Time in seconds.
 		/// @note The function must be called on a main thread.
 		/// @remark The value is evaluated based on a current target frame time.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		T NextFrameTimeSeconds() const;
+		T NextFrameTimeSeconds() const noexcept;
 		/// @brief Gets a time elapsed since the application start.
 		/// @return Time.
 		/// @note The function is thread-safe.
@@ -211,47 +211,47 @@ export namespace PonyEngine::Application
 		/// @return Time.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds DeltaTime() const = 0;
+		virtual std::chrono::nanoseconds DeltaTime() const noexcept = 0;
 		/// @brief Gets a time elapsed between the previous frame and this frame start.
 		/// @tparam T Return value type.
 		/// @return Time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		T DeltaTimeSeconds() const;
+		T DeltaTimeSeconds() const noexcept;
 		/// @brief Gets the target frame time.
 		/// @return Target frame time. 0 or less means no target frame time (it's not restricted).
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::nanoseconds TargetFrameTime() const = 0;
+		virtual std::chrono::nanoseconds TargetFrameTime() const noexcept = 0;
 		/// @brief Gets the target frame time.
 		/// @tparam T Return value type.
 		/// @return Target frame time in seconds.
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T = double> [[nodiscard("Pure function")]]
-		T TargetFrameTimeSeconds() const;
+		T TargetFrameTimeSeconds() const noexcept;
 		/// @brief Sets the target frame time.
 		/// @param frameTime Target frame time. 0 or less means no target frame time (it's not restricted).
 		/// @note The function must be called on a main thread.
-		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) = 0;
+		virtual void TargetFrameTime(std::chrono::nanoseconds frameTime) noexcept = 0;
 		/// @brief Sets the target frame time.
 		/// @tparam T Second type.
 		/// @param frameTime Target frame time. 0 or less means no target frame time (it's not restricted).
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T> [[nodiscard("Pure function")]]
-		void TargetFrameTimeSeconds(T frameTime);
+		void TargetFrameTimeSeconds(T frameTime) noexcept;
 
 		/// @brief Tries to find an interface by its type.
 		/// @param type Interface type.
 		/// @return Pointer to the interface if it's found; nullptr if it's not found.
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
-		virtual void* FindInterface(std::type_index type) const = 0;
+		virtual void* FindInterface(std::type_index type) const noexcept = 0;
 		/// @brief Tries to find an interface by its type.
 		/// @tparam T Interface type.
 		/// @return Pointer to the interface if it's found; nullptr if it's not found.
 		/// @note The function must be called on a main thread.
 		template<typename T> [[nodiscard("Pure function")]]
-		T* FindInterface() const;
+		T* FindInterface() const noexcept;
 		/// @brief Gets an interface by its type or throws an exception.
 		/// @tparam T Interface type.
 		/// @return Reference to the interface.
@@ -276,19 +276,19 @@ export namespace PonyEngine::Application
 namespace PonyEngine::Application
 {
 	template<std::floating_point T>
-	T IApplication::PrevFrameTimeSeconds() const
+	T IApplication::PrevFrameTimeSeconds() const noexcept
 	{
 		return Chrono::ToSeconds<T>(PrevFrameTime());
 	}
 
 	template<std::floating_point T>
-	T IApplication::ThisFrameTimeSeconds() const
+	T IApplication::ThisFrameTimeSeconds() const noexcept
 	{
 		return Chrono::ToSeconds<T>(ThisFrameTime());
 	}
 
 	template<std::floating_point T>
-	T IApplication::NextFrameTimeSeconds() const
+	T IApplication::NextFrameTimeSeconds() const noexcept
 	{
 		return Chrono::ToSeconds<T>(NextFrameTime());
 	}
@@ -300,25 +300,25 @@ namespace PonyEngine::Application
 	}
 
 	template<std::floating_point T>
-	T IApplication::DeltaTimeSeconds() const
+	T IApplication::DeltaTimeSeconds() const noexcept
 	{
 		return Chrono::ToSeconds<T>(DeltaTime());
 	}
 
 	template<std::floating_point T>
-	T IApplication::TargetFrameTimeSeconds() const
+	T IApplication::TargetFrameTimeSeconds() const noexcept
 	{
 		return Chrono::ToSeconds<T>(TargetFrameTime());
 	}
 
 	template<std::floating_point T>
-	void IApplication::TargetFrameTimeSeconds(const T frameTime)
+	void IApplication::TargetFrameTimeSeconds(const T frameTime) noexcept
 	{
 		TargetFrameTime(Chrono::ToDuration<std::chrono::nanoseconds>(frameTime));
 	}
 
 	template<typename T>
-	T* IApplication::FindInterface() const
+	T* IApplication::FindInterface() const noexcept
 	{
 		return static_cast<T*>(FindInterface(typeid(T)));
 	}

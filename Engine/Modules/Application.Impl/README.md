@@ -18,3 +18,13 @@ These variables are used to configure the build of the module:
 |:----------------------------------------------|:-------------:|:----------------------------------------------------------------------------------------------------------------------|
 | `PONY_ENGINE_APPLICATION_ROOT_PATH`           | ""            | Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid. |
 | `PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD` | 0.0           | Application target frame period in seconds. Must be double.                                                           |
+
+## For Pony Engine developers
+
+Main modules:
+
+### [PonyEngine.Application.Impl](Source/Main.cppm)
+
+#### [App](Source/Main-App.cppm)
+
+Implements `IApplication`. It must be controlled by a platform specific process.

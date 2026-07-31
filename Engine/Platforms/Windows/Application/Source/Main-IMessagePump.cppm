@@ -28,24 +28,24 @@ export namespace PonyEngine::Application
 		/// @note Must be called on a main thread.
 		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
-		virtual UINT LastMessageType() const = 0;
+		virtual UINT LastMessageType() const noexcept = 0;
 		/// @brief Gets a last message native time point.
 		/// @return Message native time point.
 		/// @note Must be called on a main thread.
 		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
-		virtual DWORD LastMessageNativeTimePoint() const = 0;
+		virtual DWORD LastMessageNativeTimePoint() const noexcept = 0;
 		/// @brief Gets a last message time point.
 		/// @return Message time point.
 		/// @note Must be called on a main thread.
 		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
-		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTimePoint() const = 0;
+		virtual std::chrono::time_point<std::chrono::steady_clock> LastMessageTimePoint() const noexcept = 0;
 		/// @brief Gets a last message cursor point.
 		/// @return Message cursor point.
 		/// @note Must be called on a main thread.
 		/// @remark Updated before dispatching.
 		[[nodiscard("Pure function")]]
-		virtual POINT LastMessageCursorPoint() const = 0;
+		virtual POINT LastMessageCursorPoint() const noexcept = 0;
 	};
 }
