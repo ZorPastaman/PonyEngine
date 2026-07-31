@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice;
 
 import :Resource;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Texture wrapper.
 	class Texture final : public ITexture
@@ -59,7 +59,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param usage Texture usage.
 		/// @param srgbCompatible Is the texture SRGB-compatible?
 		[[nodiscard("Pure constructor")]]
-		Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, TextureFormatID format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatID> castableFormats,
+		Texture(Platform::ComPtr<ID3D12Resource2>&& resource, TextureFormatID format, DXGI_FORMAT nativeFormat, std::span<const TextureFormatID> castableFormats,
 			std::uint32_t width, std::uint32_t height, std::uint16_t depth, std::uint8_t mipCount, TextureDimension dimension,
 			enum SampleCount sampleCount, TextureUsage usage, bool srgbCompatible);
 		Texture(const Texture&) = delete;
@@ -120,7 +120,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Texture::Texture(ID3D12Resource2& resource, const TextureFormatID format, const DXGI_FORMAT nativeFormat, const std::span<const TextureFormatID> castableFormats,
 		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint8_t mipCount, const TextureDimension dimension,
@@ -147,7 +147,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		}
 	}
 
-	Texture::Texture(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const TextureFormatID format, const DXGI_FORMAT nativeFormat, 
+	Texture::Texture(Platform::ComPtr<ID3D12Resource2>&& resource, const TextureFormatID format, const DXGI_FORMAT nativeFormat, 
 		const std::span<const TextureFormatID> castableFormats,
 		const std::uint32_t width, const std::uint32_t height, const std::uint16_t depth, const std::uint8_t mipCount, const TextureDimension dimension,
 		const enum SampleCount sampleCount, const TextureUsage usage, const bool srgbCompatible) :

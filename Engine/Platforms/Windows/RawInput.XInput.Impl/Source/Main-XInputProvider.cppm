@@ -25,7 +25,7 @@ import PonyEngine.RawInput.Ext;
 import :GamepadAxisMap;
 import :GamepadController;
 
-export namespace PonyEngine::RawInput::XInput::Windows
+export namespace PonyEngine::RawInput::XInput
 {
 	/// @brief XInput gamepad provider.
 	class XInputProvider final
@@ -34,7 +34,7 @@ export namespace PonyEngine::RawInput::XInput::Windows
 		/// @brief Creates an XInput gamepad provider.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit XInputProvider(const Application::IApplication& application) noexcept;
+		explicit XInputProvider(const Application::IApplication& application);
 		XInputProvider(const XInputProvider&) = delete;
 		XInputProvider(XInputProvider&&) = delete;
 
@@ -53,9 +53,9 @@ export namespace PonyEngine::RawInput::XInput::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::XInput::Windows
+namespace PonyEngine::RawInput::XInput
 {
-	XInputProvider::XInputProvider(const Application::IApplication& application) noexcept :
+	XInputProvider::XInputProvider(const Application::IApplication& application) :
 		deviceHub{&application.GetInterface<IDeviceHub>()},
 		logService{application.FindInterface<Log::ILogService>()},
 		gamepadAxisMap(*deviceHub)

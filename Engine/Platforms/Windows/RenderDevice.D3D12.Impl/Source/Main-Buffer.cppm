@@ -20,7 +20,7 @@ import PonyEngine.RenderDevice;
 
 import :Resource;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Buffer wrapper.
 	class Buffer final : public IBuffer
@@ -37,7 +37,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param size Buffer size.
 		/// @param usage Buffer usage.
 		[[nodiscard("Pure constructor")]]
-		Buffer(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, std::uint64_t size, BufferUsage usage) noexcept;
+		Buffer(Platform::ComPtr<ID3D12Resource2>&& resource, std::uint64_t size, BufferUsage usage) noexcept;
 		Buffer(const Buffer&) = delete;
 		Buffer(Buffer&&) = delete;
 
@@ -77,7 +77,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Buffer::Buffer(ID3D12Resource2& resource, const std::uint64_t size, const BufferUsage usage) noexcept :
 		resource(resource),
@@ -86,7 +86,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	}
 
-	Buffer::Buffer(Platform::Windows::ComPtr<ID3D12Resource2>&& resource, const std::uint64_t size, const BufferUsage usage) noexcept :
+	Buffer::Buffer(Platform::ComPtr<ID3D12Resource2>&& resource, const std::uint64_t size, const BufferUsage usage) noexcept :
 		resource(std::move(resource)),
 		size{size},
 		usage{usage}

@@ -15,7 +15,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:PipelineStateSubobject;
 
 import std;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Pipeline state subobject.
 	/// @tparam Type Subobject type.
@@ -82,7 +82,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	using PipelineStateSubobjectFlags = PipelineStateSubobject<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_FLAGS, D3D12_PIPELINE_STATE_FLAGS>; ///< Pipeline state subobject for pipeline state flags.
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	template<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type, typename DataType>
 	PipelineStateSubobject<Type, DataType>::PipelineStateSubobject(const DataType& data) noexcept :

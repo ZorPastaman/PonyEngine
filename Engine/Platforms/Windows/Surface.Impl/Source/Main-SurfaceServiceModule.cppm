@@ -22,7 +22,7 @@ import :Cursor;
 import :MessageHandler;
 import :SurfaceService;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
 	/// @brief Windows surface service module.
 	class SurfaceServiceModule final : public Application::IModule
@@ -46,7 +46,7 @@ export namespace PonyEngine::Surface::Windows
 	};
 }
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	void SurfaceServiceModule::StartUp(Application::IModuleContext& context)
 	{
@@ -54,7 +54,7 @@ namespace PonyEngine::Surface::Windows
 		surfaceServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
 		{
 			PONY_LOG(context.Logger(), Log::LogType::Debug, "Getting surface parameters.");
-			auto& nativeApplication = static_cast<Application::Windows::IApplication&>(application);
+			auto& nativeApplication = static_cast<Application::IApplication&>(application);
 			const std::string_view title = application.ProjectTitle();
 			const HICON mainIcon = nativeApplication.AppIcon();
 			const HCURSOR mainCursor = nativeApplication.AppCursor() ? nativeApplication.AppCursor() : GetDefaultCursor();

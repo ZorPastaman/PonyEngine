@@ -9,7 +9,7 @@
 
 export module PonyEngine.RenderDevice.D3D12.Impl.Windows:AtomicSupport;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Atomic operation support.
 	struct AtomicSupport final

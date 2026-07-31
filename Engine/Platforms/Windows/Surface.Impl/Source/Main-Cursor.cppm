@@ -15,7 +15,7 @@ export module PonyEngine.Surface.Impl.Windows:Cursor;
 
 import std;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
 	/// @brief Gets a default cursor.
 	/// @return Default cursor.
@@ -23,7 +23,7 @@ export namespace PonyEngine::Surface::Windows
 	HCURSOR GetDefaultCursor();
 }
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	HCURSOR GetDefaultCursor()
 	{

@@ -24,7 +24,7 @@ import :FileUtility;
 import :OverlappedRequest;
 import :Worker;
 
-export namespace PonyEngine::File::Windows
+export namespace PonyEngine::File
 {
 	/// @brief File.
 	class File final : public IFile
@@ -66,7 +66,7 @@ export namespace PonyEngine::File::Windows
 	};
 }
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	/// @brief Create file function selector.
 	/// @tparam CharT Path value type. Must be @p char or @p wchar_t.

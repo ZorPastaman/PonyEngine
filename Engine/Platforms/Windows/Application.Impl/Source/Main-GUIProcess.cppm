@@ -30,7 +30,7 @@ import :Path;
 import :Process;
 import :Timer;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Application
 {
 	/// @brief GUI process.
 	class GUIProcess final : private IMainData, private IMessagePump
@@ -127,7 +127,7 @@ export namespace PonyEngine::Application::Windows
 	};
 }
 
-namespace PonyEngine::Application::Windows
+namespace PonyEngine::Application
 {
 	GUIProcess::GUIProcess(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd) :
 		instance{hInstance},
@@ -249,10 +249,10 @@ namespace PonyEngine::Application::Windows
 		for (int i = 0; i < argc; ++i)
 		{
 			const std::wstring_view source = argv.get()[i];
-			const std::size_t size = Platform::Windows::GetStringSize(source);
+			const std::size_t size = Platform::GetStringSize(source);
 			std::string arg;
 			arg.resize(size);
-			const std::size_t copied = Platform::Windows::ConvertToString(source, arg);
+			const std::size_t copied = Platform::ConvertToString(source, arg);
 			arg.resize(copied);
 			arg.shrink_to_fit();
 

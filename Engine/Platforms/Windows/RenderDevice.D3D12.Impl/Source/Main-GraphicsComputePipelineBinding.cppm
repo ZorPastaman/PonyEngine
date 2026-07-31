@@ -14,7 +14,7 @@ import std;
 import :ComputePipelineBinding;
 import :GraphicsPipelineBinding;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Graphics and compute pipeline binding.
 	class GraphicsComputePipelineBinding final
@@ -78,7 +78,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	void GraphicsComputePipelineBinding::Reset() noexcept
 	{

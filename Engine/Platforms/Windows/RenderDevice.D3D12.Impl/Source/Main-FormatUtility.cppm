@@ -17,7 +17,7 @@ import std;
 
 import PonyEngine.RenderDevice;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Format info.
 	struct FormatInfo final
@@ -946,7 +946,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr bool IsSwapChainCompatible(const D3D12_FEATURE_DATA_FORMAT_SUPPORT& support) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	constexpr DXGI_FORMAT GetTypelessFormat(const DXGI_FORMAT format) noexcept
 	{

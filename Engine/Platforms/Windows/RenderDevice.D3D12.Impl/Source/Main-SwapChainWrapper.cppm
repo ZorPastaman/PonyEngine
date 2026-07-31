@@ -20,7 +20,7 @@ import std;
 import :SwapChain;
 import :Texture;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Swap chain wrapper with the sync logic.
 	class SwapChainWrapper final
@@ -39,7 +39,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param syncInterval Sync interval.
 		/// @param presentFlags Present flags.
 		[[nodiscard("Pure constructor")]]
-		SwapChainWrapper(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers, UINT syncInterval, UINT presentFlags) noexcept;
+		SwapChainWrapper(Platform::ComPtr<IDXGISwapChain4>&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers, UINT syncInterval, UINT presentFlags) noexcept;
 		/// @brief Creates a swap chain wrapper.
 		/// @param swapChain Swap chain.
 		/// @param buffers Swap chain buffers.
@@ -91,7 +91,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	SwapChainWrapper::SwapChainWrapper(IDXGISwapChain4& swapChain, const std::span<const std::shared_ptr<Texture>> buffers, 
 		const UINT syncInterval, const UINT presentFlags) :
@@ -104,7 +104,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		assert(std::ranges::find(this->buffers, nullptr) == this->buffers.cend() && "At least one buffer is nullptr.");
 	}
 
-	SwapChainWrapper::SwapChainWrapper(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers, 
+	SwapChainWrapper::SwapChainWrapper(Platform::ComPtr<IDXGISwapChain4>&& swapChain, std::vector<std::shared_ptr<Texture>>&& buffers, 
 		const UINT syncInterval, const UINT presentFlags) noexcept :
 		swapChain(std::move(swapChain)),
 		buffers(std::move(buffers)),

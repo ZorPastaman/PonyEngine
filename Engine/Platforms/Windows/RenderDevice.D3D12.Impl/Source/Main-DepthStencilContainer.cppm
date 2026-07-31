@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice;
 
 import :DescriptorHeap;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Container wrapper of DSVs.
 	class DepthStencilContainer final : public IDepthStencilContainer
@@ -39,7 +39,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param handleIncrement Descriptor handle increment.
 		/// @param size Descriptor heap size.
 		[[nodiscard("Pure constructor")]]
-		DepthStencilContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size);
+		DepthStencilContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size);
 		DepthStencilContainer(const DepthStencilContainer&) = delete;
 		DepthStencilContainer(DepthStencilContainer&&) = delete;
 
@@ -81,7 +81,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	DepthStencilContainer::DepthStencilContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
 		descriptorHeap(descriptorHeap, handleIncrement, false),
@@ -91,7 +91,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyDSVMeta{});
 	}
 
-	DepthStencilContainer::DepthStencilContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
+	DepthStencilContainer::DepthStencilContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
 		descriptorHeap(std::move(descriptorHeap), handleIncrement, false),
 		size{size},
 		metas(std::make_unique<DSVMeta[]>(this->size))

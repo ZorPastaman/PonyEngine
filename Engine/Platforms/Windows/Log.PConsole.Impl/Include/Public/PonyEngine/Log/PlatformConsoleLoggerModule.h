@@ -15,7 +15,7 @@ import std;
 
 import PonyEngine.Application;
 
-namespace PonyEngine::Log::PlatformConsole::Windows
+namespace PonyEngine::Log::PlatformConsole
 {
 	/// @brief Creates a platform console logger module.
 	/// @return Platform console logger module.

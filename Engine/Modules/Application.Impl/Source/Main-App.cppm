@@ -613,13 +613,13 @@ namespace PonyEngine::Application
 	{
 		PONY_LOG(logService, Log::LogType::Verbose, "Acquiring temp buffer... Size: '{}'; Alignment: '{}'.", requiredSize, requiredAlignment);
 
-		if (requiredAlignment < alignof(std::max_align_t) || !std::has_single_bit(requiredAlignment)) [[unlikely]]
+		if (!std::has_single_bit(requiredAlignment)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid alignment");
 		}
 
 		TempBufferCache& cache = GetCache();
-		Buffer buffer = GetBuffer(cache, requiredAlignment);
+		Buffer buffer = GetBuffer(cache, std::max(requiredAlignment, alignof(std::max_align_t)));
 		if (const std::size_t size = std::max(requiredSize, 1024uz); buffer.size() < size) [[unlikely]]
 		{
 			PONY_LOG(logService, Log::LogType::Debug, "Growing temp buffer.");

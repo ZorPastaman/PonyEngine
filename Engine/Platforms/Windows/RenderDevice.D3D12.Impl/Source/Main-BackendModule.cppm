@@ -21,7 +21,7 @@ import PonyEngine.RenderDevice.Ext;
 
 import :Backend;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Direct3D12 backend module.
 	class BackendModule final : public Application::IModule
@@ -45,7 +45,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	void BackendModule::StartUp(Application::IModuleContext& context)
 	{

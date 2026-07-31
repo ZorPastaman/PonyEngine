@@ -14,7 +14,7 @@ module;
 
 export module PonyEngine.Application.Windows:IMainData;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Application
 {
 	/// @brief Provides data from @p WinMain().
 	class IMainData

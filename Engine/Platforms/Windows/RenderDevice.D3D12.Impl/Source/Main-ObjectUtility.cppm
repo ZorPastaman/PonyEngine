@@ -15,7 +15,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:ObjectUtility;
 
 import std;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Sets the object name.
 	/// @param object Target object.
@@ -23,7 +23,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	void SetObjectName(ID3D12Object& object, std::string_view name);
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	void SetObjectName(ID3D12Object& object, const std::string_view name)
 	{

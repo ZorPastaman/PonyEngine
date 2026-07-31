@@ -29,7 +29,7 @@ import :MessageHandler;
 import :RawInputManager;
 import :WindowClass;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
 	/// @brief Windows surface service.
 	class SurfaceService final : public Application::IService, private ISurfaceService, private IMessageHandler
@@ -40,7 +40,7 @@ export namespace PonyEngine::Surface::Windows
 		/// @param windowClass Window class.
 		/// @param title Window title.
 		[[nodiscard("Pure constructor")]]
-		SurfaceService(Application::Windows::IApplication& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title);
+		SurfaceService(Application::IApplication& application, const std::shared_ptr<WindowClass>& windowClass, std::string_view title);
 		SurfaceService(const SurfaceService&) = delete;
 		SurfaceService(SurfaceService&&) = delete;
 
@@ -275,7 +275,7 @@ export namespace PonyEngine::Surface::Windows
 		[[nodiscard("The value must be returned to the system")]]
 		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
 
-		Application::Windows::IApplication* application; ///< Application.
+		Application::IApplication* application; ///< Application.
 		const MessagePump::IMessagePumpService* pumpService; ///< Message pump service.
 
 		Surface::RectStyle rectStyle; ///< Client rectangle style.
@@ -301,9 +301,9 @@ export namespace PonyEngine::Surface::Windows
 	};
 }
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
-	SurfaceService::SurfaceService(Application::Windows::IApplication& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
+	SurfaceService::SurfaceService(Application::IApplication& application, const std::shared_ptr<WindowClass>& windowClass, const std::string_view title) :
 		application{&application},
 		pumpService{&this->application->GetService<MessagePump::IMessagePumpService>()},
 		rectStyle(FullscreenRectStyle{.alwaysOnTop = false}),
@@ -406,7 +406,7 @@ namespace PonyEngine::Surface::Windows
 
 	SurfaceFeature SurfaceService::SupportedFeatures() const noexcept
 	{
-		return SurfaceFeature::FullscreenStyle | SurfaceFeature::WindowStyle | SurfaceFeature::ClientRect | SurfaceFeature::Title | SurfaceFeature::HardwareCursor;
+		return SurfaceFeature::FullscreenStyle | SurfaceFeaturetyle | SurfaceFeature::ClientRect | SurfaceFeature::Title | SurfaceFeature::HardwareCursor;
 	}
 
 	Surface::RectStyle SurfaceService::RectStyle() const

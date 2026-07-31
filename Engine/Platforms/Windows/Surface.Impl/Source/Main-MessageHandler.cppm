@@ -22,7 +22,7 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Log;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
 	/// @brief Windows message handler.
 	class IMessageHandler
@@ -58,7 +58,7 @@ export namespace PonyEngine::Surface::Windows
 	LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 }
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	std::unordered_map<HWND, IMessageHandler*> WindowHandlers; ///< Window handlers.
 

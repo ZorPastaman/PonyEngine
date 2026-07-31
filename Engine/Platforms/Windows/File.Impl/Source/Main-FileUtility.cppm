@@ -15,7 +15,7 @@ export module PonyEngine.File.Impl.Windows:FileUtility;
 
 import PonyEngine.File;
 
-export namespace PonyEngine::File::Windows
+export namespace PonyEngine::File
 {
 	/// @brief Converts the engine file access to a WinAPI file access.
 	/// @param access Engine file access.
@@ -35,7 +35,7 @@ export namespace PonyEngine::File::Windows
 	DWORD ToFlags(FileFlag flags) noexcept;
 }
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	DWORD ToDesiredAccess(const FileAccess access) noexcept
 	{

@@ -12,7 +12,7 @@
 import PonyEngine.Application;
 import PonyEngine.RawInput.Mouse.Impl.Windows;
 
-namespace PonyEngine::RawInput::Mouse::Windows
+namespace PonyEngine::RawInput::Mouse
 {
 	Application::IModule* GetMouseProviderModule()
 	{

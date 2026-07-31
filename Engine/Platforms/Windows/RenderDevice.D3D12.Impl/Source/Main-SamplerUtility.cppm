@@ -23,7 +23,7 @@ import PonyEngine.Type;
 
 import :Utility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Makes a sampler description.
 	/// @param params Sampler parameters.
@@ -48,7 +48,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_FILTER_REDUCTION_TYPE ToReduction(const Reduction& reduction, D3D12_COMPARISON_FUNC& comparisonFunc) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	constexpr D3D12_SAMPLER_DESC2 MakeSamplerDesc(const SamplerParams& params) noexcept
 	{

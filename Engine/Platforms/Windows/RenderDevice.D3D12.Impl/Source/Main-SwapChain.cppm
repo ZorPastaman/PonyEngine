@@ -19,7 +19,7 @@ import std;
 
 import PonyEngine.Platform.Windows;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Swap chain wrapper.
 	class SwapChain final
@@ -32,7 +32,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @brief Creates a swap chain wrapper.
 		/// @param swapChain Swap chain.
 		[[nodiscard("Pure constructor")]]
-		explicit SwapChain(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain) noexcept;
+		explicit SwapChain(Platform::ComPtr<IDXGISwapChain4>&& swapChain) noexcept;
 		[[nodiscard("Pure constructor")]]
 		SwapChain(const SwapChain& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -49,7 +49,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param index Buffer index.
 		/// @return Buffer.
 		template<std::derived_from<IUnknown> T> [[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<T> GetBuffer(UINT index) const;
+		Platform::ComPtr<T> GetBuffer(UINT index) const;
 
 		/// @brief Sets the fullscreen state.
 		/// @param fullscreen Fullscreen state.
@@ -64,18 +64,18 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		SwapChain& operator =(SwapChain&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<IDXGISwapChain4> swapChain; ///< Swap chain.
+		Platform::ComPtr<IDXGISwapChain4> swapChain; ///< Swap chain.
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	SwapChain::SwapChain(IDXGISwapChain4& swapChain) noexcept :
 		swapChain(&swapChain)
 	{
 	}
 
-	SwapChain::SwapChain(Platform::Windows::ComPtr<IDXGISwapChain4>&& swapChain) noexcept :
+	SwapChain::SwapChain(Platform::ComPtr<IDXGISwapChain4>&& swapChain) noexcept :
 		swapChain(std::move(swapChain))
 	{
 		assert(this->swapChain && "The swap chain is nullptr.");
@@ -87,9 +87,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	}
 
 	template<std::derived_from<IUnknown> T>
-	Platform::Windows::ComPtr<T> SwapChain::GetBuffer(const UINT index) const
+	Platform::ComPtr<T> SwapChain::GetBuffer(const UINT index) const
 	{
-		Platform::Windows::ComPtr<T> resource;
+		Platform::ComPtr<T> resource;
 		if (const HRESULT result = swapChain->GetBuffer(index, IID_PPV_ARGS(resource.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to get swap chain buffer: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));

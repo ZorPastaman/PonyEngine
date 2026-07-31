@@ -19,7 +19,7 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 {
 	try
 	{
-		return std::make_unique<PonyEngine::Application::Windows::GUIProcess>(hInstance, hPrevInstance, lpCmdLine, nShowCmd)->Run();
+		return std::make_unique<PonyEngine::Application::GUIProcess>(hInstance, hPrevInstance, lpCmdLine, nShowCmd)->Run();
 	}
 	catch (const std::exception& e)
 	{
@@ -39,7 +39,7 @@ int main(const int argc, const char* const argv[])
 {
 	try
 	{
-		return std::make_unique<PonyEngine::Application::Windows::ConsoleProcess>(argc, argv)->Run();
+		return std::make_unique<PonyEngine::Application::ConsoleProcess>(argc, argv)->Run();
 	}
 	catch (const std::exception& e)
 	{

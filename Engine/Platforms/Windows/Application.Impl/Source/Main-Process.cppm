@@ -19,14 +19,14 @@ import std;
 import PonyEngine.Application.Impl;
 import PonyEngine.Log;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Application
 {
 	/// @brief Sets this process priority.
 	/// @param application Application.
 	void SetProcessPriority(const App& application) noexcept;
 }
 
-namespace PonyEngine::Application::Windows
+namespace PonyEngine::Application
 {
 	void SetProcessPriority(const App& application) noexcept
 	{

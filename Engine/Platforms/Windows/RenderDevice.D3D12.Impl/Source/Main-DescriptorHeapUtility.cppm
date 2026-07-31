@@ -22,7 +22,7 @@ import :RenderTargetContainer;
 import :SamplerContainer;
 import :ShaderDataContainer;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Casts to a native depth stencil container.
 	/// @param container Depth stencil container.
@@ -167,7 +167,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_DESCRIPTOR_HEAP_DESC MakeDescriptorHeapDesc(const SamplerContainerParams& params) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	DepthStencilContainer& ToNativeContainer(IDepthStencilContainer& container)
 	{

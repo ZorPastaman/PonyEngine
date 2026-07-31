@@ -17,7 +17,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:Utility;
 
 import PonyEngine.RenderDevice;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Casts the engine comparison function to a native comparison function.
 	/// @param func Engine comparison function.
@@ -26,7 +26,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_COMPARISON_FUNC ToComparisonFunc(ComparisonFunc func) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	constexpr D3D12_COMPARISON_FUNC ToComparisonFunc(const ComparisonFunc func) noexcept
 	{

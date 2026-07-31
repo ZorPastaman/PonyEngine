@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice;
 
 import :ObjectUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Fence wrapper.
 	class Fence final : public IFence
@@ -35,7 +35,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @brief Creates a fence wrapper.
 		/// @param fence Fence.
 		[[nodiscard("Pure constructor")]]
-		explicit Fence(Platform::Windows::ComPtr<ID3D12Fence1>&& fence) noexcept;
+		explicit Fence(Platform::ComPtr<ID3D12Fence1>&& fence) noexcept;
 		Fence(const Fence&) = delete;
 		Fence(Fence&&) = delete;
 
@@ -63,20 +63,20 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		Fence& operator =(Fence&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12Fence1> fence; ///< Fence.
+		Platform::ComPtr<ID3D12Fence1> fence; ///< Fence.
 
 		std::string name; ///< Name.
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Fence::Fence(ID3D12Fence1& fence) noexcept :
 		fence(&fence)
 	{
 	}
 
-	Fence::Fence(Platform::Windows::ComPtr<ID3D12Fence1>&& fence) noexcept :
+	Fence::Fence(Platform::ComPtr<ID3D12Fence1>&& fence) noexcept :
 		fence(std::move(fence))
 	{
 		assert(this->fence && "The fence is nullptr.");

@@ -24,7 +24,7 @@ import PonyEngine.Type;
 
 import :ObjectUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Root signature wrapper.
 	class RootSignature final : public IPipelineLayout
@@ -39,7 +39,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param rootSignature Root signature.
 		/// @param params Pipeline layout parameters.
 		[[nodiscard("Pure constructor")]]
-		RootSignature(Platform::Windows::ComPtr<ID3D12RootSignature>&& rootSignature, const PipelineLayoutParams& params);
+		RootSignature(Platform::ComPtr<ID3D12RootSignature>&& rootSignature, const PipelineLayoutParams& params);
 		RootSignature(const RootSignature&) = delete;
 		RootSignature(RootSignature&&) = delete;
 
@@ -66,7 +66,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @return Metas.
 		static std::unique_ptr<std::byte[]> CreateMetas(std::span<const DescriptorSet> descriptorSets);
 
-		Platform::Windows::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
+		Platform::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
 		
 		std::size_t setCount; ///< Descriptor set count.
 		std::unique_ptr<std::byte[]> metas; ///< Descriptor set metas.
@@ -75,7 +75,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	RootSignature::RootSignature(ID3D12RootSignature& rootSignature, const PipelineLayoutParams& params) :
 		rootSignature(&rootSignature),
@@ -84,7 +84,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	}
 
-	RootSignature::RootSignature(Platform::Windows::ComPtr<ID3D12RootSignature>&& rootSignature, const PipelineLayoutParams& params) :
+	RootSignature::RootSignature(Platform::ComPtr<ID3D12RootSignature>&& rootSignature, const PipelineLayoutParams& params) :
 		rootSignature(std::move(rootSignature)),
 		setCount{params.descriptorSets.size()},
 		metas(setCount > 0uz ? CreateMetas(params.descriptorSets) : nullptr)

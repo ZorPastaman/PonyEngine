@@ -15,7 +15,7 @@ export module PonyEngine.Platform.Windows:Text;
 
 import std;
 
-export namespace PonyEngine::Platform::Windows
+export namespace PonyEngine::Platform
 {
 	/// @brief Gets a size of a converted string.
 	/// @param source Wide string.
@@ -40,7 +40,7 @@ export namespace PonyEngine::Platform::Windows
 	std::size_t ConvertToWideString(std::string_view source, std::span<wchar_t> target);
 }
 
-namespace PonyEngine::Platform::Windows
+namespace PonyEngine::Platform
 {
 	std::size_t GetStringSize(const std::wstring_view source)
 	{

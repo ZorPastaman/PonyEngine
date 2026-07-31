@@ -261,7 +261,7 @@ export namespace PonyEngine::Application
 
 		/// @brief Acquires a temporary buffer.
 		/// @param requiredSize Required size.
-		/// @param requiredAlignment Required alignment. Must be a valid alignment value and at least alignof(std::max_align_t).
+		/// @param requiredAlignment Required alignment. Must be a valid alignment value.
 		/// @return Temporary buffer.
 		/// @note Each thread has its own pool of buffers.
 		[[nodiscard("Pure function")]]

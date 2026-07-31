@@ -21,7 +21,7 @@ import PonyEngine.Platform.Windows;
 
 import :ObjectUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Resource wrapper.
 	class Resource final
@@ -34,7 +34,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @brief Creates a resource wrapper.
 		/// @param resource Resource.
 		[[nodiscard("Pure constructor")]]
-		explicit Resource(Platform::Windows::ComPtr<ID3D12Resource2>&& resource) noexcept;
+		explicit Resource(Platform::ComPtr<ID3D12Resource2>&& resource) noexcept;
 		Resource(const Resource&) = delete;
 		Resource(Resource&&) = delete;
 
@@ -84,20 +84,20 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		Resource& operator =(Resource&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12Resource2> resource; ///< Resource.
+		Platform::ComPtr<ID3D12Resource2> resource; ///< Resource.
 
 		std::string name; ///< Name.
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Resource::Resource(ID3D12Resource2& resource) noexcept :
 		resource(&resource)
 	{
 	}
 
-	Resource::Resource(Platform::Windows::ComPtr<ID3D12Resource2>&& resource) noexcept :
+	Resource::Resource(Platform::ComPtr<ID3D12Resource2>&& resource) noexcept :
 		resource(std::move(resource))
 	{
 		assert(this->resource && "The buffer resource is nullptr.");

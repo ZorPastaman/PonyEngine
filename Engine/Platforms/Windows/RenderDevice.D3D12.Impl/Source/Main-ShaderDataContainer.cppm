@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice;
 
 import :DescriptorHeap;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Container wrapper of CBVs, SRVs and UAVs.
 	class ShaderDataContainer final : public IShaderDataContainer
@@ -41,7 +41,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param size Descriptor heap size.
 		/// @param shaderVisible Is the heap shader visible?
 		[[nodiscard("Pure constructor")]]
-		ShaderDataContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size, bool shaderVisible) noexcept;
+		ShaderDataContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size, bool shaderVisible) noexcept;
 		ShaderDataContainer(const ShaderDataContainer&) = delete;
 		ShaderDataContainer(ShaderDataContainer&&) = delete;
 
@@ -91,7 +91,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	ShaderDataContainer::ShaderDataContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size, const bool shaderVisible) noexcept :
 		descriptorHeap(descriptorHeap, handleIncrement, shaderVisible),
@@ -102,7 +102,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyShaderDataMeta{});
 	}
 
-	ShaderDataContainer::ShaderDataContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement,
+	ShaderDataContainer::ShaderDataContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement,
 		const std::uint32_t size, const bool shaderVisible) noexcept :
 		descriptorHeap(std::move(descriptorHeap), handleIncrement, shaderVisible),
 		size{size},

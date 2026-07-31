@@ -11,7 +11,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:GraphicsPipelineBinding
 
 import :GraphicsPipelineState;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Graphics pipeline binding.
 	class GraphicsPipelineBinding final
@@ -47,7 +47,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	GraphicsPipelineBinding::GraphicsPipelineBinding() noexcept :
 		boundPSO{nullptr}

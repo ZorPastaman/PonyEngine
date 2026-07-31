@@ -23,7 +23,7 @@ import PonyEngine.Type;
 import :PipelineState;
 import :RootSignature;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Graphics pipeline state wrapper.
 	class GraphicsPipelineState final : public IGraphicsPipelineState
@@ -40,7 +40,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param layout Pipeline layout.
 		/// @param params Graphics pipeline state parameters.
 		[[nodiscard("Pure constructor")]]
-		GraphicsPipelineState(Platform::Windows::ComPtr<ID3D12PipelineState>&& pipelineState, 
+		GraphicsPipelineState(Platform::ComPtr<ID3D12PipelineState>&& pipelineState, 
 			const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params);
 		GraphicsPipelineState(const GraphicsPipelineState&) = delete;
 		GraphicsPipelineState(GraphicsPipelineState&&) = delete;
@@ -105,7 +105,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	GraphicsPipelineState::GraphicsPipelineState(ID3D12PipelineState& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout, const GraphicsPipelineStateParams& params) :
 		pipelineState(pipelineState),
@@ -118,7 +118,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		SetComplexData(params);
 	}
 
-	GraphicsPipelineState::GraphicsPipelineState(Platform::Windows::ComPtr<ID3D12PipelineState>&& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout, 
+	GraphicsPipelineState::GraphicsPipelineState(Platform::ComPtr<ID3D12PipelineState>&& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout, 
 		const GraphicsPipelineStateParams& params) :
 		pipelineState(std::move(pipelineState)),
 		layout(layout),

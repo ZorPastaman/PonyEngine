@@ -27,10 +27,10 @@ import PonyEngine.Platform.Windows;
 import PonyEngine.Surface.Windows;
 import PonyEngine.Type;
 
-export namespace PonyEngine::RawInput::Mouse::Windows
+export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse provider.
-	class MouseProvider final : public IInputProvider, private Surface::Windows::IRawInputObserver, private Surface::ISurfaceObserver
+	class MouseProvider final : public IInputProvider, private Surface::IRawInputObserver, private Surface::ISurfaceObserver
 	{
 	public:
 		/// @brief Creates a mouse provider.
@@ -104,7 +104,7 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 		void UpdatePointer(const RAWMOUSE& source, std::size_t mouseIndex);
 
 		IRawInputContext* input; ///< Raw input context.
-		Surface::Windows::ISurfaceService* surface; ///< Surface service.
+		Surface::ISurfaceService* surface; ///< Surface service.
 
 		DeviceTypeID deviceType; ///< Mouse device type.
 		MouseAxisMap axisMap; ///< Mouse axis map.
@@ -115,11 +115,11 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::Mouse::Windows
+namespace PonyEngine::RawInput::Mouse
 {
 	MouseProvider::MouseProvider(IRawInputContext& input) :
 		input{&input},
-		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
+		surface{&this->input->Application().GetService<Surface::ISurfaceService>()},
 		deviceType(this->input->HashDeviceType(MouseDevice::GenericType)),
 		axisMap(*this->input),
 		registeredDeviceCount{0uz}
@@ -375,12 +375,12 @@ namespace PonyEngine::RawInput::Mouse::Windows
 
 	std::pair<Application::ScopedTempBuffer, std::string_view> MouseProvider::GetMouseName(const HANDLE mouseHandle) const
 	{
-		const std::size_t nameSize = Platform::Windows::GetDeviceNameSize(mouseHandle);
+		const std::size_t nameSize = Platform::GetDeviceNameSize(mouseHandle);
 		Application::ScopedTempBuffer buffer = input->Application().AcquiredScopedTempBuffer(nameSize);
 		auto arena = Memory::Arena(*buffer);
 
 		std::span<char> name = arena.AllocateArray<char>(buffer->size_bytes());
-		const std::size_t copied = Platform::Windows::GetDeviceName(mouseHandle, name);
+		const std::size_t copied = Platform::GetDeviceName(mouseHandle, name);
 
 		return std::pair<Application::ScopedTempBuffer, std::string_view>(std::move(buffer), std::string_view(name.data(), copied));
 	}

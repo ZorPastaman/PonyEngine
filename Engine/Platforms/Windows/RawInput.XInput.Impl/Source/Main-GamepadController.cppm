@@ -24,7 +24,7 @@ import PonyEngine.RawInput.Ext;
 
 import :GamepadAxisMap;
 
-export namespace PonyEngine::RawInput::XInput::Windows
+export namespace PonyEngine::RawInput::XInput
 {
 	/// @brief XInput gamepad controller.
 	class GamepadController final : public IDeviceController, private IVibrating
@@ -114,7 +114,7 @@ export namespace PonyEngine::RawInput::XInput::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::XInput::Windows
+namespace PonyEngine::RawInput::XInput
 {
 	GamepadController::GamepadController(const GamepadAxisMap& axisMap, const Log::ILogService* const logService, const DWORD gamepadIndex) noexcept :
 		axisMap{&axisMap},

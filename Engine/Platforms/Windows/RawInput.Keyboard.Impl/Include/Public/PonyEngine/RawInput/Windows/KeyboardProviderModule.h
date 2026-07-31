@@ -13,7 +13,7 @@
 
 import PonyEngine.Application;
 
-namespace PonyEngine::RawInput::Keyboard::Windows
+namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Gets the keyboard provider module.
 	/// @return Keyboard provider module.

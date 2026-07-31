@@ -24,7 +24,7 @@ import PonyEngine.RenderDevice.Ext;
 import :Fence;
 import :FenceUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Waiter.
 	class Waiter final : public IWaiter
@@ -69,7 +69,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Waiter::Waiter(const IRenderDeviceContext& renderDevice) noexcept :
 		renderDevice{&renderDevice}

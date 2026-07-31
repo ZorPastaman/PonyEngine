@@ -11,7 +11,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:ComputePipelineBinding;
 
 import :ComputePipelineState;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Compute pipeline binding.
 	class ComputePipelineBinding final
@@ -47,7 +47,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	ComputePipelineBinding::ComputePipelineBinding() noexcept :
 		boundPSO{nullptr}

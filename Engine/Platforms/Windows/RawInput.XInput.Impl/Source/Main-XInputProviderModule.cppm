@@ -16,7 +16,7 @@ import PonyEngine.RawInput.Ext;
 
 import :XInputProvider;
 
-export namespace PonyEngine::RawInput::XInput::Windows
+export namespace PonyEngine::RawInput::XInput
 {
 	/// @brief XInput gamepad provider module.
 	class XInputProviderModule final : public Application::IModule
@@ -40,7 +40,7 @@ export namespace PonyEngine::RawInput::XInput::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::XInput::Windows
+namespace PonyEngine::RawInput::XInput
 {
 	void XInputProviderModule::StartUp(Application::IModuleContext& context)
 	{

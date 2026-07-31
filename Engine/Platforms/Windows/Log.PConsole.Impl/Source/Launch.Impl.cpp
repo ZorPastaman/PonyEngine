@@ -11,7 +11,7 @@
 
 import PonyEngine.Log.PlatformConsole.Impl.Windows;
 
-namespace PonyEngine::Log::PlatformConsole::Windows
+namespace PonyEngine::Log::PlatformConsole
 {
 	std::shared_ptr<Application::IModule> CreatePlatformConsoleLoggerModule()
 	{

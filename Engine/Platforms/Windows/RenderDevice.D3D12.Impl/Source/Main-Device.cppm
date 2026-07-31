@@ -24,7 +24,7 @@ import PonyEngine.RenderDevice.Ext;
 import :AtomicSupport;
 import :ObjectUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Device wrapper.
 	class Device final
@@ -114,17 +114,17 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param creatorId Creator ID.
 		/// @return Command queue.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12CommandQueue> CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId);
+		Platform::ComPtr<ID3D12CommandQueue> CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId);
 		/// @brief Creates a command allocator.
 		/// @param commandListType Command list type.
 		/// @return Command allocator.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
+		Platform::ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE commandListType);
 		/// @brief Creates a command list.
 		/// @param commandListType Command list type.
 		/// @return Command list.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
+		Platform::ComPtr<ID3D12GraphicsCommandList10> CreateCommandList(D3D12_COMMAND_LIST_TYPE commandListType);
 
 		/// @brief Creates a committed resource.
 		/// @param heapProperties Heap properties.
@@ -135,7 +135,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param castableFormats Castable formats.
 		/// @return Resource.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12Resource2> CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, D3D12_HEAP_FLAGS heapFlags, 
+		Platform::ComPtr<ID3D12Resource2> CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, D3D12_HEAP_FLAGS heapFlags, 
 			const D3D12_RESOURCE_DESC1& resourceDesc, D3D12_BARRIER_LAYOUT initialLayout = D3D12_BARRIER_LAYOUT_UNDEFINED,
 			const D3D12_CLEAR_VALUE& clearValue = D3D12_CLEAR_VALUE{.Format = DXGI_FORMAT_UNKNOWN}, 
 			std::span<const DXGI_FORMAT> castableFormats = std::span<const DXGI_FORMAT>());
@@ -144,7 +144,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param descriptorHeapDesc Descriptor heap description.
 		/// @return Descriptor heap.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc);
+		Platform::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc);
 		/// @brief Creates a constant buffer view.
 		/// @param cbvDesc Constant buffer view description.
 		/// @param handle Descriptor handle.
@@ -187,17 +187,17 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param rootSigDesc Root signature description.
 		/// @return Root signature.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12RootSignature> CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc);
+		Platform::ComPtr<ID3D12RootSignature> CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc);
 		/// @brief Creates a pipeline state.
 		/// @param pipelineStateStream Pipeline state stream.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12PipelineState> CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream);
+		Platform::ComPtr<ID3D12PipelineState> CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream);
 
 		/// @brief Creates a fence.
 		/// @return Fence.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<ID3D12Fence1> CreateFence();
+		Platform::ComPtr<ID3D12Fence1> CreateFence();
 
 		/// @brief Sets the name.
 		/// @param name Name to set.
@@ -210,13 +210,13 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		const IRenderDeviceContext* renderDevice; ///< Render device context.
 
 #ifndef NDEBUG
-		Platform::Windows::ComPtr<ID3D12Debug6> debug; ///< Debug interface.
+		Platform::ComPtr<ID3D12Debug6> debug; ///< Debug interface.
 #endif
-		Platform::Windows::ComPtr<ID3D12Device14> device; ///< Render device.
+		Platform::ComPtr<ID3D12Device14> device; ///< Render device.
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Device::Device(const IRenderDeviceContext& renderDevice, IUnknown& adapter) :
 		renderDevice{&renderDevice}
@@ -432,9 +432,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return device->GetDescriptorHandleIncrementSize(descriptorHeapType);
 	}
 
-	Platform::Windows::ComPtr<ID3D12CommandQueue> Device::CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId)
+	Platform::ComPtr<ID3D12CommandQueue> Device::CreateCommandQueue(const D3D12_COMMAND_QUEUE_DESC& queueDesc, const GUID& creatorId)
 	{
-		Platform::Windows::ComPtr<ID3D12CommandQueue> commandQueue;
+		Platform::ComPtr<ID3D12CommandQueue> commandQueue;
 		if (const HRESULT result = this->device->CreateCommandQueue1(&queueDesc, creatorId, IID_PPV_ARGS(commandQueue.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to acquire D3D12 command queue: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
@@ -443,9 +443,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return commandQueue;
 	}
 
-	Platform::Windows::ComPtr<ID3D12CommandAllocator> Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)
+	Platform::ComPtr<ID3D12CommandAllocator> Device::CreateCommandAllocator(const D3D12_COMMAND_LIST_TYPE commandListType)
 	{
-		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator;
+		Platform::ComPtr<ID3D12CommandAllocator> allocator;
 		if (const HRESULT result = device->CreateCommandAllocator(commandListType, IID_PPV_ARGS(allocator.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create D3D12 command allocator: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
@@ -454,9 +454,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return allocator;
 	}
 
-	Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> Device::CreateCommandList(const D3D12_COMMAND_LIST_TYPE commandListType)
+	Platform::ComPtr<ID3D12GraphicsCommandList10> Device::CreateCommandList(const D3D12_COMMAND_LIST_TYPE commandListType)
 	{
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList;
+		Platform::ComPtr<ID3D12GraphicsCommandList10> commandList;
 		if (const HRESULT result = device->CreateCommandList1(0u, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddress()));
 			FAILED(result)) [[unlikely]]
 		{
@@ -466,7 +466,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return commandList;
 	}
 
-	Platform::Windows::ComPtr<ID3D12Resource2> Device::CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, const D3D12_HEAP_FLAGS heapFlags, 
+	Platform::ComPtr<ID3D12Resource2> Device::CreateResource(const D3D12_HEAP_PROPERTIES& heapProperties, const D3D12_HEAP_FLAGS heapFlags, 
 		const D3D12_RESOURCE_DESC1& resourceDesc, const D3D12_BARRIER_LAYOUT initialLayout, const D3D12_CLEAR_VALUE& clearValue,
 		const std::span<const DXGI_FORMAT> castableFormats)
 	{
@@ -477,7 +477,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		}
 #endif
 
-		Platform::Windows::ComPtr<ID3D12Resource2> resource;
+		Platform::ComPtr<ID3D12Resource2> resource;
 		if (const HRESULT result = device->CreateCommittedResource3(&heapProperties, heapFlags, &resourceDesc, initialLayout, 
 			clearValue.Format != DXGI_FORMAT_UNKNOWN ? &clearValue : nullptr, nullptr, 
 			static_cast<UINT32>(castableFormats.size()), castableFormats.data(), IID_PPV_ARGS(resource.GetAddress())); FAILED(result)) [[unlikely]]
@@ -488,9 +488,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return resource;
 	}
 
-	Platform::Windows::ComPtr<ID3D12DescriptorHeap> Device::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc)
+	Platform::ComPtr<ID3D12DescriptorHeap> Device::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_DESC& descriptorHeapDesc)
 	{
-		Platform::Windows::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+		Platform::ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 		if (const HRESULT result = device->CreateDescriptorHeap(&descriptorHeapDesc, IID_PPV_ARGS(descriptorHeap.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create D3D12 descriptor heap: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
@@ -537,7 +537,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		device->CopyDescriptors(rangeCount, destinationHandles, rangeSizes, rangeCount, sourceHandles, rangeSizes, descriptorHeapType);
 	}
 
-	Platform::Windows::ComPtr<ID3D12RootSignature> Device::CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc)
+	Platform::ComPtr<ID3D12RootSignature> Device::CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC1& rootSigDesc)
 	{
 		const auto versionedDesc = D3D12_VERSIONED_ROOT_SIGNATURE_DESC
 		{
@@ -545,8 +545,8 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 			.Desc_1_1 = rootSigDesc,
 		};
 
-		Platform::Windows::ComPtr<ID3DBlob> successBlob;
-		Platform::Windows::ComPtr<ID3DBlob> errorBlob;
+		Platform::ComPtr<ID3DBlob> successBlob;
+		Platform::ComPtr<ID3DBlob> errorBlob;
 		if (const HRESULT result = D3D12SerializeVersionedRootSignature(&versionedDesc, successBlob.GetAddress(), errorBlob.GetAddress()); FAILED(result)) [[unlikely]]
 		{
 			if (errorBlob && errorBlob->GetBufferSize() > 0)
@@ -558,7 +558,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 			throw std::runtime_error(std::format("Failed to serialize D3D12 root signature: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		Platform::Windows::ComPtr<ID3D12RootSignature> rootSignature;
+		Platform::ComPtr<ID3D12RootSignature> rootSignature;
 		if (const HRESULT result = device->CreateRootSignature(0u, successBlob->GetBufferPointer(), successBlob->GetBufferSize(), 
 			IID_PPV_ARGS(rootSignature.GetAddress())); FAILED(result)) [[unlikely]]
 		{
@@ -568,9 +568,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return rootSignature;
 	}
 
-	Platform::Windows::ComPtr<ID3D12PipelineState> Device::CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream)
+	Platform::ComPtr<ID3D12PipelineState> Device::CreatePipelineState(const D3D12_PIPELINE_STATE_STREAM_DESC& pipelineStateStream)
 	{
-		Platform::Windows::ComPtr<ID3D12PipelineState> pipelineState;
+		Platform::ComPtr<ID3D12PipelineState> pipelineState;
 		if (const HRESULT result = device->CreatePipelineState(&pipelineStateStream, IID_PPV_ARGS(pipelineState.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create D3D12 pipeline state: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
@@ -579,9 +579,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return pipelineState;
 	}
 
-	Platform::Windows::ComPtr<ID3D12Fence1> Device::CreateFence()
+	Platform::ComPtr<ID3D12Fence1> Device::CreateFence()
 	{
-		Platform::Windows::ComPtr<ID3D12Fence1> fence;
+		Platform::ComPtr<ID3D12Fence1> fence;
 		if (const HRESULT result = device->CreateFence(0ull, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create D3D12 fence: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));

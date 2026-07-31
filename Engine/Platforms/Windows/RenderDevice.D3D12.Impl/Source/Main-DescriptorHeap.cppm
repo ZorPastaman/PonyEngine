@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice;
 
 import :ObjectUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Descriptor heap wrapper.
 	class DescriptorHeap final
@@ -39,7 +39,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param handleIncrement Descriptor handle increment.
 		/// @param shaderVisible Is it shader visible?
 		[[nodiscard("Pure constructor")]]
-		DescriptorHeap(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, bool shaderVisible) noexcept;
+		DescriptorHeap(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, bool shaderVisible) noexcept;
 		DescriptorHeap(const DescriptorHeap&) = delete;
 		DescriptorHeap(DescriptorHeap&&) = delete;
 
@@ -73,7 +73,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		DescriptorHeap& operator =(DescriptorHeap&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12DescriptorHeap> descriptorHeap; ///< Descriptor heap.
+		Platform::ComPtr<ID3D12DescriptorHeap> descriptorHeap; ///< Descriptor heap.
 		SIZE_T cpuStart; ///< CPU descriptor handle start.
 		SIZE_T gpuStart; ///< GPU descriptor handle start.
 		SIZE_T handleIncrement; ///< Descriptor handle increment.
@@ -82,7 +82,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	DescriptorHeap::DescriptorHeap(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const bool shaderVisible) noexcept :
 		descriptorHeap(&descriptorHeap),
@@ -92,7 +92,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	}
 
-	DescriptorHeap::DescriptorHeap(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const bool shaderVisible) noexcept :
+	DescriptorHeap::DescriptorHeap(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const bool shaderVisible) noexcept :
 		descriptorHeap(std::move(descriptorHeap)),
 		cpuStart{this->descriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr},
 		gpuStart{shaderVisible ? this->descriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr : std::numeric_limits<SIZE_T>::max()},

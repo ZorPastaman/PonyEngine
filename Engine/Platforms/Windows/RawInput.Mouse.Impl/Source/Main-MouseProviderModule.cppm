@@ -21,7 +21,7 @@ import PonyEngine.RawInput.Ext;
 
 import :MouseProvider;
 
-export namespace PonyEngine::RawInput::Mouse::Windows
+export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse provider module.
 	class MouseProviderModule final : public Application::IModule
@@ -45,7 +45,7 @@ export namespace PonyEngine::RawInput::Mouse::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::Mouse::Windows
+namespace PonyEngine::RawInput::Mouse
 {
 	void MouseProviderModule::StartUp(Application::IModuleContext& context)
 	{

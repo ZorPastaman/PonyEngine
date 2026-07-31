@@ -20,7 +20,7 @@ import PonyEngine.Platform.Windows;
 
 import :MessageHandler;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
 	/// @brief Window class.
 	class WindowClass final
@@ -58,11 +58,11 @@ export namespace PonyEngine::Surface::Windows
 	};
 }
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	WindowClass::WindowClass(const Application::IApplication& application, const HICON mainIcon, const HICON smallIcon, const HCURSOR cursor) :
 		application{&application},
-		moduleHandle(Platform::Windows::GetModule())
+		moduleHandle(Platform::GetModule())
 	{
 		const auto wc = WNDCLASSEXA
 		{

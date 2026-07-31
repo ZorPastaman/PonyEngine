@@ -15,7 +15,7 @@ export module PonyEngine.Platform.Windows:Device;
 
 import std;
 
-export namespace PonyEngine::Platform::Windows
+export namespace PonyEngine::Platform
 {
 	/// @brief Gets a device name size.
 	/// @param deviceHandle Device handle.
@@ -29,7 +29,7 @@ export namespace PonyEngine::Platform::Windows
 	std::size_t GetDeviceName(HANDLE deviceHandle, std::span<char> deviceName);
 }
 
-namespace PonyEngine::Platform::Windows
+namespace PonyEngine::Platform
 {
 	std::size_t GetDeviceNameSize(const HANDLE deviceHandle)
 	{

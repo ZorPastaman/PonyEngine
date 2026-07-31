@@ -21,7 +21,7 @@ import PonyEngine.File.Impl;
 
 import :OverlappedUtility;
 
-export namespace PonyEngine::File::Windows
+export namespace PonyEngine::File
 {
 	/// @brief File request with the @p OVERLAPPED structure.
 	class OverlappedRequest final
@@ -68,7 +68,7 @@ export namespace PonyEngine::File::Windows
 	};
 }
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	OverlappedRequest::OverlappedRequest(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) noexcept :
 		overlapped{CreateOverlapped(params.offset)},

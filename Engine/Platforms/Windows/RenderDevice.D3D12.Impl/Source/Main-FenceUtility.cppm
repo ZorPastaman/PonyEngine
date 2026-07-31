@@ -15,7 +15,7 @@ import PonyEngine.RenderDevice;
 
 import :Fence;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Casts the engine fence to a native fence.
 	/// @param fence Engine fence.
@@ -49,7 +49,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	const Fence* ToNativeFenceNotNullptr(const IFence* fence);
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Fence& ToNativeFence(IFence& fence)
 	{

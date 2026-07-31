@@ -21,7 +21,7 @@ import PonyEngine.RenderDevice;
 import :PipelineState;
 import :RootSignature;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Compute pipeline state wrapper.
 	class ComputePipelineState final : public IComputePipelineState
@@ -36,7 +36,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param pipelineState Pipeline state.
 		/// @param layout Pipeline layout.
 		[[nodiscard("Pure constructor")]]
-		ComputePipelineState(Platform::Windows::ComPtr<ID3D12PipelineState>&& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout) noexcept;
+		ComputePipelineState(Platform::ComPtr<ID3D12PipelineState>&& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout) noexcept;
 		ComputePipelineState(const ComputePipelineState&) = delete;
 		ComputePipelineState(ComputePipelineState&&) = delete;
 
@@ -67,7 +67,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	ComputePipelineState::ComputePipelineState(ID3D12PipelineState& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout) noexcept :
 		pipelineState(pipelineState),
@@ -75,7 +75,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 	{
 	}
 
-	ComputePipelineState::ComputePipelineState(Platform::Windows::ComPtr<ID3D12PipelineState>&& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout) noexcept :
+	ComputePipelineState::ComputePipelineState(Platform::ComPtr<ID3D12PipelineState>&& pipelineState, const std::shared_ptr<const IPipelineLayout>& layout) noexcept :
 		pipelineState(std::move(pipelineState)),
 		layout(layout)
 	{

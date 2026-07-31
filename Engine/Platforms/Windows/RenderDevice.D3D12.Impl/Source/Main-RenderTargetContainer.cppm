@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice;
 
 import :DescriptorHeap;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Container wrapper of RTVs.
 	class RenderTargetContainer final : public IRenderTargetContainer
@@ -39,7 +39,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param handleIncrement Descriptor handle increment.
 		/// @param size Descriptor heap size.
 		[[nodiscard("Pure constructor")]]
-		RenderTargetContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size);
+		RenderTargetContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size);
 		RenderTargetContainer(const RenderTargetContainer&) = delete;
 		RenderTargetContainer(RenderTargetContainer&&) = delete;
 
@@ -81,7 +81,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	RenderTargetContainer::RenderTargetContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
 		descriptorHeap(descriptorHeap, handleIncrement, false),
@@ -91,7 +91,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		std::ranges::fill(metas.get(), metas.get() + this->size, EmptyRTVMeta{});
 	}
 
-	RenderTargetContainer::RenderTargetContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
+	RenderTargetContainer::RenderTargetContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const std::uint32_t size) :
 		descriptorHeap(std::move(descriptorHeap), handleIncrement, false),
 		size{size},
 		metas(std::make_unique<RTVMeta[]>(this->size))

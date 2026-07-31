@@ -16,7 +16,7 @@ import PonyEngine.Log.Ext;
 
 import :PlatformConsoleLogger;
 
-export namespace PonyEngine::Log::PlatformConsole::Windows
+export namespace PonyEngine::Log::PlatformConsole
 {
 	/// @brief Platform console logger module.
 	class PlatformConsoleLoggerModule final : public Application::IModule
@@ -40,7 +40,7 @@ export namespace PonyEngine::Log::PlatformConsole::Windows
 	};
 }
 
-namespace PonyEngine::Log::PlatformConsole::Windows
+namespace PonyEngine::Log::PlatformConsole
 {
 	void PlatformConsoleLoggerModule::StartUp(Application::IModuleContext& context)
 	{

@@ -13,7 +13,7 @@
 
 import PonyEngine.Application;
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Gets the D3D12 backend module.
 	/// @return D3D12 backend module.

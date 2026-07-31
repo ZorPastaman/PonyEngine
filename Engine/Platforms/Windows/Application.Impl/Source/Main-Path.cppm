@@ -20,7 +20,7 @@ import std;
 import PonyEngine.Application.Impl;
 import PonyEngine.Platform.Windows;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Application
 {
 	/// @brief Gets a path to the executable.
 	/// @return Path to the executable.
@@ -40,25 +40,25 @@ export namespace PonyEngine::Application::Windows
 	std::filesystem::path GetTempDataDirectory();
 }
 
-namespace PonyEngine::Application::Windows
+namespace PonyEngine::Application
 {
 	std::filesystem::path GetExecutablePath()
 	{
-		return Platform::Windows::GetModulePath(nullptr).lexically_normal();
+		return Platform::GetModulePath(nullptr).lexically_normal();
 	}
 
 	std::filesystem::path GetLocalDataDirectory()
 	{
-		return AddTail(Platform::Windows::GetKnownPath(FOLDERID_LocalAppData));
+		return AddTail(Platform::GetKnownPath(FOLDERID_LocalAppData));
 	}
 
 	std::filesystem::path GetUserDataDirectory()
 	{
-		return AddTail(Platform::Windows::GetKnownPath(FOLDERID_SavedGames));
+		return AddTail(Platform::GetKnownPath(FOLDERID_SavedGames));
 	}
 
 	std::filesystem::path GetTempDataDirectory()
 	{
-		return AddTail(Platform::Windows::GetTemporaryPath());
+		return AddTail(Platform::GetTemporaryPath());
 	}
 }

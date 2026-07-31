@@ -11,7 +11,7 @@
 
 import PonyEngine.File.Impl.Windows;
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	Application::IModule* GetFileServiceModule()
 	{

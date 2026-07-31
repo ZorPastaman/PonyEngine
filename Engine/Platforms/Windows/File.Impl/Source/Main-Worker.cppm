@@ -22,7 +22,7 @@ import PonyEngine.Log;
 
 import :OverlappedRequest;
 
-export namespace PonyEngine::File::Windows
+export namespace PonyEngine::File
 {
 	/// @brief Worker. Manages an io thread, creates requests and updates them on their completion.
 	class Worker final
@@ -79,7 +79,7 @@ export namespace PonyEngine::File::Windows
 	};
 }
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	Worker::Worker(const Application::IApplication& application) :
 		application{&application},

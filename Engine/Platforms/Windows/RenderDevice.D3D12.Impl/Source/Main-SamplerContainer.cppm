@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice;
 
 import :DescriptorHeap;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Container wrapper of samplers.
 	class SamplerContainer final : public ISamplerContainer
@@ -41,7 +41,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param size Descriptor heap size.
 		/// @param shaderVisible Is the heap shader visible?
 		[[nodiscard("Pure constructor")]]
-		SamplerContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size, bool shaderVisible);
+		SamplerContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, UINT handleIncrement, std::uint32_t size, bool shaderVisible);
 		SamplerContainer(const SamplerContainer&) = delete;
 		SamplerContainer(SamplerContainer&&) = delete;
 
@@ -91,7 +91,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	SamplerContainer::SamplerContainer(ID3D12DescriptorHeap& descriptorHeap, const UINT handleIncrement, const std::uint32_t size, const bool shaderVisible) :
 		descriptorHeap(descriptorHeap, handleIncrement, shaderVisible),
@@ -102,7 +102,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		std::ranges::fill(metas.get(), metas.get() + this->size, EmptySamplerParams{});
 	}
 
-	SamplerContainer::SamplerContainer(Platform::Windows::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const std::uint32_t size, 
+	SamplerContainer::SamplerContainer(Platform::ComPtr<ID3D12DescriptorHeap>&& descriptorHeap, const UINT handleIncrement, const std::uint32_t size, 
 		const bool shaderVisible) :
 		descriptorHeap(std::move(descriptorHeap), handleIncrement, shaderVisible),
 		size{size},

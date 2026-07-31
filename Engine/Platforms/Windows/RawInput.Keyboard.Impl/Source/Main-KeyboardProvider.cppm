@@ -30,10 +30,10 @@ import PonyEngine.Type;
 
 import :KeyboardAxisMap;
 
-export namespace PonyEngine::RawInput::Keyboard::Windows
+export namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Windows keyboard provider.
-	class KeyboardProvider final : public IInputProvider, private Surface::Windows::IRawInputObserver, private Surface::ISurfaceObserver
+	class KeyboardProvider final : public IInputProvider, private Surface::IRawInputObserver, private Surface::ISurfaceObserver
 	{
 	public:
 		/// @brief Creates a keyboard provider.
@@ -94,7 +94,7 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 		std::pair<Application::ScopedTempBuffer, std::string_view> GetKeyboardName(HANDLE keyboardHandle) const;
 
 		IRawInputContext* input; ///< Raw input context.
-		Surface::Windows::ISurfaceService* surface; ///< Surface service.
+		Surface::ISurfaceService* surface; ///< Surface service.
 
 		DeviceTypeID deviceType; ///< Keyboard device type.
 		KeyboardAxisMap axisMap; ///< Axis map.
@@ -105,11 +105,11 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::Keyboard::Windows
+namespace PonyEngine::RawInput::Keyboard
 {
 	KeyboardProvider::KeyboardProvider(IRawInputContext& input) :
 		input{&input},
-		surface{&this->input->Application().GetService<Surface::Windows::ISurfaceService>()},
+		surface{&this->input->Application().GetService<Surface::ISurfaceService>()},
 		deviceType(this->input->HashDeviceType(KeyboardDevice::GenericType)),
 		axisMap(*this->input),
 		registeredDeviceCount{0uz}
@@ -359,12 +359,12 @@ namespace PonyEngine::RawInput::Keyboard::Windows
 
 	std::pair<Application::ScopedTempBuffer, std::string_view> KeyboardProvider::GetKeyboardName(const HANDLE keyboardHandle) const
 	{
-		const std::size_t nameSize = Platform::Windows::GetDeviceNameSize(keyboardHandle);
+		const std::size_t nameSize = Platform::GetDeviceNameSize(keyboardHandle);
 		Application::ScopedTempBuffer buffer = input->Application().AcquiredScopedTempBuffer(nameSize);
 		auto arena = Memory::Arena(*buffer);
 
 		std::span<char> name = arena.AllocateArray<char>(buffer->size_bytes());
-		const std::size_t copied = Platform::Windows::GetDeviceName(keyboardHandle, name);
+		const std::size_t copied = Platform::GetDeviceName(keyboardHandle, name);
 
 		return std::pair<Application::ScopedTempBuffer, std::string_view>(std::move(buffer), std::string_view(name.data(), copied));
 	}

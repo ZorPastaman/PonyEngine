@@ -61,7 +61,7 @@ import :TextureFormatMap;
 import :TextureUtility;
 import :Waiter;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Direct3D12 engine.
 	class Engine final
@@ -710,7 +710,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Engine::Engine(IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice},
@@ -730,7 +730,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		const D3D12_HEAP_PROPERTIES heapProperties = MakeHeapProperties(heapParams.heapType);
 		const D3D12_HEAP_FLAGS heapFlags = GetHeapFlags(params.usage, heapParams.notZeroed);
 		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params);
-		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
+		Platform::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags, resourceDesc);
 
 		return std::make_shared<Buffer>(std::move(resource), resourceDesc.Width, params.usage);
 	}
@@ -799,7 +799,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		const D3D12_RESOURCE_DESC1 resourceDesc = MakeResourceDesc(params, format);
 		const D3D12_BARRIER_LAYOUT initialLayout = ToLayout(params.initialLayout);
 		const D3D12_CLEAR_VALUE clearValue = ToClearValue(params.clearValue, format);
-		Platform::Windows::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
+		Platform::ComPtr<ID3D12Resource2> resource = device.CreateResource(heapProperties, heapFlags,
 			resourceDesc, initialLayout, clearValue, castableFormats);
 
 		return std::make_shared<Texture>(std::move(resource), params.format, format, params.castableFormats, 
@@ -1264,7 +1264,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		const DXGI_FORMAT format = GetFormat(params.format);
 		ValidateSwapChainParams(params, format);
 
-		const HWND windowHandle = renderDevice->Application().GetService<Surface::Windows::ISurfaceService>().Handle();
+		const HWND windowHandle = renderDevice->Application().GetService<Surface::ISurfaceService>().Handle();
 		const DXGI_SWAP_CHAIN_DESC1 swapChainDesc = MakeSwapChainDesc(params, format);
 		auto dxgiSwapChain = SwapChain(factory.CreateSwapChain(graphicsCommandQueue.GetCommandQueue(), windowHandle, swapChainDesc));
 		factory.MakeWindowAssociation(windowHandle, DXGI_MWA_NO_WINDOW_CHANGES);
@@ -1273,7 +1273,7 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		auto buffers = std::vector<std::shared_ptr<Texture>>(params.bufferCount);
 		for (UINT i = 0u; i < params.bufferCount; ++i)
 		{
-			Platform::Windows::ComPtr<ID3D12Resource2> resource = dxgiSwapChain.GetBuffer<ID3D12Resource2>(i);
+			Platform::ComPtr<ID3D12Resource2> resource = dxgiSwapChain.GetBuffer<ID3D12Resource2>(i);
 			const D3D12_RESOURCE_DESC1 resourceDesc = resource->GetDesc1();
 			buffers[i] = std::make_shared<Texture>(std::move(resource), params.format, format, std::span<const TextureFormatID>(),
 				static_cast<std::uint32_t>(resourceDesc.Width), static_cast<std::uint32_t>(resourceDesc.Height), 1u, 1u,

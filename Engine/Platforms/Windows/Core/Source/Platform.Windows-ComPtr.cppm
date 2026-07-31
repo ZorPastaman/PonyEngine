@@ -15,7 +15,7 @@ export module PonyEngine.Platform.Windows:ComPtr;
 
 import std;
 
-export namespace PonyEngine::Platform::Windows
+export namespace PonyEngine::Platform
 {
 	/// @brief Smart pointer to manipulate COM objects.
 	/// @tparam T Object type.
@@ -117,7 +117,7 @@ export namespace PonyEngine::Platform::Windows
 	};
 }
 
-namespace PonyEngine::Platform::Windows
+namespace PonyEngine::Platform
 {
 	template<std::derived_from<IUnknown> T>
 	ComPtr<T>::ComPtr() noexcept :

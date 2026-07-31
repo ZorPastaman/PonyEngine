@@ -13,7 +13,7 @@
 
 import PonyEngine.Application;
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	/// @brief Gets the surface service module.
 	/// @return Surface service module.

@@ -13,7 +13,7 @@
 
 import PonyEngine.Application;
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	/// @brief Gets the file service module.
 	/// @return File service module.

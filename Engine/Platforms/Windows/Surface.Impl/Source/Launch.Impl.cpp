@@ -12,7 +12,7 @@
 import PonyEngine.Application;
 import PonyEngine.Surface.Impl.Windows;
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	Application::IModule* GetSurfaceServiceModule()
 	{

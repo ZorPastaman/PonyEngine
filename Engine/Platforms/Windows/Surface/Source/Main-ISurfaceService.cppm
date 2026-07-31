@@ -21,7 +21,7 @@ import PonyEngine.Surface;
 
 import :IRawInputObserver;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
 	/// @brief Windows surface service.
 	class ISurfaceService : public Surface::ISurfaceService

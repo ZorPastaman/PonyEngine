@@ -16,7 +16,7 @@ export module PonyEngine.Application.Windows:IMessagePump;
 
 import std;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Application
 {
 	/// @brief Message pump data provider.
 	class IMessagePump

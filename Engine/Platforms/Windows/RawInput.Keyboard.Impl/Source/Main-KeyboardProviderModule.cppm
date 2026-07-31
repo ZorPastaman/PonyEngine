@@ -21,7 +21,7 @@ import PonyEngine.RawInput.Ext;
 
 import :KeyboardProvider;
 
-export namespace PonyEngine::RawInput::Keyboard::Windows
+export namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Keyboard provider module.
 	class KeyboardProviderModule final : public Application::IModule
@@ -45,7 +45,7 @@ export namespace PonyEngine::RawInput::Keyboard::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::Keyboard::Windows
+namespace PonyEngine::RawInput::Keyboard
 {
 	void KeyboardProviderModule::StartUp(Application::IModuleContext& context)
 	{

@@ -12,7 +12,7 @@
 import PonyEngine.Application;
 import PonyEngine.RawInput.Keyboard.Impl.Windows;
 
-namespace PonyEngine::RawInput::Keyboard::Windows
+namespace PonyEngine::RawInput::Keyboard
 {
 	Application::IModule* GetKeyboardProviderModule()
 	{

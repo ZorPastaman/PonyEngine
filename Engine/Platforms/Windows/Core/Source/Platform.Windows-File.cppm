@@ -19,7 +19,7 @@ import std;
 
 import :GUID;
 
-export namespace PonyEngine::Platform::Windows
+export namespace PonyEngine::Platform
 {
 	/// @brief Gets this exe/dll module.
 	/// @return Exe/dll module.
@@ -43,7 +43,7 @@ export namespace PonyEngine::Platform::Windows
 	std::filesystem::path GetTemporaryPath();
 }
 
-namespace PonyEngine::Platform::Windows
+namespace PonyEngine::Platform
 {
 	HMODULE GetModule()
 	{

@@ -15,7 +15,7 @@ import std;
 
 import PonyEngine.Application;
 
-namespace PonyEngine::RawInput::XInput::Windows
+namespace PonyEngine::RawInput::XInput
 {
 	/// @brief Creates the XInput provider module.
 	/// @return XInput provider module.

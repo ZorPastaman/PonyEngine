@@ -43,7 +43,7 @@ import :ShaderDataContainer;
 import :Texture;
 import :TextureUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Command list wrapper.
 	class CommandList final
@@ -60,7 +60,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param allocator Command allocator.
 		/// @param commandList Command list.
 		[[nodiscard("Pure constructor")]]
-		CommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
+		CommandList(IRenderDeviceContext& renderDevice, Platform::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		CommandList(const CommandList&) = delete;
 		CommandList(CommandList&&) = delete;
 
@@ -467,8 +467,8 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 
 		IRenderDeviceContext* renderDevice; ///< Render device context.
 
-		Platform::Windows::ComPtr<ID3D12CommandAllocator> allocator; ///< Command allocator.
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10> commandList; ///< Command list.
+		Platform::ComPtr<ID3D12CommandAllocator> allocator; ///< Command allocator.
+		Platform::ComPtr<ID3D12GraphicsCommandList10> commandList; ///< Command list.
 
 		bool isOpen; ///< Is the command list open?
 
@@ -476,7 +476,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	CommandList::CommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		renderDevice{&renderDevice},
@@ -487,8 +487,8 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		Reset();
 	}
 
-	CommandList::CommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
+	CommandList::CommandList(IRenderDeviceContext& renderDevice, Platform::ComPtr<ID3D12CommandAllocator>&& allocator,
+		Platform::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		renderDevice{&renderDevice},
 		allocator(std::move(allocator)),
 		commandList(std::move(commandList)),

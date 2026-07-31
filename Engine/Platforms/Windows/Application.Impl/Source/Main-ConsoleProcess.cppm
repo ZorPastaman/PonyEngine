@@ -29,7 +29,7 @@ import :Path;
 import :Process;
 import :Timer;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Application
 {
 	/// @brief Console process.
 	class ConsoleProcess final
@@ -71,7 +71,7 @@ export namespace PonyEngine::Application::Windows
 	};
 }
 
-namespace PonyEngine::Application::Windows
+namespace PonyEngine::Application
 {
 	std::atomic_bool CtrlExit = false; ///< Is CTRL+C received?
 	BOOL WINAPI CtrlHandler(DWORD ctrlType);

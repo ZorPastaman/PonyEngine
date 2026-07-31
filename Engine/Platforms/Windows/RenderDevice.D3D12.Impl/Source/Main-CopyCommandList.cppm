@@ -20,7 +20,7 @@ import PonyEngine.RenderDevice;
 
 import :CommandList;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Copy command list wrapper.
 	class CopyCommandList final : public ICopyCommandList
@@ -37,7 +37,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param allocator Copy command list allocator.
 		/// @param commandList Copy command list.
 		[[nodiscard("Pure constructor")]]
-		CopyCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
+		CopyCommandList(IRenderDeviceContext& renderDevice, Platform::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		CopyCommandList(const CopyCommandList&) = delete;
 		CopyCommandList(CopyCommandList&&) = delete;
 
@@ -77,15 +77,15 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	CopyCommandList::CopyCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		commandList(renderDevice, allocator, commandList)
 	{
 	}
 
-	CopyCommandList::CopyCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
+	CopyCommandList::CopyCommandList(IRenderDeviceContext& renderDevice, Platform::ComPtr<ID3D12CommandAllocator>&& allocator,
+		Platform::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		commandList(renderDevice, std::move(allocator), std::move(commandList))
 	{
 	}

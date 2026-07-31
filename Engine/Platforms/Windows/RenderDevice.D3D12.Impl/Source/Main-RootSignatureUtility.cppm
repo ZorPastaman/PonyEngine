@@ -23,7 +23,7 @@ import PonyEngine.Type;
 import :RootSignature;
 import :SamplerUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Root signature description counts.
 	struct RootSignatureDescCounts final
@@ -91,7 +91,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_DESCRIPTOR_RANGE_TYPE ToDescriptorRangeType(ShaderDataDescriptorType descriptorType) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	RootSignature& ToNativeRootSignature(IPipelineLayout& layout)
 	{

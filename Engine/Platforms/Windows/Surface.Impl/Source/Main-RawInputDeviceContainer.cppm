@@ -15,7 +15,7 @@ export module PonyEngine.Surface.Impl.Windows:RawInputDeviceContainer;
 
 import std;
 
-export namespace PonyEngine::Surface::Windows
+export namespace PonyEngine::Surface
 {
 	/// @brief Raw input device container.
 	class RawInputDeviceContainer final
@@ -71,7 +71,7 @@ export namespace PonyEngine::Surface::Windows
 	};
 }
 
-namespace PonyEngine::Surface::Windows
+namespace PonyEngine::Surface
 {
 	std::size_t RawInputDeviceContainer::Size() const noexcept
 	{

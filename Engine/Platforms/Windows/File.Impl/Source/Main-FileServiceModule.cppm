@@ -17,7 +17,7 @@ import std;
 
 import :FileService;
 
-export namespace PonyEngine::File::Windows
+export namespace PonyEngine::File
 {
 	/// @brief Windows file service module.
 	class FileServiceModule final : public Application::IModule
@@ -41,7 +41,7 @@ export namespace PonyEngine::File::Windows
 	};
 }
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	void FileServiceModule::StartUp(Application::IModuleContext& context)
 	{

@@ -15,7 +15,7 @@ export module PonyEngine.File.Impl.Windows:OverlappedUtility;
 
 import std;
 
-export namespace PonyEngine::File::Windows
+export namespace PonyEngine::File
 {
 	/// @brief Creates an overlapped by the file offset.
 	/// @param offset File offset.
@@ -24,7 +24,7 @@ export namespace PonyEngine::File::Windows
 	OVERLAPPED CreateOverlapped(std::size_t offset) noexcept;
 }
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	OVERLAPPED CreateOverlapped(const std::size_t offset) noexcept
 	{

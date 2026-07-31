@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/RenderDevice/Windows/D3D12BackendModule.h"
 
-PONY_ENGINE_MODULE(PonyEngine::RenderDevice::D3D12::Windows::GetD3D12BackendModule, PonyEngineRenderDeviceD3D12Backend, PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::RenderDevice::D3D12::GetD3D12BackendModule, PonyEngineRenderDeviceD3D12Backend, PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER);

@@ -24,7 +24,7 @@ import :ComputePipelineState;
 import :GraphicsPipelineState;
 import :Utility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Casts the pipeline state to a native pipeline state.
 	/// @param pipelineState Pipeline state.
@@ -126,7 +126,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_STENCIL_OP ToStencilOp(StencilOperation operation) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	GraphicsPipelineState& ToNativePipelineState(IGraphicsPipelineState& pipelineState)
 	{

@@ -22,7 +22,7 @@ import PonyEngine.RenderDevice.Ext;
 
 import :SwapChain;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief DXGI factor wrapper.
 	class Factory final
@@ -40,7 +40,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @brief Gets the most performant adapter.
 		/// @return Most performant adapter.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<IDXGIAdapter4> GetMostPerformantAdapter() const;
+		Platform::ComPtr<IDXGIAdapter4> GetMostPerformantAdapter() const;
 
 		/// @brief Checks if tearing is supported.
 		/// @return @a True if it's supported; @a false otherwise.
@@ -53,7 +53,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param swapChainDesc Swap chain description.
 		/// @return Swap chain.
 		[[nodiscard("Pure function")]]
-		Platform::Windows::ComPtr<IDXGISwapChain4> CreateSwapChain(IUnknown& device, HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc);
+		Platform::ComPtr<IDXGISwapChain4> CreateSwapChain(IUnknown& device, HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc);
 		/// @brief Makes a window association.
 		/// @param windowHandle Window handle.
 		/// @param flags Association flags.
@@ -66,13 +66,13 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		const IRenderDeviceContext* renderDevice; ///< Render device context.
 
 #ifndef NDEBUG
-		Platform::Windows::ComPtr<IDXGIDebug1> debug; ///< DXGI debug.
+		Platform::ComPtr<IDXGIDebug1> debug; ///< DXGI debug.
 #endif
-		Platform::Windows::ComPtr<IDXGIFactory7> factory; ///< DXGI factory.
+		Platform::ComPtr<IDXGIFactory7> factory; ///< DXGI factory.
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Factory::Factory(const IRenderDeviceContext& renderDevice) :
 		renderDevice{&renderDevice}
@@ -122,9 +122,9 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 #endif
 	}
 
-	Platform::Windows::ComPtr<IDXGIAdapter4> Factory::GetMostPerformantAdapter() const
+	Platform::ComPtr<IDXGIAdapter4> Factory::GetMostPerformantAdapter() const
 	{
-		Platform::Windows::ComPtr<IDXGIAdapter4> adapter;
+		Platform::ComPtr<IDXGIAdapter4> adapter;
 		if (const HRESULT result = factory->EnumAdapterByGpuPreference(0u, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(adapter.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to get adapter: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
@@ -144,14 +144,14 @@ namespace PonyEngine::RenderDevice::D3D12::Windows
 		return tearingSupport;
 	}
 
-	Platform::Windows::ComPtr<IDXGISwapChain4> Factory::CreateSwapChain(IUnknown& device, const HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc)
+	Platform::ComPtr<IDXGISwapChain4> Factory::CreateSwapChain(IUnknown& device, const HWND windowHandle, const DXGI_SWAP_CHAIN_DESC1& swapChainDesc)
 	{
-		Platform::Windows::ComPtr<IDXGISwapChain1> swapChain;
+		Platform::ComPtr<IDXGISwapChain1> swapChain;
 		if (const HRESULT result = factory->CreateSwapChainForHwnd(&device, windowHandle, &swapChainDesc, nullptr, nullptr, swapChain.GetAddress()); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to acquire DXGI swap chain: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		Platform::Windows::ComPtr<IDXGISwapChain4> modernSwapChain;
+		Platform::ComPtr<IDXGISwapChain4> modernSwapChain;
 		if (const HRESULT result = swapChain->QueryInterface(IID_PPV_ARGS(modernSwapChain.GetAddress())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to cast DXGI swap chain interface: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));

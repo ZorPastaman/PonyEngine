@@ -12,7 +12,7 @@
 import PonyEngine.Application;
 import PonyEngine.RenderDevice.D3D12.Impl.Windows;
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Application::IModule* GetD3D12BackendModule()
 	{

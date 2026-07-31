@@ -21,6 +21,8 @@ The Windows support mutates engine modules, adding code and defines to them.
 | [PonyEngine.RenderDevice.D3D12.Impl](../../Modules/RenderDevice.D3D12.Impl) | [PonyEngine.RenderDevice.D3D12.Impl.Windows](RenderDevice.D3D12.Impl) |
 | [PonyEngine.Surface](../../Modules/Surface)                                 | [PonyEngine.Surface.Windows](Surface)                                 |
 | [PonyEngine.Surface.Impl](../../Modules/Surface.Impl)                       | [PonyEngine.Surface.Impl.Windows](Surface.Impl)                       |
+| [PonyEngine.WinAPIInput](../../Modules/WinAPIInput)                         | [PonyEngine.WinAPIInput.Windows](WinAPIInput)                         |
+| [PonyEngine.WinAPIInput.Impl](../../Modules/WinAPIInput.Impl)               | [PonyEngine.WinAPIInput.Impl.Windows](WinAPIInput.Impl)               |
 
 ## Long paths
 

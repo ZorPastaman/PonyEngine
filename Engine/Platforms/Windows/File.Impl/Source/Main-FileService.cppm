@@ -17,7 +17,7 @@ import PonyEngine.File;
 import :File;
 import :Worker;
 
-export namespace PonyEngine::File::Windows
+export namespace PonyEngine::File
 {
 	/// @brief File service.
 	class FileService final : public Application::IService, private IFileService
@@ -50,7 +50,7 @@ export namespace PonyEngine::File::Windows
 	};
 }
 
-namespace PonyEngine::File::Windows
+namespace PonyEngine::File
 {
 	FileService::FileService(const Application::IApplication& application) :
 		application{&application},

@@ -17,7 +17,7 @@ import std;
 
 import PonyEngine.Log.Ext;
 
-export namespace PonyEngine::Log::PlatformConsole::Windows
+export namespace PonyEngine::Log::PlatformConsole
 {
 	/// @brief Logger that logs to the @p OutputDebugStringA().
 	class PlatformConsoleLogger final : public ILogger
@@ -37,7 +37,7 @@ export namespace PonyEngine::Log::PlatformConsole::Windows
 	};
 }
 
-namespace PonyEngine::Log::PlatformConsole::Windows
+namespace PonyEngine::Log::PlatformConsole
 {
 	void PlatformConsoleLogger::Log(const std::string_view formattedMessage, const LogEntry& logEntry) noexcept
 	{

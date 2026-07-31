@@ -11,7 +11,7 @@
 
 import PonyEngine.RawInput.XInput.Impl.Windows;
 
-namespace PonyEngine::RawInput::XInput::Windows
+namespace PonyEngine::RawInput::XInput
 {
 	std::shared_ptr<Application::IModule> CreateXInputProviderModule()
 	{

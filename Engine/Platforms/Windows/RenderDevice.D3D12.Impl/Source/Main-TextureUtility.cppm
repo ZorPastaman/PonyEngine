@@ -22,7 +22,7 @@ import PonyEngine.Type;
 
 import :Texture;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Casts to a native texture.
 	/// @param texture Engine texture.
@@ -208,7 +208,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_RESOLVE_MODE ToResolveMode(ResolveMode mode) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Texture& ToNativeTexture(ITexture& texture)
 	{

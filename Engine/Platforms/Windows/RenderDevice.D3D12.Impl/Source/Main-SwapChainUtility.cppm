@@ -19,7 +19,7 @@ import std;
 
 import PonyEngine.RenderDevice;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Makes a swap chain description.
 	/// @param params Swap chain parameters.
@@ -70,7 +70,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr SwapChainSyncMask ToSyncMode(BOOL tearingSupported) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	constexpr DXGI_SWAP_CHAIN_DESC1 MakeSwapChainDesc(const SwapChainParams& params, const DXGI_FORMAT format) noexcept
 	{

@@ -18,7 +18,7 @@ import :ComputeCommandList;
 import :CopyCommandList;
 import :GraphicsCommandList;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Casts the engine command list to a native command list.
 	/// @param commandList Engine command list.
@@ -142,7 +142,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	const BundleCommandList* ToNativeCommandListNotNullptr(const ISecondaryGraphicsCommandList* commandList);
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	GraphicsCommandList& ToNativeCommandList(IGraphicsCommandList& commandList)
 	{

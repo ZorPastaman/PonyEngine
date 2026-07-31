@@ -15,7 +15,7 @@ These variables are used to configure the build of the module:
 
 | Variable name                        | Default value | Description                                                  |
 |:-------------------------------------|:-------------:|:-------------------------------------------------------------|
-| `PONY_ENGINE_RAW_INPUT_XInput_ORDER` | p             | PonyEngine.RawInput.XInput.Impl module initialization order. |
+| `PONY_ENGINE_RAW_INPUT_XINPUT_ORDER` | p             | PonyEngine.RawInput.XInput.Impl module initialization order. |
 
 ## For Pony Engine developers
 

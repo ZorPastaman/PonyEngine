@@ -20,7 +20,7 @@ import PonyEngine.Application.Impl;
 import PonyEngine.Chrono;
 import PonyEngine.Log;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Application
 {
 	/// @brief Creates a timer.
 	/// @param application Application.
@@ -38,7 +38,7 @@ export namespace PonyEngine::Application::Windows
 	void WaitForNextFrame(HANDLE timer, const App& application) noexcept;
 }
 
-namespace PonyEngine::Application::Windows
+namespace PonyEngine::Application
 {
 	HANDLE CreateTimer(const App& application) noexcept
 	{

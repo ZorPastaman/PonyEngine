@@ -24,7 +24,7 @@ import :CommandList;
 import :ContainerBinding;
 import :GraphicsComputePipelineBinding;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Bundle command list wrapper.
 	class BundleCommandList final : public ISecondaryGraphicsCommandList
@@ -41,7 +41,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @param allocator Bundle command allocator.
 		/// @param commandList Bundle command list.
 		[[nodiscard("Pure constructor")]]
-		BundleCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
+		BundleCommandList(IRenderDeviceContext& renderDevice, Platform::ComPtr<ID3D12CommandAllocator>&& allocator, Platform::ComPtr<ID3D12GraphicsCommandList10>&& commandList);
 		BundleCommandList(const BundleCommandList&) = delete;
 		BundleCommandList(BundleCommandList&&) = delete;
 
@@ -85,15 +85,15 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	BundleCommandList::BundleCommandList(IRenderDeviceContext& renderDevice, ID3D12CommandAllocator& allocator, ID3D12GraphicsCommandList10& commandList) :
 		commandList(renderDevice, allocator, commandList)
 	{
 	}
 
-	BundleCommandList::BundleCommandList(IRenderDeviceContext& renderDevice, Platform::Windows::ComPtr<ID3D12CommandAllocator>&& allocator,
-		Platform::Windows::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
+	BundleCommandList::BundleCommandList(IRenderDeviceContext& renderDevice, Platform::ComPtr<ID3D12CommandAllocator>&& allocator,
+		Platform::ComPtr<ID3D12GraphicsCommandList10>&& commandList) :
 		commandList(renderDevice, std::move(allocator), std::move(commandList))
 	{
 	}

@@ -21,7 +21,7 @@ import PonyEngine.Platform.Windows;
 
 import :ObjectUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Command queue.
 	class CommandQueue final
@@ -34,7 +34,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		/// @brief Creates a command queue.
 		/// @param commandQueue Command queue.
 		[[nodiscard("Pure constructor")]]
-		explicit CommandQueue(Platform::Windows::ComPtr<ID3D12CommandQueue>&& commandQueue) noexcept;
+		explicit CommandQueue(Platform::ComPtr<ID3D12CommandQueue>&& commandQueue) noexcept;
 		CommandQueue(const CommandQueue&) = delete;
 		CommandQueue(CommandQueue&& other) noexcept = default;
 
@@ -64,18 +64,18 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 		CommandQueue& operator =(CommandQueue&&) = delete;
 
 	private:
-		Platform::Windows::ComPtr<ID3D12CommandQueue> commandQueue; ///< Command queue.
+		Platform::ComPtr<ID3D12CommandQueue> commandQueue; ///< Command queue.
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	CommandQueue::CommandQueue(ID3D12CommandQueue& commandQueue) noexcept :
 		commandQueue(&commandQueue)
 	{
 	}
 
-	CommandQueue::CommandQueue(Platform::Windows::ComPtr<ID3D12CommandQueue>&& commandQueue) noexcept :
+	CommandQueue::CommandQueue(Platform::ComPtr<ID3D12CommandQueue>&& commandQueue) noexcept :
 		commandQueue(std::move(commandQueue))
 	{
 		assert(this->commandQueue && "The command queue is nullptr.");

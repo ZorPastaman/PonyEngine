@@ -19,7 +19,7 @@ import PonyEngine.RenderDevice;
 
 import :Buffer;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Casts to a native buffer.
 	/// @param buffer Engine buffer.
@@ -81,7 +81,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_UNORDERED_ACCESS_VIEW_DESC MakeUAVDesc(const BufferUAVParams& params) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	Buffer& ToNativeBuffer(IBuffer& buffer)
 	{

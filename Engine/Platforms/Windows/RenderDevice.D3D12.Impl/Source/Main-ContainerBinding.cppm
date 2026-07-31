@@ -12,7 +12,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:ContainerBinding;
 import :SamplerContainer;
 import :ShaderDataContainer;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Shader data and sampler container binding.
 	class ContainerBinding final
@@ -60,7 +60,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	ContainerBinding::ContainerBinding() noexcept :
 		shaderDataContainer{nullptr},

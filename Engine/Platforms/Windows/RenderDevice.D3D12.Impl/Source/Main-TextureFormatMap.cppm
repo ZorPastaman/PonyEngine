@@ -19,7 +19,7 @@ import PonyEngine.RenderDevice.Ext;
 
 import :FormatUtility;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Texture format map.
 	class TextureFormatMap final
@@ -70,7 +70,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	};
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	TextureFormatMap::TextureFormatMap(IRenderDeviceContext& renderDevice)
 	{

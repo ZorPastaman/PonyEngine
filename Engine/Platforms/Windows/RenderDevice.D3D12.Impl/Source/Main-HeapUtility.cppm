@@ -17,7 +17,7 @@ export module PonyEngine.RenderDevice.D3D12.Impl.Windows:HeapUtility;
 
 import PonyEngine.RenderDevice;
 
-export namespace PonyEngine::RenderDevice::D3D12::Windows
+export namespace PonyEngine::RenderDevice::D3D12
 {
 	/// @brief Makes heap properties.
 	/// @param heapType Heap type.
@@ -44,7 +44,7 @@ export namespace PonyEngine::RenderDevice::D3D12::Windows
 	constexpr D3D12_HEAP_FLAGS MakeHeapFlags(TextureUsage usage, bool notZeroed) noexcept;
 }
 
-namespace PonyEngine::RenderDevice::D3D12::Windows
+namespace PonyEngine::RenderDevice::D3D12
 {
 	constexpr D3D12_HEAP_PROPERTIES MakeHeapProperties(const HeapType heapType) noexcept
 	{

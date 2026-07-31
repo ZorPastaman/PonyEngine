@@ -19,7 +19,7 @@ import std;
 
 import PonyEngine.RawInput.Ext;
 
-export namespace PonyEngine::RawInput::XInput::Windows
+export namespace PonyEngine::RawInput::XInput
 {
 	/// @brief XInput gamepad axis map.
 	class GamepadAxisMap final
@@ -106,7 +106,7 @@ export namespace PonyEngine::RawInput::XInput::Windows
 	};
 }
 
-namespace PonyEngine::RawInput::XInput::Windows
+namespace PonyEngine::RawInput::XInput
 {
 	GamepadAxisMap::GamepadAxisMap(IDeviceHub& hub)
 	{
