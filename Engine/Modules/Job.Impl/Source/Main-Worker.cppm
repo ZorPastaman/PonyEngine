@@ -97,8 +97,10 @@ export namespace PonyEngine::Job
 		/// @brief Increments the global job queue version.
 		void IncrementJobQueueVersion() const noexcept;
 
-		std::unique_ptr<JobPool> jobPool; ///< Job pool.
-		std::queue<JobID> jobQueue; ///< Job queue.
+		JobPool jobPool; ///< Job pool.
+		std::array<JobID, PONY_ENGINE_JOB_POOL_SIZE> jobQueue; ///< Job queue.
+		std::size_t jobQueueHead; ///< Job queue head.
+		std::size_t jobQueueTail; ///< Job queue tail.
 		std::mutex jobQueueMutex; ///< Mutex that must be used while working with the @p jobQueue.
 		std::atomic_size_t* jobQueueVersion; ///< Global job queue version.
 
@@ -116,7 +118,8 @@ export namespace PonyEngine::Job
 namespace PonyEngine::Job
 {
 	Worker::Worker(const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex, std::atomic_size_t* const jobQueueVersion) :
-		jobPool(std::make_unique<JobPool>()),
+		jobQueueHead{0uz},
+		jobQueueTail{0uz},
 		jobQueueVersion{jobQueueVersion},
 		workers(workers),
 		myIndex{myIndex},
@@ -153,22 +156,23 @@ namespace PonyEngine::Job
 
 	JobID Worker::AcquireJob() noexcept
 	{
-		const std::optional<std::size_t> jobIndex = jobPool->AcquireJob();
+		const std::optional<std::size_t> jobIndex = jobPool.AcquireJob();
 		return jobIndex ? JobID{.poolIndex = myIndex, .jobIndex = *jobIndex} : JobID{};
 	}
 
 	Job& Worker::GetJob(const std::size_t index) noexcept
 	{
-		return jobPool->GetJob(index);
+		return jobPool.GetJob(index);
 	}
 
-	void Worker::AddToQueue(const JobID& jobId) noexcept // It may throw, but it's intentionally noexcept to fail the program
+	void Worker::AddToQueue(const JobID& jobId) noexcept
 	{
 		assert(jobId.poolIndex == myIndex && "Wrong pool index.");
 
 		{
 			const auto lock = std::lock_guard(jobQueueMutex);
-			jobQueue.push(jobId);
+			jobQueue[jobQueueTail++] = jobId;
+			jobQueueTail %= PONY_ENGINE_JOB_POOL_SIZE;
 		}
 
 		IncrementJobQueueVersion();
@@ -181,7 +185,7 @@ namespace PonyEngine::Job
 			const std::size_t initialJobQueueVersion = jobQueueVersion->load(std::memory_order::acquire);
 			if (const JobID jobId = FindJob(); jobId.IsValid())
 			{
-				JobPool& executedJobPool = *workers[jobId.poolIndex]->jobPool;
+				JobPool& executedJobPool = workers[jobId.poolIndex]->jobPool;
 				Job& job = executedJobPool.GetJob(jobId.jobIndex);
 				job.Execute();
 				job.Task(nullptr);
@@ -189,7 +193,7 @@ namespace PonyEngine::Job
 				job.ProcessDependents([&](const JobID& dependentId)
 				{
 					Worker& dependentWorker = *workers[dependentId.poolIndex];
-					if (Job& dependent = dependentWorker.jobPool->GetJob(dependentId.jobIndex); dependent.Unblock())
+					if (Job& dependent = dependentWorker.jobPool.GetJob(dependentId.jobIndex); dependent.Unblock())
 					{
 						dependentWorker.AddToQueue(dependentId);
 					}
@@ -257,13 +261,13 @@ namespace PonyEngine::Job
 
 	JobID Worker::TakeJob() noexcept
 	{
-		if (jobQueue.empty())
+		if (jobQueueHead == jobQueueTail)
 		{
 			return JobID{};
 		}
 
-		const JobID nextJob = jobQueue.front();
-		jobQueue.pop();
+		const JobID nextJob = jobQueue[jobQueueHead++];
+		jobQueueHead %= PONY_ENGINE_JOB_POOL_SIZE;
 
 		return nextJob;
 	}
