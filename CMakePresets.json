@@ -128,7 +128,7 @@
 			"hidden": true,
 			"cacheVariables": {
 				"PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL": true,
-				"PONY_ENGINE_RAW_INPUT_MOUSE_IMPL": false,
+				"PONY_ENGINE_RAW_INPUT_MOUSE_IMPL": true,
 				"PONY_ENGINE_RAW_INPUT_KEYBOARD_ORDER": "rik",
 				"PONY_ENGINE_RAW_INPUT_MOUSE_ORDER": "rim"
 			}

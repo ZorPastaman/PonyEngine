@@ -6,7 +6,6 @@ Platform independent module: [PonyEngine.RawInput.Mouse.Impl](../../../Modules/R
 
 - [PonyEngine.Log](../../../Modules/Log)
 - [PonyEngine.Application](../Application)
-- [PonyEngine.Surface](../Surface)
 
 ## CMake variables
 

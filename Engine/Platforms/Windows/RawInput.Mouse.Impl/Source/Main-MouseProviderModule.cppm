@@ -7,16 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.RawInput.Mouse.Impl.Windows:MouseProviderModule;
 
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
 import PonyEngine.RawInput.Ext;
 
 import :MouseProvider;
@@ -41,7 +36,7 @@ export namespace PonyEngine::RawInput::Mouse
 		MouseProviderModule& operator =(MouseProviderModule&&) = delete;
 
 	private:
-		InputProviderHandle mouseProviderHandle; ///< Mouse provider handle.
+		std::unique_ptr<MouseProvider> mouseProvider; ///< Mouse provider.
 	};
 }
 
@@ -49,34 +44,11 @@ namespace PonyEngine::RawInput::Mouse
 {
 	void MouseProviderModule::StartUp(Application::IModuleContext& context)
 	{
-		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
-#ifndef NDEBUG
-		if (!inputModuleContext) [[unlikely]]
-		{
-			throw std::logic_error("Raw input module context not found");
-		}
-#endif
-
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(MouseProvider).name());
-		mouseProviderHandle = inputModuleContext->AddProvider([&](IRawInputContext& input)
-		{
-			return std::make_shared<MouseProvider>(input);
-		});
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(MouseProvider).name());
+		mouseProvider = std::make_unique<MouseProvider>(context.Application());
 	}
 
 	void MouseProviderModule::ShutDown(Application::IModuleContext& context)
 	{
-		IRawInputModuleContext* inputModuleContext = context.GetData<IRawInputModuleContext>();
-#ifndef NDEBUG
-		if (!inputModuleContext) [[unlikely]]
-		{
-			throw std::logic_error("Raw input module context not found");
-		}
-#endif
-
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(MouseProvider).name());
-		inputModuleContext->RemoveProvider(mouseProviderHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(MouseProvider).name());
+		mouseProvider.reset();
 	}
 }

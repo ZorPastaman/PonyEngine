@@ -13,6 +13,4 @@ export import PonyEngine.RawInput.Ext;
 
 export import :MouseAxis;
 export import :MouseAxisMap;
-export import :MouseContainer;
-export import :MouseEvent;
-export import :MouseEventQueue;
+export import :MouseController;

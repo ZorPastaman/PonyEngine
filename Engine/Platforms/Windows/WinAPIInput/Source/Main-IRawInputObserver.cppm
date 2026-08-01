@@ -30,7 +30,8 @@ export namespace PonyEngine::WinAPIInput
 		/// @param device Device handle.
 		/// @param isConnected Is the device connected?
 		/// @note The function is always called on a main thread.
-		/// @note It's called inside message pump queue.
+		/// @remark It's called inside message pump queue.
+		/// @remark It may be called on subscription for already connected devices.
 		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) {}
 	};
 }

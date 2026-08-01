@@ -4,7 +4,7 @@ if(NOT TARGET PonyEngine.RawInput)
 	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
 endif()
 if(NOT TARGET PonyEngine.RawInput.Ext)
-	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
+	message(FATAL_ERROR "PonyEngine.RawInput.Ext wasn't configured")
 endif()
 
 message(VERBOSE "Configuring target")

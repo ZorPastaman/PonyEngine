@@ -16,6 +16,4 @@ The module contains some utilities that can be useful for mouse implementations 
 
 - [MouseAxis](Source/Main-MouseAxis.cppm);
 - [MouseAxisMap](Source/Main-MouseAxisMap.cppm);
-- [MouseContainer](Source/Main-MouseContainer.cppm);
-- [MouseEvent](Source/Main-MouseEvent.cppm);
-- [MouseEventQueue](Source/Main-MouseEventQueue.cppm).
+- [MouseController](Source/Main-MouseController.cppm).

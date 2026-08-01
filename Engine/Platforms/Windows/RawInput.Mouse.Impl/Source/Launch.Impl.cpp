@@ -9,14 +9,12 @@
 
 #include "PonyEngine/RawInput/Windows/MouseProviderModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.RawInput.Mouse.Impl.Windows;
 
 namespace PonyEngine::RawInput::Mouse
 {
-	Application::IModule* GetMouseProviderModule()
+	std::shared_ptr<Application::IModule> CreateMouseProviderModule()
 	{
-		static MouseProviderModule mouseProviderModule;
-		return &mouseProviderModule;
+		return std::make_shared<MouseProviderModule>();
 	}
 }

@@ -101,6 +101,7 @@ export namespace PonyEngine::WinAPIInput
 		HWND hwnd; ///< Window handle.
 
 		std::unordered_map<UINT, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
+		std::unordered_map<UINT, std::vector<HANDLE>> connectedDevices; ///< Connected devices.
 
 		friend LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	};
@@ -196,10 +197,18 @@ namespace PonyEngine::WinAPIInput
 		std::vector<IRawInputObserver*>& usageObservers = rawInputObservers[usageKey];
 		usageObservers.push_back(&observer);
 
-		if (usageObservers.size() == 1uz) [[unlikely]]
+		if (usageObservers.size() == 1uz)
 		{
 			const auto rid = RAWINPUTDEVICE{.usUsagePage = usagePage, .usUsage = usage, .dwFlags = RIDEV_INPUTSINK | RIDEV_DEVNOTIFY, .hwndTarget = hwnd};
 			RegisterRawInputDevices(&rid, 1u, sizeof(RAWINPUTDEVICE));
+		}
+
+		if (const auto position = connectedDevices.find(usageKey); position != connectedDevices.cend())
+		{
+			for (const HANDLE handle : position->second)
+			{
+				observer.OnDeviceConnectionChanged(handle, true);
+			}
 		}
 	}
 
@@ -214,7 +223,7 @@ namespace PonyEngine::WinAPIInput
 			{
 				usagePosition->second.erase(observerPosition);
 
-				if (usagePosition->second.size() == 0uz) [[unlikely]]
+				if (usagePosition->second.size() == 0uz)
 				{
 					const auto rid = RAWINPUTDEVICE{.usUsagePage = usagePage, .usUsage = usage, .dwFlags = RIDEV_REMOVE, .hwndTarget = nullptr};
 					RegisterRawInputDevices(&rid, 1u, sizeof(RAWINPUTDEVICE));
@@ -304,6 +313,24 @@ namespace PonyEngine::WinAPIInput
 		const UINT usageKey = GetUsageKey(deviceHandle);
 		if (usageKey == 0u) [[unlikely]]
 		{
+			return;
+		}
+
+		try
+		{
+			if (isConnected)
+			{
+				connectedDevices[usageKey].push_back(deviceHandle);
+			}
+			else
+			{
+				std::vector<HANDLE>& devices = connectedDevices[usageKey];
+				devices.erase(std::ranges::find(devices, deviceHandle));
+			}
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On updating WinAPI connected device list.");
 			return;
 		}
 

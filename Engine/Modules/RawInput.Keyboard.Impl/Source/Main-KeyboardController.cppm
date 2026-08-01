@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
+import PonyEngine.Type;
 
 export namespace PonyEngine::RawInput::Keyboard
 {
@@ -20,8 +21,6 @@ export namespace PonyEngine::RawInput::Keyboard
 	class KeyboardController final : private IDeviceController
 	{
 	public:
-		[[nodiscard("Pure constructor")]]
-		KeyboardController() noexcept = default;
 		/// @brief Creates a keyboard controller.
 		/// @param isConnected Is the keyboard connected?
 		[[nodiscard("Pure constructor")]]
@@ -56,17 +55,26 @@ export namespace PonyEngine::RawInput::Keyboard
 	private:
 		virtual void Tick(IInputRegistry& inputRegistry) override;
 
-		/// @brief Input event.
-		struct InputEvent final
+		/// @brief Base event.
+		struct Event
 		{
 			std::chrono::time_point<std::chrono::steady_clock> time; ///< Event time.
+		};
+		/// @brief Input event.
+		struct InputEvent final : Event
+		{
 			std::optional<Math::Vector2<std::int32_t>> cursor; ///< Cursor position on the event.
 			Axis axis; ///< Axis.
 			bool pressed; ///< Is the key pressed?
 		};
+		/// @brief Connect event.
+		struct ConnectEvent final : Event
+		{
+			bool isConnected; ///< Is connected?
+		};
+		using KeyboardEvent = std::variant<InputEvent, ConnectEvent>; ///< Keyboard event.
 
-		std::vector<InputEvent> inputEvents; ///< Input events.
-		std::vector<ConnectionEvent> connectionEvents; ///< Connection events.
+		std::queue<KeyboardEvent> events; ///< Input events.
 
 		std::vector<Axis> pressedKeys; ///< Currently pressed keys.
 		bool isConnected; ///< Current connection state.
@@ -89,12 +97,9 @@ namespace PonyEngine::RawInput::Keyboard
 			return;
 		}
 
-		inputEvents.push_back(InputEvent
+		events.push(InputEvent
 		{
-			.time = time,
-			.cursor = cursor,
-			.axis = axis,
-			.pressed = pressed
+			Event{ time }, cursor, axis, pressed
 		});
 
 		if (pressed)
@@ -114,10 +119,9 @@ namespace PonyEngine::RawInput::Keyboard
 			return;
 		}
 
-		connectionEvents.push_back(ConnectionEvent
+		events.push(ConnectEvent
 		{
-			.isConnected = isConnected,
-			.timePoint = time
+			Event{ time }, isConnected
 		});
 
 		this->isConnected = isConnected;
@@ -130,25 +134,32 @@ namespace PonyEngine::RawInput::Keyboard
 
 	void KeyboardController::Tick(IInputRegistry& inputRegistry)
 	{
-		for (const InputEvent& event : inputEvents)
+		while (!events.empty())
 		{
-			const float value = event.pressed;
-			inputRegistry.AddInput(RawInputEvent
+			std::visit(Type::Overload
 			{
-				.axes = std::span(&event.axis, 1uz),
-				.values = std::span(&value, 1uz),
-				.eventType = InputEventType::State,
-				.timePoint = event.time,
-				.cursorPosition = event.cursor
-			});
+				[&](const InputEvent& input)
+				{
+					const float value = input.pressed;
+					inputRegistry.AddInput(RawInputEvent
+					{
+						.axes = std::span(&input.axis, 1uz),
+						.values = std::span(&value, 1uz),
+						.eventType = InputEventType::State,
+						.timePoint = input.time,
+						.cursorPosition = input.cursor
+					});
+				},
+				[&](const ConnectEvent& connect)
+				{
+					inputRegistry.Connect(ConnectionEvent
+					{
+						.isConnected = connect.isConnected,
+						.timePoint = connect.time
+					});
+				}
+			}, events.front());
+			events.pop();
 		}
-
-		for (const ConnectionEvent& event : connectionEvents)
-		{
-			inputRegistry.Connect(event);
-		}
-
-		inputEvents.clear();
-		connectionEvents.clear();
 	}
 }

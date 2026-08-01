@@ -111,40 +111,9 @@ namespace PonyEngine::RawInput::Keyboard
 		const HANDLE handle = rawInput.header.hDevice;
 		const std::size_t keyboardIndex = std::ranges::find(nativeHandles, handle) - nativeHandles.cbegin();
 
-		if (const std::size_t initialCount = nativeHandles.size(); keyboardIndex == initialCount) [[unlikely]]
+		if (keyboardIndex >= nativeHandles.size()) [[unlikely]]
 		{
-			const std::size_t nameLength = Platform::GetDeviceNameSize(handle);
-			const auto buffer = Application::ScopedTempBuffer(*application, nameLength);
-			auto arena = Memory::Arena(*buffer);
-			const std::span<char> name = arena.AllocateArray<char>(nameLength);
-			const std::size_t nameSize = Platform::GetDeviceName(handle, name);
-
-			try
-			{
-				nativeHandles.push_back(handle);
-				keyboardControllers.push_back(std::make_unique<KeyboardController>(true));
-				const DeviceHandle deviceHandle = hub->RegisterDevice(keyboardControllers[keyboardIndex]->Controller(), true, DeviceParams
-				{
-					.name = std::string_view(name.data(), nameSize),
-					.type = deviceType,
-					.style = deviceStyle
-				});
-				try
-				{
-					deviceHandles.push_back(deviceHandle);
-				}
-				catch (...)
-				{
-					hub->UnregisterDevice(deviceHandles[keyboardIndex], keyboardControllers[keyboardIndex]->Controller());
-					throw;
-				}
-			}
-			catch (...)
-			{
-				keyboardControllers.resize(initialCount);
-				nativeHandles.resize(initialCount);
-				throw;
-			}
+			return;
 		}
 
 		const Axis axis = axisMap.EngineAxis(*hub, rawInput.data.keyboard);
@@ -159,19 +128,54 @@ namespace PonyEngine::RawInput::Keyboard
 	{
 		if (isConnected)
 		{
-			return;
-		}
+			const std::size_t nameLength = Platform::GetDeviceNameSize(device);
+			const auto buffer = Application::ScopedTempBuffer(*application, nameLength);
+			auto arena = Memory::Arena(*buffer);
+			const std::span<char> name = arena.AllocateArray<char>(nameLength);
+			const std::size_t nameSize = Platform::GetDeviceName(device, name);
 
-		const std::size_t keyboardIndex = std::ranges::find(nativeHandles, device) - nativeHandles.cbegin();
-		if (keyboardIndex >= nativeHandles.size())
+			const std::size_t initialSize = nativeHandles.size();
+			try
+			{
+				nativeHandles.push_back(device);
+				keyboardControllers.push_back(std::make_unique<KeyboardController>(true));
+				IDeviceController& controller = keyboardControllers.back()->Controller();
+				const DeviceHandle deviceHandle = hub->RegisterDevice(controller, true, DeviceParams
+				{
+					.name = std::string_view(name.data(), nameSize),
+					.type = deviceType,
+					.style = deviceStyle
+				});
+				try
+				{
+					deviceHandles.push_back(deviceHandle);
+				}
+				catch (...)
+				{
+					hub->UnregisterDevice(deviceHandle, controller);
+					throw;
+				}
+			}
+			catch (...)
+			{
+				keyboardControllers.resize(initialSize);
+				nativeHandles.resize(initialSize);
+				throw;
+			}
+		}
+		else
 		{
-			return;
+			const std::size_t keyboardIndex = std::ranges::find(nativeHandles, device) - nativeHandles.cbegin();
+			if (keyboardIndex >= nativeHandles.size())
+			{
+				return;
+			}
+
+			hub->UnregisterDevice(deviceHandles[keyboardIndex], keyboardControllers[keyboardIndex]->Controller());
+
+			deviceHandles.erase(deviceHandles.cbegin() + keyboardIndex);
+			keyboardControllers.erase(keyboardControllers.cbegin() + keyboardIndex);
+			nativeHandles.erase(nativeHandles.cbegin() + keyboardIndex);
 		}
-
-		hub->UnregisterDevice(deviceHandles[keyboardIndex], keyboardControllers[keyboardIndex]->Controller());
-
-		deviceHandles.erase(deviceHandles.cbegin() + keyboardIndex);
-		keyboardControllers.erase(keyboardControllers.cbegin() + keyboardIndex);
-		nativeHandles.erase(nativeHandles.cbegin() + keyboardIndex);
 	}
 }
