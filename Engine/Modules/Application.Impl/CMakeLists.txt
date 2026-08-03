@@ -24,6 +24,7 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-App.cppm"
+	"Source/Main-Buffer.cppm"
 	"Source/Main-IdentityUtility.cppm"
 	"Source/Main-PathUtility.cppm"
 )

@@ -18,7 +18,7 @@ import std;
 import PonyEngine.Chrono;
 import PonyEngine.Meta;
 
-import :TempBuffer;
+import :IBuffer;
 
 export namespace PonyEngine::Application
 {
@@ -259,17 +259,15 @@ export namespace PonyEngine::Application
 		template<typename T> [[nodiscard("Pure function")]]
 		T& GetInterface() const;
 
-		/// @brief Acquires a temporary buffer.
-		/// @param requiredSize Required size.
-		/// @param requiredAlignment Required alignment. Must be a valid alignment value.
-		/// @return Temporary buffer.
-		/// @note Each thread has its own pool of buffers.
+		/// @brief Creates a buffer.
+		/// @details It uses a buffer pool. So it may reduce heap allocation count.
+		/// @param size Required size. The returned buffer may be bigger.
+		/// @param alignment Required alignment. The returned buffer may have a bigger alignment.
+		/// @return Buffer.
+		/// @note The function is thread-safe.
+		/// @remark The function uses pools and allocates as little as possible.
 		[[nodiscard("Pure function")]]
-		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment = alignof(std::max_align_t)) = 0;
-		/// @brief Releases the temporary buffer.
-		/// @param tempBuffer Temporary buffer.
-		/// @note The buffer must be returned on the same thread it was acquired.
-		virtual void ReleaseTempBuffer(TempBuffer tempBuffer) noexcept = 0;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(std::size_t size, std::size_t alignment = alignof(std::max_align_t)) = 0;
 	};
 }
 

@@ -250,10 +250,10 @@ namespace PonyEngine::WinAPIInput
 			return;
 		}
 
-		Application::ScopedTempBuffer buffer;
+		std::shared_ptr<Application::IBuffer> buffer;
 		try
 		{
-			buffer = Application::ScopedTempBuffer(*application, size);
+			buffer = application->CreateBuffer(size);
 		}
 		catch (...)
 		{
@@ -261,13 +261,14 @@ namespace PonyEngine::WinAPIInput
 			return;
 		}
 
-		if (GetRawInputData(rawInputInfo, RID_INPUT, buffer->data(), &size, sizeof(RAWINPUTHEADER)) != size) [[unlikely]]
+		const std::span<std::byte> bufferData = buffer->Span();
+		if (GetRawInputData(rawInputInfo, RID_INPUT, bufferData.data(), &size, sizeof(RAWINPUTHEADER)) != size) [[unlikely]]
 		{
 			PONY_LOG(logService, Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
 			return;
 		}
 
-		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(buffer->data());
+		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(bufferData.data());
 		const UINT usageKey = GetUsageKey(input->header);
 		if (usageKey == 0u) [[unlikely]]
 		{

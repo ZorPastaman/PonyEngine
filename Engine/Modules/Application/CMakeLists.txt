@@ -19,11 +19,10 @@ message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-IApplication.cppm"
+	"Source/Main-IBuffer.cppm"
 	"Source/Main-IModule.cppm"
 	"Source/Main-IModuleContext.cppm"
 	"Source/Main-ITickable.cppm"
-	"Source/Main-ScopedTempBuffer.cppm"
-	"Source/Main-TempBuffer.cppm"
 	"Source/Main-TickOrder.cppm"
 )
 

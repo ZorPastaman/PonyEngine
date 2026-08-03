@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Resource pack module.
 - Pack resource manifest compiler and generator.
 - GUI and console modes for Windows application.
+- WinAPI input module.
 
 ### Changed
 

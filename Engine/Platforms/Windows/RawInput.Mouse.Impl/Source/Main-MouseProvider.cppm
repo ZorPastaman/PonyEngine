@@ -154,8 +154,8 @@ namespace PonyEngine::RawInput::Mouse
 		if (isConnected)
 		{
 			const std::size_t nameLength = Platform::GetDeviceNameSize(device);
-			const auto buffer = Application::ScopedTempBuffer(*application, nameLength);
-			auto arena = Memory::Arena(*buffer);
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(nameLength);
+			auto arena = Memory::Arena(buffer->Span());
 			const std::span<char> name = arena.AllocateArray<char>(nameLength);
 			const std::size_t nameSize = Platform::GetDeviceName(device, name);
 

@@ -332,8 +332,8 @@ namespace PonyEngine::World
 		deadEntities.reserve(deadEntities.size() + entities.size());
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
-		const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
-		auto arena = Memory::Arena(*buffer);
+		const std::shared_ptr<Application::IBuffer> buffer = context->Application().CreateBuffer(bufferSize);
+		auto arena = Memory::Arena(buffer->Span());
 		const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 
 		for (ComponentTable& table : componentTables)
@@ -387,8 +387,8 @@ namespace PonyEngine::World
 		if (ComponentTable* const table = FindComponentTable(componentType))
 		{
 			const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
-			const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
-			auto arena = Memory::Arena(*buffer);
+			const std::shared_ptr<Application::IBuffer> buffer = context->Application().CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
 			const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 			RemoveComponents(*table, entities, tableEntities);
 		}
@@ -523,8 +523,8 @@ namespace PonyEngine::World
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<void*>((params.requiredComponentTypes.size() + params.optionalComponentTypes.size()) * 2uz + params.excludedComponentTypes.size()) +
 			Memory::CalculateBufferSize<std::size_t, void*>(params.optionalComponentTypes.size());
-		const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
-		auto arena = Memory::Arena(*buffer);
+		const std::shared_ptr<Application::IBuffer> buffer = context->Application().CreateBuffer(bufferSize);
+		auto arena = Memory::Arena(buffer->Span());
 
 		const std::span<const ComponentTable*> requiredComponentTables = arena.AllocateArray<const ComponentTable*>(params.requiredComponentTypes.size());
 		if (!FindRequired(params.requiredComponentTypes, requiredComponentTables))
@@ -658,8 +658,8 @@ namespace PonyEngine::World
 		CheckIfValid(entities);
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<EntityID>(entities.size());
-		const auto buffer = Application::ScopedTempBuffer(context->Application(), bufferSize);
-		auto arena = Memory::Arena(*buffer);
+		const std::shared_ptr<Application::IBuffer> buffer = context->Application().CreateBuffer(bufferSize);
+		auto arena = Memory::Arena(buffer->Span());
 		const std::span<EntityID> tableEntities = arena.AllocateArray<EntityID>(entities.size());
 
 		ComponentTable& table = GetOrCreateComponentTable(componentType);

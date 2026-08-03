@@ -188,8 +188,8 @@ namespace PonyEngine::World
 
 		const std::size_t denseSize = objectsDense.size();
 		const std::size_t bufferSize = Memory::CalculateBufferSize<HandleID>(denseSize) + Memory::CalculateBufferSize<bool, HandleID>(denseSize);
-		const auto buffer = Application::ScopedTempBuffer(context.Application(), bufferSize);
-		auto arena = Memory::Arena(*buffer);
+		const std::shared_ptr<Application::IBuffer> buffer = context.Application().CreateBuffer(bufferSize);
+		auto arena = Memory::Arena(buffer->Span());
 		const std::span<HandleID> objectsToRemove = arena.AllocateArray<HandleID>(denseSize);
 		const std::span<bool> aliveObjectFlags = arena.AllocateArray<bool>(denseSize);
 		std::ranges::fill(aliveObjectFlags, false);

@@ -25,6 +25,7 @@ import PonyEngine.Container;
 import PonyEngine.Format;
 import PonyEngine.Log;
 
+import :Buffer;
 import :IdentityUtility;
 import :PathUtility;
 
@@ -137,8 +138,7 @@ export namespace PonyEngine::Application
 		virtual void* FindInterface(std::type_index type) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual TempBuffer AcquireTempBuffer(std::size_t requiredSize, std::size_t requiredAlignment) override;
-		virtual void ReleaseTempBuffer(TempBuffer tempBuffer) noexcept override;
+		virtual std::shared_ptr<IBuffer> CreateBuffer(std::size_t size, std::size_t alignment) override;
 
 		/// @brief Initializes early modules.
 		void InitializeEarly();
@@ -220,7 +220,6 @@ export namespace PonyEngine::Application
 		App& operator =(App&) = delete;
 
 	private:
-		using Buffer = std::vector<std::byte, Container::AlignedAllocator<std::byte>>; ///< Buffer type.
 		using ModuleGetter = std::shared_ptr<IModule>(*)(); ///< Module getter function.
 
 		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstEarlyModule = nullptr; ///< Early module begin pointer.
@@ -299,6 +298,16 @@ export namespace PonyEngine::Application
 			App* application; ///< Application.
 		};
 
+		/// @brief Buffer deleter.
+		struct BufferDeleter final
+		{
+			App* application = nullptr; ///< Application.
+
+			/// @brief Deletes the buffer.
+			/// @param buffer Buffer to delete.
+			void operator ()(Buffer* buffer) const noexcept;
+		};
+
 		/// @brief Make a single string out of the command line arguments.
 		/// @return Command line string. It starts with a space.
 		[[nodiscard("Pure function")]]
@@ -340,16 +349,13 @@ export namespace PonyEngine::Application
 		/// @param count How many tickables to end.
 		void End(std::size_t count) noexcept;
 
-		/// @brief Gets a temp buffer cache for this thread.
-		/// @return Temp buffer cache.
+		/// @brief Gets a buffer data.
+		/// @return Buffer data.
 		[[nodiscard("Pure function")]]
-		static TempBufferCache& GetCache();
-		/// @brief Gets a suitable buffer.
-		/// @param cache Buffer cache.
-		/// @param requiredAlignment Required alignment.
-		/// @return Buffer.
-		[[nodiscard("Pure function")]]
-		Buffer GetBuffer(TempBufferCache& cache, std::size_t requiredAlignment) const;
+		std::vector<std::byte, Container::AlignedAllocator<std::byte>> GetBufferData() noexcept;
+		/// @brief Returns the buffer.
+		/// @param buffer Buffer to return.
+		void ReturnBuffer(Buffer& buffer) noexcept;
 
 		std::thread::id mainThreadId; ///< Main thread ID. It's a thread on which this class was created.
 		std::span<const std::string_view> commandLine; ///< Command line.
@@ -379,8 +385,14 @@ export namespace PonyEngine::Application
 		std::vector<ITickable*> beginTickables; ///< Tickables with Begin() and End() functions.
 		std::vector<ITickable*> tickTickables; ///< Tickables with Tick() function.
 
+		std::stack<std::vector<std::byte, Container::AlignedAllocator<std::byte>>> bufferDataPool; ///< Buffer data pool.
+		std::mutex bufferDataMutex; ///< Buffer data mutex.
+		std::pmr::synchronized_pool_resource bufferPool; ///< Buffer pool.
+		std::pmr::polymorphic_allocator<Buffer> bufferAllocator; ///< Buffer allocator.
+		std::pmr::synchronized_pool_resource bufferControlPool; ///< Buffer control block pool.
+		std::pmr::polymorphic_allocator<std::byte> bufferControlAllocator; ///< Buffer control block allocator.
 #ifndef NDEBUG
-		std::atomic_size_t bufferCount; ///< Buffer count.
+		std::atomic_size_t bufferCount; ///< Count of buffers in use.
 #endif
 
 		static_assert(std::atomic_size_t::is_always_lock_free, "std::atomic_size_t is not lock free.");
@@ -408,14 +420,16 @@ namespace PonyEngine::Application
 		prevFrameTimePoint(startTimePoint),
 		thisFrameTimePoint(startTimePoint),
 		targetFrameTime(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD}), std::chrono::nanoseconds(0))),
-		logService{nullptr}
+		logService{nullptr},
+		bufferAllocator(&bufferPool),
+		bufferControlAllocator(&bufferControlPool)
 	{
 	}
 
 	App::~App() noexcept
 	{
 #ifndef NDEBUG
-		assert(bufferCount.load(std::memory_order::relaxed) == 0uz && "Temp buffer count in use isn't zero.");
+		assert(bufferCount.load(std::memory_order::relaxed) == 0uz && "Buffer count in use isn't zero.");
 #endif
 		assert(tickables.size() == 0uz && "Some tickables weren't removed.");
 		assert(interfaces.size() == 0uz && "Some interfaces weren't removed.");
@@ -606,59 +620,43 @@ namespace PonyEngine::Application
 		return nullptr;
 	}
 
-	TempBuffer App::AcquireTempBuffer(const std::size_t requiredSize, const std::size_t requiredAlignment)
+	std::shared_ptr<IBuffer> App::CreateBuffer(const std::size_t size, const std::size_t alignment)
 	{
-		PONY_LOG(logService, Log::LogType::Verbose, "Acquiring temp buffer... Size: '{}'; Alignment: '{}'.", requiredSize, requiredAlignment);
-		assert(std::has_single_bit(requiredAlignment) && "Invalid alignment");
-
-		TempBufferCache& cache = GetCache();
-		Buffer buffer = GetBuffer(cache, std::max(requiredAlignment, alignof(std::max_align_t)));
-		if (const std::size_t size = std::max(requiredSize, 1024uz); buffer.size() < size) [[unlikely]]
+		if (!std::has_single_bit(alignment)) [[unlikely]]
 		{
-			PONY_LOG(logService, Log::LogType::Debug, "Growing temp buffer.");
-			buffer.resize(size);
+			throw std::invalid_argument("Invalid alignment");
+		}
+		const std::size_t actualAlignment = std::max(alignment, alignof(std::max_align_t));
+		const std::size_t actualSize = std::max(size, 1024uz);
+
+		std::vector<std::byte, Container::AlignedAllocator<std::byte>> bufferData = GetBufferData(); // It's ok to lose bufferData in case of an exception.
+		if (bufferData.get_allocator().Alignment() < actualAlignment)
+		{
+			bufferData = std::vector<std::byte, Container::AlignedAllocator<std::byte>>(Container::AlignedAllocator<std::byte>(actualAlignment));
+		}
+		if (bufferData.size() < actualSize)
+		{
+			bufferData.resize(actualSize);
 		}
 
-		const auto tempBuffer = TempBuffer{.buffer = std::span(buffer.data(), buffer.size())};
-		cache.usedBuffers.emplace(buffer.data(), std::move(buffer));
+		Buffer* const buffer = bufferAllocator.new_object<Buffer>(std::move(bufferData));
 
-		PONY_LOG(logService, Log::LogType::Verbose, "Acquiring temp buffer done. Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
+		std::shared_ptr<IBuffer> answer;
+		try
+		{
+			answer = std::shared_ptr<Buffer>(buffer, BufferDeleter{.application = this}, bufferControlAllocator);
+		}
+		catch (...)
+		{
+			bufferAllocator.delete_object(buffer);
+			throw;
+		}
 
 #ifndef NDEBUG
 		bufferCount.fetch_add(1uz, std::memory_order::relaxed);
 #endif
 
-		return tempBuffer;
-	}
-
-	void App::ReleaseTempBuffer(const TempBuffer tempBuffer) noexcept
-	{
-		PONY_LOG(logService, Log::LogType::Verbose, "Releasing temp buffer... Buffer: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(tempBuffer.buffer.data()));
-
-		TempBufferCache& cache = GetCache();
-		const auto position = cache.usedBuffers.find(tempBuffer.buffer.data());
-		if (position == cache.usedBuffers.cend()) [[unlikely]]
-		{
-			PONY_LOG(logService, Log::LogType::Fatal, "TempBuffer memory corruption detected. Terminating.");
-			std::terminate();
-		}
-
-#ifndef NDEBUG
-		bufferCount.fetch_sub(1uz, std::memory_order::relaxed);
-#endif
-
-		try
-		{
-			Buffer buffer = std::move(position->second);
-			cache.usedBuffers.erase(position);
-			cache.bufferCache.push(std::move(buffer));
-		}
-		catch (...)
-		{
-			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On moving temp buffer from used to cache.");
-		}
-
-		PONY_LOG(logService, Log::LogType::Verbose, "Releasing temp buffer done.");
+		return answer;
 	}
 
 	void App::InitializeEarly()
@@ -1010,6 +1008,11 @@ namespace PonyEngine::Application
 		application->RemoveTickable(tickable, tickOrder);
 	}
 
+	void App::BufferDeleter::operator ()(Buffer* const buffer) const noexcept
+	{
+		application->ReturnBuffer(*buffer);
+	}
+
 	std::string App::MakeCommandLineString() const
 	{
 		std::string commandLineString;
@@ -1205,29 +1208,38 @@ namespace PonyEngine::Application
 		tickTickables.clear();
 	}
 
-	App::TempBufferCache& App::GetCache()
+	std::vector<std::byte, Container::AlignedAllocator<std::byte>> App::GetBufferData() noexcept
 	{
-		thread_local auto cache = std::make_unique<TempBufferCache>();
-		return *cache;
-	}
+		const auto lock = std::lock_guard(bufferDataMutex);
 
-	App::Buffer App::GetBuffer(TempBufferCache& cache, const std::size_t requiredAlignment) const
-	{
-		if (cache.bufferCache.empty()) [[unlikely]]
+		if (bufferDataPool.empty())
 		{
-			PONY_LOG(logService, Log::LogType::Debug, "Creating new temp buffer.");
-			return Buffer(Container::AlignedAllocator<std::byte>(requiredAlignment));
+			return std::vector<std::byte, Container::AlignedAllocator<std::byte>>(Container::AlignedAllocator<std::byte>(alignof(std::max_align_t)));
 		}
 
-		Buffer buffer = std::move(cache.bufferCache.top());
-		cache.bufferCache.pop();
-
-		if (buffer.get_allocator().Alignment() < requiredAlignment) [[unlikely]]
-		{
-			PONY_LOG(logService, Log::LogType::Debug, "Realigning temp buffer.");
-			buffer = Buffer(Container::AlignedAllocator<std::byte>(requiredAlignment));
-		}
+		auto buffer = std::move(bufferDataPool.top());
+		bufferDataPool.pop();
 
 		return buffer;
+	}
+
+	void App::ReturnBuffer(Buffer& buffer) noexcept
+	{
+		try
+		{
+			const auto lock = std::lock_guard(bufferDataMutex);
+			bufferDataPool.push(std::move(buffer.Data()));
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "Failed to return buffer data to buffer data pool.");
+			// It's ok to lose the buffer data.
+		}
+
+		bufferAllocator.delete_object(&buffer);
+
+#ifndef NDEBUG
+		bufferCount.fetch_sub(1uz, std::memory_order::relaxed);
+#endif
 	}
 }
