@@ -35,7 +35,7 @@ export namespace PonyEngine::Job
 		/// @brief Creates a job service.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit JobService(const Application::IApplication& application);
+		explicit JobService(Application::IApplication& application);
 		JobService(const JobService&) = delete;
 		JobService(JobService&&) = delete;
 
@@ -79,7 +79,7 @@ export namespace PonyEngine::Job
 
 namespace PonyEngine::Job
 {
-	JobService::JobService(const Application::IApplication& application) :
+	JobService::JobService(Application::IApplication& application) :
 		logService{application.FindInterface<Log::ILogService>()},
 		targetWorkerIndex{0uz},
 		jobQueueVersion{0uz}
@@ -100,7 +100,7 @@ namespace PonyEngine::Job
 			try
 			{
 				const std::unique_ptr<Worker>& worker = workers[i];
-				worker->Start();
+				worker->Start(application);
 				PONY_LOG(logService, Log::LogType::Info, "Worker thread started. ID: '{}'.", worker->ThreadID());
 			}
 			catch (...)

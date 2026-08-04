@@ -13,4 +13,5 @@ export import PonyEngine.Application;
 
 export import :App;
 export import :IdentityUtility;
+export import :IProcess;
 export import :PathUtility;

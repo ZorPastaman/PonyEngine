@@ -1,9 +1,7 @@
 message(STATUS "Configuring PonyEngine.RenderDevice")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.RenderDevice STATIC)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-Aspect.cppm"
@@ -139,12 +137,10 @@ target_sources(PonyEngine.RenderDevice PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-ViewSupport.cppm"
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.RenderDevice PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.RenderDevice PUBLIC
 	PonyEngine.Core
 )

@@ -16,19 +16,15 @@ if(NOT TARGET PonyEngine.RawInput.Ext)
 	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
 endif()
 
-message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_RAW_INPUT_ORDER "p" CACHE STRING "PonyEngine.RawInput.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_RAW_INPUT_TICK_ORDER "0" CACHE STRING "PonyEngine.RawInput.Impl service tick order. It must be an int32 number.")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.RawInput.Impl STATIC)
 
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.RawInput.Impl PUBLIC
 	"Include/Public"
 )
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Impl PUBLIC
 	"Source/Launch.cpp"
 )
@@ -43,7 +39,6 @@ target_sources(PonyEngine.RawInput.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main-RawInputServiceModule.cppm"
 )
 
-message(VERBOSE "Configuring defines")
 pony_validate_module_order(PONY_ENGINE_RAW_INPUT_ORDER)
 pony_validate_tick_order(PONY_ENGINE_RAW_INPUT_TICK_ORDER)
 target_compile_definitions(PonyEngine.RawInput.Impl PUBLIC
@@ -53,12 +48,10 @@ target_compile_definitions(PonyEngine.RawInput.Impl PRIVATE
 	PONY_ENGINE_RAW_INPUT_TICK_ORDER=${PONY_ENGINE_RAW_INPUT_TICK_ORDER}
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.RawInput.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 if(NOT TARGET PonyEngine.RawInput)
 	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
 endif()

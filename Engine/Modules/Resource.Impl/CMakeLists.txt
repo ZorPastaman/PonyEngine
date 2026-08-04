@@ -1,18 +1,14 @@
 message(STATUS "Configuring PonyEngine.Resource.Impl")
 
-message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_RESOURCE_ORDER "p" CACHE STRING "PonyEngine.Resource.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_RESOURCE_TICK_ORDER "0" CACHE STRING "PonyEngine.Resource.Impl service tick order. It must be an int32 number.")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.Resource.Impl STATIC)
 
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Resource.Impl PUBLIC
 	"Include/Public"
 )
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Resource.Impl PUBLIC
 	"Source/Launch.cpp"
 )
@@ -31,7 +27,6 @@ target_sources(PonyEngine.Resource.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main-ResourceServiceModule.cppm"
 )
 
-message(VERBOSE "Configuring defines")
 pony_validate_module_order(PONY_ENGINE_RESOURCE_ORDER)
 pony_validate_tick_order(PONY_ENGINE_RESOURCE_TICK_ORDER)
 target_compile_definitions(PonyEngine.Resource.Impl PUBLIC
@@ -41,12 +36,10 @@ target_compile_definitions(PonyEngine.Resource.Impl PRIVATE
 	PONY_ENGINE_RESOURCE_TICK_ORDER=${PONY_ENGINE_RESOURCE_TICK_ORDER}
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Resource.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 if(NOT TARGET PonyEngine.Resource)
 	message(FATAL_ERROR "PonyEngine.Resource wasn't configured")
 endif()

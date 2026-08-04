@@ -30,7 +30,6 @@ set(PONY_RENDER_MODULES "")
 set(PONY_INPUT_MODULES "")
 set(PONY_LOGIC_MODULES "")
 
-message(VERBOSE "Post-configuring")
 pony_apply_flags(PonyEngine.Core)
 
 pony_apply_flags(PonyEngine.Log)
@@ -101,7 +100,6 @@ endif()
 
 set(PONY_INSTALL_TARGETS PonyEngine.Application.Impl)
 if(PONY_MAKE_GROUPS)
-	message(VERBOSE "Making application module groups")
 	pony_manage_module_group(PONY_LOG_MODULES PonyModule.Log PONY_INSTALL_TARGETS)
 	pony_manage_module_group(PONY_BASE_MODULES PonyModule.Base PONY_INSTALL_TARGETS)
 	pony_manage_module_group(PONY_INPUT_MODULES PonyModule.Input PONY_INSTALL_TARGETS)
@@ -109,7 +107,6 @@ if(PONY_MAKE_GROUPS)
 	pony_manage_module_group(PONY_RESOURCE_MODULES PonyModule.Resource PONY_INSTALL_TARGETS)
 	pony_manage_module_group(PONY_LOGIC_MODULES PonyModule.Logic PONY_INSTALL_TARGETS)
 else()
-	message(VERBOSE "Adding application modules")
 	pony_add_application_modules(
 		${PONY_LOG_MODULES}
 		${PONY_BASE_MODULES}
@@ -120,7 +117,6 @@ else()
 	)
 endif()
 
-message(VERBOSE "Installing")
 install(TARGETS ${PONY_INSTALL_TARGETS}
 	RUNTIME DESTINATION .
 	LIBRARY DESTINATION

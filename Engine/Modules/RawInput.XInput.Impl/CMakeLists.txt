@@ -7,15 +7,12 @@ if(NOT TARGET PonyEngine.RawInput.Ext)
 	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
 endif()
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.RawInput.XInput.Impl STATIC)
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.RawInput.XInput.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.RawInput.XInput.Impl PRIVATE
 	PonyEngine.RawInput
 	PonyEngine.RawInput.Ext

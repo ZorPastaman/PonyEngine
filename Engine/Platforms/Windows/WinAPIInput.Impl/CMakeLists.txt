@@ -10,15 +10,12 @@ if(NOT TARGET PonyEngine.Log)
 	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
 endif()
 
-message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_WINAPI_INPUT_ORDER "p" CACHE STRING "PonyEngine.WinAPIInput.Impl module initialization order. Its first character must be in range [b-y].")
 
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.WinAPIInput.Impl PUBLIC
 	"Include/Public"
 )
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.WinAPIInput.Impl PUBLIC
 	"Source/Launch.cpp"
 )
@@ -31,13 +28,11 @@ target_sources(PonyEngine.WinAPIInput.Impl PUBLIC FILE_SET CXX_MODULES BASE_DIRS
 	"Source/Main-InputDispatcherModule.cppm"
 )
 
-message(VERBOSE "Configuring defines")
 pony_validate_module_order(PONY_ENGINE_WINAPI_INPUT_ORDER)
 target_compile_definitions(PonyEngine.WinAPIInput.Impl PUBLIC
 	PONY_ENGINE_WINAPI_INPUT_ORDER=${PONY_ENGINE_WINAPI_INPUT_ORDER}
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.WinAPIInput.Impl PUBLIC
 	PonyEngine.Application
 )

@@ -9,7 +9,6 @@ else()
 	set(PONY_IS_SUBPROJECT FALSE)
 endif()
 
-message(VERBOSE "Configuring environment")
 if(NOT PONY_IS_SUBPROJECT)
 	set(CMAKE_CXX_STANDARD 23)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)

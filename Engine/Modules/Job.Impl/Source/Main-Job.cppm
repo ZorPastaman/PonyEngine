@@ -74,9 +74,11 @@ export namespace PonyEngine::Job
 		[[nodiscard("Must be used")]]
 		bool AddDependent(const JobID& dependent, std::size_t version) noexcept;
 		/// @brief Process dependents.
+		/// @tparam F Invocable type.
 		/// @param func Process function.
 		/// @note The function clears the dependent list after processing.
-		void ProcessDependents(const std::function<void(const JobID&)>& func);
+		template<std::invocable<const JobID&> F>
+		void ProcessDependents(F&& func);
 
 		Job& operator =(const Job&) = delete;
 		Job& operator =(Job&&) = delete;
@@ -179,13 +181,14 @@ namespace PonyEngine::Job
 		return true;
 	}
 
-	void Job::ProcessDependents(const std::function<void(const JobID&)>& func)
+	template<std::invocable<const JobID&> F>
+	void Job::ProcessDependents(F&& func)
 	{
 		const auto lock = std::lock_guard(dependentMutex);
 
 		for (const JobID& dependent : dependents)
 		{
-			func(dependent);
+			std::invoke(std::forward<F>(func), dependent);
 		}
 
 		dependents.clear();

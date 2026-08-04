@@ -27,6 +27,7 @@ import PonyEngine.Log;
 
 import :Buffer;
 import :IdentityUtility;
+import :IProcess;
 import :PathUtility;
 
 /// @brief Begins an early section declaration.
@@ -56,14 +57,17 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates an application.
+		/// @param threadRoles Thread roles.
 		/// @param commandLine Command line.
 		/// @param executableFile Executable file path.
 		/// @param localDataDirectory Local data directory.
 		/// @param userDataDirectory User data directory.
 		/// @param tempDataDirectory Temporary data directory.
+		/// @param process Process.
 		[[nodiscard("Pure constructor")]]
-		App(std::span<const std::string_view> commandLine, const std::filesystem::path& executableFile, const std::filesystem::path& localDataDirectory,
-			const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory);
+		App(std::span<const std::string_view> commandLine, std::span<const std::string_view> threadRoles, const std::filesystem::path& executableFile,
+			const std::filesystem::path& localDataDirectory, const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory, 
+			IProcess& process);
 		App(const App&) = delete;
 		App(App&&) = delete;
 
@@ -139,6 +143,14 @@ export namespace PonyEngine::Application
 
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<IBuffer> CreateBuffer(std::size_t size, std::size_t alignment) override;
+
+		[[nodiscard("Pure function")]] 
+		virtual std::span<const std::string_view> ThreadRoles() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IThreadControl> CreateThreadControl(std::thread& thread) override;
+		[[nodiscard("Pure function")]] 
+		virtual std::string_view MainThreadRole() const noexcept override;
+		virtual void MainThreadRole(std::string_view role) override;
 
 		/// @brief Initializes early modules.
 		void InitializeEarly();
@@ -358,7 +370,8 @@ export namespace PonyEngine::Application
 		void ReturnBuffer(Buffer& buffer) noexcept;
 
 		std::thread::id mainThreadId; ///< Main thread ID. It's a thread on which this class was created.
-		std::span<const std::string_view> commandLine; ///< Command line.
+		std::vector<std::string_view> commandLine; ///< Command line.
+		std::vector<std::string_view> threadRoles; ///< Thread roles.
 
 		std::filesystem::path executableFile; ///< Path to the executable.
 		std::filesystem::path executableDirectory; ///< Executable directory.
@@ -366,6 +379,8 @@ export namespace PonyEngine::Application
 		std::filesystem::path localDataDirectory; ///< Local data directory.
 		std::filesystem::path userDataDirectory; ///< User data directory.
 		std::filesystem::path tempDataDirectory; ///< Temporal data directory.
+
+		IProcess* process; ///< Process.
 
 		std::optional<int> exitCode; ///< Exit code.
 		std::uint64_t frameCount; ///< Frame count.
@@ -401,13 +416,14 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	App::App(const std::span<const std::string_view> commandLine, const std::filesystem::path& executableFile, const std::filesystem::path& localDataDirectory,
-		const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory) :
+	App::App(const std::span<const std::string_view> commandLine, std::span<const std::string_view> threadRoles, const std::filesystem::path& executableFile,
+		const std::filesystem::path& localDataDirectory, const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory, IProcess& process) :
 #ifndef NDEBUG
 		bufferCount(0uz),
 #endif
 		mainThreadId(std::this_thread::get_id()),
-		commandLine(commandLine),
+		commandLine(commandLine.cbegin(), commandLine.cend()),
+		threadRoles(threadRoles.cbegin(), threadRoles.cend()),
 		executableFile(executableFile),
 		executableDirectory(this->executableFile.parent_path()),
 		rootDirectory((this->executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_APPLICATION_ROOT_PATH)).lexically_normal()),
@@ -422,7 +438,8 @@ namespace PonyEngine::Application
 		targetFrameTime(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD}), std::chrono::nanoseconds(0))),
 		logService{nullptr},
 		bufferAllocator(&bufferPool),
-		bufferControlAllocator(&bufferControlPool)
+		bufferControlAllocator(&bufferControlPool),
+		process{&process}
 	{
 	}
 
@@ -657,6 +674,28 @@ namespace PonyEngine::Application
 #endif
 
 		return answer;
+	}
+
+	std::span<const std::string_view> App::ThreadRoles() const noexcept
+	{
+		return threadRoles;
+	}
+
+	std::shared_ptr<IThreadControl> App::CreateThreadControl(std::thread& thread)
+	{
+		return process->CreateThreadControl(thread);
+	}
+
+	std::string_view App::MainThreadRole() const noexcept
+	{
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+		return process->MainThreadRole();
+	}
+
+	void App::MainThreadRole(const std::string_view role)
+	{
+		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+		process->MainThreadRole(role);
 	}
 
 	void App::InitializeEarly()

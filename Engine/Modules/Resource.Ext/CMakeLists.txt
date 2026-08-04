@@ -1,9 +1,7 @@
 message(STATUS "Configuring PonyEngine.Resource.Ext")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.Resource.Ext STATIC)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-IFileResourceData.cppm"
@@ -18,12 +16,10 @@ target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-ResourceProviderHandle.cppm"
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Resource.Ext PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 if(NOT TARGET PonyEngine.Resource)
 	message(FATAL_ERROR "PonyEngine.Resource wasn't configured")
 endif()

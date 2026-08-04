@@ -1,0 +1,35 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include "PonyEngine/Platform/Windows/Framework.h"
+
+#include <avrt.h>
+
+export module PonyEngine.Application.Impl.Windows:ThreadRole;
+
+import std;
+
+export namespace PonyEngine::Application
+{
+	/// @brief Thread role.
+	struct ThreadRole final
+	{
+		int threadPriority = THREAD_PRIORITY_NORMAL; ///< Thread priority.
+		AVRT_PRIORITY mmcssPriority = AVRT_PRIORITY_NORMAL; ///< MMCSS priority. It's used only if the @p mmcssTask isn't empty.
+		std::string_view mmcssTask = ""; ///< MMCSS task. If empty, no mmcss task is applied.
+	};
+
+	/// @brief Thread roles.
+	const std::unordered_map<std::string_view, ThreadRole> ThreadRoles
+	{
+${PONY_APPLICATION_THREAD_ROLES}
+	};
+}

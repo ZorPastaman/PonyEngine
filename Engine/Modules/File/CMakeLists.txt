@@ -1,9 +1,7 @@
 message(STATUS "Configuring PonyEngine.File")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.File STATIC)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-FileAccess.cppm"
@@ -20,12 +18,10 @@ target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-WriteParams.cppm"
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.File PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.File PUBLIC
 	PonyEngine.Core
 )

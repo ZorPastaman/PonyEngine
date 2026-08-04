@@ -1,18 +1,14 @@
 message(STATUS "Configuring PonyEngine.RenderDevice.D3D12.Impl for Windows")
 
-message(VERBOSE "Configuring parameters")
 set(PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER "p" CACHE STRING "PonyEngine.RenderDevice.D3D12.Impl module initialization order. Its first character must be in range [b-y].")
 
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.RenderDevice.D3D12.Impl PUBLIC
 	"Include/Public"
 )
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.RenderDevice.D3D12.Impl PRIVATE
 	"Include/Private"
 )
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC
 	"Source/Launch.cpp"
 )
@@ -70,13 +66,11 @@ target_sources(PonyEngine.RenderDevice.D3D12.Impl PUBLIC FILE_SET CXX_MODULES BA
 	"Source/Main-Waiter.cppm"
 )
 
-message(VERBOSE "Configuring defines")
 pony_validate_module_order(PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER)
 target_compile_definitions(PonyEngine.RenderDevice.D3D12.Impl PUBLIC
 	PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER=${PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER}
 )
 
-message(VERBOSE "Configuring dependencies")
 if(NOT TARGET PonyEngine.RenderDevice)
 	message(FATAL_ERROR "PonyEngine.RenderDevice wasn't configured")
 endif()

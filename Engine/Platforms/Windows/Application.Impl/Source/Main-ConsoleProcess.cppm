@@ -23,16 +23,17 @@ import std;
 import PonyEngine.Application.Impl;
 import PonyEngine.Application.Windows;
 import PonyEngine.Log;
-import PonyEngine.Platform.Windows;
 
+import :CommandLine;
 import :Path;
 import :Process;
+import :ThreadControl;
 import :Timer;
 
 export namespace PonyEngine::Application
 {
 	/// @brief Console process.
-	class ConsoleProcess final
+	class ConsoleProcess final : private IProcess
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -51,22 +52,24 @@ export namespace PonyEngine::Application
 		ConsoleProcess& operator =(ConsoleProcess&&) = delete;
 
 	private:
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<IThreadControl> CreateThreadControl(std::thread& thread) override;
+		[[nodiscard("Pure function")]] 
+		virtual std::string_view MainThreadRole() const noexcept override;
+		virtual void MainThreadRole(std::string_view role) override;
+
 		/// @brief Initializes the application.
 		void Initialize();
 		/// @brief Finalizes the application.
 		void Finalize();
-
-		/// @brief Logs basic info.
-		void LogProcessBasicInfo() const noexcept;
 
 		/// @brief Runs the main loop.
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
 		int RunMainLoop();
 
-		std::vector<std::string_view> commandLine; ///< Command line.
-
 		std::unique_ptr<App> application; ///< Application.
+		ThreadControl mainThreadControl; ///< Main thread control.
 		HANDLE timer; ///< Timer handle.
 	};
 }
@@ -77,6 +80,7 @@ namespace PonyEngine::Application
 	BOOL WINAPI CtrlHandler(DWORD ctrlType);
 
 	ConsoleProcess::ConsoleProcess(const int argc, const char* const argv[]) :
+		mainThreadControl(GetCurrentThread()),
 		timer{nullptr}
 	{
 		if (!SetConsoleCtrlHandler(&CtrlHandler, TRUE)) [[unlikely]]
@@ -93,13 +97,8 @@ namespace PonyEngine::Application
 			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to set output console CP. ErrorCode = '0x{:X}'.", GetLastError());
 		}
 
-		commandLine.reserve(argc);
-		for (int i = 0; i < argc; ++i)
-		{
-			commandLine.push_back(argv[i]);
-		}
-
-		application = std::make_unique<App>(commandLine, GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), GetTempDataDirectory());
+		application = std::make_unique<App>(MakeCommandLineView(argc, argv), GetThreadRoles(), GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), 
+			GetTempDataDirectory(), static_cast<IProcess&>(*this));
 	}
 
 	int ConsoleProcess::Run()
@@ -125,12 +124,28 @@ namespace PonyEngine::Application
 		return exitCode;
 	}
 
+	std::shared_ptr<IThreadControl> ConsoleProcess::CreateThreadControl(std::thread& thread)
+	{
+		return std::make_shared<ThreadControl>(thread);
+	}
+
+	std::string_view ConsoleProcess::MainThreadRole() const noexcept
+	{
+		return mainThreadControl.Role();
+	}
+
+	void ConsoleProcess::MainThreadRole(const std::string_view role)
+	{
+		mainThreadControl.Role(role);
+	}
+
 	void ConsoleProcess::Initialize()
 	{
 		application->InitializeEarly();
 		application->LogBasicInfo();
-		LogProcessBasicInfo();
+		LogProcessBasicInfo(*application);
 		SetProcessPriority(*application);
+		SetMainThreadRole(*application, mainThreadControl);
 		timer = CreateTimer(*application);
 		try
 		{
@@ -171,11 +186,6 @@ namespace PonyEngine::Application
 			std::println(std::cerr, "{} tickables weren't removed from application.", count);
 		}
 #endif
-	}
-
-	void ConsoleProcess::LogProcessBasicInfo() const noexcept
-	{
-		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
 	}
 
 	int ConsoleProcess::RunMainLoop()

@@ -9,19 +9,15 @@ function(pony_make_module_group group_target)
 
 	message(STATUS "Making module group: '${group_target}'. Modules: '${module_arg_MODULES}'")
 
-	message(VERBOSE "Adding PONY_DLL define")
 	foreach(MODULE IN LISTS module_arg_MODULES)
 		target_compile_definitions(${MODULE} PRIVATE PONY_DLL)
 	endforeach()
 
-	message(VERBOSE "Configuring target")
 	add_library(${group_target} SHARED)
 
-	message(VERBOSE "Setting properties")
 	if(module_arg_GROUP_NAME)
 		set_target_properties(${group_target} PROPERTIES OUTPUT_NAME "${module_arg_GROUP_NAME}")
 	endif()
 
-	message(VERBOSE "Configuring dependencies")
 	target_link_libraries(${group_target} PUBLIC ${module_arg_MODULES})
 endfunction()

@@ -17,6 +17,6 @@ export namespace PonyEngine::Job
 	struct JobHandle final
 	{
 		std::size_t id = std::numeric_limits<std::size_t>::max(); ///< Job ID.
-		std::size_t version = 0uz; ///< Handle version.
+		std::size_t version = 0uz; ///< Job version.
 	};
 }

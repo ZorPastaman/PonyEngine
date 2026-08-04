@@ -7,10 +7,8 @@ if(NOT TARGET PonyEngine.RawInput)
 	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
 endif()
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.RawInput.Ext STATIC)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-DeviceParams.cppm"
@@ -20,12 +18,10 @@ target_sources(PonyEngine.RawInput.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IInputRegistry.cppm"
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.RawInput.Ext PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.RawInput.Ext PUBLIC
 	PonyEngine.Core
 	PonyEngine.RawInput

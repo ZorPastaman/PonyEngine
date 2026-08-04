@@ -177,7 +177,7 @@
 			"displayName": "Runtime: Windows GUI MSVC - Debug",
 			"inherits": [ "Runtime-Debug", "Runtime-Windows-GUI-MSVC" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": true
+				"PONY_ENGINE_APPLICATION_CREATE_CONSOLE": true
 			}
 		},
 		{
@@ -185,7 +185,7 @@
 			"displayName": "Runtime: Windows GUI MSVC - Optimized",
 			"inherits": [ "Runtime-Optimized", "Runtime-Windows-GUI-MSVC" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": true
+				"PONY_ENGINE_APPLICATION_CREATE_CONSOLE": true
 			}
 		},
 		{
@@ -193,7 +193,7 @@
 			"displayName": "Runtime: Windows GUI MSVC - Release",
 			"inherits": [ "Runtime-Release", "Runtime-Windows-GUI-MSVC" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": false
+				"PONY_ENGINE_APPLICATION_CREATE_CONSOLE": false
 			}
 		},
 		{
@@ -201,7 +201,7 @@
 			"displayName": "Runtime: Windows GUI MSVC - Shipping",
 			"inherits": [ "Runtime-Shipping", "Runtime-Windows-GUI-MSVC" ],
 			"cacheVariables": {
-				"PONY_ENGINE_CREATE_CONSOLE": false
+				"PONY_ENGINE_APPLICATION_CREATE_CONSOLE": false
 			}
 		},
 		{

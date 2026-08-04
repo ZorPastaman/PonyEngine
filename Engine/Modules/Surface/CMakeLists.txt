@@ -1,9 +1,7 @@
 message(STATUS "Configuring PonyEngine.Surface")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.Surface STATIC)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-ISurfaceObserver.cppm"
@@ -13,12 +11,10 @@ target_sources(PonyEngine.Surface PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-SurfaceFeature.cppm"
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Surface PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Surface PUBLIC
 	PonyEngine.Core
 )

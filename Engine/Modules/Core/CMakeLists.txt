@@ -1,17 +1,13 @@
 message(STATUS "Configuring PonyEngine.Core")
 
-message(VERBOSE "Configuring environment")
 include("CMake/Target.cmake")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.Core STATIC)
 
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Core PUBLIC 
 	"Include/Public"
 )
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Chrono.cppm"
 	"Source/Chrono-Conversion.cppm"
@@ -50,7 +46,6 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Type-Variant.cppm"
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )

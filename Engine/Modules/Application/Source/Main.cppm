@@ -13,5 +13,6 @@ export import :IApplication;
 export import :IBuffer;
 export import :IModule;
 export import :IModuleContext;
+export import :IThreadControl;
 export import :ITickable;
 export import :TickOrder;

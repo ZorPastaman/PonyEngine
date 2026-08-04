@@ -1,6 +1,5 @@
 message(STATUS "Configuring tools")
 
-message(VERBOSE "Configuring environment")
 include(FetchContent)
 
 message(STATUS "Fetching TOML++")
@@ -24,7 +23,6 @@ list(APPEND PONY_INSTALL_TARGETS PonyTools.FileResourceManifestGenerator)
 list(APPEND PONY_INSTALL_TARGETS PonyTools.PackResourceManifestCompiler)
 list(APPEND PONY_INSTALL_TARGETS PonyTools.PackResourceManifestGenerator)
 
-message(VERBOSE "Installing")
 if(PONY_TOOLS_INSTALL_DEFAULT)
 	install(TARGETS ${PONY_INSTALL_TARGETS}
 		RUNTIME DESTINATION .

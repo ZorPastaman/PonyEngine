@@ -4,15 +4,12 @@ if(NOT TARGET PonyEngine.Core)
 	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
 endif()
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.RawInput STATIC)
 
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.RawInput PUBLIC
 	"Include/Public"
 )
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-Axis.cppm"
@@ -32,12 +29,10 @@ target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-Style.cppm"
 )
 
-message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.RawInput PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.RawInput PUBLIC
 	PonyEngine.Core
 )

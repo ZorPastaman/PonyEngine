@@ -15,8 +15,6 @@ module;
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-#include <shellapi.h>
-
 export module PonyEngine.Application.Impl.Windows:GUIProcess;
 
 #ifdef PONY_ENGINE_APPLICATION_MODE_GUI
@@ -24,16 +22,17 @@ export module PonyEngine.Application.Impl.Windows:GUIProcess;
 import PonyEngine.Application.Impl;
 import PonyEngine.Application.Windows;
 import PonyEngine.Log;
-import PonyEngine.Platform.Windows;
 
+import :CommandLine;
 import :Path;
 import :Process;
+import :ThreadControl;
 import :Timer;
 
 export namespace PonyEngine::Application
 {
 	/// @brief GUI process.
-	class GUIProcess final : private IMainData, private IMessagePump
+	class GUIProcess final : private IProcess, private IMainData, private IMessagePump
 	{
 	public:
 		/// @brief Creates a GUI process.
@@ -58,6 +57,12 @@ export namespace PonyEngine::Application
 
 	private:
 		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<IThreadControl> CreateThreadControl(std::thread& thread) override;
+		[[nodiscard("Pure function")]] 
+		virtual std::string_view MainThreadRole() const noexcept override;
+		virtual void MainThreadRole(std::string_view role) override;
+
+		[[nodiscard("Pure function")]] 
 		virtual HINSTANCE Instance() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual HINSTANCE PrevInstance() const noexcept override;
@@ -75,9 +80,6 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]] 
 		virtual POINT LastMessageCursorPoint() const noexcept override;
 
-		/// @brief Updates the command line.
-		void UpdateCommandLine();
-
 		/// @brief Initializes the application.
 		void Initialize();
 		/// @brief Finalizes the application.
@@ -87,9 +89,6 @@ export namespace PonyEngine::Application
 		void CreateConsole() noexcept;
 		/// @brief Destroys a console if it was created.
 		void DestroyConsole() noexcept;
-
-		/// @brief Logs basic info.
-		void LogProcessBasicInfo() const noexcept;
 
 		/// @brief Adds the process interfaces to the application.
 		void AddProcessInterfaces();
@@ -113,8 +112,7 @@ export namespace PonyEngine::Application
 
 		bool hasConsole; ///< Does the process have a console?
 
-		std::vector<std::string> commandLineSource; ///< Command line strings.
-		std::vector<std::string_view> commandLine; ///< Command line.
+		std::vector<std::string> commandLine; ///< Command line.
 
 		std::chrono::time_point<std::chrono::steady_clock> lastMessageTime; ///< Time of a last message.
 		DWORD lastMessageNativeTime; ///< Native time of a last message.
@@ -123,6 +121,7 @@ export namespace PonyEngine::Application
 
 		std::unique_ptr<App> application; ///< Application.
 
+		ThreadControl mainThreadControl; ///< Main thread control.
 		HANDLE timer; ///< Timer handle.
 	};
 }
@@ -135,14 +134,16 @@ namespace PonyEngine::Application
 		cmdLine{lpCmdLine},
 		showCmd{nShowCmd},
 		hasConsole{false},
+		commandLine(MakeCommandLine()),
 		lastMessageTime(std::chrono::steady_clock::now()),
 		lastMessageNativeTime(GetTickCount()),
 		lastMessageType{0u},
 		lastMessageCursorPoint{.x = 0l, .y = 0l},
+		mainThreadControl(GetCurrentThread()),
 		timer{nullptr}
 	{
-		UpdateCommandLine();
-		application = std::make_unique<App>(commandLine, GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), GetTempDataDirectory());
+		application = std::make_unique<App>(MakeCommandLineView(commandLine), GetThreadRoles(), GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), 
+			GetTempDataDirectory(), static_cast<IProcess&>(*this));
 	}
 
 	int GUIProcess::Run()
@@ -166,6 +167,21 @@ namespace PonyEngine::Application
 		Finalize();
 
 		return exitCode;
+	}
+
+	std::shared_ptr<IThreadControl> GUIProcess::CreateThreadControl(std::thread& thread)
+	{
+		return std::make_shared<ThreadControl>(thread);
+	}
+
+	std::string_view GUIProcess::MainThreadRole() const noexcept
+	{
+		return mainThreadControl.Role();
+	}
+
+	void GUIProcess::MainThreadRole(const std::string_view role)
+	{
+		mainThreadControl.Role(role);
 	}
 
 	HINSTANCE GUIProcess::Instance() const noexcept
@@ -212,38 +228,14 @@ namespace PonyEngine::Application
 		return lastMessageCursorPoint;
 	}
 
-	void GUIProcess::UpdateCommandLine()
-	{
-		int argc;
-		const auto argv = std::unique_ptr<wchar_t*, decltype(&LocalFree)>(CommandLineToArgvW(GetCommandLineW(), &argc), &LocalFree);
-
-		commandLineSource.clear();
-		commandLine.clear();
-		commandLineSource.reserve(argc);
-		commandLine.reserve(argc);
-
-		for (int i = 0; i < argc; ++i)
-		{
-			const std::wstring_view source = argv.get()[i];
-			const std::size_t size = Platform::GetStringSize(source);
-			std::string arg;
-			arg.resize(size);
-			const std::size_t copied = Platform::ConvertToString(source, arg);
-			arg.resize(copied);
-			arg.shrink_to_fit();
-
-			commandLineSource.push_back(std::move(arg));
-			commandLine.push_back(commandLineSource.back());
-		}
-	}
-
 	void GUIProcess::Initialize()
 	{
 		application->InitializeEarly();
 		CreateConsole();
 		application->LogBasicInfo();
-		LogProcessBasicInfo();
+		LogProcessBasicInfo(*application);
 		SetProcessPriority(*application);
+		SetMainThreadRole(*application, mainThreadControl);
 		timer = CreateTimer(*application);
 		try
 		{
@@ -300,7 +292,7 @@ namespace PonyEngine::Application
 
 	void GUIProcess::CreateConsole() noexcept
 	{
-#ifdef PONY_ENGINE_CREATE_CONSOLE
+#ifdef PONY_ENGINE_APPLICATION_CREATE_CONSOLE
 		if (!AllocConsole()) [[unlikely]]
 		{
 			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to allocate console. ErrorCode = '0x{:X}'.", GetLastError());
@@ -335,7 +327,7 @@ namespace PonyEngine::Application
 
 	void GUIProcess::DestroyConsole() noexcept
 	{
-#ifdef PONY_ENGINE_CREATE_CONSOLE
+#ifdef PONY_ENGINE_APPLICATION_CREATE_CONSOLE
 		if (!hasConsole)
 		{
 			return;
@@ -361,11 +353,6 @@ namespace PonyEngine::Application
 		}
 		hasConsole = false;
 #endif
-	}
-
-	void GUIProcess::LogProcessBasicInfo() const noexcept
-	{
-		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
 	}
 
 	void GUIProcess::AddProcessInterfaces()

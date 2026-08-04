@@ -1,7 +1,6 @@
 message(STATUS "Configuring PonyEngine.Core.Tests")
 add_executable(PonyEngine.Core.Tests)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
 	"Chrono/Conversion.cpp"
 	"Hash/FNV1a.cpp"
@@ -35,17 +34,14 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Type/Limits.cpp"
 )
 
-message(VERBOSE "Configuring defines")
 pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
 	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Core.Tests PRIVATE 
 	Catch2::Catch2WithMain
 	PonyEngine.Core
 )
 
-message(VERBOSE "Discovering tests")
 catch_discover_tests(PonyEngine.Core.Tests)

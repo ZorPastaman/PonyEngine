@@ -11,15 +11,19 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Macro/Text.h"
+
 export module PonyEngine.Job.Impl:Worker;
 
 import std;
 
+import PonyEngine.Application;
 import PonyEngine.Job;
 
 import :Job;
 import :JobID;
 import :JobPool;
+import :JobQueue;
 
 export namespace PonyEngine::Job
 {
@@ -44,8 +48,9 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		std::thread::id ThreadID() const noexcept;
 		/// @brief Starts the worker.
+		/// @param application Application.
 		/// @note The worker mustn't be started or stopped before calling this.
-		void Start();
+		void Start(Application::IApplication& application);
 		/// @brief Stops the worker.
 		void Stop() noexcept;
 		/// @brief Joins the worker thread.
@@ -88,26 +93,19 @@ export namespace PonyEngine::Job
 		/// @return Next job.
 		[[nodiscard("Must be used")]]
 		JobID GrabJob() noexcept;
-		/// @brief Takes a job from the local queue.
-		/// @return Next job.
-		/// @note The function is unsafe.
-		[[nodiscard("Must be used")]]
-		JobID TakeJob() noexcept;
 
 		/// @brief Increments the global job queue version.
 		void IncrementJobQueueVersion() const noexcept;
 
 		JobPool jobPool; ///< Job pool.
-		std::array<JobID, PONY_ENGINE_JOB_POOL_SIZE> jobQueue; ///< Job queue.
-		std::size_t jobQueueHead; ///< Job queue head.
-		std::size_t jobQueueTail; ///< Job queue tail.
-		std::mutex jobQueueMutex; ///< Mutex that must be used while working with the @p jobQueue.
+		JobQueue jobQueue; ///< Job queue.
 		std::atomic_size_t* jobQueueVersion; ///< Global job queue version.
 
 		std::span<const std::unique_ptr<Worker>> workers; ///< All workers list.
 		std::size_t myIndex; ///< This worker index in the @p workers.
 
 		std::optional<std::thread> thread; ///< Worker thread.
+		std::shared_ptr<Application::IThreadControl> threadControl; ///< Thread control.
 		std::atomic_bool running; ///< Is the worker running?
 
 		static_assert(std::atomic_bool::is_always_lock_free, "Bool is not lock-free");
@@ -118,8 +116,6 @@ export namespace PonyEngine::Job
 namespace PonyEngine::Job
 {
 	Worker::Worker(const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex, std::atomic_size_t* const jobQueueVersion) :
-		jobQueueHead{0uz},
-		jobQueueTail{0uz},
 		jobQueueVersion{jobQueueVersion},
 		workers(workers),
 		myIndex{myIndex},
@@ -135,11 +131,13 @@ namespace PonyEngine::Job
 		return thread->get_id();
 	}
 
-	void Worker::Start()
+	void Worker::Start(Application::IApplication& application)
 	{
 		assert(!thread && "The thread was already started.");
 		assert(running.load(std::memory_order::relaxed) && "The worker is stopped.");
 		thread = std::thread(&Worker::Work, this);
+		threadControl = application.CreateThreadControl(*thread);
+		threadControl->Role(PONY_STRINGIFY_VALUE(PONY_ENGINE_JOB_THREAD_ROLE));
 	}
 
 	void Worker::Stop() noexcept
@@ -169,12 +167,7 @@ namespace PonyEngine::Job
 	{
 		assert(jobId.poolIndex == myIndex && "Wrong pool index.");
 
-		{
-			const auto lock = std::lock_guard(jobQueueMutex);
-			jobQueue[jobQueueTail++] = jobId;
-			jobQueueTail %= PONY_ENGINE_JOB_POOL_SIZE;
-		}
-
+		jobQueue.AddJob(jobId);
 		IncrementJobQueueVersion();
 	}
 
@@ -190,7 +183,7 @@ namespace PonyEngine::Job
 				job.Execute();
 				job.Task(nullptr);
 				job.IncrementVersion();
-				job.ProcessDependents([&](const JobID& dependentId)
+				job.ProcessDependents([&](const JobID& dependentId) noexcept
 				{
 					Worker& dependentWorker = *workers[dependentId.poolIndex];
 					if (Job& dependent = dependentWorker.jobPool.GetJob(dependentId.jobIndex); dependent.Unblock())
@@ -215,11 +208,7 @@ namespace PonyEngine::Job
 
 	JobID Worker::GetJob() noexcept
 	{
-		JobID job;
-		{
-			const auto lock = std::lock_guard(jobQueueMutex);
-			job = TakeJob();
-		}
+		const JobID job = jobQueue.GetJob();
 
 		if (job.IsValid())
 		{
@@ -245,11 +234,7 @@ namespace PonyEngine::Job
 
 	JobID Worker::GrabJob() noexcept
 	{
-		auto job = JobID{};
-		if (const auto lock = std::unique_lock(jobQueueMutex, std::try_to_lock))
-		{
-			job = TakeJob();
-		}
+		const JobID job = jobQueue.StealJob();
 
 		if (job.IsValid())
 		{
@@ -257,19 +242,6 @@ namespace PonyEngine::Job
 		}
 
 		return job;
-	}
-
-	JobID Worker::TakeJob() noexcept
-	{
-		if (jobQueueHead == jobQueueTail)
-		{
-			return JobID{};
-		}
-
-		const JobID nextJob = jobQueue[jobQueueHead++];
-		jobQueueHead %= PONY_ENGINE_JOB_POOL_SIZE;
-
-		return nextJob;
 	}
 
 	void Worker::IncrementJobQueueVersion() const noexcept
