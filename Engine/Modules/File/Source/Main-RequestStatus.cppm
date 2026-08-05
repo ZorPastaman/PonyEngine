@@ -22,18 +22,20 @@ export namespace PonyEngine::File
 	{
 		Pending, ///< A request is still in progress.
 		Success, ///< A request finished with a success.
-		Failure ///< A request finished with a failure.
+		Failure, ///< A request finished with a failure.
+		Canceled ///< A request was canceled.
 	};
 }
 
 namespace PonyEngine::File
 {
 	/// @brief Request status names.
-	constexpr std::array<std::string_view, 3> RequestStatusNames
+	constexpr std::array<std::string_view, 4> RequestStatusNames
 	{
 		"Pending",
 		"Success",
-		"Failure"
+		"Failure",
+		"Canceled"
 	};
 }
 

@@ -99,11 +99,9 @@ namespace PonyEngine::File
 
 	void FileInfo::ValidateAccess(const FileAccess access) const
 	{
-#ifndef NDEBUG
 		if (None(access, this->access)) [[unlikely]]
 		{
 			throw std::logic_error("Invalid access");
 		}
-#endif
 	}
 }

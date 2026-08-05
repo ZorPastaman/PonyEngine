@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::File
 {
-	/// @brief Gets the file service module.
+	/// @brief Creates the file service module.
 	/// @return File service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetFileServiceModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateFileServiceModule();
 }

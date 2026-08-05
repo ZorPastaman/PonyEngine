@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.File;
 
+import :IRequestController;
 import :Request;
 
 export namespace PonyEngine::File
@@ -22,10 +23,11 @@ export namespace PonyEngine::File
 	{
 	public:
 		/// @brief Creates a read request.
+		/// @param controller Request controller.
 		/// @param params Read parameters.
-		/// @param callback Request callback. Can be nullptr.
+		/// @param handler Request handler. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		ReadRequest(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) noexcept;
+		ReadRequest(IRequestController& controller, const ReadParams& params, IReadHandler* handler) noexcept;
 		ReadRequest(const ReadRequest&) = delete;
 		ReadRequest(ReadRequest&&) = delete;
 
@@ -41,6 +43,8 @@ export namespace PonyEngine::File
 		[[nodiscard("Pure function")]] 
 		virtual const std::exception_ptr& Exception() const override;
 
+		virtual void Cancel() override;
+
 		virtual void Wait() const noexcept override;
 
 		/// @brief Sets the status to success.
@@ -49,25 +53,31 @@ export namespace PonyEngine::File
 		/// @brief Sets the status to failure.
 		/// @param exception Exception that occured during the request execution.
 		void SetFailure(const std::exception_ptr& exception) noexcept;
+		/// @brief Sets the status to canceled.
+		void SetCanceled() noexcept;
 
 		ReadRequest& operator =(const ReadRequest&) = delete;
 		ReadRequest& operator =(ReadRequest&&) = delete;
 
 	private:
-		/// @brief Invokes the callback if it's not nullptr.
-		void InvokeCallback() const;
+		/// @brief Invokes the handler complete if it's not nullptr.
+		void InvokeHandlerComplete() const;
+		/// @brief Invokes the handler cancel if it's not nullptr.
+		void InvokeHandlerCancel() const;
 
+		IRequestController* controller; ///< Request controller.
 		ReadParams params; ///< Read parameters.
 		Request request; ///< Read request.
-		std::function<void(const IReadRequest&)> callback; ///< Request callback.
+		IReadHandler* handler; ///< Request handler.
 	};
 }
 
 namespace PonyEngine::File
 {
-	ReadRequest::ReadRequest(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) noexcept :
+	ReadRequest::ReadRequest(IRequestController& controller, const ReadParams& params, IReadHandler* const handler) noexcept :
+		controller{&controller},
 		params(params),
-		callback(callback)
+		handler{handler}
 	{
 	}
 
@@ -91,6 +101,11 @@ namespace PonyEngine::File
 		return request.Exception();
 	}
 
+	void ReadRequest::Cancel()
+	{
+		controller->Cancel();
+	}
+
 	void ReadRequest::Wait() const noexcept
 	{
 		request.Wait();
@@ -99,20 +114,34 @@ namespace PonyEngine::File
 	void ReadRequest::SetSuccess(const std::size_t byteCount) noexcept
 	{
 		request.SetSuccess(byteCount);
-		InvokeCallback();
+		InvokeHandlerComplete();
 	}
 
 	void ReadRequest::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		request.SetFailed(exception);
-		InvokeCallback();
+		InvokeHandlerComplete();
 	}
 
-	void ReadRequest::InvokeCallback() const
+	void ReadRequest::SetCanceled() noexcept
 	{
-		if (callback)
+		request.SetCanceled();
+		InvokeHandlerCancel();
+	}
+
+	void ReadRequest::InvokeHandlerComplete() const
+	{
+		if (handler)
 		{
-			callback(*this);
+			handler->OnCompleted(*this);
+		}
+	}
+
+	void ReadRequest::InvokeHandlerCancel() const
+	{
+		if (handler)
+		{
+			handler->OnCanceled(*this);
 		}
 	}
 }

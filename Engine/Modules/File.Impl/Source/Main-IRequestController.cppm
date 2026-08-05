@@ -7,14 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/File/Windows/FileServiceModule.h"
+module;
 
-import PonyEngine.File.Impl.Windows;
+#include "PonyEngine/Object/Body.h"
 
-namespace PonyEngine::File
+export module PonyEngine.File.Impl:IRequestController;
+
+export namespace PonyEngine::File
 {
-	std::shared_ptr<Application::IModule> CreateFileServiceModule()
+	/// @brief Request controller
+	class IRequestController
 	{
-		return std::make_shared<FileServiceModule>();
-	}
+		PONY_INTERFACE_BODY(IRequestController)
+
+		/// @brief Cancels the request.
+		virtual void Cancel() = 0;
+	};
 }

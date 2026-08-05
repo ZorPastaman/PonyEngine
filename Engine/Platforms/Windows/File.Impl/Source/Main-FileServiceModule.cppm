@@ -37,7 +37,7 @@ export namespace PonyEngine::File
 		FileServiceModule& operator =(FileServiceModule&&) = delete;
 
 	private:
-		Application::ServiceHandle fileServiceHandle; ///< File service handle.
+		std::unique_ptr<FileService> fileService; ///< File service.
 	};
 }
 
@@ -45,18 +45,21 @@ namespace PonyEngine::File
 {
 	void FileServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(FileService).name());
-		fileServiceHandle = context.ServiceModuleContext().AddService([](Application::IApplication& application)
+		fileService = std::make_unique<FileService>(context.Application());
+		try
 		{
-			return std::make_shared<FileService>(application);
-		});
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(FileService).name());
+			context.AddInterface<IFileService>(*fileService);
+		}
+		catch (...)
+		{
+			fileService.reset();
+			throw;
+		}
 	}
 
 	void FileServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(FileService).name());
-		context.ServiceModuleContext().RemoveService(fileServiceHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(FileService).name());
+		context.RemoveInterface<IFileService>(*fileService);
+		fileService.reset();
 	}
 }

@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/File/Windows/FileServiceModule.h"
 
-PONY_LOG_MODULE(PonyEngine::File::GetFileServiceModule, PonyEngineFileService, PONY_ENGINE_FILE_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::File::CreateFileServiceModule, PonyEngineFileService, PONY_ENGINE_FILE_ORDER);

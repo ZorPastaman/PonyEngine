@@ -21,9 +21,12 @@ import PonyEngine.Application.Impl;
 
 export namespace PonyEngine::Application
 {
+	/// @brief Context.
 	class Context final
 	{
 	public:
+		/// @brief Creates a context.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
 		explicit Context(const App& application) noexcept;
 		Context(const Context&) = delete;
@@ -31,10 +34,14 @@ export namespace PonyEngine::Application
 
 		~Context() noexcept = default;
 
+		/// @brief Gets the application.
+		/// @return Application.
 		[[nodiscard("Pure function")]]
 		const App& Application() const noexcept;
 
+		/// @brief Increments the thread control count.
 		void IncrementThreadControlCount() const noexcept;
+		/// @brief Decrements the thread control count.
 		void DecrementThreadControlCount() const noexcept;
 
 		/// @brief Ensures that counts are zero. Must be called on process destruction.

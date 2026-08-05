@@ -37,6 +37,11 @@ export namespace PonyEngine::File
 		[[nodiscard("Pure function")]]
 		virtual const std::exception_ptr& Exception() const = 0;
 
+		/// @brief Cancels the request.
+		/// @note The cancel is not immediate, it may take some time to cancel the operation.
+		///       And because of it, the request may complete event if you requested a cancel.
+		virtual void Cancel() = 0;
+
 		/// @brief Makes the thread sleep till the request is completed with success or failure.
 		virtual void Wait() const noexcept = 0;
 	};

@@ -20,8 +20,9 @@ import PonyEngine.Application;
 import PonyEngine.File.Impl;
 import PonyEngine.Log;
 
+import :FileContext;
 import :FileUtility;
-import :OverlappedRequest;
+import :ServiceContext;
 import :Worker;
 
 export namespace PonyEngine::File
@@ -31,12 +32,11 @@ export namespace PonyEngine::File
 	{
 	public:
 		/// @brief Opens a file.
-		/// @param application Application.
-		/// @param worker Worker.
+		/// @param context Context.
 		/// @param path File path
 		/// @param params File parameters.
 		[[nodiscard("Pure constructor")]]
-		File(const Application::IApplication& application, const Worker& worker, const std::filesystem::path& path, FileParams params);
+		File(const ServiceContext& context, const std::filesystem::path& path, FileParams params);
 		File(const File&) = delete;
 		File(File&&) = delete;
 
@@ -50,19 +50,26 @@ export namespace PonyEngine::File
 		virtual FileFlag Flags() const noexcept override;
 
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) const override;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, IReadHandler* handler) const override;
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback) override;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, IWriteHandler* handler) override;
 
 		File& operator =(const File&) = delete;
 		File& operator =(File&&) = delete;
 
 	private:
-		const Application::IApplication* application; ///< Application.
-		const Worker* worker; ///< Worker.
+		/// @brief Opens a file.
+		/// @param path File path.
+		/// @param params File parameters.
+		/// @return File handle.
+		[[nodiscard("Pure function")]]
+		HANDLE OpenFile(const std::filesystem::path& path, FileParams params) const;
+
+		const ServiceContext* context; ///< Context.
 
 		FileInfo fileInfo; ///< File info.
 		HANDLE fileHandle; ///< File handle.
+		FileContext fileContext; ///< File context.
 	};
 }
 
@@ -83,41 +90,37 @@ namespace PonyEngine::File
 		static constexpr auto Value = &CreateFileW; ///< @p CreateFileW.
 	};
 
-	File::File(const Application::IApplication& application, const Worker& worker, const std::filesystem::path& path, const FileParams params) :
-		application{&application},
-		worker{&worker},
-		fileInfo(path, params.access, params.flags)
+	File::File(const ServiceContext& context, const std::filesystem::path& path, const FileParams params) :
+		context{&context},
+		fileInfo(path, params.access, params.flags),
+		fileHandle(OpenFile(path, params)),
+		fileContext(fileHandle)
 	{
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating file... Path: '{}'; Access: '{}'; OpenMode: '{}'; Flags: '{}'.",
-			path.string(), params.access, params.openMode, params.flags);
-		fileHandle = CreateFileSelector<std::filesystem::path::value_type>::Value(path.c_str(), ToDesiredAccess(params.access), FILE_SHARE_READ, nullptr,
-			ToCreationDisposition(params.access, params.openMode), FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | ToFlags(params.flags), nullptr);
-		if (fileHandle == INVALID_HANDLE_VALUE) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to create file: Error code = '0x{:X}'", GetLastError()));
-		}
-		PONY_LOG(this->application->Logger(), Log::LogType::Info, "Creating file done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fileHandle));
-
 		try
 		{
-			this->worker->AssociateFile(fileHandle, *this);
+			this->context->Worker().AssociateFile(fileHandle, *this);
 		}
 		catch (...)
 		{
 			if (!CloseHandle(fileHandle)) [[unlikely]]
 			{
-				PONY_LOG(this->application->Logger(), Log::LogType::Error, "Failed to close file. Error code: '0x{:X}'.", GetLastError());
+				PONY_LOG(this->context->LogService(), Log::LogType::Error, "Failed to close file. Error code: '0x{:X}'.", GetLastError());
 			}
 			throw;
 		}
+
+		this->context->IncrementFileCount();
 	}
 
 	File::~File() noexcept
 	{
 		if (!CloseHandle(fileHandle)) [[unlikely]]
 		{
-			PONY_LOG(application->Logger(), Log::LogType::Error, "Failed to close file. Error code: '0x{:X}'.", GetLastError());
+			PONY_LOG(this->context->LogService(), Log::LogType::Error, "Failed to close file. Error code: '0x{:X}'.", GetLastError());
 		}
+
+		this->context->DecrementFileCount();
+		fileContext.EnsureZeroCounts();
 	}
 
 	const std::filesystem::path& File::Path() const noexcept
@@ -135,17 +138,34 @@ namespace PonyEngine::File
 		return fileInfo.Flags();
 	}
 
-	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) const
+	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params, IReadHandler* handler) const
 	{
 		fileInfo.ValidateRead();
-		const std::shared_ptr<OverlappedRequest> request = worker->MakeRequest(fileHandle, params, callback);
+		const std::shared_ptr<OverlappedRequest> request = context->Worker().MakeRequest(fileContext, params, handler);
 		return std::shared_ptr<IReadRequest>(request, &request->Request().Read());
 	}
 
-	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback)
+	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params, IWriteHandler* handler)
 	{
 		fileInfo.ValidateWrite();
-		const std::shared_ptr<OverlappedRequest> request = worker->MakeRequest(fileHandle, params, callback);
+		const std::shared_ptr<OverlappedRequest> request = context->Worker().MakeRequest(fileContext, params, handler);
 		return std::shared_ptr<IWriteRequest>(request, &request->Request().Write());
+	}
+
+	HANDLE File::OpenFile(const std::filesystem::path& path, FileParams params) const
+	{
+		PONY_LOG(context->LogService(), Log::LogType::Info, "Creating file... Path: '{}'; Access: '{}'; OpenMode: '{}'; Flags: '{}'.",
+			path.string(), params.access, params.openMode, params.flags);
+
+		const HANDLE file = CreateFileSelector<std::filesystem::path::value_type>::Value(path.c_str(), ToDesiredAccess(params.access), FILE_SHARE_READ, nullptr,
+			ToCreationDisposition(params.access, params.openMode), FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | ToFlags(params.flags), nullptr);
+		if (file == INVALID_HANDLE_VALUE) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create file: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		PONY_LOG(context->LogService(), Log::LogType::Info, "Creating file done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(file));
+
+		return file;
 	}
 }

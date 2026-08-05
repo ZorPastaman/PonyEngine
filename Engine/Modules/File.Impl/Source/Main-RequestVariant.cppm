@@ -24,15 +24,17 @@ export namespace PonyEngine::File
 	{
 	public:
 		/// @brief Creates a read request.
+		/// @param controller Request controller.
 		/// @param params Read parameters.
-		/// @param callback Request callback.
+		/// @param handler Request handler. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		RequestVariant(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) noexcept;
+		RequestVariant(IRequestController& controller, const ReadParams& params, IReadHandler* handler) noexcept;
 		/// @brief Creates a write request.
+		/// @param controller Request controller.
 		/// @param params Write parameters.
-		/// @param callback Request callback.
+		/// @param handler Request handler. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		RequestVariant(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback) noexcept;
+		RequestVariant(IRequestController& controller, const WriteParams& params, IWriteHandler* handler) noexcept;
 		RequestVariant(const RequestVariant&) = delete;
 		RequestVariant(RequestVariant&&) = delete;
 
@@ -69,7 +71,9 @@ export namespace PonyEngine::File
 		void SetSuccess(std::size_t byteCount) noexcept;
 		/// @brief Sets the status to failure.
 		/// @param exception Exception that occured during the request execution.
-		void SetFailed(const std::exception_ptr& exception) noexcept;
+		void SetFailure(const std::exception_ptr& exception) noexcept;
+		/// @brief Sets the status to canceled.
+		void SetCanceled() noexcept;
 
 		RequestVariant& operator =(const RequestVariant&) = delete;
 		RequestVariant& operator =(RequestVariant&&) = delete;
@@ -81,13 +85,13 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	RequestVariant::RequestVariant(const ReadParams& params, const std::function<void(const IReadRequest&)>& callback) noexcept :
-		request(std::in_place_type<ReadRequest>, params, callback)
+	RequestVariant::RequestVariant(IRequestController& controller, const ReadParams& params, IReadHandler* const handler) noexcept :
+		request(std::in_place_type<ReadRequest>, controller, params, handler)
 	{
 	}
 
-	RequestVariant::RequestVariant(const WriteParams& params, const std::function<void(const IWriteRequest&)>& callback) noexcept :
-		request(std::in_place_type<WriteRequest>, params, callback)
+	RequestVariant::RequestVariant(IRequestController& controller, const WriteParams& params, IWriteHandler* const handler) noexcept :
+		request(std::in_place_type<WriteRequest>, controller, params, handler)
 	{
 	}
 
@@ -136,7 +140,7 @@ namespace PonyEngine::File
 		}, request);
 	}
 
-	void RequestVariant::SetFailed(const std::exception_ptr& exception) noexcept
+	void RequestVariant::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		std::visit(Type::Overload
 		{
@@ -147,6 +151,21 @@ namespace PonyEngine::File
 			[&](WriteRequest& writeRequest)
 			{
 				writeRequest.SetFailure(exception);
+			}
+		}, request);
+	}
+
+	void RequestVariant::SetCanceled() noexcept
+	{
+		std::visit(Type::Overload
+		{
+			[&](ReadRequest& readRequest)
+			{
+				readRequest.SetCanceled();
+			},
+			[&](WriteRequest& writeRequest)
+			{
+				writeRequest.SetCanceled();
 			}
 		}, request);
 	}

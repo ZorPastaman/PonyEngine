@@ -28,7 +28,7 @@ export namespace PonyEngine::File
 		Request(const Request&) = delete;
 		Request(Request&&) = delete;
 
-		~Request() noexcept = default;
+		~Request() noexcept;
 
 		/// @brief Gets the request status.
 		/// @return Request status.
@@ -51,7 +51,9 @@ export namespace PonyEngine::File
 		/// @brief Sets the status to failure.
 		/// @param exception Exception that occured during the request execution.
 		void SetFailed(const std::exception_ptr& exception) noexcept;
-
+		/// @brief Sets the status to canceled.
+		void SetCanceled() noexcept;
+		
 		/// @brief Makes the thread sleep till the request is completed with success or failure.
 		void Wait() const noexcept;
 
@@ -71,8 +73,13 @@ namespace PonyEngine::File
 {
 	Request::Request() noexcept :
 		byteCount{0uz},
-		status{RequestStatus::Pending}
+		status(RequestStatus::Pending)
 	{
+	}
+
+	Request::~Request() noexcept
+	{
+		assert(status.load(std::memory_order::relaxed) != RequestStatus::Pending && "Pending request destructed.");
 	}
 
 	RequestStatus Request::Status() const noexcept
@@ -114,6 +121,12 @@ namespace PonyEngine::File
 		
 		this->exception = exception;
 		status.store(RequestStatus::Failure, std::memory_order::release);
+	}
+
+	void Request::SetCanceled() noexcept
+	{
+		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status.");
+		status.store(RequestStatus::Canceled, std::memory_order::relaxed);
 	}
 
 	void Request::Wait() const noexcept

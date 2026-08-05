@@ -54,12 +54,10 @@ namespace PonyEngine::File
 
 	DWORD ToCreationDisposition(const FileAccess access, const FileOpenMode openMode)
 	{
-#ifndef NDEBUG
 		if (Any(FileOpenMode::Truncate, openMode) && None(FileAccess::Write, access)) [[unlikely]]
 		{
 			throw std::invalid_argument("Truncate open mode without write file access");
 		}
-#endif
 
 		if (All(FileAccess::Read, access))
 		{

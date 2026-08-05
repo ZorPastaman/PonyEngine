@@ -12,6 +12,7 @@ export module PonyEngine.File.Impl;
 export import PonyEngine.File;
 
 export import :FileInfo;
+export import :IRequestController;
 export import :ReadRequest;
 export import :Request;
 export import :RequestVariant;
