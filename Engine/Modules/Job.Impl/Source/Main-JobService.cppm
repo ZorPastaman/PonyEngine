@@ -12,6 +12,7 @@ module;
 #include <cassert>
 
 #include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Macro/Text.h"
 
 export module PonyEngine.Job.Impl:JobService;
 
@@ -87,7 +88,8 @@ namespace PonyEngine::Job
 		const std::size_t concurrency = std::thread::hardware_concurrency();
 		const std::size_t threadCount = std::max(Math::DifferenceClamp(concurrency, std::size_t{PONY_ENGINE_JOB_RESERVED_THREAD_COUNT}), std::size_t{PONY_ENGINE_JOB_MIN_THREAD_COUNT});
 
-		PONY_LOG(logService, Log::LogType::Info, "Creating workers... Thread count: '{}'; Hardware concurrency: '{}'.", threadCount, concurrency);
+		PONY_LOG(logService, Log::LogType::Info, "Creating workers... Thread count: '{}'; Hardware concurrency: '{}'; Role: '{}'.", threadCount, concurrency,
+			PONY_STRINGIFY_VALUE(PONY_ENGINE_JOB_THREAD_ROLE));
 		workers.resize(threadCount);
 
 		for (std::size_t i = 0uz; i < threadCount; ++i)

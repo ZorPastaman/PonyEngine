@@ -45,7 +45,7 @@ export namespace PonyEngine::Application
 		GUIProcess(const GUIProcess&) = delete;
 		GUIProcess(GUIProcess&&) = delete;
 
-		~GUIProcess() noexcept = default;
+		~GUIProcess() noexcept;
 
 		/// @brief Runs the process.
 		/// @return Exit code.
@@ -90,6 +90,11 @@ export namespace PonyEngine::Application
 		/// @brief Destroys a console if it was created.
 		void DestroyConsole() noexcept;
 
+		/// @brief Creates a main thread control.
+		void CreateMainThreadControl() noexcept;
+		/// @brief Destroys a main thread control.
+		void DestroyMainThreadControl() noexcept;
+
 		/// @brief Adds the process interfaces to the application.
 		void AddProcessInterfaces();
 		/// @brief Removes the process interfaces from the application.
@@ -121,7 +126,9 @@ export namespace PonyEngine::Application
 
 		std::unique_ptr<App> application; ///< Application.
 
-		ThreadControl mainThreadControl; ///< Main thread control.
+		std::unique_ptr<Context> context; ///< Context.
+
+		std::unique_ptr<ThreadControl> mainThreadControl; ///< Main thread control.
 		HANDLE timer; ///< Timer handle.
 	};
 }
@@ -139,11 +146,16 @@ namespace PonyEngine::Application
 		lastMessageNativeTime(GetTickCount()),
 		lastMessageType{0u},
 		lastMessageCursorPoint{.x = 0l, .y = 0l},
-		mainThreadControl(GetCurrentThread()),
 		timer{nullptr}
 	{
 		application = std::make_unique<App>(MakeCommandLineView(commandLine), GetThreadRoles(), GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), 
 			GetTempDataDirectory(), static_cast<IProcess&>(*this));
+		context = std::make_unique<Context>(*application);
+	}
+
+	GUIProcess::~GUIProcess() noexcept
+	{
+		context->EnsureZeroCounts();
 	}
 
 	int GUIProcess::Run()
@@ -171,17 +183,22 @@ namespace PonyEngine::Application
 
 	std::shared_ptr<IThreadControl> GUIProcess::CreateThreadControl(std::thread& thread)
 	{
-		return std::make_shared<ThreadControl>(thread);
+		return std::make_shared<ThreadControl>(*context, thread);
 	}
 
 	std::string_view GUIProcess::MainThreadRole() const noexcept
 	{
-		return mainThreadControl.Role();
+		return mainThreadControl ? mainThreadControl->Role() : IThreadControl::InvalidRole;
 	}
 
 	void GUIProcess::MainThreadRole(const std::string_view role)
 	{
-		mainThreadControl.Role(role);
+		if (!mainThreadControl)
+		{
+			throw std::logic_error("Main thread wasn't created");
+		}
+
+		mainThreadControl->Role(role);
 	}
 
 	HINSTANCE GUIProcess::Instance() const noexcept
@@ -235,7 +252,7 @@ namespace PonyEngine::Application
 		application->LogBasicInfo();
 		LogProcessBasicInfo(*application);
 		SetProcessPriority(*application);
-		SetMainThreadRole(*application, mainThreadControl);
+		CreateMainThreadControl();
 		timer = CreateTimer(*application);
 		try
 		{
@@ -262,6 +279,7 @@ namespace PonyEngine::Application
 		catch (...)
 		{
 			DestroyTimer(timer, *application);
+			DestroyMainThreadControl();
 			DestroyConsole();
 			application->FinalizeEarly();
 			throw;
@@ -274,6 +292,7 @@ namespace PonyEngine::Application
 		application->FinalizeNormal();
 		RemoveProcessInterfaces();
 		DestroyTimer(timer, *application);
+		DestroyMainThreadControl();
 		DestroyConsole();
 		application->FinalizeEarly();
 
@@ -353,6 +372,24 @@ namespace PonyEngine::Application
 		}
 		hasConsole = false;
 #endif
+	}
+
+	void GUIProcess::CreateMainThreadControl() noexcept
+	{
+		try
+		{
+			mainThreadControl = std::make_unique<ThreadControl>(*context, GetCurrentThread());
+			SetMainThreadRole(*application, *mainThreadControl);
+		}
+		catch (...)
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On main thread control creation.");
+		}
+	}
+
+	void GUIProcess::DestroyMainThreadControl() noexcept
+	{
+		mainThreadControl.reset();
 	}
 
 	void GUIProcess::AddProcessInterfaces()

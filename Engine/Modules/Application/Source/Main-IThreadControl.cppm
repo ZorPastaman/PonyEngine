@@ -22,6 +22,8 @@ export namespace PonyEngine::Application
 	{
 		PONY_INTERFACE_BODY(IThreadControl)
 
+		static constexpr std::string_view InvalidRole = "INVALID"; ///< The role that is set in case of an exception on setting a role.
+
 		/// @brief Gets a current role.
 		/// @return Role.
 		[[nodiscard("Pure function")]]

@@ -11,6 +11,7 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 #include <avrt.h>
@@ -20,7 +21,9 @@ export module PonyEngine.Application.Impl.Windows:ThreadControl;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Log;
 
+import :Context;
 import :ThreadRole;
 
 export namespace PonyEngine::Application
@@ -30,13 +33,15 @@ export namespace PonyEngine::Application
 	{
 	public:
 		/// @brief Creates a thread control.
+		/// @param context Context.
 		/// @param thread Thread. Must be valid.
 		[[nodiscard("Pure constructor")]]
-		explicit ThreadControl(std::thread& thread) noexcept;
+		explicit ThreadControl(const Context& context, std::thread& thread);
 		/// @brief Creates a thread control.
+		/// @param context Context.
 		/// @param thread Thread. Must be valid.
 		[[nodiscard("Pure constructor")]]
-		explicit ThreadControl(HANDLE thread) noexcept;
+		explicit ThreadControl(const Context& context, HANDLE thread);
 		ThreadControl(const ThreadControl&) = delete;
 		ThreadControl(ThreadControl&&) = delete;
 
@@ -54,6 +59,12 @@ export namespace PonyEngine::Application
 		ThreadControl& operator =(ThreadControl&&) = delete;
 
 	private:
+		void SetRole(std::string_view role);
+		void SetDefaultRole();
+		void RevertMMCSS();
+
+		const Context* context; ///< Context.
+
 		HANDLE thread; ///< Thread.
 		std::string_view role; ///< Thread role.
 		HANDLE mmcssHandle; ///< MMCSS handle.
@@ -67,23 +78,46 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	ThreadControl::ThreadControl(std::thread& thread) noexcept :
-		ThreadControl(thread.native_handle())
+	ThreadControl::ThreadControl(const Context& context, std::thread& thread) :
+		ThreadControl(context, thread.native_handle())
 	{
 	}
 
-	ThreadControl::ThreadControl(const HANDLE thread) noexcept :
+	ThreadControl::ThreadControl(const Context& context, const HANDLE thread) :
+		context{&context},
 		thread{thread},
 		mmcssHandle{nullptr}
 	{
+		if (!GetThreadId(this->thread)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid thread");
+		}
+
+		this->context->IncrementThreadControlCount();
 	}
 
 	ThreadControl::~ThreadControl() noexcept
 	{
-		if (mmcssHandle)
+		assert(GetThreadId(thread) != 0 && "The thread is invalid on thread control destruction.");
+
+		try
 		{
-			AvRevertMmThreadCharacteristics(mmcssHandle);
+			RevertMMCSS();
 		}
+		catch (...)
+		{
+			PONY_LOG(context->Application().LogService(), Log::LogType::Error, std::current_exception());
+		}
+		try
+		{
+			SetDefaultRole();
+		}
+		catch (...)
+		{
+			PONY_LOG(context->Application().LogService(), Log::LogType::Error, std::current_exception());
+		}
+
+		context->DecrementThreadControlCount();
 	}
 
 	std::string_view ThreadControl::Role() const noexcept
@@ -95,59 +129,78 @@ namespace PonyEngine::Application
 	{
 		try
 		{
-			if (mmcssHandle)
-			{
-				if (!AvRevertMmThreadCharacteristics(mmcssHandle)) [[unlikely]]
-				{
-					throw std::runtime_error(std::format("Failed to revert mmcss task: Error code = '0x{:X}'", GetLastError()));
-				}
-				mmcssHandle = nullptr;
-			}
+			RevertMMCSS();
 
 			if (role.empty())
 			{
-				if (!SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) [[unlikely]]
-				{
-					throw std::runtime_error(std::format("Failed to set normal priority: Error code = '0x{:X}'", GetLastError()));
-				}
-
-				this->role = "";
+				SetDefaultRole();
 			}
 			else
 			{
-				const auto roleDesc = ThreadRoles.find(role);
-				if (roleDesc == ThreadRoles.cend()) [[unlikely]]
-				{
-					throw std::invalid_argument("Invalid role");
-				}
-
-				if (!SetThreadPriority(thread, roleDesc->second.threadPriority)) [[unlikely]]
-				{
-					throw std::runtime_error(std::format("Failed to set '{}' priority: Error code = '0x{:X}'", roleDesc->first, GetLastError()));
-				}
-
-				if (!roleDesc->second.mmcssTask.empty())
-				{
-					DWORD index = 0;
-					mmcssHandle = AvSetMmThreadCharacteristicsA(roleDesc->second.mmcssTask.data(), &index);
-					if (!mmcssHandle) [[unlikely]]
-					{
-						throw std::runtime_error(std::format("Failed to set mmcss thread task: Task = '{}', Error code = '0x{:X}'", roleDesc->second.mmcssTask, GetLastError()));
-					}
-					if (!AvSetMmThreadPriority(mmcssHandle, roleDesc->second.mmcssPriority)) [[unlikely]]
-					{
-						throw std::runtime_error(std::format("Failed to set mmcss thread priority: Task = '{}', Error code = '0x{:X}'", roleDesc->second.mmcssTask, GetLastError()));
-					}
-				}
-
-				this->role = roleDesc->first;
+				SetRole(role);
 			}
 		}
 		catch (...)
 		{
-			Role("");
+			this->role = InvalidRole;
 			throw;
 		}
+	}
+
+	void ThreadControl::SetRole(const std::string_view role)
+	{
+		const auto roleDesc = ThreadRoles.find(role);
+		if (roleDesc == ThreadRoles.cend()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid role");
+		}
+
+		if (!SetThreadPriority(thread, roleDesc->second.threadPriority)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to set '{}' priority: Error code = '0x{:X}'", roleDesc->first, GetLastError()));
+		}
+
+		if (!roleDesc->second.mmcssTask.empty())
+		{
+			DWORD index = 0;
+			mmcssHandle = AvSetMmThreadCharacteristicsA(roleDesc->second.mmcssTask.data(), &index);
+			if (!mmcssHandle) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to set mmcss thread task: Task = '{}', Error code = '0x{:X}'", roleDesc->second.mmcssTask, GetLastError()));
+			}
+
+			if (!AvSetMmThreadPriority(mmcssHandle, roleDesc->second.mmcssPriority)) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to set mmcss thread priority: Task = '{}', Error code = '0x{:X}'", roleDesc->second.mmcssTask, GetLastError()));
+			}
+		}
+
+		this->role = roleDesc->first;
+	}
+
+	void ThreadControl::SetDefaultRole()
+	{
+		if (!SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to set normal priority: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		this->role = "";
+	}
+
+	void ThreadControl::RevertMMCSS()
+	{
+		if (!mmcssHandle)
+		{
+			return;
+		}
+
+		if (!AvRevertMmThreadCharacteristics(mmcssHandle)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to revert mmcss task: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		mmcssHandle = nullptr;
 	}
 
 	std::vector<std::string_view> GetThreadRoles()

@@ -41,7 +41,7 @@ export namespace PonyEngine::Application
 		ConsoleProcess(const ConsoleProcess&) = delete;
 		ConsoleProcess(ConsoleProcess&&) = delete;
 
-		~ConsoleProcess() noexcept = default;
+		~ConsoleProcess() noexcept;
 
 		/// @brief Runs the process.
 		/// @return Exit code.
@@ -63,13 +63,21 @@ export namespace PonyEngine::Application
 		/// @brief Finalizes the application.
 		void Finalize();
 
+		/// @brief Creates a main thread control.
+		void CreateMainThreadControl() noexcept;
+		/// @brief Destroys a main thread control.
+		void DestroyMainThreadControl() noexcept;
+
 		/// @brief Runs the main loop.
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
 		int RunMainLoop();
 
 		std::unique_ptr<App> application; ///< Application.
-		ThreadControl mainThreadControl; ///< Main thread control.
+
+		std::unique_ptr<Context> context; ///< Context.
+
+		std::unique_ptr<ThreadControl> mainThreadControl; ///< Main thread control.
 		HANDLE timer; ///< Timer handle.
 	};
 }
@@ -80,7 +88,6 @@ namespace PonyEngine::Application
 	BOOL WINAPI CtrlHandler(DWORD ctrlType);
 
 	ConsoleProcess::ConsoleProcess(const int argc, const char* const argv[]) :
-		mainThreadControl(GetCurrentThread()),
 		timer{nullptr}
 	{
 		if (!SetConsoleCtrlHandler(&CtrlHandler, TRUE)) [[unlikely]]
@@ -99,6 +106,12 @@ namespace PonyEngine::Application
 
 		application = std::make_unique<App>(MakeCommandLineView(argc, argv), GetThreadRoles(), GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), 
 			GetTempDataDirectory(), static_cast<IProcess&>(*this));
+		context = std::make_unique<Context>(*application);
+	}
+
+	ConsoleProcess::~ConsoleProcess() noexcept
+	{
+		context->EnsureZeroCounts();
 	}
 
 	int ConsoleProcess::Run()
@@ -126,17 +139,22 @@ namespace PonyEngine::Application
 
 	std::shared_ptr<IThreadControl> ConsoleProcess::CreateThreadControl(std::thread& thread)
 	{
-		return std::make_shared<ThreadControl>(thread);
+		return std::make_shared<ThreadControl>(*context, thread);
 	}
 
 	std::string_view ConsoleProcess::MainThreadRole() const noexcept
 	{
-		return mainThreadControl.Role();
+		return mainThreadControl ? mainThreadControl->Role() : IThreadControl::InvalidRole;
 	}
 
 	void ConsoleProcess::MainThreadRole(const std::string_view role)
 	{
-		mainThreadControl.Role(role);
+		if (!mainThreadControl)
+		{
+			throw std::logic_error("Main thread wasn't created");
+		}
+
+		mainThreadControl->Role(role);
 	}
 
 	void ConsoleProcess::Initialize()
@@ -145,7 +163,7 @@ namespace PonyEngine::Application
 		application->LogBasicInfo();
 		LogProcessBasicInfo(*application);
 		SetProcessPriority(*application);
-		SetMainThreadRole(*application, mainThreadControl);
+		CreateMainThreadControl();
 		timer = CreateTimer(*application);
 		try
 		{
@@ -163,6 +181,7 @@ namespace PonyEngine::Application
 		catch (...)
 		{
 			DestroyTimer(timer, *application);
+			DestroyMainThreadControl();
 			application->FinalizeEarly();
 			throw;
 		}
@@ -173,6 +192,7 @@ namespace PonyEngine::Application
 		application->FinalizeLate();
 		application->FinalizeNormal();
 		DestroyTimer(timer, *application);
+		DestroyMainThreadControl();
 		application->FinalizeEarly();
 
 #ifndef NDEBUG
@@ -186,6 +206,24 @@ namespace PonyEngine::Application
 			std::println(std::cerr, "{} tickables weren't removed from application.", count);
 		}
 #endif
+	}
+
+	void ConsoleProcess::CreateMainThreadControl() noexcept
+	{
+		try
+		{
+			mainThreadControl = std::make_unique<ThreadControl>(*context, GetCurrentThread());
+			SetMainThreadRole(*application, *mainThreadControl);
+		}
+		catch (...)
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On main thread control creation.");
+		}
+	}
+
+	void ConsoleProcess::DestroyMainThreadControl() noexcept
+	{
+		mainThreadControl.reset();
 	}
 
 	int ConsoleProcess::RunMainLoop()

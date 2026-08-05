@@ -53,7 +53,9 @@ namespace PonyEngine::Application
 #ifdef PONY_ENGINE_APPLICATION_MAIN_THREAD_ROLE
 		try
 		{
-			threadControl.Role(PONY_STRINGIFY_VALUE(PONY_ENGINE_APPLICATION_MAIN_THREAD_ROLE));
+			constexpr std::string_view role = PONY_STRINGIFY_VALUE(PONY_ENGINE_APPLICATION_MAIN_THREAD_ROLE);
+			PONY_LOG(application.LogService(), Log::LogType::Info, "Setting main thread role. Role: '{}'.", role);
+			threadControl.Role(role);
 		}
 		catch (...)
 		{

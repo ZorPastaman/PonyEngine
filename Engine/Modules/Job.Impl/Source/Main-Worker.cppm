@@ -11,6 +11,7 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Macro/Text.h"
 
 export module PonyEngine.Job.Impl:Worker;
@@ -19,6 +20,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Job;
+import PonyEngine.Log;
 
 import :Job;
 import :JobID;
@@ -136,8 +138,16 @@ namespace PonyEngine::Job
 		assert(!thread && "The thread was already started.");
 		assert(running.load(std::memory_order::relaxed) && "The worker is stopped.");
 		thread = std::thread(&Worker::Work, this);
-		threadControl = application.CreateThreadControl(*thread);
-		threadControl->Role(PONY_STRINGIFY_VALUE(PONY_ENGINE_JOB_THREAD_ROLE));
+
+		try
+		{
+			threadControl = application.CreateThreadControl(*thread);
+			threadControl->Role(PONY_STRINGIFY_VALUE(PONY_ENGINE_JOB_THREAD_ROLE));
+		}
+		catch (...)
+		{
+			PONY_LOG(application.FindInterface<Log::ILogService>(), Log::LogType::Error, std::current_exception(), "Failed to set worker thread role.");
+		}
 	}
 
 	void Worker::Stop() noexcept
@@ -149,6 +159,7 @@ namespace PonyEngine::Job
 	{
 		assert(thread && "The thread wasn't created.");
 		assert(!running.load(std::memory_order::relaxed) && "The worker wasn't stopped.");
+		threadControl.reset();
 		thread->join();
 	}
 

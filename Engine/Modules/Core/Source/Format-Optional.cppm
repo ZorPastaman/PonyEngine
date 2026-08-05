@@ -44,6 +44,6 @@ public:
 			return subFormatter.format(*optional, context);
 		}
 
-		return std::ranges::copy("std::nullopt", context.out()).out;
+		return std::ranges::copy("std::nullopt"sv, context.out()).out;
 	}
 };

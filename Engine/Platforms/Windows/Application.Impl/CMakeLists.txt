@@ -24,6 +24,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 	"Source/Main.cppm"
 	"Source/Main-CommandLine.cppm"
 	"Source/Main-ConsoleProcess.cppm"
+	"Source/Main-Context.cppm"
 	"Source/Main-GUIProcess.cppm"
 	"Source/Main-Path.cppm"
 	"Source/Main-Process.cppm"
