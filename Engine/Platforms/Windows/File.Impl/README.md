@@ -4,17 +4,17 @@ Platform independent module: [PonyEngine.File.Impl](../../../Modules/File.Impl).
 
 ## Dependencies
 
-- [PonyEngine.Core](../Core)
-- [PonyEngine.Log](../../../Modules/Log)
 - [PonyEngine.Application](../Application)
+- [PonyEngine.Log](../../../Modules/Log)
 
 ## CMake variables
 
 These variables are used to configure the build of the module:
 
-| Variable name            | Default value | Description                                       |
-|:-------------------------|:-------------:|:--------------------------------------------------|
-| `PONY_ENGINE_FILE_ORDER` | p             | PonyEngine.File.Impl module initialization order. |
+| Variable name                  | Default value | Description                                       |
+|:-------------------------------|:-------------:|:--------------------------------------------------|
+| `PONY_ENGINE_FILE_ORDER`       | p             | PonyEngine.File.Impl module initialization order. |
+| `PONY_ENGINE_FILE_THREAD_ROLE` | IO            | PonyEngine.File.Impl io thread role.              |
 
 ## For Pony Engine developers
 

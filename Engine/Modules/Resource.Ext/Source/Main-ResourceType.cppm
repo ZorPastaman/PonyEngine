@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource:ResourceType;
+export module PonyEngine.Resource.Ext:ResourceType;
 
 import std;
 

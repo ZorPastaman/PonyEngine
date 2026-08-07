@@ -1,5 +1,12 @@
 message(STATUS "Configuring PonyEngine.File.Impl for Windows")
 
+if(NOT TARGET PonyEngine.Application)
+	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Log)
+	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
+endif()
+
 set(PONY_ENGINE_FILE_ORDER "p" CACHE STRING "PonyEngine.File.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_FILE_THREAD_ROLE "IO" CACHE STRING "PonyEngine.File.Impl io thread role.")
 
@@ -36,6 +43,5 @@ target_link_libraries(PonyEngine.File.Impl PUBLIC
 	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.File.Impl PRIVATE
-	PonyEngine.Core
 	PonyEngine.Log
 )

@@ -44,7 +44,6 @@ To a module to a build, a specific CMake flag must be `true`.
 | [PonyEngine.Resource](Modules/Resource)                               | `PONY_ENGINE_RESOURCE`                 | Resource service API module. The service provides resources.                                                                  |
 | [PonyEngine.Resource.Ext](Modules/Resource.Ext)                       | `PONY_ENGINE_RESOURCE_EXT`             | Resource service extension API module. Provides interfaces for resource providers.                                            |
 | [PonyEngine.Resource.Impl](Modules/Resource.Impl)                     | `PONY_ENGINE_RESOURCE_IMPL`            | Resource service implementation module.                                                                                       |
-| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)           | `PONY_ENGINE_RESOURCE_FILE_IMPL`       | File resource provider module. Provides resources that are individual files.                                                  |
 | [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)           | `PONY_ENGINE_RESOURCE_PACK_IMPL`       | Pack resource provider module. Provides resources that are stored in binary containers.                                       |
 | [PonyEngine.Shader](Modules/Shader)                                   | `PONY_ENGINE_SHADER`                   | Shader utilities module. Provides utility functions and classes for both C\++ and hlsl.                                       |
 | [PonyEngine.Surface](Modules/Surface)                                 | `PONY_ENGINE_SURFACE`                  | Surface service API module. The service controls an output video surface.                                                     |
@@ -95,7 +94,6 @@ The table of the module-platform compatibility:
 | [PonyEngine.Resource](Modules/Resource)                               | -                                | &check;                      |
 | [PonyEngine.Resource.Ext](Modules/Resource.Ext)                       | -                                | &check;                      |
 | [PonyEngine.Resource.Impl](Modules/Resource.Impl)                     | -                                | &check;                      |
-| [PonyEngine.Resource.File.Impl](Modules/Resource.File.Impl)           | -                                | &check;                      |
 | [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)           | -                                | &check;                      |
 | [PonyEngine.Shader](Modules/Shader)                                   | -                                | &check;                      |
 | [PonyEngine.Surface](Modules/Surface)                                 | -                                | &check;                      |

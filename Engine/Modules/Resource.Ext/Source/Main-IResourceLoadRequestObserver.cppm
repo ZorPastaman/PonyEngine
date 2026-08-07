@@ -11,20 +11,18 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Resource.Ext:IMemoryResourceData;
-
-import std;
+export module PonyEngine.Resource.Ext:IResourceLoadRequestObserver;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Memory resource data.
-	class IMemoryResourceData
+	/// @brief Resource load request observer.
+	class IResourceLoadRequestObserver
 	{
-		PONY_INTERFACE_BODY(IMemoryResourceData)
+		PONY_INTERFACE_BODY(IResourceLoadRequestObserver)
 
-		/// @brief Gets a resource memory.
-		/// @return Resource memory.
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::byte> Memory() const noexcept = 0;
+		/// @brief Invoked on a load error. Usually due to a dependency error.
+		virtual void OnError() = 0;
+		/// @brief Invoked on a cancel requested.
+		virtual void OnCancel() = 0;
 	};
 }

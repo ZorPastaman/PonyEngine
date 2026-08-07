@@ -11,13 +11,14 @@ export module PonyEngine.Resource.Ext;
 
 export import PonyEngine.Resource;
 
-export import :IFileResourceData;
-export import :ILoadableResourceData;
-export import :IMemoryResourceData;
-export import :IResourceContext;
-export import :IResourceModuleContext;
+export import :CollectionResource;
+export import :IResourceHub;
+export import :IResourceLoader;
+export import :IResourceLoadRequest;
+export import :IResourceLoadRequestObserver;
 export import :IResourceProvider;
-export import :IResourceRegistry;
-export import :ResourceHandle;
-export import :ResourceParams;
-export import :ResourceProviderHandle;
+export import :ResourceCollection;
+export import :ResourceLoadContext;
+export import :ResourceLoadData;
+export import :ResourceLoadInfo;
+export import :ResourceType;

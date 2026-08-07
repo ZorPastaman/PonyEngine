@@ -1,31 +1,34 @@
 message(STATUS "Configuring PonyEngine.Resource.Ext")
 
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.Resource)
+	message(FATAL_ERROR "PonyEngine.Resource wasn't configured")
+endif()
+
 add_library(PonyEngine.Resource.Ext STATIC)
 
 target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-IFileResourceData.cppm"
-	"Source/Main-ILoadableResourceData.cppm"
-	"Source/Main-IMemoryResourceData.cppm"
-	"Source/Main-IResourceContext.cppm"
-	"Source/Main-IResourceModuleContext.cppm"
+	"Source/Main-CollectionResource.cppm"
+	"Source/Main-IResourceHub.cppm"
+	"Source/Main-IResourceLoader.cppm"
+	"Source/Main-IResourceLoadRequest.cppm"
+	"Source/Main-IResourceLoadRequestObserver.cppm"
 	"Source/Main-IResourceProvider.cppm"
-	"Source/Main-IResourceRegistry.cppm"
-	"Source/Main-ResourceHandle.cppm"
-	"Source/Main-ResourceParams.cppm"
-	"Source/Main-ResourceProviderHandle.cppm"
+	"Source/Main-ResourceCollection.cppm"
+	"Source/Main-ResourceLoadContext.cppm"
+	"Source/Main-ResourceLoadData.cppm"
+	"Source/Main-ResourceLoadInfo.cppm"
+	"Source/Main-ResourceType.cppm"
 )
 
 set_target_properties(PonyEngine.Resource.Ext PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-if(NOT TARGET PonyEngine.Resource)
-	message(FATAL_ERROR "PonyEngine.Resource wasn't configured")
-endif()
 target_link_libraries(PonyEngine.Resource.Ext PUBLIC
-	PonyEngine.Resource
 	PonyEngine.Core
-	PonyEngine.Application
-	PonyEngine.Log
+	PonyEngine.Resource
 )

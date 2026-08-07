@@ -7,31 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.Resource:IResource;
+export module PonyEngine.Resource.Ext:ResourceLoadInfo;
 
 import std;
 
-import :ResourceID;
 import :ResourceType;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource.
-	class IResource
+	/// @brief Resource load info.
+	struct ResourceLoadInfo final
 	{
-		PONY_INTERFACE_BODY(IResource)
-
-		/// @brief Gets a resource ID.
-		/// @return Resource ID.
-		[[nodiscard("Pure function")]]
-		virtual ResourceID ResourceID() const noexcept = 0;
-		/// @brief Gets a resource type.
-		/// @return Resource type.
-		[[nodiscard("Pure function")]]
-		virtual ResourceType Type() const noexcept = 0;
+		ResourceType type; ///< Resource type.
+		std::span<const std::byte> dataMeta; ///< Resource data meta.
+		std::span<const std::byte> loadMeta; ///< Resource load meta.
+		std::span<const std::type_index> dataAccessTypes; ///< Resource access types.
 	};
 }

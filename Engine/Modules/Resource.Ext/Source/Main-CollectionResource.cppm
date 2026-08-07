@@ -7,20 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Ext:ResourceParams;
+export module PonyEngine.Resource.Ext:CollectionResource;
 
 import std;
 
 import PonyEngine.Resource;
 
+import :ResourceType;
+
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource parameters.
-	struct ResourceParams final
+	/// @brief Collection resource info.
+	struct CollectionResource final
 	{
 		ResourceID id; ///< Resource ID. Must be valid.
 		ResourceType type; ///< Resource type. Must be valid.
-		ResourceAvailability availability = ResourceAvailability::None; ///< Resource availability. Must have at least one flag set.
-		std::size_t index = 0uz; ///< Resource index.
+		std::span<const ResourceID> dependencies; ///< Dependencies. They are not validated on registration but must be available on the resource load.
+		std::span<const std::byte> dataMeta; ///< Resource data meta. It's used by a loader.
+		std::span<const std::byte> loadMeta; ///< Resource load meta. It's used by a loader.
+		std::size_t dataIndex = 0uz; ///< Resource data index.
 	};
 }

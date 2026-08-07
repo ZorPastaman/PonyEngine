@@ -7,26 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Object/Body.h"
-
-export module PonyEngine.Resource:IMemoryResource;
+export module PonyEngine.Resource.Ext:ResourceLoadData;
 
 import std;
 
-import :IResource;
-
 export namespace PonyEngine::Resource
 {
-	/// @brief Direct memory resource access.
-	class IMemoryResource : public IResource
+	/// @brief Resource load data.
+	struct ResourceLoadData final
 	{
-		PONY_INTERFACE_BODY(IMemoryResource)
-
-		/// @brief Gets a resource memory.
-		/// @return Resource memory.
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::byte> Memory() const noexcept = 0;
+		std::size_t dataAccessTypeIndex = std::numeric_limits<std::size_t>::max(); ///< Data access type index that will be used on a resource load.
+		std::vector<std::type_index> outputTypes; ///< Resource output types.
+		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>> loadData; ///< Load data that will be passed on a resource load.
 	};
 }

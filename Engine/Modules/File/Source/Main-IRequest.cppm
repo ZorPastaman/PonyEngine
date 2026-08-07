@@ -42,7 +42,7 @@ export namespace PonyEngine::File
 		///       And because of it, the request may complete event if you requested a cancel.
 		virtual void Cancel() = 0;
 
-		/// @brief Makes the thread sleep till the request is completed with success or failure.
+		/// @brief Makes the thread sleep till the request is completed with success or failure or cancel.
 		virtual void Wait() const noexcept = 0;
 	};
 }

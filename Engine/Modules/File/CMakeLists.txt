@@ -1,5 +1,9 @@
 message(STATUS "Configuring PonyEngine.File")
 
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+
 add_library(PonyEngine.File STATIC)
 
 target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES 

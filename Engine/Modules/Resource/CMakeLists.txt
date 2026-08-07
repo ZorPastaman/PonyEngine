@@ -1,21 +1,18 @@
 message(STATUS "Configuring PonyEngine.Resource")
 
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+
 add_library(PonyEngine.Resource STATIC)
 
 target_sources(PonyEngine.Resource PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	"Source/Main-IFileResource.cppm"
-	"Source/Main-ILoadableResource.cppm"
-	"Source/Main-ILoadRequest.cppm"
-	"Source/Main-IMemoryResource.cppm"
-	"Source/Main-IResource.cppm"
+	"Source/Main-IResourceRequest.cppm"
 	"Source/Main-IResourceService.cppm"
-	"Source/Main-LoadParams.cppm"
 	"Source/Main-RequestStatus.cppm"
-	"Source/Main-ResourceAvailability.cppm"
 	"Source/Main-ResourceID.cppm"
-	"Source/Main-ResourceType.cppm"
-)
+ )
 
 set_target_properties(PonyEngine.Resource PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE

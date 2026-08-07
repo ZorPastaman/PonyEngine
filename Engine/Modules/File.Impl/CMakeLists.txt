@@ -1,5 +1,12 @@
 message(STATUS "Configuring PonyEngine.File.Impl")
 
+if(NOT TARGET PonyEngine.Core)
+	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
+endif()
+if(NOT TARGET PonyEngine.File)
+	message(FATAL_ERROR "PonyEngine.File wasn't configured")
+endif()
+
 add_library(PonyEngine.File.Impl STATIC)
 
 target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES FILES 
@@ -16,9 +23,6 @@ set_target_properties(PonyEngine.File.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-if(NOT TARGET PonyEngine.File)
-	message(FATAL_ERROR "PonyEngine.File wasn't configured")
-endif()
 target_link_libraries(PonyEngine.File.Impl PRIVATE
 	PonyEngine.File
 	PonyEngine.Core
