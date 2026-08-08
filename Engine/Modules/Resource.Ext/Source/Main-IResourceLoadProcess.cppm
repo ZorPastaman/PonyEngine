@@ -11,18 +11,18 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Resource.Ext:IResourceLoadRequestObserver;
+export module PonyEngine.Resource.Ext:IResourceLoadProcess;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource load request observer.
-	class IResourceLoadRequestObserver
+	/// @brief Resource load process.
+	class IResourceLoadProcess
 	{
-		PONY_INTERFACE_BODY(IResourceLoadRequestObserver)
+		PONY_INTERFACE_BODY(IResourceLoadProcess)
 
-		/// @brief Invoked on a load error. Usually due to a dependency error.
-		virtual void OnError() = 0;
-		/// @brief Invoked on a cancel requested.
-		virtual void OnCancel() = 0;
+		/// @brief Cancels the load.
+		/// @note The cancel in the system is immediate but the process is kept alive till it's safe to release.
+		/// @note It's considered safe when the process sets any status to the @p IResourceLoadRequest.
+		virtual void Cancel() = 0;
 	};
 }

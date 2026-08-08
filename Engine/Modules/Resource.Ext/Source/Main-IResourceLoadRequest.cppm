@@ -15,23 +15,12 @@ export module PonyEngine.Resource.Ext:IResourceLoadRequest;
 
 import std;
 
-import :IResourceLoadRequestObserver;
-
 export namespace PonyEngine::Resource
 {
 	/// @brief Resource load request.
 	class IResourceLoadRequest
 	{
 		PONY_INTERFACE_BODY(IResourceLoadRequest)
-
-		/// @brief Checks if the operation cancel is requested.
-		/// @return @a True if it's requested; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsCancelRequested() const noexcept = 0;
-
-		/// @brief Sets the observer.
-		/// @param observer Observer to set. May be nullptr.
-		virtual void SetObserver(IResourceLoadRequestObserver* observer) = 0;
 
 		/// @brief Sets the success.
 		/// @param resources Resources. Must have all requested resource types.

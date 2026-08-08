@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Resource;
 
+import :IResourceLoadProcess;
 import :IResourceLoadRequest;
 import :ResourceLoadContext;
 import :ResourceLoadInfo;
@@ -36,6 +37,8 @@ export namespace PonyEngine::Resource
 		/// @brief Makes a load operation.
 		/// @param context Resource load context.
 		/// @param loadRequest Resource load request.
-		virtual void Load(const ResourceLoadContext& context, const std::shared_ptr<IResourceLoadRequest>& loadRequest) = 0;
+		/// @return Resource load process.
+		[[nodiscard("Weird call")]]
+		virtual std::shared_ptr<IResourceLoadProcess> Load(const ResourceLoadContext& context, IResourceLoadRequest& loadRequest) = 0;
 	};
 }
