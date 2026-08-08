@@ -116,16 +116,16 @@ export namespace PonyEngine::World
 		TypelessObjectHandle ResurrectObject(std::type_index objectType, const std::shared_ptr<void>& object);
 		/// @brief Kills an object.
 		/// @param handleId Object handle ID.
-		void KillObject(HandleID handleId);
+		void KillObject(ObjectHandleID handleId);
 
-		std::vector<HandleID> objectsSparse; ///< Sparse.
-		std::vector<HandleVersion> handleVersions; ///< Handle versions. Synced with the @p objectsSparse by index.
-		std::vector<HandleID> objectsDense; ///< Dense.
+		std::vector<ObjectHandleID> objectsSparse; ///< Sparse.
+		std::vector<ObjectHandleVersion> handleVersions; ///< Handle versions. Synced with the @p objectsSparse by index.
+		std::vector<ObjectHandleID> objectsDense; ///< Dense.
 		std::vector<Object> objects; ///< Objects. Synced with the @p objectsDense by index.
-		std::vector<HandleID> objectFreeList; ///< Object free list.
-		std::unordered_map<std::pair<void*, std::type_index>, HandleID> objectIndices; ///< Object index map.
+		std::vector<ObjectHandleID> objectFreeList; ///< Object free list.
+		std::unordered_map<std::pair<void*, std::type_index>, ObjectHandleID> objectIndices; ///< Object index map.
 
-		static_assert(sizeof(HandleID) <= sizeof(std::size_t), "HandleID is greater than std::size_t.");
+		static_assert(sizeof(ObjectHandleID) <= sizeof(std::size_t), "ObjectHandleID is greater than std::size_t.");
 	};
 }
 
@@ -187,10 +187,10 @@ namespace PonyEngine::World
 		}
 
 		const std::size_t denseSize = objectsDense.size();
-		const std::size_t bufferSize = Memory::CalculateBufferSize<HandleID>(denseSize) + Memory::CalculateBufferSize<bool, HandleID>(denseSize);
+		const std::size_t bufferSize = Memory::CalculateBufferSize<ObjectHandleID>(denseSize) + Memory::CalculateBufferSize<bool, ObjectHandleID>(denseSize);
 		const std::shared_ptr<Application::IBuffer> buffer = context.Application().CreateBuffer(bufferSize);
 		auto arena = Memory::Arena(buffer->Span());
-		const std::span<HandleID> objectsToRemove = arena.AllocateArray<HandleID>(denseSize);
+		const std::span<ObjectHandleID> objectsToRemove = arena.AllocateArray<ObjectHandleID>(denseSize);
 		const std::span<bool> aliveObjectFlags = arena.AllocateArray<bool>(denseSize);
 		std::ranges::fill(aliveObjectFlags, false);
 
@@ -217,7 +217,7 @@ namespace PonyEngine::World
 							continue;
 						}
 
-						const HandleID flagIndex = objectsSparse[handle.id];
+						const ObjectHandleID flagIndex = objectsSparse[handle.id];
 						foundCount += !aliveObjectFlags[flagIndex];
 						aliveObjectFlags[flagIndex] = true;
 
@@ -248,7 +248,7 @@ namespace PonyEngine::World
 		const auto objectTypePair = std::pair(object.get(), objectType);
 		if (const auto position = objectIndices.find(objectTypePair); position != objectIndices.cend())
 		{
-			const HandleID handleId = position->second;
+			const ObjectHandleID handleId = position->second;
 			return TypelessObjectHandle{.id = handleId, .version = handleVersions[handleId]};
 		}
 
@@ -257,15 +257,15 @@ namespace PonyEngine::World
 
 	TypelessObjectHandle ObjectTable::CreateObject(const std::type_index objectType, const std::shared_ptr<void>& object)
 	{
-		if (objectsSparse.size() >= std::numeric_limits<HandleID>::max()) [[unlikely]]
+		if (objectsSparse.size() >= std::numeric_limits<ObjectHandleID>::max()) [[unlikely]]
 		{
 			throw std::logic_error("Object list is full");
 		}
 
-		const HandleID handleId = static_cast<HandleID>(objectsSparse.size());
-		constexpr HandleVersion handleVersion = 1u;
+		const ObjectHandleID handleId = static_cast<ObjectHandleID>(objectsSparse.size());
+		constexpr ObjectHandleVersion handleVersion = 1u;
 
-		objectsSparse.push_back(static_cast<HandleID>(objectsDense.size()));
+		objectsSparse.push_back(static_cast<ObjectHandleID>(objectsDense.size()));
 		try
 		{
 			handleVersions.push_back(handleVersion);
@@ -309,19 +309,19 @@ namespace PonyEngine::World
 
 	TypelessObjectHandle ObjectTable::ResurrectObject(const std::type_index objectType, const std::shared_ptr<void>& object)
 	{
-		const HandleID handleId = objectFreeList.back();
+		const ObjectHandleID handleId = objectFreeList.back();
 		const auto objectTypePair = std::pair(object.get(), objectType);
 		objectIndices[objectTypePair] = handleId;
 		objectFreeList.pop_back();
-		objectsSparse[handleId] = static_cast<HandleID>(objectsDense.size());
-		const HandleVersion handleVersion = ++handleVersions[handleId];
+		objectsSparse[handleId] = static_cast<ObjectHandleID>(objectsDense.size());
+		const ObjectHandleVersion handleVersion = ++handleVersions[handleId];
 		objectsDense.push_back(handleId);
 		objects.push_back(Object{.object = object, .type = objectType});
 
 		return TypelessObjectHandle{.id = handleId, .version = handleVersion};
 	}
 
-	void ObjectTable::KillObject(const HandleID handleId)
+	void ObjectTable::KillObject(const ObjectHandleID handleId)
 	{
 		objectFreeList.push_back(handleId);
 
@@ -329,12 +329,12 @@ namespace PonyEngine::World
 		const auto objectTypePair = std::pair(object.object.get(), object.type);
 		objectIndices.erase(objectTypePair);
 
-		const HandleID lastHandle = objectsDense.back();
+		const ObjectHandleID lastHandle = objectsDense.back();
 		objectsDense[handleId] = lastHandle;
 		std::swap(objects[handleId], objects[lastHandle]);
 		objectsSparse[lastHandle] = handleId;
 
-		objectsSparse[handleId] = std::numeric_limits<HandleID>::max();
+		objectsSparse[handleId] = std::numeric_limits<ObjectHandleID>::max();
 		++handleVersions[handleId];
 		objectsDense.pop_back();
 		objects.pop_back();

@@ -13,14 +13,14 @@ import std;
 
 export namespace PonyEngine::World
 {
-	using HandleID = std::uint32_t; ///< Handle ID.
-	using HandleVersion = std::uint32_t; ///< Handle version.
+	using ObjectHandleID = std::uint32_t; ///< Object handle ID.
+	using ObjectHandleVersion = std::uint32_t; ///< Handle version.
 
 	/// @brief Typeless object handle. Don't use them directly. Use the @p ObjectHandle.
 	struct TypelessObjectHandle final
 	{
-		HandleID id = std::numeric_limits<HandleID>::max(); ///< Handle ID.
-		HandleVersion version = 0u; ///< Handle version.
+		ObjectHandleID id = std::numeric_limits<ObjectHandleID>::max(); ///< Handle ID.
+		ObjectHandleVersion version = 0u; ///< Handle version.
 
 		[[nodiscard("Pure operator")]]
 		constexpr auto operator <=>(const TypelessObjectHandle& other) const noexcept = default;
@@ -43,8 +43,12 @@ struct std::hash<PonyEngine::World::TypelessObjectHandle> final
 	[[nodiscard("Pure function")]]
 	size_t operator ()(const PonyEngine::World::TypelessObjectHandle& handle) const noexcept
 	{
-		const std::uint64_t hash = static_cast<std::uint64_t>(handle.id) << 32 | handle.version;
-		return std::hash<std::uint64_t>()(hash);
+		using Hash = std::uint64_t;
+		static_assert(sizeof(Hash) == sizeof(handle), "Invalid hash type.");
+
+		Hash hash;
+		std::memcpy(&hash, &handle, sizeof(Hash));
+		return std::hash<Hash>()(hash);
 	}
 };
 

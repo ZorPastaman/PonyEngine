@@ -13,20 +13,14 @@ import std;
 
 export namespace PonyEngine::RawInput
 {
+	using DeviceHandleID = std::uint32_t;
+	using DeviceHandleVersion = std::uint32_t;
+
 	/// @brief Device handle.
 	struct DeviceHandle final
 	{
-		std::uint32_t id = 0u; ///< ID. It's used only by the owner.
-
-		/// @brief Checks if the handle is valid.
-		/// @return @a True if it's valid; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		constexpr bool IsValid() const noexcept;
-
-		/// @brief Checks if the handle is valid.
-		/// @return @a True if it's valid; @a false otherwise.
-		[[nodiscard("Pure operator")]]
-		explicit constexpr operator bool() const noexcept;
+		DeviceHandleID id = std::numeric_limits<DeviceHandleID>::max(); ///< ID.
+		DeviceHandleVersion version = std::numeric_limits<DeviceHandleVersion>::min(); ///< Version.
 
 		[[nodiscard("Pure operator")]]
 		constexpr auto operator <=>(const DeviceHandle& other) const noexcept = default;
@@ -37,21 +31,13 @@ export template<>
 struct std::hash<PonyEngine::RawInput::DeviceHandle> final
 {
 	[[nodiscard("Pure function")]]
-	size_t operator ()(const PonyEngine::RawInput::DeviceHandle handle) const noexcept
+	size_t operator ()(const PonyEngine::RawInput::DeviceHandle& handle) const noexcept
 	{
-		return std::hash<std::uint32_t>()(handle.id);
+		using Hash = std::uint64_t;
+		static_assert(sizeof(Hash) == sizeof(handle), "Invalid hash type.");
+
+		Hash hash;
+		std::memcpy(&hash, &handle, sizeof(Hash));
+		return std::hash<Hash>()(hash);
 	}
 };
-
-namespace PonyEngine::RawInput
-{
-	constexpr bool DeviceHandle::IsValid() const noexcept
-	{
-		return id;
-	}
-
-	constexpr DeviceHandle::operator bool() const noexcept
-	{
-		return IsValid();
-	}
-}

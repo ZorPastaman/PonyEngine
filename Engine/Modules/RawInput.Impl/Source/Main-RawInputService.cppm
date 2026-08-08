@@ -20,6 +20,7 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Hash;
 import PonyEngine.Log;
+import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.Type;
 
@@ -145,6 +146,23 @@ export namespace PonyEngine::RawInput
 		/// @param connection Connection event.
 		void Connect(DeviceHandle device, const ConnectionEvent& connection);
 
+		/// @brief Checks if the device handle is invalid.
+		/// @param handle Handle to check.
+		/// @return @a True if it's invalid; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsInvalid(DeviceHandle handle) const noexcept;
+		/// @brief Makes a new device handle.
+		/// @return Device handle.
+		[[nodiscard("Weird call")]]
+		DeviceHandle MakeDeviceHandle();
+		/// @brief Resurrects a device handle.
+		/// @return Device handle.
+		[[nodiscard("Weird call")]]
+		DeviceHandle ResurrectDeviceHandle() noexcept;
+		/// @brief Kills the device handle.
+		/// @param handle Device handle to kill.
+		void KillDeviceHandle(DeviceHandle handle) noexcept;
+
 		/// @brief Calls connection observers.
 		/// @param device Device.
 		/// @param connection Connection event.
@@ -167,14 +185,15 @@ export namespace PonyEngine::RawInput
 		InputDeviceContainer devices; ///< Input devices.
 		RawInputQueue inputQueue; ///< Input queue.
 
+		std::vector<DeviceHandleVersion> deviceHandleVersions; ///< Device handle versions.
+		std::vector<DeviceHandleID> deadDeviceHandleIds; ///< Device handle IDs.
+		DeviceHandle lastInputDevice; ///< Last device that sent input.
+
 		std::unordered_map<std::uint32_t, std::vector<std::string>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
 		std::unordered_map<struct DeviceType, std::string> deviceTypeHashMap; ///< Device type hash map.
 		std::unordered_map<struct DeviceStyle, std::string> deviceStyleHashMap; ///< Device style hash map.
 
 		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
-
-		DeviceHandle lastInputDevice; ///< Last device that sent input.
-		DeviceHandle nextDeviceHandle; ///< Next device handle.
 	};
 }
 
@@ -182,9 +201,7 @@ namespace PonyEngine::RawInput
 {
 	RawInputService::RawInputService(const Application::IApplication& application) noexcept :
 		application{&application},
-		logService{this->application->FindInterface<Log::ILogService>()},
-		lastInputDevice{.id = 0u},
-		nextDeviceHandle{.id = 1u}
+		logService{this->application->FindInterface<Log::ILogService>()}
 	{
 	}
 
@@ -425,16 +442,20 @@ namespace PonyEngine::RawInput
 			}
 		}
 
-		if (!nextDeviceHandle.IsValid()) [[unlikely]]
+		const DeviceHandle currentHandle = deadDeviceHandleIds.empty()
+			? MakeDeviceHandle()
+			: ResurrectDeviceHandle();
+		try
 		{
-			throw std::overflow_error("No more device handles available");
+			devices.Add(currentHandle, deviceController, isConnected, params);
+		}
+		catch (...)
+		{
+			KillDeviceHandle(currentHandle);
+			throw;
 		}
 
-		const DeviceHandle currentHandle = nextDeviceHandle;
-		devices.Add(currentHandle, deviceController, isConnected, params);
-		++nextDeviceHandle.id;
-
-		PONY_LOG(logService, Log::LogType::Info, "Device registered. Handle: '0x{:X}'; Controller: '{}'; Name: '{}'.", 
+		PONY_LOG(logService, Log::LogType::Info, "Device registered. HandleID: '0x{:X}'; Controller: '{}'; Name: '{}'.", 
 			currentHandle.id, typeid(deviceController).name(), params.name);
 
 		ObserveDeviceAdded(currentHandle);
@@ -452,11 +473,12 @@ namespace PonyEngine::RawInput
 
 		if (lastInputDevice == deviceHandle)
 		{
-			lastInputDevice.id = 0u;
+			lastInputDevice = DeviceHandle{};
 		}
 
 		inputQueue.Remove(deviceHandle);
 		devices.Remove(deviceIndex);
+		KillDeviceHandle(deviceHandle);
 	}
 
 	Application::ITickable& RawInputService::Tickable() noexcept
@@ -544,6 +566,50 @@ namespace PonyEngine::RawInput
 	void RawInputService::Connect(const DeviceHandle device, const ConnectionEvent& connection)
 	{
 		inputQueue.AddConnection(device, connection);
+	}
+
+	bool RawInputService::IsInvalid(const DeviceHandle handle) const noexcept
+	{
+		return Math::IsEven(handle.version) || handle.id >= deviceHandleVersions.size() || deviceHandleVersions[handle.id] != handle.version;
+	}
+
+	DeviceHandle RawInputService::MakeDeviceHandle()
+	{
+		if (deviceHandleVersions.size() >= std::numeric_limits<DeviceHandleID>::max())
+		{
+			throw std::overflow_error("No more device handles available");
+		}
+
+		const DeviceHandleID handleId = static_cast<DeviceHandleID>(deviceHandleVersions.size());
+
+		constexpr DeviceHandleVersion handleVersion = 1u;
+		deviceHandleVersions.push_back(handleVersion);
+
+		return DeviceHandle{.id = handleId, .version = handleVersion};
+	}
+
+	DeviceHandle RawInputService::ResurrectDeviceHandle() noexcept
+	{
+		const DeviceHandleID handleId = deadDeviceHandleIds.back();
+		deadDeviceHandleIds.pop_back();
+
+		const DeviceHandleVersion handleVersion = ++deviceHandleVersions[handleId];
+
+		return DeviceHandle{.id = handleId, .version = handleVersion};
+	}
+
+	void RawInputService::KillDeviceHandle(const DeviceHandle handle) noexcept
+	{
+		try
+		{
+			++deviceHandleVersions[handle.id];
+			deadDeviceHandleIds.push_back(handle.id);
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On killing device handle. HandleID: '0x{:X}'.", handle.id);
+			// Just forget about this handle.
+		}
 	}
 
 	void RawInputService::ObserveConnection(const DeviceHandle device, const ConnectionEvent& connection) const noexcept
