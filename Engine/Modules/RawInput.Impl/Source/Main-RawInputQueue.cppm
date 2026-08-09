@@ -45,7 +45,7 @@ export namespace PonyEngine::RawInput
 		/// @return Device handle.
 		/// @remark It works correct only after calling @p SortEvents().
 		[[nodiscard("Pure function")]]
-		DeviceHandle Device(std::size_t index) const noexcept;
+		DeviceHandleID Device(std::size_t index) const noexcept;
 		/// @brief Gets an input event.
 		/// @param index Input event index.
 		/// @return Input event.
@@ -59,14 +59,14 @@ export namespace PonyEngine::RawInput
 		/// @brief Adds the input event.
 		/// @param device Device.
 		/// @param event Input event.
-		void AddInput(DeviceHandle device, const RawInputEvent& event);
+		void AddInput(DeviceHandleID device, const RawInputEvent& event);
 		/// @brief Adds the connection event.
 		/// @param device Device.
 		/// @param event Connection event.
-		void AddConnection(DeviceHandle device, const ConnectionEvent& event);
+		void AddConnection(DeviceHandleID device, const ConnectionEvent& event);
 		/// @brief Removes all the event for the device.
 		/// @param device Device.
-		void Remove(DeviceHandle device) noexcept;
+		void Remove(DeviceHandleID device) noexcept;
 		/// @brief Clears all the data.
 		void Clear() noexcept;
 
@@ -88,7 +88,7 @@ export namespace PonyEngine::RawInput
 			bool isConnected = false;
 		};
 
-		std::vector<DeviceHandle> devices; ///< Input device handles.
+		std::vector<DeviceHandleID> devices; ///< Input device handles.
 		std::vector<std::variant<InputData, ConnectionData>> events; ///< Input events.
 		std::vector<std::chrono::time_point<std::chrono::steady_clock>> eventTimes; ///< Input event times.
 
@@ -106,7 +106,7 @@ namespace PonyEngine::RawInput
 		return eventIndices.size();
 	}
 
-	DeviceHandle RawInputQueue::Device(const std::size_t index) const noexcept
+	DeviceHandleID RawInputQueue::Device(const std::size_t index) const noexcept
 	{
 		return devices[eventIndices[index]];
 	}
@@ -177,7 +177,7 @@ namespace PonyEngine::RawInput
 		});
 	}
 
-	void RawInputQueue::AddInput(const DeviceHandle device, const RawInputEvent& event)
+	void RawInputQueue::AddInput(const DeviceHandleID device, const RawInputEvent& event)
 	{
 		assert(event.axes.size() == event.values.size() && "Incorrect event axes/values.");
 
@@ -221,7 +221,7 @@ namespace PonyEngine::RawInput
 		}
 	}
 
-	void RawInputQueue::AddConnection(const DeviceHandle device, const ConnectionEvent& event)
+	void RawInputQueue::AddConnection(const DeviceHandleID device, const ConnectionEvent& event)
 	{
 		devices.push_back(device);
 		try
@@ -244,7 +244,7 @@ namespace PonyEngine::RawInput
 		}
 	}
 
-	void RawInputQueue::Remove(const DeviceHandle device) noexcept
+	void RawInputQueue::Remove(const DeviceHandleID device) noexcept
 	{
 		for (std::size_t i = devices.size(); i-- > 0uz; )
 		{

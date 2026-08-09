@@ -41,13 +41,13 @@ export namespace PonyEngine::RawInput
 		/// @param handle Device handle.
 		/// @return Handle index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(DeviceHandle handle) const noexcept;
+		std::size_t IndexOf(DeviceHandleID handle) const noexcept;
 
 		/// @brief Gets a device handle at the @p index.
 		/// @param index Index.
 		/// @return Device handle.
 		[[nodiscard("Pure function")]]
-		DeviceHandle Handle(std::size_t index) const noexcept;
+		DeviceHandleID Handle(std::size_t index) const noexcept;
 		/// @brief Gets a device controller at the @p index.
 		/// @param index Index.
 		/// @return Device controller.
@@ -110,7 +110,7 @@ export namespace PonyEngine::RawInput
 		/// @param handle Device handle.
 		/// @param isConnected Is the device connected?
 		/// @param params Device parameters.
-		void Add(DeviceHandle handle, IDeviceController& controller, bool isConnected, const DeviceParams& params);
+		void Add(DeviceHandleID handle, IDeviceController& controller, bool isConnected, const DeviceParams& params);
 		/// @brief Removes a device.
 		/// @param index Device index.
 		void Remove(std::size_t index) noexcept;
@@ -140,7 +140,7 @@ export namespace PonyEngine::RawInput
 		/// @return Axis index.
 		std::size_t AddAxis(std::size_t deviceIndex, Axis axis);
 
-		std::vector<DeviceHandle> handles; ///< Device handles.
+		std::vector<DeviceHandleID> handles; ///< Device handles.
 		std::vector<IDeviceController*> controllers; ///< Device controller.
 		std::vector<std::string> deviceNames; ///< Device names.
 		std::vector<struct DeviceType> deviceTypes; ///< Device types.
@@ -163,9 +163,15 @@ namespace PonyEngine::RawInput
 		return handles.size();
 	}
 
-	std::size_t InputDeviceContainer::IndexOf(const DeviceHandle handle) const noexcept
+	std::size_t InputDeviceContainer::IndexOf(const DeviceHandleID handle) const noexcept
 	{
-		return std::ranges::find(handles, handle) - handles.cbegin();
+		auto position = std::ranges::lower_bound(handles, handle);
+		if (position != handles.cend() && *position != handle)
+		{
+			position = handles.cend();
+		}
+
+		return position - handles.cbegin();
 	}
 
 	IDeviceController& InputDeviceContainer::Controller(const std::size_t index) const noexcept
@@ -173,7 +179,7 @@ namespace PonyEngine::RawInput
 		return *controllers[index];
 	}
 
-	DeviceHandle InputDeviceContainer::Handle(const std::size_t index) const noexcept
+	DeviceHandleID InputDeviceContainer::Handle(const std::size_t index) const noexcept
 	{
 		return handles[index];
 	}
@@ -265,31 +271,56 @@ namespace PonyEngine::RawInput
 		std::ranges::fill(deltas, 0.f);
 	}
 
-	void InputDeviceContainer::Add(const DeviceHandle handle, IDeviceController& controller, const bool isConnected, const DeviceParams& params)
+	void InputDeviceContainer::Add(const DeviceHandleID handle, IDeviceController& controller, const bool isConnected, const DeviceParams& params)
 	{
 		const std::size_t initialSize = Size();
+		const std::size_t index = std::ranges::lower_bound(handles, handle) - handles.cbegin();
 
 		try
 		{
-			handles.push_back(handle);
-			controllers.push_back(&controller);
-			deviceNames.push_back(std::string(params.name));
-			deviceTypes.push_back(params.type);
-			deviceStyles.push_back(params.style);
-			features.push_back(std::vector(params.features.cbegin(), params.features.cend()));
-			connections.push_back(isConnected);
-			axisIndices.push_back(std::vector<std::size_t>());
+			handles.insert(handles.cbegin() + index, handle);
+			controllers.insert(controllers.cbegin() + index, &controller);
+			deviceNames.insert(deviceNames.cbegin() + index, std::string(params.name));
+			deviceTypes.insert(deviceTypes.cbegin() + index, params.type);
+			deviceStyles.insert(deviceStyles.cbegin() + index, params.style);
+			features.insert(features.cbegin() + index, std::vector(params.features.cbegin(), params.features.cend()));
+			connections.insert(connections.cbegin() + index, isConnected);
+			axisIndices.insert(axisIndices.cbegin() + index, std::vector<std::size_t>());
 		}
 		catch (...)
 		{
-			axisIndices.resize(initialSize);
-			connections.resize(initialSize);
-			features.resize(initialSize);
-			deviceStyles.resize(initialSize);
-			deviceTypes.resize(initialSize);
-			deviceNames.resize(initialSize);
-			controllers.resize(initialSize);
-			handles.resize(initialSize);
+			if (axisIndices.size() != initialSize)
+			{
+				axisIndices.erase(axisIndices.cbegin() + index);
+			}
+			if (connections.size() != initialSize)
+			{
+				connections.erase(connections.cbegin() + index);
+			}
+			if (features.size() != initialSize)
+			{
+				features.erase(features.cbegin() + index);
+			}
+			if (deviceStyles.size() != initialSize)
+			{
+				deviceStyles.erase(deviceStyles.cbegin() + index);
+			}
+			if (deviceTypes.size() != initialSize)
+			{
+				deviceTypes.erase(deviceTypes.cbegin() + index);
+			}
+			if (deviceNames.size() != initialSize)
+			{
+				deviceNames.erase(deviceNames.cbegin() + index);
+			}
+			if (controllers.size() != initialSize)
+			{
+				controllers.erase(controllers.cbegin() + index);
+			}
+			if (handles.size() != initialSize)
+			{
+				handles.erase(handles.cbegin() + index);
+			}
 
 			throw;
 		}

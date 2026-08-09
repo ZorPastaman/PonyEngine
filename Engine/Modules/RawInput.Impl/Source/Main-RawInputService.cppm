@@ -112,7 +112,7 @@ export namespace PonyEngine::RawInput
 			/// @param rawInput Raw input service.
 			/// @param device Device handle.
 			[[nodiscard("Pure constructor")]]
-			explicit InputRegistry(RawInputService& rawInput, DeviceHandle device) noexcept;
+			explicit InputRegistry(RawInputService& rawInput, DeviceHandleID device) noexcept;
 			[[nodiscard("Pure constructor")]]
 			InputRegistry(const InputRegistry& other) noexcept = default;
 			[[nodiscard("Pure constructor")]]
@@ -128,7 +128,7 @@ export namespace PonyEngine::RawInput
 
 		private:
 			RawInputService* rawInput; ///< Raw input service.
-			DeviceHandle device; ///< Device handle.
+			DeviceHandleID device; ///< Device handle.
 		};
 
 		/// @brief Ticks controllers.
@@ -140,11 +140,11 @@ export namespace PonyEngine::RawInput
 		/// @brief Adds the input.
 		/// @param device Input device.
 		/// @param input Input event.
-		void AddInput(DeviceHandle device, const RawInputEvent& input);
+		void AddInput(DeviceHandleID device, const RawInputEvent& input);
 		/// @brief Adds the connection event.
 		/// @param device Input device.
 		/// @param connection Connection event.
-		void Connect(DeviceHandle device, const ConnectionEvent& connection);
+		void Connect(DeviceHandleID device, const ConnectionEvent& connection);
 
 		/// @brief Checks if the device handle is invalid.
 		/// @param handle Handle to check.
@@ -212,73 +212,80 @@ namespace PonyEngine::RawInput
 
 	float RawInputService::Value(const Axis axis) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		return devices.Value(axis);
 	}
 
 	float RawInputService::Value(const Axis axis, const DeviceHandle deviceHandle) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.Value(axis, devices.IndexOf(deviceHandle));
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
+		return devices.Value(axis, devices.IndexOf(deviceHandle.id));
 	}
 
 	DeviceHandle RawInputService::LastInputDevice() const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		return lastInputDevice;
 	}
 
 	std::size_t RawInputService::DeviceCount() const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		return devices.Size();
 	}
 
 	DeviceHandle RawInputService::Device(const std::size_t index) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.Handle(index);
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		const DeviceHandleID id = devices.Handle(index);
+		return DeviceHandle{.id = id, .version = deviceHandleVersions[id]};
 	}
 
 	bool RawInputService::IsValid(const DeviceHandle deviceHandle) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.IndexOf(deviceHandle) < devices.Size();
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		return !IsInvalid(deviceHandle);
 	}
 
 	bool RawInputService::IsConnected(const DeviceHandle deviceHandle) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.IsConnected(devices.IndexOf(deviceHandle));
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
+		return devices.IsConnected(devices.IndexOf(deviceHandle.id));
 	}
 
 	std::string_view RawInputService::DeviceName(const DeviceHandle deviceHandle) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.DeviceName(devices.IndexOf(deviceHandle));
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
+		return devices.DeviceName(devices.IndexOf(deviceHandle.id));
 	}
 
 	struct DeviceType RawInputService::DeviceType(const DeviceHandle deviceHandle) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.DeviceType(devices.IndexOf(deviceHandle));
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
+		return devices.DeviceType(devices.IndexOf(deviceHandle.id));
 	}
 
 	struct DeviceStyle RawInputService::DeviceStyle(const DeviceHandle deviceHandle) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.DeviceStyle(devices.IndexOf(deviceHandle));
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
+		return devices.DeviceStyle(devices.IndexOf(deviceHandle.id));
 	}
 
 	void* RawInputService::FindFeature(const DeviceHandle deviceHandle, const std::type_index type) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		return devices.FindFeature(devices.IndexOf(deviceHandle), type);
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
+		return devices.FindFeature(devices.IndexOf(deviceHandle.id), type);
 	}
 
 	Axis RawInputService::MakeAxis(const std::string_view axis)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 
 		const std::uint32_t hash = Hash::FNV1a32(axis);
 		auto axisId = Axis{.hash = hash};
@@ -294,7 +301,7 @@ namespace PonyEngine::RawInput
 				PONY_LOG(logService, Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
 				if (axes.size() >= std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 				{
-					throw std::bad_alloc();
+					throw std::overflow_error("Max number of axis with the same hash has been reached");
 				}
 
 				axes.push_back(std::string(axis));
@@ -312,14 +319,14 @@ namespace PonyEngine::RawInput
 
 	bool RawInputService::IsAxisValid(const Axis axis) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		const auto position = axisHashMap.find(axis.hash);
 		return position != axisHashMap.cend() && axis.index < position->second.size();
 	}
 
 	std::string_view RawInputService::GetAxisString(const Axis axis) const
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		const auto position = axisHashMap.find(axis.hash);
 		if (position == axisHashMap.cend() || axis.index >= position->second.size()) [[unlikely]]
 		{
@@ -331,7 +338,7 @@ namespace PonyEngine::RawInput
 
 	struct DeviceType RawInputService::MakeDeviceType(const std::string_view deviceType)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 
 		const auto deviceTypeId = RawInput::DeviceType{ .hash = Hash::FNV1a64(deviceType) };
 
@@ -353,13 +360,13 @@ namespace PonyEngine::RawInput
 
 	bool RawInputService::IsDeviceTypeValid(const struct DeviceType deviceType) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		return deviceTypeHashMap.contains(deviceType);
 	}
 
 	std::string_view RawInputService::GetDeviceTypeString(const struct DeviceType deviceType) const
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 
 		const auto position = deviceTypeHashMap.find(deviceType);
 		if (position == deviceTypeHashMap.cend()) [[unlikely]]
@@ -372,7 +379,7 @@ namespace PonyEngine::RawInput
 
 	struct DeviceStyle RawInputService::MakeDeviceStyle(const std::string_view deviceStyle)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 
 		const auto deviceStyleId = RawInput::DeviceStyle{ .hash = Hash::FNV1a64(deviceStyle) };
 
@@ -394,13 +401,13 @@ namespace PonyEngine::RawInput
 
 	bool RawInputService::IsDeviceStyleValid(const struct DeviceStyle deviceStyle) const noexcept
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		return deviceStyleHashMap.contains(deviceStyle);
 	}
 
 	std::string_view RawInputService::GetDeviceStyleString(const struct DeviceStyle deviceStyle) const
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 
 		const auto position = deviceStyleHashMap.find(deviceStyle);
 		if (position == deviceStyleHashMap.cend()) [[unlikely]]
@@ -413,13 +420,13 @@ namespace PonyEngine::RawInput
 
 	void RawInputService::AddObserver(IRawInputObserver& observer)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		inputObservers.push_back(&observer);
 	}
 
 	void RawInputService::RemoveObserver(IRawInputObserver& observer)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		const auto position = std::ranges::find(inputObservers, &observer);
 		assert(position != inputObservers.cend() && "Observer wasn't added");
 		inputObservers.erase(position);
@@ -427,7 +434,7 @@ namespace PonyEngine::RawInput
 
 	DeviceHandle RawInputService::RegisterDevice(IDeviceController& deviceController, const bool isConnected, const DeviceParams& params)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		assert(IsDeviceTypeValid(params.type) && "Device type is invalid");
 		assert(IsDeviceStyleValid(params.style) && "Device style is invalid");
 		for (const FeatureEntry& feature : params.features)
@@ -438,7 +445,7 @@ namespace PonyEngine::RawInput
 		{
 			for (std::size_t j = 0uz; j < i; ++j)
 			{
-				assert(params.features[i].featureType == params.features[j].featureType && "Feature type duplicate found");
+				assert(params.features[i].featureType == params.features[j].featureType && "Feature type duplicate found.");
 			}
 		}
 
@@ -447,7 +454,7 @@ namespace PonyEngine::RawInput
 			: ResurrectDeviceHandle();
 		try
 		{
-			devices.Add(currentHandle, deviceController, isConnected, params);
+			devices.Add(currentHandle.id, deviceController, isConnected, params);
 		}
 		catch (...)
 		{
@@ -465,8 +472,9 @@ namespace PonyEngine::RawInput
 
 	void RawInputService::UnregisterDevice(const DeviceHandle deviceHandle, IDeviceController& deviceController)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		const std::size_t deviceIndex = devices.IndexOf(deviceHandle);
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
+		const std::size_t deviceIndex = devices.IndexOf(deviceHandle.id);
 		assert(&devices.Controller(deviceIndex) == &deviceController && "Invalid controller");
 
 		ObserveDeviceRemoved(deviceHandle);
@@ -476,7 +484,7 @@ namespace PonyEngine::RawInput
 			lastInputDevice = DeviceHandle{};
 		}
 
-		inputQueue.Remove(deviceHandle);
+		inputQueue.Remove(deviceHandle.id);
 		devices.Remove(deviceIndex);
 		KillDeviceHandle(deviceHandle);
 	}
@@ -500,7 +508,7 @@ namespace PonyEngine::RawInput
 		ProcessInputQueue();
 	}
 
-	RawInputService::InputRegistry::InputRegistry(RawInputService& rawInput, const DeviceHandle device) noexcept :
+	RawInputService::InputRegistry::InputRegistry(RawInputService& rawInput, const DeviceHandleID device) noexcept :
 		rawInput{&rawInput},
 		device(device)
 	{
@@ -521,8 +529,8 @@ namespace PonyEngine::RawInput
 		for (std::size_t i = 0uz; i < devices.Size(); ++i)
 		{
 			IDeviceController& controller = devices.Controller(i);
-			const DeviceHandle deviceHandle = devices.Handle(i);
-			auto registry = InputRegistry(*this, deviceHandle);
+			const DeviceHandleID deviceHandleId = devices.Handle(i);
+			auto registry = InputRegistry(*this, deviceHandleId);
 			PONY_LOG(logService, Log::LogType::Verbose, "Ticking '{}' input device controller.", typeid(controller).name());
 			controller.Tick(registry);
 		}
@@ -532,7 +540,8 @@ namespace PonyEngine::RawInput
 	{
 		for (std::size_t eventIndex = 0uz; eventIndex < inputQueue.EventCount(); ++eventIndex)
 		{
-			const DeviceHandle device = inputQueue.Device(eventIndex);
+			const DeviceHandleID device = inputQueue.Device(eventIndex);
+			const auto deviceHandle = DeviceHandle{.id = device, .version = deviceHandleVersions[device]};
 			const std::variant<RawInputEvent, ConnectionEvent> event = inputQueue.Event(eventIndex);
 			const std::size_t deviceIndex = devices.IndexOf(device);
 
@@ -544,26 +553,26 @@ namespace PonyEngine::RawInput
 					{
 						devices.Value(deviceIndex, inputEvent.axes[axisIndex], inputEvent.values[axisIndex], inputEvent.eventType);
 					}
-					lastInputDevice = device;
+					lastInputDevice = deviceHandle;
 
-					ObserveInput(device, inputEvent);
+					ObserveInput(deviceHandle, inputEvent);
 				},
 				[&](const ConnectionEvent& connectionEvent)
 				{
-					PONY_LOG(logService, Log::LogType::Debug, "Connection status of device '0x{:X}' changed to '{}'.", device.id, connectionEvent.isConnected);
+					PONY_LOG(logService, Log::LogType::Debug, "Connection status of device '0x{:X}' changed to '{}'.", device, connectionEvent.isConnected);
 					devices.IsConnected(devices.IndexOf(device), connectionEvent.isConnected);
-					ObserveConnection(device, connectionEvent);
+					ObserveConnection(deviceHandle, connectionEvent);
 				}
 			}, event);
 		}
 	}
 
-	void RawInputService::AddInput(const DeviceHandle device, const RawInputEvent& input)
+	void RawInputService::AddInput(const DeviceHandleID device, const RawInputEvent& input)
 	{
 		inputQueue.AddInput(device, input);
 	}
 
-	void RawInputService::Connect(const DeviceHandle device, const ConnectionEvent& connection)
+	void RawInputService::Connect(const DeviceHandleID device, const ConnectionEvent& connection)
 	{
 		inputQueue.AddConnection(device, connection);
 	}
