@@ -44,7 +44,7 @@ namespace PonyEngine::Log
 {
 	void LogServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		logService = std::make_unique<LogService>();
+		logService = std::make_unique<LogService>(context.Application());
 
 		try
 		{

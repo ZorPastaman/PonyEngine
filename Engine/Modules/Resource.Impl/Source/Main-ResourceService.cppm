@@ -118,6 +118,7 @@ namespace PonyEngine::Resource
 	ResourceCollection ResourceService::RegisterCollection(IResourceProvider& provider,
 		const std::span<const CollectionResource> resources, const std::span<const std::type_index> dataAccessTypes)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		assert(!dataAccessTypes.empty() && "Empty data access types");
 
 		std::vector<ResourceID> resourceIds;
@@ -214,6 +215,8 @@ namespace PonyEngine::Resource
 
 	void ResourceService::UnregisterCollection(IResourceProvider& provider, const ResourceCollection collection)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+
 		const auto lock = std::unique_lock(stateMutex);
 
 		assert(resourceCollectionVersions[collection.id] == collection.version && "Invalid collection");
@@ -231,6 +234,8 @@ namespace PonyEngine::Resource
 
 	void ResourceService::RegisterLoader(IResourceLoader& loader, const std::span<const ResourceType> types)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+
 		const auto lock = std::unique_lock(stateMutex);
 
 		for (const ResourceType type : types)
@@ -244,6 +249,8 @@ namespace PonyEngine::Resource
 
 	void ResourceService::UnregisterLoader(IResourceLoader& loader)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+
 		const auto lock = std::unique_lock(stateMutex);
 
 		const std::size_t index = loaderContainer.IndexOf(loader);

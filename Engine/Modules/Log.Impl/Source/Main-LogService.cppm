@@ -26,8 +26,10 @@ export namespace PonyEngine::Log
 	class LogService final : public ILogService, public ILogHub
 	{
 	public:
+		/// @brief Creates a log service.
+		/// @param application Application.
 		[[nodiscard("Pure constuctor")]]
-		LogService() noexcept = default;
+		LogService(Application::IApplication& application) noexcept;
 		LogService(const LogService&) = delete;
 		LogService(LogService&&) = delete;
 
@@ -59,6 +61,8 @@ export namespace PonyEngine::Log
 
 		inline static thread_local std::string logString; ///< Log string.
 
+		Application::IApplication* application; ///< Application.
+
 		std::vector<ILogger*> loggers; ////< Loggers.
 		mutable std::mutex logMutex; ///< Log mutex.
 	};
@@ -66,6 +70,11 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
+	LogService::LogService(Application::IApplication& application) noexcept :
+		application{&application}
+	{
+	}
+
 	LogService::~LogService() noexcept
 	{
 		assert(loggers.size() == 0uz && "Some loggers weren't removed.");
@@ -154,6 +163,8 @@ namespace PonyEngine::Log
 
 	void LogService::AddLogger(ILogger& logger)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+
 		const auto lock = std::lock_guard(logMutex);
 		assert(std::ranges::find(loggers, &logger) == loggers.cend() && "Logger is already added");
 		loggers.push_back(&logger);
@@ -161,6 +172,8 @@ namespace PonyEngine::Log
 
 	void LogService::RemoveLogger(ILogger& logger)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
+
 		const auto lock = std::lock_guard(logMutex);
 		const auto position = std::ranges::find(loggers, &logger);
 		assert(position != loggers.cend() && "Logger wasn't added");

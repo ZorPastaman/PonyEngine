@@ -27,9 +27,11 @@ export namespace PonyEngine::Log
 
 		/// @brief Adds the logger.
 		/// @param logger Logger to add. Must be unique.
+		/// @note The function must be called on a main thread.
 		virtual void AddLogger(ILogger& logger) = 0;
 		/// @brief Removes the logger.
 		/// @param logger Logger to remove. Must be previously added.
+		/// @note The function must be called on a main thread.
 		virtual void RemoveLogger(ILogger& logger) = 0;
 	};
 }

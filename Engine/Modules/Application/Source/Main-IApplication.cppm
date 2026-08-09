@@ -272,6 +272,7 @@ export namespace PonyEngine::Application
 
 		/// @brief Gets thread roles.
 		/// @return Thread roles.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const std::string_view> ThreadRoles() const noexcept = 0;
 		/// @brief Creates a thread control.
