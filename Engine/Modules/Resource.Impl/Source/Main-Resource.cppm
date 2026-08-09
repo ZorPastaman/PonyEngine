@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Impl:ResourceEntry;
+export module PonyEngine.Resource.Impl:Resource;
 
 import std;
 
@@ -15,13 +15,15 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource entry.
-	struct ResourceEntry final
+	struct Resource final
 	{
-		ResourceID id; ///< Resource ID.
-		ResourceType type; ///< Resource type.
-		ResourceAvailability availability = ResourceAvailability::None; ///< Resource availability.
-		std::size_t index = 0uz; ///< Resource index.
-		IResourceProvider* provider = nullptr; ///< Resource provider.
+		ResourceID id;
+		ResourceType type;
+		std::vector<ResourceID> dependencies;
+		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>> loadData;
+		std::vector<std::type_index> outputTypes;
+		ResourceCollectionID collection;
+		std::size_t index = std::numeric_limits<std::size_t>::max();
+		std::type_index dataAccessType;
 	};
 }

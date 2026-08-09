@@ -584,7 +584,7 @@ namespace PonyEngine::RawInput
 
 	DeviceHandle RawInputService::MakeDeviceHandle()
 	{
-		if (deviceHandleVersions.size() >= std::numeric_limits<DeviceHandleID>::max())
+		if (deviceHandleVersions.size() >= std::numeric_limits<DeviceHandleID>::max()) [[unlikely]]
 		{
 			throw std::overflow_error("No more device handles available");
 		}

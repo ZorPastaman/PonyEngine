@@ -12,6 +12,7 @@ export module PonyEngine.Resource.Ext;
 export import PonyEngine.Resource;
 
 export import :CollectionResource;
+export import :EngineResourceType;
 export import :IResourceHub;
 export import :IResourceLoader;
 export import :IResourceLoadProcess;

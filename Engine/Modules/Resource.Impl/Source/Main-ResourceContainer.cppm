@@ -7,21 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyEngine.Resource.Impl:ResourceContainer;
 
 import std;
 
 import PonyEngine.Resource.Ext;
 
-import :ResourceEntry;
+import :Resource;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource container.
 	class ResourceContainer final
 	{
 	public:
@@ -32,107 +27,72 @@ export namespace PonyEngine::Resource
 
 		~ResourceContainer() noexcept = default;
 
-		/// @brief Gets a resource entry.
-		/// @param resourceId Resource ID.
-		/// @return Resource entry; @a nullptr if not found.
 		[[nodiscard("Pure function")]]
-		const ResourceEntry* GetResource(ResourceID resourceId) const noexcept;
-		/// @brief Checks if the container is empty.
-		/// @return @a True if it's empty; @a false otherwise.
+		bool Contains(ResourceID resourceId) const noexcept;
 		[[nodiscard("Pure function")]]
-		bool Empty() const noexcept;
+		std::size_t TypeCount(ResourceType type) const noexcept;
 
-		/// @brief Adds a resource.
-		/// @param params Resource parameters.
-		/// @param provider Resource provider.
-		/// @param handle Resource handle.
-		void AddResource(const ResourceParams& params, IResourceProvider& provider, ResourceHandle handle);
-		/// @brief Removes a resource.
-		/// @param handle Resource handle.
-		void RemoveResource(ResourceHandle handle);
-		/// @brief Clears the container.
+		void Add(ResourceID id, Resource&& resource);
+		void Remove(ResourceID id) noexcept;
 		void Clear() noexcept;
-
-		/// @brief Gets the handle map.
-		/// @return Handle map.
-		[[nodiscard("Pure function")]]
-		const std::unordered_map<ResourceHandle, ResourceID>& Handles() const noexcept;
 
 		ResourceContainer& operator =(const ResourceContainer&) = delete;
 		ResourceContainer& operator =(ResourceContainer&&) = delete;
 
 	private:
-		std::unordered_map<ResourceID, ResourceEntry> resources; ///< ResourceID to resource entry map.
-		std::unordered_map<ResourceHandle, ResourceID> handleToIdMap; ///< Resource handle to resource ID map.
+		std::unordered_map<ResourceID, Resource> resources;
+		std::unordered_map<ResourceType, std::size_t> typeCounts;
 	};
 }
 
 namespace PonyEngine::Resource
 {
-	const ResourceEntry* ResourceContainer::GetResource(const ResourceID resourceId) const noexcept
+	bool ResourceContainer::Contains(const ResourceID resourceId) const noexcept
 	{
-		if (const auto position = resources.find(resourceId); position != resources.cend())
-		{
-			return &position->second;
-		}
-
-		return nullptr;
+		return resources.contains(resourceId);
 	}
 
-	bool ResourceContainer::Empty() const noexcept
+	std::size_t ResourceContainer::TypeCount(const ResourceType type) const noexcept
 	{
-		return handleToIdMap.empty();
-	}
-
-	void ResourceContainer::AddResource(const ResourceParams& params, IResourceProvider& provider, const ResourceHandle handle)
-	{
-		assert(!handleToIdMap.contains(handle) && "The handle has already been added.");
-
-		if (resources.contains(params.id)) [[unlikely]]
+		if (const auto position = typeCounts.find(type); position != typeCounts.cend())
 		{
-			throw std::invalid_argument("Resource ID was already added");
+			return position->second;
 		}
 
-		handleToIdMap.emplace(handle, params.id);
+		return 0uz;
+	}
+
+	void ResourceContainer::Add(const ResourceID id, Resource&& resource)
+	{
+		if (!typeCounts.contains(resource.type))
+		{
+			typeCounts[resource.type] = 0uz;
+		}
+		++typeCounts[resource.type];
+
 		try
 		{
-			resources[params.id] = ResourceEntry
-			{
-				.id = params.id,
-				.type = params.type,
-				.availability = params.availability,
-				.index = params.index,
-				.provider = &provider
-			};
+			resources.emplace(id, std::move(resource));
 		}
 		catch (...)
 		{
-			handleToIdMap.erase(handle);
+			--typeCounts[resource.type];
 			throw;
 		}
 	}
 
-	void ResourceContainer::RemoveResource(const ResourceHandle handle)
+	void ResourceContainer::Remove(const ResourceID id) noexcept
 	{
-		if (const auto position = handleToIdMap.find(handle); position != handleToIdMap.cend())
+		if (const auto position = resources.find(id); position != resources.cend())
 		{
-			resources.erase(position->second);
-			handleToIdMap.erase(position);
-		}
-		else
-		{
-			throw std::invalid_argument("Resource handle not found");
+			--typeCounts[position->second.type];
+			resources.erase(position);
 		}
 	}
 
 	void ResourceContainer::Clear() noexcept
 	{
+		typeCounts.clear();
 		resources.clear();
-		handleToIdMap.clear();
-	}
-
-	const std::unordered_map<ResourceHandle, ResourceID>& ResourceContainer::Handles() const noexcept
-	{
-		return handleToIdMap;
 	}
 }

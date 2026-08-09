@@ -35,20 +35,24 @@ export namespace PonyEngine::Resource
 		/// @param resources Collection resources.
 		/// @param dataAccessTypes Data access types.
 		/// @return Resource collection.
+		/// @note The function is thread-safe.
 		[[nodiscard("Must be used to unregister")]]
 		virtual ResourceCollection RegisterCollection(IResourceProvider& provider, std::span<const CollectionResource> resources, 
 			std::span<const std::type_index> dataAccessTypes) = 0;
 		/// @brief Unregisters the resource collection.
 		/// @param provider Resource provider.
 		/// @param collection Previously registers resource collection.
+		/// @note The function is thread-safe.
 		virtual void UnregisterCollection(IResourceProvider& provider, ResourceCollection collection) = 0;
 
 		/// @brief Registers the loader.
 		/// @param loader Loader. Must be kept alive till it's unregistered.
 		/// @param types Resource types.
+		/// @note The function is thread-safe.
 		virtual void RegisterLoader(IResourceLoader& loader, std::span<const ResourceType> types) = 0;
 		/// @brief Unregisters the loader.
 		/// @param loader Loader.
+		/// @note The function is thread-safe.
 		virtual void UnregisterLoader(IResourceLoader& loader) = 0;
 
 		/// @brief Makes a resource ID from the resource ID string.
