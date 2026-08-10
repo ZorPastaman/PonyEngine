@@ -27,6 +27,7 @@ import :CollectionContainer;
 import :LoaderContainer;
 import :Resource;
 import :ResourceContainer;
+import :ResourceRequest;
 
 export namespace PonyEngine::Resource
 {
@@ -39,12 +40,13 @@ export namespace PonyEngine::Resource
 		ResourceService(const ResourceService&) = delete;
 		ResourceService(ResourceService&&) = delete;
 
-		~ResourceService() noexcept = default;
+		~ResourceService() noexcept;
 
 		[[nodiscard("Pure function")]] 
 		virtual bool HasResource(ResourceID resourceId) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsResourceTypeOf(ResourceID resourceId, std::type_index type) const override;
+		[[nodiscard("Pure function")]] 
+		virtual bool IsResourceTypeOf(ResourceID resourceId, std::span<const std::type_index> types) const override;
+
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId) const override;
 		[[nodiscard("Pure function")]] 
@@ -89,6 +91,11 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		IResourceLoader* FindLoader(ResourceType type) const noexcept;
 
+		[[nodiscard("Pure function")]]
+		bool CheckResourceType(ResourceID resourceId, std::span<const std::type_index> types) const;
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<IResourceRequest> MakeResourceRequest(ResourceID resourceId) const;
+
 		Application::IApplication* application;
 		Log::ILogService* logService;
 
@@ -98,12 +105,12 @@ export namespace PonyEngine::Resource
 		CollectionContainer collectionContainer;
 		ResourceContainer resourceContainer;
 		LoaderContainer loaderContainer;
-		std::shared_mutex stateMutex;
+		mutable std::shared_mutex stateMutex;
 
 		std::unordered_map<ResourceID, std::string> resourceIdToStringMap;
-		std::shared_mutex resourceIdToStringMapMutex;
+		mutable std::shared_mutex resourceIdToStringMapMutex;
 		std::unordered_map<ResourceType, std::string> resourceTypeToStringMap;
-		std::shared_mutex resourceTypeToStringMapMutex;
+		mutable std::shared_mutex resourceTypeToStringMapMutex;
 	};
 }
 
@@ -113,6 +120,42 @@ namespace PonyEngine::Resource
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()}
 	{
+	}
+
+	ResourceService::~ResourceService() noexcept
+	{
+		assert(collectionContainer.Size() == 0uz && "Collections weren't removed.");
+		assert(loaderContainer.Size() == 0uz && "Loaders weren't removed.");
+	}
+
+	bool ResourceService::HasResource(const ResourceID resourceId) const noexcept
+	{
+		const auto lock = std::shared_lock(stateMutex);
+		return resourceContainer.Contains(resourceId);
+	}
+
+	bool ResourceService::IsResourceTypeOf(const ResourceID resourceId, const std::span<const std::type_index> types) const
+	{
+		const auto lock = std::shared_lock(stateMutex);
+		return CheckResourceType(resourceId, types);
+	}
+
+	std::shared_ptr<IResourceRequest> ResourceService::LoadResource(const ResourceID resourceId) const
+	{
+		const auto lock = std::shared_lock(stateMutex);
+		return MakeResourceRequest(resourceId);
+	}
+
+	std::shared_ptr<IResourceRequest> ResourceService::LoadResource(const ResourceID resourceId, const std::span<const std::type_index> types) const
+	{
+		const auto lock = std::shared_lock(stateMutex);
+
+		if (!CheckResourceType(resourceId, types)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid type");
+		}
+
+		return MakeResourceRequest(resourceId);
 	}
 
 	ResourceCollection ResourceService::RegisterCollection(IResourceProvider& provider,
@@ -139,21 +182,21 @@ namespace PonyEngine::Resource
 			{
 				if (resourceContainer.Contains(resource.id)) [[unlikely]]
 				{
-					throw std::invalid_argument(std::format("Resource with the same ID '0x{:X}' is already added", resource.id));
+					throw std::invalid_argument(std::format("Resource with the same ID '0x{:X}' is already added", resource.id.value));
 				}
 				if (!IsResourceIDValid(resource.id)) [[unlikely]]
 				{
-					throw std::invalid_argument(std::format("Resource ID is invalid: ID = '0x{:X}'", resource.id));
+					throw std::invalid_argument(std::format("Resource ID is invalid: ID = '0x{:X}'", resource.id.value));
 				}
 				if (!IsResourceTypeValid(resource.type)) [[unlikely]]
 				{
-					throw std::invalid_argument(std::format("Resource type is invalid: Type = '0x{:X}'", resource.type));
+					throw std::invalid_argument(std::format("Resource type is invalid: Type = '0x{:X}'", resource.type.value));
 				}
 				for (const ResourceID dependencyId : resource.dependencies)
 				{
 					if (!IsResourceIDValid(dependencyId)) [[unlikely]]
 					{
-						throw std::invalid_argument(std::format("Resource ID of dependency is invalid: ID = '0x{:X}'", dependencyId));
+						throw std::invalid_argument(std::format("Resource ID of dependency is invalid: ID = '0x{:X}'", dependencyId.value));
 					}
 				}
 				for (std::size_t i = 1uz; i < resource.dependencies.size(); ++i)
@@ -170,7 +213,7 @@ namespace PonyEngine::Resource
 				IResourceLoader* const loader = FindLoader(resource.type);
 				if (!loader) [[unlikely]]
 				{
-					throw std::logic_error(std::format("No resource loader found for type '0x{:X}'", resource.type));
+					throw std::logic_error(std::format("No resource loader found for type '0x{:X}'", resource.type.value));
 				}
 
 				ResourceLoadData loadData;
@@ -181,6 +224,31 @@ namespace PonyEngine::Resource
 					.loadMeta = resource.loadMeta,
 					.dataAccessTypes = dataAccessTypes
 				}, loadData);
+
+				if (loadData.dataAccessTypeIndex >= dataAccessTypes.size()) [[unlikely]]
+				{
+					throw std::logic_error("Loader set invalid access type");
+				}
+				for (std::size_t i = 1uz; i < loadData.outputTypes.size(); ++i)
+				{
+					for (std::size_t j = 0uz; j < i; ++j)
+					{
+						if (loadData.outputTypes[i] == loadData.outputTypes[j]) [[unlikely]]
+						{
+							throw std::logic_error("Loader set duplicate output types");
+						}
+					}
+				}
+				for (std::size_t i = 1uz; i < loadData.loadData.size(); ++i)
+				{
+					for (std::size_t j = 0uz; j < i; ++j)
+					{
+						if (loadData.loadData[i].second == loadData.loadData[j].second) [[unlikely]]
+						{
+							throw std::logic_error("Loader set duplicate load data types");
+						}
+					}
+				}
 
 				resourceContainer.Add(resource.id, Resource
 				{
@@ -399,5 +467,52 @@ namespace PonyEngine::Resource
 	{
 		const std::size_t index = loaderContainer.IndexOf(type);
 		return index < loaderContainer.Size() ? &loaderContainer.Loader(index) : nullptr;
+	}
+
+	bool ResourceService::CheckResourceType(const ResourceID resourceId, const std::span<const std::type_index> types) const
+	{
+		if (const Resource* const resource = resourceContainer.FindResource(resourceId)) [[likely]]
+		{
+			for (const std::type_index type : types)
+			{
+				if (!std::ranges::contains(resource->outputTypes, type))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		throw std::invalid_argument("Resource not found");
+	}
+
+	std::shared_ptr<IResourceRequest> ResourceService::MakeResourceRequest(const ResourceID resourceId) const
+	{
+		const Resource* const resource = resourceContainer.FindResource(resourceId);
+		if (!resource) [[unlikely]]
+		{
+			throw std::invalid_argument("Resource not found");
+		}
+
+		// TODO: Add caching here
+
+		std::vector<std::shared_ptr<const IResourceRequest>> dependencies;
+		dependencies.reserve(resource->dependencies.size());
+		for (const ResourceID dependency : resource->dependencies)
+		{
+			dependencies.push_back(MakeResourceRequest(dependency));
+		}
+
+		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->collection));
+		const auto collection = ResourceCollection{.id = resource->collection, .version = resourceCollectionVersions[resource->collection]};
+		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->index, resource->dataAccessType);
+
+		IResourceLoader* const loader = FindLoader(resource->type);
+		assert(loader && "Loader not found.");
+
+		const auto request = std::make_shared<ResourceRequest>(*resource, std::move(dataAccess), std::move(dependencies), *loader);
+
+		return request;
 	}
 }

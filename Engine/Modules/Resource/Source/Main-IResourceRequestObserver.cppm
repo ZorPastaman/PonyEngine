@@ -7,14 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Resource/ResourceServiceModule.h"
+module;
 
-import PonyEngine.Resource.Impl;
+#include "PonyEngine/Object/Body.h"
 
-namespace PonyEngine::Resource
+export module PonyEngine.Resource:IResourceRequestObserver;
+
+import :ResourceID;
+
+export namespace PonyEngine::Resource
 {
-	std::shared_ptr<Application::IModule> CreateResourceServiceModule()
+	/// @brief Resource request observer.
+	class IResourceRequestObserver
 	{
-		return std::make_shared<ResourceServiceModule>();
-	}
+		PONY_INTERFACE_BODY(IResourceRequestObserver)
+
+		/// @brief Invoked on request status change.
+		/// @param resourceId Resource ID.
+		virtual void OnStatusChanged(ResourceID resourceId) = 0;
+	};
 }

@@ -23,8 +23,9 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(IResourceLoadRequest)
 
 		/// @brief Sets the success.
+		/// @param mainResource Main resource.
 		/// @param resources Resources. Must have all requested resource types.
-		virtual void SetSuccess(std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> resources) = 0;
+		virtual void SetSuccess(const std::shared_ptr<const void>& mainResource, std::span<const std::pair<const void*, std::type_index>> resources) = 0;
 		/// @brief Sets the failure.
 		/// @param exception Exception.
 		virtual void SetFailure(const std::exception_ptr& exception) = 0;

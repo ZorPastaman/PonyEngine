@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Resource.Impl:ResourceContainer;
 
 import std;
@@ -30,6 +34,8 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		bool Contains(ResourceID resourceId) const noexcept;
 		[[nodiscard("Pure function")]]
+		const Resource* FindResource(ResourceID resourceId) const noexcept;
+		[[nodiscard("Pure function")]]
 		std::size_t TypeCount(ResourceType type) const noexcept;
 
 		void Add(ResourceID id, Resource&& resource);
@@ -52,6 +58,16 @@ namespace PonyEngine::Resource
 		return resources.contains(resourceId);
 	}
 
+	const Resource* ResourceContainer::FindResource(const ResourceID resourceId) const noexcept
+	{
+		if (const auto position = resources.find(resourceId); position != resources.cend())
+		{
+			return &position->second;
+		}
+
+		return nullptr;
+	}
+
 	std::size_t ResourceContainer::TypeCount(const ResourceType type) const noexcept
 	{
 		if (const auto position = typeCounts.find(type); position != typeCounts.cend())
@@ -72,7 +88,8 @@ namespace PonyEngine::Resource
 
 		try
 		{
-			resources.emplace(id, std::move(resource));
+			const auto [_, added] = resources.try_emplace(id, std::move(resource));
+			assert(added && "The resource not added.");
 		}
 		catch (...)
 		{

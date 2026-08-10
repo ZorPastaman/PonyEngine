@@ -7,16 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.Resource.Impl:ResourceServiceModule;
 
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Log;
 
 import :ResourceService;
 
@@ -40,8 +35,7 @@ export namespace PonyEngine::Resource
 		ResourceServiceModule& operator =(ResourceServiceModule&&) = delete;
 
 	private:
-		Application::ModuleDataHandle inputServiceModuleHandle; ///< Resource service module handle.
-		Application::ServiceHandle inputServiceHandle; ///< Resource service handle.
+		std::unique_ptr<ResourceService> resourceService; ///< Resource service.
 	};
 }
 
@@ -49,33 +43,31 @@ namespace PonyEngine::Resource
 {
 	void ResourceServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}'...", typeid(ResourceService).name());
+		resourceService = std::make_unique<ResourceService>(context.Application());
 		try
 		{
-			inputServiceHandle = context.ServiceModuleContext().AddService([&](Application::IApplication& application)
+			context.AddInterface<IResourceService>(*resourceService);
+			try
 			{
-				const auto input = std::make_shared<ResourceService>(application);
-				inputServiceModuleHandle = context.AddData(std::shared_ptr<IResourceModuleContext>(input, input.get()));
-
-				return input;
-			});
+				context.AddInterface<IResourceHub>(*resourceService);
+			}
+			catch (...)
+			{
+				context.RemoveInterface<IResourceService>(*resourceService);
+				throw;
+			}
 		}
 		catch (...)
 		{
-			if (inputServiceModuleHandle.IsValid())
-			{
-				context.RemoveData(inputServiceModuleHandle);
-			}
+			resourceService.reset();
 			throw;
 		}
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Constructing '{}' done.", typeid(ResourceService).name());
 	}
 
 	void ResourceServiceModule::ShutDown(Application::IModuleContext& context)
 	{
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}'...", typeid(ResourceService).name());
-		context.ServiceModuleContext().RemoveService(inputServiceHandle);
-		context.RemoveData(inputServiceModuleHandle);
-		PONY_LOG(context.Logger(), Log::LogType::Info, "Releasing '{}' done.", typeid(ResourceService).name());
+		context.RemoveInterface<IResourceHub>(*resourceService);
+		context.RemoveInterface<IResourceService>(*resourceService);
+		resourceService.reset();
 	}
 }

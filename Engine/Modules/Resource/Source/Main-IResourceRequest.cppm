@@ -15,14 +15,12 @@ export module PonyEngine.Resource:IResourceRequest;
 
 import std;
 
+import :IResourceRequestObserver;
 import :RequestStatus;
 import :ResourceID;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource request observer.
-	class IResourceRequestObserver;
-
 	/// @brief Resource request.
 	class IResourceRequest
 	{
@@ -37,11 +35,16 @@ export namespace PonyEngine::Resource
 		/// @param type The resource type to check against.
 		/// @return @a true if the resource is of the specified type; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		virtual bool IsTypeOf(std::type_index type) const noexcept = 0;
-		/// @brief Checks whether the resource is of type @p T.
-		/// @tparam T The resource type to check against.
-		/// @return @a true if the resource is of the specified type; @a false otherwise.
-		template<typename T> [[nodiscard("Pure function")]]
+		bool IsTypeOf(std::type_index type) const noexcept;
+		/// @brief Checks whether the resource is of types @p types.
+		/// @param types The resource types to check against.
+		/// @return @a true if the resource is of the specified types; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsTypeOf(std::span<const std::type_index> types) const noexcept = 0;
+		/// @brief Checks whether the resource is of types @p Args.
+		/// @tparam Args The resource types to check against.
+		/// @return @a true if the resource is of the specified types; @a false otherwise.
+		template<typename... Args> [[nodiscard("Pure function")]]
 		bool IsTypeOf() const noexcept;
 		
 		/// @brief Gets the request status.
@@ -81,23 +84,19 @@ export namespace PonyEngine::Resource
 		/// @param observer Observer to remove.
 		virtual void RemoveObserver(IResourceRequestObserver& observer) = 0;
 	};
-
-	class IResourceRequestObserver
-	{
-		PONY_INTERFACE_BODY(IResourceRequestObserver)
-
-		/// @brief Invoked on request status change.
-		/// @param request Resource request.
-		virtual void OnStatusChanged(IResourceRequest& request) = 0;
-	};
 }
 
 namespace PonyEngine::Resource
 {
-	template<typename T>
+	bool IResourceRequest::IsTypeOf(const std::type_index type) const noexcept
+	{
+		return IsTypeOf(std::span(&type, 1uz));
+	}
+
+	template<typename... Args>
 	bool IResourceRequest::IsTypeOf() const noexcept
 	{
-		return IsTypeOf(typeid(T));
+		return IsTypeOf(std::array<std::type_index, sizeof...(Args)>(typeid(Args)...));
 	}
 
 	template<typename T>

@@ -10,4 +10,4 @@
 #include "PonyEngine/Application/Module.h"
 #include "PonyEngine/Resource/ResourceServiceModule.h"
 
-PONY_ENGINE_MODULE(PonyEngine::Resource::GetResourceServiceModule, PonyEngineResourceService, PONY_ENGINE_RESOURCE_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::Resource::CreateResourceServiceModule, PonyEngineResourceService, PONY_ENGINE_RESOURCE_ORDER);

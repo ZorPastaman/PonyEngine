@@ -11,12 +11,14 @@
 
 #include "PonyEngine/Macro/Compiler.h"
 
+import std;
+
 import PonyEngine.Application;
 
 namespace PonyEngine::Resource
 {
-	/// @brief Gets the resource service module.
+	/// @brief Creates the resource service module.
 	/// @return Resource service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetResourceServiceModule();
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateResourceServiceModule();
 }
