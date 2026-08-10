@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.World.Impl:WorldService;
@@ -76,8 +74,6 @@ namespace PonyEngine::World
 
 	void WorldService::RegisterComponent(const std::type_index componentType, const std::size_t componentSize, const std::size_t componentAlignment)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-
 		PONY_LOG(logService, Log::LogType::Info, "Registering component type. Type name: '{}'; size: '{}'; alignment: '{}'.", 
 			componentType.name(), componentSize, componentAlignment);
 		typeRegistry.AddComponentType(componentType, componentSize, componentAlignment);
@@ -85,8 +81,6 @@ namespace PonyEngine::World
 
 	void WorldService::RegisterComponentObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
 	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-
 		PONY_LOG(logService, Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
 			componentType.name(), objectType.name(), componentOffset);
 		typeRegistry.RegisterComponentObjectHandleMember(objectType, componentType, componentOffset);
