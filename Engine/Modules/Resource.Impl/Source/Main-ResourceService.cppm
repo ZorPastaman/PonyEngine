@@ -507,11 +507,12 @@ namespace PonyEngine::Resource
 		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->collection));
 		const auto collection = ResourceCollection{.id = resource->collection, .version = resourceCollectionVersions[resource->collection]};
 		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->index, resource->dataAccessType);
+		assert(dataAccess && "Data access is nullptr.");
 
 		IResourceLoader* const loader = FindLoader(resource->type);
 		assert(loader && "Loader not found.");
 
-		const auto request = std::make_shared<ResourceRequest>(*resource, std::move(dataAccess), std::move(dependencies), *loader);
+		const auto request = std::make_shared<ResourceRequest>(logService, *resource, std::move(dataAccess), std::move(dependencies), *loader);
 
 		return request;
 	}

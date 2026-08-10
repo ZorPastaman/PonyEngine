@@ -11,10 +11,13 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
+
 export module PonyEngine.Resource.Impl:ResourceRequest;
 
 import std;
 
+import PonyEngine.Log;
 import PonyEngine.Resource.Ext;
 
 import :Resource;
@@ -25,7 +28,7 @@ export namespace PonyEngine::Resource
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		ResourceRequest(const struct Resource& resource, std::shared_ptr<void>&& resourceDataAccess,
+		ResourceRequest(const Log::ILogService* logService, const struct Resource& resource, std::shared_ptr<void>&& resourceDataAccess,
 			std::vector<std::shared_ptr<const IResourceRequest>>&& dependencies, IResourceLoader& loader);
 		ResourceRequest(const ResourceRequest&) = delete;
 		ResourceRequest(ResourceRequest&&) = delete;
@@ -59,7 +62,9 @@ export namespace PonyEngine::Resource
 		virtual void SetFailure(const std::exception_ptr& exception) override;
 		virtual void SetCanceled() override;
 
-		void Observe() const noexcept;
+		void OnFinished() const noexcept;
+
+		const Log::ILogService* logService;
 
 		struct ResourceID resourceId;
 		ResourceType resourceType; ///< Resource type.
@@ -86,8 +91,9 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
-	ResourceRequest::ResourceRequest(const struct Resource& resource, std::shared_ptr<void>&& resourceDataAccess,
+	ResourceRequest::ResourceRequest(const Log::ILogService* const logService, const struct Resource& resource, std::shared_ptr<void>&& resourceDataAccess,
 		std::vector<std::shared_ptr<const IResourceRequest>>&& dependencies, IResourceLoader& loader) :
+		logService{logService},
 		resourceId(resource.id),
 		resourceType(resource.type),
 		resourceDataAccess(std::move(resourceDataAccess)),
@@ -109,6 +115,7 @@ namespace PonyEngine::Resource
 			.outputTypes = this->outputTypes
 		};
 		loadProcess = loader.Load(context, *this);
+		assert(loadProcess && "Load process is nullptr.");
 	}
 
 	struct ResourceID ResourceRequest::ResourceID() const noexcept
@@ -230,7 +237,7 @@ namespace PonyEngine::Resource
 		}
 
 		status.store(RequestStatus::Success, std::memory_order::release);
-		Observe();
+		OnFinished();
 	}
 
 	void ResourceRequest::SetFailure(const std::exception_ptr& exception)
@@ -238,17 +245,17 @@ namespace PonyEngine::Resource
 		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status");
 		this->exception = exception;
 		status.store(RequestStatus::Failure, std::memory_order::release);
-		Observe();
+		OnFinished();
 	}
 
 	void ResourceRequest::SetCanceled()
 	{
 		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status");
 		status.store(RequestStatus::Canceled, std::memory_order::release);
-		Observe();
+		OnFinished();
 	}
 
-	void ResourceRequest::Observe() const noexcept
+	void ResourceRequest::OnFinished() const noexcept
 	{
 		const auto lock = std::lock_guard(observerMutex);
 
@@ -260,7 +267,7 @@ namespace PonyEngine::Resource
 			}
 			catch (...)
 			{
-				// TODO: Add logging via a context
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On resource request observer on status changed. Observer: '{}'.", typeid(*observer).name());
 			}
 		}
 
