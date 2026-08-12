@@ -10,7 +10,6 @@
 export module PonyEngine.Resource;
 
 export import :IResourceRequest;
-export import :IResourceRequestObserver;
 export import :IResourceService;
 export import :RequestStatus;
 export import :ResourceID;

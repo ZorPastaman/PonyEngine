@@ -23,11 +23,12 @@ import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Resource.Ext;
 
+import :CachedResourceRequest;
 import :CollectionContainer;
+import :LoadableResource;
 import :LoaderContainer;
 import :Resource;
 import :ResourceContainer;
-import :ResourceLoadRequest;
 
 export namespace PonyEngine::Resource
 {
@@ -216,52 +217,19 @@ namespace PonyEngine::Resource
 					throw std::logic_error(std::format("No resource loader found for type '0x{:X}'", resource.type.value));
 				}
 
-				ResourceLoadData loadData;
-				loader->PrepareResource(ResourceLoadInfo
+				auto loadableResource = LoadableResource(resource.type, resource.dataMeta, resource.loadMeta, dataAccessTypes);
+				loader->PrepareResource(loadableResource);
+				if (!loadableResource.DataAccessType()) [[unlikely]]
 				{
-					.type = resource.type,
-					.dataMeta = resource.dataMeta,
-					.loadMeta = resource.loadMeta,
-					.dataAccessTypes = dataAccessTypes
-				}, loadData);
-
-				if (loadData.dataAccessTypeIndex >= dataAccessTypes.size()) [[unlikely]]
-				{
-					throw std::logic_error("Loader set invalid access type");
+					throw std::logic_error("Loader didn't set data access type");
 				}
-				for (std::size_t i = 1uz; i < loadData.outputTypes.size(); ++i)
+				if (loadableResource.OutputTypes().empty()) [[unlikely]]
 				{
-					for (std::size_t j = 0uz; j < i; ++j)
-					{
-						if (loadData.outputTypes[i] == loadData.outputTypes[j]) [[unlikely]]
-						{
-							throw std::logic_error("Loader set duplicate output types");
-						}
-					}
-				}
-				for (std::size_t i = 1uz; i < loadData.loadData.size(); ++i)
-				{
-					for (std::size_t j = 0uz; j < i; ++j)
-					{
-						if (loadData.loadData[i].second == loadData.loadData[j].second) [[unlikely]]
-						{
-							throw std::logic_error("Loader set duplicate load data types");
-						}
-					}
+					throw std::logic_error("Loader didn't set output types");
 				}
 
-				resourceContainer.Add(resource.id, Resource
-				{
-					.id = resource.id,
-					.type = resource.type,
-					.dependencies = std::vector(resource.dependencies.cbegin(), resource.dependencies.cend()),
-					.loadData = std::move(loadData.loadData),
-					.outputTypes = std::move(loadData.outputTypes),
-					.collection = collection.id,
-					.index = resource.dataIndex,
-					.dataAccessType = dataAccessTypes[loadData.dataAccessTypeIndex]
-				});
-
+				resourceContainer.Add(std::make_shared<Resource>(resource.id, resource.type, resource.dependencies, collection.id, resource.dataIndex,
+					*loadableResource.DataAccessType(), loadableResource.LoadData(), loadableResource.OutputTypes()));
 				++addedResourceCount;
 			}
 		}
@@ -471,11 +439,11 @@ namespace PonyEngine::Resource
 
 	bool ResourceService::CheckResourceType(const ResourceID resourceId, const std::span<const std::type_index> types) const
 	{
-		if (const Resource* const resource = resourceContainer.FindResource(resourceId)) [[likely]]
+		if (const std::shared_ptr<Resource>& resource = resourceContainer.FindResource(resourceId)) [[likely]]
 		{
-			for (const std::type_index type : types)
+			for (const std::span<const std::type_index> outputTypes = resource->OutputTypes(); const std::type_index type : types)
 			{
-				if (!std::ranges::contains(resource->outputTypes, type))
+				if (!std::ranges::contains(outputTypes, type))
 				{
 					return false;
 				}
@@ -489,13 +457,19 @@ namespace PonyEngine::Resource
 
 	std::shared_ptr<IResourceRequest> ResourceService::MakeResourceRequest(const ResourceID resourceId) const
 	{
-		const Resource* const resource = resourceContainer.FindResource(resourceId);
+		const std::shared_ptr<Resource>& resource = resourceContainer.FindResource(resourceId);
 		if (!resource) [[unlikely]]
 		{
 			throw std::invalid_argument("Resource not found");
 		}
 
-		// TODO: Add caching here
+		const auto lock = resource->Lock();
+
+		if (std::shared_ptr<const void> mainResource = resource->MainResource())
+		{
+			return std::make_shared<CachedResourceRequest>(resource->ResourceID(), resource->OutputTypes(),
+				std::move(mainResource), resource->Resources());
+		}
 
 		std::vector<std::shared_ptr<const IResourceRequest>> dependencies;
 		dependencies.reserve(resource->dependencies.size());
@@ -506,7 +480,7 @@ namespace PonyEngine::Resource
 
 		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->collection));
 		const auto collection = ResourceCollection{.id = resource->collection, .version = resourceCollectionVersions[resource->collection]};
-		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->index, resource->dataAccessType);
+		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->collectionResourceIndex, resource->dataAccessType);
 		assert(dataAccess && "Data access is nullptr.");
 
 		IResourceLoader* const loader = FindLoader(resource->type);

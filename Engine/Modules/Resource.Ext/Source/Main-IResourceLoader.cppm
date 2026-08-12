@@ -17,11 +17,10 @@ import std;
 
 import PonyEngine.Resource;
 
-import :IResourceLoadProcess;
+import :ILoadableResource;
+import :IResourceLoadHandler;
 import :IResourceLoadRequest;
 import :ResourceLoadContext;
-import :ResourceLoadInfo;
-import :ResourceLoadData;
 
 export namespace PonyEngine::Resource
 {
@@ -31,14 +30,13 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(IResourceLoader)
 
 		/// @brief Prepares a resource.
-		/// @param info Resource info.
-		/// @param data Resource data.
-		virtual void PrepareResource(const ResourceLoadInfo& info, ResourceLoadData& data) = 0;
-		/// @brief Makes a load operation.
+		/// @param context Resource context.
+		virtual void PrepareResource(ILoadableResource& context) = 0;
+		/// @brief Makes a load request.
 		/// @param context Resource load context.
-		/// @param loadRequest Resource load request.
-		/// @return Resource load process.
+		/// @param loadHandler Resource load handler. Must be kept alive till the end of the request.
+		/// @return Resource load request.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IResourceLoadProcess> Load(const ResourceLoadContext& context, IResourceLoadRequest& loadRequest) = 0;
+		virtual std::shared_ptr<IResourceLoadRequest> Load(const ResourceLoadContext& context, IResourceLoadHandler& loadHandler) = 0;
 	};
 }

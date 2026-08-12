@@ -34,11 +34,11 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		bool Contains(ResourceID resourceId) const noexcept;
 		[[nodiscard("Pure function")]]
-		const Resource* FindResource(ResourceID resourceId) const noexcept;
+		const std::shared_ptr<Resource>& FindResource(ResourceID resourceId) const noexcept;
 		[[nodiscard("Pure function")]]
 		std::size_t TypeCount(ResourceType type) const noexcept;
 
-		void Add(ResourceID id, Resource&& resource);
+		void Add(std::shared_ptr<Resource>&& resource);
 		void Remove(ResourceID id) noexcept;
 		void Clear() noexcept;
 
@@ -46,7 +46,7 @@ export namespace PonyEngine::Resource
 		ResourceContainer& operator =(ResourceContainer&&) = delete;
 
 	private:
-		std::unordered_map<ResourceID, Resource> resources;
+		std::unordered_map<ResourceID, std::shared_ptr<Resource>> resources;
 		std::unordered_map<ResourceType, std::size_t> typeCounts;
 	};
 }
@@ -58,11 +58,11 @@ namespace PonyEngine::Resource
 		return resources.contains(resourceId);
 	}
 
-	const Resource* ResourceContainer::FindResource(const ResourceID resourceId) const noexcept
+	const std::shared_ptr<Resource>& ResourceContainer::FindResource(const ResourceID resourceId) const noexcept
 	{
 		if (const auto position = resources.find(resourceId); position != resources.cend())
 		{
-			return &position->second;
+			return position->second;
 		}
 
 		return nullptr;
@@ -78,13 +78,16 @@ namespace PonyEngine::Resource
 		return 0uz;
 	}
 
-	void ResourceContainer::Add(const ResourceID id, Resource&& resource)
+	void ResourceContainer::Add(std::shared_ptr<Resource>&& resource)
 	{
-		if (!typeCounts.contains(resource.type))
+		const ResourceID id = resource->ResourceID();
+		const ResourceType type = resource->Type();
+
+		if (!typeCounts.contains(type))
 		{
-			typeCounts[resource.type] = 0uz;
+			typeCounts[type] = 0uz;
 		}
-		++typeCounts[resource.type];
+		++typeCounts[type];
 
 		try
 		{
@@ -93,7 +96,7 @@ namespace PonyEngine::Resource
 		}
 		catch (...)
 		{
-			--typeCounts[resource.type];
+			--typeCounts[type];
 			throw;
 		}
 	}
@@ -102,7 +105,7 @@ namespace PonyEngine::Resource
 	{
 		if (const auto position = resources.find(id); position != resources.cend())
 		{
-			--typeCounts[position->second.type];
+			--typeCounts[position->second->Type()];
 			resources.erase(position);
 		}
 	}

@@ -13,13 +13,11 @@ export import PonyEngine.Resource;
 
 export import :CollectionResource;
 export import :EngineResourceType;
+export import :ILoadableResource;
 export import :IResourceHub;
 export import :IResourceLoader;
-export import :IResourceLoadProcess;
 export import :IResourceLoadRequest;
 export import :IResourceProvider;
 export import :ResourceCollection;
 export import :ResourceLoadContext;
-export import :ResourceLoadData;
-export import :ResourceLoadInfo;
 export import :ResourceType;

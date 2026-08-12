@@ -15,12 +15,14 @@ export module PonyEngine.Resource:IResourceRequest;
 
 import std;
 
-import :IResourceRequestObserver;
 import :RequestStatus;
 import :ResourceID;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource request observer.
+	class IResourceRequestObserver;
+
 	/// @brief Resource request.
 	class IResourceRequest
 	{
@@ -83,6 +85,16 @@ export namespace PonyEngine::Resource
 		/// @brief Removes the request observer.
 		/// @param observer Observer to remove.
 		virtual void RemoveObserver(IResourceRequestObserver& observer) const = 0;
+	};
+
+	/// @brief Resource request observer.
+	class IResourceRequestObserver
+	{
+		PONY_INTERFACE_BODY(IResourceRequestObserver)
+
+		/// @brief Invoked on request status change.
+		/// @param request Request.
+		virtual void OnStatusChanged(const IResourceRequest& request) = 0;
 	};
 }
 

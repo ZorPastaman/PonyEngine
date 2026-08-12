@@ -17,6 +17,7 @@ import std;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Engine resource types.
 	struct EngineResourceType final
 	{
 		PONY_NON_CONSTRUCTIBLE_BODY(EngineResourceType)
