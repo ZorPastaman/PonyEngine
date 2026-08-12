@@ -77,7 +77,7 @@ namespace PonyEngine::Log
 
 	LogService::~LogService() noexcept
 	{
-		assert(loggers.size() == 0uz && "Some loggers weren't removed.");
+		assert(loggers.empty() && "Some loggers weren't removed.");
 	}
 
 	void LogService::Log(const LogType logType, const std::string_view message) const noexcept

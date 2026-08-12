@@ -448,8 +448,8 @@ namespace PonyEngine::Application
 #ifndef NDEBUG
 		assert(bufferCount.load(std::memory_order::relaxed) == 0uz && "Buffer count in use isn't zero.");
 #endif
-		assert(tickables.size() == 0uz && "Some tickables weren't removed.");
-		assert(interfaces.size() == 0uz && "Some interfaces weren't removed.");
+		assert(tickables.empty() && "Some tickables weren't removed.");
+		assert(interfaces.empty() && "Some interfaces weren't removed.");
 	}
 
 	std::string_view App::EngineName() const noexcept

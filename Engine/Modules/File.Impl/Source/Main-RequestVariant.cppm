@@ -26,15 +26,13 @@ export namespace PonyEngine::File
 		/// @brief Creates a read request.
 		/// @param controller Request controller.
 		/// @param params Read parameters.
-		/// @param handler Request handler. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		RequestVariant(IRequestController& controller, const ReadParams& params, IReadHandler* handler) noexcept;
+		RequestVariant(IRequestController& controller, const ReadParams& params) noexcept;
 		/// @brief Creates a write request.
 		/// @param controller Request controller.
 		/// @param params Write parameters.
-		/// @param handler Request handler. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		RequestVariant(IRequestController& controller, const WriteParams& params, IWriteHandler* handler) noexcept;
+		RequestVariant(IRequestController& controller, const WriteParams& params) noexcept;
 		RequestVariant(const RequestVariant&) = delete;
 		RequestVariant(RequestVariant&&) = delete;
 
@@ -85,13 +83,13 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	RequestVariant::RequestVariant(IRequestController& controller, const ReadParams& params, IReadHandler* const handler) noexcept :
-		request(std::in_place_type<ReadRequest>, controller, params, handler)
+	RequestVariant::RequestVariant(IRequestController& controller, const ReadParams& params) noexcept :
+		request(std::in_place_type<ReadRequest>, controller, params)
 	{
 	}
 
-	RequestVariant::RequestVariant(IRequestController& controller, const WriteParams& params, IWriteHandler* const handler) noexcept :
-		request(std::in_place_type<WriteRequest>, controller, params, handler)
+	RequestVariant::RequestVariant(IRequestController& controller, const WriteParams& params) noexcept :
+		request(std::in_place_type<WriteRequest>, controller, params)
 	{
 	}
 

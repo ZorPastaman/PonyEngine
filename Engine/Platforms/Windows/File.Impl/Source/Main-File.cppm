@@ -20,7 +20,6 @@ import PonyEngine.Application;
 import PonyEngine.File.Impl;
 import PonyEngine.Log;
 
-import :FileContext;
 import :FileUtility;
 import :ServiceContext;
 import :Worker;
@@ -28,7 +27,7 @@ import :Worker;
 export namespace PonyEngine::File
 {
 	/// @brief File.
-	class File final : public IFile
+	class File final : public IFile, public std::enable_shared_from_this<File>
 	{
 	public:
 		/// @brief Opens a file.
@@ -50,9 +49,9 @@ export namespace PonyEngine::File
 		virtual FileFlag Flags() const noexcept override;
 
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, IReadHandler* handler) const override;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params) override;
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, IWriteHandler* handler) override;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params) override;
 
 		File& operator =(const File&) = delete;
 		File& operator =(File&&) = delete;
@@ -69,7 +68,6 @@ export namespace PonyEngine::File
 
 		FileInfo fileInfo; ///< File info.
 		HANDLE fileHandle; ///< File handle.
-		FileContext fileContext; ///< File context.
 	};
 }
 
@@ -93,8 +91,7 @@ namespace PonyEngine::File
 	File::File(const ServiceContext& context, const std::filesystem::path& path, const FileParams params) :
 		context{&context},
 		fileInfo(path, params.access, params.flags),
-		fileHandle(OpenFile(path, params)),
-		fileContext(fileHandle)
+		fileHandle(OpenFile(path, params))
 	{
 		try
 		{
@@ -120,7 +117,6 @@ namespace PonyEngine::File
 		}
 
 		this->context->DecrementFileCount();
-		fileContext.EnsureZeroCounts();
 	}
 
 	const std::filesystem::path& File::Path() const noexcept
@@ -138,18 +134,16 @@ namespace PonyEngine::File
 		return fileInfo.Flags();
 	}
 
-	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params, IReadHandler* handler) const
+	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params)
 	{
 		fileInfo.ValidateRead();
-		const std::shared_ptr<OverlappedRequest> request = context->Worker().MakeRequest(fileContext, params, handler);
-		return std::shared_ptr<IReadRequest>(request, &request->Request().Read());
+		return context->Worker().MakeRequest(fileHandle, shared_from_this(), params);
 	}
 
-	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params, IWriteHandler* handler)
+	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params)
 	{
 		fileInfo.ValidateWrite();
-		const std::shared_ptr<OverlappedRequest> request = context->Worker().MakeRequest(fileContext, params, handler);
-		return std::shared_ptr<IWriteRequest>(request, &request->Request().Write());
+		return context->Worker().MakeRequest(fileHandle, shared_from_this(), params);
 	}
 
 	HANDLE File::OpenFile(const std::filesystem::path& path, FileParams params) const

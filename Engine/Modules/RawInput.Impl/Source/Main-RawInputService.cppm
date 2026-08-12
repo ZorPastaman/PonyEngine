@@ -86,8 +86,8 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]] 
 		virtual std::string_view GetDeviceStyleString(struct DeviceStyle deviceStyle) const override;
 
-		virtual void AddObserver(IRawInputObserver& observer) override;
-		virtual void RemoveObserver(IRawInputObserver& observer) override;
+		virtual void AddObserver(IRawInputObserver& observer) const override;
+		virtual void RemoveObserver(IRawInputObserver& observer) const override;
 
 		[[nodiscard("Must be used to unregister")]] 
 		virtual DeviceHandle RegisterDevice(IDeviceController& deviceController, bool isConnected, const DeviceParams& params) override;
@@ -193,7 +193,7 @@ export namespace PonyEngine::RawInput
 		std::unordered_map<struct DeviceType, std::string> deviceTypeHashMap; ///< Device type hash map.
 		std::unordered_map<struct DeviceStyle, std::string> deviceStyleHashMap; ///< Device style hash map.
 
-		std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
+		mutable std::vector<IRawInputObserver*> inputObservers; ///< Input observers.
 	};
 }
 
@@ -208,7 +208,7 @@ namespace PonyEngine::RawInput
 	RawInputService::~RawInputService() noexcept
 	{
 		assert(devices.Size() == 0uz && "Some raw input devices weren't removed.");
-		assert(inputObservers.size() == 0uz && "Some input observers weren't removed.");
+		assert(inputObservers.empty() && "Some input observers weren't removed.");
 	}
 
 	float RawInputService::Value(const Axis axis) const noexcept
@@ -419,13 +419,13 @@ namespace PonyEngine::RawInput
 		return position->second;
 	}
 
-	void RawInputService::AddObserver(IRawInputObserver& observer)
+	void RawInputService::AddObserver(IRawInputObserver& observer) const
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		inputObservers.push_back(&observer);
 	}
 
-	void RawInputService::RemoveObserver(IRawInputObserver& observer)
+	void RawInputService::RemoveObserver(IRawInputObserver& observer) const
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		const auto position = std::ranges::find(inputObservers, &observer);

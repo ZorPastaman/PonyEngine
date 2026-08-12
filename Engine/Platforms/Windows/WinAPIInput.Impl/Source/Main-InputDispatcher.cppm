@@ -223,7 +223,7 @@ namespace PonyEngine::WinAPIInput
 			{
 				usagePosition->second.erase(observerPosition);
 
-				if (usagePosition->second.size() == 0uz)
+				if (usagePosition->second.empty())
 				{
 					const auto rid = RAWINPUTDEVICE{.usUsagePage = usagePage, .usUsage = usage, .dwFlags = RIDEV_REMOVE, .hwndTarget = nullptr};
 					RegisterRawInputDevices(&rid, 1u, sizeof(RAWINPUTDEVICE));

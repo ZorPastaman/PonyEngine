@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Macro/Text.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
@@ -21,7 +23,6 @@ import PonyEngine.Application;
 import PonyEngine.File.Impl;
 import PonyEngine.Log;
 
-import :FileContext;
 import :OverlappedRequest;
 
 export namespace PonyEngine::File
@@ -45,24 +46,32 @@ export namespace PonyEngine::File
 		void AssociateFile(HANDLE fileHandle, const IFile& file) const;
 
 		/// @brief Makes a read request.
-		/// @param fileContext File context. Its handle must be associated with the worker.
+		/// @param fileHandle File handle. Must be associated with the worker.
+		/// @param file File that created this request.
 		/// @param params Read parameters.
-		/// @param handler Read handler. Can be nullptr.
 		/// @return Overlapped read request.
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<OverlappedRequest> MakeRequest(const FileContext& fileContext, const ReadParams& params, IReadHandler* handler) const;
+		std::shared_ptr<IReadRequest> MakeRequest(HANDLE fileHandle, std::shared_ptr<IFile>&& file, const ReadParams& params) const;
 		/// @brief Makes a write request.
-		/// @param fileContext File context. Its handle must be associated with the worker.
+		/// @param fileHandle File handle. Must be associated with the worker.
+		/// @param file File that created this request.
 		/// @param params Write parameters.
-		/// @param handler Write handler. Can be nullptr.
 		/// @return Overlapped write request.
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<OverlappedRequest> MakeRequest(const FileContext& fileContext, const WriteParams& params, IWriteHandler* handler) const;
+		std::shared_ptr<IWriteRequest> MakeRequest(HANDLE fileHandle, std::shared_ptr<IFile>&& file, const WriteParams& params) const;
 
 		Worker& operator =(const Worker&) = delete;
 		Worker& operator =(Worker&&) = delete;
 
 	private:
+		/// @brief Adds the ongoing request.
+		/// @param request Request to add.
+		void AddOngoingRequest(const std::shared_ptr<OverlappedRequest>& request) const;
+		/// @brief Removes the ongoing request.
+		/// @param overlapped Request overlapped.
+		/// @return Ongoing request.
+		std::shared_ptr<OverlappedRequest> RemoveOngoingRequest(const OVERLAPPED* overlapped) const;
+
 		/// @brief Work function.
 		void Work() const noexcept;
 
@@ -72,6 +81,9 @@ export namespace PonyEngine::File
 
 		std::pmr::synchronized_pool_resource requestPool; ///< Request pool.
 		std::pmr::polymorphic_allocator<OverlappedRequest> requestAllocator; ///< Request allocator.
+
+		mutable std::unordered_map<const OVERLAPPED*, std::shared_ptr<OverlappedRequest>> ongoingRequests; ///< Ongoing requests.
+		mutable std::mutex ongoingRequestMutex; ///< Ongoing request mutex.
 
 		std::thread thread; ///< Worker thread.
 		std::shared_ptr<Application::IThreadControl> threadControl; ///< Thread control.
@@ -152,14 +164,108 @@ namespace PonyEngine::File
 		PONY_LOG(logService, Log::LogType::Info, "Associating file with iocp done. Handle: '0x{:X}; IOCP: '0x{:X}''.", reinterpret_cast<std::uintptr_t>(fileHandle), reinterpret_cast<std::uintptr_t>(iocp));
 	}
 
-	std::shared_ptr<OverlappedRequest> Worker::MakeRequest(const FileContext& fileContext, const ReadParams& params, IReadHandler* const handler) const
+	std::shared_ptr<IReadRequest> Worker::MakeRequest(const HANDLE fileHandle, std::shared_ptr<IFile>&& file, const ReadParams& params) const
 	{
-		return std::allocate_shared<OverlappedRequest>(requestAllocator, fileContext, params, handler);
+		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Too great buffer");
+		}
+
+		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, fileHandle, std::move(file), params);
+		AddOngoingRequest(request);
+
+		try
+		{
+			if (ReadFile(fileHandle, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
+			{
+				DWORD bytesTransferred = 0;
+				if (GetOverlappedResult(fileHandle, &request->Overlapped(), &bytesTransferred, FALSE)) [[likely]]
+				{
+					RemoveOngoingRequest(&request->Overlapped());
+					request->Request().SetSuccess(static_cast<std::size_t>(bytesTransferred));
+				}
+				else [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to create file read request: Error code = '0x{:X}'", GetLastError()));
+				}
+			}
+			else [[likely]]
+			{
+				if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to create file read request: Error code = '0x{:X}'", error));
+				}
+			}
+		}
+		catch (...)
+		{
+			RemoveOngoingRequest(&request->Overlapped());
+			throw;
+		}
+
+		return std::shared_ptr<IReadRequest>(std::move(request), &request->Request().Read());
 	}
 
-	std::shared_ptr<OverlappedRequest> Worker::MakeRequest(const FileContext& fileContext, const WriteParams& params, IWriteHandler* const handler) const
+	std::shared_ptr<IWriteRequest> Worker::MakeRequest(const HANDLE fileHandle, std::shared_ptr<IFile>&& file, const WriteParams& params) const
 	{
-		return std::allocate_shared<OverlappedRequest>(requestAllocator, fileContext, params, handler);
+		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Too great buffer");
+		}
+
+		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, fileHandle, std::move(file), params);
+		AddOngoingRequest(request);
+
+		try
+		{
+			if (WriteFile(fileHandle, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
+			{
+				DWORD bytesTransferred = 0;
+				if (GetOverlappedResult(fileHandle, &request->Overlapped(), &bytesTransferred, FALSE)) [[likely]]
+				{
+					RemoveOngoingRequest(&request->Overlapped());
+					request->Request().SetSuccess(static_cast<std::size_t>(bytesTransferred));
+				}
+				else [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to create file write request: Error code = '0x{:X}'", GetLastError()));
+				}
+			}
+			else [[likely]]
+			{
+				if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to create file write request: Error code = '0x{:X}'", error));
+				}
+			}
+		}
+		catch (...)
+		{
+			RemoveOngoingRequest(&request->Overlapped());
+			throw;
+		}
+
+		return std::shared_ptr<IWriteRequest>(std::move(request), &request->Request().Write());
+	}
+
+	void Worker::AddOngoingRequest(const std::shared_ptr<OverlappedRequest>& request) const
+	{
+		const auto lock = std::lock_guard(ongoingRequestMutex);
+		assert(!ongoingRequests.contains(&request->Overlapped()) && "Double request addition.");
+
+		ongoingRequests[&request->Overlapped()] = request;
+	}
+
+	std::shared_ptr<OverlappedRequest> Worker::RemoveOngoingRequest(const OVERLAPPED* const overlapped) const
+	{
+		const auto lock = std::lock_guard(ongoingRequestMutex);
+		const auto position = ongoingRequests.find(overlapped);
+		assert(position != ongoingRequests.cend() && "Request wasn't added.");
+
+		std::shared_ptr<OverlappedRequest> request = std::move(position->second);
+		ongoingRequests.erase(position);
+		
+		return request;
 	}
 
 	void Worker::Work() const noexcept
@@ -174,8 +280,8 @@ namespace PonyEngine::File
 			{
 				if (overlapped) [[likely]]
 				{
-					OverlappedRequest& request = OverlappedRequest::ToRequest(*overlapped);
-					request.Request().SetSuccess(static_cast<std::size_t>(bytesTransferred));
+					const std::shared_ptr<OverlappedRequest> request = RemoveOngoingRequest(overlapped);
+					request->Request().SetSuccess(static_cast<std::size_t>(bytesTransferred));
 				}
 			}
 			else [[unlikely]]
@@ -183,11 +289,11 @@ namespace PonyEngine::File
 				const DWORD error = GetLastError();
 				if (overlapped) [[likely]]
 				{
-					OverlappedRequest& request = OverlappedRequest::ToRequest(*overlapped);
+					const std::shared_ptr<OverlappedRequest> request = RemoveOngoingRequest(overlapped);
 
 					if (error == ERROR_OPERATION_ABORTED) [[likely]]
 					{
-						request.Request().SetCanceled();
+						request->Request().SetCanceled();
 					}
 					else [[unlikely]]
 					{
@@ -199,7 +305,7 @@ namespace PonyEngine::File
 						{
 							const std::exception_ptr exception = std::current_exception();
 							PONY_LOG(logService, Log::LogType::Error, exception);
-							request.Request().SetFailure(exception);
+							request->Request().SetFailure(exception);
 						}
 					}
 				}

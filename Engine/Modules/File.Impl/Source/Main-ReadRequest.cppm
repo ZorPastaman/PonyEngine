@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.File.Impl:ReadRequest;
 
 import std;
@@ -25,13 +29,12 @@ export namespace PonyEngine::File
 		/// @brief Creates a read request.
 		/// @param controller Request controller.
 		/// @param params Read parameters.
-		/// @param handler Request handler. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		ReadRequest(IRequestController& controller, const ReadParams& params, IReadHandler* handler) noexcept;
+		ReadRequest(IRequestController& controller, const ReadParams& params) noexcept;
 		ReadRequest(const ReadRequest&) = delete;
 		ReadRequest(ReadRequest&&) = delete;
 
-		~ReadRequest() noexcept = default;
+		~ReadRequest() noexcept;
 
 		[[nodiscard("Pure function")]] 
 		virtual const ReadParams& Params() const noexcept override;
@@ -47,6 +50,9 @@ export namespace PonyEngine::File
 
 		virtual void Wait() const noexcept override;
 
+		virtual void AddObserver(IReadObserver& observer) const override;
+		virtual void RemoveObserver(IReadObserver& observer) const override;
+
 		/// @brief Sets the status to success.
 		/// @param byteCount Transferred byte count.
 		void SetSuccess(std::size_t byteCount) noexcept;
@@ -60,25 +66,31 @@ export namespace PonyEngine::File
 		ReadRequest& operator =(ReadRequest&&) = delete;
 
 	private:
-		/// @brief Invokes the handler complete if it's not nullptr.
-		void InvokeHandlerComplete() const;
-		/// @brief Invokes the handler cancel if it's not nullptr.
-		void InvokeHandlerCancel() const;
+		/// @brief Calls observers.
+		void Observe() noexcept;
 
 		IRequestController* controller; ///< Request controller.
 		ReadParams params; ///< Read parameters.
 		Request request; ///< Read request.
-		IReadHandler* handler; ///< Request handler.
+
+		mutable std::vector<IReadObserver*> observers; ///< Observers.
+		bool observerCalled; ///< Were observers called?
+		mutable std::mutex observerMutex; ///< Observer mutex.
 	};
 }
 
 namespace PonyEngine::File
 {
-	ReadRequest::ReadRequest(IRequestController& controller, const ReadParams& params, IReadHandler* const handler) noexcept :
+	ReadRequest::ReadRequest(IRequestController& controller, const ReadParams& params) noexcept :
 		controller{&controller},
 		params(params),
-		handler{handler}
+		observerCalled{false}
 	{
+	}
+
+	ReadRequest::~ReadRequest() noexcept
+	{
+		assert(observers.empty() && "Observers weren't removed.");
 	}
 
 	const ReadParams& ReadRequest::Params() const noexcept
@@ -111,37 +123,58 @@ namespace PonyEngine::File
 		request.Wait();
 	}
 
+	void ReadRequest::AddObserver(IReadObserver& observer) const
+	{
+		const auto lock = std::lock_guard(observerMutex);
+		observers.push_back(&observer);
+
+		if (observerCalled)
+		{
+			observer.OnStatusChanged(*this);
+		}
+	}
+
+	void ReadRequest::RemoveObserver(IReadObserver& observer) const
+	{
+		const auto lock = std::lock_guard(observerMutex);
+		
+		if (const auto position = std::ranges::find(observers, &observer); position != observers.cend()) [[likely]]
+		{
+			observers.erase(position);
+		}
+		else [[unlikely]]
+		{
+			throw std::invalid_argument("Observer wasn't added");
+		}
+	}
+
 	void ReadRequest::SetSuccess(const std::size_t byteCount) noexcept
 	{
 		request.SetSuccess(byteCount);
-		InvokeHandlerComplete();
+		Observe();
 	}
 
 	void ReadRequest::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		request.SetFailed(exception);
-		InvokeHandlerComplete();
+		Observe();
 	}
 
 	void ReadRequest::SetCanceled() noexcept
 	{
 		request.SetCanceled();
-		InvokeHandlerCancel();
+		Observe();
 	}
 
-	void ReadRequest::InvokeHandlerComplete() const
+	void ReadRequest::Observe() noexcept
 	{
-		if (handler)
-		{
-			handler->OnCompleted(*this);
-		}
-	}
+		const auto lock = std::lock_guard(observerMutex);
 
-	void ReadRequest::InvokeHandlerCancel() const
-	{
-		if (handler)
+		for (IReadObserver* const observer : observers)
 		{
-			handler->OnCanceled(*this);
+			observer->OnStatusChanged(*this);
 		}
+
+		observerCalled = true;
 	}
 }

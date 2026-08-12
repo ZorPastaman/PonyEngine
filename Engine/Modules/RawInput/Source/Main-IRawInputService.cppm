@@ -171,11 +171,11 @@ export namespace PonyEngine::RawInput
 		/// @brief Adds the global raw input observer.
 		/// @param observer Raw input observer. Must be kept alive till it's removed.
 		/// @note The function must be called on a main thread.
-		virtual void AddObserver(IRawInputObserver& observer) = 0;
+		virtual void AddObserver(IRawInputObserver& observer) const = 0;
 		/// @brief Removes the global raw input observer.
 		/// @param observer Raw input observer.
 		/// @note The function must be called on a main thread.
-		virtual void RemoveObserver(IRawInputObserver& observer) = 0;
+		virtual void RemoveObserver(IRawInputObserver& observer) const = 0;
 	};
 }
 
