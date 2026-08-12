@@ -34,9 +34,12 @@ target_sources(PonyEngine.Resource.Impl PRIVATE
 target_sources(PonyEngine.Resource.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-CollectionContainer.cppm"
+	"Source/Main-IResourceLoadRequestObserver.cppm"
 	"Source/Main-LoaderContainer.cppm"
 	"Source/Main-Resource.cppm"
+	"Source/Main-ResourceCache.cppm"
 	"Source/Main-ResourceContainer.cppm"
+	"Source/Main-ResourceLoadRequest.cppm"
 	"Source/Main-ResourceRequest.cppm"
 	"Source/Main-ResourceService.cppm"
 	"Source/Main-ResourceServiceModule.cppm"

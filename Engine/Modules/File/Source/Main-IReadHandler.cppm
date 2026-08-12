@@ -24,9 +24,9 @@ export namespace PonyEngine::File
 
 		/// @brief Invoked on a request complete event.
 		/// @param request Request.
-		virtual void OnCompleted(const IReadRequest& request) = 0;
+		virtual void OnCompleted(const IReadRequest& request) noexcept = 0;
 		/// @brief Invoked on a request cancel event.
 		/// @param request Request.
-		virtual void OnCanceled(const IReadRequest& request) = 0;
+		virtual void OnCanceled(const IReadRequest& request) noexcept = 0;
 	};
 }

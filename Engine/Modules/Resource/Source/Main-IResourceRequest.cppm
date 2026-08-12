@@ -79,10 +79,10 @@ export namespace PonyEngine::Resource
 
 		/// @brief Adds the request observer.
 		/// @param observer Observer to add.
-		virtual void AddObserver(IResourceRequestObserver& observer) = 0;
+		virtual void AddObserver(IResourceRequestObserver& observer) const = 0;
 		/// @brief Removes the request observer.
 		/// @param observer Observer to remove.
-		virtual void RemoveObserver(IResourceRequestObserver& observer) = 0;
+		virtual void RemoveObserver(IResourceRequestObserver& observer) const = 0;
 	};
 }
 
@@ -96,7 +96,7 @@ namespace PonyEngine::Resource
 	template<typename... Args>
 	bool IResourceRequest::IsTypeOf() const noexcept
 	{
-		return IsTypeOf(std::array<std::type_index, sizeof...(Args)>(typeid(Args)...));
+		return IsTypeOf(std::array<std::type_index, sizeof...(Args)>{typeid(Args)...});
 	}
 
 	template<typename T>

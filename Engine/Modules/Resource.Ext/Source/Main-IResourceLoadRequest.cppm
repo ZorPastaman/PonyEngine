@@ -29,7 +29,5 @@ export namespace PonyEngine::Resource
 		/// @brief Sets the failure.
 		/// @param exception Exception.
 		virtual void SetFailure(const std::exception_ptr& exception) = 0;
-		/// @brief Sets canceled. May be set only if requested.
-		virtual void SetCanceled() = 0;
 	};
 }

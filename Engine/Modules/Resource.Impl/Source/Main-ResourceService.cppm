@@ -27,7 +27,7 @@ import :CollectionContainer;
 import :LoaderContainer;
 import :Resource;
 import :ResourceContainer;
-import :ResourceRequest;
+import :ResourceLoadRequest;
 
 export namespace PonyEngine::Resource
 {
@@ -512,7 +512,7 @@ namespace PonyEngine::Resource
 		IResourceLoader* const loader = FindLoader(resource->type);
 		assert(loader && "Loader not found.");
 
-		const auto request = std::make_shared<ResourceRequest>(logService, *resource, std::move(dataAccess), std::move(dependencies), *loader);
+		const auto request = std::make_shared<ResourceLoadRequest>(*resource, std::move(dataAccess), std::move(dependencies), *loader);
 
 		return request;
 	}

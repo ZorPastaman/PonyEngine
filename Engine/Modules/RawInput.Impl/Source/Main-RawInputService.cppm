@@ -208,6 +208,7 @@ namespace PonyEngine::RawInput
 	RawInputService::~RawInputService() noexcept
 	{
 		assert(devices.Size() == 0uz && "Some raw input devices weren't removed.");
+		assert(inputObservers.size() == 0uz && "Some input observers weren't removed.");
 	}
 
 	float RawInputService::Value(const Axis axis) const noexcept
