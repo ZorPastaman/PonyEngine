@@ -15,9 +15,8 @@ export module PonyEngine.File.Impl.Windows:ServiceContext;
 
 import std;
 
+import PonyEngine.Application;
 import PonyEngine.Log;
-
-import :Worker;
 
 export namespace PonyEngine::File
 {
@@ -26,23 +25,22 @@ export namespace PonyEngine::File
 	{
 	public:
 		/// @brief Creates a service context.
-		/// @param logService Log service.
-		/// @param worker Worker.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		ServiceContext(const Log::ILogService* logService, class Worker& worker) noexcept;
+		explicit ServiceContext(Application::IApplication& application) noexcept;
 		ServiceContext(const ServiceContext&) = delete;
 		ServiceContext(ServiceContext&&) = delete;
 
 		~ServiceContext() noexcept = default;
 
+		/// @brief Gets the application.
+		/// @return Application.
+		[[nodiscard("Pure function")]]
+		Application::IApplication& Application() const noexcept;
 		/// @brief Gets the log service.
 		/// @return Log service.
 		[[nodiscard("Pure function")]]
 		const Log::ILogService* LogService() const noexcept;
-		/// @brief Gets the worker.
-		/// @return Worker.
-		[[nodiscard("Pure function")]]
-		class Worker& Worker() const noexcept;
 
 		/// @brief Increments the file count.
 		void IncrementFileCount() const noexcept;
@@ -56,8 +54,8 @@ export namespace PonyEngine::File
 		ServiceContext& operator =(ServiceContext&&) = delete;
 
 	private:
+		Application::IApplication* application; ///< Application.
 		const Log::ILogService* logService; ///< Log service.
-		class Worker* worker; ///< Worker.
 
 #ifndef NDEBUG
 		mutable std::atomic_size_t fileCount; ///< File count.
@@ -67,23 +65,23 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	ServiceContext::ServiceContext(const Log::ILogService* const logService, class Worker& worker) noexcept :
+	ServiceContext::ServiceContext(Application::IApplication& application) noexcept :
 #ifndef NDEBUG
 		fileCount(0uz),
 #endif
-		logService{logService},
-		worker{&worker}
+		application{&application},
+		logService{this->application->FindInterface<Log::ILogService>()}
 	{
+	}
+
+	Application::IApplication& ServiceContext::Application() const noexcept
+	{
+		return *application;
 	}
 
 	const Log::ILogService* ServiceContext::LogService() const noexcept
 	{
 		return logService;
-	}
-
-	class Worker& ServiceContext::Worker() const noexcept
-	{
-		return *worker;
 	}
 
 	void ServiceContext::IncrementFileCount() const noexcept

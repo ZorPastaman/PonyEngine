@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.File:IRequest;
 
+import std;
+
 import :RequestStatus;
 
 export namespace PonyEngine::File

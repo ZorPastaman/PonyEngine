@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Log/Log.h"
-
 export module PonyEngine.File.Impl.Windows:FileServiceModule;
 
 import std;

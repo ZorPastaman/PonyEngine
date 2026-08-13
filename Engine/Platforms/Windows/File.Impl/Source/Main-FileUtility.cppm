@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.File.Impl.Windows:FileUtility;
 
+import std;
+
 import PonyEngine.File;
 
 export namespace PonyEngine::File
@@ -76,7 +78,7 @@ namespace PonyEngine::File
 
 	DWORD ToFlags(const FileFlag flags) noexcept
 	{
-		DWORD answer = 0u;
+		DWORD answer = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED;
 		if (Any(FileFlag::SequentialScan, flags))
 		{
 			answer |= FILE_FLAG_SEQUENTIAL_SCAN;

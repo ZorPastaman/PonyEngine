@@ -14,6 +14,7 @@ import std;
 import PonyEngine.File;
 import PonyEngine.Type;
 
+import :IRequestController;
 import :ReadRequest;
 import :WriteRequest;
 

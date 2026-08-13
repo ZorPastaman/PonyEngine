@@ -19,6 +19,7 @@ import std;
 
 import PonyEngine.File.Impl;
 
+import :FileHandle;
 import :OverlappedUtility;
 
 export namespace PonyEngine::File
@@ -28,17 +29,15 @@ export namespace PonyEngine::File
 	{
 	public:
 		/// @brief Creates a read request.
-		/// @param fileHandle File handle.
 		/// @param file File that created this request.
 		/// @param params Read parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit OverlappedRequest(HANDLE fileHandle, std::shared_ptr<IFile>&& file, const ReadParams& params);
+		explicit OverlappedRequest(const std::shared_ptr<FileHandle>& file, const ReadParams& params);
 		/// @brief Creates a write request.
-		/// @param fileHandle File handle.
 		/// @param file File that created this request.
 		/// @param params Write parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit OverlappedRequest(HANDLE fileHandle, std::shared_ptr<IFile>&& file, const WriteParams& params);
+		explicit OverlappedRequest(const std::shared_ptr<FileHandle>& file, const WriteParams& params);
 		OverlappedRequest(const OverlappedRequest&) = delete;
 		OverlappedRequest(OverlappedRequest&&) = delete;
 
@@ -69,26 +68,23 @@ export namespace PonyEngine::File
 
 		OVERLAPPED overlapped; ///< Overlapped.
 		RequestVariant request; ///< Request.
-		HANDLE fileHandle; ///< File handle.
-		std::shared_ptr<IFile> file; ///< File that created this request.
+		std::shared_ptr<FileHandle> file; ///< File that created this request.
 	};
 }
 
 namespace PonyEngine::File
 {
-	OverlappedRequest::OverlappedRequest(const HANDLE fileHandle, std::shared_ptr<IFile>&& file, const ReadParams& params) :
+	OverlappedRequest::OverlappedRequest(const std::shared_ptr<FileHandle>& file, const ReadParams& params) :
 		overlapped{CreateOverlapped(params.offset)},
 		request(*this, params),
-		fileHandle(fileHandle),
-		file(std::move(file))
+		file(file)
 	{
 	}
 
-	OverlappedRequest::OverlappedRequest(const HANDLE fileHandle, std::shared_ptr<IFile>&& file, const WriteParams& params) :
+	OverlappedRequest::OverlappedRequest(const std::shared_ptr<FileHandle>& file, const WriteParams& params) :
 		overlapped{CreateOverlapped(params.offset)},
 		request(*this, params),
-		fileHandle(fileHandle),
-		file(std::move(file))
+		file(file)
 	{
 	}
 
@@ -114,7 +110,7 @@ namespace PonyEngine::File
 
 	void OverlappedRequest::Cancel()
 	{
-		if (!CancelIoEx(fileHandle, &overlapped)) [[unlikely]]
+		if (!CancelIoEx(file->Handle(), &overlapped)) [[unlikely]]
 		{
 			if (const DWORD error = GetLastError(); error != ERROR_NOT_FOUND) [[unlikely]]
 			{

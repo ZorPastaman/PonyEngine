@@ -9,8 +9,6 @@
 
 export module PonyEngine.File:FileParams;
 
-import std;
-
 import :FileAccess;
 import :FileFlag;
 import :FileOpenMode;

@@ -40,16 +40,16 @@ export namespace PonyEngine::File
 		FileService& operator =(FileService&&) = delete;
 
 	private:
-		Worker worker; ///< Worker.
 		ServiceContext context; ///< Context.
+		Worker worker; ///< Worker.
 	};
 }
 
 namespace PonyEngine::File
 {
 	FileService::FileService(Application::IApplication& application) :
-		worker(application),
-		context(application.FindInterface<Log::ILogService>(), worker)
+		context(application),
+		worker(context)
 	{
 	}
 
@@ -60,6 +60,6 @@ namespace PonyEngine::File
 
 	std::shared_ptr<IFile> FileService::OpenFile(const std::filesystem::path& path, const FileParams params)
 	{
-		return std::make_shared<File>(context, path, params);
+		return std::make_shared<File>(worker, context, path, params);
 	}
 }
