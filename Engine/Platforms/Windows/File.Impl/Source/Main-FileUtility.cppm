@@ -78,22 +78,18 @@ namespace PonyEngine::File
 
 	DWORD ToFlags(const FileFlag flags) noexcept
 	{
+		constexpr std::array<std::pair<FileFlag, DWORD>, 4> map
+		{
+			std::pair(FileFlag::SequentialScan, FILE_FLAG_SEQUENTIAL_SCAN),
+			std::pair(FileFlag::RandomAccess, FILE_FLAG_RANDOM_ACCESS),
+			std::pair(FileFlag::DeleteOnClose, FILE_FLAG_DELETE_ON_CLOSE),
+			std::pair(FileFlag::WriteThrough, FILE_FLAG_WRITE_THROUGH),
+		};
+
 		DWORD answer = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED;
-		if (Any(FileFlag::SequentialScan, flags))
+		for (const auto [flag, nativeFlag] : map)
 		{
-			answer |= FILE_FLAG_SEQUENTIAL_SCAN;
-		}
-		if (Any(FileFlag::RandomAccess, flags))
-		{
-			answer |= FILE_FLAG_RANDOM_ACCESS;
-		}
-		if (Any(FileFlag::DeleteOnClose, flags))
-		{
-			answer |= FILE_FLAG_DELETE_ON_CLOSE;
-		}
-		if (Any(FileFlag::WriteThrough, flags))
-		{
-			answer |= FILE_FLAG_WRITE_THROUGH;
+			answer |= Any(flag, flags) ? nativeFlag : 0;
 		}
 
 		return answer;
