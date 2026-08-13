@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Resource.Impl:CachedResourceRequest;
 
 import std;
@@ -21,6 +25,10 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure constructor")]]
 		CachedResourceRequest(struct ResourceID id, std::span<const std::type_index> outputTypes, 
 			std::shared_ptr<const void>&& mainResource, std::span<const void* const> resources);
+		CachedResourceRequest(const CachedResourceRequest&) = delete;
+		CachedResourceRequest(CachedResourceRequest&&) = delete;
+
+		~CachedResourceRequest() noexcept;
 
 		[[nodiscard("Pure function")]] 
 		virtual struct ResourceID ResourceID() const noexcept override;
@@ -40,6 +48,9 @@ export namespace PonyEngine::Resource
 
 		virtual void AddObserver(IResourceRequestObserver& observer) const override;
 		virtual void RemoveObserver(IResourceRequestObserver& observer) const override;
+
+		CachedResourceRequest& operator =(const CachedResourceRequest&) = delete;
+		CachedResourceRequest& operator =(CachedResourceRequest&&) = delete;
 
 	private:
 		struct ResourceID id;
@@ -62,6 +73,12 @@ namespace PonyEngine::Resource
 		mainResource(std::move(mainResource)),
 		resources(resources.cbegin(), resources.cend())
 	{
+		assert(this->mainResource && "Main resource is nullptr.");
+	}
+
+	CachedResourceRequest::~CachedResourceRequest() noexcept
+	{
+		assert(observers.empty() && "Some observers weren't removed.");
 	}
 
 	struct ResourceID CachedResourceRequest::ResourceID() const noexcept

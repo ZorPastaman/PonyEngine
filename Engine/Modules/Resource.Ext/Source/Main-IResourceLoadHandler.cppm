@@ -25,7 +25,7 @@ export namespace PonyEngine::Resource
 		/// @brief Sets the success.
 		/// @param mainResource Main resource.
 		/// @param resources Resources. Must have all requested resource types.
-		virtual void SetSuccess(const std::shared_ptr<const void>& mainResource, std::span<const std::pair<const void*, std::type_index>> resources) = 0;
+		virtual void SetSuccess(const std::shared_ptr<const void>& mainResource, std::span<const void* const> resources) = 0;
 		/// @brief Sets the failure.
 		/// @param exception Exception.
 		virtual void SetFailure(const std::exception_ptr& exception) = 0;

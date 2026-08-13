@@ -34,7 +34,7 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		bool Contains(ResourceID resourceId) const noexcept;
 		[[nodiscard("Pure function")]]
-		const std::shared_ptr<Resource>& FindResource(ResourceID resourceId) const noexcept;
+		const std::shared_ptr<Resource>& GetResource(ResourceID resourceId) const noexcept;
 		[[nodiscard("Pure function")]]
 		std::size_t TypeCount(ResourceType type) const noexcept;
 
@@ -58,14 +58,11 @@ namespace PonyEngine::Resource
 		return resources.contains(resourceId);
 	}
 
-	const std::shared_ptr<Resource>& ResourceContainer::FindResource(const ResourceID resourceId) const noexcept
+	const std::shared_ptr<Resource>& ResourceContainer::GetResource(const ResourceID resourceId) const noexcept
 	{
-		if (const auto position = resources.find(resourceId); position != resources.cend())
-		{
-			return position->second;
-		}
-
-		return nullptr;
+		const auto position = resources.find(resourceId);
+		assert(position != resources.cend());
+		return position->second;
 	}
 
 	std::size_t ResourceContainer::TypeCount(const ResourceType type) const noexcept
@@ -80,8 +77,8 @@ namespace PonyEngine::Resource
 
 	void ResourceContainer::Add(std::shared_ptr<Resource>&& resource)
 	{
-		const ResourceID id = resource->ResourceID();
-		const ResourceType type = resource->Type();
+		const ResourceID id = resource->info->id;
+		const ResourceType type = resource->info->type;
 
 		if (!typeCounts.contains(type))
 		{
@@ -105,7 +102,7 @@ namespace PonyEngine::Resource
 	{
 		if (const auto position = resources.find(id); position != resources.cend())
 		{
-			--typeCounts[position->second->Type()];
+			--typeCounts[position->second->info->type];
 			resources.erase(position);
 		}
 	}

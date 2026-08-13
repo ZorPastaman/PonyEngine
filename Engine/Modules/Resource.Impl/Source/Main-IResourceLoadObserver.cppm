@@ -11,21 +11,14 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.Resource.Ext:IResourceLoadRequest;
-
-import std;
+export module PonyEngine.Resource.Impl:IResourceLoadObserver;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource load request.
-	class IResourceLoadRequest
+	class IResourceLoadObserver
 	{
-		PONY_INTERFACE_BODY(IResourceLoadRequest)
+		PONY_INTERFACE_BODY(IResourceLoadObserver)
 
-		/// @brief Cancels the request.
-		virtual void Cancel() = 0;
-
-		/// @brief Forgets the load handler.
-		virtual void ForgetHandler() noexcept = 0;
+		virtual void OnStatusChanged() noexcept = 0;
 	};
 }

@@ -94,7 +94,7 @@ export namespace PonyEngine::Resource
 
 		/// @brief Invoked on request status change.
 		/// @param request Request.
-		virtual void OnStatusChanged(const IResourceRequest& request) = 0;
+		virtual void OnStatusChanged(const IResourceRequest& request) noexcept = 0;
 	};
 }
 

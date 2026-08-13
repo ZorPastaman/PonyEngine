@@ -16,6 +16,7 @@ export import :EngineResourceType;
 export import :ILoadableResource;
 export import :IResourceHub;
 export import :IResourceLoader;
+export import :IResourceLoadHandler;
 export import :IResourceLoadRequest;
 export import :IResourceProvider;
 export import :ResourceCollection;
