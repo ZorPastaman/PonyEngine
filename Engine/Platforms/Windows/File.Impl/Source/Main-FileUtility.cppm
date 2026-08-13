@@ -41,14 +41,16 @@ namespace PonyEngine::File
 {
 	DWORD ToDesiredAccess(const FileAccess access) noexcept
 	{
+		constexpr std::array<std::pair<FileAccess, DWORD>, 2> map
+		{
+			std::pair(FileAccess::Read, GENERIC_READ),
+			std::pair(FileAccess::Write, GENERIC_WRITE)
+		};
+
 		DWORD desiredAccess = 0u;
-		if (Any(FileAccess::Read, access))
+		for (const auto [flag, nativeFlag] : map)
 		{
-			desiredAccess |= GENERIC_READ;
-		}
-		if (Any(FileAccess::Write, access))
-		{
-			desiredAccess |= GENERIC_WRITE;
+			desiredAccess |= Any(flag, access) ? nativeFlag : 0;
 		}
 
 		return desiredAccess;
@@ -61,16 +63,16 @@ namespace PonyEngine::File
 			throw std::invalid_argument("Truncate open mode without write file access");
 		}
 
-		if (All(FileAccess::Read, access))
-		{
-			return OPEN_EXISTING;
-		}
-
 		if (Any(FileAccess::Write, access))
 		{
 			return Any(FileOpenMode::Truncate, openMode)
 				? CREATE_ALWAYS
 				: OPEN_ALWAYS;
+		}
+
+		if (Any(FileAccess::Read, access))
+		{
+			return OPEN_EXISTING;
 		}
 
 		throw std::invalid_argument("Invalid access");

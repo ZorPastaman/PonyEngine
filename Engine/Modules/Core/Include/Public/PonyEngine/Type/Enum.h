@@ -132,6 +132,10 @@
 	[[nodiscard("Pure function")]] \
 	constexpr bool All(const Mask value, const Mask mask) noexcept \
 	{ \
+		return (value & mask) == mask; \
+	} \
+	constexpr bool Only(const Mask value, const Mask mask) noexcept \
+	{ \
 		return (value & mask) == value; \
 	} \
 	[[nodiscard("Pure function")]] \

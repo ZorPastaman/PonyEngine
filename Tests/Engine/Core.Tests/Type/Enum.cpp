@@ -83,8 +83,10 @@ TEST_CASE("ENUM_MASK_OPERATORS work as expected", "[Utility][Enum]")
 
 TEST_CASE("ENUM_MASK_CHECKS work as expected", "[Utility][Enum]")
 {
-	STATIC_REQUIRE(Name::All(Name::Permission::Read | Name::Permission::Execute, Name::Permission::All));
-	STATIC_REQUIRE_FALSE(Name::All(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Read));
+	STATIC_REQUIRE(Name::All(Name::Permission::All, Name::Permission::Read | Name::Permission::Execute));
+	STATIC_REQUIRE_FALSE(Name::All(Name::Permission::Read, Name::Permission::Read | Name::Permission::Execute));
+	STATIC_REQUIRE(Name::Only(Name::Permission::Read | Name::Permission::Execute, Name::Permission::All));
+	STATIC_REQUIRE_FALSE(Name::Only(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Read));
 	STATIC_REQUIRE(Name::Any(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Read | Name::Permission::Write));
 	STATIC_REQUIRE_FALSE(Name::Any(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Write));
 	STATIC_REQUIRE_FALSE(Name::None(Name::Permission::Read | Name::Permission::Execute, Name::Permission::Read | Name::Permission::Write));
