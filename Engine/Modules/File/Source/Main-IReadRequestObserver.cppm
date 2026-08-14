@@ -11,23 +11,24 @@ module;
 
 #include "PonyEngine/Object/Body.h"
 
-export module PonyEngine.File:IReadRequest;
+export module PonyEngine.File:IReadRequestObserver;
 
 import std;
 
-import :IRequest;
-import :ReadParams;
-
 export namespace PonyEngine::File
 {
-	/// @brief Read request.
-	class IReadRequest : public IRequest
+	/// @brief Read request observer.
+	class IReadRequestObserver
 	{
-		PONY_INTERFACE_BODY(IReadRequest)
+		PONY_INTERFACE_BODY(IReadRequestObserver)
 
-		/// @brief Gets the request params.
-		/// @return Request params.
-		[[nodiscard("Pure function")]]
-		virtual const ReadParams& Params() const noexcept = 0;
+		/// @brief Invoked on a success.
+		/// @param byteCount How many bytes were transferred.
+		virtual void OnSuccess(std::size_t byteCount) noexcept = 0;
+		/// @brief Invoked on a failure.
+		/// @param exception Exception.
+		virtual void OnFailure(const std::exception_ptr& exception) noexcept = 0;
+		/// @brief Invoked on cancel.
+		virtual void OnCancel() noexcept = 0;
 	};
 }

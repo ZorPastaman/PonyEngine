@@ -26,13 +26,13 @@ import PonyEngine.Resource.Ext;
 import :CachedResourceRequest;
 import :CollectionContainer;
 import :LoadableResource;
-import :LoadedResourceRequest;
 import :LoaderContainer;
 import :Resource;
 import :ResourceContainer;
 import :ResourceData;
 import :ResourceInfo;
-import :ResourceLoadHandler;
+import :ResourceLoadProcess;
+import :Utility;
 
 export namespace PonyEngine::Resource
 {
@@ -48,14 +48,12 @@ export namespace PonyEngine::Resource
 		~ResourceService() noexcept;
 
 		[[nodiscard("Pure function")]] 
-		virtual bool HasResource(ResourceID resourceId) const noexcept override;
+		virtual bool HasResource(ResourceID resourceId) const override;
 		[[nodiscard("Pure function")]] 
 		virtual bool IsResourceTypeOf(ResourceID resourceId, std::span<const std::type_index> types) const override;
 
 		[[nodiscard("Pure function")]] 
-		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId) const override;
-		[[nodiscard("Pure function")]] 
-		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId,std::span<const std::type_index> types) const override;
+		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId,std::span<const std::type_index> types, IResourceRequestObserver* observer) const override;
 
 		[[nodiscard("Must be used to unregister")]] 
 		virtual ResourceCollection RegisterCollection(IResourceProvider& provider, std::span<const CollectionResource> resources,
@@ -96,11 +94,6 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		IResourceLoader* FindLoader(ResourceType type) const noexcept;
 
-		[[nodiscard("Pure function")]]
-		bool CheckResourceType(ResourceID resourceId, std::span<const std::type_index> types) const;
-		[[nodiscard("Pure function")]]
-		std::shared_ptr<IResourceRequest> MakeResourceRequest(ResourceID resourceId) const;
-
 		Application::IApplication* application;
 		Log::ILogService* logService;
 
@@ -133,20 +126,19 @@ namespace PonyEngine::Resource
 		assert(loaderContainer.Size() == 0uz && "Loaders weren't removed.");
 	}
 
-	bool ResourceService::HasResource(const ResourceID resourceId) const noexcept
+	bool ResourceService::HasResource(const ResourceID resourceId) const
 	{
+		if (!IsResourceIDValid(resourceId)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid resource ID");
+		}
+
 		const auto lock = std::shared_lock(stateMutex);
 		return resourceContainer.Contains(resourceId);
 	}
 
 	bool ResourceService::IsResourceTypeOf(const ResourceID resourceId, const std::span<const std::type_index> types) const
 	{
-		const auto lock = std::shared_lock(stateMutex);
-		return CheckResourceType(resourceId, types);
-	}
-
-	std::shared_ptr<IResourceRequest> ResourceService::LoadResource(const ResourceID resourceId) const
-	{
 		if (!IsResourceIDValid(resourceId)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid resource ID");
@@ -159,29 +151,61 @@ namespace PonyEngine::Resource
 			throw std::invalid_argument("Resource not found");
 		}
 
-		return MakeResourceRequest(resourceId);
+		return CheckTypes(types, resourceContainer.GetResource(resourceId)->info->outputTypes);
 	}
 
-	std::shared_ptr<IResourceRequest> ResourceService::LoadResource(const ResourceID resourceId, const std::span<const std::type_index> types) const
+	std::shared_ptr<IResourceRequest> ResourceService::LoadResource(const ResourceID resourceId, const std::span<const std::type_index> types, 
+		IResourceRequestObserver* const observer) const
 	{
 		if (!IsResourceIDValid(resourceId)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid resource ID");
 		}
 
-		const auto lock = std::shared_lock(stateMutex);
+		const auto stateLock = std::shared_lock(stateMutex);
 
 		if (!resourceContainer.Contains(resourceId))
 		{
 			throw std::invalid_argument("Resource not found");
 		}
 
-		if (!CheckResourceType(resourceId, types)) [[unlikely]]
+		const std::shared_ptr<Resource>& resource = resourceContainer.GetResource(resourceId);
+		if (!CheckTypes(types, resourceContainer.GetResource(resourceId)->info->outputTypes))
 		{
 			throw std::invalid_argument("Invalid type");
 		}
 
-		return MakeResourceRequest(resourceId);
+		const auto resourceLock = std::lock_guard(*resource->mutex);
+
+		if (std::shared_ptr<const void> mainResource = resource->data->MainResource())
+		{
+			const auto request = std::make_shared<CachedResourceRequest>(resource->info, resource->data, mainResource);
+
+			if (observer)
+			{
+				observer->OnSuccess(request->Result());
+			}
+
+			return request;
+		}
+
+		if (const std::shared_ptr<ResourceLoadProcess> loadProcess = resource->loadProcess.lock())
+		{
+			return std::make_shared<LoadedResourceRequest>(loadProcess, observer);
+		}
+
+		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->info->collection));
+		const auto collection = ResourceCollection{ .id = resource->info->collection, .version = resourceCollectionVersions[resource->info->collection] };
+		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->info->collectionResourceIndex, resource->info->dataAccessType);
+		assert(dataAccess && "Data access is nullptr.");
+
+		IResourceLoader* const loader = FindLoader(resource->info->type);
+		assert(loader && "Loader not found.");
+
+		const auto loadProcess = std::make_shared<ResourceLoadProcess>(resource->info, resource->data, resource->mutex, std::move(dataAccess), *loader);
+		resource->loadProcess = loadProcess;
+
+		return std::make_shared<LoadedResourceRequest>(loadProcess, observer);
 	}
 
 	ResourceCollection ResourceService::RegisterCollection(IResourceProvider& provider,
@@ -218,27 +242,6 @@ namespace PonyEngine::Resource
 				{
 					throw std::invalid_argument(std::format("Resource type is invalid: Type = '0x{:X}'", resource.type.value));
 				}
-				for (const ResourceID dependencyId : resource.dependencies)
-				{
-					if (!IsResourceIDValid(dependencyId)) [[unlikely]]
-					{
-						throw std::invalid_argument(std::format("Resource ID of dependency is invalid: ID = '0x{:X}'", dependencyId.value));
-					}
-					if (dependencyId == resource.id) [[unlikely]]
-					{
-						throw std::invalid_argument(std::format("Resource with ID '0x{:X}' has itself as dependency", resource.id.value));
-					}
-				}
-				for (std::size_t i = 1uz; i < resource.dependencies.size(); ++i)
-				{
-					for (std::size_t j = 0uz; j < i; ++j)
-					{
-						if (resource.dependencies[i] == resource.dependencies[j]) [[unlikely]]
-						{
-							throw std::invalid_argument(std::format("Same resource ID is used in dependencies twice: ID = '0x{:X}'", resource.dependencies[i].value));
-						}
-					}
-				}
 
 				IResourceLoader* const loader = FindLoader(resource.type);
 				if (!loader) [[unlikely]]
@@ -261,7 +264,6 @@ namespace PonyEngine::Resource
 				{
 					.id = resource.id,
 					.type = resource.type,
-					.dependencies = std::vector(resource.dependencies.cbegin(), resource.dependencies.cend()),
 					.collection = collection.id,
 					.collectionResourceIndex = resource.dataIndex,
 					.dataAccessType = *loadableResource.DataAccessType(),
@@ -338,7 +340,7 @@ namespace PonyEngine::Resource
 		{
 			if (resourceContainer.TypeCount(resourceType) > 0uz) [[unlikely]]
 			{
-				throw std::logic_error("One of resource loader types is still in use");
+				throw std::logic_error("Some resource loader types are still in use");
 			}
 		}
 
@@ -480,70 +482,5 @@ namespace PonyEngine::Resource
 	{
 		const std::size_t index = loaderContainer.IndexOf(type);
 		return index < loaderContainer.Size() ? &loaderContainer.Loader(index) : nullptr;
-	}
-
-	bool ResourceService::CheckResourceType(const ResourceID resourceId, const std::span<const std::type_index> types) const
-	{
-		const std::shared_ptr<Resource>& resource = resourceContainer.GetResource(resourceId);
-
-		for (const std::span<const std::type_index> outputTypes = resource->info->outputTypes; const std::type_index type : types)
-		{
-			if (!std::ranges::contains(outputTypes, type))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	std::shared_ptr<IResourceRequest> ResourceService::MakeResourceRequest(const ResourceID resourceId) const
-	{
-		if (!resourceContainer.Contains(resourceId))
-		{
-			throw std::invalid_argument(std::format("Resource with ID '{}' not found", resourceId.value));
-		}
-
-		const std::shared_ptr<Resource>& resource = resourceContainer.GetResource(resourceId);
-		const auto lock = std::lock_guard(*resource->mutex);
-
-		if (std::shared_ptr<const void> mainResource = resource->data->MainResource())
-		{
-			return std::make_shared<CachedResourceRequest>(resource->info->id, resource->info->outputTypes,
-				std::move(mainResource), resource->data->Resources());
-		}
-
-		if (const std::shared_ptr<ResourceLoadHandler> loadHandler = resource->loadHandler.lock())
-		{
-			return std::make_shared<LoadedResourceRequest>(resource->info->id, loadHandler);
-		}
-
-		std::vector<std::shared_ptr<const IResourceRequest>> dependencies;
-		dependencies.reserve(resource->info->dependencies.size());
-		for (const ResourceID dependency : resource->info->dependencies)
-		{
-			dependencies.push_back(MakeResourceRequest(dependency));
-		}
-
-		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->info->collection));
-		const auto collection = ResourceCollection{.id = resource->info->collection, .version = resourceCollectionVersions[resource->info->collection]};
-		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->info->collectionResourceIndex, resource->info->dataAccessType);
-		assert(dataAccess && "Data access is nullptr.");
-
-		IResourceLoader* const loader = FindLoader(resource->info->type);
-		assert(loader && "Loader not found.");
-
-		const auto loadHandler = std::make_shared<ResourceLoadHandler>(resource->data, resource->mutex, *loader, ResourceLoadContext
-		{
-			.resourceType = resource->info->type,
-			.resourceDataAccess = std::move(dataAccess),
-			.resourceDataAccessType = resource->info->dataAccessType,
-			.loadData = resource->info->loadData,
-			.dependencies = dependencies,
-			.outputTypes = resource->info->outputTypes
-		});
-		resource->loadHandler = loadHandler;
-
-		return std::make_shared<LoadedResourceRequest>(resource->info->id, loadHandler);
 	}
 }

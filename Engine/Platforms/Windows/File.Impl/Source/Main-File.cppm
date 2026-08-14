@@ -43,9 +43,9 @@ export namespace PonyEngine::File
 		virtual FileFlag Flags() const noexcept override;
 
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params) override;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, IReadRequestObserver* observer) override;
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params) override;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, IWriteRequestObserver* observer) override;
 
 		File& operator =(const File&) = delete;
 		File& operator =(File&&) = delete;
@@ -54,7 +54,7 @@ export namespace PonyEngine::File
 		Worker* worker; ///< Worker.
 
 		FileInfo fileInfo; ///< File info.
-		std::shared_ptr<FileHandle> fileHandle; ///< File handle.
+		std::shared_ptr<const FileHandle> fileHandle; ///< File handle.
 	};
 }
 
@@ -83,15 +83,15 @@ namespace PonyEngine::File
 		return fileInfo.Flags();
 	}
 
-	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params)
+	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params, IReadRequestObserver* const observer)
 	{
 		fileInfo.ValidateRead();
-		return worker->MakeRequest(fileHandle, params);
+		return worker->MakeRequest(fileHandle, params, observer);
 	}
 
-	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params)
+	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params, IWriteRequestObserver* const observer)
 	{
 		fileInfo.ValidateWrite();
-		return worker->MakeRequest(fileHandle, params);
+		return worker->MakeRequest(fileHandle, params, observer);
 	}
 }

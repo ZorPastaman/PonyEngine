@@ -7,23 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Impl:Resource;
+export module PonyEngine.Resource.Impl:Utility;
 
 import std;
 
-import PonyEngine.Resource.Ext;
-
-import :ResourceData;
-import :ResourceInfo;
-import :ResourceLoadProcess;
-
 export namespace PonyEngine::Resource
 {
-	struct Resource final
+	bool CheckTypes(std::span<const std::type_index> required, std::span<const std::type_index> provided) noexcept;
+}
+
+namespace PonyEngine::Resource
+{
+	bool CheckTypes(const std::span<const std::type_index> required, const std::span<const std::type_index> provided) noexcept
 	{
-		std::shared_ptr<const ResourceInfo> info;
-		std::shared_ptr<ResourceData> data;
-		std::weak_ptr<ResourceLoadProcess> loadProcess;
-		std::shared_ptr<std::mutex> mutex;
-	};
+		for (const std::type_index type : required)
+		{
+			if (!std::ranges::contains(provided, type))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

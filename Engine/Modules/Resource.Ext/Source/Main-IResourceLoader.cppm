@@ -34,9 +34,9 @@ export namespace PonyEngine::Resource
 		virtual void PrepareResource(ILoadableResource& context) = 0;
 		/// @brief Makes a load request.
 		/// @param context Resource load context.
-		/// @param loadHandler Resource load handler. Must be kept alive till the end of the request.
+		/// @param loadHandler Resource load handler.
 		/// @return Resource load request.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IResourceLoadRequest> Load(const ResourceLoadContext& context, IResourceLoadHandler& loadHandler) = 0;
+		virtual std::shared_ptr<IResourceLoadRequest> Load(const ResourceLoadContext& context, const std::shared_ptr<IResourceLoadHandler>& loadHandler) = 0;
 	};
 }

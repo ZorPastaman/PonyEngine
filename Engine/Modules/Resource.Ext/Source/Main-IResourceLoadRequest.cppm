@@ -24,8 +24,5 @@ export namespace PonyEngine::Resource
 
 		/// @brief Cancels the request.
 		virtual void Cancel() = 0;
-
-		/// @brief Forgets the load handler.
-		virtual void ForgetHandler() noexcept = 0;
 	};
 }

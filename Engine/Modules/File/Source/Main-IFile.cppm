@@ -18,7 +18,9 @@ import std;
 import :FileAccess;
 import :FileFlag;
 import :IReadRequest;
+import :IReadRequestObserver;
 import :IWriteRequest;
+import :IWriteRequestObserver;
 import :ReadParams;
 import :WriteParams;
 
@@ -44,17 +46,19 @@ export namespace PonyEngine::File
 
 		/// @brief Makes a read request.
 		/// @param params Read parameters.
+		/// @param observer Observer. Can be nullptr. It will be called on the caller thread or on an io thread.
 		/// @return Read request.
-		/// @note The buffer must be kept alive till the finish of the operation.
+		/// @note The buffer and observer must be kept alive till the finish of the operation.
 		/// @note The function is thread-safe.
 		[[nodiscard("Must be used")]]
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params) = 0;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, IReadRequestObserver* observer = nullptr) = 0;
 		/// @brief Makes a write request.
 		/// @param params Write parameters.
+		/// @param observer Observer. Can be nullptr. It will be called on the caller thread or on an io thread.
 		/// @return Write request.
-		/// @note The buffer must be kept alive till the finish of the operation.
+		/// @note The buffer and observer must be kept alive till the finish of the operation.
 		/// @note The function is thread-safe.
 		[[nodiscard("Must be used")]]
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params) = 0;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, IWriteRequestObserver* observer = nullptr) = 0;
 	};
 }

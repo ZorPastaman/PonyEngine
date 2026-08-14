@@ -24,7 +24,6 @@ export namespace PonyEngine::Resource
 		std::shared_ptr<void> resourceDataAccess; ///< Resource data access.
 		std::type_index resourceDataAccessType; ///< Resource data access type.
 		std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> loadData; ///< Resource load data.
-		std::span<const std::shared_ptr<const IResourceRequest>> dependencies; ///< Resource dependencies. May be not loaded.
 		std::span<const std::type_index> outputTypes; ///< Resource output types.
 	};
 }

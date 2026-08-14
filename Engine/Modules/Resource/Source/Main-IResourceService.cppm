@@ -16,6 +16,7 @@ export module PonyEngine.Resource:IResourceService;
 import std;
 
 import :IResourceRequest;
+import :IResourceRequestObserver;
 import :ResourceID;
 
 export namespace PonyEngine::Resource
@@ -26,11 +27,11 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(IResourceService)
 
 		/// @brief Checks if the service has a resource with the given ID.
-		/// @param resourceId Resource ID.
+		/// @param resourceId Resource ID. Must be valid.
 		/// @return @a True if such a resource is available; @a false otherwise.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual bool HasResource(ResourceID resourceId) const noexcept = 0;
+		virtual bool HasResource(ResourceID resourceId) const = 0;
 		/// @brief Checks whether the resource is of type @p type.
 		/// @param resourceId Resource ID. Must be valid.
 		/// @param type The resource type to check against.
@@ -55,31 +56,36 @@ export namespace PonyEngine::Resource
 
 		/// @brief Loads a resource.
 		/// @param resourceId Resource ID. Must be valid.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId) const = 0;
+		std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId, IResourceRequestObserver* observer = nullptr) const;
 		/// @brief Loads a resource with type check.
 		/// @param resourceId Resource ID. Must be valid.
 		/// @param type Type that the resource must be type of.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId, std::type_index type) const;
+		std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId, std::type_index type, IResourceRequestObserver* observer = nullptr) const;
 		/// @brief Loads a resource with type checks.
 		/// @param resourceId Resource ID. Must be valid.
 		/// @param types Types that the resource must be type of.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId, std::span<const std::type_index> types) const = 0;
+		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId, std::span<const std::type_index> types, 
+			IResourceRequestObserver* observer = nullptr) const = 0;
 		/// @brief Loads a resource with type check.
 		/// @tparam Args Types that the resource must be type of.
 		/// @param resourceId Resource ID. Must be valid.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		template<typename... Args> [[nodiscard("Pure function")]]
-		std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId) const;
+		std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId, IResourceRequestObserver* observer = nullptr) const;
 
 		/// @brief Makes a resource ID from the resource ID string.
 		/// @param resourceId Resource ID string.
@@ -115,14 +121,19 @@ namespace PonyEngine::Resource
 		return IsResourceTypeOf(resourceId, std::array<std::type_index, sizeof...(Args)>{typeid(Args)...});
 	}
 
-	std::shared_ptr<IResourceRequest> IResourceService::LoadResource(const ResourceID resourceId, const std::type_index type) const
+	std::shared_ptr<IResourceRequest> IResourceService::LoadResource(const ResourceID resourceId, IResourceRequestObserver* const observer) const
 	{
-		return LoadResource(resourceId, std::span(&type, 1uz));
+		return LoadResource(resourceId, std::span<const std::type_index>(), observer);
+	}
+
+	std::shared_ptr<IResourceRequest> IResourceService::LoadResource(const ResourceID resourceId, const std::type_index type, IResourceRequestObserver* const observer) const
+	{
+		return LoadResource(resourceId, std::span(&type, 1uz), observer);
 	}
 
 	template<typename... Args>
-	std::shared_ptr<IResourceRequest> IResourceService::LoadResource(const ResourceID resourceId) const
+	std::shared_ptr<IResourceRequest> IResourceService::LoadResource(const ResourceID resourceId, IResourceRequestObserver* const observer) const
 	{
-		return LoadResource(resourceId, std::array<std::type_index, sizeof...(Args)>{typeid(Args)...});
+		return LoadResource(resourceId, std::array<std::type_index, sizeof...(Args)>{typeid(Args)...}, observer);
 	}
 }

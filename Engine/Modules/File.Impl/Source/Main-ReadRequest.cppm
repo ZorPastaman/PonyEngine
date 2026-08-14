@@ -29,12 +29,13 @@ export namespace PonyEngine::File
 		/// @brief Creates a read request.
 		/// @param controller Request controller.
 		/// @param params Read parameters.
+		/// @param observer Observer. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		ReadRequest(IRequestController& controller, const ReadParams& params) noexcept;
+		ReadRequest(IRequestController& controller, const ReadParams& params, IReadRequestObserver* observer) noexcept;
 		ReadRequest(const ReadRequest&) = delete;
 		ReadRequest(ReadRequest&&) = delete;
 
-		~ReadRequest() noexcept;
+		~ReadRequest() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
 		virtual const ReadParams& Params() const noexcept override;
@@ -50,9 +51,6 @@ export namespace PonyEngine::File
 
 		virtual void Wait() const noexcept override;
 
-		virtual void AddObserver(IReadObserver& observer) const override;
-		virtual void RemoveObserver(IReadObserver& observer) const override;
-
 		/// @brief Sets the status to success.
 		/// @param byteCount Transferred byte count.
 		void SetSuccess(std::size_t byteCount) noexcept;
@@ -66,31 +64,21 @@ export namespace PonyEngine::File
 		ReadRequest& operator =(ReadRequest&&) = delete;
 
 	private:
-		/// @brief Calls observers.
-		void Observe() noexcept;
-
 		IRequestController* controller; ///< Request controller.
 		ReadParams params; ///< Read parameters.
 		Request request; ///< Read request.
 
-		mutable std::vector<IReadObserver*> observers; ///< Observers.
-		bool observerCalled; ///< Were observers called?
-		mutable std::mutex observerMutex; ///< Observer mutex.
+		IReadRequestObserver* observer; ///< Observer.
 	};
 }
 
 namespace PonyEngine::File
 {
-	ReadRequest::ReadRequest(IRequestController& controller, const ReadParams& params) noexcept :
+	ReadRequest::ReadRequest(IRequestController& controller, const ReadParams& params, IReadRequestObserver* const observer) noexcept :
 		controller{&controller},
 		params(params),
-		observerCalled{false}
+		observer{observer}
 	{
-	}
-
-	ReadRequest::~ReadRequest() noexcept
-	{
-		assert(observers.empty() && "Observers weren't removed.");
 	}
 
 	const ReadParams& ReadRequest::Params() const noexcept
@@ -123,58 +111,33 @@ namespace PonyEngine::File
 		request.Wait();
 	}
 
-	void ReadRequest::AddObserver(IReadObserver& observer) const
-	{
-		const auto lock = std::lock_guard(observerMutex);
-		observers.push_back(&observer);
-
-		if (observerCalled)
-		{
-			observer.OnStatusChanged(*this);
-		}
-	}
-
-	void ReadRequest::RemoveObserver(IReadObserver& observer) const
-	{
-		const auto lock = std::lock_guard(observerMutex);
-		
-		if (const auto position = std::ranges::find(observers, &observer); position != observers.cend()) [[likely]]
-		{
-			observers.erase(position);
-		}
-		else [[unlikely]]
-		{
-			throw std::invalid_argument("Observer wasn't added");
-		}
-	}
-
 	void ReadRequest::SetSuccess(const std::size_t byteCount) noexcept
 	{
 		request.SetSuccess(byteCount);
-		Observe();
+		
+		if (observer)
+		{
+			observer->OnSuccess(byteCount);
+		}
 	}
 
 	void ReadRequest::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		request.SetFailed(exception);
-		Observe();
+		
+		if (observer)
+		{
+			observer->OnFailure(exception);
+		}
 	}
 
 	void ReadRequest::SetCanceled() noexcept
 	{
 		request.SetCanceled();
-		Observe();
-	}
-
-	void ReadRequest::Observe() noexcept
-	{
-		const auto lock = std::lock_guard(observerMutex);
-
-		for (IReadObserver* const observer : observers)
+		
+		if (observer)
 		{
-			observer->OnStatusChanged(*this);
+			observer->OnCancel();
 		}
-
-		observerCalled = true;
 	}
 }

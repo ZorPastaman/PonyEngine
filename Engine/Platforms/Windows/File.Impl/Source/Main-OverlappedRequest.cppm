@@ -31,13 +31,15 @@ export namespace PonyEngine::File
 		/// @brief Creates a read request.
 		/// @param file File that created this request.
 		/// @param params Read parameters.
+		/// @param observer Observer. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		explicit OverlappedRequest(const std::shared_ptr<FileHandle>& file, const ReadParams& params);
+		explicit OverlappedRequest(const std::shared_ptr<const FileHandle>& file, const ReadParams& params, IReadRequestObserver* observer) noexcept;
 		/// @brief Creates a write request.
 		/// @param file File that created this request.
 		/// @param params Write parameters.
+		/// @param observer Observer. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		explicit OverlappedRequest(const std::shared_ptr<FileHandle>& file, const WriteParams& params);
+		explicit OverlappedRequest(const std::shared_ptr<const FileHandle>& file, const WriteParams& params, IWriteRequestObserver* observer) noexcept;
 		OverlappedRequest(const OverlappedRequest&) = delete;
 		OverlappedRequest(OverlappedRequest&&) = delete;
 
@@ -68,22 +70,22 @@ export namespace PonyEngine::File
 
 		OVERLAPPED overlapped; ///< Overlapped.
 		RequestVariant request; ///< Request.
-		std::shared_ptr<FileHandle> file; ///< File that created this request.
+		std::shared_ptr<const FileHandle> file; ///< File that created this request.
 	};
 }
 
 namespace PonyEngine::File
 {
-	OverlappedRequest::OverlappedRequest(const std::shared_ptr<FileHandle>& file, const ReadParams& params) :
+	OverlappedRequest::OverlappedRequest(const std::shared_ptr<const FileHandle>& file, const ReadParams& params, IReadRequestObserver* const observer) noexcept :
 		overlapped{CreateOverlapped(params.offset)},
-		request(*this, params),
+		request(*this, params, observer),
 		file(file)
 	{
 	}
 
-	OverlappedRequest::OverlappedRequest(const std::shared_ptr<FileHandle>& file, const WriteParams& params) :
+	OverlappedRequest::OverlappedRequest(const std::shared_ptr<const FileHandle>& file, const WriteParams& params, IWriteRequestObserver* const observer) noexcept :
 		overlapped{CreateOverlapped(params.offset)},
-		request(*this, params),
+		request(*this, params, observer),
 		file(file)
 	{
 	}

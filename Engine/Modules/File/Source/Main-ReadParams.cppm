@@ -18,6 +18,5 @@ export namespace PonyEngine::File
 	{
 		std::span<std::byte> buffer; ///< Input buffer. Its size determines how many bytes are read from a file. Must be kept alive till the end of an operation.
 		std::size_t offset = 0uz; ///< File offset.
-		std::shared_ptr<void> storage; ///< Optional storage parameter. It's an object that keeps the @p buffer alive.
 	};
 }

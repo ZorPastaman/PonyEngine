@@ -22,7 +22,6 @@ export namespace PonyEngine::Resource
 	{
 		ResourceID id; ///< Resource ID. Must be valid.
 		ResourceType type; ///< Resource type. Must be valid.
-		std::span<const ResourceID> dependencies; ///< Dependencies. They are not validated on registration but must be available on the resource load.
 		std::span<const std::byte> dataMeta; ///< Resource data meta. It's used by a loader.
 		std::span<const std::byte> loadMeta; ///< Resource load meta. It's used by a loader.
 		std::size_t dataIndex = 0uz; ///< Resource data index.

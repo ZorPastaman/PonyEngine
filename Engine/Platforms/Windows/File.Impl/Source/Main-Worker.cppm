@@ -44,20 +44,22 @@ export namespace PonyEngine::File
 
 		/// @brief Associates the file handle with the worker iocp.
 		/// @param file File.
-		void AssociateFile(const std::shared_ptr<FileHandle>& file) const;
+		void AssociateFile(const std::shared_ptr<const FileHandle>& file) const;
 
 		/// @brief Makes a read request.
 		/// @param file File that created this request.
 		/// @param params Read parameters.
+		/// @param observer Observer. Can be nullptr.
 		/// @return Overlapped read request.
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<IReadRequest> MakeRequest(const std::shared_ptr<FileHandle>& file, const ReadParams& params) const;
+		std::shared_ptr<IReadRequest> MakeRequest(const std::shared_ptr<const FileHandle>& file, const ReadParams& params, IReadRequestObserver* observer) const;
 		/// @brief Makes a write request.
 		/// @param file File that created this request.
 		/// @param params Write parameters.
+		/// @param observer Observer. Can be nullptr.
 		/// @return Overlapped write request.
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<IWriteRequest> MakeRequest(const std::shared_ptr<FileHandle>& file, const WriteParams& params) const;
+		std::shared_ptr<IWriteRequest> MakeRequest(const std::shared_ptr<const FileHandle>& file, const WriteParams& params, IWriteRequestObserver* observer) const;
 
 		Worker& operator =(const Worker&) = delete;
 		Worker& operator =(Worker&&) = delete;
@@ -153,7 +155,7 @@ namespace PonyEngine::File
 		PONY_LOG(context->LogService(), Log::LogType::Info, "Closing IOCP done.");
 	}
 
-	void Worker::AssociateFile(const std::shared_ptr<FileHandle>& file) const
+	void Worker::AssociateFile(const std::shared_ptr<const FileHandle>& file) const
 	{
 		PONY_LOG(context->LogService(), Log::LogType::Debug, "Associating file with iocp... File handle: '0x{:X}'; IOCP: '0x{:X}'.",
 			reinterpret_cast<std::uintptr_t>(file->Handle()), reinterpret_cast<std::uintptr_t>(iocp));
@@ -165,14 +167,14 @@ namespace PonyEngine::File
 			reinterpret_cast<std::uintptr_t>(file->Handle()), reinterpret_cast<std::uintptr_t>(iocp));
 	}
 
-	std::shared_ptr<IReadRequest> Worker::MakeRequest(const std::shared_ptr<FileHandle>& file, const ReadParams& params) const
+	std::shared_ptr<IReadRequest> Worker::MakeRequest(const std::shared_ptr<const FileHandle>& file, const ReadParams& params, IReadRequestObserver* const observer) const
 	{
 		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Too great buffer");
 		}
 
-		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, file, params);
+		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, file, params, observer);
 		AddOngoingRequest(request);
 
 		try
@@ -207,14 +209,14 @@ namespace PonyEngine::File
 		return std::shared_ptr<IReadRequest>(std::move(request), &request->Request().Read());
 	}
 
-	std::shared_ptr<IWriteRequest> Worker::MakeRequest(const std::shared_ptr<FileHandle>& file, const WriteParams& params) const
+	std::shared_ptr<IWriteRequest> Worker::MakeRequest(const std::shared_ptr<const FileHandle>& file, const WriteParams& params, IWriteRequestObserver* const observer) const
 	{
 		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Too great buffer");
 		}
 
-		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, file, params);
+		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, file, params, observer);
 		AddOngoingRequest(request);
 
 		try

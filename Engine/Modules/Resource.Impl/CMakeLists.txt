@@ -35,17 +35,17 @@ target_sources(PonyEngine.Resource.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-CachedResourceRequest.cppm"
 	"Source/Main-CollectionContainer.cppm"
-	"Source/Main-IResourceLoadObserver.cppm"
 	"Source/Main-LoadableResource.cppm"
-	"Source/Main-LoadedResourceRequest.cppm"
 	"Source/Main-LoaderContainer.cppm"
 	"Source/Main-Resource.cppm"
 	"Source/Main-ResourceContainer.cppm"
 	"Source/Main-ResourceData.cppm"
 	"Source/Main-ResourceInfo.cppm"
-	"Source/Main-ResourceLoadHandler.cppm"
+	"Source/Main-ResourceLoadProcess.cppm"
+	"Source/Main-ResourceRequestResult.cppm"
 	"Source/Main-ResourceService.cppm"
 	"Source/Main-ResourceServiceModule.cppm"
+	"Source/Main-Utility.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_RESOURCE_ORDER)
