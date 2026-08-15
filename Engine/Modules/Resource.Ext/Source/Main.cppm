@@ -13,7 +13,10 @@ export import PonyEngine.Resource;
 
 export import :CollectionResource;
 export import :EngineResourceType;
+export import :IFileDataAccess;
+export import :ILoadableDataAccess;
 export import :ILoadableResource;
+export import :IMemoryDataAccess;
 export import :IResourceHub;
 export import :IResourceLoader;
 export import :IResourceLoadHandler;
