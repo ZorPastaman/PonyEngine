@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Resource:IResourceRequestObserver;
 
+import std;
+
 import :IResourceRequestResult;
 
 export namespace PonyEngine::Resource

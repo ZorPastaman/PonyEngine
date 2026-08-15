@@ -21,6 +21,7 @@ import :Resource;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource container.
 	class ResourceContainer final
 	{
 	public:
@@ -31,23 +32,37 @@ export namespace PonyEngine::Resource
 
 		~ResourceContainer() noexcept = default;
 
+		/// @brief Checks if the container has the @p resourceId.
+		/// @param resourceId Resource ID to find.
+		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool Contains(ResourceID resourceId) const noexcept;
+		/// @brief Gets a resource.
+		/// @param resourceId Resource ID. It must be contained by the container.
+		/// @return Resource.
 		[[nodiscard("Pure function")]]
 		const std::shared_ptr<Resource>& GetResource(ResourceID resourceId) const noexcept;
+		/// @brief Gets how many resources are of type @p type.
+		/// @param type Resource type.
+		/// @return Type count.
 		[[nodiscard("Pure function")]]
 		std::size_t TypeCount(ResourceType type) const noexcept;
 
+		/// @brief Adds the resource.
+		/// @param resource Resource to add.
 		void Add(std::shared_ptr<Resource>&& resource);
+		/// @brief Removes a resource.
+		/// @param id Resource ID to remove.
 		void Remove(ResourceID id) noexcept;
+		/// @brief Clears the container.
 		void Clear() noexcept;
 
 		ResourceContainer& operator =(const ResourceContainer&) = delete;
 		ResourceContainer& operator =(ResourceContainer&&) = delete;
 
 	private:
-		std::unordered_map<ResourceID, std::shared_ptr<Resource>> resources;
-		std::unordered_map<ResourceType, std::size_t> typeCounts;
+		std::unordered_map<ResourceID, std::shared_ptr<Resource>> resources; ///< Resources.
+		std::unordered_map<ResourceType, std::size_t> typeCounts; ///< Type counts.
 	};
 }
 

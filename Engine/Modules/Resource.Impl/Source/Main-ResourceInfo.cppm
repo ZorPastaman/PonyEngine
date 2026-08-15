@@ -15,19 +15,18 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource info.
 	struct ResourceInfo final
 	{
-		ResourceID id;
-		ResourceType type;
+		ResourceID id; ///< Resource ID.
+		ResourceType type; ///< Resource type.
 
-		std::vector<ResourceID> dependencies;
+		ResourceCollectionID collection; ///< Collection ID that uses this resource.
+		std::size_t collectionResourceIndex; ///< Collection resource index.
+		std::type_index dataAccessType; ///< Data access type.
 
-		ResourceCollectionID collection;
-		std::size_t collectionResourceIndex;
-		std::type_index dataAccessType;
+		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>> loadData; ///< Load data.
 
-		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>> loadData;
-
-		std::vector<std::type_index> outputTypes;
+		std::vector<std::type_index> outputTypes; ///< Output types.
 	};
 }

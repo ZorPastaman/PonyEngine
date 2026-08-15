@@ -19,12 +19,17 @@ import :ResourceRequestResult;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource request that is used when the resource is already loaded and still in memory.
 	class CachedResourceRequest final : public IResourceRequest
 	{
 	public:
+		/// @brief Creates a cached resource request.
+		/// @param info Resource info. Mustn't be nullptr.
+		/// @param data Resource data. Mustn't be nullptr.
+		/// @param mainResource Main resource. Mustn't be nullptr.
 		[[nodiscard("Pure constructor")]]
 		CachedResourceRequest(const std::shared_ptr<const ResourceInfo>& info, const std::shared_ptr<const ResourceData>& data, 
-			const std::shared_ptr<const void>& mainResource) noexcept;
+			const std::shared_ptr<const void>& mainResource);
 		CachedResourceRequest(const CachedResourceRequest&) = delete;
 		CachedResourceRequest(CachedResourceRequest&&) = delete;
 
@@ -50,15 +55,15 @@ export namespace PonyEngine::Resource
 		CachedResourceRequest& operator =(CachedResourceRequest&&) = delete;
 
 	private:
-		struct ResourceID id;
-		std::shared_ptr<const ResourceRequestResult> result;
+		struct ResourceID id; ///< Resource ID.
+		std::shared_ptr<const ResourceRequestResult> result; ///< Load result.
 	};
 }
 
 namespace PonyEngine::Resource
 {
 	CachedResourceRequest::CachedResourceRequest(const std::shared_ptr<const ResourceInfo>& info, const std::shared_ptr<const ResourceData>& data,
-		const std::shared_ptr<const void>& mainResource) noexcept :
+		const std::shared_ptr<const void>& mainResource) :
 		id(info->id),
 		result(std::make_shared<ResourceRequestResult>(info, data, mainResource))
 	{

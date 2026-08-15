@@ -13,6 +13,10 @@ import std;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Checks if all the required types are provided.
+	/// @param required Required types.
+	/// @param provided Provided types.
+	/// @return @a True if all the required types are provided; @a false otherwise.
 	bool CheckTypes(std::span<const std::type_index> required, std::span<const std::type_index> provided) noexcept;
 }
 

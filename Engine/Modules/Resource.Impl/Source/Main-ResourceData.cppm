@@ -15,13 +15,14 @@ export module PonyEngine.Resource.Impl:ResourceData;
 
 import std;
 
-import :ResourceInfo;
-
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource data.
 	class ResourceData final
 	{
 	public:
+		/// @brief Creates a resource data.
+		/// @param outputTypeCount Output type count.
 		[[nodiscard("Pure constructor")]]
 		explicit ResourceData(std::size_t outputTypeCount);
 		ResourceData(const ResourceData&) = delete;
@@ -29,19 +30,26 @@ export namespace PonyEngine::Resource
 
 		~ResourceData() noexcept = default;
 
+		/// @brief Locks the main resource.
+		/// @return Main resource. May be nullptr.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<const void> MainResource() const noexcept;
+		/// @brief Gets the output resources.
+		/// @return Output resources.
 		[[nodiscard("Pure function")]]
 		std::span<const void* const> Resources() const noexcept;
 
+		/// @brief Sets the resource.
+		/// @param mainResource Main resource.
+		/// @param resources Output resources. Must follow the same type order as the resource info output types.
 		void SetResource(const std::shared_ptr<const void>& mainResource, std::span<const void* const> resources) noexcept;
 
 		ResourceData& operator =(const ResourceData&) = delete;
 		ResourceData& operator =(ResourceData&&) = delete;
 
 	private:
-		std::weak_ptr<const void> mainResource;
-		std::vector<const void*> resources;
+		std::weak_ptr<const void> mainResource; ///< Main resource.
+		std::vector<const void*> resources; ///< Output resources.
 	};
 }
 

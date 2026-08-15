@@ -15,6 +15,7 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource collection container.
 	class CollectionContainer final
 	{
 	public:
@@ -25,30 +26,51 @@ export namespace PonyEngine::Resource
 
 		~CollectionContainer() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Tries to find an index of the collection.
+		/// @param collection Collection to find.
+		/// @return Index or size if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(ResourceCollectionID collection) const noexcept;
 
+		/// @brief Gets a collection.
+		/// @param index Collection index.
+		/// @return Collection.
 		[[nodiscard("Pure function")]]
 		ResourceCollectionID Collection(std::size_t index) const noexcept;
+		/// @brief Gets a collection provider.
+		/// @param index Collection index.
+		/// @return Provider.
 		[[nodiscard("Pure function")]]
 		IResourceProvider& Provider(std::size_t index) const noexcept;
+		/// @brief Gets resource IDs.
+		/// @param index Collection index.
+		/// @return Resource IDs.
 		[[nodiscard("Pure function")]]
 		std::span<const ResourceID> Resources(std::size_t index) const noexcept;
 
+		/// @brief Adds the collection.
+		/// @param collection Collection to add.
+		/// @param provider Provider.
+		/// @param resources Resources.
 		void Add(ResourceCollectionID collection, IResourceProvider& provider, std::vector<ResourceID>&& resources);
+		/// @brief Removes a collection.
+		/// @param index Collection index.
 		void Remove(std::size_t index) noexcept;
+		/// @brief Clears the container.
 		void Clear() noexcept;
 
 		CollectionContainer& operator =(const CollectionContainer&) = delete;
 		CollectionContainer& operator =(CollectionContainer&&) = delete;
 
 	private:
-		std::vector<ResourceCollectionID> collections;
-		std::vector<IResourceProvider*> providers;
-		std::vector<std::vector<ResourceID>> resources;
+		std::vector<ResourceCollectionID> collections; ///< Resource collections.
+		std::vector<IResourceProvider*> providers; ///< Providers.
+		std::vector<std::vector<ResourceID>> resources; ///< Resource IDs.
 	};
 }
 

@@ -11,19 +11,18 @@ export module PonyEngine.Resource.Impl:Resource;
 
 import std;
 
-import PonyEngine.Resource.Ext;
-
 import :ResourceData;
 import :ResourceInfo;
 import :ResourceLoadProcess;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource.
 	struct Resource final
 	{
-		std::shared_ptr<const ResourceInfo> info;
-		std::shared_ptr<ResourceData> data;
-		std::weak_ptr<ResourceLoadProcess> loadProcess;
-		std::shared_ptr<std::mutex> mutex;
+		std::shared_ptr<const ResourceInfo> info; ///< Resource info.
+		std::shared_ptr<ResourceData> data; ///< Resource data.
+		std::weak_ptr<ResourceLoadProcess> loadProcess; ///< Resource load process.
+		std::shared_ptr<std::mutex> mutex; ///< Resource mutex.
 	};
 }

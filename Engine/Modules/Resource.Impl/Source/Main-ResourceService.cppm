@@ -40,6 +40,8 @@ export namespace PonyEngine::Resource
 	class ResourceService final : public IResourceService, public IResourceHub
 	{
 	public:
+		/// @brief Creates a resource service.
+		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
 		explicit ResourceService(Application::IApplication& application);
 		ResourceService(const ResourceService&) = delete;
@@ -81,34 +83,48 @@ export namespace PonyEngine::Resource
 		ResourceService& operator =(ResourceService&&) = delete;
 
 	private:
+		/// @brief Checks if the resource collection is valid.
+		/// @param collection Resource collection.
+		/// @return @a True if it's valid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsValid(ResourceCollection collection) const noexcept;
+		/// @brief Creates a new collection.
+		/// @return Collection.
 		[[nodiscard("Must be used")]]
 		ResourceCollection CreateCollection();
+		/// @brief Makes a completely new collection.
+		/// @return Collection.
 		[[nodiscard("Must be used")]]
 		ResourceCollection MakeCollection();
+		/// @brief Resurrects a collection.
+		/// @return Collection.
 		[[nodiscard("Must be used")]]
 		ResourceCollection ResurrectCollection() noexcept;
+		/// @brief Kills the collection.
+		/// @param collection Collection to kill.
 		void KillCollection(ResourceCollection collection) noexcept;
 
+		/// @brief Finds a loader by the resource type.
+		/// @param type Resource type.
+		/// @return Loader; nullptr if not found.
 		[[nodiscard("Pure function")]]
 		IResourceLoader* FindLoader(ResourceType type) const noexcept;
 
-		Application::IApplication* application;
-		Log::ILogService* logService;
+		Application::IApplication* application; ///< Application.
+		Log::ILogService* logService; ///< Log service.
 
-		std::vector<ResourceCollectionVersion> resourceCollectionVersions;
-		std::vector<ResourceCollectionID> deadResourceCollectionIds;
+		std::vector<ResourceCollectionVersion> resourceCollectionVersions; ///< Resource collection versions.
+		std::vector<ResourceCollectionID> deadResourceCollectionIds; ///< Dead resource collection IDs.
 
-		CollectionContainer collectionContainer;
-		ResourceContainer resourceContainer;
-		LoaderContainer loaderContainer;
-		mutable std::shared_mutex stateMutex;
+		CollectionContainer collectionContainer; ///< Resource collection container.
+		ResourceContainer resourceContainer; ///< Resource container.
+		LoaderContainer loaderContainer; ///< Loader container.
+		mutable std::shared_mutex stateMutex; ///< State mutex.
 
-		std::unordered_map<ResourceID, std::string> resourceIdToStringMap;
-		mutable std::shared_mutex resourceIdToStringMapMutex;
-		std::unordered_map<ResourceType, std::string> resourceTypeToStringMap;
-		mutable std::shared_mutex resourceTypeToStringMapMutex;
+		std::unordered_map<ResourceID, std::string> resourceIdToStringMap; ///< Resource ID to resource ID string map.
+		mutable std::shared_mutex resourceIdToStringMapMutex; ///< Resource ID map mutex.
+		std::unordered_map<ResourceType, std::string> resourceTypeToStringMap; ///< Resource type to resource type string map.
+		mutable std::shared_mutex resourceTypeToStringMapMutex; ///< Resource type map mutex.
 	};
 }
 
@@ -191,11 +207,14 @@ namespace PonyEngine::Resource
 
 		if (const std::shared_ptr<ResourceLoadProcess> loadProcess = resource->loadProcess.lock())
 		{
-			return std::make_shared<LoadedResourceRequest>(loadProcess, observer);
+			if (loadProcess->PrepareForRequest())
+			{
+				return std::make_shared<LoadedResourceRequest>(loadProcess, observer);
+			}
 		}
 
 		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->info->collection));
-		const auto collection = ResourceCollection{ .id = resource->info->collection, .version = resourceCollectionVersions[resource->info->collection] };
+		const auto collection = ResourceCollection{.id = resource->info->collection, .version = resourceCollectionVersions[resource->info->collection]};
 		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->info->collectionResourceIndex, resource->info->dataAccessType);
 		assert(dataAccess && "Data access is nullptr.");
 
@@ -299,7 +318,10 @@ namespace PonyEngine::Resource
 	{
 		const auto lock = std::unique_lock(stateMutex);
 
-		assert(resourceCollectionVersions[collection.id] == collection.version && "Invalid collection");
+		if (!IsValid(collection))
+		{
+			throw std::invalid_argument("Invalid collection");
+		}
 
 		const std::size_t index = collectionContainer.IndexOf(collection.id);
 		assert(index < collectionContainer.Size() && &collectionContainer.Provider(index) == &provider && "invalid collection");

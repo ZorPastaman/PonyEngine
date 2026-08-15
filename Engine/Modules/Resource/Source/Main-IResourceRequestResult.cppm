@@ -15,8 +15,6 @@ export module PonyEngine.Resource:IResourceRequestResult;
 
 import std;
 
-import :ResourceID;
-
 export namespace PonyEngine::Resource
 {
 	/// @brief Resource request result.

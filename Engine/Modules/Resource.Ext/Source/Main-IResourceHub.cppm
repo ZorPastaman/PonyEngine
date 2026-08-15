@@ -17,10 +17,10 @@ import std;
 
 import PonyEngine.Resource;
 
+import :CollectionResource;
 import :IResourceLoader;
 import :IResourceProvider;
 import :ResourceCollection;
-import :CollectionResource;
 import :ResourceType;
 
 export namespace PonyEngine::Resource

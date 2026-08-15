@@ -15,6 +15,7 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Loader container.
 	class LoaderContainer final
 	{
 	public:
@@ -25,29 +26,49 @@ export namespace PonyEngine::Resource
 
 		~LoaderContainer() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Tries to find an index of the @p loader.
+		/// @param loader Loader.
+		/// @return Loader index or size if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(IResourceLoader& loader) const noexcept;
+		/// @brief Tries to find an index of the @p type.
+		/// @param type Resource type.
+		/// @return Type index or size if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(ResourceType type) const noexcept;
 
+		/// @brief Gets a loader at the index.
+		/// @param index Loader index.
+		/// @return Loader.
 		[[nodiscard("Pure function")]]
 		IResourceLoader& Loader(std::size_t index) const noexcept;
+		/// @brief Gets types at the index.
+		/// @param index Type index.
+		/// @return Types.
 		[[nodiscard("Pure function")]]
 		std::span<const ResourceType> Types(std::size_t index) const noexcept;
 
+		/// @brief Adds the loader.
+		/// @param loader Loader.
+		/// @param types Resource types.
 		void Add(IResourceLoader& loader, std::span<const ResourceType> types);
+		/// @brief Removes a loader.
+		/// @param index Loader index.
 		void Remove(std::size_t index) noexcept;
+		/// @brief Clears the container.
 		void Clear() noexcept;
 
 		LoaderContainer& operator =(const LoaderContainer&) = delete;
 		LoaderContainer& operator =(LoaderContainer&&) = delete;
 
 	private:
-		std::vector<IResourceLoader*> loaders;
-		std::vector<std::vector<ResourceType>> types;
+		std::vector<IResourceLoader*> loaders; ///< Loaders.
+		std::vector<std::vector<ResourceType>> types; ///< Resource types.
 	};
 }
 
@@ -89,7 +110,7 @@ namespace PonyEngine::Resource
 		return types[index];
 	}
 
-	void LoaderContainer::Add(IResourceLoader& loader, std::span<const ResourceType> types)
+	void LoaderContainer::Add(IResourceLoader& loader, const std::span<const ResourceType> types)
 	{
 		loaders.push_back(&loader);
 		try

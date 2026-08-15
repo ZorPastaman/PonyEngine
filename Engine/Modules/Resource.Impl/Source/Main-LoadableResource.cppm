@@ -19,9 +19,15 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Loadable resource.
 	class LoadableResource final : public ILoadableResource
 	{
 	public:
+		/// @brief Creates a loadable resource.
+		/// @param resourceType Resource type.
+		/// @param dataMeta Resource data meta.
+		/// @param loadMeta Resource load meta.
+		/// @param dataAccessTypes Data access types.
 		[[nodiscard("Pure constructor")]]
 		LoadableResource(ResourceType resourceType, std::span<const std::byte> dataMeta, std::span<const std::byte> loadMeta, 
 			std::span<const std::type_index> dataAccessTypes) noexcept;
@@ -55,14 +61,14 @@ export namespace PonyEngine::Resource
 		LoadableResource& operator =(LoadableResource&&) = delete;
 
 	private:
-		ResourceType resourceType;
-		std::span<const std::byte> dataMeta;
-		std::span<const std::byte> loadMeta;
-		std::span<const std::type_index> dataAccessTypes;
+		ResourceType resourceType; ///< Resource type.
+		std::span<const std::byte> dataMeta; ///< Data meta.
+		std::span<const std::byte> loadMeta; ///< Load meta.
+		std::span<const std::type_index> dataAccessTypes; ///< Data access types.
 
-		std::optional<std::type_index> dataAccessType;
-		std::vector<std::type_index> outputTypes;
-		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>> loadData;
+		std::optional<std::type_index> dataAccessType; ///< Chosen data access type.
+		std::vector<std::type_index> outputTypes; ///< Resource output types.
+		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>> loadData; ///< Load data.
 	};
 }
 
@@ -75,6 +81,7 @@ namespace PonyEngine::Resource
 		loadMeta(loadMeta),
 		dataAccessTypes(dataAccessTypes)
 	{
+		assert(!this->dataAccessTypes.empty() && "Zero data access types.");
 	}
 
 	ResourceType LoadableResource::Type() const noexcept
@@ -126,6 +133,10 @@ namespace PonyEngine::Resource
 			{
 				assert(outputTypes[i] != outputTypes[j] && "Output type duplicate.");
 			}
+		}
+		for (const std::type_index type : outputTypes)
+		{
+			assert(!std::ranges::contains(this->outputTypes, type) && "Output type already added.");
 		}
 
 		this->outputTypes.append_range(outputTypes);

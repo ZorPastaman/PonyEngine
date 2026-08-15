@@ -113,6 +113,7 @@ namespace PonyEngine::File
 
 		this->byteCount = byteCount;
 		status.store(RequestStatus::Success, std::memory_order::release);
+		status.notify_all();
 	}
 
 	void Request::SetFailed(const std::exception_ptr& exception) noexcept
@@ -121,12 +122,14 @@ namespace PonyEngine::File
 		
 		this->exception = exception;
 		status.store(RequestStatus::Failure, std::memory_order::release);
+		status.notify_all();
 	}
 
 	void Request::SetCanceled() noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status.");
 		status.store(RequestStatus::Canceled, std::memory_order::relaxed);
+		status.notify_all();
 	}
 
 	void Request::Wait() const noexcept

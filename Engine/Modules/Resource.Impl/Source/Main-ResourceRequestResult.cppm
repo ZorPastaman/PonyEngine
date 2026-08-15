@@ -23,9 +23,14 @@ import :Utility;
 
 export namespace PonyEngine::Resource
 {
+	/// @brief Resource request result.
 	class ResourceRequestResult final : public IResourceRequestResult
 	{
 	public:
+		/// @brief Creates a resource request result.
+		/// @param info Resource info.
+		/// @param data Resource data.
+		/// @param mainResource Main resource.
 		[[nodiscard("Pure function")]]
 		ResourceRequestResult(const std::shared_ptr<const ResourceInfo>& info, const std::shared_ptr<const ResourceData>& data,
 			const std::shared_ptr<const void>& mainResource) noexcept;
@@ -44,9 +49,9 @@ export namespace PonyEngine::Resource
 		ResourceRequestResult& operator =(ResourceRequestResult&&) = delete;
 
 	private:
-		std::shared_ptr<const ResourceInfo> info;
-		std::shared_ptr<const ResourceData> data;
-		std::shared_ptr<const void> mainResource;
+		std::shared_ptr<const ResourceInfo> info; ///< Resource info.
+		std::shared_ptr<const ResourceData> data; ///< Resource data.
+		std::shared_ptr<const void> mainResource; ///< Main resource.
 	};
 }
 
