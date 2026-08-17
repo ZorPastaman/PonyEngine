@@ -37,6 +37,6 @@ export namespace PonyEngine::Resource
 		/// @param loadHandler Resource load handler.
 		/// @return Resource load request.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IResourceLoadRequest> Load(const ResourceLoadContext& context, const std::shared_ptr<IResourceLoadHandler>& loadHandler) = 0;
+		virtual std::shared_ptr<IResourceLoadRequest> Load(const ResourceLoadContext& context, IResourceLoadHandler& loadHandler) = 0;
 	};
 }

@@ -22,7 +22,8 @@ export namespace PonyEngine::Resource
 	{
 		PONY_INTERFACE_BODY(IResourceLoadRequest)
 
-		/// @brief Cancels the request.
-		virtual void Cancel() = 0;
+		/// @brief Stops the request.
+		/// @note It mustn't call a handler after this function returns.
+		virtual void Stop() = 0;
 	};
 }

@@ -207,7 +207,7 @@ namespace PonyEngine::Resource
 
 		if (const std::shared_ptr<ResourceLoadProcess> loadProcess = resource->loadProcess.lock())
 		{
-			if (loadProcess->PrepareForRequest())
+			if (loadProcess->IncrementCancelCount())
 			{
 				return std::make_shared<LoadedResourceRequest>(loadProcess, observer);
 			}

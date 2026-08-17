@@ -28,7 +28,7 @@ export namespace PonyEngine::Resource
 	class LoadedResourceRequest;
 
 	/// @brief Resource load process.
-	class ResourceLoadProcess final
+	class ResourceLoadProcess final : private IResourceLoadHandler
 	{
 	public:
 		/// @brief Creates a resource load process.
@@ -70,12 +70,12 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		const std::exception_ptr& Exception() const;
 
-		/// @brief Prepares the process for a new request.
+		/// @brief Increments the cancel count if it's greater than 0.
 		/// @return @a True if the process is still valid; @a false otherwise.
-		bool PrepareForRequest() noexcept;
+		bool IncrementCancelCount() noexcept;
 		/// @brief Decrements the cancel count.
 		/// @details If the cancel count reaches 0, it calls a cancel function.
-		void Cancel();
+		void DecrementCancelCount();
 
 		/// @brief Adds the request observer.
 		/// @param request Request observer.
@@ -94,40 +94,10 @@ export namespace PonyEngine::Resource
 		/// @brief Sets success.
 		/// @param mainResource Main resource.
 		/// @param resources Output resources.
-		void SetSuccess(const std::shared_ptr<const void>& mainResource, std::span<const void* const> resources);
+		virtual void SetSuccess(const std::shared_ptr<const void>& mainResource, std::span<const void* const> resources) override;
 		/// @brief Sets failure.
 		/// @param exception Exception.
-		void SetFailure(const std::exception_ptr& exception);
-		/// @brief Sets cancel.
-		void SetCancel();
-
-		/// @brief Resource load handler.
-		class ResourceLoadHandler final : public IResourceLoadHandler
-		{
-		public:
-			/// @brief Creates a resource load handler.
-			/// @param process Process.
-			[[nodiscard("Pure constructor")]]
-			explicit ResourceLoadHandler(ResourceLoadProcess* process);
-			ResourceLoadHandler(const ResourceLoadHandler&) = delete;
-			ResourceLoadHandler(ResourceLoadHandler&&) = delete;
-
-			~ResourceLoadHandler() noexcept = default;
-
-			virtual void SetSuccess(const std::shared_ptr<const void>& mainResource, std::span<const void* const> resources) override;
-			virtual void SetFailure(const std::exception_ptr& exception) override;
-			virtual void SetCancel() override;
-
-			/// @brief Detaches the handler from the process.
-			void Detach() noexcept;
-
-			ResourceLoadHandler& operator =(const ResourceLoadHandler&) = delete;
-			ResourceLoadHandler& operator =(ResourceLoadHandler&&) = delete;
-
-		private:
-			ResourceLoadProcess* process; ///< Process.
-			std::mutex mutex; ///< Handler mutex.
-		};
+		virtual void SetFailure(const std::exception_ptr& exception) override;
 
 		std::shared_ptr<const ResourceInfo> resourceInfo; ///< Resource info.
 		std::shared_ptr<ResourceData> resourceData; ///< Resource data.
@@ -136,10 +106,8 @@ export namespace PonyEngine::Resource
 		std::shared_ptr<const ResourceRequestResult> result; ///< Result.
 		std::exception_ptr exception; ///< Exception.
 		std::atomic<RequestStatus> status; ///< Process status.
-		std::size_t cancelCount; ///< Cancel count.
-		mutable std::shared_mutex stateMutex; ///< State mutex.
+		std::atomic_size_t cancelCount; ///< Cancel count.
 
-		std::shared_ptr<ResourceLoadHandler> handler; ///< Load handler.
 		std::shared_ptr<IResourceLoadRequest> request; ///< Load request.
 
 		mutable std::vector<const LoadedResourceRequest*> observers; ///< Observers.
@@ -147,6 +115,7 @@ export namespace PonyEngine::Resource
 		mutable std::mutex observerMutex; ///< Observer mutex.
 
 		static_assert(std::atomic<RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 
 	/// @brief Resource request that is attached to an actual load process.
@@ -209,8 +178,7 @@ namespace PonyEngine::Resource
 		resourceData(resourceData),
 		resourceMutex(resourceMutex),
 		status(RequestStatus::Pending),
-		cancelCount{0uz},
-		handler(std::make_shared<ResourceLoadHandler>(this)),
+		cancelCount(1uz),
 		observersCalled{false}
 	{
 		assert(this->resourceInfo && "Resource info is nullptr.");
@@ -224,13 +192,13 @@ namespace PonyEngine::Resource
 			.resourceDataAccessType = this->resourceInfo->dataAccessType,
 			.loadData = this->resourceInfo->loadData,
 			.outputTypes = this->resourceInfo->outputTypes
-		}, handler);
+		}, *this);
 	}
 
 	ResourceLoadProcess::~ResourceLoadProcess() noexcept
 	{
 		assert(observers.empty() && "Some observers weren't removed.");
-		handler->Detach();
+		request->Stop();
 	}
 
 	struct ResourceID ResourceLoadProcess::ResourceID() const noexcept
@@ -245,14 +213,11 @@ namespace PonyEngine::Resource
 
 	RequestStatus ResourceLoadProcess::Status() const noexcept
 	{
-		const auto lock = std::shared_lock(stateMutex);
 		return status.load(std::memory_order::acquire);
 	}
 
 	const std::shared_ptr<const ResourceRequestResult>& ResourceLoadProcess::Result() const
 	{
-		const auto lock = std::shared_lock(stateMutex);
-
 		if (status.load(std::memory_order::acquire) != RequestStatus::Success)
 		{
 			throw std::logic_error("Invalid status");
@@ -263,8 +228,6 @@ namespace PonyEngine::Resource
 
 	const std::exception_ptr& ResourceLoadProcess::Exception() const
 	{
-		const auto lock = std::shared_lock(stateMutex);
-
 		if (status.load(std::memory_order::acquire) != RequestStatus::Failure)
 		{
 			throw std::logic_error("Invalid status");
@@ -273,47 +236,36 @@ namespace PonyEngine::Resource
 		return exception;
 	}
 
-	bool ResourceLoadProcess::PrepareForRequest() noexcept
+	bool ResourceLoadProcess::IncrementCancelCount() noexcept
 	{
-		const auto lock = std::unique_lock(stateMutex);
-
-		if (const RequestStatus currentStatus = status.load(std::memory_order::acquire); 
-			currentStatus == RequestStatus::Failure || currentStatus == RequestStatus::Canceled)
+		std::size_t currentCancelCount = cancelCount.load(std::memory_order::relaxed);
+		while (currentCancelCount != 0uz && !cancelCount.compare_exchange_weak(currentCancelCount, currentCancelCount + 1uz, std::memory_order::relaxed))
 		{
-			return false;
 		}
 
-		++cancelCount;
-		return true;
+		return currentCancelCount != 0uz;
 	}
 
-	void ResourceLoadProcess::Cancel()
+	void ResourceLoadProcess::DecrementCancelCount()
 	{
-		const auto lock = std::unique_lock(stateMutex);
-
-		if (status.load(std::memory_order::acquire) == RequestStatus::Canceled)
+		if (cancelCount.fetch_sub(1uz, std::memory_order::relaxed) != 1uz)
 		{
 			return;
 		}
 
-		assert(cancelCount > 0uz && "Invalid cancel count.");
+		assert(status.load(std::memory_order::acquire) == RequestStatus::Pending && "Invalid status.");
 
-		if (--cancelCount == 0uz)
+		request->Stop();
+		
+		status.store(RequestStatus::Canceled, std::memory_order::release);
+		status.notify_all();
+
+		const auto observerLock = std::lock_guard(observerMutex);
+		for (const LoadedResourceRequest* request : observers)
 		{
-			status.store(RequestStatus::Canceled, std::memory_order::release);
-			status.notify_all();
-
-			{
-				const auto observerLock = std::lock_guard(observerMutex);
-				for (const LoadedResourceRequest* request : observers)
-				{
-					request->OnCanceled();
-				}
-				observersCalled = true;
-			}
-
-			request->Cancel();
+			request->OnCanceled();
 		}
+		observersCalled = true;
 	}
 
 	void ResourceLoadProcess::AddObserver(const LoadedResourceRequest& request) const
@@ -358,12 +310,12 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::SetSuccess(const std::shared_ptr<const void>& mainResource, const std::span<const void* const> resources)
 	{
-		const auto lock = std::unique_lock(stateMutex);
-
-		if (status.load(std::memory_order::acquire) != RequestStatus::Pending)
+		if (!IncrementCancelCount())
 		{
 			return;
 		}
+
+		assert(status.load(std::memory_order::acquire) == RequestStatus::Pending && "Invalid status.");
 
 		{
 			const auto resourceLock = std::lock_guard(*resourceMutex);
@@ -384,16 +336,17 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::SetFailure(const std::exception_ptr& exception)
 	{
-		const auto lock = std::unique_lock(stateMutex);
-
-		if (status.load(std::memory_order::acquire) != RequestStatus::Pending)
+		if (!IncrementCancelCount())
 		{
 			return;
 		}
 
+		assert(status.load(std::memory_order::acquire) == RequestStatus::Pending && "Invalid status.");
+
 		this->exception = exception;
 
 		status.store(RequestStatus::Failure, std::memory_order::release);
+		status.notify_all();
 
 		const auto observerLock = std::lock_guard(observerMutex);
 		for (const LoadedResourceRequest* request : observers)
@@ -401,67 +354,6 @@ namespace PonyEngine::Resource
 			request->OnFailure();
 		}
 		observersCalled = true;
-	}
-
-	void ResourceLoadProcess::SetCancel()
-	{
-		const auto lock = std::unique_lock(stateMutex);
-
-		if (status.load(std::memory_order::acquire) != RequestStatus::Pending)
-		{
-			return;
-		}
-
-		status.store(RequestStatus::Canceled, std::memory_order::release);
-		status.notify_all();
-
-		const auto observerLock = std::lock_guard(observerMutex);
-		for (const LoadedResourceRequest* request : observers)
-		{
-			request->OnCanceled();
-		}
-		observersCalled = true;
-	}
-
-	ResourceLoadProcess::ResourceLoadHandler::ResourceLoadHandler(ResourceLoadProcess* const process) :
-		process{process}
-	{
-	}
-
-	void ResourceLoadProcess::ResourceLoadHandler::SetSuccess(const std::shared_ptr<const void>& mainResource, const std::span<const void* const> resources)
-	{
-		const auto lock = std::lock_guard(mutex);
-
-		if (process)
-		{
-			process->SetSuccess(mainResource, resources);
-		}
-	}
-
-	void ResourceLoadProcess::ResourceLoadHandler::SetFailure(const std::exception_ptr& exception)
-	{
-		const auto lock = std::lock_guard(mutex);
-
-		if (process)
-		{
-			process->SetFailure(exception);
-		}
-	}
-
-	void ResourceLoadProcess::ResourceLoadHandler::SetCancel()
-	{
-		const auto lock = std::lock_guard(mutex);
-
-		if (process)
-		{
-			process->SetCancel();
-		}
-	}
-
-	void ResourceLoadProcess::ResourceLoadHandler::Detach() noexcept
-	{
-		const auto lock = std::lock_guard(mutex);
-		process = nullptr;
 	}
 
 	LoadedResourceRequest::LoadedResourceRequest(const std::shared_ptr<ResourceLoadProcess>& process, IResourceRequestObserver* const observer) :
@@ -512,7 +404,7 @@ namespace PonyEngine::Resource
 	{
 		if (!canceled.exchange(true))
 		{
-			process->Cancel();
+			process->DecrementCancelCount();
 		}
 	}
 
