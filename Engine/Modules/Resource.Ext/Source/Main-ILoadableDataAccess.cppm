@@ -36,6 +36,11 @@ export namespace PonyEngine::Resource
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
 		virtual LoadableRequestStatus Status() const noexcept = 0;
+		/// @brief Gets how many bytes were transferred.
+		/// @return Transferred byte count.
+		/// @note It's valid to call it only if the request status is success.
+		[[nodiscard("Pure function")]]
+		virtual std::size_t ByteCount() const = 0;
 		/// @brief Gets an exception that occured during the request execution.
 		/// @return Exception.
 		/// @note It's valid to call it only if the request status is failure.
@@ -57,7 +62,8 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(ILoadableDataAccessRequestObserver)
 
 		/// @brief Invoked on a success.
-		virtual void OnSuccess() noexcept = 0;
+		/// @param byteCount How many bytes were transferred.
+		virtual void OnSuccess(std::size_t byteCount) noexcept = 0;
 		/// @brief Invoked on a failure.
 		/// @param exception Exception.
 		virtual void OnFailure(const std::exception_ptr& exception) noexcept = 0;

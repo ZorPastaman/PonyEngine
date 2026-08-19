@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Log/FileLoggerModule.h"
+#include "PonyEngine/Log/File/FileLoggerModule.h"
 
-PONY_LOG_MODULE(PonyEngine::Log::File::CreateFileLoggerModule, PonyEngineFileLogger, PONY_ENGINE_LOG_FILE_ORDER)
+PONY_LOG_MODULE(PonyEngine::Log::File::CreateFileLoggerModule, PonyEngineLogFileLogger, PONY_ENGINE_LOG_FILE_ORDER)

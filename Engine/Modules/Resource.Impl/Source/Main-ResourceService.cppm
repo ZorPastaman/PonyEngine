@@ -140,6 +140,9 @@ namespace PonyEngine::Resource
 	{
 		assert(collectionContainer.Size() == 0uz && "Collections weren't removed.");
 		assert(loaderContainer.Size() == 0uz && "Loaders weren't removed.");
+
+		// TODO: Add request count checks
+		// TODO: Add logs
 	}
 
 	bool ResourceService::HasResource(const ResourceID resourceId) const
@@ -214,8 +217,7 @@ namespace PonyEngine::Resource
 		}
 
 		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->info->collection));
-		const auto collection = ResourceCollection{.id = resource->info->collection, .version = resourceCollectionVersions[resource->info->collection]};
-		std::shared_ptr<void> dataAccess = provider.GetResourceData(collection, resource->info->collectionResourceIndex, resource->info->dataAccessType);
+		std::shared_ptr<void> dataAccess = provider.GetResourceData(resource->info->collectionResourceIndex, resource->info->dataAccessType);
 		assert(dataAccess && "Data access is nullptr.");
 
 		IResourceLoader* const loader = FindLoader(resource->info->type);

@@ -11,26 +11,26 @@ module;
 
 #include "PonyEngine/Type/Enum.h"
 
-export module PonyEngine.File:RequestStatus;
+export module PonyEngine.Resource.Pack:PackMountRequestStatus;
 
 import std;
 
-export namespace PonyEngine::File
+export namespace PonyEngine::Resource::Pack
 {
-	/// @brief Request status.
-	enum class RequestStatus : std::uint8_t
+	/// @brief Pack mount request status.
+	enum class PackMountRequestStatus : std::uint8_t
 	{
 		Pending, ///< A request is still in progress.
 		Success, ///< A request finished with a success.
 		Failure, ///< A request finished with a failure.
-		Canceled ///< A request was canceled.
+		Canceled ///< A request is canceled.
 	};
 }
 
-namespace PonyEngine::File
+namespace PonyEngine::Resource::Pack
 {
-	/// @brief Request status names.
-	constexpr std::array<std::string_view, 4> RequestStatusNames
+	/// @brief Pack mount request status names.
+	constexpr std::array<std::string_view, 4> PackMountRequestStatusNames
 	{
 		"Pending",
 		"Success",
@@ -39,7 +39,7 @@ namespace PonyEngine::File
 	};
 }
 
-export 
+export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::File::RequestStatus, PonyEngine::File::RequestStatusNames)
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Resource::Pack::PackMountRequestStatus, PonyEngine::Resource::Pack::PackMountRequestStatusNames)
 }

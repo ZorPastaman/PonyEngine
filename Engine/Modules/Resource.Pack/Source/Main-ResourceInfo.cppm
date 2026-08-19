@@ -7,16 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module PonyEngine.Resource.Pack:ResourceInfo;
 
-#include "PonyEngine/Macro/Compiler.h"
+import PonyEngine.Resource.Ext;
 
-import PonyEngine.Application;
-
-namespace PonyEngine::Resource::Pack
+export namespace PonyEngine::Resource::Pack
 {
-	/// @brief Gets the pack resource provider module.
-	/// @return Pack resource provider module.
-	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT Application::IModule* GetPackResourceProviderModule();
+	struct ResourceInfo final
+	{
+		ResourceID id;
+		ResourceType type;
+	};
 }

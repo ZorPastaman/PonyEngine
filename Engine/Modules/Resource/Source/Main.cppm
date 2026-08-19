@@ -13,5 +13,5 @@ export import :IResourceRequest;
 export import :IResourceRequestObserver;
 export import :IResourceRequestResult;
 export import :IResourceService;
-export import :RequestStatus;
+export import :ResourceRequestStatus;
 export import :ResourceID;

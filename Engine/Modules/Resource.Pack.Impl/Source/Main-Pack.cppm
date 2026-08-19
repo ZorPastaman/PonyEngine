@@ -1,0 +1,95 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+export module PonyEngine.Resource.Pack.Impl:Pack;
+
+import std;
+
+import PonyEngine.File;
+import PonyEngine.Resource.Pack;
+
+import :FileDataAccess;
+import :FileLoadableDataAccess;
+import :MemoryDataAccess;
+import :MemoryLoadableDataAccess;
+
+export namespace PonyEngine::Resource::Pack
+{
+	class Pack final : public IResourceProvider
+	{
+	public:
+		[[nodiscard("Pure constructor")]]
+		Pack(const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile, std::span<const std::pair<std::size_t, std::size_t>> resourceRanges,
+			const std::shared_ptr<LoadableDataAccessRequestBuffer>& requestBuffer, const std::shared_ptr<const std::byte[]>& loadedData);
+		Pack(const Pack&) = delete;
+		Pack(Pack&&) = delete;
+
+		~Pack() noexcept = default;
+
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<void> GetResourceData(std::size_t index, std::type_index accessType) override;
+
+		Pack& operator =(const Pack&) = delete;
+		Pack& operator =(Pack&&) = delete;
+
+	private:
+		std::filesystem::path packDataPath;
+		std::shared_ptr<File::IFile> dataFile;
+		std::vector<std::pair<std::size_t, std::size_t>> resourceRanges;
+
+		std::shared_ptr<LoadableDataAccessRequestBuffer> requestBuffer;
+		std::shared_ptr<const std::byte[]> loadedData;
+	};
+}
+
+namespace PonyEngine::Resource::Pack
+{
+	Pack::Pack(const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile, const std::span<const std::pair<std::size_t, std::size_t>> resourceRanges,
+		const std::shared_ptr<LoadableDataAccessRequestBuffer>& requestBuffer, const std::shared_ptr<const std::byte[]>& loadedData) :
+		packDataPath(packDataPath),
+		dataFile(dataFile),
+		resourceRanges(resourceRanges.cbegin(), resourceRanges.cend()),
+		requestBuffer(requestBuffer),
+		loadedData(loadedData)
+	{
+	}
+
+	std::shared_ptr<void> Pack::GetResourceData(const std::size_t index, const std::type_index accessType)
+	{
+		const auto [offset, size] = resourceRanges[index];
+
+		if (accessType == typeid(ILoadableDataAccess))
+		{
+			if (loadedData) [[likely]]
+			{
+				return std::make_shared<MemoryLoadableDataAccess>(loadedData, offset, size, requestBuffer);
+			}
+			if (dataFile) [[likely]]
+			{
+				return std::make_shared<FileLoadableDataAccess>(dataFile, offset, size, requestBuffer);
+			}
+		}
+		else if (accessType == typeid(IFileDataAccess))
+		{
+			if (!packDataPath.empty()) [[likely]]
+			{
+				return std::make_shared<FileDataAccess>(packDataPath, offset, size);
+			}
+		}
+		else if (accessType == typeid(IMemoryDataAccess))
+		{
+			if (loadedData) [[likely]]
+			{
+				return std::make_shared<MemoryDataAccess>(loadedData, offset, size);
+			}
+		}
+
+		throw std::invalid_argument("Invalid access type");
+	}
+}

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/RawInput/Windows/KeyboardProviderModule.h"
+#include "PonyEngine/RawInput/Keyboard/Windows/KeyboardProviderModule.h"
 
 import PonyEngine.RawInput.Keyboard.Impl.Windows;
 

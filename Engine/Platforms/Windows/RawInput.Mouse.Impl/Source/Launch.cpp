@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/RawInput/Windows/MouseProviderModule.h"
+#include "PonyEngine/RawInput/Mouse/Windows/MouseProviderModule.h"
 
 PONY_ENGINE_MODULE(PonyEngine::RawInput::Mouse::CreateMouseProviderModule, PonyEngineRawInputMouseProvider, PONY_ENGINE_RAW_INPUT_MOUSE_ORDER);

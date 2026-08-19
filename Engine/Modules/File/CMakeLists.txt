@@ -12,6 +12,7 @@ target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-FileFlag.cppm"
 	"Source/Main-FileOpenMode.cppm"
 	"Source/Main-FileParams.cppm"
+	"Source/Main-FileRequestStatus.cppm"
 	"Source/Main-IFile.cppm"
 	"Source/Main-IFileService.cppm"
 	"Source/Main-IReadRequest.cppm"
@@ -20,7 +21,6 @@ target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IWriteRequest.cppm"
 	"Source/Main-IWriteRequestObserver.cppm"
 	"Source/Main-ReadParams.cppm"
-	"Source/Main-RequestStatus.cppm"
 	"Source/Main-WriteParams.cppm"
 )
 

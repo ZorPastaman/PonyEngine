@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Log/PlatformConsoleLoggerModule.h"
+#include "PonyEngine/Log/PlatformConsole/Windows/PlatformConsoleLoggerModule.h"
 
-PONY_LOG_MODULE(PonyEngine::Log::PlatformConsole::CreatePlatformConsoleLoggerModule, PonyEnginePConsoleLogger, PONY_ENGINE_LOG_PCONSOLE_ORDER)
+PONY_LOG_MODULE(PonyEngine::Log::PlatformConsole::CreatePlatformConsoleLoggerModule, PonyEngineLogPConsoleLogger, PONY_ENGINE_LOG_PCONSOLE_ORDER)

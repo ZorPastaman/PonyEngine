@@ -41,7 +41,7 @@ export namespace PonyEngine::File
 		virtual const ReadParams& Params() const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual RequestStatus Status() const noexcept override;
+		virtual FileRequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t ByteCount() const override;
 		[[nodiscard("Pure function")]] 
@@ -86,7 +86,7 @@ namespace PonyEngine::File
 		return params;
 	}
 
-	RequestStatus ReadRequest::Status() const noexcept
+	FileRequestStatus ReadRequest::Status() const noexcept
 	{
 		return request.Status();
 	}

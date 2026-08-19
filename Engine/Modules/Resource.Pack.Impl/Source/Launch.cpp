@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Resource/PackResourceProviderModule.h"
+#include "PonyEngine/Resource/Pack/PackServiceModule.h"
 
-PONY_ENGINE_MODULE(PonyEngine::Resource::Pack::GetPackResourceProviderModule, PonyEnginePackResourceProvider, PONY_ENGINE_RESOURCE_PACK_ORDER);
+PONY_ENGINE_MODULE(PonyEngine::Resource::Pack::CreatePackServiceModule, PonyEngineResourcePackService, PONY_ENGINE_RESOURCE_PACK_ORDER);

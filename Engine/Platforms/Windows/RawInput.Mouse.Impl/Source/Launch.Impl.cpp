@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/RawInput/Windows/MouseProviderModule.h"
+#include "PonyEngine/RawInput/Mouse/Windows/MouseProviderModule.h"
 
 import PonyEngine.RawInput.Mouse.Impl.Windows;
 

@@ -58,7 +58,7 @@ export namespace PonyEngine::Resource
 		/// @brief Gets the request status.
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
-		RequestStatus Status() const noexcept;
+		ResourceRequestStatus Status() const noexcept;
 		/// @brief Gets the request result.
 		/// @return Request result.
 		/// @note It's valid to call only if the status is success.
@@ -105,7 +105,7 @@ export namespace PonyEngine::Resource
 
 		std::shared_ptr<const ResourceRequestResult> result; ///< Result.
 		std::exception_ptr exception; ///< Exception.
-		std::atomic<RequestStatus> status; ///< Process status.
+		std::atomic<ResourceRequestStatus> status; ///< Process status.
 		std::atomic_size_t cancelCount; ///< Cancel count.
 
 		std::shared_ptr<IResourceLoadRequest> request; ///< Load request.
@@ -114,7 +114,7 @@ export namespace PonyEngine::Resource
 		bool observersCalled; ///< Were the observers called?
 		mutable std::mutex observerMutex; ///< Observer mutex.
 
-		static_assert(std::atomic<RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
+		static_assert(std::atomic<ResourceRequestStatus>::is_always_lock_free, "ResourceRequestStatus isn't lock-free.");
 		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 
@@ -138,7 +138,7 @@ export namespace PonyEngine::Resource
 		virtual bool IsTypeOf(std::span<const std::type_index> types) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual RequestStatus Status() const noexcept override;
+		virtual ResourceRequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<const IResourceRequestResult> Result() const override;
 		[[nodiscard("Pure function")]] 
@@ -177,7 +177,7 @@ namespace PonyEngine::Resource
 		resourceInfo(resourceInfo),
 		resourceData(resourceData),
 		resourceMutex(resourceMutex),
-		status(RequestStatus::Pending),
+		status(ResourceRequestStatus::Pending),
 		cancelCount(1uz),
 		observersCalled{false}
 	{
@@ -211,14 +211,14 @@ namespace PonyEngine::Resource
 		return CheckTypes(types, resourceInfo->outputTypes);
 	}
 
-	RequestStatus ResourceLoadProcess::Status() const noexcept
+	ResourceRequestStatus ResourceLoadProcess::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
 	}
 
 	const std::shared_ptr<const ResourceRequestResult>& ResourceLoadProcess::Result() const
 	{
-		if (status.load(std::memory_order::acquire) != RequestStatus::Success)
+		if (status.load(std::memory_order::acquire) != ResourceRequestStatus::Success)
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -228,7 +228,7 @@ namespace PonyEngine::Resource
 
 	const std::exception_ptr& ResourceLoadProcess::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != RequestStatus::Failure)
+		if (status.load(std::memory_order::acquire) != ResourceRequestStatus::Failure)
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -253,11 +253,11 @@ namespace PonyEngine::Resource
 			return;
 		}
 
-		assert(status.load(std::memory_order::acquire) == RequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending && "Invalid status.");
 
 		request->Stop();
 		
-		status.store(RequestStatus::Canceled, std::memory_order::release);
+		status.store(ResourceRequestStatus::Canceled, std::memory_order::release);
 		status.notify_all();
 
 		const auto observerLock = std::lock_guard(observerMutex);
@@ -277,13 +277,13 @@ namespace PonyEngine::Resource
 		{
 			switch (Status())
 			{
-			case RequestStatus::Success:
+			case ResourceRequestStatus::Success:
 				request.OnSuccess();
 				break;
-			case RequestStatus::Failure:
+			case ResourceRequestStatus::Failure:
 				request.OnFailure();
 				break;
-			case RequestStatus::Canceled:
+			case ResourceRequestStatus::Canceled:
 				request.OnCanceled();
 				break;
 			default: 
@@ -302,9 +302,9 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == RequestStatus::Pending)
+		while (status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending)
 		{
-			status.wait(RequestStatus::Pending, std::memory_order::acquire);
+			status.wait(ResourceRequestStatus::Pending, std::memory_order::acquire);
 		}
 	}
 
@@ -315,7 +315,7 @@ namespace PonyEngine::Resource
 			return;
 		}
 
-		assert(status.load(std::memory_order::acquire) == RequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending && "Invalid status.");
 
 		{
 			const auto resourceLock = std::lock_guard(*resourceMutex);
@@ -323,7 +323,7 @@ namespace PonyEngine::Resource
 		}
 		result = std::make_shared<ResourceRequestResult>(resourceInfo, resourceData, mainResource);
 		
-		status.store(RequestStatus::Success, std::memory_order::release);
+		status.store(ResourceRequestStatus::Success, std::memory_order::release);
 		status.notify_all();
 
 		const auto observerLock = std::lock_guard(observerMutex);
@@ -341,11 +341,11 @@ namespace PonyEngine::Resource
 			return;
 		}
 
-		assert(status.load(std::memory_order::acquire) == RequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending && "Invalid status.");
 
 		this->exception = exception;
 
-		status.store(RequestStatus::Failure, std::memory_order::release);
+		status.store(ResourceRequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 
 		const auto observerLock = std::lock_guard(observerMutex);
@@ -363,7 +363,7 @@ namespace PonyEngine::Resource
 	{
 		if (this->observer)
 		{
-			process->AddObserver(*this);
+			this->process->AddObserver(*this);
 		}
 	}
 
@@ -385,7 +385,7 @@ namespace PonyEngine::Resource
 		return process->IsTypeOf(types);
 	}
 
-	RequestStatus LoadedResourceRequest::Status() const noexcept
+	ResourceRequestStatus LoadedResourceRequest::Status() const noexcept
 	{
 		return process->Status();
 	}

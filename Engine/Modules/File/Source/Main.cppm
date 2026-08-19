@@ -21,5 +21,5 @@ export import :IRequest;
 export import :IWriteRequest;
 export import :IWriteRequestObserver;
 export import :ReadParams;
-export import :RequestStatus;
+export import :FileRequestStatus;
 export import :WriteParams;

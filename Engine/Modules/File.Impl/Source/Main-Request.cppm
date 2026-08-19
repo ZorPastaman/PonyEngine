@@ -33,7 +33,7 @@ export namespace PonyEngine::File
 		/// @brief Gets the request status.
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
-		RequestStatus Status() const noexcept;
+		FileRequestStatus Status() const noexcept;
 		/// @brief Gets how many bytes were transferred.
 		/// @return Transferred byte count.
 		/// @note It's valid to call it only if the request status is success.
@@ -63,9 +63,9 @@ export namespace PonyEngine::File
 	private:
 		std::size_t byteCount; ///< Transferred byte count.
 		std::exception_ptr exception; ///< Exception that occured during the request execution.
-		std::atomic<RequestStatus> status; ///< Request status.
+		std::atomic<FileRequestStatus> status; ///< Request status.
 
-		static_assert(std::atomic<RequestStatus>::is_always_lock_free, "RequestStatus is not lock-free.");
+		static_assert(std::atomic<FileRequestStatus>::is_always_lock_free, "FileRequestStatus is not lock-free.");
 	};
 }
 
@@ -73,23 +73,23 @@ namespace PonyEngine::File
 {
 	Request::Request() noexcept :
 		byteCount{0uz},
-		status(RequestStatus::Pending)
+		status(FileRequestStatus::Pending)
 	{
 	}
 
 	Request::~Request() noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) != RequestStatus::Pending && "Pending request destructed.");
+		assert(status.load(std::memory_order::relaxed) != FileRequestStatus::Pending && "Pending request destructed.");
 	}
 
-	RequestStatus Request::Status() const noexcept
+	FileRequestStatus Request::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
 	}
 
 	std::size_t Request::ByteCount() const
 	{
-		if (status.load(std::memory_order::acquire) != RequestStatus::Success) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != FileRequestStatus::Success) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -99,7 +99,7 @@ namespace PonyEngine::File
 
 	const std::exception_ptr& Request::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != RequestStatus::Failure) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != FileRequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -109,34 +109,34 @@ namespace PonyEngine::File
 
 	void Request::SetSuccess(const std::size_t byteCount) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == FileRequestStatus::Pending && "Invalid status.");
 
 		this->byteCount = byteCount;
-		status.store(RequestStatus::Success, std::memory_order::release);
+		status.store(FileRequestStatus::Success, std::memory_order::release);
 		status.notify_all();
 	}
 
 	void Request::SetFailed(const std::exception_ptr& exception) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == FileRequestStatus::Pending && "Invalid status.");
 		
 		this->exception = exception;
-		status.store(RequestStatus::Failure, std::memory_order::release);
+		status.store(FileRequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 	}
 
 	void Request::SetCanceled() noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == RequestStatus::Pending && "Invalid status.");
-		status.store(RequestStatus::Canceled, std::memory_order::relaxed);
+		assert(status.load(std::memory_order::relaxed) == FileRequestStatus::Pending && "Invalid status.");
+		status.store(FileRequestStatus::Canceled, std::memory_order::relaxed);
 		status.notify_all();
 	}
 
 	void Request::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == RequestStatus::Pending)
+		while (status.load(std::memory_order::acquire) == FileRequestStatus::Pending)
 		{
-			status.wait(RequestStatus::Pending, std::memory_order::acquire);
+			status.wait(FileRequestStatus::Pending, std::memory_order::acquire);
 		}
 	}
 }

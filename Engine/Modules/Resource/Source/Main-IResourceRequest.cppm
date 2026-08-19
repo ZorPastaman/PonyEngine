@@ -16,7 +16,7 @@ export module PonyEngine.Resource:IResourceRequest;
 import std;
 
 import :IResourceRequestResult;
-import :RequestStatus;
+import :ResourceRequestStatus;
 import :ResourceID;
 
 export namespace PonyEngine::Resource
@@ -50,7 +50,7 @@ export namespace PonyEngine::Resource
 		/// @brief Gets the request status.
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
-		virtual RequestStatus Status() const noexcept = 0;
+		virtual ResourceRequestStatus Status() const noexcept = 0;
 		/// @brief Gets a result of the request.
 		/// @return Request result.
 		/// @not It's valid to call it only if the request status is success.
@@ -63,8 +63,6 @@ export namespace PonyEngine::Resource
 		virtual const std::exception_ptr& Exception() const = 0;
 
 		/// @brief Cancels the request.
-		/// @note The cancel is not immediate, it may take some time to cancel the operation.
-		///       And because of it, the request may complete event if you requested a cancel.
 		virtual void Cancel() = 0;
 
 		/// @brief Makes the thread sleep till the request is completed with success or failure or cancel.

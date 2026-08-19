@@ -11,14 +11,14 @@ module;
 
 #include "PonyEngine/Type/Enum.h"
 
-export module PonyEngine.Resource:RequestStatus;
+export module PonyEngine.Resource:ResourceRequestStatus;
 
 import std;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Request status.
-	enum class RequestStatus : std::uint8_t
+	/// @brief Resource request status.
+	enum class ResourceRequestStatus : std::uint8_t
 	{
 		Pending, ///< A request is still in progress.
 		Success, ///< A request finished with a success.
@@ -29,8 +29,8 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
-	/// @brief Request status names.
-	constexpr std::array<std::string_view, 4> RequestStatusNames
+	/// @brief Resource request status names.
+	constexpr std::array<std::string_view, 4> ResourceRequestStatusNames
 	{
 		"Pending",
 		"Success",
@@ -41,5 +41,5 @@ namespace PonyEngine::Resource
 
 export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Resource::RequestStatus, PonyEngine::Resource::RequestStatusNames)
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Resource::ResourceRequestStatus, PonyEngine::Resource::ResourceRequestStatusNames)
 }

@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/RawInput/Windows/KeyboardProviderModule.h"
+#include "PonyEngine/RawInput/Keyboard/Windows/KeyboardProviderModule.h"
 
 PONY_ENGINE_MODULE(PonyEngine::RawInput::Keyboard::CreateKeyboardProviderModule, PonyEngineRawInputKeyboardProvider, PONY_ENGINE_RAW_INPUT_KEYBOARD_ORDER);

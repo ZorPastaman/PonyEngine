@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/RawInput/Windows/XInputProviderModule.h"
+#include "PonyEngine/RawInput/XInput/Windows/XInputProviderModule.h"
 
 import PonyEngine.RawInput.XInput.Impl.Windows;
 

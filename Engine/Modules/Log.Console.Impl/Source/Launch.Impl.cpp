@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/ConsoleLoggerModule.h"
+#include "PonyEngine/Log/Console/ConsoleLoggerModule.h"
 
 import PonyEngine.Log.Console.Impl;
 

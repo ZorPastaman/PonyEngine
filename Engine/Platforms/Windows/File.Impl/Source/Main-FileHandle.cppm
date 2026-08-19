@@ -74,8 +74,8 @@ namespace PonyEngine::File
 		PONY_LOG(this->context->LogService(), Log::LogType::Debug, "Opening file... Path: '{}'; Access: '{}'; OpenMode: '{}'; Flags: '{}'.",
 			path.string(), params.access, params.openMode, params.flags);
 
-		fileHandle = CreateFileSelector<std::filesystem::path::value_type>::Value(path.c_str(), ToDesiredAccess(params.access), FILE_SHARE_READ, nullptr,
-			ToCreationDisposition(params.access, params.openMode), ToFlags(params.flags), nullptr);
+		fileHandle = CreateFileSelector<std::filesystem::path::value_type>::Value(path.c_str(), ToDesiredAccess(params.access), 
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, ToCreationDisposition(params.access, params.openMode), ToFlags(params.flags), nullptr);
 		if (fileHandle == INVALID_HANDLE_VALUE) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create file: Error code = '0x{:X}'", GetLastError()));

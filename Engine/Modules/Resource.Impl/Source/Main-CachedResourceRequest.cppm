@@ -41,7 +41,7 @@ export namespace PonyEngine::Resource
 		virtual bool IsTypeOf(std::span<const std::type_index> types) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual RequestStatus Status() const noexcept override;
+		virtual ResourceRequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<const IResourceRequestResult> Result() const override;
 		[[nodiscard("Pure function")]] 
@@ -79,9 +79,9 @@ namespace PonyEngine::Resource
 		return result->IsTypeOf(types);
 	}
 
-	RequestStatus CachedResourceRequest::Status() const noexcept
+	ResourceRequestStatus CachedResourceRequest::Status() const noexcept
 	{
-		return RequestStatus::Success;
+		return ResourceRequestStatus::Success;
 	}
 
 	std::shared_ptr<const IResourceRequestResult> CachedResourceRequest::Result() const

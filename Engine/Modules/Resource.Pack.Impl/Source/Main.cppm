@@ -11,4 +11,4 @@ export module PonyEngine.Resource.Pack.Impl;
 
 export import PonyEngine.Resource.Ext;
 
-export import :PackResourceProviderModule;
+export import :PackServiceModule;

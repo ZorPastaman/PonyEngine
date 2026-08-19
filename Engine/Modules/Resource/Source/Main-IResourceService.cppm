@@ -56,7 +56,7 @@ export namespace PonyEngine::Resource
 
 		/// @brief Loads a resource.
 		/// @param resourceId Resource ID. Must be valid.
-		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request or destruction of the returned resource request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
@@ -64,7 +64,7 @@ export namespace PonyEngine::Resource
 		/// @brief Loads a resource with type check.
 		/// @param resourceId Resource ID. Must be valid.
 		/// @param type Type that the resource must be type of.
-		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request or destruction of the returned resource request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
@@ -72,7 +72,7 @@ export namespace PonyEngine::Resource
 		/// @brief Loads a resource with type checks.
 		/// @param resourceId Resource ID. Must be valid.
 		/// @param types Types that the resource must be type of.
-		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request or destruction of the returned resource request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
@@ -81,7 +81,7 @@ export namespace PonyEngine::Resource
 		/// @brief Loads a resource with type check.
 		/// @tparam Args Types that the resource must be type of.
 		/// @param resourceId Resource ID. Must be valid.
-		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request.
+		/// @param observer Observer. Can be nullptr. Must be kept alive till the finish of the load request or destruction of the returned resource request.
 		/// @return Resource request.
 		/// @note The function is thread-safe.
 		template<typename... Args> [[nodiscard("Pure function")]]

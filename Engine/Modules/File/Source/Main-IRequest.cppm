@@ -15,7 +15,7 @@ export module PonyEngine.File:IRequest;
 
 import std;
 
-import :RequestStatus;
+import :FileRequestStatus;
 
 export namespace PonyEngine::File
 {
@@ -27,7 +27,7 @@ export namespace PonyEngine::File
 		/// @brief Gets the request status.
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
-		virtual RequestStatus Status() const noexcept = 0;
+		virtual FileRequestStatus Status() const noexcept = 0;
 		/// @brief Gets how many bytes were transferred.
 		/// @return Transferred byte count.
 		/// @note It's valid to call it only if the request status is success.

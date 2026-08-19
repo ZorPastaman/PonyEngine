@@ -27,11 +27,10 @@ export namespace PonyEngine::Resource
 		PONY_INTERFACE_BODY(IResourceProvider)
 
 		/// @brief Gets a resource data.
-		/// @param collection Resource collection.
 		/// @param index Resource index.
 		/// @param accessType Access type.
 		/// @return Access of the requested type.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<void> GetResourceData(ResourceCollection collection, std::size_t index, std::type_index accessType) = 0;
+		virtual std::shared_ptr<void> GetResourceData(std::size_t index, std::type_index accessType) = 0;
 	};
 }

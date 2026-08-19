@@ -7,16 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Resource/PackResourceProviderModule.h"
+#include "PonyEngine/Resource/Pack/PackServiceModule.h"
 
-import PonyEngine.Application;
 import PonyEngine.Resource.Pack.Impl;
 
 namespace PonyEngine::Resource::Pack
 {
-	Application::IModule* GetPackResourceProviderModule()
+	std::shared_ptr<Application::IModule> CreatePackServiceModule()
 	{
-		static PackResourceProviderModule packResourceProviderModule;
-		return &packResourceProviderModule;
+		return std::make_shared<PackServiceModule>();
 	}
 }
