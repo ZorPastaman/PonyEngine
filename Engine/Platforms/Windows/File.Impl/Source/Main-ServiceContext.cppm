@@ -18,6 +18,8 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Log;
 
+import :Worker;
+
 export namespace PonyEngine::File
 {
 	/// @brief Service context.
@@ -26,8 +28,9 @@ export namespace PonyEngine::File
 	public:
 		/// @brief Creates a service context.
 		/// @param application Application.
+		/// @param worker Worker.
 		[[nodiscard("Pure constructor")]]
-		explicit ServiceContext(Application::IApplication& application) noexcept;
+		ServiceContext(Application::IApplication& application, class Worker& worker) noexcept;
 		ServiceContext(const ServiceContext&) = delete;
 		ServiceContext(ServiceContext&&) = delete;
 
@@ -41,6 +44,10 @@ export namespace PonyEngine::File
 		/// @return Log service.
 		[[nodiscard("Pure function")]]
 		const Log::ILogService* LogService() const noexcept;
+		/// @brief Gets the worker.
+		/// @return Worker.
+		[[nodiscard("Pure function")]]
+		class Worker& Worker() const noexcept;
 
 		/// @brief Increments the file count.
 		void IncrementFileCount() const noexcept;
@@ -56,6 +63,7 @@ export namespace PonyEngine::File
 	private:
 		Application::IApplication* application; ///< Application.
 		const Log::ILogService* logService; ///< Log service.
+		class Worker* worker; ///< Worker.
 
 #ifndef NDEBUG
 		mutable std::atomic_size_t fileCount; ///< File count.
@@ -65,12 +73,13 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	ServiceContext::ServiceContext(Application::IApplication& application) noexcept :
+	ServiceContext::ServiceContext(Application::IApplication& application, class Worker& worker) noexcept :
 #ifndef NDEBUG
 		fileCount(0uz),
 #endif
 		application{&application},
-		logService{this->application->FindInterface<Log::ILogService>()}
+		logService{this->application->FindInterface<Log::ILogService>()},
+		worker{&worker}
 	{
 	}
 
@@ -82,6 +91,11 @@ namespace PonyEngine::File
 	const Log::ILogService* ServiceContext::LogService() const noexcept
 	{
 		return logService;
+	}
+
+	class Worker& ServiceContext::Worker() const noexcept
+	{
+		return *worker;
 	}
 
 	void ServiceContext::IncrementFileCount() const noexcept

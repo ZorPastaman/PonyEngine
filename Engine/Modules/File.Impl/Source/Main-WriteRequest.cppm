@@ -17,25 +17,23 @@ import std;
 
 import PonyEngine.File;
 
-import :IRequestController;
 import :Request;
 
 export namespace PonyEngine::File
 {
 	/// @brief Write request.
-	class WriteRequest final : public IWriteRequest
+	class WriteRequest : public IWriteRequest
 	{
 	public:
 		/// @brief Creates a write request.
-		/// @param controller Request controller.
 		/// @param params Write parameters.
-		/// @param observer Observer. Can be nullptr.
+		/// @param callback Callback. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		WriteRequest(IRequestController& controller, const WriteParams& params, IWriteRequestObserver* observer) noexcept;
+		WriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback) noexcept;
 		WriteRequest(const WriteRequest&) = delete;
 		WriteRequest(WriteRequest&&) = delete;
 
-		~WriteRequest() noexcept = default;
+		virtual ~WriteRequest() noexcept = default;
 
 		[[nodiscard("Pure function")]]
 		virtual const WriteParams& Params() const noexcept override;
@@ -46,8 +44,6 @@ export namespace PonyEngine::File
 		virtual std::size_t ByteCount() const override;
 		[[nodiscard("Pure function")]]
 		virtual const std::exception_ptr& Exception() const override;
-
-		virtual void Cancel() override;
 
 		virtual void Wait() const noexcept override;
 
@@ -64,20 +60,21 @@ export namespace PonyEngine::File
 		WriteRequest& operator =(WriteRequest&&) = delete;
 
 	private:
-		IRequestController* controller; ///< Request controller.
+		/// @brief Invokes the callback if it's not nullptr.
+		void InvokeCallback() noexcept;
+
 		WriteParams params; ///< Write parameters.
 		Request request; ///< Write request.
 
-		IWriteRequestObserver* observer; ///< Observer.
+		std::move_only_function<void(const IWriteRequest&)> callback; ///< Callback.
 	};
 }
 
 namespace PonyEngine::File
 {
-	WriteRequest::WriteRequest(IRequestController& controller, const WriteParams& params, IWriteRequestObserver* const observer) noexcept :
-		controller{ &controller },
+	WriteRequest::WriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback) noexcept :
 		params(params),
-		observer{observer}
+		callback(std::move(callback))
 	{
 	}
 
@@ -101,11 +98,6 @@ namespace PonyEngine::File
 		return request.Exception();
 	}
 
-	void WriteRequest::Cancel()
-	{
-		controller->Cancel();
-	}
-
 	void WriteRequest::Wait() const noexcept
 	{
 		request.Wait();
@@ -114,30 +106,26 @@ namespace PonyEngine::File
 	void WriteRequest::SetSuccess(const std::size_t byteCount) noexcept
 	{
 		request.SetSuccess(byteCount);
-		
-		if (observer)
-		{
-			observer->OnSuccess(byteCount);
-		}
+		InvokeCallback();
 	}
 
 	void WriteRequest::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		request.SetFailed(exception);
-		
-		if (observer)
-		{
-			observer->OnFailure(exception);
-		}
+		InvokeCallback();
 	}
 
 	void WriteRequest::SetCanceled() noexcept
 	{
 		request.SetCanceled();
-		
-		if (observer)
+		InvokeCallback();
+	}
+
+	void WriteRequest::InvokeCallback() noexcept
+	{
+		if (callback)
 		{
-			observer->OnCancel();
+			callback(*this);
 		}
 	}
 }

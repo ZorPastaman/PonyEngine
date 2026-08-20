@@ -12,10 +12,8 @@ add_library(PonyEngine.File.Impl STATIC)
 target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-FileInfo.cppm"
-	"Source/Main-IRequestController.cppm"
 	"Source/Main-ReadRequest.cppm"
 	"Source/Main-Request.cppm"
-	"Source/Main-RequestVariant.cppm"
 	"Source/Main-WriteRequest.cppm"
 )
 

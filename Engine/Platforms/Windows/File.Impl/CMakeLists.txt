@@ -23,12 +23,13 @@ target_sources(PonyEngine.File.Impl PRIVATE
 target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/Main.cppm"
 	"Source/Main-File.cppm"
-	"Source/Main-FileHandle.cppm"
 	"Source/Main-FileService.cppm"
 	"Source/Main-FileServiceModule.cppm"
 	"Source/Main-FileUtility.cppm"
+	"Source/Main-OverlappedReadRequest.cppm"
 	"Source/Main-OverlappedRequest.cppm"
 	"Source/Main-OverlappedUtility.cppm"
+	"Source/Main-OverlappedWriteRequest.cppm"
 	"Source/Main-ServiceContext.cppm"
 	"Source/Main-Worker.cppm"
 )

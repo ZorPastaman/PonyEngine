@@ -28,7 +28,7 @@ export namespace PonyEngine::File
 		Request(const Request&) = delete;
 		Request(Request&&) = delete;
 
-		~Request() noexcept;
+		~Request() noexcept = default;
 
 		/// @brief Gets the request status.
 		/// @return Request status.
@@ -77,11 +77,6 @@ namespace PonyEngine::File
 	{
 	}
 
-	Request::~Request() noexcept
-	{
-		assert(status.load(std::memory_order::relaxed) != FileRequestStatus::Pending && "Pending request destructed.");
-	}
-
 	FileRequestStatus Request::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
@@ -128,7 +123,7 @@ namespace PonyEngine::File
 	void Request::SetCanceled() noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == FileRequestStatus::Pending && "Invalid status.");
-		status.store(FileRequestStatus::Canceled, std::memory_order::relaxed);
+		status.store(FileRequestStatus::Canceled, std::memory_order::release);
 		status.notify_all();
 	}
 

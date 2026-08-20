@@ -17,25 +17,23 @@ import std;
 
 import PonyEngine.File;
 
-import :IRequestController;
 import :Request;
 
 export namespace PonyEngine::File
 {
 	/// @brief Read request.
-	class ReadRequest final : public IReadRequest
+	class ReadRequest : public IReadRequest
 	{
 	public:
 		/// @brief Creates a read request.
-		/// @param controller Request controller.
 		/// @param params Read parameters.
-		/// @param observer Observer. Can be nullptr.
+		/// @param callback Callback. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		ReadRequest(IRequestController& controller, const ReadParams& params, IReadRequestObserver* observer) noexcept;
+		ReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback) noexcept;
 		ReadRequest(const ReadRequest&) = delete;
 		ReadRequest(ReadRequest&&) = delete;
 
-		~ReadRequest() noexcept = default;
+		virtual ~ReadRequest() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
 		virtual const ReadParams& Params() const noexcept override;
@@ -46,8 +44,6 @@ export namespace PonyEngine::File
 		virtual std::size_t ByteCount() const override;
 		[[nodiscard("Pure function")]] 
 		virtual const std::exception_ptr& Exception() const override;
-
-		virtual void Cancel() override;
 
 		virtual void Wait() const noexcept override;
 
@@ -64,20 +60,21 @@ export namespace PonyEngine::File
 		ReadRequest& operator =(ReadRequest&&) = delete;
 
 	private:
-		IRequestController* controller; ///< Request controller.
+		/// @brief Invokes the callback if it's not nullptr.
+		void InvokeCallback() noexcept;
+
 		ReadParams params; ///< Read parameters.
 		Request request; ///< Read request.
 
-		IReadRequestObserver* observer; ///< Observer.
+		std::move_only_function<void(const IReadRequest&)> callback; ///< Callback.
 	};
 }
 
 namespace PonyEngine::File
 {
-	ReadRequest::ReadRequest(IRequestController& controller, const ReadParams& params, IReadRequestObserver* const observer) noexcept :
-		controller{&controller},
+	ReadRequest::ReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback) noexcept :
 		params(params),
-		observer{observer}
+		callback(std::move(callback))
 	{
 	}
 
@@ -101,11 +98,6 @@ namespace PonyEngine::File
 		return request.Exception();
 	}
 
-	void ReadRequest::Cancel()
-	{
-		controller->Cancel();
-	}
-
 	void ReadRequest::Wait() const noexcept
 	{
 		request.Wait();
@@ -114,30 +106,26 @@ namespace PonyEngine::File
 	void ReadRequest::SetSuccess(const std::size_t byteCount) noexcept
 	{
 		request.SetSuccess(byteCount);
-		
-		if (observer)
-		{
-			observer->OnSuccess(byteCount);
-		}
+		InvokeCallback();
 	}
 
 	void ReadRequest::SetFailure(const std::exception_ptr& exception) noexcept
 	{
 		request.SetFailed(exception);
-		
-		if (observer)
-		{
-			observer->OnFailure(exception);
-		}
+		InvokeCallback();
 	}
 
 	void ReadRequest::SetCanceled() noexcept
 	{
 		request.SetCanceled();
-		
-		if (observer)
+		InvokeCallback();
+	}
+
+	void ReadRequest::InvokeCallback() noexcept
+	{
+		if (callback)
 		{
-			observer->OnCancel();
+			callback(*this);
 		}
 	}
 }
