@@ -10,5 +10,4 @@
 export module PonyEngine.Job;
 
 export import :IJobService;
-export import :ITask;
 export import :JobHandle;

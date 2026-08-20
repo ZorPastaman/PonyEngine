@@ -24,7 +24,7 @@ import PonyEngine.Resource.Pack;
 
 import :FileDataAccess;
 import :FileLoadableDataAccess;
-import :LoadableDataAccessRequestBuffer;
+import :LoadableDataAccessRequestWorker;
 import :MemoryDataAccess;
 import :PackContainer;
 
@@ -82,7 +82,7 @@ export namespace PonyEngine::Resource::Pack
 		Log::ILogService* logService;
 		IResourceHub* resourceHub;
 
-		std::shared_ptr<LoadableDataAccessRequestBuffer> loadableDataAccessRequestBuffer;
+		LoadableDataAccessRequestWorker loadableDataAccessRequestWorker;
 
 		PackContainer packContainer;
 		std::vector<PackVersion> packVersions;
@@ -98,7 +98,7 @@ namespace PonyEngine::Resource::Pack
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
 		resourceHub{&this->application->GetInterface<IResourceHub>()},
-		loadableDataAccessRequestBuffer(std::make_shared<LoadableDataAccessRequestBuffer>(this->application->GetInterface<Job::IJobService>()))
+		loadableDataAccessRequestWorker(this->application->GetInterface<Job::IJobService>())
 	{
 	}
 

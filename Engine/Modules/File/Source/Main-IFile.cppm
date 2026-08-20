@@ -49,7 +49,7 @@ export namespace PonyEngine::File
 		/// @note The file, request, buffer and callback must be kept alive till the finish of the operation.
 		/// @note The function is thread-safe.
 		[[nodiscard("Must be used")]]
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback = nullptr) = 0;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback = nullptr) = 0;
 		/// @brief Makes a write request.
 		/// @param params Write parameters.
 		/// @param callback Callback. Can be nullptr. It will be called on the caller thread or on an io thread. It may be called before the function returns.
@@ -57,6 +57,6 @@ export namespace PonyEngine::File
 		/// @note The file, request, buffer and observer must be kept alive till the finish of the operation.
 		/// @note The function is thread-safe.
 		[[nodiscard("Must be used")]]
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback = nullptr) = 0;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback = nullptr) = 0;
 	};
 }

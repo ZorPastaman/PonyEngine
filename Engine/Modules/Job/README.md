@@ -19,10 +19,6 @@ Main sub-modules:
 
 Job service interface.
 
-#### [ITask](Source/Main-ITask.cppm)
-
-Task interface. It's scheduled to the job service.
-
 #### [JobHandle](Source/Main-JobHandle.cppm)
 
 Handle of a scheduled job.

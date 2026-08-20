@@ -30,7 +30,7 @@ export namespace PonyEngine::File
 		/// @param callback Callback.
 		/// @param file File that created this request.
 		[[nodiscard("Pure constructor")]]
-		OverlappedWriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback, HANDLE file) noexcept;
+		OverlappedWriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, HANDLE file) noexcept;
 		OverlappedWriteRequest(const OverlappedWriteRequest&) = delete;
 		OverlappedWriteRequest(OverlappedWriteRequest&&) = delete;
 
@@ -54,7 +54,7 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	OverlappedWriteRequest::OverlappedWriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback, const HANDLE file) noexcept :
+	OverlappedWriteRequest::OverlappedWriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, const HANDLE file) noexcept :
 		WriteRequest(params, std::move(callback)),
 		file(file),
 		overlapped(CreateOverlapped(params.offset))

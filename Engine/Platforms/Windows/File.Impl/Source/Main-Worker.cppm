@@ -50,14 +50,14 @@ export namespace PonyEngine::File
 		/// @param file File that created this request.
 		/// @return Read request.
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<IReadRequest> MakeRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback, HANDLE file) const;
+		std::shared_ptr<IReadRequest> MakeRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, HANDLE file) const;
 		/// @brief Makes a write request.
 		/// @param params Write parameters.
 		/// @param callback Callback.
 		/// @param file File that created this request.
 		/// @return Write request.
 		[[nodiscard("Must be used")]]
-		std::shared_ptr<IWriteRequest> MakeRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback, HANDLE file) const;
+		std::shared_ptr<IWriteRequest> MakeRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, HANDLE file) const;
 
 		Worker& operator =(const Worker&) = delete;
 		Worker& operator =(Worker&&) = delete;
@@ -169,7 +169,7 @@ namespace PonyEngine::File
 			reinterpret_cast<std::uintptr_t>(file), reinterpret_cast<std::uintptr_t>(iocp));
 	}
 
-	std::shared_ptr<IReadRequest> Worker::MakeRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback, const HANDLE file) const
+	std::shared_ptr<IReadRequest> Worker::MakeRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, const HANDLE file) const
 	{
 		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
 		{
@@ -211,7 +211,7 @@ namespace PonyEngine::File
 		return std::shared_ptr<IReadRequest>(std::move(request), &request->Read());
 	}
 
-	std::shared_ptr<IWriteRequest> Worker::MakeRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback, HANDLE file) const
+	std::shared_ptr<IWriteRequest> Worker::MakeRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, HANDLE file) const
 	{
 		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
 		{

@@ -46,7 +46,7 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		virtual std::size_t WorkerCount() const noexcept override;
 
-		virtual JobHandle Schedule(ITask& task, std::span<const JobHandle> dependencies) override;
+		virtual JobHandle Schedule(std::move_only_function<void() noexcept> task, std::span<const JobHandle> dependencies) override;
 
 		virtual void Wait(std::span<const JobHandle> handles) const override;
 		[[nodiscard("Pure function")]]
@@ -125,14 +125,14 @@ namespace PonyEngine::Job
 		return workers.size();
 	}
 
-	JobHandle JobService::Schedule(ITask& task, const std::span<const JobHandle> dependencies)
+	JobHandle JobService::Schedule(std::move_only_function<void() noexcept> task, const std::span<const JobHandle> dependencies)
 	{
 		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
 		const JobID jobId = GetFreeJob(workerIndex);
 		Worker& worker = *workers[jobId.poolIndex];
 		Job& job = worker.GetJob(jobId.jobIndex);
 		const std::size_t version = job.Version();
-		job.Task(&task);
+		job.Task(std::move(task));
 		job.Block(dependencies.size());
 
 		const auto handle = ToJobHandle(jobId, version);

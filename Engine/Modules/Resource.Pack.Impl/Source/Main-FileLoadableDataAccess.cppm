@@ -19,8 +19,8 @@ import PonyEngine.Math;
 import PonyEngine.File;
 import PonyEngine.Resource.Ext;
 
-import :FileLoadableDataAccessRequest;
-import :LoadableDataAccessRequestBuffer;
+import :LoadableDataAccessRequest;
+import :LoadableDataAccessRequestWorker;
 
 export namespace PonyEngine::Resource::Pack
 {
@@ -29,7 +29,7 @@ export namespace PonyEngine::Resource::Pack
 	public:
 		[[nodiscard("Pure constructor")]]
 		FileLoadableDataAccess(const std::shared_ptr<File::IFile>& dataFile, std::size_t offset, std::size_t size, 
-			const std::shared_ptr<LoadableDataAccessRequestBuffer>& requestBuffer) noexcept;
+			const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer) noexcept;
 		FileLoadableDataAccess(const FileLoadableDataAccess&) = delete;
 		FileLoadableDataAccess(FileLoadableDataAccess&&) = delete;
 
@@ -49,14 +49,14 @@ export namespace PonyEngine::Resource::Pack
 		std::size_t offset;
 		std::size_t size;
 		
-		std::shared_ptr<LoadableDataAccessRequestBuffer> requestBuffer;
+		std::shared_ptr<LoadableDataAccessRequestWorker> requestBuffer;
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
 	FileLoadableDataAccess::FileLoadableDataAccess(const std::shared_ptr<File::IFile>& dataFile, const std::size_t offset, const std::size_t size,
-		const std::shared_ptr<LoadableDataAccessRequestBuffer>& requestBuffer) noexcept :
+		const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer) noexcept :
 		dataFile(dataFile),
 		offset{offset},
 		size{size},

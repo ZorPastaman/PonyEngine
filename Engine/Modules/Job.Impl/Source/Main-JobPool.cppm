@@ -29,7 +29,7 @@ export namespace PonyEngine::Job
 		JobPool(const JobPool&) = delete;
 		JobPool(JobPool&&) = delete;
 
-		~JobPool() noexcept = default;
+		~JobPool() noexcept;
 
 		/// @brief Tries to acquire a job.
 		/// @return Job index or std::nullopt if the pool is empty.
@@ -68,6 +68,11 @@ namespace PonyEngine::Job
 		freeJobCount{PONY_ENGINE_JOB_POOL_SIZE}
 	{
 		std::ranges::iota(freeJobs, 0uz);
+	}
+
+	JobPool::~JobPool() noexcept
+	{
+		assert(freeJobCount == freeJobs.size() && "Some jobs aren't finished.");
 	}
 
 	std::optional<std::size_t> JobPool::AcquireJob() noexcept

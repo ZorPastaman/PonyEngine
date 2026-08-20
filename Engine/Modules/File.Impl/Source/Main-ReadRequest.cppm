@@ -29,7 +29,7 @@ export namespace PonyEngine::File
 		/// @param params Read parameters.
 		/// @param callback Callback. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		ReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback) noexcept;
+		ReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback) noexcept;
 		ReadRequest(const ReadRequest&) = delete;
 		ReadRequest(ReadRequest&&) = delete;
 
@@ -66,13 +66,13 @@ export namespace PonyEngine::File
 		ReadParams params; ///< Read parameters.
 		Request request; ///< Read request.
 
-		std::move_only_function<void(const IReadRequest&)> callback; ///< Callback.
+		std::move_only_function<void(const IReadRequest&) noexcept> callback; ///< Callback.
 	};
 }
 
 namespace PonyEngine::File
 {
-	ReadRequest::ReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback) noexcept :
+	ReadRequest::ReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback) noexcept :
 		params(params),
 		callback(std::move(callback))
 	{

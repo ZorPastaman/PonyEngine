@@ -20,7 +20,7 @@ import PonyEngine.Memory;
 import PonyEngine.Resource.Ext;
 
 import :MemoryLoadableDataAccessRequest;
-import :LoadableDataAccessRequestBuffer;
+import :LoadableDataAccessRequestWorker;
 
 export namespace PonyEngine::Resource::Pack
 {
@@ -29,7 +29,7 @@ export namespace PonyEngine::Resource::Pack
 	public:
 		[[nodiscard("Pure constructor")]]
 		MemoryLoadableDataAccess(const std::shared_ptr<const std::byte[]>& loadedData, std::size_t offset, std::size_t size,
-			const std::shared_ptr<LoadableDataAccessRequestBuffer>& requestBuffer) noexcept;
+			const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer) noexcept;
 		MemoryLoadableDataAccess(const MemoryLoadableDataAccess&) = delete;
 		MemoryLoadableDataAccess(MemoryLoadableDataAccess&&) = delete;
 
@@ -48,14 +48,14 @@ export namespace PonyEngine::Resource::Pack
 		std::shared_ptr<const std::byte[]> loadedData;
 		std::span<const std::byte> buffer;
 
-		std::shared_ptr<LoadableDataAccessRequestBuffer> requestBuffer;
+		std::shared_ptr<LoadableDataAccessRequestWorker> requestBuffer;
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
 	MemoryLoadableDataAccess::MemoryLoadableDataAccess(const std::shared_ptr<const std::byte[]>& loadedData, const std::size_t offset, const std::size_t size,
-		const std::shared_ptr<LoadableDataAccessRequestBuffer>& requestBuffer) noexcept :
+		const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer) noexcept :
 		loadedData(loadedData),
 		buffer(&loadedData[offset], size),
 		requestBuffer(requestBuffer)

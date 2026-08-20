@@ -32,13 +32,13 @@ export namespace PonyEngine::File
 		/// @param callback Callback.
 		/// @param file File that created this request.
 		[[nodiscard("Pure constructor")]]
-		explicit OverlappedRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback, HANDLE file) noexcept;
+		explicit OverlappedRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, HANDLE file) noexcept;
 		/// @brief Creates a write request.
 		/// @param params Write parameters.
 		/// @param callback Callback.
 		/// @param file File that created this request.
 		[[nodiscard("Pure constructor")]]
-		explicit OverlappedRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback, HANDLE file) noexcept;
+		explicit OverlappedRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, HANDLE file) noexcept;
 		OverlappedRequest(const OverlappedRequest&) = delete;
 		OverlappedRequest(OverlappedRequest&&) = delete;
 
@@ -87,12 +87,12 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	OverlappedRequest::OverlappedRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback, const HANDLE file) noexcept :
+	OverlappedRequest::OverlappedRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, const HANDLE file) noexcept :
 		request(std::in_place_type<OverlappedReadRequest>, params, std::move(callback), file)
 	{
 	}
 
-	OverlappedRequest::OverlappedRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback, const HANDLE file) noexcept :
+	OverlappedRequest::OverlappedRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, const HANDLE file) noexcept :
 		request(std::in_place_type<OverlappedWriteRequest>, params, std::move(callback), file)
 	{
 	}

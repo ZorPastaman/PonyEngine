@@ -50,10 +50,10 @@ export namespace PonyEngine::Job
 		bool HasTask() const noexcept;
 		/// @brief Sets the task.
 		/// @param task Task to set. Can be nullptr.
-		void Task(ITask* task) noexcept;
+		void Task(std::move_only_function<void() noexcept> task) noexcept;
 		/// @brief Executes a current task.
 		/// @note The job must have a task, otherwise the call is not allowed.
-		void Execute() const noexcept;
+		void Execute() noexcept;
 
 		/// @brief Decrements the block count.
 		/// @return @a True if the job is fully unlocked (block count has reached 0); @a false otherwise.
@@ -85,7 +85,7 @@ export namespace PonyEngine::Job
 
 	private:
 		std::atomic_size_t version; ///< Job version.
-		ITask* task; ///< Job task.
+		std::move_only_function<void() noexcept> task; ///< Job task.
 
 		std::atomic_size_t blockCount; ///< Block count. How many dependencies must be completed before starting this job.
 		std::vector<JobID> dependents; ///< Dependents.
@@ -102,6 +102,7 @@ namespace PonyEngine::Job
 		task{nullptr},
 		blockCount{0uz}
 	{
+		dependents.reserve(8uz);
 	}
 
 	std::size_t Job::Version() const noexcept
@@ -125,18 +126,18 @@ namespace PonyEngine::Job
 
 	bool Job::HasTask() const noexcept
 	{
-		return task;
+		return static_cast<bool>(task);
 	}
 
-	void Job::Task(ITask* const task) noexcept
+	void Job::Task(std::move_only_function<void() noexcept> task) noexcept
 	{
-		this->task = task;
+		this->task = std::move(task);
 	}
 
-	void Job::Execute() const noexcept
+	void Job::Execute() noexcept
 	{
 		assert(task && "The task is nullptr.");
-		task->Execute();
+		task();
 	}
 
 	bool Job::Unblock() noexcept

@@ -29,7 +29,7 @@ export namespace PonyEngine::File
 		/// @param params Write parameters.
 		/// @param callback Callback. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		WriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback) noexcept;
+		WriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback) noexcept;
 		WriteRequest(const WriteRequest&) = delete;
 		WriteRequest(WriteRequest&&) = delete;
 
@@ -66,13 +66,13 @@ export namespace PonyEngine::File
 		WriteParams params; ///< Write parameters.
 		Request request; ///< Write request.
 
-		std::move_only_function<void(const IWriteRequest&)> callback; ///< Callback.
+		std::move_only_function<void(const IWriteRequest&) noexcept> callback; ///< Callback.
 	};
 }
 
 namespace PonyEngine::File
 {
-	WriteRequest::WriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback) noexcept :
+	WriteRequest::WriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback) noexcept :
 		params(params),
 		callback(std::move(callback))
 	{

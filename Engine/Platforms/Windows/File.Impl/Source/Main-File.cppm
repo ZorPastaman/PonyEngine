@@ -48,9 +48,9 @@ export namespace PonyEngine::File
 		virtual FileFlag Flags() const noexcept override;
 
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback) override;
+		virtual std::shared_ptr<IReadRequest> Read(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback) override;
 		[[nodiscard("Must be used")]] 
-		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback) override;
+		virtual std::shared_ptr<IWriteRequest> Write(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback) override;
 
 		File& operator =(const File&) = delete;
 		File& operator =(File&&) = delete;
@@ -123,13 +123,13 @@ namespace PonyEngine::File
 		return fileInfo.Flags();
 	}
 
-	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params, std::move_only_function<void(const IReadRequest&)> callback)
+	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback)
 	{
 		fileInfo.ValidateRead();
 		return context->Worker().MakeRequest(params, std::move(callback), fileHandle);
 	}
 
-	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params, std::move_only_function<void(const IWriteRequest&)> callback)
+	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback)
 	{
 		fileInfo.ValidateWrite();
 		return context->Worker().MakeRequest(params, std::move(callback), fileHandle);

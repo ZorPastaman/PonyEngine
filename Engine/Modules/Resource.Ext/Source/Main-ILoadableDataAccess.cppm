@@ -56,21 +56,6 @@ export namespace PonyEngine::Resource
 		virtual void Wait() const noexcept = 0;
 	};
 
-	/// @brief Loadable data access request observer.
-	class ILoadableDataAccessRequestObserver
-	{
-		PONY_INTERFACE_BODY(ILoadableDataAccessRequestObserver)
-
-		/// @brief Invoked on a success.
-		/// @param byteCount How many bytes were transferred.
-		virtual void OnSuccess(std::size_t byteCount) noexcept = 0;
-		/// @brief Invoked on a failure.
-		/// @param exception Exception.
-		virtual void OnFailure(const std::exception_ptr& exception) noexcept = 0;
-		/// @brief Invoked on cancel.
-		virtual void OnCancel() noexcept = 0;
-	};
-
 	/// @brief Loadable data access.
 	class ILoadableDataAccess
 	{
@@ -82,12 +67,14 @@ export namespace PonyEngine::Resource
 		virtual std::size_t Size() const noexcept = 0;
 
 		/// @brief Makes a load request.
-		/// @param buffer Data buffer. Must be valid till the end of the operation.
+		/// @param buffer Data buffer.
 		/// @param offset Read offset.
-		/// @param observer Observer. Can be nullptr. Must be valid till the end of the operation.
-		/// @return Load request.
+		/// @param callback Callback. Can be nullptr. It will be called on the caller thread or on an io thread. It may be called before the function returns.
+		/// @return Load request. Must be destroyed before the access.
+		/// @note The access, request, buffer and callback must be kept alive till the finish of the operation.
 		[[nodiscard("Must be used")]]
-		virtual std::shared_ptr<ILoadableDataAccessRequest> Load(std::span<std::byte> buffer, std::size_t offset, ILoadableDataAccessRequestObserver* observer = nullptr) = 0;
+		virtual std::shared_ptr<ILoadableDataAccessRequest> Load(std::span<std::byte> buffer, std::size_t offset, 
+			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback = nullptr) = 0;
 	};
 }
 
