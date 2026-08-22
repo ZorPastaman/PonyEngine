@@ -17,19 +17,10 @@ endif()
 include("CMake/Resource.cmake")
 include("CMake/ThreadRole.cmake")
 
-target_sources(PonyEngine.Application.Impl PRIVATE
-	"Source/Launch.cpp"
-)
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/Main.cppm"
 	"Source/Main-CommandLine.cppm"
-	"Source/Main-ConsoleProcess.cppm"
-	"Source/Main-Context.cppm"
-	"Source/Main-GUIProcess.cppm"
-	"Source/Main-Path.cppm"
 	"Source/Main-Process.cppm"
-	"Source/Main-ThreadControl.cppm"
-	"Source/Main-Timer.cppm"
 )
 
 if(PONY_ENGINE_APPLICATION_ADD_DEFAULT_MANIFEST)
@@ -46,7 +37,20 @@ target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH=${PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH}
 )
 
-if(PONY_ENGINE_APPLICATION_MODE STREQUAL "GUI")
+if(PONY_ENGINE_APPLICATION_MODE STREQUAL "Console")
+	target_sources(PonyEngine.Application.Impl PRIVATE
+		"Source/Launch.Console.cpp"
+	)
+	target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
+		"Source/Main-ConsoleProcess.cppm"
+	)
+elseif(PONY_ENGINE_APPLICATION_MODE STREQUAL "GUI")
+	target_sources(PonyEngine.Application.Impl PRIVATE
+		"Source/Launch.GUI.cpp"
+	)
+	target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
+		"Source/Main-GUIProcess.cppm"
+	)
 	set_target_properties(PonyEngine.Application.Impl PROPERTIES
 		WIN32_EXECUTABLE TRUE
 	)

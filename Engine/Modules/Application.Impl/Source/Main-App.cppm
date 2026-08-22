@@ -146,11 +146,8 @@ export namespace PonyEngine::Application
 
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const std::string_view> ThreadRoles() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IThreadControl> CreateThreadControl(std::thread& thread) override;
 		[[nodiscard("Pure function")]] 
-		virtual std::string_view MainThreadRole() const noexcept override;
-		virtual void MainThreadRole(std::string_view role) override;
+		virtual std::thread CreateThread(std::move_only_function<void()> func, const ThreadParams& params) override;
 
 		/// @brief Initializes early modules.
 		void InitializeEarly();
@@ -681,21 +678,9 @@ namespace PonyEngine::Application
 		return threadRoles;
 	}
 
-	std::shared_ptr<IThreadControl> App::CreateThreadControl(std::thread& thread)
+	std::thread App::CreateThread(std::move_only_function<void()> func, const ThreadParams& params)
 	{
-		return process->CreateThreadControl(thread);
-	}
-
-	std::string_view App::MainThreadRole() const noexcept
-	{
-		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
-		return process->MainThreadRole();
-	}
-
-	void App::MainThreadRole(const std::string_view role)
-	{
-		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
-		process->MainThreadRole(role);
+		return process->CreateThread(std::move(func), params);
 	}
 
 	void App::InitializeEarly()
@@ -820,9 +805,32 @@ namespace PonyEngine::Application
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
-		tickables.shrink_to_fit();
-		UpdateBeginTickables();
-		UpdateTickTickables();
+		try
+		{
+			tickables.shrink_to_fit();
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On shrinking tickables.");
+		}
+		try
+		{
+			UpdateBeginTickables();
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On preparing begin tickables.");
+			throw;
+		}
+		try
+		{
+			UpdateTickTickables();
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On preparing tick tickables.");
+			throw;
+		}
 
 		std::size_t count = 0uz;
 		try
@@ -875,10 +883,24 @@ namespace PonyEngine::Application
 		for (ITickable* const tickable : tickTickables)
 		{
 			PONY_LOG(logService, Log::LogType::Verbose, "Ticking '{}'...", typeid(*tickable).name());
-			tickable->Tick();
+			try
+			{
+				tickable->Tick();
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On ticking '{}'.", typeid(*tickable).name());
+				throw;
+			}
 			PONY_LOG(logService, Log::LogType::Verbose, "Ticking '{}' done.", typeid(*tickable).name());
 		}
 		PONY_LOG(logService, Log::LogType::Verbose, "Ticking tickables done.");
+	}
+
+	template<typename T>
+	T* App::FindInterface() const
+	{
+		return static_cast<T*>(FindInterface(typeid(T)));
 	}
 
 	void App::AddInterface(const std::type_index type, void* const interface)
@@ -888,12 +910,6 @@ namespace PonyEngine::Application
 		PONY_LOG(logService, Log::LogType::Info, "Adding interface. Type: '{}'; Address: '0x{:X}'.", type.name(), reinterpret_cast<std::uintptr_t>(interface));
 		const auto [iterator, added] = interfaces.try_emplace(type, interface);
 		assert(added && "Interface is already added");
-	}
-
-	template<typename T>
-	T* App::FindInterface() const
-	{
-		return static_cast<T*>(FindInterface(typeid(T)));
 	}
 
 	template<typename T>
@@ -1080,14 +1096,38 @@ namespace PonyEngine::Application
 		{
 			if (const auto moduleGetter = *reinterpret_cast<ModuleGetter*>(current))
 			{
-				std::shared_ptr<IModule> appModule = moduleGetter();
+				std::shared_ptr<IModule> appModule;
+				try
+				{
+					appModule = moduleGetter();
+				}
+				catch (...)
+				{
+					PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On creating a module.");
+					throw;
+				}
 				assert(appModule && "Module is nullptr");
 				PONY_LOG(logService, Log::LogType::Info, "Module created: '{}'.", typeid(*appModule).name());
-				modules.push_back(std::move(appModule));
+				try
+				{
+					modules.push_back(std::move(appModule));
+				}
+				catch (...)
+				{
+					PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On adding module to list. Module: '{}'.", typeid(*appModule).name());
+					throw;
+				}
 			}
 		}
 
-		modules.shrink_to_fit();
+		try
+		{
+			modules.shrink_to_fit();
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On shrinking module list.");
+		}
 	}
 
 	void App::DestroyModules(std::vector<std::shared_ptr<IModule>>& modules) const noexcept
@@ -1100,7 +1140,14 @@ namespace PonyEngine::Application
 		}
 
 		modules.clear();
-		modules.shrink_to_fit();
+		try
+		{
+			modules.shrink_to_fit();
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On shrinking module list.");
+		}
 	}
 
 	void App::StartUpModules(const std::span<const std::shared_ptr<IModule>> modules, std::size_t& count)

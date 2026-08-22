@@ -85,7 +85,6 @@ export namespace PonyEngine::File
 		mutable std::mutex ongoingRequestMutex; ///< Ongoing request mutex.
 
 		std::thread thread; ///< Worker thread.
-		std::shared_ptr<Application::IThreadControl> threadControl; ///< Thread control.
 		std::atomic_bool running; ///< Should the worker run?
 
 		static_assert(std::atomic_bool::is_always_lock_free, "bool is not lock-free.");
@@ -111,7 +110,11 @@ namespace PonyEngine::File
 		PONY_LOG(logService, Log::LogType::Info, "Creating io work thread... Role: '{}'.", role);
 		try
 		{
-			thread = std::thread(&Worker::Work, this);
+			thread = application.CreateThread([this] { Work(); }, Application::ThreadParams
+			{
+				.role = role,
+				.logService = logService
+			});
 		}
 		catch (...)
 		{
@@ -120,15 +123,6 @@ namespace PonyEngine::File
 				PONY_LOG(logService, Log::LogType::Error, "Failed to close iocp. Error code: '0x{:X}'.", GetLastError());
 			}
 			throw;
-		}
-		try
-		{
-			threadControl = application.CreateThreadControl(thread);
-			threadControl->Role(role);
-		}
-		catch (...)
-		{
-			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "Failed to set io thread role.");
 		}
 		PONY_LOG(logService, Log::LogType::Info, "Creating io work thread done.");
 	}
@@ -143,7 +137,6 @@ namespace PonyEngine::File
 		{
 			PONY_LOG(logService, Log::LogType::Error, "Failed to post queued io completion status. Error code: '0x{:X}'.", GetLastError());
 		}
-		threadControl.reset();
 		thread.join();
 		PONY_LOG(logService, Log::LogType::Info, "Closing io work thread done.");
 

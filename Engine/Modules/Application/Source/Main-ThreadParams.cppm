@@ -7,12 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application;
+export module PonyEngine.Application:ThreadParams;
 
-export import :IApplication;
-export import :IBuffer;
-export import :IModule;
-export import :IModuleContext;
-export import :ITickable;
-export import :ThreadParams;
-export import :TickOrder;
+import std;
+
+import PonyEngine.Log;
+
+export namespace PonyEngine::Application
+{
+	/// @brief Thread parameters.
+	struct ThreadParams final
+	{
+		std::string_view role = ""; ///< Thread role. Must be valid. Empty role means a default role.
+		Log::ILogService* logService = nullptr; ///< Log service that the thread must use in system calls. May be nullptr.
+	};
+}

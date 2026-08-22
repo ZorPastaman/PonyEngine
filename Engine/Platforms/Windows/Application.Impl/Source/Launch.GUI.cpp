@@ -13,13 +13,13 @@ import std;
 
 import PonyEngine.Application.Impl.Windows;
 
-#ifdef PONY_ENGINE_APPLICATION_MODE_GUI
-
 int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd)
 {
 	try
 	{
-		return std::make_unique<PonyEngine::Application::GUIProcess>(hInstance, hPrevInstance, lpCmdLine, nShowCmd)->Run();
+		const std::vector<std::string> commandLine = PonyEngine::Application::MakeCommandLine();
+		const std::vector<std::string_view> commandLineView = PonyEngine::Application::MakeCommandLineView(commandLine);
+		return std::make_unique<PonyEngine::Application::GUIProcess>(hInstance, hPrevInstance, lpCmdLine, nShowCmd, commandLineView)->Run();
 	}
 	catch (const std::exception& e)
 	{
@@ -32,29 +32,3 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 		return -1;
 	}
 }
-
-#elifdef PONY_ENGINE_APPLICATION_MODE_CONSOLE
-
-int main(const int argc, const char* const argv[])
-{
-	try
-	{
-		return std::make_unique<PonyEngine::Application::ConsoleProcess>(argc, argv)->Run();
-	}
-	catch (const std::exception& e)
-	{
-		std::println(std::cerr, "{}:\n{}", typeid(e).name(), e.what());
-		return -1;
-	}
-	catch (...)
-	{
-		std::println(std::cerr, "Unexpected exception");
-		return -1;
-	}
-}
-
-#else
-
-#error "No GUI or Console define set"
-
-#endif

@@ -11,7 +11,6 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Macro/Text.h"
 
 export module PonyEngine.Job.Impl:Worker;
@@ -107,7 +106,6 @@ export namespace PonyEngine::Job
 		std::size_t myIndex; ///< This worker index in the @p workers.
 
 		std::optional<std::thread> thread; ///< Worker thread.
-		std::shared_ptr<Application::IThreadControl> threadControl; ///< Thread control.
 		std::atomic_bool running; ///< Is the worker running?
 
 		static_assert(std::atomic_bool::is_always_lock_free, "Bool is not lock-free");
@@ -137,17 +135,11 @@ namespace PonyEngine::Job
 	{
 		assert(!thread && "The thread was already started.");
 		assert(running.load(std::memory_order::relaxed) && "The worker is stopped.");
-		thread = std::thread(&Worker::Work, this);
-
-		try
+		thread = application.CreateThread([this] { Work(); }, Application::ThreadParams
 		{
-			threadControl = application.CreateThreadControl(*thread);
-			threadControl->Role(PONY_STRINGIFY_VALUE(PONY_ENGINE_JOB_THREAD_ROLE));
-		}
-		catch (...)
-		{
-			PONY_LOG(application.FindInterface<Log::ILogService>(), Log::LogType::Error, std::current_exception(), "Failed to set worker thread role.");
-		}
+			.role = PONY_STRINGIFY_VALUE(PONY_ENGINE_JOB_THREAD_ROLE),
+			.logService = application.FindInterface<Log::ILogService>()
+		});
 	}
 
 	void Worker::Stop() noexcept
@@ -159,7 +151,6 @@ namespace PonyEngine::Job
 	{
 		assert(thread && "The thread wasn't created.");
 		assert(!running.load(std::memory_order::relaxed) && "The worker wasn't stopped.");
-		threadControl.reset();
 		thread->join();
 	}
 

@@ -3,6 +3,9 @@ message(STATUS "Configuring PonyEngine.Application")
 if(NOT TARGET PonyEngine.Core)
 	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
 endif()
+if(NOT TARGET PonyEngine.Log)
+	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
+endif()
 
 include("CMake/Module.cmake")
 
@@ -18,8 +21,8 @@ target_sources(PonyEngine.Application PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IBuffer.cppm"
 	"Source/Main-IModule.cppm"
 	"Source/Main-IModuleContext.cppm"
-	"Source/Main-IThreadControl.cppm"
 	"Source/Main-ITickable.cppm"
+	"Source/Main-ThreadParams.cppm"
 	"Source/Main-TickOrder.cppm"
 )
 
@@ -29,4 +32,5 @@ set_target_properties(PonyEngine.Application PROPERTIES
 
 target_link_libraries(PonyEngine.Application PUBLIC
 	PonyEngine.Core
+	PonyEngine.Log
 )

@@ -24,22 +24,11 @@ export namespace PonyEngine::Application
 	{
 		PONY_INTERFACE_BODY(IProcess)
 
-		/// @brief Creates a thread control.
-		/// @param thread Target thread.
-		/// @return Thread control.
-		/// @note The function is thread-safe.
-		/// @note Only one thread control per thread may be created.
+		/// @brief Creates a thread.
+		/// @param func Thread function.
+		/// @param params Thread parameters.
+		/// @return Thread.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IThreadControl> CreateThreadControl(std::thread& thread) = 0;
-		/// @brief Gets a current role of a main thread.
-		/// @return Role.
-		/// @note The function must be called on a main thread.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view MainThreadRole() const noexcept = 0;
-		/// @brief Sets the role to a main thread.
-		/// @param role Role to set. Empty role means a default role.
-		/// @note In case of an exception, a default role will be applied.
-		/// @note The function must be called on a main thread.
-		virtual void MainThreadRole(std::string_view role) = 0;
+		virtual std::thread CreateThread(std::move_only_function<void()> func, const ThreadParams& params = ThreadParams{}) = 0;
 	};
 }

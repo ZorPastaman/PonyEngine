@@ -13,7 +13,7 @@ endif()
 include("CMake/Module.cmake")
 
 set(PONY_ENGINE_APPLICATION_ROOT_PATH "" CACHE STRING "Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid.")
-set(PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD "0.0" CACHE STRING "Application target frame period in seconds. Must be double.")
+set(PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD "0.002" CACHE STRING "Application target frame period in seconds. Must be double.")
 
 add_executable(PonyEngine.Application.Impl)
 
