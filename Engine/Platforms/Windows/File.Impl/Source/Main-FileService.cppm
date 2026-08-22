@@ -76,13 +76,22 @@ namespace PonyEngine::File
 	std::shared_ptr<IFile> FileService::OpenFile(const std::filesystem::path& path, const FileParams params)
 	{
 #ifndef NDEBUG
-		const auto file = std::shared_ptr<File>(new File(logService, worker, path, params), [this](const File* const fileToDelete) noexcept
-		{
-			fileCount.fetch_sub(1uz, std::memory_order::relaxed);
-			delete fileToDelete;
-		});
+		const auto file = new File(logService, worker, path, params);
 		fileCount.fetch_add(1uz, std::memory_order::relaxed);
-		return file;
+		try
+		{
+			return std::shared_ptr<File>(file, [this](const File* const fileToDelete) noexcept
+			{
+				delete fileToDelete;
+				fileCount.fetch_sub(1uz, std::memory_order::relaxed);
+			});
+		}
+		catch (...)
+		{
+			delete file;
+			fileCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
 #else
 		return std::make_shared<File>(logService, worker, path, params);
 #endif

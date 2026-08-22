@@ -20,7 +20,6 @@ import PonyEngine.Memory;
 import PonyEngine.World;
 
 import :ComponentTable;
-import :ServiceContext;
 import :TypeRegistry;
 
 template<>
@@ -79,10 +78,11 @@ export namespace PonyEngine::World
 		const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept;
 
 		/// @brief Collects garbage.
-		/// @param context World service context.
+		/// @param application Application.
+		/// @param typeRegistry Type registry.
 		/// @param componentTables Component table.
 		/// @param componentTablesIndices Component table index map.
-		void CollectGarbage(const ServiceContext& context, std::span<const ComponentTable> componentTables, 
+		void CollectGarbage(Application::IApplication& application, const TypeRegistry& typeRegistry, std::span<const ComponentTable> componentTables,
 			const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices);
 
 		ObjectTable& operator =(const ObjectTable&) = delete;
@@ -178,7 +178,7 @@ namespace PonyEngine::World
 		return objects[objectsSparse[handle.id]].object;
 	}
 
-	void ObjectTable::CollectGarbage(const ServiceContext& context, const std::span<const ComponentTable> componentTables,
+	void ObjectTable::CollectGarbage(Application::IApplication& application, const TypeRegistry& typeRegistry, const std::span<const ComponentTable> componentTables,
 		const std::unordered_map<std::type_index, std::size_t>& componentTablesIndices)
 	{
 		if (objectsDense.empty()) [[unlikely]]
@@ -188,17 +188,17 @@ namespace PonyEngine::World
 
 		const std::size_t denseSize = objectsDense.size();
 		const std::size_t bufferSize = Memory::CalculateBufferSize<ObjectHandleID>(denseSize) + Memory::CalculateBufferSize<bool, ObjectHandleID>(denseSize);
-		const std::shared_ptr<Application::IBuffer> buffer = context.Application().CreateBuffer(bufferSize);
+		const std::shared_ptr<Application::IBuffer> buffer = application.CreateBuffer(bufferSize);
 		auto arena = Memory::Arena(buffer->Span());
 		const std::span<ObjectHandleID> objectsToRemove = arena.AllocateArray<ObjectHandleID>(denseSize);
 		const std::span<bool> aliveObjectFlags = arena.AllocateArray<bool>(denseSize);
 		std::ranges::fill(aliveObjectFlags, false);
 
 		{
-			const std::shared_lock<std::shared_mutex> typeRegistryLock = context.TypeRegistry().Lock();
+			const std::shared_lock<std::shared_mutex> typeRegistryLock = typeRegistry.Lock();
 			for (std::size_t foundCount = 0uz; const auto [componentType, componentTableIndex] : componentTablesIndices)
 			{
-				const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = context.TypeRegistry().ObjectOffsets(componentType);
+				const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = typeRegistry.ObjectOffsets(componentType);
 				if (objectOffsets.empty())
 				{
 					continue;

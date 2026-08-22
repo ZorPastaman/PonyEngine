@@ -96,6 +96,11 @@ namespace PonyEngine::World
 		{
 		}
 
+		if (index < offsets.size() && offsets[index].first == componentOffset)
+		{
+			return;
+		}
+
 		offsets.insert(offsets.cbegin() + index, std::pair(componentOffset, objectType));
 	}
 

@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.World.Impl:WorldService;
@@ -20,7 +22,6 @@ import PonyEngine.Log;
 import PonyEngine.World;
 
 import :ObjectTable;
-import :ServiceContext;
 import :TypeRegistry;
 import :World;
 
@@ -54,22 +55,28 @@ export namespace PonyEngine::World
 
 		TypeRegistry typeRegistry; ///< Type registry.
 
-		ServiceContext context; ///< World service context.
+#ifndef NDEBUG
+		std::atomic_size_t worldCount;
+#endif
 	};
 }
 
 namespace PonyEngine::World
 {
 	WorldService::WorldService(Application::IApplication& application) noexcept :
+#ifndef NDEBUG
+		worldCount(0uz),
+#endif
 		application{&application},
-		logService{this->application->FindInterface<Log::ILogService>()},
-		context(*this->application, typeRegistry)
+		logService{this->application->FindInterface<Log::ILogService>()}
 	{
 	}
 
 	WorldService::~WorldService() noexcept
 	{
-		context.EnsureZeroCounts();
+#ifndef NDEBUG
+		assert(worldCount.load(std::memory_order::relaxed) == 0uz && "Some worlds weren't destroyed.");
+#endif
 	}
 
 	void WorldService::RegisterComponent(const std::type_index componentType, const std::size_t componentSize, const std::size_t componentAlignment)
@@ -88,6 +95,25 @@ namespace PonyEngine::World
 
 	std::shared_ptr<IWorld> WorldService::CreateWorld()
 	{
-		return std::make_shared<World>(context);
+#ifndef NDEBUG
+		const auto world = new World(*application, typeRegistry);
+		worldCount.fetch_add(1uz, std::memory_order::relaxed);
+		try
+		{
+			return std::shared_ptr<World>(world, [this](const World* const worldToDestroy) noexcept
+			{
+				delete worldToDestroy;
+				worldCount.fetch_sub(1uz, std::memory_order::relaxed);
+			});
+		}
+		catch (...)
+		{
+			delete world;
+			worldCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
+		return std::make_shared<World>(*application, typeRegistry);
+#endif
 	}
 }

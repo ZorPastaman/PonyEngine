@@ -31,7 +31,6 @@ target_sources(PonyEngine.World.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
 	"Source/Main-ComponentTable.cppm"
 	"Source/Main-ObjectTable.cppm"
-	"Source/Main-ServiceContext.cppm"
 	"Source/Main-TypeRegistry.cppm"
 	"Source/Main-World.cppm"
 	"Source/Main-WorldService.cppm"
