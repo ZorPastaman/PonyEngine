@@ -30,7 +30,6 @@ target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CM
 	"Source/Main-OverlappedRequest.cppm"
 	"Source/Main-OverlappedUtility.cppm"
 	"Source/Main-OverlappedWriteRequest.cppm"
-	"Source/Main-ServiceContext.cppm"
 	"Source/Main-Worker.cppm"
 )
 

@@ -7,15 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.File.Impl.Windows:FileService;
 
 import std;
 
 import PonyEngine.Application;
 import PonyEngine.File;
+import PonyEngine.Log;
 
 import :File;
-import :ServiceContext;
 import :Worker;
 
 export namespace PonyEngine::File
@@ -40,26 +44,47 @@ export namespace PonyEngine::File
 		FileService& operator =(FileService&&) = delete;
 
 	private:
+		const Log::ILogService* logService; ///< Log service.
 		Worker worker; ///< Worker.
-		ServiceContext context; ///< Context.
+
+#ifndef NDEBUG
+		std::atomic_size_t fileCount;
+#endif
+
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 }
 
 namespace PonyEngine::File
 {
 	FileService::FileService(Application::IApplication& application) :
-		worker(application),
-		context(application, worker)
+#ifndef NDEBUG
+		fileCount(0uz),
+#endif
+		logService{application.FindInterface<Log::ILogService>()},
+		worker(application)
 	{
 	}
 
 	FileService::~FileService() noexcept
 	{
-		context.EnsureZeroCounts();
+#ifndef NDEBUG
+		assert(fileCount.load(std::memory_order::relaxed) == 0uz && "Some files are still open.");
+#endif
 	}
 
 	std::shared_ptr<IFile> FileService::OpenFile(const std::filesystem::path& path, const FileParams params)
 	{
-		return std::make_shared<File>(context, path, params);
+#ifndef NDEBUG
+		const auto file = std::shared_ptr<File>(new File(logService, worker, path, params), [this](const File* const fileToDelete) noexcept
+		{
+			fileCount.fetch_sub(1uz, std::memory_order::relaxed);
+			delete fileToDelete;
+		});
+		fileCount.fetch_add(1uz, std::memory_order::relaxed);
+		return file;
+#else
+		return std::make_shared<File>(logService, worker, path, params);
+#endif
 	}
 }

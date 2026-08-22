@@ -20,7 +20,6 @@ import PonyEngine.File.Impl;
 import PonyEngine.Log;
 
 import :FileUtility;
-import :ServiceContext;
 import :Worker;
 
 export namespace PonyEngine::File
@@ -30,11 +29,12 @@ export namespace PonyEngine::File
 	{
 	public:
 		/// @brief Opens a file.
-		/// @param context Context.
+		/// @param logService Log service.
+		/// @param worker Worker.
 		/// @param path File path
 		/// @param params File parameters.
 		[[nodiscard("Pure constructor")]]
-		File(const ServiceContext& context, const std::filesystem::path& path, FileParams params);
+		File(const Log::ILogService* logService, Worker& worker, const std::filesystem::path& path, FileParams params);
 		File(const File&) = delete;
 		File(File&&) = delete;
 
@@ -60,7 +60,8 @@ export namespace PonyEngine::File
 		HANDLE OpenFile(const std::filesystem::path& path, const FileParams params) const;
 		void CloseFile() const noexcept;
 
-		const ServiceContext* context; ///< Context.
+		const Log::ILogService* logService; ///< Log service.
+		Worker* worker; ///< Worker
 
 		FileInfo fileInfo; ///< File info.
 		HANDLE fileHandle; ///< File handle.
@@ -84,28 +85,26 @@ namespace PonyEngine::File
 		static constexpr auto Value = &CreateFileW; ///< @p CreateFileW.
 	};
 
-	File::File(const ServiceContext& context, const std::filesystem::path& path, const FileParams params) :
-		context{&context},
+	File::File(const Log::ILogService* logService, Worker& worker, const std::filesystem::path& path, const FileParams params) :
+		logService{logService},
+		worker{&worker},
 		fileInfo(path, params.access, params.flags),
 		fileHandle(OpenFile(path, params))
 	{
 		try
 		{
-			this->context->Worker().AssociateFile(fileHandle);
+			this->worker->AssociateFile(fileHandle);
 		}
 		catch (...)
 		{
 			CloseFile();
 			throw;
 		}
-
-		this->context->IncrementFileCount();
 	}
 
 	File::~File() noexcept
 	{
 		CloseFile();
-		context->DecrementFileCount();
 	}
 
 	const std::filesystem::path& File::Path() const noexcept
@@ -126,18 +125,18 @@ namespace PonyEngine::File
 	std::shared_ptr<IReadRequest> File::Read(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback)
 	{
 		fileInfo.ValidateRead();
-		return context->Worker().MakeRequest(params, std::move(callback), fileHandle);
+		return worker->MakeRequest(params, std::move(callback), fileHandle);
 	}
 
 	std::shared_ptr<IWriteRequest> File::Write(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback)
 	{
 		fileInfo.ValidateWrite();
-		return context->Worker().MakeRequest(params, std::move(callback), fileHandle);
+		return worker->MakeRequest(params, std::move(callback), fileHandle);
 	}
 
 	HANDLE File::OpenFile(const std::filesystem::path& path, const FileParams params) const
 	{
-		PONY_LOG(context->LogService(), Log::LogType::Debug, "Opening file... Path: '{}'; Access: '{}'; OpenMode: '{}'; Flags: '{}'.",
+		PONY_LOG(logService, Log::LogType::Debug, "Opening file... Path: '{}'; Access: '{}'; OpenMode: '{}'; Flags: '{}'.",
 			path.string(), params.access, params.openMode, params.flags);
 
 		const HANDLE fileHandle = CreateFileSelector<std::filesystem::path::value_type>::Value(path.c_str(), ToDesiredAccess(params.access),
@@ -147,20 +146,20 @@ namespace PonyEngine::File
 			throw std::runtime_error(std::format("Failed to create file: Error code = '0x{:X}'", GetLastError()));
 		}
 
-		PONY_LOG(context->LogService(), Log::LogType::Debug, "Opening file done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fileHandle));
+		PONY_LOG(logService, Log::LogType::Debug, "Opening file done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fileHandle));
 
 		return fileHandle;
 	}
 
 	void File::CloseFile() const noexcept
 	{
-		PONY_LOG(context->LogService(), Log::LogType::Debug, "Closing file... Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fileHandle));
+		PONY_LOG(logService, Log::LogType::Debug, "Closing file... Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fileHandle));
 
 		if (!CloseHandle(fileHandle)) [[unlikely]]
 		{
-			PONY_LOG(context->LogService(), Log::LogType::Error, "Failed to close file. Error code: '0x{:X}'.", GetLastError());
+			PONY_LOG(logService, Log::LogType::Error, "Failed to close file. Error code: '0x{:X}'.", GetLastError());
 		}
 
-		PONY_LOG(context->LogService(), Log::LogType::Debug, "Closing file done.");
+		PONY_LOG(logService, Log::LogType::Debug, "Closing file done.");
 	}
 }
