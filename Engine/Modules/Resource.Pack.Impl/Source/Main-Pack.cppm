@@ -25,8 +25,8 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Pack(const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile, std::span<const std::pair<std::size_t, std::size_t>> resourceRanges,
-			const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer, const std::shared_ptr<const std::byte[]>& loadedData);
+		Pack(LoadableDataAccessRequestWorker& worker, const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile, 
+			const std::shared_ptr<const std::byte[]>& loadedData, std::span<const std::pair<std::size_t, std::size_t>> resourceRanges);
 		Pack(const Pack&) = delete;
 		Pack(Pack&&) = delete;
 
@@ -39,24 +39,25 @@ export namespace PonyEngine::Resource::Pack
 		Pack& operator =(Pack&&) = delete;
 
 	private:
+		LoadableDataAccessRequestWorker* worker;
+
 		std::filesystem::path packDataPath;
 		std::shared_ptr<File::IFile> dataFile;
-		std::vector<std::pair<std::size_t, std::size_t>> resourceRanges;
-
-		std::shared_ptr<LoadableDataAccessRequestWorker> requestBuffer;
 		std::shared_ptr<const std::byte[]> loadedData;
+
+		std::vector<std::pair<std::size_t, std::size_t>> resourceRanges;
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
-	Pack::Pack(const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile, const std::span<const std::pair<std::size_t, std::size_t>> resourceRanges,
-		const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer, const std::shared_ptr<const std::byte[]>& loadedData) :
+	Pack::Pack(LoadableDataAccessRequestWorker& worker, const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile,
+		const std::shared_ptr<const std::byte[]>& loadedData, const std::span<const std::pair<std::size_t, std::size_t>> resourceRanges) :
+		worker{&worker},
 		packDataPath(packDataPath),
 		dataFile(dataFile),
-		resourceRanges(resourceRanges.cbegin(), resourceRanges.cend()),
-		requestBuffer(requestBuffer),
-		loadedData(loadedData)
+		loadedData(loadedData),
+		resourceRanges(resourceRanges.cbegin(), resourceRanges.cend())
 	{
 	}
 
@@ -68,11 +69,11 @@ namespace PonyEngine::Resource::Pack
 		{
 			if (loadedData) [[likely]]
 			{
-				return std::make_shared<MemoryLoadableDataAccess>(loadedData, offset, size, requestBuffer);
+				return std::make_shared<MemoryLoadableDataAccess>(*worker, loadedData, offset, size);
 			}
 			if (dataFile) [[likely]]
 			{
-				return std::make_shared<FileLoadableDataAccess>(dataFile, offset, size, requestBuffer);
+				return std::make_shared<FileLoadableDataAccess>(*worker, dataFile, offset, size);
 			}
 		}
 		else if (accessType == typeid(IFileDataAccess))

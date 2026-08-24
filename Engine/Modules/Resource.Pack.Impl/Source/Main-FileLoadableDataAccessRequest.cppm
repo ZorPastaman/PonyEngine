@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyEngine.Resource.Pack.Impl:FileLoadableDataAccessRequest;
 
 import std;
@@ -25,13 +21,18 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit FileLoadableDataAccessRequest(std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
+		explicit FileLoadableDataAccessRequest(const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
+		FileLoadableDataAccessRequest(const FileLoadableDataAccessRequest&) = delete;
+		FileLoadableDataAccessRequest(FileLoadableDataAccessRequest&&) = delete;
 
 		virtual ~FileLoadableDataAccessRequest() noexcept override = default;
 
 		virtual void Cancel() override;
 
 		void FileRequest(std::shared_ptr<File::IReadRequest>&& fileRequest) noexcept;
+
+		FileLoadableDataAccessRequest& operator =(const FileLoadableDataAccessRequest&) = delete;
+		FileLoadableDataAccessRequest& operator =(FileLoadableDataAccessRequest&&) = delete;
 
 	private:
 		std::shared_ptr<File::IReadRequest> fileRequest;
@@ -40,8 +41,9 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	FileLoadableDataAccessRequest::FileLoadableDataAccessRequest(std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept :
-		LoadableDataAccessRequest(std::move(callback))
+	FileLoadableDataAccessRequest::FileLoadableDataAccessRequest(const LoadParams& params, 
+		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept :
+		LoadableDataAccessRequest(params, std::move(callback))
 	{
 	}
 

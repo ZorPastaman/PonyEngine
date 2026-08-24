@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Resource.Pack.Impl:PackService;
@@ -20,6 +22,7 @@ import PonyEngine.File;
 import PonyEngine.Job;
 import PonyEngine.Log;
 import PonyEngine.Math;
+import PonyEngine.Memory;
 import PonyEngine.Resource.Pack;
 
 import :FileDataAccess;
@@ -27,6 +30,7 @@ import :FileLoadableDataAccess;
 import :LoadableDataAccessRequestWorker;
 import :MemoryDataAccess;
 import :PackContainer;
+import :FilePackMountRequest;
 
 export namespace PonyEngine::Resource::Pack
 {
@@ -60,12 +64,9 @@ export namespace PonyEngine::Resource::Pack
 		PackService& operator =(PackService&&) = delete;
 
 	private:
-		class FilePackMountRequest final : public IPackMountRequest
-		{
-		public:
-			[[nodiscard("Pure constructor")]]
-			FilePackMountRequest(PackService& packService, const std::filesystem::path& packPath, AccessType accessType);
-		};
+		static constexpr std::string_view PackManifestExtension = ".prpm";
+		static constexpr std::string_view PackDataExtension = ".prpd";
+		static constexpr std::string_view MagicWord = "PonyEngineRPM";
 
 		[[nodiscard("Must be used")]]
 		PackHandle CreatePackHandle();
@@ -78,9 +79,15 @@ export namespace PonyEngine::Resource::Pack
 		void AddPack(ResourceCollection collection, const std::shared_ptr<class Pack>& pack, std::span<const ResourceInfo> resourceInfos);
 		void RemovePack(PackHandle packHandle);
 
+		void AddMountRequest(const std::shared_ptr<FilePackMountRequest>& request);
+		std::shared_ptr<FilePackMountRequest> RemoveMountRequest(FilePackMountRequest* request);
+		void ParseManifest(FilePackMountRequest& request) noexcept;
+
 		Application::IApplication* application;
 		Log::ILogService* logService;
 		IResourceHub* resourceHub;
+		File::IFileService* fileService;
+		Job::IJobService* jobService;
 
 		LoadableDataAccessRequestWorker loadableDataAccessRequestWorker;
 
@@ -88,7 +95,10 @@ export namespace PonyEngine::Resource::Pack
 		std::vector<PackVersion> packVersions;
 		std::vector<PackID> deadPackIds;
 
-		std::shared_mutex stateMutex;
+		mutable std::shared_mutex stateMutex;
+
+		std::unordered_map<FilePackMountRequest*, std::shared_ptr<FilePackMountRequest>> mountRequests;
+		std::mutex mountRequestMutex;
 	};
 }
 
@@ -98,6 +108,8 @@ namespace PonyEngine::Resource::Pack
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
 		resourceHub{&this->application->GetInterface<IResourceHub>()},
+		fileService{&this->application->GetInterface<File::IFileService>()},
+		jobService{&this->application->GetInterface<Job::IJobService>()},
 		loadableDataAccessRequestWorker(this->application->GetInterface<Job::IJobService>())
 	{
 	}
@@ -159,7 +171,77 @@ namespace PonyEngine::Resource::Pack
 
 	std::shared_ptr<IPackMountRequest> PackService::MountPack(const std::filesystem::path& packPath, const AccessType accessType)
 	{
-		return std::make_shared<FilePackMountRequest>(*this, packPath, accessType);
+		if (packPath.extension() != PackManifestExtension) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid pack path");
+		}
+		if (None(AccessType::Loadable | AccessType::File | AccessType::Memory, accessType)) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid access type");
+		}
+
+		const std::shared_ptr<File::IFile> manifest = fileService->OpenFile(packPath, File::FileParams::Read());
+		const std::shared_ptr<File::IFile> data = fileService->OpenFile(packPath.stem() / PackDataExtension, File::FileParams::Read());
+		const bool loadedData = Any(AccessType::Memory, accessType);
+		const std::shared_ptr<Application::IBuffer> manifestBuffer = application->CreateBuffer(std::filesystem::file_size(manifest->Path()));
+		const std::size_t dataFileSize = std::filesystem::file_size(data->Path());
+		const std::shared_ptr<Application::IBuffer> dataBuffer = loadedData ? application->CreateBuffer(dataFileSize) : nullptr;
+		const auto request = std::make_shared<FilePackMountRequest>(manifest, data, dataFileSize, manifestBuffer, dataBuffer);
+		AddMountRequest(request);
+
+		try
+		{
+			request->SetManifestRequest(manifest->Read(File::ReadParams{.buffer = manifestBuffer->Span()}, [this, req = request.get()](const File::IReadRequest& readRequest) noexcept
+			{
+				switch (readRequest.Status())
+				{
+				case File::FileRequestStatus::Success:
+					if (req->IsCancelRequested())
+					{
+						if (req->DecrementRequestCount() == 1uz)
+						{
+							const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+							mountRequest->SetCanceled();
+						}
+					}
+					else
+					{
+						ParseManifest(*req);
+					}
+					break;
+				case File::FileRequestStatus::Failure:
+					req->ManifestException(readRequest.Exception());
+					if (req->DecrementRequestCount() == 1uz)
+					{
+						const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+						mountRequest->SetFailure(req->ManifestException());
+					}
+					break;
+				case File::FileRequestStatus::Canceled:
+					if (req->DecrementRequestCount() == 1uz)
+					{
+						const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+						mountRequest->SetCanceled();
+					}
+					break;
+				default: [[unlikely]]
+					assert(false && "Unexpected read request status.");
+					break;
+				}
+			}));
+		}
+		catch (...)
+		{
+			RemoveMountRequest(request.get());
+			throw;
+		}
+
+		if (loadedData)
+		{
+			// TODO: Data load request.
+		}
+
+		return request;
 	}
 
 	void PackService::AddPack(const ResourceCollection collection, const std::shared_ptr<class Pack>& pack, const std::span<const ResourceInfo> resourceInfos)
@@ -181,5 +263,227 @@ namespace PonyEngine::Resource::Pack
 		}
 
 		packContainer.Remove(index);
+	}
+
+	void PackService::ParseManifest(FilePackMountRequest& request) noexcept
+	{
+		try
+		{
+			jobService->Schedule([this, req = &request]() noexcept
+			{
+				if (req->IsCancelRequested())
+				{
+					if (req->DecrementRequestCount() == 1uz)
+					{
+						const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+						mountRequest->SetCanceled();
+					}
+
+					return;
+				}
+
+				try
+				{
+					const std::span<const std::byte> manifestBuffer = req->ManifestBuffer();
+					const std::byte* manifest = manifestBuffer.data();
+					const std::byte* const manifestBufferEnd = manifestBuffer.data() + manifestBuffer.size();
+
+					if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < MagicWord.size()) [[unlikely]]
+					{
+						throw std::runtime_error("Unexpected manifest end");
+					}
+					if (std::memcmp(manifest, MagicWord.data(), MagicWord.size())) [[unlikely]]
+					{
+						throw std::runtime_error("Manifest doesn't have valid magic word");
+					}
+					manifest += MagicWord.size();
+
+					if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < sizeof(std::size_t) * 4uz) [[unlikely]]
+					{
+						throw std::runtime_error("Unexpected manifest end");
+					}
+					constexpr std::size_t typeCountIndex = 0uz;
+					constexpr std::size_t dataMetaCountIndex = 1uz;
+					constexpr std::size_t loadMetaCountIndex = 2uz;
+					constexpr std::size_t resourceCountIndex = 3uz;
+					std::array<std::size_t, 4uz> mainCounts;
+					std::memcpy(mainCounts.data(), manifest, sizeof(std::size_t) * 4uz);
+					manifest += sizeof(std::size_t) * 4uz;
+
+					const std::size_t tempBufferSize = Memory::CalculateBufferSize<ResourceType>(mainCounts[typeCountIndex]) +
+						Memory::CalculateBufferSize<std::span<const std::byte>, ResourceType>(mainCounts[dataMetaCountIndex]) +
+						Memory::CalculateBufferSize<std::span<const std::byte>, std::span<const std::byte>>(mainCounts[loadMetaCountIndex]);
+					const std::shared_ptr<Application::IBuffer> tempBuffer = application->CreateBuffer(tempBufferSize);
+					auto tempArena = Memory::Arena(tempBuffer->Span());
+
+					if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < mainCounts[typeCountIndex]) [[unlikely]]
+					{
+						throw std::runtime_error("Unexpected manifest end");
+					}
+					const auto typeSizes = std::span(reinterpret_cast<const std::uint8_t*>(manifest), mainCounts[typeCountIndex]);
+					manifest += mainCounts[typeCountIndex];
+
+					if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < std::ranges::fold_left(typeSizes, 0uz, std::plus<std::size_t>())) [[unlikely]]
+					{
+						throw std::runtime_error("Unexpected manifest end");
+					}
+					const std::span<ResourceType> resourceTypes = tempArena.AllocateArray<ResourceType>(mainCounts[typeCountIndex]);
+					for (std::size_t i = 0uz; i < resourceTypes.size(); ++i)
+					{
+						resourceTypes[i] = resourceHub->MakeResourceType(std::string_view(reinterpret_cast<const char*>(manifest), typeSizes[i]));
+						manifest += typeSizes[i];
+					}
+
+					if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < mainCounts[dataMetaCountIndex] * sizeof(std::size_t)) [[unlikely]]
+					{
+						throw std::runtime_error("Unexpected manifest end");
+					}
+					const std::byte* dataMetaSize = manifest;
+					manifest += mainCounts[dataMetaCountIndex] * sizeof(std::size_t);
+					const std::span<std::span<const std::byte>> dataMetas = tempArena.AllocateArray<std::span<const std::byte>>(mainCounts[dataMetaCountIndex]);
+					for (std::size_t i = 0uz; i < dataMetas.size(); ++i)
+					{
+						std::size_t size;
+						std::memcpy(&size, dataMetaSize, sizeof(std::size_t));
+						dataMetaSize += sizeof(std::size_t);
+						if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < size) [[unlikely]]
+						{
+							throw std::runtime_error("Unexpected manifest end");
+						}
+						dataMetas[i] = std::span(manifest, size);
+						manifest += size;
+					}
+
+					if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < mainCounts[loadMetaCountIndex] * sizeof(std::size_t)) [[unlikely]]
+					{
+						throw std::runtime_error("Unexpected manifest end");
+					}
+					const std::byte* loadMetaSize = manifest;
+					manifest += mainCounts[loadMetaCountIndex] * sizeof(std::size_t);
+					const std::span<std::span<const std::byte>> loadMetas = tempArena.AllocateArray<std::span<const std::byte>>(mainCounts[loadMetaCountIndex]);
+					for (std::size_t i = 0uz; i < loadMetas.size(); ++i)
+					{
+						std::size_t size;
+						std::memcpy(&size, loadMetaSize, sizeof(std::size_t));
+						loadMetaSize += sizeof(std::size_t);
+						if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < size) [[unlikely]]
+						{
+							throw std::runtime_error("Unexpected manifest end");
+						}
+						loadMetas[i] = std::span(manifest, size);
+						manifest += size;
+					}
+
+					const std::size_t resourceBufferSize = Memory::CalculateBufferSize<std::pair<std::size_t, std::size_t>>(mainCounts[resourceCountIndex]) +
+						Memory::CalculateBufferSize<CollectionResource, std::pair<std::size_t, std::size_t>>(mainCounts[resourceCountIndex]);
+					const std::shared_ptr<Application::IBuffer> resourceBuffer = application->CreateBuffer(resourceBufferSize);
+					auto resourceArena = Memory::Arena(resourceBuffer->Span());
+
+					const std::span<std::pair<std::size_t, std::size_t>> ranges = resourceArena.AllocateArray<std::pair<std::size_t, std::size_t>>(mainCounts[resourceCountIndex]);
+					if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < ranges.size_bytes()) [[unlikely]]
+					{
+						throw std::runtime_error("Unexpected manifest end");
+					}
+					std::memcpy(ranges.data(), manifest, ranges.size_bytes());
+					manifest += ranges.size_bytes();
+					for (const auto [offset, size] : ranges)
+					{
+						if (Math::SumClamp(offset, size) > req->DataFileSize()) [[unlikely]]
+						{
+							throw std::runtime_error("Invalid data range");
+						}
+					}
+
+					const std::span<CollectionResource> resources = resourceArena.AllocateArray<CollectionResource>(mainCounts[resourceCountIndex]);
+					for (std::size_t i = 0uz; i < resources.size(); ++i)
+					{
+						if (manifest >= manifestBufferEnd) [[unlikely]]
+						{
+							throw std::runtime_error("Unexpected manifest end");
+						}
+						const std::uint8_t idSize = *reinterpret_cast<const std::uint8_t*>(manifest++);
+						if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < idSize) [[unlikely]]
+						{
+							throw std::runtime_error("Unexpected manifest end");
+						}
+						const auto id = std::string_view(reinterpret_cast<const char*>(manifest), idSize);
+
+						if (manifest >= manifestBufferEnd || manifestBufferEnd - manifest < sizeof(std::size_t) * 4uz) [[unlikely]]
+						{
+							throw std::runtime_error("Unexpected manifest end");
+						}
+						constexpr std::size_t typeIndexIndex = 0uz;
+						constexpr std::size_t dataMetaIndexIndex = 1uz;
+						constexpr std::size_t loadMetaIndexIndex = 2uz;
+						constexpr std::size_t dataIndexIndex = 3uz;
+						std::array<std::size_t, 4uz> resourceIndices;
+						std::memcpy(resourceIndices.data(), manifest, sizeof(std::size_t) * 4uz);
+						manifest += sizeof(std::size_t) * 4uz;
+
+						const std::size_t typeIndex = resourceIndices[typeIndexIndex];
+						if (typeIndex >= resourceTypes.size()) [[unlikely]]
+						{
+							throw std::runtime_error("Invalid resource type index");
+						}
+						const std::size_t dataMetaIndex = resourceIndices[dataMetaIndexIndex];
+						if (dataMetaIndex >= dataMetas.size()) [[unlikely]]
+						{
+							throw std::runtime_error("Invalid data meta index");
+						}
+						const std::size_t loadMetaIndex = resourceIndices[loadMetaIndexIndex];
+						if (loadMetaIndex >= loadMetas.size()) [[unlikely]]
+						{
+							throw std::runtime_error("Invalid data meta index");
+						}
+						const std::size_t dataIndex = resourceIndices[dataIndexIndex];
+						if (dataIndex >= ranges.size()) [[unlikely]]
+						{
+							throw std::runtime_error("Invalid data meta index");
+						}
+						resources[i] = CollectionResource
+						{
+							.id = resourceHub->MakeResourceID(id),
+							.type = resourceTypes[typeIndex],
+							.dataMeta = dataMetas[dataMetaIndex],
+							.loadMeta = loadMetas[loadMetaIndex],
+							.dataIndex = dataIndex
+						};
+					}
+
+					// TODO: Move data to the request.
+
+					if (req->DecrementRequestCount() == 1uz)
+					{
+						if (req->IsCancelRequested())
+						{
+							const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+							mountRequest->SetCanceled();
+						}
+						else
+						{
+							// TODO: Make jobs for pack creation and resource registration
+						}
+					}
+				}
+				catch (...)
+				{
+					req->ManifestException(std::current_exception());
+					if (req->DecrementRequestCount() == 1uz)
+					{
+						const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+						mountRequest->SetFailure(req->ManifestException());
+					}
+				}
+			});
+		}
+		catch (...)
+		{
+			request.ManifestException(std::current_exception());
+			if (request.DecrementRequestCount() == 1uz)
+			{
+				const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(&request);
+				mountRequest->SetFailure(request.ManifestException());
+			}
+		}
 	}
 }

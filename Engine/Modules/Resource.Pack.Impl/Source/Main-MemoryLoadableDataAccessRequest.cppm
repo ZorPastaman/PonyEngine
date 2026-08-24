@@ -7,15 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyEngine.Resource.Pack.Impl:MemoryLoadableDataAccessRequest;
 
 import std;
-
-import PonyEngine.Job;
 
 import :LoadableDataAccessRequest;
 
@@ -25,29 +19,27 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit MemoryLoadableDataAccessRequest(std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
+		explicit MemoryLoadableDataAccessRequest(const std::shared_ptr<const std::byte[]>& loadedData, const LoadParams& params,
+			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
+		MemoryLoadableDataAccessRequest(const MemoryLoadableDataAccessRequest&) = delete;
+		MemoryLoadableDataAccessRequest(MemoryLoadableDataAccessRequest&&) = delete;
 
 		virtual ~MemoryLoadableDataAccessRequest() noexcept override = default;
 
+		MemoryLoadableDataAccessRequest& operator =(const MemoryLoadableDataAccessRequest&) = delete;
+		MemoryLoadableDataAccessRequest& operator =(MemoryLoadableDataAccessRequest&&) = delete;
+
 	private:
-		std::shared_ptr<>
+		std::shared_ptr<const std::byte[]> loadedData;
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
-	MemoryLoadableDataAccessRequest::MemoryLoadableDataAccessRequest(std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept :
-		LoadableDataAccessRequest(std::move(callback))
+	MemoryLoadableDataAccessRequest::MemoryLoadableDataAccessRequest(const std::shared_ptr<const std::byte[]>& loadedData, const LoadParams& params,
+		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept :
+		LoadableDataAccessRequest(params, std::move(callback)),
+		loadedData(loadedData)
 	{
-	}
-
-	void MemoryLoadableDataAccessRequest::Cancel()
-	{
-		memoryRequest->Cancel();
-	}
-
-	void MemoryLoadableDataAccessRequest::MemoryRequest(std::shared_ptr<Memory::IReadRequest>&& memoryRequest) noexcept
-	{
-		this->memoryRequest = std::move(memoryRequest);
 	}
 }

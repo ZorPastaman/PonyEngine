@@ -69,7 +69,7 @@ export namespace PonyEngine::File
 		/// @brief Removes the ongoing request.
 		/// @param overlapped Request overlapped.
 		/// @return Ongoing request.
-		std::shared_ptr<OverlappedRequest> RemoveOngoingRequest(const OVERLAPPED* overlapped) const;
+		std::shared_ptr<OverlappedRequest> RemoveOngoingRequest(const OVERLAPPED* overlapped) const noexcept;
 
 		/// @brief Work function.
 		void Work() const noexcept;
@@ -79,7 +79,7 @@ export namespace PonyEngine::File
 		HANDLE iocp; ///< IO completion port.
 
 		std::pmr::synchronized_pool_resource requestPool; ///< Request pool.
-		std::pmr::polymorphic_allocator<OverlappedRequest> requestAllocator; ///< Request allocator.
+		mutable std::pmr::polymorphic_allocator<OverlappedRequest> requestAllocator; ///< Request allocator.
 
 		mutable std::unordered_map<const OVERLAPPED*, std::shared_ptr<OverlappedRequest>> ongoingRequests; ///< Ongoing requests.
 		mutable std::mutex ongoingRequestMutex; ///< Ongoing request mutex.
@@ -87,13 +87,21 @@ export namespace PonyEngine::File
 		std::thread thread; ///< Worker thread.
 		std::atomic_bool running; ///< Should the worker run?
 
+#ifndef NDEBUG
+		mutable std::atomic_size_t requestCount;
+#endif
+
 		static_assert(std::atomic_bool::is_always_lock_free, "bool is not lock-free.");
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 }
 
 namespace PonyEngine::File
 {
 	Worker::Worker(Application::IApplication& application) :
+#ifndef NDEBUG
+		requestCount(0uz),
+#endif
 		logService{application.FindInterface<Log::ILogService>()},
 		requestAllocator(&requestPool),
 		running(true)
@@ -129,7 +137,9 @@ namespace PonyEngine::File
 
 	Worker::~Worker() noexcept
 	{
-		assert(ongoingRequests.empty() && "Some file requests are still ongoing.");
+#ifndef NDEBUG
+		assert(requestCount.load(std::memory_order::relaxed) == 0uz && "Some file requests are still alive.");
+#endif
 
 		PONY_LOG(logService, Log::LogType::Info, "Closing io work thread...");
 		running.store(false, std::memory_order::relaxed);
@@ -169,7 +179,27 @@ namespace PonyEngine::File
 			throw std::invalid_argument("Too great buffer");
 		}
 
+#ifndef NDEBUG
+		const auto overlappedRequest = requestAllocator.new_object<OverlappedRequest>(params, std::move(callback), file);
+		requestCount.fetch_add(1uz, std::memory_order::relaxed);
+		std::shared_ptr<OverlappedRequest> request;
+		try
+		{
+			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](const OverlappedRequest* const req)
+			{
+				requestAllocator.delete_object(req);
+				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			}, requestAllocator);
+		}
+		catch (...)
+		{
+			requestAllocator.delete_object(overlappedRequest);
+			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
+#endif
 		AddOngoingRequest(request);
 
 		try
@@ -211,7 +241,27 @@ namespace PonyEngine::File
 			throw std::invalid_argument("Too great buffer");
 		}
 
+#ifndef NDEBUG
+		const auto overlappedRequest = requestAllocator.new_object<OverlappedRequest>(params, std::move(callback), file);
+		requestCount.fetch_add(1uz, std::memory_order::relaxed);
+		std::shared_ptr<OverlappedRequest> request;
+		try
+		{
+			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](const OverlappedRequest* const req)
+			{
+				requestAllocator.delete_object(req);
+				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			}, requestAllocator);
+		}
+		catch (...)
+		{
+			requestAllocator.delete_object(overlappedRequest);
+			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
+#endif
 		AddOngoingRequest(request);
 
 		try
@@ -254,7 +304,7 @@ namespace PonyEngine::File
 		ongoingRequests[&request->Overlapped()] = request;
 	}
 
-	std::shared_ptr<OverlappedRequest> Worker::RemoveOngoingRequest(const OVERLAPPED* const overlapped) const
+	std::shared_ptr<OverlappedRequest> Worker::RemoveOngoingRequest(const OVERLAPPED* const overlapped) const noexcept
 	{
 		const auto lock = std::lock_guard(ongoingRequestMutex);
 		const auto position = ongoingRequests.find(overlapped);

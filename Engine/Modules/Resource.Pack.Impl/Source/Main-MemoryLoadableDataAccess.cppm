@@ -16,10 +16,9 @@ export module PonyEngine.Resource.Pack.Impl:MemoryLoadableDataAccess;
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.Memory;
 import PonyEngine.Resource.Ext;
 
-import :MemoryLoadableDataAccessRequest;
+import :LoadableDataAccessRequest;
 import :LoadableDataAccessRequestWorker;
 
 export namespace PonyEngine::Resource::Pack
@@ -28,8 +27,7 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		MemoryLoadableDataAccess(const std::shared_ptr<const std::byte[]>& loadedData, std::size_t offset, std::size_t size,
-			const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer) noexcept;
+		MemoryLoadableDataAccess(LoadableDataAccessRequestWorker& worker, const std::shared_ptr<const std::byte[]>& loadedData, std::size_t offset, std::size_t size) noexcept;
 		MemoryLoadableDataAccess(const MemoryLoadableDataAccess&) = delete;
 		MemoryLoadableDataAccess(MemoryLoadableDataAccess&&) = delete;
 
@@ -39,29 +37,30 @@ export namespace PonyEngine::Resource::Pack
 		virtual std::size_t Size() const noexcept override;
 
 		[[nodiscard("Must be used")]]
-		virtual std::shared_ptr<ILoadableDataAccessRequest> Load(std::span<std::byte> buffer, std::size_t offset, ILoadableDataAccessRequestObserver* observer) override;
+		virtual std::shared_ptr<ILoadableDataAccessRequest> Load(const LoadParams& params,
+			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) override;
 
 		MemoryLoadableDataAccess& operator =(const MemoryLoadableDataAccess&) = delete;
 		MemoryLoadableDataAccess& operator =(MemoryLoadableDataAccess&&) = delete;
 
 	private:
+		LoadableDataAccessRequestWorker* worker;
+
 		std::shared_ptr<const std::byte[]> loadedData;
 		std::span<const std::byte> buffer;
-
-		std::shared_ptr<LoadableDataAccessRequestWorker> requestBuffer;
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
-	MemoryLoadableDataAccess::MemoryLoadableDataAccess(const std::shared_ptr<const std::byte[]>& loadedData, const std::size_t offset, const std::size_t size,
-		const std::shared_ptr<LoadableDataAccessRequestWorker>& requestBuffer) noexcept :
+	MemoryLoadableDataAccess::MemoryLoadableDataAccess(LoadableDataAccessRequestWorker& worker, const std::shared_ptr<const std::byte[]>& loadedData, 
+		const std::size_t offset, const std::size_t size) noexcept :
+		worker{&worker},
 		loadedData(loadedData),
-		buffer(&loadedData[offset], size),
-		requestBuffer(requestBuffer)
+		buffer(&loadedData[offset], size)
 	{
+		assert(this->worker && "Worker is nullptr.");
 		assert(this->loadedData && "Data is nullptr.");
-		assert(this->requestBuffer && "Request buffer is nullptr.");
 	}
 
 	std::size_t MemoryLoadableDataAccess::Size() const noexcept
@@ -69,14 +68,9 @@ namespace PonyEngine::Resource::Pack
 		return buffer.size();
 	}
 
-	std::shared_ptr<ILoadableDataAccessRequest> MemoryLoadableDataAccess::Load(const std::span<std::byte> buffer, const std::size_t offset,
-		ILoadableDataAccessRequestObserver* const observer)
+	std::shared_ptr<ILoadableDataAccessRequest> MemoryLoadableDataAccess::Load(const LoadParams& params,
+		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback)
 	{
-		if (Math::SumClamp(buffer.size(), offset) > this->buffer.size()) [[unlikely]]
-		{
-			throw std::out_of_range("Out of range");
-		}
-
-		return requestBuffer->CreateRequest(loadedData, this->buffer.subspan(offset, buffer.size()), buffer, observer);
+		return worker->CreateRequest(loadedData, buffer, params, std::move(callback));
 	}
 }

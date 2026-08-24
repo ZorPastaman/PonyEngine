@@ -27,10 +27,22 @@ export namespace PonyEngine::Resource
 		Canceled ///< A request was canceled.
 	};
 
+	/// @brief Load parameters.
+	struct LoadParams final
+	{
+		std::span<std::byte> buffer; ///< Target buffer.
+		std::size_t offset = 0uz; ///< Read offset.
+	};
+
 	/// @brief Loadable data access request.
 	class ILoadableDataAccessRequest
 	{
 		PONY_INTERFACE_BODY(ILoadableDataAccessRequest)
+
+		/// @brief Gets the request parameters.
+		/// @return Request parameters.
+		[[nodiscard("Pure function")]]
+		virtual const LoadParams& Params() const noexcept = 0;
 
 		/// @brief Gets the request status.
 		/// @return Request status.
@@ -67,13 +79,12 @@ export namespace PonyEngine::Resource
 		virtual std::size_t Size() const noexcept = 0;
 
 		/// @brief Makes a load request.
-		/// @param buffer Data buffer.
-		/// @param offset Read offset.
+		/// @param params Load parameters.
 		/// @param callback Callback. Can be nullptr. It will be called on the caller thread or on an io thread. It may be called before the function returns.
 		/// @return Load request. Must be destroyed before the access.
 		/// @note The access, request, buffer and callback must be kept alive till the finish of the operation.
 		[[nodiscard("Must be used")]]
-		virtual std::shared_ptr<ILoadableDataAccessRequest> Load(std::span<std::byte> buffer, std::size_t offset, 
+		virtual std::shared_ptr<ILoadableDataAccessRequest> Load(const LoadParams& params, 
 			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback = nullptr) = 0;
 	};
 }

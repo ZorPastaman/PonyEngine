@@ -23,22 +23,25 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit LoadableDataAccessRequest(std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
+		explicit LoadableDataAccessRequest(const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
 		LoadableDataAccessRequest(const LoadableDataAccessRequest&) = delete;
 		LoadableDataAccessRequest(LoadableDataAccessRequest&&) = delete;
 
 		virtual ~LoadableDataAccessRequest() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual LoadableRequestStatus Status() const noexcept override;
+		virtual const LoadParams& Params() const noexcept override final;
+
 		[[nodiscard("Pure function")]]
-		virtual std::size_t ByteCount() const override;
+		virtual LoadableRequestStatus Status() const noexcept override final;
 		[[nodiscard("Pure function")]]
-		virtual const std::exception_ptr& Exception() const override;
+		virtual std::size_t ByteCount() const override final;
+		[[nodiscard("Pure function")]]
+		virtual const std::exception_ptr& Exception() const override final;
 
 		virtual void Cancel() override;
 
-		virtual void Wait() const noexcept override;
+		virtual void Wait() const noexcept override final;
 
 		/// @brief Sets the status to success.
 		/// @param byteCount Transferred byte count.
@@ -55,6 +58,8 @@ export namespace PonyEngine::Resource::Pack
 	private:
 		void InvokeCallback() noexcept;
 
+		const LoadParams params;
+
 		std::size_t byteCount; ///< Transferred byte count.
 		std::exception_ptr exception; ///< Exception that occured during the request execution.
 		std::atomic<LoadableRequestStatus> status;
@@ -68,11 +73,17 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	LoadableDataAccessRequest::LoadableDataAccessRequest(std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept :
+	LoadableDataAccessRequest::LoadableDataAccessRequest(const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept :
+		params(params),
 		byteCount{0uz},
 		status(LoadableRequestStatus::Pending),
 		callback(std::move(callback))
 	{
+	}
+
+	const LoadParams& LoadableDataAccessRequest::Params() const noexcept
+	{
+		return params;
 	}
 
 	LoadableRequestStatus LoadableDataAccessRequest::Status() const noexcept
