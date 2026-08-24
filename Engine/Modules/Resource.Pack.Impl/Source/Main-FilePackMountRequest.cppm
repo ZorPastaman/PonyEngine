@@ -102,9 +102,9 @@ namespace PonyEngine::Resource::Pack
 		hasManifestException(false),
 		hasDataException(false),
 		manifestFile(std::move(manifestFile)),
-		dataFileSize(dataFileSize),
 		manifestBuffer(std::move(manifestBuffer)),
 		dataFile(std::move(dataFile)),
+		dataFileSize(dataFileSize),
 		dataBuffer(std::move(dataBuffer))
 	{
 	}

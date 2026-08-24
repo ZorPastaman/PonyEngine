@@ -96,7 +96,7 @@ namespace PonyEngine::Resource::Pack
 		std::shared_ptr<FileLoadableDataAccessRequest> request;
 		try
 		{
-			request = std::shared_ptr<FileLoadableDataAccessRequest>(fileRequest, [this](const FileLoadableDataAccessRequest* const req)
+			request = std::shared_ptr<FileLoadableDataAccessRequest>(fileRequest, [this](FileLoadableDataAccessRequest* const req)
 			{
 				allocator.delete_object(req);
 				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
@@ -161,7 +161,7 @@ namespace PonyEngine::Resource::Pack
 		std::shared_ptr<MemoryLoadableDataAccessRequest> request;
 		try
 		{
-			request = std::shared_ptr<MemoryLoadableDataAccessRequest>(memoryRequest, [this](const MemoryLoadableDataAccessRequest* const req)
+			request = std::shared_ptr<MemoryLoadableDataAccessRequest>(memoryRequest, [this](MemoryLoadableDataAccessRequest* const req)
 			{
 				allocator.delete_object(req);
 				requestCount.fetch_sub(1uz, std::memory_order::relaxed);

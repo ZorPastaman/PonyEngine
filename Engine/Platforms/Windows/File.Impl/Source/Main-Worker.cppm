@@ -78,7 +78,7 @@ export namespace PonyEngine::File
 
 		HANDLE iocp; ///< IO completion port.
 
-		std::pmr::synchronized_pool_resource requestPool; ///< Request pool.
+		mutable std::pmr::synchronized_pool_resource requestPool; ///< Request pool.
 		mutable std::pmr::polymorphic_allocator<OverlappedRequest> requestAllocator; ///< Request allocator.
 
 		mutable std::unordered_map<const OVERLAPPED*, std::shared_ptr<OverlappedRequest>> ongoingRequests; ///< Ongoing requests.
@@ -185,7 +185,7 @@ namespace PonyEngine::File
 		std::shared_ptr<OverlappedRequest> request;
 		try
 		{
-			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](const OverlappedRequest* const req)
+			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](OverlappedRequest* const req)
 			{
 				requestAllocator.delete_object(req);
 				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
@@ -247,7 +247,7 @@ namespace PonyEngine::File
 		std::shared_ptr<OverlappedRequest> request;
 		try
 		{
-			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](const OverlappedRequest* const req)
+			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](OverlappedRequest* const req)
 			{
 				requestAllocator.delete_object(req);
 				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
