@@ -23,12 +23,12 @@ import :ComponentTable;
 import :TypeRegistry;
 
 template<>
-struct std::hash<std::pair<void*, std::type_index>> final
+struct std::hash<std::pair<const void*, std::type_index>> final
 {
 	[[nodiscard("Pure function")]]
-	size_t operator ()(const std::pair<void*, std::type_index>& pair) const noexcept
+	size_t operator ()(const std::pair<const void*, std::type_index>& pair) const noexcept
 	{
-		const std::size_t pointerHash = std::hash<void*>()(pair.first);
+		const std::size_t pointerHash = std::hash<const void*>()(pair.first);
 		const std::size_t typeHash = pair.second.hash_code();
 		return pointerHash ^ (typeHash + 0x9E3779B9 + (pointerHash << 6) + (pointerHash >> 2));
 	}
@@ -53,7 +53,7 @@ export namespace PonyEngine::World
 		/// @param object Object.
 		/// @return Object handle.
 		[[nodiscard("Weird call")]]
-		TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object);
+		TypelessObjectHandle RegisterObject(std::type_index objectType, std::shared_ptr<void> object);
 		/// @brief Unregisters the object.
 		/// @param objectType Object type.
 		/// @param handle Object handle.
@@ -62,7 +62,7 @@ export namespace PonyEngine::World
 		/// @param handle Object handle.
 		/// @param objectType Object type.
 		/// @param object Replacement object.
-		void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, const std::shared_ptr<void>& object);
+		void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, std::shared_ptr<void> object);
 
 		/// @brief Checks if the object is valid.
 		/// @param objectType Object type.
@@ -101,19 +101,19 @@ export namespace PonyEngine::World
 		/// @param object Object.
 		/// @return Object handle or @p std::nullopt if not found.
 		[[nodiscard("Pure function")]]
-		std::optional<TypelessObjectHandle> TryFindObject(std::type_index objectType, const std::shared_ptr<void>& object) const noexcept;
+		std::optional<TypelessObjectHandle> TryFindObject(std::type_index objectType, const void* object) const noexcept;
 		/// @brief Creates an object registration.
 		/// @param objectType Object type.
 		/// @param object Object.
 		/// @return Object handle.
 		[[nodiscard("Must be used")]]
-		TypelessObjectHandle CreateObject(std::type_index objectType, const std::shared_ptr<void>& object);
+		TypelessObjectHandle CreateObject(std::type_index objectType, std::shared_ptr<void> object);
 		/// @brief Reuses an object registration.
 		/// @param objectType Object type.
 		/// @param object Object.
 		/// @return Object handle.
 		[[nodiscard("Must be used")]]
-		TypelessObjectHandle ResurrectObject(std::type_index objectType, const std::shared_ptr<void>& object);
+		TypelessObjectHandle ResurrectObject(std::type_index objectType, std::shared_ptr<void> object);
 		/// @brief Kills an object.
 		/// @param handleId Object handle ID.
 		void KillObject(ObjectHandleID handleId);
@@ -123,7 +123,7 @@ export namespace PonyEngine::World
 		std::vector<ObjectHandleID> objectsDense; ///< Dense.
 		std::vector<Object> objects; ///< Objects. Synced with the @p objectsDense by index.
 		std::vector<ObjectHandleID> objectFreeList; ///< Object free list.
-		std::unordered_map<std::pair<void*, std::type_index>, ObjectHandleID> objectIndices; ///< Object index map.
+		std::unordered_map<std::pair<const void*, std::type_index>, ObjectHandleID> objectIndices; ///< Object index map.
 
 		static_assert(sizeof(ObjectHandleID) <= sizeof(std::size_t), "ObjectHandleID is greater than std::size_t.");
 	};
@@ -131,19 +131,19 @@ export namespace PonyEngine::World
 
 namespace PonyEngine::World
 {
-	TypelessObjectHandle ObjectTable::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
+	TypelessObjectHandle ObjectTable::RegisterObject(const std::type_index objectType, std::shared_ptr<void> object)
 	{
-		if (const std::optional<TypelessObjectHandle> fromExisting = TryFindObject(objectType, object))
+		if (const std::optional<TypelessObjectHandle> fromExisting = TryFindObject(objectType, object.get()))
 		{
 			return *fromExisting;
 		}
 
 		if (objectFreeList.empty())
 		{
-			return CreateObject(objectType, object);
+			return CreateObject(objectType, std::move(object));
 		}
 
-		return ResurrectObject(objectType, object);
+		return ResurrectObject(objectType, std::move(object));
 	}
 
 	void ObjectTable::UnregisterObject(const std::type_index objectType, const TypelessObjectHandle handle)
@@ -156,14 +156,14 @@ namespace PonyEngine::World
 		KillObject(handle.id);
 	}
 
-	void ObjectTable::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, const std::shared_ptr<void>& object)
+	void ObjectTable::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, std::shared_ptr<void> object)
 	{
 		if (!IsObjectValid(objectType, handle)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid handle");
 		}
 
-		objects[objectsSparse[handle.id]].object = object;
+		objects[objectsSparse[handle.id]].object = std::move(object);
 	}
 
 	bool ObjectTable::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
@@ -243,9 +243,9 @@ namespace PonyEngine::World
 		}
 	}
 
-	std::optional<TypelessObjectHandle> ObjectTable::TryFindObject(const std::type_index objectType, const std::shared_ptr<void>& object) const noexcept
+	std::optional<TypelessObjectHandle> ObjectTable::TryFindObject(const std::type_index objectType, const void* const object) const noexcept
 	{
-		const auto objectTypePair = std::pair(object.get(), objectType);
+		const auto objectTypePair = std::pair(object, objectType);
 		if (const auto position = objectIndices.find(objectTypePair); position != objectIndices.cend())
 		{
 			const ObjectHandleID handleId = position->second;
@@ -255,7 +255,7 @@ namespace PonyEngine::World
 		return std::nullopt;
 	}
 
-	TypelessObjectHandle ObjectTable::CreateObject(const std::type_index objectType, const std::shared_ptr<void>& object)
+	TypelessObjectHandle ObjectTable::CreateObject(const std::type_index objectType, std::shared_ptr<void> object)
 	{
 		if (objectsSparse.size() >= std::numeric_limits<ObjectHandleID>::max()) [[unlikely]]
 		{
@@ -264,6 +264,8 @@ namespace PonyEngine::World
 
 		const ObjectHandleID handleId = static_cast<ObjectHandleID>(objectsSparse.size());
 		constexpr ObjectHandleVersion handleVersion = 1u;
+
+		const void* const pointer = object.get();
 
 		objectsSparse.push_back(static_cast<ObjectHandleID>(objectsDense.size()));
 		try
@@ -274,10 +276,10 @@ namespace PonyEngine::World
 				objectsDense.push_back(handleId);
 				try
 				{
-					objects.push_back(Object{.object = object, .type = objectType});
+					objects.push_back(Object{.object = std::move(object), .type = objectType});
 					try
 					{
-						const auto objectTypePair = std::pair(object.get(), objectType);
+						const auto objectTypePair = std::pair(pointer, objectType);
 						objectIndices[objectTypePair] = handleId;
 					}
 					catch (...)
@@ -307,16 +309,16 @@ namespace PonyEngine::World
 		return TypelessObjectHandle{.id = handleId, .version = handleVersion};
 	}
 
-	TypelessObjectHandle ObjectTable::ResurrectObject(const std::type_index objectType, const std::shared_ptr<void>& object)
+	TypelessObjectHandle ObjectTable::ResurrectObject(const std::type_index objectType, std::shared_ptr<void> object)
 	{
 		const ObjectHandleID handleId = objectFreeList.back();
-		const auto objectTypePair = std::pair(object.get(), objectType);
+		const auto objectTypePair = std::pair<const void*, std::type_index>(object.get(), objectType);
 		objectIndices[objectTypePair] = handleId;
 		objectFreeList.pop_back();
 		objectsSparse[handleId] = static_cast<ObjectHandleID>(objectsDense.size());
 		const ObjectHandleVersion handleVersion = ++handleVersions[handleId];
 		objectsDense.push_back(handleId);
-		objects.push_back(Object{.object = object, .type = objectType});
+		objects.push_back(Object{.object = std::move(object), .type = objectType});
 
 		return TypelessObjectHandle{.id = handleId, .version = handleVersion};
 	}
@@ -326,7 +328,7 @@ namespace PonyEngine::World
 		objectFreeList.push_back(handleId);
 
 		Object& object = objects[handleId];
-		const auto objectTypePair = std::pair(object.object.get(), object.type);
+		const auto objectTypePair = std::pair<const void*, std::type_index>(object.object.get(), object.type);
 		objectIndices.erase(objectTypePair);
 
 		const ObjectHandleID lastHandle = objectsDense.back();

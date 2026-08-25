@@ -79,14 +79,16 @@ export namespace PonyEngine::World
 
 	protected:
 		[[nodiscard("Weird call")]] 
-		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, const std::shared_ptr<void>& object) override;
+		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, std::shared_ptr<void> object) override;
 		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) override;
-		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, const std::shared_ptr<void>& object) override;
+		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, std::shared_ptr<void> object) override;
 
 		[[nodiscard("Pure function")]] 
 		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual const std::shared_ptr<void>& GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
+		virtual void* GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<void> GetObjectShared(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 
 	private:
 		/// @brief Checks if the entity is invalid.
@@ -555,9 +557,9 @@ namespace PonyEngine::World
 		objectTable.CollectGarbage(*application, *typeRegistry, componentTables, componentTablesIndices);
 	}
 
-	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, const std::shared_ptr<void>& object)
+	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, std::shared_ptr<void> object)
 	{
-		return objectTable.RegisterObject(objectType, object);
+		return objectTable.RegisterObject(objectType, std::move(object));
 	}
 
 	void World::UnregisterObject(const std::type_index objectType, const TypelessObjectHandle handle)
@@ -565,9 +567,9 @@ namespace PonyEngine::World
 		objectTable.UnregisterObject(objectType, handle);
 	}
 
-	void World::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, const std::shared_ptr<void>& object)
+	void World::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, std::shared_ptr<void> object)
 	{
-		objectTable.ReplaceObject(handle, objectType, object);
+		objectTable.ReplaceObject(handle, objectType, std::move(object));
 	}
 
 	bool World::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
@@ -575,7 +577,12 @@ namespace PonyEngine::World
 		return objectTable.IsObjectValid(objectType, handle);
 	}
 
-	const std::shared_ptr<void>& World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	void* World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	{
+		return objectTable.GetObject(objectType, handle).get();
+	}
+
+	std::shared_ptr<void> World::GetObjectShared(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
 	{
 		return objectTable.GetObject(objectType, handle);
 	}
