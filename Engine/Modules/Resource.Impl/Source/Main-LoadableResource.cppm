@@ -45,17 +45,22 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const std::type_index> DataAccessTypes() const noexcept override;
 
-		[[nodiscard("Pure function")]] 
-		virtual std::optional<std::type_index> DataAccessType() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::span<const std::type_index> OutputTypes() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> LoadData() const noexcept override;
+		virtual void SetDataAccessType(std::type_index dataAccessType) override;
+		virtual void AddInterfaceTypes(std::span<const std::type_index> interfaceTypes) override;
+		virtual void AddLoadData(std::shared_ptr<const void> loadData, std::type_index loadDataType) override;
 
-		virtual void DataAccessType(std::type_index dataAccessType) override;
-		virtual void AddOutputTypes(std::span<const std::type_index> outputTypes) override;
-		virtual void AddLoadData(std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> loadData) override;
-		virtual void AddLoadData(std::span<const std::shared_ptr<const void>> loadData, std::span<const std::type_index> loadDataTypes) override;
+		/// @brief Gets the data access type.
+		/// @return Data access type.
+		[[nodiscard("Pure function")]]
+		std::optional<std::type_index> DataAccessType() const noexcept;
+		/// @brief Gets the interface types.
+		/// @return Interfaces types
+		[[nodiscard("Pure function")]]
+		std::vector<std::type_index>& InterfaceTypes() noexcept;
+		/// @brief Gets the load data.
+		/// @return Load data.
+		[[nodiscard("Pure function")]]
+		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>>& LoadData() noexcept;
 
 		LoadableResource& operator =(const LoadableResource&) = delete;
 		LoadableResource& operator =(LoadableResource&&) = delete;
@@ -67,7 +72,7 @@ export namespace PonyEngine::Resource
 		std::span<const std::type_index> dataAccessTypes; ///< Data access types.
 
 		std::optional<std::type_index> dataAccessType; ///< Chosen data access type.
-		std::vector<std::type_index> outputTypes; ///< Resource output types.
+		std::vector<std::type_index> interfaceTypes; ///< Resource interface types.
 		std::vector<std::pair<std::shared_ptr<const void>, std::type_index>> loadData; ///< Load data.
 	};
 }
@@ -109,51 +114,41 @@ namespace PonyEngine::Resource
 		return dataAccessType;
 	}
 
-	std::span<const std::type_index> LoadableResource::OutputTypes() const noexcept
+	std::vector<std::type_index>& LoadableResource::InterfaceTypes() noexcept
 	{
-		return outputTypes;
+		return interfaceTypes;
 	}
 
-	std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> LoadableResource::LoadData() const noexcept
+	std::vector<std::pair<std::shared_ptr<const void>, std::type_index>>& LoadableResource::LoadData() noexcept
 	{
 		return loadData;
 	}
 
-	void LoadableResource::DataAccessType(const std::type_index dataAccessType)
+	void LoadableResource::SetDataAccessType(const std::type_index dataAccessType)
 	{
 		assert(std::ranges::contains(dataAccessTypes, dataAccessType) && "Invalid data type.");
 		this->dataAccessType = dataAccessType;
 	}
 
-	void LoadableResource::AddOutputTypes(const std::span<const std::type_index> outputTypes)
+	void LoadableResource::AddInterfaceTypes(std::span<const std::type_index> interfaceTypes)
 	{
-		for (std::size_t i = 1uz; i < outputTypes.size(); ++i)
+		for (std::size_t i = 1uz; i < interfaceTypes.size(); ++i)
 		{
 			for (std::size_t j = 0uz; j < i; ++j)
 			{
-				assert(outputTypes[i] != outputTypes[j] && "Output type duplicate.");
+				assert(interfaceTypes[i] != interfaceTypes[j] && "Output type duplicate.");
 			}
 		}
-		for (const std::type_index type : outputTypes)
+		for (const std::type_index type : interfaceTypes)
 		{
-			assert(!std::ranges::contains(this->outputTypes, type) && "Output type already added.");
+			assert(!std::ranges::contains(this->interfaceTypes, type) && "Output type already added.");
 		}
 
-		this->outputTypes.append_range(outputTypes);
+		this->interfaceTypes.append_range(interfaceTypes);
 	}
 
-	void LoadableResource::AddLoadData(const std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> loadData)
+	void LoadableResource::AddLoadData(std::shared_ptr<const void> loadData, const std::type_index loadDataType)
 	{
-		this->loadData.append_range(loadData);
-	}
-
-	void LoadableResource::AddLoadData(const std::span<const std::shared_ptr<const void>> loadData, const std::span<const std::type_index> loadDataTypes)
-	{
-		assert(loadData.size() == loadDataTypes.size() && "Load data and types sizes mismatched.");
-
-		for (std::size_t i = 0uz; i < loadData.size(); ++i)
-		{
-			this->loadData.emplace_back(loadData[i], loadDataTypes[i]);
-		}
+		this->loadData.push_back(std::pair(std::move(loadData), loadDataType));
 	}
 }

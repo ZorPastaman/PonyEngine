@@ -65,9 +65,8 @@ export namespace PonyEngine::Application
 		/// @param tempDataDirectory Temporary data directory.
 		/// @param process Process.
 		[[nodiscard("Pure constructor")]]
-		App(std::span<const std::string_view> commandLine, std::span<const std::string_view> threadRoles, const std::filesystem::path& executableFile,
-			const std::filesystem::path& localDataDirectory, const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory, 
-			IProcess& process);
+		App(std::span<const std::string_view> commandLine, std::span<const std::string_view> threadRoles, std::filesystem::path executableFile,
+			std::filesystem::path localDataDirectory, std::filesystem::path userDataDirectory, std::filesystem::path tempDataDirectory, IProcess& process);
 		App(const App&) = delete;
 		App(App&&) = delete;
 
@@ -215,15 +214,6 @@ export namespace PonyEngine::Application
 		const Log::ILogService* LogService() const noexcept;
 		/// @brief Logs basic application info.
 		void LogBasicInfo() const noexcept;
-
-		/// @brief Gets the interfaces.
-		/// @return Interfaces.
-		[[nodiscard("Pure function")]]
-		const std::unordered_map<std::type_index, void*>& Interfaces() const noexcept;
-		/// @brief Gets the tickables.
-		/// @return Tickables.
-		[[nodiscard("Pure function")]]
-		std::span<const std::pair<ITickable*, TickableOrder>> Tickables() const noexcept;
 
 		App& operator =(const App&) = delete;
 		App& operator =(App&) = delete;
@@ -413,20 +403,21 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	App::App(const std::span<const std::string_view> commandLine, std::span<const std::string_view> threadRoles, const std::filesystem::path& executableFile,
-		const std::filesystem::path& localDataDirectory, const std::filesystem::path& userDataDirectory, const std::filesystem::path& tempDataDirectory, IProcess& process) :
+	App::App(const std::span<const std::string_view> commandLine, const std::span<const std::string_view> threadRoles, std::filesystem::path executableFile,
+		std::filesystem::path localDataDirectory, std::filesystem::path userDataDirectory, std::filesystem::path tempDataDirectory, IProcess& process) :
 #ifndef NDEBUG
 		bufferCount(0uz),
 #endif
 		mainThreadId(std::this_thread::get_id()),
 		commandLine(commandLine.cbegin(), commandLine.cend()),
 		threadRoles(threadRoles.cbegin(), threadRoles.cend()),
-		executableFile(executableFile),
+		executableFile(std::move(executableFile)),
 		executableDirectory(this->executableFile.parent_path()),
 		rootDirectory((this->executableDirectory / PONY_STRINGIFY_VALUE(PONY_ENGINE_APPLICATION_ROOT_PATH)).lexically_normal()),
-		localDataDirectory(localDataDirectory),
-		userDataDirectory(userDataDirectory),
-		tempDataDirectory(tempDataDirectory),
+		localDataDirectory(std::move(localDataDirectory)),
+		userDataDirectory(std::move(userDataDirectory)),
+		tempDataDirectory(std::move(tempDataDirectory)),
+		process{&process},
 		exitCode(std::nullopt),
 		frameCount{0ull},
 		startTimePoint(NowTimePoint()),
@@ -435,8 +426,7 @@ namespace PonyEngine::Application
 		targetFrameTime(std::max(Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD}), std::chrono::nanoseconds(0))),
 		logService{nullptr},
 		bufferAllocator(&bufferPool),
-		bufferControlAllocator(&bufferControlPool),
-		process{&process}
+		bufferControlAllocator(&bufferControlPool)
 	{
 	}
 
@@ -981,16 +971,6 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On logging basic info.");
 			// Strange but it's ok to ignore.
 		}
-	}
-
-	const std::unordered_map<std::type_index, void*>& App::Interfaces() const noexcept
-	{
-		return interfaces;
-	}
-
-	std::span<const std::pair<ITickable*, TickableOrder>> App::Tickables() const noexcept
-	{
-		return tickables;
 	}
 
 	App::StartUpModuleContext::StartUpModuleContext(App& application) noexcept :

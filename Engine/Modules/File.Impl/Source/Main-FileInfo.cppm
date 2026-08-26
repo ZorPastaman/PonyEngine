@@ -24,7 +24,7 @@ export namespace PonyEngine::File
 		/// @param access File access.
 		/// @param flags File flags.
 		[[nodiscard("Pure constructor")]]
-		FileInfo(const std::filesystem::path& path, FileAccess access, FileFlag flags);
+		FileInfo(std::filesystem::path path, FileAccess access, FileFlag flags);
 		[[nodiscard("Pure constructor")]]
 		FileInfo(const FileInfo& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -65,8 +65,8 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	FileInfo::FileInfo(const std::filesystem::path& path, const FileAccess access, const FileFlag flags) :
-		path(path),
+	FileInfo::FileInfo(std::filesystem::path path, const FileAccess access, const FileFlag flags) :
+		path(std::move(path)),
 		access{access},
 		flags{flags}
 	{

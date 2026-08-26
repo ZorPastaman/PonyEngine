@@ -76,12 +76,14 @@ export namespace PonyEngine::Resource::Pack
 		PackHandle ResurrectPackHandle() noexcept;
 		void KillPackHandle(PackHandle packHandle) noexcept;
 
-		void AddPack(ResourceCollection collection, const std::shared_ptr<class Pack>& pack, std::span<const ResourceInfo> resourceInfos);
+		[[nodiscard("Must be used")]]
+		PackHandle AddPack(ResourceCollection collection, const std::shared_ptr<class Pack>& pack, std::span<const ResourceInfo> resourceInfos);
 		void RemovePack(PackHandle packHandle);
 
 		void AddMountRequest(const std::shared_ptr<FilePackMountRequest>& request);
 		std::shared_ptr<FilePackMountRequest> RemoveMountRequest(FilePackMountRequest* request);
 		void ParseManifest(FilePackMountRequest& request) noexcept;
+		void CreatePack(FilePackMountRequest& request) noexcept;
 
 		Application::IApplication* application;
 		Log::ILogService* logService;
@@ -186,7 +188,7 @@ namespace PonyEngine::Resource::Pack
 		const std::shared_ptr<Application::IBuffer> manifestBuffer = application->CreateBuffer(std::filesystem::file_size(manifest->Path()));
 		const std::size_t dataFileSize = std::filesystem::file_size(data->Path());
 		const std::shared_ptr<Application::IBuffer> dataBuffer = loadedData ? application->CreateBuffer(dataFileSize) : nullptr;
-		const auto request = std::make_shared<FilePackMountRequest>(manifest, data, dataFileSize, manifestBuffer, dataBuffer);
+		const auto request = std::make_shared<FilePackMountRequest>(accessType, manifest, data, dataFileSize, manifestBuffer, dataBuffer);
 		AddMountRequest(request);
 
 		try
@@ -244,12 +246,14 @@ namespace PonyEngine::Resource::Pack
 		return request;
 	}
 
-	void PackService::AddPack(const ResourceCollection collection, const std::shared_ptr<class Pack>& pack, const std::span<const ResourceInfo> resourceInfos)
+	PackHandle PackService::AddPack(const ResourceCollection collection, const std::shared_ptr<class Pack>& pack, const std::span<const ResourceInfo> resourceInfos)
 	{
 		const auto lock = std::unique_lock(stateMutex);
 
 		const PackHandle packHandle = CreatePackHandle();
 		packContainer.Add(packHandle, collection, pack, resourceInfos);
+
+		return packHandle;
 	}
 
 	void PackService::RemovePack(const PackHandle packHandle)
@@ -450,7 +454,8 @@ namespace PonyEngine::Resource::Pack
 						};
 					}
 
-					// TODO: Move data to the request.
+					req->Ranges(ranges);
+					req->CollectionResources(resources);
 
 					if (req->DecrementRequestCount() == 1uz)
 					{
@@ -461,7 +466,7 @@ namespace PonyEngine::Resource::Pack
 						}
 						else
 						{
-							// TODO: Make jobs for pack creation and resource registration
+							CreatePack(*req);
 						}
 					}
 				}
@@ -484,6 +489,93 @@ namespace PonyEngine::Resource::Pack
 				const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(&request);
 				mountRequest->SetFailure(request.ManifestException());
 			}
+		}
+	}
+
+	void PackService::CreatePack(FilePackMountRequest& request) noexcept
+	{
+		try
+		{
+			jobService->Schedule([this, req = &request]() noexcept
+			{
+				if (req->IsCancelRequested())
+				{
+					if (req->DecrementRequestCount() == 1uz)
+					{
+						const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+						mountRequest->SetCanceled();
+					}
+
+					return;
+				}
+
+				try
+				{
+					std::shared_ptr<std::byte[]> loadedData = nullptr;
+					if (Any(AccessType::Memory, req->AccessType()))
+					{
+						loadedData = std::make_shared<std::byte[]>(req->DataBuffer().size());
+						std::memcpy(loadedData.get(), req->DataBuffer().data(), req->DataBuffer().size());
+					}
+
+					const auto pack = std::make_shared<class Pack>(loadableDataAccessRequestWorker,
+						Any(AccessType::File, req->AccessType()) ? req->DataFile()->Path() : std::filesystem::path(),
+						Any(AccessType::Loadable, req->AccessType()) && None(AccessType::Memory, req->AccessType()) ? req->DataFile() : nullptr,
+						loadedData, req->Ranges());
+
+					std::vector<std::type_index> accessTypes;
+					accessTypes.reserve(3uz);
+					if (Any(AccessType::Loadable, req->AccessType()))
+					{
+						accessTypes.push_back(typeid(ILoadableDataAccess));
+					}
+					if (Any(AccessType::File, req->AccessType()))
+					{
+						accessTypes.push_back(typeid(IFileDataAccess));
+					}
+					if (Any(AccessType::Memory, req->AccessType()))
+					{
+						accessTypes.push_back(typeid(IMemoryDataAccess));
+					}
+					const std::span<const CollectionResource> resources = req->CollectionResources();
+					const ResourceCollection collection = resourceHub->RegisterCollection(*pack, resources, accessTypes);
+
+					try
+					{
+						std::vector<ResourceInfo> infos;
+						infos.reserve(resources.size());
+						for (const CollectionResource& resource : resources)
+						{
+							infos.push_back(ResourceInfo
+							{
+								.id = resource.id,
+								.type = resource.type
+							});
+						}
+						const PackHandle packHandle = AddPack(collection, pack, infos);
+
+						const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+						mountRequest->SetSuccess(packHandle);
+					}
+					catch (...)
+					{
+						resourceHub->UnregisterCollection(*pack, collection);
+						throw;
+					}
+				}
+				catch (...)
+				{
+					req->ManifestException(std::current_exception());
+					const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(req);
+					mountRequest->SetFailure(req->ManifestException());
+				}
+			});
+		}
+		catch (...)
+		{
+			request.ManifestException(std::current_exception());
+			const std::shared_ptr<FilePackMountRequest> mountRequest = RemoveMountRequest(&request);
+			mountRequest->SetFailure(request.ManifestException());
 		}
 	}
 }

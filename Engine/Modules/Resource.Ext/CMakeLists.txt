@@ -16,14 +16,14 @@ target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IFileDataAccess.cppm"
 	"Source/Main-ILoadableDataAccess.cppm"
 	"Source/Main-ILoadableResource.cppm"
+	"Source/Main-ILoadContext.cppm"
 	"Source/Main-IMemoryDataAccess.cppm"
 	"Source/Main-IResourceHub.cppm"
 	"Source/Main-IResourceLoader.cppm"
-	"Source/Main-IResourceLoadHandler.cppm"
 	"Source/Main-IResourceLoadRequest.cppm"
 	"Source/Main-IResourceProvider.cppm"
 	"Source/Main-ResourceCollection.cppm"
-	"Source/Main-ResourceLoadContext.cppm"
+	"Source/Main-ResourceLoadRequestStatus.cppm"
 	"Source/Main-ResourceType.cppm"
 )
 

@@ -9,8 +9,6 @@ add_library(PonyEngine.Resource STATIC)
 target_sources(PonyEngine.Resource PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-IResourceRequest.cppm"
-	"Source/Main-IResourceRequestObserver.cppm"
-	"Source/Main-IResourceRequestResult.cppm"
 	"Source/Main-IResourceService.cppm"
 	"Source/Main-ResourceID.cppm"
 	"Source/Main-ResourceRequestStatus.cppm"

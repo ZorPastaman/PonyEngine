@@ -38,7 +38,7 @@ export namespace PonyEngine::File
 		~FileService() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const std::filesystem::path& path, FileParams params) override;
+		virtual std::shared_ptr<IFile> OpenFile(std::filesystem::path path, FileParams params) override;
 
 		FileService& operator =(const FileService&) = delete;
 		FileService& operator =(FileService&&) = delete;
@@ -73,10 +73,10 @@ namespace PonyEngine::File
 #endif
 	}
 
-	std::shared_ptr<IFile> FileService::OpenFile(const std::filesystem::path& path, const FileParams params)
+	std::shared_ptr<IFile> FileService::OpenFile(std::filesystem::path path, const FileParams params)
 	{
 #ifndef NDEBUG
-		const auto file = new File(logService, worker, path, params);
+		const auto file = new File(logService, worker, std::move(path), params);
 		fileCount.fetch_add(1uz, std::memory_order::relaxed);
 		try
 		{
@@ -93,7 +93,7 @@ namespace PonyEngine::File
 			throw;
 		}
 #else
-		return std::make_shared<File>(logService, worker, path, params);
+		return std::make_shared<File>(logService, worker, std::move(path), params);
 #endif
 	}
 }

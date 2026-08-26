@@ -43,59 +43,26 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		virtual std::span<const std::type_index> DataAccessTypes() const noexcept = 0;
 
-		/// @brief Gets the data access type.
-		/// @return Data access type.
-		[[nodiscard("Pure function")]]
-		virtual std::optional<std::type_index> DataAccessType() const noexcept = 0;
-		/// @brief Gets the output types.
-		/// @return Output types.
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::type_index> OutputTypes() const noexcept = 0;
-		/// @brief Gets the load data.
-		/// @return Load data.
-		[[nodiscard("Pure function")]]
-		virtual std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> LoadData() const noexcept = 0;
-
 		/// @brief Sets the data access type.
 		/// @param dataAccessType Data access type. Must be one of the @p DataAccessTypes().
-		virtual void DataAccessType(std::type_index dataAccessType) = 0;
-		/// @brief Adds the resource output type.
-		/// @param outputType Resource output type.
-		void AddOutputType(std::type_index outputType);
-		/// @brief Adds the resource output types.
-		/// @param outputTypes Resource output types.
-		virtual void AddOutputTypes(std::span<const std::type_index> outputTypes) = 0;
-		/// @brief Adds the load data.
-		/// @param loadData Load data.
-		void AddLoadData(const std::pair<std::shared_ptr<const void>, std::type_index>& loadData);
-		/// @brief Adds the load data.
-		/// @param loadData Load data.
-		virtual void AddLoadData(std::span<const std::pair<std::shared_ptr<const void>, std::type_index>> loadData) = 0;
+		virtual void SetDataAccessType(std::type_index dataAccessType) = 0;
+		/// @brief Adds the resource interface type.
+		/// @param interfaceType Resource interface type.
+		void AddInterfaceType(std::type_index interfaceType);
+		/// @brief Adds the resource interface types.
+		/// @param interfaceTypes Resource interface types.
+		virtual void AddInterfaceTypes(std::span<const std::type_index> interfaceTypes) = 0;
 		/// @brief Adds the load data.
 		/// @param loadData Load data.
 		/// @param loadDataType Load data type.
-		void AddLoadData(const std::shared_ptr<const void>& loadData, std::type_index loadDataType);
-		/// @brief Adds the load data.
-		/// @param loadData Load data.
-		/// @param loadDataTypes Load data types.
-		virtual void AddLoadData(std::span<const std::shared_ptr<const void>> loadData, std::span<const std::type_index> loadDataTypes) = 0;
+		virtual void AddLoadData(std::shared_ptr<const void> loadData, std::type_index loadDataType) = 0;
 	};
 }
 
 namespace PonyEngine::Resource
 {
-	void ILoadableResource::AddOutputType(const std::type_index outputType)
+	void ILoadableResource::AddInterfaceType(const std::type_index interfaceType)
 	{
-		AddOutputTypes(std::span(&outputType, 1uz));
-	}
-
-	void ILoadableResource::AddLoadData(const std::pair<std::shared_ptr<const void>, std::type_index>& loadData)
-	{
-		AddLoadData(std::span(&loadData, 1uz));
-	}
-
-	void ILoadableResource::AddLoadData(const std::shared_ptr<const void>& loadData, const std::type_index loadDataType)
-	{
-		AddLoadData(std::span(&loadData, 1uz), std::span(&loadDataType, 1uz));
+		AddInterfaceTypes(std::span(&interfaceType, 1uz));
 	}
 }

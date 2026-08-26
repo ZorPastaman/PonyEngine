@@ -50,7 +50,7 @@ export namespace PonyEngine::File
 		void SetSuccess(std::size_t byteCount) noexcept;
 		/// @brief Sets the status to failure.
 		/// @param exception Exception that occured during the request execution.
-		void SetFailed(const std::exception_ptr& exception) noexcept;
+		void SetFailed(std::exception_ptr exception) noexcept;
 		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 		
@@ -111,11 +111,11 @@ namespace PonyEngine::File
 		status.notify_all();
 	}
 
-	void Request::SetFailed(const std::exception_ptr& exception) noexcept
+	void Request::SetFailed(std::exception_ptr exception) noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == FileRequestStatus::Pending && "Invalid status.");
 		
-		this->exception = exception;
+		this->exception = std::move(exception);
 		status.store(FileRequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 	}

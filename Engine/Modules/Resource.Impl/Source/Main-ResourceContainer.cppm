@@ -50,7 +50,7 @@ export namespace PonyEngine::Resource
 
 		/// @brief Adds the resource.
 		/// @param resource Resource to add.
-		void Add(std::shared_ptr<Resource>&& resource);
+		void Add(std::shared_ptr<Resource> resource);
 		/// @brief Removes a resource.
 		/// @param id Resource ID to remove.
 		void Remove(ResourceID id) noexcept;
@@ -90,10 +90,10 @@ namespace PonyEngine::Resource
 		return 0uz;
 	}
 
-	void ResourceContainer::Add(std::shared_ptr<Resource>&& resource)
+	void ResourceContainer::Add(std::shared_ptr<Resource> resource)
 	{
-		const ResourceID id = resource->info->id;
-		const ResourceType type = resource->info->type;
+		const ResourceID id = resource->ID();
+		const ResourceType type = resource->Type();
 
 		if (!typeCounts.contains(type))
 		{
@@ -117,7 +117,7 @@ namespace PonyEngine::Resource
 	{
 		if (const auto position = resources.find(id); position != resources.cend())
 		{
-			--typeCounts[position->second->info->type];
+			--typeCounts[position->second->Type()];
 			resources.erase(position);
 		}
 	}

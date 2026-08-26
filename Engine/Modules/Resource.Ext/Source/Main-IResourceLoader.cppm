@@ -18,9 +18,8 @@ import std;
 import PonyEngine.Resource;
 
 import :ILoadableResource;
-import :IResourceLoadHandler;
+import :ILoadContext;
 import :IResourceLoadRequest;
-import :ResourceLoadContext;
 
 export namespace PonyEngine::Resource
 {
@@ -33,10 +32,11 @@ export namespace PonyEngine::Resource
 		/// @param context Resource context.
 		virtual void PrepareResource(ILoadableResource& context) = 0;
 		/// @brief Makes a load request.
-		/// @param context Resource load context.
-		/// @param loadHandler Resource load handler.
+		/// @param context Load context.
+		/// @param callback Callback. May be nullptr.
 		/// @return Resource load request.
+		/// @note The context, request, callback and loader must be kept alive till the finish of the operation.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IResourceLoadRequest> Load(const ResourceLoadContext& context, IResourceLoadHandler& loadHandler) = 0;
+		virtual std::shared_ptr<IResourceLoadRequest> Load(ILoadContext& context, std::move_only_function<void(const IResourceLoadRequest&) noexcept> callback = nullptr) = 0;
 	};
 }

@@ -52,7 +52,7 @@ export namespace PonyEngine::File
 		void SetSuccess(std::size_t byteCount) noexcept;
 		/// @brief Sets the status to failure.
 		/// @param exception Exception that occured during the request execution.
-		void SetFailure(const std::exception_ptr& exception) noexcept;
+		void SetFailure(std::exception_ptr exception) noexcept;
 		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
@@ -109,9 +109,9 @@ namespace PonyEngine::File
 		InvokeCallback();
 	}
 
-	void ReadRequest::SetFailure(const std::exception_ptr& exception) noexcept
+	void ReadRequest::SetFailure(std::exception_ptr exception) noexcept
 	{
-		request.SetFailed(exception);
+		request.SetFailed(std::move(exception));
 		InvokeCallback();
 	}
 

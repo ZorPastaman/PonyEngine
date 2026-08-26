@@ -31,6 +31,6 @@ export namespace PonyEngine::File
 		/// @return File.
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IFile> OpenFile(const std::filesystem::path& path, FileParams params) = 0;
+		virtual std::shared_ptr<IFile> OpenFile(std::filesystem::path path, FileParams params) = 0;
 	};
 }

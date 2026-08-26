@@ -17,130 +17,157 @@ import std;
 
 import PonyEngine.Resource.Ext;
 
-import :ResourceData;
-import :ResourceInfo;
-import :ResourceRequestResult;
+import :Resource;
 import :Utility;
 
 export namespace PonyEngine::Resource
 {
-	/// @brief Resource request that is attached to an actual load process.
-	class LoadedResourceRequest;
+	/// @brief Resource request that is used when a resource isn't alive.
+	class OngoingResourceRequest;
 
 	/// @brief Resource load process.
-	class ResourceLoadProcess final : private IResourceLoadHandler
+	class ResourceLoadProcess final : public ILoadContext
 	{
 	public:
 		/// @brief Creates a resource load process.
-		/// @param resourceInfo Resource info.
-		/// @param resourceData Resource data.
-		/// @param resourceMutex Resource mutex.
-		/// @param resourceDataAccess Resource data access. Must be of a chosen type.
-		/// @param loader Loader.
+		/// @param resource Resource load process.
+		/// @param resourceDataAccess Resource data access. Must be of a valid type declared in the @p resource.
 		[[nodiscard("Pure constructor")]]
-		ResourceLoadProcess(const std::shared_ptr<const ResourceInfo>& resourceInfo, const std::shared_ptr<ResourceData>& resourceData,
-			const std::shared_ptr<std::mutex>& resourceMutex, std::shared_ptr<void>&& resourceDataAccess, IResourceLoader& loader);
+		ResourceLoadProcess(std::shared_ptr<class Resource> resource, std::shared_ptr<void> resourceDataAccess);
 		ResourceLoadProcess(const ResourceLoadProcess&) = delete;
 		ResourceLoadProcess(ResourceLoadProcess&&) = delete;
 
-		~ResourceLoadProcess() noexcept;
+		~ResourceLoadProcess() noexcept = default;
+
+		[[nodiscard("Pure function")]] 
+		virtual void* ResourceDataAccess() const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual std::type_index ResourceDataAccessType() const noexcept override;
+
+		[[nodiscard("Pure function")]] 
+		virtual struct ResourceType ResourceType() const noexcept override;
+
+		[[nodiscard("Pure function")]] 
+		virtual std::size_t LoadDataCount() const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual const void* LoadData(std::size_t index) const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual std::type_index LoadDataType(std::size_t index) const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual std::span<const std::type_index> InterfaceTypes() const noexcept override;
+
+		/// @brief Gets the resource.
+		/// @return Resource.
+		[[nodiscard("Pure function")]]
+		const Resource* Resource() const noexcept;
 
 		/// @brief Gets the resource ID.
 		/// @return Resource ID.
 		[[nodiscard("Pure function")]]
 		struct ResourceID ResourceID() const noexcept;
-		/// @brief Checks if the output type of the resource contains the @p types.
-		/// @param types Types to check against.
-		/// @return @a True if the resource is of type @p types; @a false otherwise.
+		/// @brief Checks if the resource has interfaces.
+		/// @param types Interfaces to check.
+		/// @return @a True if it has all the required interfaces; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsTypeOf(std::span<const std::type_index> types) const noexcept;
+		bool HasInterfaces(std::span<const std::type_index> types) const noexcept;
 
-		/// @brief Gets the request status.
-		/// @return Request status.
+		/// @brief Gets the status.
+		/// @return Status.
 		[[nodiscard("Pure function")]]
 		ResourceRequestStatus Status() const noexcept;
-		/// @brief Gets the request result.
-		/// @return Request result.
+		/// @brief Gets a resource interface.
+		/// @param type Resource interface type. Must be one of the resource interfaces.
+		/// @return Resource interface.
 		/// @note It's valid to call only if the status is success.
 		[[nodiscard("Pure function")]]
-		const std::shared_ptr<const ResourceRequestResult>& Result() const;
-		/// @brief Gets the exception.
+		std::shared_ptr<const void> Resource(std::type_index type) const;
+		/// @brief Gets an exception.
 		/// @return Exception.
 		/// @note It's valid to call only if the status is failure.
 		[[nodiscard("Pure function")]]
 		const std::exception_ptr& Exception() const;
 
-		/// @brief Increments the cancel count if it's greater than 0.
-		/// @return @a True if the process is still valid; @a false otherwise.
+		/// @brief Tries to increment the cancel count.
+		/// @details If the cancel count is already 0, it will do nothing.
+		/// @return @a True if the cancel count is incremented; @a false otherwise.
+		[[nodiscard("Must be used")]]
 		bool IncrementCancelCount() noexcept;
 		/// @brief Decrements the cancel count.
-		/// @details If the cancel count reaches 0, it calls a cancel function.
-		void DecrementCancelCount();
-
-		/// @brief Adds the request observer.
-		/// @param request Request observer.
-		void AddObserver(const LoadedResourceRequest& request) const;
-		/// @brief Removes the request observer.
-		/// @param request Request observer.
-		void RemoveObserver(const LoadedResourceRequest& request) const;
+		/// @details If it reaches 0, the load request will be canceled.
+		void DecrementCancelCount() noexcept;
 
 		/// @brief Waits till the process is finished.
 		void Wait() const noexcept;
+
+		/// @brief Adds the request callback.
+		/// @param request Request callback to add.
+		void AddRequest(OngoingResourceRequest& request);
+		/// @brief Removes the request callback.
+		/// @param request Request callback to remove.
+		void RemoveRequest(OngoingResourceRequest& request);
+
+		/// @brief Sets the load request.
+		/// @param loadRequest Load request.
+		void SetLoadRequest(std::shared_ptr<IResourceLoadRequest> loadRequest) noexcept;
+
+		/// @brief Sets success.
+		/// @param mainResource Main resource. Must be alive.
+		/// @param resourceInterfaces Resource interfaces. Must be synced with resource interface types by index.
+		void SetSuccess(std::shared_ptr<const void> mainResource, std::span<const void* const> resourceInterfaces) noexcept;
+		/// @brief Sets failure.
+		/// @param exception Exception.
+		void SetFailure(std::exception_ptr exception);
+		/// @brief Sets canceled.
+		void SetCanceled();
 
 		ResourceLoadProcess& operator =(const ResourceLoadProcess&) = delete;
 		ResourceLoadProcess& operator =(ResourceLoadProcess&&) = delete;
 
 	private:
-		/// @brief Sets success.
-		/// @param mainResource Main resource.
-		/// @param resources Output resources.
-		virtual void SetSuccess(const std::shared_ptr<const void>& mainResource, std::span<const void* const> resources) override;
-		/// @brief Sets failure.
-		/// @param exception Exception.
-		virtual void SetFailure(const std::exception_ptr& exception) override;
+		/// @brief Invokes callback.
+		void InvokeCallback() noexcept;
 
-		std::shared_ptr<const ResourceInfo> resourceInfo; ///< Resource info.
-		std::shared_ptr<ResourceData> resourceData; ///< Resource data.
-		std::shared_ptr<std::mutex> resourceMutex; ///< Resource mutex.
+		std::shared_ptr<class Resource> resource; ///< Resource.
+		std::shared_ptr<void> resourceDataAccess; ///< Resource data access.
 
-		std::shared_ptr<const ResourceRequestResult> result; ///< Result.
+		std::shared_ptr<const void> mainResource; ///< Main resource.
 		std::exception_ptr exception; ///< Exception.
-		std::atomic<ResourceRequestStatus> status; ///< Process status.
+		std::atomic<ResourceRequestStatus> status; ///< Status.
 		std::atomic_size_t cancelCount; ///< Cancel count.
+		
+		std::shared_ptr<IResourceLoadRequest> loadRequest; ///< Load request.
 
-		std::shared_ptr<IResourceLoadRequest> request; ///< Load request.
+		std::vector<OngoingResourceRequest*> requests; ///< Request callbacks.
+		bool finished; ///< Were the @p requests called?
+		std::mutex requestMutex; ///< Request callback mutex.
 
-		mutable std::vector<const LoadedResourceRequest*> observers; ///< Observers.
-		bool observersCalled; ///< Were the observers called?
-		mutable std::mutex observerMutex; ///< Observer mutex.
-
-		static_assert(std::atomic<ResourceRequestStatus>::is_always_lock_free, "ResourceRequestStatus isn't lock-free.");
+		static_assert(std::atomic<ResourceRequestStatus>::is_always_lock_free, "Resource request status isn't lock-free.");
 		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 
-	/// @brief Resource request that is attached to an actual load process.
-	class LoadedResourceRequest final : public IResourceRequest
+	/// @brief Resource request that is used when a resource isn't alive.
+	class OngoingResourceRequest final : public IResourceRequest
 	{
 	public:
-		/// @brief Creates a loaded resource request.
-		/// @param process Load process.
-		/// @param observer Observer.
+		/// @brief Creates an ongoing resource load request.
+		/// @param loadProcess Load process. Must be alive.
+		/// @param callback Callback. Can be nullptr.
 		[[nodiscard("Pure constructor")]]
-		explicit LoadedResourceRequest(const std::shared_ptr<ResourceLoadProcess>& process, IResourceRequestObserver* observer);
-		LoadedResourceRequest(const LoadedResourceRequest&) = delete;
-		LoadedResourceRequest(LoadedResourceRequest&&) = delete;
+		OngoingResourceRequest(std::shared_ptr<ResourceLoadProcess> loadProcess, std::move_only_function<void(const IResourceRequest&) noexcept> callback) noexcept;
+		OngoingResourceRequest(const OngoingResourceRequest&) = delete;
+		OngoingResourceRequest(OngoingResourceRequest&&) = delete;
 
-		~LoadedResourceRequest() noexcept;
+		~OngoingResourceRequest() noexcept;
 
-		[[nodiscard("Pure function")]] 
+		[[nodiscard("Pure function")]]
 		virtual struct ResourceID ResourceID() const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual bool IsTypeOf(std::span<const std::type_index> types) const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool HasInterfaces(std::span<const std::type_index> types) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
 		virtual ResourceRequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::shared_ptr<const IResourceRequestResult> Result() const override;
+		virtual std::shared_ptr<const void> Resource(std::type_index type) const override;
 		[[nodiscard("Pure function")]] 
 		virtual const std::exception_ptr& Exception() const override;
 
@@ -148,23 +175,17 @@ export namespace PonyEngine::Resource
 
 		virtual void Wait() const noexcept override;
 
-		LoadedResourceRequest& operator =(const LoadedResourceRequest&) = delete;
-		LoadedResourceRequest& operator =(LoadedResourceRequest&&) = delete;
+		/// @brief Called on load process status change.
+		void OnStatusChanged() noexcept;
+
+		OngoingResourceRequest& operator =(const OngoingResourceRequest&) = delete;
+		OngoingResourceRequest& operator =(OngoingResourceRequest&&) = delete;
 
 	private:
-		/// @brief Invoked on success.
-		void OnSuccess() const noexcept;
-		/// @brief Invoked on failure.
-		void OnFailure() const noexcept;
-		/// @brief Invoked on canceled.
-		void OnCanceled() const noexcept;
+		std::shared_ptr<ResourceLoadProcess> loadProcess; ///< Load process.
+		std::atomic_bool canceled; ///< Is the request canceled?
 
-		std::shared_ptr<ResourceLoadProcess> process; ///< Load process.
-		IResourceRequestObserver* observer; ///< Request observer.
-
-		std::atomic_bool canceled; ///< Is this request canceled?
-
-		friend ResourceLoadProcess;
+		std::move_only_function<void(const IResourceRequest&) noexcept> callback; ///< Callback.
 
 		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free.");
 	};
@@ -172,43 +193,65 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
-	ResourceLoadProcess::ResourceLoadProcess(const std::shared_ptr<const ResourceInfo>& resourceInfo, const std::shared_ptr<ResourceData>& resourceData,
-		const std::shared_ptr<std::mutex>& resourceMutex, std::shared_ptr<void>&& resourceDataAccess, IResourceLoader& loader) :
-		resourceInfo(resourceInfo),
-		resourceData(resourceData),
-		resourceMutex(resourceMutex),
+	ResourceLoadProcess::ResourceLoadProcess(std::shared_ptr<class Resource> resource, std::shared_ptr<void> resourceDataAccess) :
+		resource(std::move(resource)),
+		resourceDataAccess(std::move(resourceDataAccess)),
 		status(ResourceRequestStatus::Pending),
 		cancelCount(1uz),
-		observersCalled{false}
+		finished{false}
 	{
-		assert(this->resourceInfo && "Resource info is nullptr.");
-		assert(this->resourceData && "Resource data is nullptr.");
-		assert(resourceDataAccess && "Resource data access is nullptr.");
-
-		request = loader.Load(ResourceLoadContext
-		{
-			.resourceType = this->resourceInfo->type,
-			.resourceDataAccess = std::move(resourceDataAccess),
-			.resourceDataAccessType = this->resourceInfo->dataAccessType,
-			.loadData = this->resourceInfo->loadData,
-			.outputTypes = this->resourceInfo->outputTypes
-		}, *this);
+		assert(this->resource && "Resource is nullptr.");
+		assert(this->resourceDataAccess && "Resource data access is nullptr.");
 	}
 
-	ResourceLoadProcess::~ResourceLoadProcess() noexcept
+	void* ResourceLoadProcess::ResourceDataAccess() const noexcept
 	{
-		assert(observers.empty() && "Some observers weren't removed.");
-		request->Stop();
+		return resourceDataAccess.get();
+	}
+
+	std::type_index ResourceLoadProcess::ResourceDataAccessType() const noexcept
+	{
+		return resource->DataAccessType();
+	}
+
+	struct ResourceType ResourceLoadProcess::ResourceType() const noexcept
+	{
+		return resource->Type();
+	}
+
+	std::size_t ResourceLoadProcess::LoadDataCount() const noexcept
+	{
+		return resource->LoadData().size();
+	}
+
+	const void* ResourceLoadProcess::LoadData(const std::size_t index) const noexcept
+	{
+		return resource->LoadData()[index].first.get();
+	}
+
+	std::type_index ResourceLoadProcess::LoadDataType(const std::size_t index) const noexcept
+	{
+		return resource->LoadData()[index].second;
+	}
+
+	std::span<const std::type_index> ResourceLoadProcess::InterfaceTypes() const noexcept
+	{
+		return resource->InterfaceTypes();
+	}
+
+	const Resource* ResourceLoadProcess::Resource() const noexcept
+	{
+		return resource.get();
 	}
 
 	struct ResourceID ResourceLoadProcess::ResourceID() const noexcept
 	{
-		return resourceInfo->id;
+		return resource->ID();
 	}
 
-	bool ResourceLoadProcess::IsTypeOf(const std::span<const std::type_index> types) const noexcept
+	bool ResourceLoadProcess::HasInterfaces(const std::span<const std::type_index> types) const noexcept
 	{
-		return CheckTypes(types, resourceInfo->outputTypes);
+		return CheckTypes(types, resource->InterfaceTypes());
 	}
 
 	ResourceRequestStatus ResourceLoadProcess::Status() const noexcept
@@ -216,14 +259,14 @@ namespace PonyEngine::Resource
 		return status.load(std::memory_order::acquire);
 	}
 
-	const std::shared_ptr<const ResourceRequestResult>& ResourceLoadProcess::Result() const
+	std::shared_ptr<const void> ResourceLoadProcess::Resource(const std::type_index type) const
 	{
 		if (status.load(std::memory_order::acquire) != ResourceRequestStatus::Success)
 		{
 			throw std::logic_error("Invalid status");
 		}
 
-		return result;
+		return MakeResource(type, resource->InterfaceTypes(), resource->ResourceInterfaces(), mainResource);
 	}
 
 	const std::exception_ptr& ResourceLoadProcess::Exception() const
@@ -238,66 +281,20 @@ namespace PonyEngine::Resource
 
 	bool ResourceLoadProcess::IncrementCancelCount() noexcept
 	{
-		std::size_t currentCancelCount = cancelCount.load(std::memory_order::relaxed);
-		while (currentCancelCount != 0uz && !cancelCount.compare_exchange_weak(currentCancelCount, currentCancelCount + 1uz, std::memory_order::relaxed))
+		std::size_t count = cancelCount.load(std::memory_order::relaxed);
+		while (count != 0uz && !cancelCount.compare_exchange_weak(count, count + 1uz, std::memory_order::relaxed))
 		{
 		}
 
-		return currentCancelCount != 0uz;
+		return count != 0uz;
 	}
 
-	void ResourceLoadProcess::DecrementCancelCount()
+	void ResourceLoadProcess::DecrementCancelCount() noexcept
 	{
-		if (cancelCount.fetch_sub(1uz, std::memory_order::relaxed) != 1uz)
+		if (cancelCount.fetch_sub(1uz, std::memory_order::relaxed) == 1uz)
 		{
-			return;
+			loadRequest->Cancel();
 		}
-
-		assert(status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending && "Invalid status.");
-
-		request->Stop();
-		
-		status.store(ResourceRequestStatus::Canceled, std::memory_order::release);
-		status.notify_all();
-
-		const auto observerLock = std::lock_guard(observerMutex);
-		for (const LoadedResourceRequest* request : observers)
-		{
-			request->OnCanceled();
-		}
-		observersCalled = true;
-	}
-
-	void ResourceLoadProcess::AddObserver(const LoadedResourceRequest& request) const
-	{
-		const auto lock = std::lock_guard(observerMutex);
-		observers.push_back(&request);
-
-		if (observersCalled)
-		{
-			switch (Status())
-			{
-			case ResourceRequestStatus::Success:
-				request.OnSuccess();
-				break;
-			case ResourceRequestStatus::Failure:
-				request.OnFailure();
-				break;
-			case ResourceRequestStatus::Canceled:
-				request.OnCanceled();
-				break;
-			default: 
-				break;
-			}
-		}
-	}
-
-	void ResourceLoadProcess::RemoveObserver(const LoadedResourceRequest& request) const
-	{
-		const auto lock = std::lock_guard(observerMutex);
-		const auto position = std::ranges::find(observers, &request);
-		assert(position != observers.cend() && "Observer not found.");
-		observers.erase(position);
 	}
 
 	void ResourceLoadProcess::Wait() const noexcept
@@ -308,123 +305,161 @@ namespace PonyEngine::Resource
 		}
 	}
 
-	void ResourceLoadProcess::SetSuccess(const std::shared_ptr<const void>& mainResource, const std::span<const void* const> resources)
+	void ResourceLoadProcess::AddRequest(OngoingResourceRequest& request)
 	{
-		if (!IncrementCancelCount())
+		const auto lock = std::lock_guard(requestMutex);
+
+		requests.push_back(&request);
+
+		if (finished)
 		{
-			return;
+			request.OnStatusChanged();
+		}
+	}
+
+	void ResourceLoadProcess::RemoveRequest(OngoingResourceRequest& request)
+	{
+		const auto lock = std::lock_guard(requestMutex);
+
+		const auto position = std::ranges::find(requests, &request);
+		assert(position != requests.cend() && "Request not found.");
+		requests.erase(position);
+	}
+
+	void ResourceLoadProcess::SetLoadRequest(std::shared_ptr<IResourceLoadRequest> loadRequest) noexcept
+	{
+		assert(loadRequest && "Load request is nullptr.");
+		this->loadRequest = std::move(loadRequest);
+	}
+
+	void ResourceLoadProcess::SetSuccess(std::shared_ptr<const void> mainResource, const std::span<const void* const> resourceInterfaces) noexcept
+	{
+		assert(status.load(std::memory_order::relaxed) == ResourceRequestStatus::Pending && "Invalid status.");
+		assert(mainResource && "Main resource is nullptr.");
+
+		this->mainResource = std::move(mainResource);
+		{
+			const std::lock_guard<std::mutex> lock = resource->Lock();
+			resource->SetResourceData(this->mainResource, resourceInterfaces);
 		}
 
-		assert(status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending && "Invalid status.");
-
-		{
-			const auto resourceLock = std::lock_guard(*resourceMutex);
-			resourceData->SetResource(mainResource, resources);
-		}
-		result = std::make_shared<ResourceRequestResult>(resourceInfo, resourceData, mainResource);
-		
 		status.store(ResourceRequestStatus::Success, std::memory_order::release);
 		status.notify_all();
 
-		const auto observerLock = std::lock_guard(observerMutex);
-		for (const LoadedResourceRequest* request : observers)
-		{
-			request->OnSuccess();
-		}
-		observersCalled = true;
+		InvokeCallback();
 	}
 
-	void ResourceLoadProcess::SetFailure(const std::exception_ptr& exception)
+	void ResourceLoadProcess::SetFailure(std::exception_ptr exception)
 	{
-		if (!IncrementCancelCount())
-		{
-			return;
-		}
+		assert(status.load(std::memory_order::relaxed) == ResourceRequestStatus::Pending && "Invalid status.");
 
-		assert(status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending && "Invalid status.");
-
-		this->exception = exception;
+		this->exception = std::move(exception);
 
 		status.store(ResourceRequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 
-		const auto observerLock = std::lock_guard(observerMutex);
-		for (const LoadedResourceRequest* request : observers)
+		InvokeCallback();
+	}
+
+	void ResourceLoadProcess::SetCanceled()
+	{
+		assert(status.load(std::memory_order::relaxed) == ResourceRequestStatus::Pending && "Invalid status.");
+
+		status.store(ResourceRequestStatus::Canceled, std::memory_order::release);
+		status.notify_all();
+
+		InvokeCallback();
+	}
+
+	void ResourceLoadProcess::InvokeCallback() noexcept
+	{
+		const auto lock = std::lock_guard(requestMutex);
+
+		for (OngoingResourceRequest* const request : requests)
 		{
-			request->OnFailure();
+			request->OnStatusChanged();
 		}
-		observersCalled = true;
+
+		finished = true;
 	}
 
-	LoadedResourceRequest::LoadedResourceRequest(const std::shared_ptr<ResourceLoadProcess>& process, IResourceRequestObserver* const observer) :
-		process(process),
-		observer{observer},
-		canceled(false)
+	OngoingResourceRequest::OngoingResourceRequest(std::shared_ptr<ResourceLoadProcess> loadProcess, 
+		std::move_only_function<void(const IResourceRequest&) noexcept> callback) noexcept :
+		loadProcess(std::move(loadProcess)),
+		canceled(false),
+		callback(std::move(callback))
 	{
-		if (this->observer)
+		assert(this->loadProcess && "Load process is nullptr.");
+
+		if (this->callback)
 		{
-			this->process->AddObserver(*this);
-		}
-	}
-
-	LoadedResourceRequest::~LoadedResourceRequest() noexcept
-	{
-		if (observer)
-		{
-			process->RemoveObserver(*this);
-		}
-	}
-
-	struct ResourceID LoadedResourceRequest::ResourceID() const noexcept
-	{
-		return process->ResourceID();
-	}
-
-	bool LoadedResourceRequest::IsTypeOf(const std::span<const std::type_index> types) const noexcept
-	{
-		return process->IsTypeOf(types);
-	}
-
-	ResourceRequestStatus LoadedResourceRequest::Status() const noexcept
-	{
-		return process->Status();
-	}
-
-	std::shared_ptr<const IResourceRequestResult> LoadedResourceRequest::Result() const
-	{
-		return process->Result();
-	}
-
-	const std::exception_ptr& LoadedResourceRequest::Exception() const
-	{
-		return process->Exception();
-	}
-
-	void LoadedResourceRequest::Cancel()
-	{
-		if (!canceled.exchange(true))
-		{
-			process->DecrementCancelCount();
+			this->loadProcess->AddRequest(*this);
 		}
 	}
 
-	void LoadedResourceRequest::Wait() const noexcept
+	OngoingResourceRequest::~OngoingResourceRequest() noexcept
 	{
-		process->Wait();
+		if (callback)
+		{
+			loadProcess->RemoveRequest(*this);
+		}
 	}
 
-	void LoadedResourceRequest::OnSuccess() const noexcept
+	struct ResourceID OngoingResourceRequest::ResourceID() const noexcept
 	{
-		observer->OnSuccess(process->Result());
+		return loadProcess->ResourceID();
 	}
 
-	void LoadedResourceRequest::OnFailure() const noexcept
+	bool OngoingResourceRequest::HasInterfaces(const std::span<const std::type_index> types) const noexcept
 	{
-		observer->OnFailure(process->Exception());
+		return loadProcess->HasInterfaces(types);
 	}
 
-	void LoadedResourceRequest::OnCanceled() const noexcept
+	ResourceRequestStatus OngoingResourceRequest::Status() const noexcept
 	{
-		observer->OnCancel();
+		return canceled.load(std::memory_order::relaxed) ? ResourceRequestStatus::Canceled : loadProcess->Status();
+	}
+
+	std::shared_ptr<const void> OngoingResourceRequest::Resource(const std::type_index type) const
+	{
+		if (canceled.load(std::memory_order::relaxed))
+		{
+			throw std::logic_error("Invalid status");
+		}
+
+		return loadProcess->Resource(type);
+	}
+
+	const std::exception_ptr& OngoingResourceRequest::Exception() const
+	{
+		if (canceled.load(std::memory_order::relaxed))
+		{
+			throw std::logic_error("Invalid status");
+		}
+
+		return loadProcess->Exception();
+	}
+
+	void OngoingResourceRequest::Cancel()
+	{
+		if (!canceled.exchange(true, std::memory_order::relaxed))
+		{
+			loadProcess->DecrementCancelCount();
+		}
+	}
+
+	void OngoingResourceRequest::Wait() const noexcept
+	{
+		if (canceled.load(std::memory_order::relaxed))
+		{
+			return;
+		}
+
+		loadProcess->Wait();
+	}
+
+	void OngoingResourceRequest::OnStatusChanged() noexcept
+	{
+		callback(*this);
 	}
 }

@@ -15,7 +15,6 @@ export module PonyEngine.Resource:IResourceRequest;
 
 import std;
 
-import :IResourceRequestResult;
 import :ResourceRequestStatus;
 import :ResourceID;
 
@@ -31,31 +30,36 @@ export namespace PonyEngine::Resource
 		/// @note The function is always valid to call.
 		[[nodiscard("Pure function")]]
 		virtual ResourceID ResourceID() const noexcept = 0;
-		/// @brief Checks whether the resource is of type @p type.
-		/// @param type The resource type to check against.
-		/// @return @a true if the resource is of the specified type; @a false otherwise.
+		/// @brief Checks whether the resource has an interface of type @p type.
+		/// @param type Interface type to check against.
+		/// @return @a True if the resource has an interface of the specified type; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsTypeOf(std::type_index type) const noexcept;
-		/// @brief Checks whether the resource is of types @p types.
-		/// @param types The resource types to check against.
-		/// @return @a true if the resource is of the specified types; @a false otherwise.
+		bool HasInterface(std::type_index type) const noexcept;
+		/// @brief Checks whether the resource has interfaces of types @p types.
+		/// @param types Interface types to check against.
+		/// @return @a True if the resource has an interface of the specified type; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		virtual bool IsTypeOf(std::span<const std::type_index> types) const noexcept = 0;
-		/// @brief Checks whether the resource is of types @p Args.
-		/// @tparam Args The resource types to check against.
-		/// @return @a true if the resource is of the specified types; @a false otherwise.
+		virtual bool HasInterfaces(std::span<const std::type_index> types) const noexcept = 0;
+		/// @brief Checks whether the resource has interfaces of types @p Args.
+		/// @tparam Args Interface types to check against.
+		/// @return @a True if the resource has an interface of the specified type; @a false otherwise.
 		template<typename... Args> [[nodiscard("Pure function")]]
-		bool IsTypeOf() const noexcept;
+		bool HasInterfaces() const noexcept;
 		
 		/// @brief Gets the request status.
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
 		virtual ResourceRequestStatus Status() const noexcept = 0;
-		/// @brief Gets a result of the request.
-		/// @return Request result.
-		/// @not It's valid to call it only if the request status is success.
+		/// @brief Gets a resource.
+		/// @param type Resource type. Must be one of the resource types.
+		/// @return Resource.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<const IResourceRequestResult> Result() const = 0;
+		virtual std::shared_ptr<const void> Resource(std::type_index type) const = 0;
+		/// @brief Gets a resource.
+		/// @tparam T Resource type. Must be one of the resource types.
+		/// @return Resource.
+		template<typename T> [[nodiscard("Pure function")]]
+		std::shared_ptr<const T> Resource() const;
 		/// @brief Gets an exception that occured during the request execution.
 		/// @return Exception.
 		/// @note It's valid to call it only if the request status is failure.
@@ -72,14 +76,20 @@ export namespace PonyEngine::Resource
 
 namespace PonyEngine::Resource
 {
-	bool IResourceRequest::IsTypeOf(const std::type_index type) const noexcept
+	bool IResourceRequest::HasInterface(const std::type_index type) const noexcept
 	{
-		return IsTypeOf(std::span(&type, 1uz));
+		return HasInterfaces(std::span(&type, 1uz));
 	}
 
 	template<typename... Args>
-	bool IResourceRequest::IsTypeOf() const noexcept
+	bool IResourceRequest::HasInterfaces() const noexcept
 	{
-		return IsTypeOf(std::array<std::type_index, sizeof...(Args)>{typeid(Args)...});
+		return HasInterfaces(std::array<std::type_index, sizeof...(Args)>{typeid(Args)...});
+	}
+
+	template<typename T>
+	std::shared_ptr<const T> IResourceRequest::Resource() const
+	{
+		return std::static_pointer_cast<const T>(Resource(typeid(T)));
 	}
 }

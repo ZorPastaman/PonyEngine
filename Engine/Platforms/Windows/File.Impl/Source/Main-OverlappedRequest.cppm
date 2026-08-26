@@ -73,7 +73,7 @@ export namespace PonyEngine::File
 		void SetSuccess(std::size_t byteCount) noexcept;
 		/// @brief Sets the status to failure.
 		/// @param exception Exception that occured during the request execution.
-		void SetFailure(const std::exception_ptr& exception) noexcept;
+		void SetFailure(std::exception_ptr exception) noexcept;
 		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
@@ -172,17 +172,17 @@ namespace PonyEngine::File
 		}, request);
 	}
 
-	void OverlappedRequest::SetFailure(const std::exception_ptr& exception) noexcept
+	void OverlappedRequest::SetFailure(std::exception_ptr exception) noexcept
 	{
 		std::visit(Type::Overload
 		{
 			[&](OverlappedReadRequest& readRequest)
 			{
-				readRequest.SetFailure(exception);
+				readRequest.SetFailure(std::move(exception));
 			},
 			[&](OverlappedWriteRequest& writeRequest)
 			{
-				writeRequest.SetFailure(exception);
+				writeRequest.SetFailure(std::move(exception));
 			}
 		}, request);
 	}

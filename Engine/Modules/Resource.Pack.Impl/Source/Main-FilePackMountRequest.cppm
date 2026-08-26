@@ -25,7 +25,7 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		FilePackMountRequest(std::shared_ptr<File::IFile> manifestFile, std::shared_ptr<File::IFile> dataFile, std::size_t dataFileSize,
+		FilePackMountRequest(enum AccessType accessType, std::shared_ptr<File::IFile> manifestFile, std::shared_ptr<File::IFile> dataFile, std::size_t dataFileSize,
 			std::shared_ptr<Application::IBuffer> manifestBuffer, std::shared_ptr<Application::IBuffer> dataBuffer) noexcept;
 
 		[[nodiscard("Pure function")]]
@@ -44,6 +44,10 @@ export namespace PonyEngine::Resource::Pack
 
 		[[nodiscard("Pure function")]]
 		std::span<const std::byte> ManifestBuffer() const noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const std::byte> DataBuffer() const noexcept;
+		[[nodiscard("Pure function")]]
+		const std::shared_ptr<File::IFile>& DataFile() const noexcept;
 		[[nodiscard("Pure function")]]
 		std::size_t DataFileSize() const noexcept;
 
@@ -65,6 +69,17 @@ export namespace PonyEngine::Resource::Pack
 		const std::exception_ptr& DataException() const noexcept;
 		void DataException(const std::exception_ptr& exception) noexcept;
 
+		[[nodiscard("Pure function")]]
+		enum AccessType AccessType() const noexcept;
+
+		[[nodiscard("Pure function")]]
+		std::span<const CollectionResource> CollectionResources() const noexcept;
+		void CollectionResources(std::span<const CollectionResource> collectionResources);
+
+		[[nodiscard("Pure function")]]
+		std::span<const std::pair<std::size_t, std::size_t>> Ranges() const noexcept;
+		void Ranges(std::span<const std::pair<std::size_t, std::size_t>> ranges);
+
 		void SetSuccess(PackHandle packHandle) noexcept;
 		void SetFailure(const std::exception_ptr& exception) noexcept;
 		void SetCanceled() noexcept;
@@ -79,6 +94,7 @@ export namespace PonyEngine::Resource::Pack
 		std::atomic_bool hasManifestException;
 		std::atomic_bool hasDataException;
 
+		enum AccessType accessType;
 		std::shared_ptr<File::IFile> manifestFile;
 		std::shared_ptr<Application::IBuffer> manifestBuffer;
 		std::shared_ptr<File::IReadRequest> manifestReadRequest;
@@ -89,18 +105,22 @@ export namespace PonyEngine::Resource::Pack
 
 		std::exception_ptr manifestException;
 		std::exception_ptr dataException;
+
+		std::vector<CollectionResource> collectionResources;
+		std::vector<std::pair<std::size_t, std::size_t>> ranges;
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
-	FilePackMountRequest::FilePackMountRequest(std::shared_ptr<File::IFile> manifestFile, std::shared_ptr<File::IFile> dataFile, const std::size_t dataFileSize,
+	FilePackMountRequest::FilePackMountRequest(const enum AccessType accessType, std::shared_ptr<File::IFile> manifestFile, std::shared_ptr<File::IFile> dataFile, const std::size_t dataFileSize,
 		std::shared_ptr<Application::IBuffer> manifestBuffer, std::shared_ptr<Application::IBuffer> dataBuffer) noexcept :
 		status(PackMountRequestStatus::Pending),
 		cancelRequested(false),
 		readRequestCount(1uz + (dataBuffer != nullptr)),
 		hasManifestException(false),
 		hasDataException(false),
+		accessType{accessType},
 		manifestFile(std::move(manifestFile)),
 		manifestBuffer(std::move(manifestBuffer)),
 		dataFile(std::move(dataFile)),
@@ -162,6 +182,16 @@ namespace PonyEngine::Resource::Pack
 		return manifestBuffer->Span();
 	}
 
+	std::span<const std::byte> FilePackMountRequest::DataBuffer() const noexcept
+	{
+		return dataBuffer->Span();
+	}
+
+	const std::shared_ptr<File::IFile>& FilePackMountRequest::DataFile() const noexcept
+	{
+		return dataFile;
+	}
+
 	std::size_t FilePackMountRequest::DataFileSize() const noexcept
 	{
 		return dataFileSize;
@@ -221,6 +251,31 @@ namespace PonyEngine::Resource::Pack
 
 		dataException = exception;
 		hasDataException.store(true, std::memory_order::release);
+	}
+
+	enum AccessType FilePackMountRequest::AccessType() const noexcept
+	{
+		return accessType;
+	}
+
+	std::span<const CollectionResource> FilePackMountRequest::CollectionResources() const noexcept
+	{
+		return collectionResources;
+	}
+
+	void FilePackMountRequest::CollectionResources(const std::span<const CollectionResource> collectionResources)
+	{
+		this->collectionResources.assign_range(collectionResources);
+	}
+
+	std::span<const std::pair<std::size_t, std::size_t>> FilePackMountRequest::Ranges() const noexcept
+	{
+		return ranges;
+	}
+
+	void FilePackMountRequest::Ranges(const std::span<const std::pair<std::size_t, std::size_t>> ranges)
+	{
+		this->ranges.assign_range(ranges);
 	}
 
 	void FilePackMountRequest::SetSuccess(const PackHandle packHandle) noexcept

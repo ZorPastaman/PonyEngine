@@ -23,14 +23,12 @@ import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Resource.Ext;
 
-import :CachedResourceRequest;
 import :CollectionContainer;
+import :CompletedResourceRequest;
 import :LoadableResource;
 import :LoaderContainer;
 import :Resource;
 import :ResourceContainer;
-import :ResourceData;
-import :ResourceInfo;
 import :ResourceLoadProcess;
 import :Utility;
 
@@ -52,10 +50,11 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]] 
 		virtual bool HasResource(ResourceID resourceId) const override;
 		[[nodiscard("Pure function")]] 
-		virtual bool IsResourceTypeOf(ResourceID resourceId, std::span<const std::type_index> types) const override;
+		virtual bool HasInterfaces(ResourceID resourceId, std::span<const std::type_index> types) const override;
 
 		[[nodiscard("Pure function")]] 
-		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId,std::span<const std::type_index> types, IResourceRequestObserver* observer) const override;
+		virtual std::shared_ptr<IResourceRequest> LoadResource(ResourceID resourceId, std::span<const std::type_index> interfaceTypes,
+			std::move_only_function<void(const IResourceRequest&) noexcept> callback) const override;
 
 		[[nodiscard("Must be used to unregister")]] 
 		virtual ResourceCollection RegisterCollection(IResourceProvider& provider, std::span<const CollectionResource> resources,
@@ -110,6 +109,18 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		IResourceLoader* FindLoader(ResourceType type) const noexcept;
 
+		/// @brief Tries to find an ongoing load process.
+		/// @param resource Resource.
+		/// @return Load process or nullptr if not found.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<ResourceLoadProcess> FindLoadProcess(const Resource* resource) const noexcept;
+		/// @brief Adds the load process.
+		/// @param loadProcess Load process to add.
+		void AddLoadProcess(std::shared_ptr<ResourceLoadProcess> loadProcess) const;
+		/// @brief Removes the load process.
+		/// @param loadProcess Load process to remove.
+		void RemoveLoadProcess(const ResourceLoadProcess* loadProcess) const;
+
 		Application::IApplication* application; ///< Application.
 		Log::ILogService* logService; ///< Log service.
 
@@ -120,6 +131,9 @@ export namespace PonyEngine::Resource
 		ResourceContainer resourceContainer; ///< Resource container.
 		LoaderContainer loaderContainer; ///< Loader container.
 		mutable std::shared_mutex stateMutex; ///< State mutex.
+
+		mutable std::unordered_map<const Resource*, std::vector<std::shared_ptr<ResourceLoadProcess>>> loadProcesses; ///< Load process.
+		mutable std::mutex loadProcessMutex; ///< Load process mutex.
 
 		std::unordered_map<ResourceID, std::string> resourceIdToStringMap; ///< Resource ID to resource ID string map.
 		mutable std::shared_mutex resourceIdToStringMapMutex; ///< Resource ID map mutex.
@@ -140,9 +154,6 @@ namespace PonyEngine::Resource
 	{
 		assert(collectionContainer.Size() == 0uz && "Collections weren't removed.");
 		assert(loaderContainer.Size() == 0uz && "Loaders weren't removed.");
-
-		// TODO: Add request count checks
-		// TODO: Add logs
 	}
 
 	bool ResourceService::HasResource(const ResourceID resourceId) const
@@ -156,7 +167,7 @@ namespace PonyEngine::Resource
 		return resourceContainer.Contains(resourceId);
 	}
 
-	bool ResourceService::IsResourceTypeOf(const ResourceID resourceId, const std::span<const std::type_index> types) const
+	bool ResourceService::HasInterfaces(const ResourceID resourceId, const std::span<const std::type_index> types) const
 	{
 		if (!IsResourceIDValid(resourceId)) [[unlikely]]
 		{
@@ -165,16 +176,16 @@ namespace PonyEngine::Resource
 
 		const auto lock = std::shared_lock(stateMutex);
 
-		if (!resourceContainer.Contains(resourceId))
+		if (!resourceContainer.Contains(resourceId)) [[unlikely]]
 		{
 			throw std::invalid_argument("Resource not found");
 		}
 
-		return CheckTypes(types, resourceContainer.GetResource(resourceId)->info->outputTypes);
+		return CheckTypes(types, resourceContainer.GetResource(resourceId)->InterfaceTypes());
 	}
 
-	std::shared_ptr<IResourceRequest> ResourceService::LoadResource(const ResourceID resourceId, const std::span<const std::type_index> types, 
-		IResourceRequestObserver* const observer) const
+	std::shared_ptr<IResourceRequest> ResourceService::LoadResource(const ResourceID resourceId, const std::span<const std::type_index> interfaceTypes,
+		std::move_only_function<void(const IResourceRequest&) noexcept> callback) const
 	{
 		if (!IsResourceIDValid(resourceId)) [[unlikely]]
 		{
@@ -183,50 +194,86 @@ namespace PonyEngine::Resource
 
 		const auto stateLock = std::shared_lock(stateMutex);
 
-		if (!resourceContainer.Contains(resourceId))
+		if (!resourceContainer.Contains(resourceId)) [[unlikely]]
 		{
 			throw std::invalid_argument("Resource not found");
 		}
 
 		const std::shared_ptr<Resource>& resource = resourceContainer.GetResource(resourceId);
-		if (!CheckTypes(types, resourceContainer.GetResource(resourceId)->info->outputTypes))
+		if (!CheckTypes(interfaceTypes, resource->InterfaceTypes())) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid type");
 		}
 
-		const auto resourceLock = std::lock_guard(*resource->mutex);
+		const std::lock_guard<std::mutex> resourceLock = resource->Lock();
 
-		if (std::shared_ptr<const void> mainResource = resource->data->MainResource())
+		if (std::shared_ptr<const void> mainResource = resource->MainResource())
 		{
-			const auto request = std::make_shared<CachedResourceRequest>(resource->info, resource->data, mainResource);
+			const auto request = std::make_shared<CompletedResourceRequest>(resource, std::move(mainResource));
 
-			if (observer)
+			if (callback)
 			{
-				observer->OnSuccess(request->Result());
+				callback(*request);
 			}
 
 			return request;
 		}
 
-		if (const std::shared_ptr<ResourceLoadProcess> loadProcess = resource->loadProcess.lock())
+		if (std::shared_ptr<ResourceLoadProcess> loadProcess = FindLoadProcess(resource.get()))
 		{
 			if (loadProcess->IncrementCancelCount())
 			{
-				return std::make_shared<LoadedResourceRequest>(loadProcess, observer);
+				return std::make_shared<OngoingResourceRequest>(std::move(loadProcess), std::move(callback));
 			}
 		}
 
-		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->info->collection));
-		std::shared_ptr<void> dataAccess = provider.GetResourceData(resource->info->collectionResourceIndex, resource->info->dataAccessType);
+		IResourceProvider& provider = collectionContainer.Provider(collectionContainer.IndexOf(resource->Collection()));
+		std::shared_ptr<void> dataAccess = provider.GetResourceData(resource->CollectionResourceIndex(), resource->DataAccessType());
 		assert(dataAccess && "Data access is nullptr.");
 
-		IResourceLoader* const loader = FindLoader(resource->info->type);
+		IResourceLoader* const loader = FindLoader(resource->Type());
 		assert(loader && "Loader not found.");
 
-		const auto loadProcess = std::make_shared<ResourceLoadProcess>(resource->info, resource->data, resource->mutex, std::move(dataAccess), *loader);
-		resource->loadProcess = loadProcess;
+		auto loadProcess = std::make_shared<ResourceLoadProcess>(resource, dataAccess);
+		AddLoadProcess(loadProcess);
 
-		return std::make_shared<LoadedResourceRequest>(loadProcess, observer);
+		try
+		{
+			loadProcess->SetLoadRequest(loader->Load(*loadProcess, [this, process = loadProcess.get()](const IResourceLoadRequest& request) noexcept
+			{
+				if (process->IncrementCancelCount())
+				{
+					switch (request.Status())
+					{
+					case ResourceLoadRequestStatus::Success:
+						process->SetSuccess(request.MainResource(), request.ResourceInterfaces());
+						break;
+					case ResourceLoadRequestStatus::Failure:
+						process->SetFailure(request.Exception());
+						break;
+					case ResourceLoadRequestStatus::Canceled:
+						process->SetCanceled();
+						break;
+					default: [[unlikely]]
+						assert(false && "Unexpected status.");
+						break;
+					}
+				}
+				else
+				{
+					process->SetCanceled();
+				}
+
+				RemoveLoadProcess(process);
+			}));
+		}
+		catch (...)
+		{
+			RemoveLoadProcess(loadProcess.get());
+			throw;
+		}
+
+		return std::make_shared<OngoingResourceRequest>(std::move(loadProcess), std::move(callback));
 	}
 
 	ResourceCollection ResourceService::RegisterCollection(IResourceProvider& provider,
@@ -276,27 +323,13 @@ namespace PonyEngine::Resource
 				{
 					throw std::logic_error("Loader didn't set data access type");
 				}
-				if (loadableResource.OutputTypes().empty()) [[unlikely]]
+				if (loadableResource.InterfaceTypes().empty()) [[unlikely]]
 				{
 					throw std::logic_error("Loader didn't set output types");
 				}
 
-				const auto resourceInfo = std::make_shared<const ResourceInfo>(ResourceInfo
-				{
-					.id = resource.id,
-					.type = resource.type,
-					.collection = collection.id,
-					.collectionResourceIndex = resource.dataIndex,
-					.dataAccessType = *loadableResource.DataAccessType(),
-					.loadData = std::vector(loadableResource.LoadData().cbegin(), loadableResource.LoadData().cend()),
-					.outputTypes = std::vector(loadableResource.OutputTypes().cbegin(), loadableResource.OutputTypes().cend())
-				});
-				resourceContainer.Add(std::make_shared<Resource>(Resource
-				{
-					.info = resourceInfo,
-					.data = std::make_shared<ResourceData>(resourceInfo->outputTypes.size()),
-					.mutex = std::make_shared<std::mutex>()
-				}));
+				resourceContainer.Add(std::make_shared<Resource>(resource.id, resource.type, collection.id, resource.dataIndex, 
+					*loadableResource.DataAccessType(), std::move(loadableResource.LoadData()), std::move(loadableResource.InterfaceTypes())));
 
 				++addedResourceCount;
 			}
@@ -506,5 +539,45 @@ namespace PonyEngine::Resource
 	{
 		const std::size_t index = loaderContainer.IndexOf(type);
 		return index < loaderContainer.Size() ? &loaderContainer.Loader(index) : nullptr;
+	}
+
+	std::shared_ptr<ResourceLoadProcess> ResourceService::FindLoadProcess(const Resource* const resource) const noexcept
+	{
+		const auto lock = std::lock_guard(loadProcessMutex);
+
+		if (const auto position = loadProcesses.find(resource); position != loadProcesses.cend())
+		{
+			return position->second.back();
+		}
+
+		return nullptr;
+	}
+
+	void ResourceService::AddLoadProcess(std::shared_ptr<ResourceLoadProcess> loadProcess) const
+	{
+		const auto lock = std::lock_guard(loadProcessMutex);
+
+		std::vector<std::shared_ptr<ResourceLoadProcess>>& processes = loadProcesses[loadProcess->Resource()];
+		assert(!std::ranges::contains(processes, loadProcess) && "Load process was already added.");
+		processes.push_back(std::move(loadProcess));
+	}
+
+	void ResourceService::RemoveLoadProcess(const ResourceLoadProcess* const loadProcess) const
+	{
+		const auto lock = std::lock_guard(loadProcessMutex);
+
+		const auto resourcePosition = loadProcesses.find(loadProcess->Resource());
+		assert(resourcePosition != loadProcesses.cend() && "Load process resource not found.");
+		const auto processPosition = std::ranges::find_if(resourcePosition->second, [&](const std::shared_ptr<ResourceLoadProcess>& p) { return p.get() == loadProcess; });
+		assert(processPosition != resourcePosition->second.cend() && "Load process not found.");
+
+		if (resourcePosition->second.size() == 1uz) [[likely]]
+		{
+			loadProcesses.erase(resourcePosition);
+		}
+		else [[unlikely]]
+		{
+			resourcePosition->second.erase(processPosition);
+		}
 	}
 }
