@@ -615,7 +615,7 @@ namespace PonyEngine::Resource::Pack
 		{
 			jobService->Schedule([this, req = &request]() noexcept
 			{
-				if (CheckCancel(req))
+				if (!CheckCancel(req))
 				{
 					return;
 				}
