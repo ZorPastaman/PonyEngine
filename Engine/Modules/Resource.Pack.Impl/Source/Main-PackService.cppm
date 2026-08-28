@@ -249,17 +249,19 @@ namespace PonyEngine::Resource::Pack
 		{
 			jobService->Schedule([this, req = request.get(), src = packData.data()]() noexcept
 			{
+				if (!CheckCancel(req))
+				{
+					return;
+				}
+
+				const std::span<std::byte> data = req->Data();
+				std::memcpy(data.data(), src, data.size());
+
 				if (CheckCancel(req))
 				{
-					const std::span<std::byte> data = req->Data();
-					std::memcpy(data.data(), src, data.size());
-
-					if (CheckCancel(req))
+					if (req->DecrementRequestCount())
 					{
-						if (req->DecrementRequestCount())
-						{
-							CreatePack(*req);
-						}
+						CreatePack(*req);
 					}
 				}
 			});
@@ -364,7 +366,7 @@ namespace PonyEngine::Resource::Pack
 		{
 			jobService->Schedule([this, req = &request]() noexcept
 			{
-				if (CheckCancel(req))
+				if (!CheckCancel(req))
 				{
 					return;
 				}
