@@ -20,7 +20,7 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		FileDataAccess(const std::filesystem::path& path, std::size_t offset, std::size_t size) noexcept;
+		FileDataAccess(std::filesystem::path path, std::size_t offset, std::size_t size) noexcept;
 		[[nodiscard("Pure constructor")]]
 		FileDataAccess(const FileDataAccess& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -47,8 +47,8 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	FileDataAccess::FileDataAccess(const std::filesystem::path& path, const std::size_t offset, const std::size_t size) noexcept :
-		path(path),
+	FileDataAccess::FileDataAccess(std::filesystem::path path, const std::size_t offset, const std::size_t size) noexcept :
+		path(std::move(path)),
 		offset{offset},
 		size{size}
 	{

@@ -29,7 +29,7 @@ export namespace PonyEngine::Log
 		/// @brief Creates a log service.
 		/// @param application Application.
 		[[nodiscard("Pure constuctor")]]
-		LogService(Application::IApplication& application) noexcept;
+		explicit LogService(Application::IApplication& application) noexcept;
 		LogService(const LogService&) = delete;
 		LogService(LogService&&) = delete;
 

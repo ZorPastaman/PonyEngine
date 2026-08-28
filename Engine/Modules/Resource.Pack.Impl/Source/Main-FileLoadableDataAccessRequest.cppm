@@ -29,7 +29,7 @@ export namespace PonyEngine::Resource::Pack
 
 		virtual void Cancel() override;
 
-		void FileRequest(std::shared_ptr<File::IReadRequest>&& fileRequest) noexcept;
+		void FileRequest(std::shared_ptr<File::IReadRequest> fileRequest) noexcept;
 
 		FileLoadableDataAccessRequest& operator =(const FileLoadableDataAccessRequest&) = delete;
 		FileLoadableDataAccessRequest& operator =(FileLoadableDataAccessRequest&&) = delete;
@@ -52,7 +52,7 @@ namespace PonyEngine::Resource::Pack
 		fileRequest->Cancel();
 	}
 
-	void FileLoadableDataAccessRequest::FileRequest(std::shared_ptr<File::IReadRequest>&& fileRequest) noexcept
+	void FileLoadableDataAccessRequest::FileRequest(std::shared_ptr<File::IReadRequest> fileRequest) noexcept
 	{
 		this->fileRequest = std::move(fileRequest);
 	}

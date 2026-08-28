@@ -20,7 +20,7 @@ import PonyEngine.Job;
 import PonyEngine.Math;
 
 import :FileLoadableDataAccessRequest;
-import :MemoryLoadableDataAccessRequest;
+import :LoadableDataAccessRequest;
 
 export namespace PonyEngine::Resource::Pack
 {
@@ -38,8 +38,8 @@ export namespace PonyEngine::Resource::Pack
 		std::shared_ptr<FileLoadableDataAccessRequest> CreateRequest(File::IFile& dataFile, std::size_t fileSize, const LoadParams& params, 
 			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const;
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<MemoryLoadableDataAccessRequest> CreateRequest(const std::shared_ptr<const std::byte[]>& loadedData,
-			std::span<const std::byte> source, const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const;
+		std::shared_ptr<LoadableDataAccessRequest> CreateRequest(std::span<const std::byte> source, const LoadParams& params, 
+			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const;
 
 		LoadableDataAccessRequestWorker& operator =(const LoadableDataAccessRequestWorker&) = delete;
 		LoadableDataAccessRequestWorker& operator =(LoadableDataAccessRequestWorker&&) = delete;
@@ -91,12 +91,12 @@ namespace PonyEngine::Resource::Pack
 		}
 
 #ifndef NDEBUG
-		const auto fileRequest = allocator.new_object<FileLoadableDataAccessRequest>(params, std::move(callback));
+		const auto rawRequest = allocator.new_object<FileLoadableDataAccessRequest>(params, std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
 		std::shared_ptr<FileLoadableDataAccessRequest> request;
 		try
 		{
-			request = std::shared_ptr<FileLoadableDataAccessRequest>(fileRequest, [this](FileLoadableDataAccessRequest* const req)
+			request = std::shared_ptr<FileLoadableDataAccessRequest>(rawRequest, [this](FileLoadableDataAccessRequest* const req)
 			{
 				allocator.delete_object(req);
 				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
@@ -104,12 +104,12 @@ namespace PonyEngine::Resource::Pack
 		}
 		catch (...)
 		{
-			allocator.delete_object(fileRequest);
+			allocator.delete_object(rawRequest);
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
 			throw;
 		}
 #else
-		const auto request = std::allocate_shared<FileLoadableDataAccessRequest>(allocator, params, std::move(callback));
+		auto request = std::allocate_shared<FileLoadableDataAccessRequest>(allocator, params, std::move(callback));
 #endif
 		AddRequest(request);
 
@@ -147,8 +147,8 @@ namespace PonyEngine::Resource::Pack
 		return request;
 	}
 
-	std::shared_ptr<MemoryLoadableDataAccessRequest> LoadableDataAccessRequestWorker::CreateRequest(const std::shared_ptr<const std::byte[]>& loadedData, 
-		std::span<const std::byte> source, const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const
+	std::shared_ptr<LoadableDataAccessRequest> LoadableDataAccessRequestWorker::CreateRequest(const std::span<const std::byte> source, const LoadParams& params,
+		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const
 	{
 		if (Math::SumClamp(params.buffer.size(), params.offset) > source.size()) [[unlikely]]
 		{
@@ -156,12 +156,12 @@ namespace PonyEngine::Resource::Pack
 		}
 
 #ifndef NDEBUG
-		const auto memoryRequest = allocator.new_object<MemoryLoadableDataAccessRequest>(loadedData, params, std::move(callback));
+		const auto memoryRequest = allocator.new_object<LoadableDataAccessRequest>(params, std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		std::shared_ptr<MemoryLoadableDataAccessRequest> request;
+		std::shared_ptr<LoadableDataAccessRequest> request;
 		try
 		{
-			request = std::shared_ptr<MemoryLoadableDataAccessRequest>(memoryRequest, [this](MemoryLoadableDataAccessRequest* const req)
+			request = std::shared_ptr<LoadableDataAccessRequest>(memoryRequest, [this](LoadableDataAccessRequest* const req)
 			{
 				allocator.delete_object(req);
 				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
@@ -174,7 +174,7 @@ namespace PonyEngine::Resource::Pack
 			throw;
 		}
 #else
-		const auto request = std::allocate_shared<MemoryLoadableDataAccessRequest>(allocator, loadedData, params, std::move(callback));
+		auto request = std::allocate_shared<LoadableDataAccessRequest>(allocator, params, std::move(callback));
 #endif
 		AddRequest(request);
 

@@ -20,7 +20,6 @@ target_sources(PonyEngine.Resource.Pack PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IPackUnmountRequest.cppm"
 	"Source/Main-PackHandle.cppm"
 	"Source/Main-PackMountRequestStatus.cppm"
-	"Source/Main-ResourceInfo.cppm"
 )
 
 set_target_properties(PonyEngine.Resource.Pack PROPERTIES

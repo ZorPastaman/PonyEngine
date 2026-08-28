@@ -61,9 +61,9 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]] 
 		virtual std::string_view DeviceName(DeviceHandle deviceHandle) const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual RawInput::DeviceType DeviceType(DeviceHandle deviceHandle) const noexcept override;
+		virtual struct DeviceType DeviceType(DeviceHandle deviceHandle) const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual RawInput::DeviceStyle DeviceStyle(DeviceHandle deviceHandle) const noexcept override;
+		virtual struct DeviceStyle DeviceStyle(DeviceHandle deviceHandle) const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual void* FindFeature(DeviceHandle deviceHandle, std::type_index type) const noexcept override;
 

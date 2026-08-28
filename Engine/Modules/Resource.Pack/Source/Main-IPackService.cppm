@@ -21,7 +21,6 @@ import :AccessType;
 import :IPackMountRequest;
 import :IPackUnmountRequest;
 import :PackHandle;
-import :ResourceInfo;
 
 export namespace PonyEngine::Resource::Pack
 {
@@ -30,23 +29,17 @@ export namespace PonyEngine::Resource::Pack
 	{
 		PONY_INTERFACE_BODY(IPackService)
 
-		[[nodiscard("Pure function")]]
-		virtual std::size_t PackCount() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual PackHandle Pack(std::size_t index) const = 0;
-		[[nodiscard("Pure function")]]
-		virtual bool IsValid(PackHandle packHandle) const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual std::span<const ResourceInfo> Resources(PackHandle packHandle) const = 0;
-
 		/// @brief Mounts a pack.
 		/// @param packPath Path to a pack manifest. If it's relative it's resolved relative to the application root.
 		/// @param accessType Access type.
+		/// @param callback Callback.
 		/// @return Pack mount request.
+		/// @note The request and the callback must be kept alive till the end of the operation.
 		/// @note The function is thread-safe.
-		virtual std::shared_ptr<IPackMountRequest> MountPack(const std::filesystem::path& packPath, enum AccessType accessType = AccessType::Loadable | AccessType::File) = 0;
+		virtual std::shared_ptr<IPackMountRequest> MountPack(std::filesystem::path packPath, enum AccessType accessType = AccessType::Loadable | AccessType::File,
+			std::move_only_function<void(const IPackMountRequest&) noexcept> callback = nullptr) = 0;
 		virtual std::shared_ptr<IPackMountRequest> MountPack(std::span<const std::byte> packManifest, std::span<const std::byte> packData, 
-			enum AccessType accessType = AccessType::Loadable | AccessType::Memory) = 0;
+			enum AccessType accessType = AccessType::Loadable | AccessType::Memory, std::move_only_function<void(const IPackMountRequest&) noexcept> callback = nullptr) = 0;
 		virtual std::shared_ptr<IPackUnmountRequest> UnmountPack(PackHandle packHandle) = 0;
 	};
 }

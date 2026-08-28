@@ -19,7 +19,7 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		MemoryDataAccess(const std::shared_ptr<const std::byte[]>& loadedData, std::size_t offset, std::size_t size) noexcept;
+		MemoryDataAccess(std::shared_ptr<const std::byte[]> loadedData, std::size_t offset, std::size_t size) noexcept;
 		[[nodiscard("Pure constructor")]]
 		MemoryDataAccess(const MemoryDataAccess& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -41,8 +41,8 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	MemoryDataAccess::MemoryDataAccess(const std::shared_ptr<const std::byte[]>& loadedData, const std::size_t offset, const std::size_t size) noexcept :
-		loadedData(loadedData),
+	MemoryDataAccess::MemoryDataAccess(std::shared_ptr<const std::byte[]> loadedData, const std::size_t offset, const std::size_t size) noexcept :
+		loadedData(std::move(loadedData)),
 		buffer(&this->loadedData[offset], size)
 	{
 	}

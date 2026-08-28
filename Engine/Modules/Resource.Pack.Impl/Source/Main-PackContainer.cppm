@@ -39,10 +39,8 @@ export namespace PonyEngine::Resource::Pack
 		ResourceCollection Collection(std::size_t index) const noexcept;
 		[[nodiscard("Pure function")]]
 		class Pack& Pack(std::size_t index) const noexcept;
-		[[nodiscard("Pure function")]]
-		std::span<const ResourceInfo> ResourceInfos(std::size_t index) const noexcept;
 
-		void Add(PackHandle handle, ResourceCollection collection, const std::shared_ptr<class Pack>& pack, std::span<const ResourceInfo> resourceInfos);
+		void Add(PackHandle handle, ResourceCollection collection, std::shared_ptr<class Pack> pack);
 		void Remove(std::size_t index) noexcept;
 		void Clear() noexcept;
 
@@ -53,6 +51,5 @@ export namespace PonyEngine::Resource::Pack
 		std::vector<PackHandle> handles;
 		std::vector<ResourceCollection> collections;
 		std::vector<std::shared_ptr<class Pack>> packs;
-		std::vector<std::vector<ResourceInfo>> resourceInfos;
 	};
 }

@@ -25,8 +25,8 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Pack(LoadableDataAccessRequestWorker& worker, const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile, 
-			const std::shared_ptr<const std::byte[]>& loadedData, std::span<const std::pair<std::size_t, std::size_t>> resourceRanges);
+		Pack(LoadableDataAccessRequestWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile, 
+			std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges);
 		Pack(const Pack&) = delete;
 		Pack(Pack&&) = delete;
 
@@ -51,13 +51,13 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	Pack::Pack(LoadableDataAccessRequestWorker& worker, const std::filesystem::path& packDataPath, const std::shared_ptr<File::IFile>& dataFile,
-		const std::shared_ptr<const std::byte[]>& loadedData, const std::span<const std::pair<std::size_t, std::size_t>> resourceRanges) :
+	Pack::Pack(LoadableDataAccessRequestWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
+		std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges) :
 		worker{&worker},
-		packDataPath(packDataPath),
-		dataFile(dataFile),
-		loadedData(loadedData),
-		resourceRanges(resourceRanges.cbegin(), resourceRanges.cend())
+		packDataPath(std::move(packDataPath)),
+		dataFile(std::move(dataFile)),
+		loadedData(std::move(loadedData)),
+		resourceRanges(std::move(resourceRanges))
 	{
 	}
 

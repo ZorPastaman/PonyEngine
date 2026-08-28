@@ -17,4 +17,3 @@ export import :IPackService;
 export import :IPackUnmountRequest;
 export import :PackHandle;
 export import :PackMountRequestStatus;
-export import :ResourceInfo;
