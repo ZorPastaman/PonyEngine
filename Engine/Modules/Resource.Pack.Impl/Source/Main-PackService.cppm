@@ -270,9 +270,7 @@ namespace PonyEngine::Resource::Pack
 			throw;
 		}
 
-		try
-		{
-		}
+		ParseManifest(*request);
 
 		return request;
 	}
