@@ -174,6 +174,10 @@ namespace PonyEngine::File
 
 	std::shared_ptr<IReadRequest> Worker::MakeRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, const HANDLE file) const
 	{
+		if (!params.buffer.data()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer is nullptr");
+		}
 		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Too great buffer");
@@ -236,6 +240,10 @@ namespace PonyEngine::File
 
 	std::shared_ptr<IWriteRequest> Worker::MakeRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, HANDLE file) const
 	{
+		if (!params.buffer.data()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer is nullptr");
+		}
 		if (params.buffer.size() > std::numeric_limits<DWORD>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Too great buffer");
@@ -351,9 +359,9 @@ namespace PonyEngine::File
 						}
 						catch (...)
 						{
-							const std::exception_ptr exception = std::current_exception();
+							std::exception_ptr exception = std::current_exception();
 							PONY_LOG(logService, Log::LogType::Error, exception);
-							request->SetFailure(exception);
+							request->SetFailure(std::move(exception));
 						}
 					}
 				}

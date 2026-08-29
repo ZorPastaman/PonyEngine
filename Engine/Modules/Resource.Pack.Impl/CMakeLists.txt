@@ -50,6 +50,7 @@ target_sources(PonyEngine.Resource.Pack.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main-PackContainer.cppm"
 	"Source/Main-PackService.cppm"
 	"Source/Main-PackServiceModule.cppm"
+	"Source/Main-PackUnmountRequest.cppm"
   "Source/Main-MemoryLoadableDataAccess.cppm" "Source/Main-FileLoadableDataAccessRequest.cppm"  "Source/Main-FilePackMountRequest.cppm" "Source/Main-PackMountRequest.cppm")
 
 pony_validate_module_order(PONY_ENGINE_RESOURCE_PACK_ORDER)

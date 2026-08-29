@@ -38,6 +38,8 @@ export namespace PonyEngine::Resource::Pack
 		[[nodiscard("Pure function")]]
 		const std::shared_ptr<File::IFile>& ManifestFile() const noexcept;
 		[[nodiscard("Pure function")]]
+		std::span<std::byte> ManifestTarget() const noexcept;
+		[[nodiscard("Pure function")]]
 		const std::shared_ptr<File::IReadRequest>& ManifestReadRequest() const noexcept;
 		void ManifestReadRequest(std::shared_ptr<File::IReadRequest> request) noexcept;
 
@@ -94,6 +96,11 @@ namespace PonyEngine::Resource::Pack
 	const std::shared_ptr<File::IFile>& FilePackMountRequest::ManifestFile() const noexcept
 	{
 		return manifestFile;
+	}
+
+	std::span<std::byte> FilePackMountRequest::ManifestTarget() const noexcept
+	{
+		return std::span<std::byte>(manifestBuffer.get(), ManifestSize());
 	}
 
 	const std::shared_ptr<File::IReadRequest>& FilePackMountRequest::ManifestReadRequest() const noexcept

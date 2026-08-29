@@ -28,7 +28,7 @@ export namespace PonyEngine::Resource::Pack
 		/// @brief Gets the request status.
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
-		virtual PackMountRequestStatus Status() const noexcept = 0;
+		virtual PackRequestStatus Status() const noexcept = 0;
 		/// @brief Gets a pack.
 		/// @return Pack.
 		/// @not It's valid to call it only if the request status is success.

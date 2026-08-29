@@ -31,7 +31,7 @@ export namespace PonyEngine::Resource::Pack
 		virtual ~PackMountRequest() = default;
 
 		[[nodiscard("Pure function")]] 
-		virtual PackMountRequestStatus Status() const noexcept override final;
+		virtual PackRequestStatus Status() const noexcept override final;
 		[[nodiscard("Pure function")]] 
 		virtual PackHandle Pack() const override final;
 		[[nodiscard("Pure function")]] 
@@ -47,6 +47,8 @@ export namespace PonyEngine::Resource::Pack
 		[[nodiscard("Pure function")]]
 		enum AccessType AccessType() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		std::size_t ManifestSize() const noexcept;
 		[[nodiscard("Pure function")]]
 		std::span<const std::byte> Manifest() const noexcept;
 		[[nodiscard("Pure function")]]
@@ -84,7 +86,7 @@ export namespace PonyEngine::Resource::Pack
 		std::span<const std::pair<std::size_t, std::size_t>> Ranges() const noexcept;
 
 		void SetSuccess(PackHandle packHandle) noexcept;
-		void SetFailure(const std::exception_ptr& exception) noexcept;
+		void SetFailure(std::exception_ptr exception) noexcept;
 		void SetCanceled() noexcept;
 
 		PackMountRequest& operator =(const PackMountRequest&) = delete;
@@ -99,7 +101,7 @@ export namespace PonyEngine::Resource::Pack
 
 		PackHandle packHandle;
 		std::exception_ptr exception;
-		std::atomic<PackMountRequestStatus> status;
+		std::atomic<PackRequestStatus> status;
 
 		enum AccessType accessType;
 
@@ -125,7 +127,7 @@ namespace PonyEngine::Resource::Pack
 		manifest(manifest),
 		dataBuffer(std::move(dataBuffer)),
 		dataSize{dataSize},
-		status(PackMountRequestStatus::Pending),
+		status(PackRequestStatus::Pending),
 		accessType{accessType},
 		cancelRequested(false),
 		readRequestCount(1uz + (dataBuffer != nullptr)),
@@ -135,14 +137,14 @@ namespace PonyEngine::Resource::Pack
 	{
 	}
 
-	PackMountRequestStatus PackMountRequest::Status() const noexcept
+	PackRequestStatus PackMountRequest::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
 	}
 
 	PackHandle PackMountRequest::Pack() const
 	{
-		if (status.load(std::memory_order::acquire) != PackMountRequestStatus::Success) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != PackRequestStatus::Success) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -152,7 +154,7 @@ namespace PonyEngine::Resource::Pack
 
 	const std::exception_ptr& PackMountRequest::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != PackMountRequestStatus::Failure) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != PackRequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -167,9 +169,9 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == PackMountRequestStatus::Pending)
+		while (status.load(std::memory_order::acquire) == PackRequestStatus::Pending)
 		{
-			status.wait(PackMountRequestStatus::Pending, std::memory_order::acquire);
+			status.wait(PackRequestStatus::Pending, std::memory_order::acquire);
 		}
 	}
 
@@ -181,6 +183,11 @@ namespace PonyEngine::Resource::Pack
 	enum AccessType PackMountRequest::AccessType() const noexcept
 	{
 		return accessType;
+	}
+
+	std::size_t PackMountRequest::ManifestSize() const noexcept
+	{
+		return manifest.size();
 	}
 
 	std::span<const std::byte> PackMountRequest::Manifest() const noexcept
@@ -272,21 +279,21 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::SetSuccess(const PackHandle packHandle) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == PackMountRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == PackRequestStatus::Pending && "Invalid status.");
 
 		this->packHandle = packHandle;
-		status.store(PackMountRequestStatus::Success, std::memory_order::release);
+		status.store(PackRequestStatus::Success, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
 	}
 
-	void PackMountRequest::SetFailure(const std::exception_ptr& exception) noexcept
+	void PackMountRequest::SetFailure(std::exception_ptr exception) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == PackMountRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == PackRequestStatus::Pending && "Invalid status.");
 
-		this->exception = exception;
-		status.store(PackMountRequestStatus::Failure, std::memory_order::release);
+		this->exception = std::move(exception);
+		status.store(PackRequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -294,9 +301,9 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::SetCanceled() noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == PackMountRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == PackRequestStatus::Pending && "Invalid status.");
 
-		status.store(PackMountRequestStatus::Canceled, std::memory_order::release);
+		status.store(PackRequestStatus::Canceled, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();

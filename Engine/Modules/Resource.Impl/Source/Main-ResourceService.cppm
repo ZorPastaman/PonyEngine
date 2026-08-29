@@ -119,7 +119,7 @@ export namespace PonyEngine::Resource
 		void AddLoadProcess(std::shared_ptr<ResourceLoadProcess> loadProcess) const;
 		/// @brief Removes the load process.
 		/// @param loadProcess Load process to remove.
-		void RemoveLoadProcess(const ResourceLoadProcess* loadProcess) const;
+		void RemoveLoadProcess(const ResourceLoadProcess* loadProcess) const noexcept;
 
 		Application::IApplication* application; ///< Application.
 		Log::ILogService* logService; ///< Log service.
@@ -291,58 +291,65 @@ namespace PonyEngine::Resource
 		const auto lock = std::unique_lock(stateMutex);
 
 		const ResourceCollection collection = CreateCollection();
-		collectionContainer.Add(collection.id, provider, std::move(resourceIds));
-
-		std::size_t addedResourceCount = 0uz;
 		try
 		{
-			for (const CollectionResource& resource : resources)
+			collectionContainer.Add(collection.id, provider, std::move(resourceIds));
+
+			std::size_t addedResourceCount = 0uz;
+			try
 			{
-				if (resourceContainer.Contains(resource.id)) [[unlikely]]
+				for (const CollectionResource& resource : resources)
 				{
-					throw std::invalid_argument(std::format("Resource with the same ID '0x{:X}' is already added", resource.id.value));
-				}
-				if (!IsResourceIDValid(resource.id)) [[unlikely]]
-				{
-					throw std::invalid_argument(std::format("Resource ID is invalid: ID = '0x{:X}'", resource.id.value));
-				}
-				if (!IsResourceTypeValid(resource.type)) [[unlikely]]
-				{
-					throw std::invalid_argument(std::format("Resource type is invalid: Type = '0x{:X}'", resource.type.value));
-				}
+					if (resourceContainer.Contains(resource.id)) [[unlikely]]
+					{
+						throw std::invalid_argument(std::format("Resource with the same ID '0x{:X}' is already added", resource.id.value));
+					}
+					if (!IsResourceIDValid(resource.id)) [[unlikely]]
+					{
+						throw std::invalid_argument(std::format("Resource ID is invalid: ID = '0x{:X}'", resource.id.value));
+					}
+					if (!IsResourceTypeValid(resource.type)) [[unlikely]]
+					{
+						throw std::invalid_argument(std::format("Resource type is invalid: Type = '0x{:X}'", resource.type.value));
+					}
 
-				IResourceLoader* const loader = FindLoader(resource.type);
-				if (!loader) [[unlikely]]
-				{
-					throw std::logic_error(std::format("No resource loader found for type '0x{:X}'", resource.type.value));
-				}
+					IResourceLoader* const loader = FindLoader(resource.type);
+					if (!loader) [[unlikely]]
+					{
+						throw std::logic_error(std::format("No resource loader found for type '0x{:X}'", resource.type.value));
+					}
 
-				auto loadableResource = LoadableResource(resource.type, resource.dataMeta, resource.loadMeta, dataAccessTypes);
-				loader->PrepareResource(loadableResource);
-				if (!loadableResource.DataAccessType()) [[unlikely]]
-				{
-					throw std::logic_error("Loader didn't set data access type");
-				}
-				if (loadableResource.InterfaceTypes().empty()) [[unlikely]]
-				{
-					throw std::logic_error("Loader didn't set output types");
-				}
+					auto loadableResource = LoadableResource(resource.type, resource.dataMeta, resource.loadMeta, dataAccessTypes);
+					loader->PrepareResource(loadableResource);
+					if (!loadableResource.DataAccessType()) [[unlikely]]
+					{
+						throw std::logic_error("Loader didn't set data access type");
+					}
+					if (loadableResource.InterfaceTypes().empty()) [[unlikely]]
+					{
+						throw std::logic_error("Loader didn't set output types");
+					}
 
-				resourceContainer.Add(std::make_shared<Resource>(resource.id, resource.type, collection.id, resource.dataIndex, 
-					*loadableResource.DataAccessType(), std::move(loadableResource.LoadData()), std::move(loadableResource.InterfaceTypes())));
+					resourceContainer.Add(std::make_shared<Resource>(resource.id, resource.type, collection.id, resource.dataIndex,
+						*loadableResource.DataAccessType(), std::move(loadableResource.LoadData()), std::move(loadableResource.InterfaceTypes())));
 
-				++addedResourceCount;
+					++addedResourceCount;
+				}
+			}
+			catch (...)
+			{
+				for (std::size_t i = addedResourceCount; i-- > 0uz; )
+				{
+					resourceContainer.Remove(resources[i].id);
+				}
+				collectionContainer.Remove(collectionContainer.IndexOf(collection.id));
+
+				throw;
 			}
 		}
 		catch (...)
 		{
-			for (std::size_t i = addedResourceCount; i-- > 0uz; )
-			{
-				resourceContainer.Remove(resources[i].id);
-			}
-
-			collectionContainer.Remove(collectionContainer.IndexOf(collection.id));
-
+			KillCollection(collection);
 			throw;
 		}
 
@@ -365,8 +372,9 @@ namespace PonyEngine::Resource
 		{
 			resourceContainer.Remove(resourceId);
 		}
-
 		collectionContainer.Remove(index);
+
+		KillCollection(collection);
 	}
 
 	void ResourceService::RegisterLoader(IResourceLoader& loader, const std::span<const ResourceType> types)
@@ -562,7 +570,7 @@ namespace PonyEngine::Resource
 		processes.push_back(std::move(loadProcess));
 	}
 
-	void ResourceService::RemoveLoadProcess(const ResourceLoadProcess* const loadProcess) const
+	void ResourceService::RemoveLoadProcess(const ResourceLoadProcess* const loadProcess) const noexcept
 	{
 		const auto lock = std::lock_guard(loadProcessMutex);
 

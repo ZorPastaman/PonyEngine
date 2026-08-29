@@ -40,6 +40,6 @@ export namespace PonyEngine::Resource::Pack
 			std::move_only_function<void(const IPackMountRequest&) noexcept> callback = nullptr) = 0;
 		virtual std::shared_ptr<IPackMountRequest> MountPack(std::span<const std::byte> packManifest, std::span<const std::byte> packData, 
 			enum AccessType accessType = AccessType::Loadable | AccessType::Memory, std::move_only_function<void(const IPackMountRequest&) noexcept> callback = nullptr) = 0;
-		virtual std::shared_ptr<IPackUnmountRequest> UnmountPack(PackHandle packHandle) = 0;
+		virtual std::shared_ptr<IPackUnmountRequest> UnmountPack(PackHandle packHandle, std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback = nullptr) = 0;
 	};
 }

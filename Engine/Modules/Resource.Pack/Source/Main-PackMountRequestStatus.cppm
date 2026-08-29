@@ -17,8 +17,8 @@ import std;
 
 export namespace PonyEngine::Resource::Pack
 {
-	/// @brief Pack mount request status.
-	enum class PackMountRequestStatus : std::uint8_t
+	/// @brief Pack request status.
+	enum class PackRequestStatus : std::uint8_t
 	{
 		Pending, ///< A request is still in progress.
 		Success, ///< A request finished with a success.
@@ -29,8 +29,8 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	/// @brief Pack mount request status names.
-	constexpr std::array<std::string_view, 4> PackMountRequestStatusNames
+	/// @brief Pack request status names.
+	constexpr std::array<std::string_view, 4> PackRequestStatusNames
 	{
 		"Pending",
 		"Success",
@@ -41,5 +41,5 @@ namespace PonyEngine::Resource::Pack
 
 export
 {
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Resource::Pack::PackMountRequestStatus, PonyEngine::Resource::Pack::PackMountRequestStatusNames)
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Resource::Pack::PackRequestStatus, PonyEngine::Resource::Pack::PackRequestStatusNames)
 }

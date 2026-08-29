@@ -85,6 +85,10 @@ namespace PonyEngine::Resource::Pack
 	std::shared_ptr<FileLoadableDataAccessRequest> LoadableDataAccessRequestWorker::CreateRequest(File::IFile& dataFile, const std::size_t fileSize, const LoadParams& params,
 		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const
 	{
+		if (!params.buffer.data()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer is nullptr");
+		}
 		if (Math::SumClamp(params.buffer.size(), params.offset) > fileSize) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
@@ -150,6 +154,10 @@ namespace PonyEngine::Resource::Pack
 	std::shared_ptr<LoadableDataAccessRequest> LoadableDataAccessRequestWorker::CreateRequest(const std::span<const std::byte> source, const LoadParams& params,
 		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const
 	{
+		if (!params.buffer.data()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer is nullptr");
+		}
 		if (Math::SumClamp(params.buffer.size(), params.offset) > source.size()) [[unlikely]]
 		{
 			throw std::out_of_range("Out of range");
