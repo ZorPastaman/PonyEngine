@@ -15,13 +15,14 @@ export module PonyEngine.Resource:IResourceRequest;
 
 import std;
 
-import :ResourceRequestStatus;
+import PonyEngine.Async;
+
 import :ResourceID;
 
 export namespace PonyEngine::Resource
 {
 	/// @brief Resource request.
-	class IResourceRequest
+	class IResourceRequest : public Async::IRequest
 	{
 		PONY_INTERFACE_BODY(IResourceRequest)
 
@@ -45,11 +46,7 @@ export namespace PonyEngine::Resource
 		/// @return @a True if the resource has an interface of the specified type; @a false otherwise.
 		template<typename... Args> [[nodiscard("Pure function")]]
 		bool HasInterfaces() const noexcept;
-		
-		/// @brief Gets the request status.
-		/// @return Request status.
-		[[nodiscard("Pure function")]]
-		virtual ResourceRequestStatus Status() const noexcept = 0;
+
 		/// @brief Gets a resource.
 		/// @param type Resource type. Must be one of the resource types.
 		/// @return Resource.
@@ -65,12 +62,6 @@ export namespace PonyEngine::Resource
 		/// @note It's valid to call it only if the request status is failure.
 		[[nodiscard("Pure function")]]
 		virtual const std::exception_ptr& Exception() const = 0;
-
-		/// @brief Cancels the request.
-		virtual void Cancel() = 0;
-
-		/// @brief Makes the thread sleep till the request is completed with success or failure or cancel.
-		virtual void Wait() const noexcept = 0;
 	};
 }
 

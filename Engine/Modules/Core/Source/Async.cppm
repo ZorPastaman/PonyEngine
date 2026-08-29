@@ -7,16 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.File;
+export module PonyEngine.Async;
 
-export import :FileAccess;
-export import :FileFlag;
-export import :FileOpenMode;
-export import :FileParams;
-export import :IFile;
-export import :IFileService;
-export import :IReadRequest;
 export import :IRequest;
-export import :IWriteRequest;
-export import :ReadParams;
-export import :WriteParams;
+export import :RequestStatus;

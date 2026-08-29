@@ -17,12 +17,13 @@ import std;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack data access type.
 	enum class AccessType : std::uint8_t
 	{
 		None = 0,
-		Loadable = 1 << 0,
-		File = 1 << 1,
-		Memory = 1 << 2,
+		Loadable = 1 << 0, ///< A pack data is available via @p ILoadableDataAccess.
+		File = 1 << 1, ///< A pack data is available via @p IFileDataAccess.
+		Memory = 1 << 2, ///< A pack data is available via @p IMemoryDataAccess.
 		All = (1 << 3) - 1
 	};
 
@@ -31,6 +32,7 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack data access type names.
 	constexpr std::array<std::string_view, 3> AccessTypeNames
 	{
 		"Loadable",

@@ -9,6 +9,9 @@ target_include_directories(PonyEngine.Core PUBLIC
 )
 
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+	"Source/Async.cppm"
+	"Source/Async-IRequest.cppm"
+	"Source/Async-RequestStatus.cppm"
 	"Source/Chrono.cppm"
 	"Source/Chrono-Conversion.cppm"
 	"Source/Container.cppm"

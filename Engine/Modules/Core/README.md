@@ -6,6 +6,10 @@ The module requires a compiler specific implementation.
 
 ## C\++ modules
 
+### [PonyEngine.Async](Source/Async.cppm)
+
+Utilities for async operations.
+
 ### [PonyEngine.Chrono](Source/Chrono.cppm)
 
 Utilities for `std::chrono`.

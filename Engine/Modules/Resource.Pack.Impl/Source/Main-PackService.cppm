@@ -18,6 +18,7 @@ export module PonyEngine.Resource.Pack.Impl:PackService;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Async;
 import PonyEngine.File;
 import PonyEngine.Job;
 import PonyEngine.Log;
@@ -191,13 +192,13 @@ namespace PonyEngine::Resource::Pack
 			{
 				switch (readRequest.Status())
 				{
-				case File::FileRequestStatus::Success:
+				case Async::RequestStatus::Success:
 					if (CheckCancel(req))
 					{
 						ParseManifest(*req);
 					}
 					break;
-				case File::FileRequestStatus::Failure:
+				case Async::RequestStatus::Failure:
 					req->ManifestException(readRequest.Exception());
 					if (req->DecrementRequestCount())
 					{
@@ -205,7 +206,7 @@ namespace PonyEngine::Resource::Pack
 						mountRequest->SetFailure(req->ManifestException());
 					}
 					break;
-				case File::FileRequestStatus::Canceled:
+				case Async::RequestStatus::Canceled:
 					if (req->DecrementRequestCount())
 					{
 						const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
@@ -239,7 +240,7 @@ namespace PonyEngine::Resource::Pack
 				{
 					switch (readRequest.Status())
 					{
-					case File::FileRequestStatus::Success:
+					case Async::RequestStatus::Success:
 						if (CheckCancel(req))
 						{
 							if (req->DecrementRequestCount())
@@ -248,7 +249,7 @@ namespace PonyEngine::Resource::Pack
 							}
 						}
 						break;
-					case File::FileRequestStatus::Failure:
+					case Async::RequestStatus::Failure:
 						req->DataException(readRequest.Exception());
 						if (req->DecrementRequestCount())
 						{
@@ -256,7 +257,7 @@ namespace PonyEngine::Resource::Pack
 							mountRequest->SetFailure(req->HasManifestException() ? req->ManifestException() : req->DataException());
 						}
 						break;
-					case File::FileRequestStatus::Canceled:
+					case Async::RequestStatus::Canceled:
 						if (req->DecrementRequestCount())
 						{
 							const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
@@ -308,7 +309,7 @@ namespace PonyEngine::Resource::Pack
 
 		auto dataBuffer = std::make_shared<std::byte[]>(packData.size());
 
-		auto request = std::make_shared<PackMountRequest>(accessType, packManifest, std::move(dataBuffer), packData.size(), std::move(callback));
+		auto request = std::make_shared<PackMountRequest>(accessType, packManifest.data(), packManifest.size(), std::move(dataBuffer), packData.size(), std::move(callback));
 		AddMountRequest(request);
 
 		try

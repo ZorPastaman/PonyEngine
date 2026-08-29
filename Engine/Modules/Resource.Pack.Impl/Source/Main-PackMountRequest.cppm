@@ -15,6 +15,7 @@ export module PonyEngine.Resource.Pack.Impl:PackMountRequest;
 
 import std;
 
+import PonyEngine.Async;
 import PonyEngine.Resource.Pack;
 
 export namespace PonyEngine::Resource::Pack
@@ -23,7 +24,7 @@ export namespace PonyEngine::Resource::Pack
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		PackMountRequest(enum AccessType accessType, std::span<const std::byte> manifest, std::shared_ptr<std::byte[]> dataBuffer, std::size_t dataSize, 
+		PackMountRequest(enum AccessType accessType, const std::byte* manifest, std::size_t manifestSize, std::shared_ptr<std::byte[]> dataBuffer, std::size_t dataSize, 
 			std::move_only_function<void(const IPackMountRequest&) noexcept> callback) noexcept;
 		PackMountRequest(const PackMountRequest&) = delete;
 		PackMountRequest(PackMountRequest&&) = delete;
@@ -31,7 +32,7 @@ export namespace PonyEngine::Resource::Pack
 		virtual ~PackMountRequest() = default;
 
 		[[nodiscard("Pure function")]] 
-		virtual PackRequestStatus Status() const noexcept override final;
+		virtual Async::RequestStatus Status() const noexcept override final;
 		[[nodiscard("Pure function")]] 
 		virtual PackHandle Pack() const override final;
 		[[nodiscard("Pure function")]] 
@@ -95,13 +96,14 @@ export namespace PonyEngine::Resource::Pack
 	private:
 		void InvokeCallback() noexcept;
 
-		std::span<const std::byte> manifest;
+		const std::byte* manifest;
+		std::size_t manifestSize;
 		std::shared_ptr<std::byte[]> dataBuffer;
 		std::size_t dataSize;
 
 		PackHandle packHandle;
 		std::exception_ptr exception;
-		std::atomic<PackRequestStatus> status;
+		std::atomic<Async::RequestStatus> status;
 
 		enum AccessType accessType;
 
@@ -122,12 +124,13 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	PackMountRequest::PackMountRequest(const enum AccessType accessType, const std::span<const std::byte> manifest, std::shared_ptr<std::byte[]> dataBuffer, const std::size_t dataSize,
-		std::move_only_function<void(const IPackMountRequest&) noexcept> callback) noexcept :
-		manifest(manifest),
+	PackMountRequest::PackMountRequest(const enum AccessType accessType, const std::byte* const manifest, const std::size_t manifestSize, 
+		std::shared_ptr<std::byte[]> dataBuffer, const std::size_t dataSize, std::move_only_function<void(const IPackMountRequest&) noexcept> callback) noexcept :
+		manifest{manifest},
+		manifestSize{manifestSize},
 		dataBuffer(std::move(dataBuffer)),
 		dataSize{dataSize},
-		status(PackRequestStatus::Pending),
+		status(Async::RequestStatus::Pending),
 		accessType{accessType},
 		cancelRequested(false),
 		readRequestCount(1uz + (dataBuffer != nullptr)),
@@ -137,14 +140,14 @@ namespace PonyEngine::Resource::Pack
 	{
 	}
 
-	PackRequestStatus PackMountRequest::Status() const noexcept
+	Async::RequestStatus PackMountRequest::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
 	}
 
 	PackHandle PackMountRequest::Pack() const
 	{
-		if (status.load(std::memory_order::acquire) != PackRequestStatus::Success) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Success) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -154,7 +157,7 @@ namespace PonyEngine::Resource::Pack
 
 	const std::exception_ptr& PackMountRequest::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != PackRequestStatus::Failure) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -169,9 +172,9 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == PackRequestStatus::Pending)
+		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
 		{
-			status.wait(PackRequestStatus::Pending, std::memory_order::acquire);
+			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 		}
 	}
 
@@ -187,12 +190,12 @@ namespace PonyEngine::Resource::Pack
 
 	std::size_t PackMountRequest::ManifestSize() const noexcept
 	{
-		return manifest.size();
+		return manifestSize;
 	}
 
 	std::span<const std::byte> PackMountRequest::Manifest() const noexcept
 	{
-		return manifest;
+		return std::span<const std::byte>(manifest, manifestSize);
 	}
 
 	const std::shared_ptr<std::byte[]>& PackMountRequest::DataBuffer() const noexcept
@@ -279,10 +282,10 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::SetSuccess(const PackHandle packHandle) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == PackRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
 		this->packHandle = packHandle;
-		status.store(PackRequestStatus::Success, std::memory_order::release);
+		status.store(Async::RequestStatus::Success, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -290,10 +293,10 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::SetFailure(std::exception_ptr exception) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == PackRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
 		this->exception = std::move(exception);
-		status.store(PackRequestStatus::Failure, std::memory_order::release);
+		status.store(Async::RequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -301,9 +304,9 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::SetCanceled() noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == PackRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
-		status.store(PackRequestStatus::Canceled, std::memory_order::release);
+		status.store(Async::RequestStatus::Canceled, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();

@@ -11,7 +11,6 @@ target_sources(PonyEngine.Resource PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IResourceRequest.cppm"
 	"Source/Main-IResourceService.cppm"
 	"Source/Main-ResourceID.cppm"
-	"Source/Main-ResourceRequestStatus.cppm"
 )
 
 set_target_properties(PonyEngine.Resource PROPERTIES

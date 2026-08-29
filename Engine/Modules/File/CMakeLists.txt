@@ -12,7 +12,6 @@ target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-FileFlag.cppm"
 	"Source/Main-FileOpenMode.cppm"
 	"Source/Main-FileParams.cppm"
-	"Source/Main-FileRequestStatus.cppm"
 	"Source/Main-IFile.cppm"
 	"Source/Main-IFileService.cppm"
 	"Source/Main-IReadRequest.cppm"

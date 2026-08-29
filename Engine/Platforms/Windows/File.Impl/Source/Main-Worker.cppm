@@ -137,10 +137,6 @@ namespace PonyEngine::File
 
 	Worker::~Worker() noexcept
 	{
-#ifndef NDEBUG
-		assert(requestCount.load(std::memory_order::relaxed) == 0uz && "Some file requests are still alive.");
-#endif
-
 		PONY_LOG(logService, Log::LogType::Info, "Closing io work thread...");
 		running.store(false, std::memory_order::relaxed);
 		if (!PostQueuedCompletionStatus(iocp, 0, 0, nullptr)) [[unlikely]]
@@ -156,6 +152,10 @@ namespace PonyEngine::File
 			PONY_LOG(logService, Log::LogType::Error, "Failed to close iocp. Error code: '0x{:X}'.", GetLastError());
 		}
 		PONY_LOG(logService, Log::LogType::Info, "Closing IOCP done.");
+
+#ifndef NDEBUG
+		assert(requestCount.load(std::memory_order::relaxed) == 0uz && "Some file requests are still alive.");
+#endif
 	}
 
 	void Worker::AssociateFile(const HANDLE file) const

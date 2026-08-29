@@ -15,6 +15,7 @@ export module PonyEngine.Resource.Pack.Impl:LoadableDataAccessRequestWorker;
 
 import std;
 
+import PonyEngine.Async;
 import PonyEngine.File;
 import PonyEngine.Job;
 import PonyEngine.Math;
@@ -125,13 +126,13 @@ namespace PonyEngine::Resource::Pack
 				const std::shared_ptr<LoadableDataAccessRequest> finishedRequest = RemoveRequest(req);
 				switch (readRequest.Status())
 				{
-				case File::FileRequestStatus::Success:
+				case Async::RequestStatus::Success:
 					finishedRequest->SetSuccess(readRequest.ByteCount());
 					break;
-				case File::FileRequestStatus::Failure:
+				case Async::RequestStatus::Failure:
 					finishedRequest->SetFailed(readRequest.Exception());
 					break;
-				case File::FileRequestStatus::Canceled:
+				case Async::RequestStatus::Canceled:
 					finishedRequest->SetCanceled();
 					break;
 				default: [[unlikely]]

@@ -22,6 +22,6 @@ set_target_properties(PonyEngine.File.Impl PROPERTIES
 )
 
 target_link_libraries(PonyEngine.File.Impl PRIVATE
-	PonyEngine.File
 	PonyEngine.Core
+	PonyEngine.File
 )

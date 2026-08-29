@@ -15,15 +15,20 @@ export module PonyEngine.Resource.Pack.Impl:LoadableDataAccessRequest;
 
 import std;
 
+import PonyEngine.Async;
 import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Loadable data access request.
 	class LoadableDataAccessRequest : public ILoadableDataAccessRequest
 	{
 	public:
+		/// @brief Creates a loadable data access request.
+		/// @param params Load parameters.
+		/// @param callback Request callback.
 		[[nodiscard("Pure constructor")]]
-		explicit LoadableDataAccessRequest(const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
+		LoadableDataAccessRequest(const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept;
 		LoadableDataAccessRequest(const LoadableDataAccessRequest&) = delete;
 		LoadableDataAccessRequest(LoadableDataAccessRequest&&) = delete;
 
@@ -33,7 +38,7 @@ export namespace PonyEngine::Resource::Pack
 		virtual const LoadParams& Params() const noexcept override final;
 
 		[[nodiscard("Pure function")]]
-		virtual LoadableRequestStatus Status() const noexcept override final;
+		virtual Async::RequestStatus Status() const noexcept override final;
 		[[nodiscard("Pure function")]]
 		virtual std::size_t ByteCount() const override final;
 		[[nodiscard("Pure function")]]
@@ -56,18 +61,18 @@ export namespace PonyEngine::Resource::Pack
 		LoadableDataAccessRequest& operator =(LoadableDataAccessRequest&&) = delete;
 
 	private:
+		/// @brief Invokes a callback if it's set.
 		void InvokeCallback() noexcept;
 
 		const LoadParams params;
 
 		std::size_t byteCount; ///< Transferred byte count.
 		std::exception_ptr exception; ///< Exception that occured during the request execution.
-		std::atomic<LoadableRequestStatus> status;
+		std::atomic<Async::RequestStatus> status; ///< Request status.
 
-		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback;
+		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback; ///< Callback.
 
-		static_assert(std::atomic<LoadableRequestStatus>::is_always_lock_free, "LoadableRequestStatus isn't lock-free.");
-		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free.");
+		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
 	};
 }
 
@@ -76,7 +81,7 @@ namespace PonyEngine::Resource::Pack
 	LoadableDataAccessRequest::LoadableDataAccessRequest(const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) noexcept :
 		params(params),
 		byteCount{0uz},
-		status(LoadableRequestStatus::Pending),
+		status(Async::RequestStatus::Pending),
 		callback(std::move(callback))
 	{
 	}
@@ -86,14 +91,14 @@ namespace PonyEngine::Resource::Pack
 		return params;
 	}
 
-	LoadableRequestStatus LoadableDataAccessRequest::Status() const noexcept
+	Async::RequestStatus LoadableDataAccessRequest::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
 	}
 
 	std::size_t LoadableDataAccessRequest::ByteCount() const
 	{
-		if (status.load(std::memory_order::acquire) != LoadableRequestStatus::Success) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Success) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -103,7 +108,7 @@ namespace PonyEngine::Resource::Pack
 
 	const std::exception_ptr& LoadableDataAccessRequest::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != LoadableRequestStatus::Failure) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -117,18 +122,18 @@ namespace PonyEngine::Resource::Pack
 
 	void LoadableDataAccessRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == LoadableRequestStatus::Pending)
+		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
 		{
-			status.wait(LoadableRequestStatus::Pending, std::memory_order::acquire);
+			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 		}
 	}
 
 	void LoadableDataAccessRequest::SetSuccess(const std::size_t byteCount) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == LoadableRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
 		this->byteCount = byteCount;
-		status.store(LoadableRequestStatus::Success, std::memory_order::release);
+		status.store(Async::RequestStatus::Success, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -136,10 +141,10 @@ namespace PonyEngine::Resource::Pack
 
 	void LoadableDataAccessRequest::SetFailed(std::exception_ptr exception) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == LoadableRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
 		this->exception = std::move(exception);
-		status.store(LoadableRequestStatus::Failure, std::memory_order::release);
+		status.store(Async::RequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -147,8 +152,8 @@ namespace PonyEngine::Resource::Pack
 
 	void LoadableDataAccessRequest::SetCanceled() noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == LoadableRequestStatus::Pending && "Invalid status.");
-		status.store(LoadableRequestStatus::Canceled, std::memory_order::release);
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
+		status.store(Async::RequestStatus::Canceled, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();

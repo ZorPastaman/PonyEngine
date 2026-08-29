@@ -15,6 +15,7 @@ export module PonyEngine.File.Impl:ReadRequest;
 
 import std;
 
+import PonyEngine.Async;
 import PonyEngine.File;
 
 import :Request;
@@ -39,7 +40,7 @@ export namespace PonyEngine::File
 		virtual const ReadParams& Params() const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual FileRequestStatus Status() const noexcept override;
+		virtual Async::RequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t ByteCount() const override;
 		[[nodiscard("Pure function")]] 
@@ -83,7 +84,7 @@ namespace PonyEngine::File
 		return params;
 	}
 
-	FileRequestStatus ReadRequest::Status() const noexcept
+	Async::RequestStatus ReadRequest::Status() const noexcept
 	{
 		return request.Status();
 	}

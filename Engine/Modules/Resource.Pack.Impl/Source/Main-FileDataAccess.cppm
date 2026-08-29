@@ -16,9 +16,14 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief File data access.
 	class FileDataAccess final : public IFileDataAccess
 	{
 	public:
+		/// @brief Creates a file data access.
+		/// @param path File path.
+		/// @param offset Data offset.
+		/// @param size Data size.
 		[[nodiscard("Pure constructor")]]
 		FileDataAccess(std::filesystem::path path, std::size_t offset, std::size_t size) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -39,9 +44,9 @@ export namespace PonyEngine::Resource::Pack
 		FileDataAccess& operator =(FileDataAccess&& other) noexcept = default;
 
 	private:
-		std::filesystem::path path;
-		std::size_t offset;
-		std::size_t size;
+		std::filesystem::path path; ///< File path.
+		std::size_t offset; ///< Data offset.
+		std::size_t size; ///< Data size.
 	};
 }
 

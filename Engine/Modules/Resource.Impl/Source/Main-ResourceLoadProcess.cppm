@@ -15,6 +15,7 @@ export module PonyEngine.Resource.Impl:ResourceLoadProcess;
 
 import std;
 
+import PonyEngine.Async;
 import PonyEngine.Resource.Ext;
 
 import :Resource;
@@ -74,7 +75,7 @@ export namespace PonyEngine::Resource
 		/// @brief Gets the status.
 		/// @return Status.
 		[[nodiscard("Pure function")]]
-		ResourceRequestStatus Status() const noexcept;
+		Async::RequestStatus Status() const noexcept;
 		/// @brief Gets a resource interface.
 		/// @param type Resource interface type. Must be one of the resource interfaces.
 		/// @return Resource interface.
@@ -132,7 +133,7 @@ export namespace PonyEngine::Resource
 
 		std::shared_ptr<const void> mainResource; ///< Main resource.
 		std::exception_ptr exception; ///< Exception.
-		std::atomic<ResourceRequestStatus> status; ///< Status.
+		std::atomic<Async::RequestStatus> status; ///< Status.
 		std::atomic_size_t cancelCount; ///< Cancel count.
 		
 		std::shared_ptr<IResourceLoadRequest> loadRequest; ///< Load request.
@@ -141,7 +142,7 @@ export namespace PonyEngine::Resource
 		bool finished; ///< Were the @p requests called?
 		std::mutex requestMutex; ///< Request callback mutex.
 
-		static_assert(std::atomic<ResourceRequestStatus>::is_always_lock_free, "Resource request status isn't lock-free.");
+		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
 		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 
@@ -165,7 +166,7 @@ export namespace PonyEngine::Resource
 		virtual bool HasInterfaces(std::span<const std::type_index> types) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual ResourceRequestStatus Status() const noexcept override;
+		virtual Async::RequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<const void> Resource(std::type_index type) const override;
 		[[nodiscard("Pure function")]] 
@@ -196,7 +197,7 @@ namespace PonyEngine::Resource
 	ResourceLoadProcess::ResourceLoadProcess(std::shared_ptr<class Resource> resource, std::shared_ptr<void> resourceDataAccess) :
 		resource(std::move(resource)),
 		resourceDataAccess(std::move(resourceDataAccess)),
-		status(ResourceRequestStatus::Pending),
+		status(Async::RequestStatus::Pending),
 		cancelCount(1uz),
 		finished{false}
 	{
@@ -254,14 +255,14 @@ namespace PonyEngine::Resource
 		return CheckTypes(types, resource->InterfaceTypes());
 	}
 
-	ResourceRequestStatus ResourceLoadProcess::Status() const noexcept
+	Async::RequestStatus ResourceLoadProcess::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
 	}
 
 	std::shared_ptr<const void> ResourceLoadProcess::Resource(const std::type_index type) const
 	{
-		if (status.load(std::memory_order::acquire) != ResourceRequestStatus::Success)
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Success)
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -271,7 +272,7 @@ namespace PonyEngine::Resource
 
 	const std::exception_ptr& ResourceLoadProcess::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != ResourceRequestStatus::Failure)
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure)
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -299,9 +300,9 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == ResourceRequestStatus::Pending)
+		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
 		{
-			status.wait(ResourceRequestStatus::Pending, std::memory_order::acquire);
+			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 		}
 	}
 
@@ -334,7 +335,7 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::SetSuccess(std::shared_ptr<const void> mainResource, const std::span<const void* const> resourceInterfaces) noexcept
 	{
-		assert(status.load(std::memory_order::relaxed) == ResourceRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 		assert(mainResource && "Main resource is nullptr.");
 
 		this->mainResource = std::move(mainResource);
@@ -343,7 +344,7 @@ namespace PonyEngine::Resource
 			resource->SetResourceData(this->mainResource, resourceInterfaces);
 		}
 
-		status.store(ResourceRequestStatus::Success, std::memory_order::release);
+		status.store(Async::RequestStatus::Success, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -351,11 +352,11 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::SetFailure(std::exception_ptr exception)
 	{
-		assert(status.load(std::memory_order::relaxed) == ResourceRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
 		this->exception = std::move(exception);
 
-		status.store(ResourceRequestStatus::Failure, std::memory_order::release);
+		status.store(Async::RequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -363,9 +364,9 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::SetCanceled()
 	{
-		assert(status.load(std::memory_order::relaxed) == ResourceRequestStatus::Pending && "Invalid status.");
+		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
-		status.store(ResourceRequestStatus::Canceled, std::memory_order::release);
+		status.store(Async::RequestStatus::Canceled, std::memory_order::release);
 		status.notify_all();
 
 		InvokeCallback();
@@ -415,9 +416,9 @@ namespace PonyEngine::Resource
 		return loadProcess->HasInterfaces(types);
 	}
 
-	ResourceRequestStatus OngoingResourceRequest::Status() const noexcept
+	Async::RequestStatus OngoingResourceRequest::Status() const noexcept
 	{
-		return canceled.load(std::memory_order::relaxed) ? ResourceRequestStatus::Canceled : loadProcess->Status();
+		return canceled.load(std::memory_order::relaxed) ? Async::RequestStatus::Canceled : loadProcess->Status();
 	}
 
 	std::shared_ptr<const void> OngoingResourceRequest::Resource(const std::type_index type) const

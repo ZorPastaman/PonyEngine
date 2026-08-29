@@ -10,23 +10,15 @@
 module;
 
 #include "PonyEngine/Object/Body.h"
-#include "PonyEngine/Type/Enum.h"
 
 export module PonyEngine.Resource.Ext:ILoadableDataAccess;
 
 import std;
 
+import PonyEngine.Async;
+
 export namespace PonyEngine::Resource
 {
-	/// @brief Request status.
-	enum class LoadableRequestStatus : std::uint8_t
-	{
-		Pending, ///< A request is still in progress.
-		Success, ///< A request finished with a success.
-		Failure, ///< A request finished with a failure.
-		Canceled ///< A request was canceled.
-	};
-
 	/// @brief Load parameters.
 	struct LoadParams final
 	{
@@ -35,7 +27,7 @@ export namespace PonyEngine::Resource
 	};
 
 	/// @brief Loadable data access request.
-	class ILoadableDataAccessRequest
+	class ILoadableDataAccessRequest : public Async::IRequest
 	{
 		PONY_INTERFACE_BODY(ILoadableDataAccessRequest)
 
@@ -44,10 +36,6 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]]
 		virtual const LoadParams& Params() const noexcept = 0;
 
-		/// @brief Gets the request status.
-		/// @return Request status.
-		[[nodiscard("Pure function")]]
-		virtual LoadableRequestStatus Status() const noexcept = 0;
 		/// @brief Gets how many bytes were transferred.
 		/// @return Transferred byte count.
 		/// @note It's valid to call it only if the request status is success.
@@ -58,14 +46,6 @@ export namespace PonyEngine::Resource
 		/// @note It's valid to call it only if the request status is failure.
 		[[nodiscard("Pure function")]]
 		virtual const std::exception_ptr& Exception() const = 0;
-
-		/// @brief Cancels the request.
-		/// @note The cancel is not immediate, it may take some time to cancel the operation.
-		///       And because of it, the request may complete event if you requested a cancel.
-		virtual void Cancel() = 0;
-
-		/// @brief Makes the thread sleep till the request is completed with success or failure or cancel.
-		virtual void Wait() const noexcept = 0;
 	};
 
 	/// @brief Loadable data access.
@@ -87,21 +67,4 @@ export namespace PonyEngine::Resource
 		virtual std::shared_ptr<ILoadableDataAccessRequest> Load(const LoadParams& params, 
 			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback = nullptr) = 0;
 	};
-}
-
-namespace PonyEngine::Resource
-{
-	/// @brief Request status names.
-	constexpr std::array<std::string_view, 4> LoadableRequestStatusNames
-	{
-		"Pending",
-		"Success",
-		"Failure",
-		"Canceled"
-	};
-}
-
-export
-{
-	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Resource::LoadableRequestStatus, PonyEngine::Resource::LoadableRequestStatusNames)
 }

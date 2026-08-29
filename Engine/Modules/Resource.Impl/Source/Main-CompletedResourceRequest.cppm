@@ -15,6 +15,7 @@ export module PonyEngine.Resource.Impl:CompletedResourceRequest;
 
 import std;
 
+import PonyEngine.Async;
 import PonyEngine.Resource.Ext;
 
 import :Resource;
@@ -42,7 +43,7 @@ export namespace PonyEngine::Resource
 		virtual bool HasInterfaces(std::span<const std::type_index> types) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual ResourceRequestStatus Status() const noexcept override;
+		virtual Async::RequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<const void> Resource(std::type_index type) const override;
 		[[nodiscard("Pure function")]] 
@@ -81,9 +82,9 @@ namespace PonyEngine::Resource
 		return CheckTypes(types, resource->InterfaceTypes());
 	}
 
-	ResourceRequestStatus CompletedResourceRequest::Status() const noexcept
+	Async::RequestStatus CompletedResourceRequest::Status() const noexcept
 	{
-		return ResourceRequestStatus::Success;
+		return Async::RequestStatus::Success;
 	}
 
 	std::shared_ptr<const void> CompletedResourceRequest::Resource(const std::type_index type) const

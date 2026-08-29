@@ -15,20 +15,17 @@ export module PonyEngine.Resource.Pack:IPackMountRequest;
 
 import std;
 
+import PonyEngine.Async;
+
 import :PackHandle;
-import :PackMountRequestStatus;
 
 export namespace PonyEngine::Resource::Pack
 {
 	/// @brief Pack mount request.
-	class IPackMountRequest
+	class IPackMountRequest : public Async::IRequest
 	{
 		PONY_INTERFACE_BODY(IPackMountRequest)
 
-		/// @brief Gets the request status.
-		/// @return Request status.
-		[[nodiscard("Pure function")]]
-		virtual PackRequestStatus Status() const noexcept = 0;
 		/// @brief Gets a pack.
 		/// @return Pack.
 		/// @not It's valid to call it only if the request status is success.
@@ -39,12 +36,5 @@ export namespace PonyEngine::Resource::Pack
 		/// @note It's valid to call it only if the request status is failure.
 		[[nodiscard("Pure function")]]
 		virtual const std::exception_ptr& Exception() const = 0;
-
-		/// @brief Cancels the request.
-		/// @remark The request may be completed even if the cancel was requested.
-		virtual void Cancel() = 0;
-
-		/// @brief Makes the thread sleep till the request is completed with success or failure or cancel.
-		virtual void Wait() const noexcept = 0;
 	};
 }

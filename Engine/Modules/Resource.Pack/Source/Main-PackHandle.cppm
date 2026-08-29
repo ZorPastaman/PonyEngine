@@ -13,13 +13,14 @@ import std;
 
 export namespace PonyEngine::Resource::Pack
 {
-	using PackID = std::uint32_t;
-	using PackVersion = std::uint32_t;
+	using PackID = std::uint32_t; ///< Pack handle ID type.
+	using PackVersion = std::uint32_t; ///< Pack handle version type.
 
+	/// @brief Pack handle.
 	struct PackHandle final
 	{
-		PackID id = std::numeric_limits<PackID>::max();
-		PackVersion version = std::numeric_limits<PackVersion>::min();
+		PackID id = std::numeric_limits<PackID>::max(); ///< Pack handle ID.
+		PackVersion version = std::numeric_limits<PackVersion>::min(); ///< Pack handle version.
 
 		[[nodiscard("Pure operator")]]
 		constexpr auto operator <=>(const PackHandle& other) const noexcept = default;

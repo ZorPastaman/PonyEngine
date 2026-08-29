@@ -16,7 +16,6 @@ export module PonyEngine.Resource.Pack.Impl:FileLoadableDataAccess;
 import std;
 
 import PonyEngine.File;
-import PonyEngine.Math;
 import PonyEngine.Resource.Ext;
 
 import :LoadableDataAccessRequest;
@@ -24,9 +23,15 @@ import :LoadableDataAccessRequestWorker;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief File loadable data access.
 	class FileLoadableDataAccess final : public ILoadableDataAccess
 	{
 	public:
+		/// @brief Creates a file loadable data access.
+		/// @param worker Loadable data access request worker.
+		/// @param dataFile Data file.
+		/// @param offset Data offset.
+		/// @param size Data size.
 		[[nodiscard("Pure constructor")]]
 		FileLoadableDataAccess(LoadableDataAccessRequestWorker& worker, std::shared_ptr<File::IFile> dataFile, std::size_t offset, std::size_t size) noexcept;
 		FileLoadableDataAccess(const FileLoadableDataAccess&) = delete;
@@ -45,11 +50,11 @@ export namespace PonyEngine::Resource::Pack
 		FileLoadableDataAccess& operator =(FileLoadableDataAccess&&) = delete;
 
 	private:
-		LoadableDataAccessRequestWorker* worker;
+		LoadableDataAccessRequestWorker* worker; ///< Loadable data access request worker.
 
-		std::shared_ptr<File::IFile> dataFile;
-		std::size_t offset;
-		std::size_t size;
+		std::shared_ptr<File::IFile> dataFile; ///< Data file.
+		std::size_t offset; ///< Data offset.
+		std::size_t size; ///< Data size.
 	};
 }
 
@@ -62,7 +67,6 @@ namespace PonyEngine::Resource::Pack
 		offset{offset},
 		size{size}
 	{
-		assert(this->worker && "Worker is nullptr.");
 		assert(this->dataFile && "Data file is nullptr.");
 	}
 
