@@ -17,7 +17,6 @@ if(NOT TARGET PonyEngine.Resource.Ext)
 endif()
 
 set(PONY_ENGINE_RESOURCE_ORDER "p" CACHE STRING "PonyEngine.Resource.Impl module initialization order. Its first character must be in range [b-y].")
-set(PONY_ENGINE_RESOURCE_TICK_ORDER "0" CACHE STRING "PonyEngine.Resource.Impl service tick order. It must be an int32 number.")
 
 add_library(PonyEngine.Resource.Impl STATIC)
 
@@ -33,28 +32,21 @@ target_sources(PonyEngine.Resource.Impl PRIVATE
 )
 target_sources(PonyEngine.Resource.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
-	
 	"Source/Main-CollectionContainer.cppm"
+	"Source/Main-CompletedResourceRequest.cppm"
 	"Source/Main-LoadableResource.cppm"
 	"Source/Main-LoaderContainer.cppm"
 	"Source/Main-Resource.cppm"
 	"Source/Main-ResourceContainer.cppm"
-	
-	
-	
-	
+	"Source/Main-ResourceLoadProcess.cppm"
 	"Source/Main-ResourceService.cppm"
 	"Source/Main-ResourceServiceModule.cppm"
 	"Source/Main-Utility.cppm"
- "Source/Main-CompletedResourceRequest.cppm" "Source/Main-ResourceLoadProcess.cppm")
+)
 
 pony_validate_module_order(PONY_ENGINE_RESOURCE_ORDER)
-pony_validate_tick_order(PONY_ENGINE_RESOURCE_TICK_ORDER)
 target_compile_definitions(PonyEngine.Resource.Impl PUBLIC
 	PONY_ENGINE_RESOURCE_ORDER=${PONY_ENGINE_RESOURCE_ORDER}
-)
-target_compile_definitions(PonyEngine.Resource.Impl PRIVATE
-	PONY_ENGINE_RESOURCE_TICK_ORDER=${PONY_ENGINE_RESOURCE_TICK_ORDER}
 )
 
 set_target_properties(PonyEngine.Resource.Impl PROPERTIES

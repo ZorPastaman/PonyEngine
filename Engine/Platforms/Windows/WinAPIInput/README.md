@@ -10,8 +10,6 @@ Platform independent module: [PonyEngine.WinAPIInput](../../../Modules/WinAPIInp
 
 ### [PonyEngine.WinAPIInput](Source/Main.cppm)
 
-Main interfaces:
-
 #### [IRawInputObserver](Source/Main-IRawInputObserver.cppm)
 
 WinAPI raw input observer.

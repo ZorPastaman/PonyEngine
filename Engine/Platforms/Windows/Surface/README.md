@@ -6,8 +6,6 @@ Platform independent module: [PonyEngine.Surface](../../../Modules/Surface).
 
 ### [PonyEngine.Surface.Windows](Source/Main.cppm)
 
-Main interfaces:
-
 #### [ISurfaceService](Source/Main-ISurfaceService.cppm)
 
 Windows specific surface service public interface, inherits the platform independent interface.

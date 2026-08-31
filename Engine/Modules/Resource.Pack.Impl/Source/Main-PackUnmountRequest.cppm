@@ -20,9 +20,13 @@ import PonyEngine.Resource.Pack;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack unmount request.
 	class PackUnmountRequest final : public IPackUnmountRequest
 	{
 	public:
+		/// @brief Creates a pack unmount request.
+		/// @param packHandle Pack handle.
+		/// @param callback Callback.
 		[[nodiscard("Pure constructor")]]
 		PackUnmountRequest(PackHandle packHandle, std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback) noexcept;
 		PackUnmountRequest(const PackUnmountRequest&) = delete;
@@ -42,27 +46,34 @@ export namespace PonyEngine::Resource::Pack
 
 		virtual void Wait() const noexcept override;
 
+		/// @brief Checks if the cancel is requested.
+		/// @return Is cancel requested?
 		[[nodiscard("Pure function")]]
 		bool IsCancelRequested() const noexcept;
 
+		/// @brief Sets the status to success.
 		void SetSuccess() noexcept;
+		/// @brief Sets the status to failure.
+		/// @param exception Exception.
 		void SetFailure(std::exception_ptr exception) noexcept;
+		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
 		PackUnmountRequest& operator =(const PackUnmountRequest&) = delete;
 		PackUnmountRequest& operator =(PackUnmountRequest&&) = delete;
 
 	private:
+		/// @brief Invokes a callback if it's not nullptr.
 		void InvokeCallback() noexcept;
 
-		PackHandle packHandle;
+		PackHandle packHandle; ///< Pack handle.
 
-		std::exception_ptr exception;
-		std::atomic<Async::RequestStatus> status;
+		std::exception_ptr exception; ///< Exception.
+		std::atomic<Async::RequestStatus> status; ///< Status.
 
-		std::atomic_bool isCancelRequested;
+		std::atomic_bool isCancelRequested; ///< Is cancel requested?
 
-		std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback;
+		std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback; ///< Callback.
 
 		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
 		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free.");

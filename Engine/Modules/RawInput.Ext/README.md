@@ -13,8 +13,6 @@ The raw input service doesn't know about specific devices, it's just a middle se
 
 ### [PonyEngine.RawInput.Ext](Source/Main.cppm)
 
-Main interfaces:
-
 #### [IDeviceController](Source/Main-IDeviceController.cppm)
 
 Interface that receives requests about its devices.

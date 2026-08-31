@@ -26,11 +26,9 @@ import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Resource.Pack;
 
-import :FileDataAccess;
-import :FileLoadableDataAccess;
+import :DataAccessWorker;
 import :FilePackMountRequest;
 import :LoadableDataAccessRequestWorker;
-import :MemoryDataAccess;
 import :PackContainer;
 import :PackMountRequest;
 import :PackUnmountRequest;
@@ -60,71 +58,144 @@ export namespace PonyEngine::Resource::Pack
 		PackService& operator =(PackService&&) = delete;
 
 	private:
-		static constexpr std::string_view PackManifestExtension = ".prpm";
-		static constexpr std::string_view PackDataExtension = ".prpd";
-		static constexpr std::string_view MagicWord = "PonyEngineRPM";
+		static constexpr std::string_view PackManifestExtension = ".prpm"; ///< Pack manifest file extension.
+		static constexpr std::string_view PackDataExtension = ".prpd"; ///< Pack data file extension.
+		static constexpr std::string_view MagicWord = "PonyEngineRPM"; ///< Pack manifest magic word.
 
+		/// @brief Manifest resource.
 		struct ManifestResource final
 		{
-			std::size_t typeIndex;
-			std::size_t dataMetaIndex;
-			std::size_t loadMetaIndex;
-			std::size_t rangeIndex;
+			std::size_t typeIndex; ///< Resource type index.
+			std::size_t dataMetaIndex; ///< Resource data meta index.
+			std::size_t loadMetaIndex; ////< Resouce load meta index.
+			std::size_t rangeIndex; ///< Resource data range index.
 		};
 
+		/// @brief Checks if the @p packHandle is valid.
+		/// @param packHandle Pack handle to check.
+		/// @return @a True if it's valid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsValid(PackHandle packHandle) const noexcept;
+		/// @brief Creates a pack handle.
+		/// @return Pack handle.
 		[[nodiscard("Must be used")]]
 		PackHandle CreatePackHandle();
+		/// @brief Makes a new pack handle.
+		/// @return Pack handle.
 		[[nodiscard("Must be used")]]
 		PackHandle MakePackHandle();
+		/// @brief Resurrects a pack handle.
+		/// @return Pack handle.
 		[[nodiscard("Must be used")]]
 		PackHandle ResurrectPackHandle() noexcept;
+		/// @brief Kills the pack handle.
+		/// @param packHandle Pack handle to kill.
 		void KillPackHandle(PackHandle packHandle) noexcept;
 
+		/// @brief Adds the mount request.
+		/// @param request Mount request to add.
 		void AddMountRequest(const std::shared_ptr<PackMountRequest>& request);
+		/// @brief Removes the mount request.
+		/// @param request Mount request to remove.
+		/// @return Removed mounted request.
 		std::shared_ptr<PackMountRequest> RemoveMountRequest(PackMountRequest* request) noexcept;
+
+		/// @brief Checks if the request is canceled and process canceling if needed.
+		/// @param request Request to check.
+		/// @return @a True if the request isn't canceled and the caller may proceed its operations; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool CheckCancel(PackMountRequest* request);
 
+		/// @brief Adds a manifest parse task.
+		/// @param request Mount request that has a manifest to parse.
 		void ParseManifest(PackMountRequest& request) noexcept;
+		/// @brief Validates that the manifest has enough data.
+		/// @param manifest Current manifest pointer.
+		/// @param manifestEnd Manifest end pointer.
+		/// @param requiredSize Required size.
 		static void ValidateManifestSize(const std::byte* manifest, const std::byte* manifestEnd, std::size_t requiredSize);
+		/// @brief Checks the manifest data. Moves the pointer if the check passes.
+		/// @tparam T Data type.
+		/// @param manifest Manifest pointer.
+		/// @param data Data to check.
+		/// @param error Error message in case of a failure.
 		template<typename T>
 		static void CheckManifestData(const std::byte*& manifest, std::span<const T> data, std::string_view error);
+		/// @brief Moves the manifest pointer.
+		/// @param manifest Current manifest pointer.
+		/// @param count How many bytes to skip.
+		/// @return Previous pointer.
 		static const std::byte* MoveManifestData(const std::byte*& manifest, std::size_t count) noexcept;
+		/// @brief Reads the manifest data and moves the pointer.
+		/// @tparam T Manifest data type.
+		/// @param manifest Manifest.
+		/// @return Manifest data.
 		template<typename T>
 		static T ReadManifestData(const std::byte*& manifest) noexcept;
+		/// @brief Reads the manifest data as a span and moves the pointer.
+		/// @tparam T Manifest data type.
+		/// @param manifest Manifest.
+		/// @param count Manifest data count.
+		/// @return Manifest data span.
 		template<typename T>
 		static std::span<const T> ReadManifestSpan(const std::byte*& manifest, std::size_t count) noexcept requires (sizeof(T) == 1);
+		/// @brief Reads the manifest data as a string and moves the pointer.
+		/// @param manifest Manifest.
+		/// @param count Manifest data count.
+		/// @return Manifest data string.
 		[[nodiscard("Pure function")]]
 		static std::string_view ReadManifestString(const std::byte*& manifest, std::size_t count) noexcept;
+		/// @brief Sums the data.
+		/// @tparam T Data type.
+		/// @param data Data.
+		/// @param count Data count.
+		/// @return Sum.
 		template<std::unsigned_integral T> [[nodiscard("Pure function")]]
 		static std::size_t SumManifestData(const std::byte* data, std::size_t count) noexcept;
 
+		/// @brief Adds a pack creation task.
+		/// @param request Mount task.
 		void CreatePack(PackMountRequest& request) noexcept;
 
+		/// @brief Adds the unmount request.
+		/// @param request Unmount request to add.
 		void AddUnmountRequest(const std::shared_ptr<PackUnmountRequest>& request);
+		/// @brief Removes the unmount request.
+		/// @param request Unmount request to remove.
+		/// @return Removed request.
 		std::shared_ptr<PackUnmountRequest> RemoveUnmountRequest(PackUnmountRequest* request) noexcept;
 
-		Application::IApplication* application;
-		const Log::ILogService* logService;
-		IResourceHub* resourceHub;
-		File::IFileService* fileService;
-		Job::IJobService* jobService;
+		/// @brief Increment the ongoing request count.
+		void IncrementOngoingRequestCount() const noexcept;
+		/// @brief Decrement the ongoing request count.
+		void DecrementOngoingRequestCount() const noexcept;
+		/// @brief Wait till the ongoing request count reaches 0.
+		void WaitForOngoingRequestCountToFinish() const noexcept;
 
-		LoadableDataAccessRequestWorker loadableDataAccessRequestWorker;
+		Application::IApplication* application; ///< Application.
+		const Log::ILogService* logService; ///< Log service.
+		IResourceHub* resourceHub; ///< Resource hub.
+		File::IFileService* fileService; ///< File service.
+		Job::IJobService* jobService; ///< Job service.
 
-		PackContainer packContainer;
-		std::vector<PackVersion> packVersions;
-		std::vector<PackID> deadPackIds;
+		LoadableDataAccessRequestWorker loadableDataAccessRequestWorker; ///< Loadable data access request worker.
+		DataAccessWorker dataAccessWorker; ///< Data access worker.
 
-		mutable std::shared_mutex stateMutex;
+		PackContainer packContainer; ///< Pack container.
+		std::vector<PackVersion> packVersions; ///< Pack versions.
+		std::vector<PackID> deadPackIds; ///< Dead pack IDs.
 
-		std::unordered_map<PackMountRequest*, std::shared_ptr<PackMountRequest>> mountRequests;
-		std::mutex mountRequestMutex;
+		mutable std::shared_mutex stateMutex; ///< Service state mutex.
 
-		std::unordered_map<PackUnmountRequest*, std::shared_ptr<PackUnmountRequest>> unmountRequests;
-		std::mutex unmountRequestMutex;
+		std::unordered_map<PackMountRequest*, std::shared_ptr<PackMountRequest>> mountRequests; ///< Mount requests.
+		std::mutex mountRequestMutex; ///< Mount request mutex.
+
+		std::unordered_map<PackUnmountRequest*, std::shared_ptr<PackUnmountRequest>> unmountRequests; ///< Unmount requests.
+		std::mutex unmountRequestMutex; ///< Unmount request mutex.
+
+		mutable std::atomic_size_t ongoingRequestCount; ///< Ongoing request count.
+
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 }
 
@@ -136,12 +207,16 @@ namespace PonyEngine::Resource::Pack
 		resourceHub{&this->application->GetInterface<IResourceHub>()},
 		fileService{&this->application->GetInterface<File::IFileService>()},
 		jobService{&this->application->GetInterface<Job::IJobService>()},
-		loadableDataAccessRequestWorker(this->application->GetInterface<Job::IJobService>())
+		loadableDataAccessRequestWorker(this->application->GetInterface<Job::IJobService>()),
+		dataAccessWorker(loadableDataAccessRequestWorker),
+		ongoingRequestCount(0uz)
 	{
 	}
 
 	PackService::~PackService() noexcept
 	{
+		WaitForOngoingRequestCountToFinish();
+
 		for (std::size_t i = packContainer.Size(); i-- > 0uz; )
 		{
 			try
@@ -154,8 +229,6 @@ namespace PonyEngine::Resource::Pack
 					packContainer.Handle(i), packContainer.Collection(i).id);
 			}
 		}
-
-		packContainer.Clear();
 	}
 
 	std::shared_ptr<IPackMountRequest> PackService::MountPack(std::filesystem::path packPath, const AccessType accessType, 
@@ -185,6 +258,7 @@ namespace PonyEngine::Resource::Pack
 		auto request = std::make_shared<FilePackMountRequest>(std::move(manifest), std::move(data), accessType, 
 			std::move(manifestBuffer), manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
 		AddMountRequest(request);
+		IncrementOngoingRequestCount();
 
 		try
 		{
@@ -202,14 +276,16 @@ namespace PonyEngine::Resource::Pack
 					req->ManifestException(readRequest.Exception());
 					if (req->DecrementRequestCount())
 					{
-						const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 						mountRequest->SetFailure(req->ManifestException());
+						mountRequest.reset();
+						DecrementOngoingRequestCount();
 					}
 					break;
 				case Async::RequestStatus::Canceled:
 					if (req->DecrementRequestCount())
 					{
-						const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 						if (mountRequest->HasDataException())
 						{
 							mountRequest->SetFailure(req->DataException());
@@ -218,6 +294,8 @@ namespace PonyEngine::Resource::Pack
 						{
 							mountRequest->SetCanceled();
 						}
+						mountRequest.reset();
+						DecrementOngoingRequestCount();
 					}
 					break;
 				default: [[unlikely]]
@@ -229,6 +307,7 @@ namespace PonyEngine::Resource::Pack
 		catch (...)
 		{
 			RemoveMountRequest(request.get());
+			DecrementOngoingRequestCount();
 			throw;
 		}
 
@@ -253,14 +332,16 @@ namespace PonyEngine::Resource::Pack
 						req->DataException(readRequest.Exception());
 						if (req->DecrementRequestCount())
 						{
-							const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+							std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 							mountRequest->SetFailure(req->HasManifestException() ? req->ManifestException() : req->DataException());
+							mountRequest.reset();
+							DecrementOngoingRequestCount();
 						}
 						break;
 					case Async::RequestStatus::Canceled:
 						if (req->DecrementRequestCount())
 						{
-							const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+							std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 							if (mountRequest->HasManifestException())
 							{
 								mountRequest->SetFailure(mountRequest->ManifestException());
@@ -269,6 +350,8 @@ namespace PonyEngine::Resource::Pack
 							{
 								mountRequest->SetCanceled();
 							}
+							mountRequest.reset();
+							DecrementOngoingRequestCount();
 						}
 						break;
 					default: [[unlikely]]
@@ -282,8 +365,10 @@ namespace PonyEngine::Resource::Pack
 				request->DataException(std::current_exception());
 				if (request->DecrementRequestCount())
 				{
-					const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(request.get());
+					std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(request.get());
 					mountRequest->SetFailure(request->HasManifestException() ? request->ManifestException() : request->DataException());
+					mountRequest.reset();
+					DecrementOngoingRequestCount();
 				}
 			}
 		}
@@ -311,6 +396,7 @@ namespace PonyEngine::Resource::Pack
 
 		auto request = std::make_shared<PackMountRequest>(accessType, packManifest.data(), packManifest.size(), std::move(dataBuffer), packData.size(), std::move(callback));
 		AddMountRequest(request);
+		IncrementOngoingRequestCount();
 
 		try
 		{
@@ -336,6 +422,7 @@ namespace PonyEngine::Resource::Pack
 		catch (...)
 		{
 			RemoveMountRequest(request.get());
+			DecrementOngoingRequestCount();
 			throw;
 		}
 
@@ -469,8 +556,10 @@ namespace PonyEngine::Resource::Pack
 		{
 			if (request->DecrementRequestCount())
 			{
-				const std::shared_ptr<PackMountRequest> req = RemoveMountRequest(request);
+				std::shared_ptr<PackMountRequest> req = RemoveMountRequest(request);
 				req->SetCanceled();
+				req.reset();
+				DecrementOngoingRequestCount();
 			}
 
 			return false;
@@ -619,8 +708,10 @@ namespace PonyEngine::Resource::Pack
 					req->ManifestException(std::current_exception());
 					if (req->DecrementRequestCount())
 					{
-						const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 						mountRequest->SetFailure(req->ManifestException());
+						mountRequest.reset();
+						DecrementOngoingRequestCount();
 					}
 				}
 
@@ -638,8 +729,10 @@ namespace PonyEngine::Resource::Pack
 			request.ManifestException(std::current_exception());
 			if (request.DecrementRequestCount())
 			{
-				const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(&request);
+				std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(&request);
 				mountRequest->SetFailure(request.ManifestException());
+				mountRequest.reset();
+				DecrementOngoingRequestCount();
 			}
 		}
 	}
@@ -754,7 +847,7 @@ namespace PonyEngine::Resource::Pack
 						? req->DataBuffer() 
 						: nullptr;
 
-					auto pack = std::make_shared<class Pack>(loadableDataAccessRequestWorker, std::move(dataFilePath), std::move(dataFile),
+					auto pack = std::make_shared<class Pack>(dataAccessWorker, std::move(dataFilePath), std::move(dataFile),
 						std::move(loadedData), std::move(req->Ranges()));
 
 					std::vector<std::type_index> accessTypes;
@@ -789,8 +882,10 @@ namespace PonyEngine::Resource::Pack
 							throw;
 						}
 
-						const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 						mountRequest->SetSuccess(packHandle);
+						mountRequest.reset();
+						DecrementOngoingRequestCount();
 					}
 					catch (...)
 					{
@@ -801,16 +896,20 @@ namespace PonyEngine::Resource::Pack
 				catch (...)
 				{
 					req->ManifestException(std::current_exception());
-					const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+					std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 					mountRequest->SetFailure(req->ManifestException());
+					mountRequest.reset();
+					DecrementOngoingRequestCount();
 				}
 			});
 		}
 		catch (...)
 		{
 			request.ManifestException(std::current_exception());
-			const std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(&request);
+			std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(&request);
 			mountRequest->SetFailure(request.ManifestException());
+			mountRequest.reset();
+			DecrementOngoingRequestCount();
 		}
 	}
 
@@ -832,5 +931,26 @@ namespace PonyEngine::Resource::Pack
 		unmountRequests.erase(position);
 
 		return req;
+	}
+
+	void PackService::IncrementOngoingRequestCount() const noexcept
+	{
+		ongoingRequestCount.fetch_add(1uz, std::memory_order::release);
+	}
+
+	void PackService::DecrementOngoingRequestCount() const noexcept
+	{
+		ongoingRequestCount.fetch_sub(1uz, std::memory_order::release);
+		ongoingRequestCount.notify_one();
+	}
+
+	void PackService::WaitForOngoingRequestCountToFinish() const noexcept
+	{
+		for (std::size_t requestCount = ongoingRequestCount.load(std::memory_order::acquire);
+			requestCount > 0uz;
+			requestCount = ongoingRequestCount.load(std::memory_order::acquire))
+		{
+			ongoingRequestCount.wait(requestCount, std::memory_order::acquire);
+		}
 	}
 }

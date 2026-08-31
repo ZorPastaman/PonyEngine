@@ -18,6 +18,7 @@ export module PonyEngine.Resource.Impl:ResourceService;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Async;
 import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.Math;
@@ -121,6 +122,13 @@ export namespace PonyEngine::Resource
 		/// @param loadProcess Load process to remove.
 		void RemoveLoadProcess(const ResourceLoadProcess* loadProcess) const noexcept;
 
+		/// @brief Increment the load process count.
+		void IncrementLoadProcessCount() const noexcept;
+		/// @brief Decrement the load process count.
+		void DecrementLoadProcessCount() const noexcept;
+		/// @brief Wait till the load process count reaches 0.
+		void WaitForLoadProcessesToFinish() const noexcept;
+
 		Application::IApplication* application; ///< Application.
 		Log::ILogService* logService; ///< Log service.
 
@@ -134,11 +142,14 @@ export namespace PonyEngine::Resource
 
 		mutable std::unordered_map<const Resource*, std::vector<std::shared_ptr<ResourceLoadProcess>>> loadProcesses; ///< Load process.
 		mutable std::mutex loadProcessMutex; ///< Load process mutex.
+		mutable std::atomic_size_t loadProcessCount; ///< Load process count.
 
 		std::unordered_map<ResourceID, std::string> resourceIdToStringMap; ///< Resource ID to resource ID string map.
 		mutable std::shared_mutex resourceIdToStringMapMutex; ///< Resource ID map mutex.
 		std::unordered_map<ResourceType, std::string> resourceTypeToStringMap; ///< Resource type to resource type string map.
 		mutable std::shared_mutex resourceTypeToStringMapMutex; ///< Resource type map mutex.
+
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 }
 
@@ -146,12 +157,15 @@ namespace PonyEngine::Resource
 {
 	ResourceService::ResourceService(Application::IApplication& application) :
 		application{&application},
-		logService{this->application->FindInterface<Log::ILogService>()}
+		logService{this->application->FindInterface<Log::ILogService>()},
+		loadProcessCount(0uz)
 	{
 	}
 
 	ResourceService::~ResourceService() noexcept
 	{
+		WaitForLoadProcessesToFinish();
+
 		assert(collectionContainer.Size() == 0uz && "Collections weren't removed.");
 		assert(loaderContainer.Size() == 0uz && "Loaders weren't removed.");
 	}
@@ -234,7 +248,23 @@ namespace PonyEngine::Resource
 		IResourceLoader* const loader = FindLoader(resource->Type());
 		assert(loader && "Loader not found.");
 
-		auto loadProcess = std::make_shared<ResourceLoadProcess>(resource, dataAccess);
+		const auto rawLoadProcess = new ResourceLoadProcess(resource, dataAccess);
+		IncrementLoadProcessCount();
+		std::shared_ptr<ResourceLoadProcess> loadProcess;
+		try
+		{
+			loadProcess = std::shared_ptr<ResourceLoadProcess>(rawLoadProcess, [this](const ResourceLoadProcess* const process) noexcept
+			{
+				delete process;
+				DecrementLoadProcessCount();
+			});
+		}
+		catch (...)
+		{
+			delete rawLoadProcess;
+			DecrementLoadProcessCount();
+			throw;
+		}
 		AddLoadProcess(loadProcess);
 
 		try
@@ -245,13 +275,13 @@ namespace PonyEngine::Resource
 				{
 					switch (request.Status())
 					{
-					case ResourceLoadRequestStatus::Success:
+					case Async::RequestStatus::Success:
 						process->SetSuccess(request.MainResource(), request.ResourceInterfaces());
 						break;
-					case ResourceLoadRequestStatus::Failure:
+					case Async::RequestStatus::Failure:
 						process->SetFailure(request.Exception());
 						break;
-					case ResourceLoadRequestStatus::Canceled:
+					case Async::RequestStatus::Canceled:
 						process->SetCanceled();
 						break;
 					default: [[unlikely]]
@@ -586,6 +616,27 @@ namespace PonyEngine::Resource
 		else [[unlikely]]
 		{
 			resourcePosition->second.erase(processPosition);
+		}
+	}
+
+	void ResourceService::IncrementLoadProcessCount() const noexcept
+	{
+		loadProcessCount.fetch_add(1uz, std::memory_order::release);
+	}
+
+	void ResourceService::DecrementLoadProcessCount() const noexcept
+	{
+		loadProcessCount.fetch_sub(1uz, std::memory_order::release);
+		loadProcessCount.notify_one();
+	}
+
+	void ResourceService::WaitForLoadProcessesToFinish() const noexcept
+	{
+		for (std::size_t requestCount = loadProcessCount.load(std::memory_order::acquire);
+			requestCount > 0uz;
+			requestCount = loadProcessCount.load(std::memory_order::acquire))
+		{
+			loadProcessCount.wait(requestCount, std::memory_order::acquire);
 		}
 	}
 }

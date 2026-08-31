@@ -15,9 +15,14 @@ import PonyEngine.Resource.Ext;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Memory data access.
 	class MemoryDataAccess final : public IMemoryDataAccess
 	{
 	public:
+		/// @brief Creates a memory data access.
+		/// @param loadedData Pack data.
+		/// @param offset Data offset.
+		/// @param size Data size.
 		[[nodiscard("Pure constructor")]]
 		MemoryDataAccess(std::shared_ptr<const std::byte[]> loadedData, std::size_t offset, std::size_t size) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -34,8 +39,8 @@ export namespace PonyEngine::Resource::Pack
 		MemoryDataAccess& operator =(MemoryDataAccess&& other) noexcept = default;
 
 	private:
-		std::shared_ptr<const std::byte[]> loadedData;
-		std::span<const std::byte> buffer;
+		std::shared_ptr<const std::byte[]> loadedData; ///< Pack data.
+		std::span<const std::byte> buffer; ///< Pack segment.
 	};
 }
 

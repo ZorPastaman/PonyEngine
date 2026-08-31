@@ -71,6 +71,13 @@ export namespace PonyEngine::File
 		/// @return Ongoing request.
 		std::shared_ptr<OverlappedRequest> RemoveOngoingRequest(const OVERLAPPED* overlapped) const noexcept;
 
+		/// @brief Increment the ongoing request count.
+		void IncrementOngoingRequestCount() const noexcept;
+		/// @brief Decrement the ongoing request count.
+		void DecrementOngoingRequestCount() const noexcept;
+		/// @brief Wait till the ongoing request count reaches 0.
+		void WaitForOngoingRequestCountToFinish() const noexcept;
+
 		/// @brief Work function.
 		void Work() const noexcept;
 
@@ -83,6 +90,7 @@ export namespace PonyEngine::File
 
 		mutable std::unordered_map<const OVERLAPPED*, std::shared_ptr<OverlappedRequest>> ongoingRequests; ///< Ongoing requests.
 		mutable std::mutex ongoingRequestMutex; ///< Ongoing request mutex.
+		mutable std::atomic_size_t ongoingRequestCount; ///< Ongoing request count.
 
 		std::thread thread; ///< Worker thread.
 		std::atomic_bool running; ///< Should the worker run?
@@ -104,6 +112,7 @@ namespace PonyEngine::File
 #endif
 		logService{application.FindInterface<Log::ILogService>()},
 		requestAllocator(&requestPool),
+		ongoingRequestCount(0uz),
 		running(true)
 	{
 		PONY_LOG(logService, Log::LogType::Info, "Creating IOCP...");
@@ -137,6 +146,12 @@ namespace PonyEngine::File
 
 	Worker::~Worker() noexcept
 	{
+		WaitForOngoingRequestCountToFinish();
+
+#ifndef NDEBUG
+		assert(requestCount.load(std::memory_order::relaxed) == 0uz && "Some file requests are still alive.");
+#endif
+
 		PONY_LOG(logService, Log::LogType::Info, "Closing io work thread...");
 		running.store(false, std::memory_order::relaxed);
 		if (!PostQueuedCompletionStatus(iocp, 0, 0, nullptr)) [[unlikely]]
@@ -152,10 +167,6 @@ namespace PonyEngine::File
 			PONY_LOG(logService, Log::LogType::Error, "Failed to close iocp. Error code: '0x{:X}'.", GetLastError());
 		}
 		PONY_LOG(logService, Log::LogType::Info, "Closing IOCP done.");
-
-#ifndef NDEBUG
-		assert(requestCount.load(std::memory_order::relaxed) == 0uz && "Some file requests are still alive.");
-#endif
 	}
 
 	void Worker::AssociateFile(const HANDLE file) const
@@ -204,6 +215,7 @@ namespace PonyEngine::File
 #else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
 #endif
+		IncrementOngoingRequestCount();
 		AddOngoingRequest(request);
 
 		try
@@ -215,6 +227,7 @@ namespace PonyEngine::File
 				{
 					RemoveOngoingRequest(&request->Overlapped());
 					request->SetSuccess(static_cast<std::size_t>(bytesTransferred));
+					DecrementOngoingRequestCount();
 				}
 				else [[unlikely]]
 				{
@@ -232,6 +245,7 @@ namespace PonyEngine::File
 		catch (...)
 		{
 			RemoveOngoingRequest(&request->Overlapped());
+			DecrementOngoingRequestCount();
 			throw;
 		}
 
@@ -270,6 +284,7 @@ namespace PonyEngine::File
 #else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
 #endif
+		IncrementOngoingRequestCount();
 		AddOngoingRequest(request);
 
 		try
@@ -281,6 +296,7 @@ namespace PonyEngine::File
 				{
 					RemoveOngoingRequest(&request->Overlapped());
 					request->SetSuccess(static_cast<std::size_t>(bytesTransferred));
+					DecrementOngoingRequestCount();
 				}
 				else [[unlikely]]
 				{
@@ -298,6 +314,7 @@ namespace PonyEngine::File
 		catch (...)
 		{
 			RemoveOngoingRequest(&request->Overlapped());
+			DecrementOngoingRequestCount();
 			throw;
 		}
 
@@ -322,6 +339,27 @@ namespace PonyEngine::File
 		ongoingRequests.erase(position);
 		
 		return request;
+	}
+
+	void Worker::IncrementOngoingRequestCount() const noexcept
+	{
+		ongoingRequestCount.fetch_add(1uz, std::memory_order::release);
+	}
+
+	void Worker::DecrementOngoingRequestCount() const noexcept
+	{
+		ongoingRequestCount.fetch_sub(1uz, std::memory_order::release);
+		ongoingRequestCount.notify_one();
+	}
+
+	void Worker::WaitForOngoingRequestCountToFinish() const noexcept
+	{
+		for (std::size_t requestCount = ongoingRequestCount.load(std::memory_order::acquire);
+			requestCount > 0uz;
+			requestCount = ongoingRequestCount.load(std::memory_order::acquire))
+		{
+			ongoingRequestCount.wait(requestCount, std::memory_order::acquire);
+		}
 	}
 
 	void Worker::Work() const noexcept
@@ -355,12 +393,11 @@ namespace PonyEngine::File
 					{
 						try
 						{
-							throw std::runtime_error(std::format("Failed to get queued io completion status: Error code = '0x{:X}'", error));
+							throw std::runtime_error(std::format("Failed to do file async operation: Error code = '0x{:X}'", error));
 						}
 						catch (...)
 						{
 							std::exception_ptr exception = std::current_exception();
-							PONY_LOG(logService, Log::LogType::Error, exception);
 							request->SetFailure(std::move(exception));
 						}
 					}
@@ -369,6 +406,11 @@ namespace PonyEngine::File
 				{
 					PONY_LOG(logService, Log::LogType::Error, "Failed to get queued io completion status. Error code: '0x{:X}'.", error);
 				}
+			}
+
+			if (overlapped) [[likely]]
+			{
+				DecrementOngoingRequestCount();
 			}
 		}
 	}

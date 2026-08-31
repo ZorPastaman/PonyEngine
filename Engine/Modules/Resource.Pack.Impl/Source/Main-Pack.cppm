@@ -14,6 +14,7 @@ import std;
 import PonyEngine.File;
 import PonyEngine.Resource.Pack;
 
+import :DataAccessWorker;
 import :FileDataAccess;
 import :FileLoadableDataAccess;
 import :MemoryDataAccess;
@@ -21,12 +22,19 @@ import :MemoryLoadableDataAccess;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack.
 	class Pack final : public IResourceProvider
 	{
 	public:
+		/// @brief Creates a pack.
+		/// @param worker Data access worker.
+		/// @param packDataPath Pack data path. If set to a non-empty value, the pack will provide @p IFileDataAccess.
+		/// @param dataFile Data file. If set, the pack will provide @p ILoadableDataAccess.
+		/// @param loadedData Loaded pack data. If set, the pack will provide @p ILoadableDataAccess and @p IMemoryDataAccess. It has a priority over the file loadable access.
+		/// @param resourceRanges Resource ranges. Must be valid.
 		[[nodiscard("Pure constructor")]]
-		Pack(LoadableDataAccessRequestWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile, 
-			std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges);
+		Pack(DataAccessWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
+			std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges) noexcept;
 		Pack(const Pack&) = delete;
 		Pack(Pack&&) = delete;
 
@@ -39,20 +47,20 @@ export namespace PonyEngine::Resource::Pack
 		Pack& operator =(Pack&&) = delete;
 
 	private:
-		LoadableDataAccessRequestWorker* worker;
+		DataAccessWorker* worker; ///< Data access worker.
 
-		std::filesystem::path packDataPath;
-		std::shared_ptr<File::IFile> dataFile;
-		std::shared_ptr<const std::byte[]> loadedData;
+		std::filesystem::path packDataPath; ///< Pack data path.
+		std::shared_ptr<File::IFile> dataFile; ///< Pack data file.
+		std::shared_ptr<const std::byte[]> loadedData; ///< Pack loaded data.
 
-		std::vector<std::pair<std::size_t, std::size_t>> resourceRanges;
+		std::vector<std::pair<std::size_t, std::size_t>> resourceRanges; ///< Resource ranges.
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
-	Pack::Pack(LoadableDataAccessRequestWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
-		std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges) :
+	Pack::Pack(DataAccessWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
+		std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges) noexcept :
 		worker{&worker},
 		packDataPath(std::move(packDataPath)),
 		dataFile(std::move(dataFile)),
@@ -67,27 +75,27 @@ namespace PonyEngine::Resource::Pack
 
 		if (accessType == typeid(ILoadableDataAccess))
 		{
-			if (loadedData) [[likely]]
+			if (loadedData)
 			{
-				return std::make_shared<MemoryLoadableDataAccess>(*worker, loadedData, offset, size);
+				return worker->CreateMemoryLoadableDataAccess(loadedData, offset, size);
 			}
 			if (dataFile) [[likely]]
 			{
-				return std::make_shared<FileLoadableDataAccess>(*worker, dataFile, offset, size);
+				return worker->CreateFileLoadableDataAccess(dataFile, offset, size);
 			}
 		}
 		else if (accessType == typeid(IFileDataAccess))
 		{
 			if (!packDataPath.empty()) [[likely]]
 			{
-				return std::make_shared<FileDataAccess>(packDataPath, offset, size);
+				return worker->CreateFileDataAccess(packDataPath, offset, size);
 			}
 		}
 		else if (accessType == typeid(IMemoryDataAccess))
 		{
 			if (loadedData) [[likely]]
 			{
-				return std::make_shared<MemoryDataAccess>(loadedData, offset, size);
+				return worker->CreateMemoryDataAccess(loadedData, offset, size);
 			}
 		}
 

@@ -14,8 +14,6 @@ The render device service doesn't have a support for any backend by default. The
 
 ### [PonyEngine.RenderDevice.Ext](Source/Main.cppm)
 
-Main interfaces:
-
 #### [IBackend](Source/Main-IBackend.cppm)
 
 Backend interface. Each backend must implement it.

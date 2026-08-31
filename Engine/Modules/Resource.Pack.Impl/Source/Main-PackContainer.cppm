@@ -17,6 +17,7 @@ import :Pack;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack container.
 	class PackContainer final
 	{
 	public:
@@ -27,21 +28,42 @@ export namespace PonyEngine::Resource::Pack
 
 		~PackContainer() noexcept = default;
 
+		/// @brief Gets the size.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
+		/// @brief Tries to find an index of the @p handle.
+		/// @param handle Pack handle.
+		/// @return Pack handle index or @p Size() if not found.
 		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(PackID handle) const noexcept;
 
+		/// @brief Gets a pack handle.
+		/// @param index Pack index.
+		/// @return Pack handle.
 		[[nodiscard("Pure function")]]
 		PackID Handle(std::size_t index) const noexcept;
+		/// @brief Gets a pack resource collection.
+		/// @param index Pack index.
+		/// @return Pack resource collection.
 		[[nodiscard("Pure function")]]
 		ResourceCollection Collection(std::size_t index) const noexcept;
+		/// @brief Gets a pack.
+		/// @param index Pack index.
+		/// @return Pack.
 		[[nodiscard("Pure function")]]
 		class Pack& Pack(std::size_t index) const noexcept;
 
+		/// @brief Adds the pack.
+		/// @param handle Pack handle.
+		/// @param collection Pack resource collection.
+		/// @param pack Pack.
 		void Add(PackID handle, ResourceCollection collection, std::shared_ptr<class Pack> pack);
+		/// @brief Removes a pack.
+		/// @param index Pack index.
 		void Remove(std::size_t index) noexcept;
+		/// @brief Clears the container.
 		void Clear() noexcept;
 
 		PackContainer& operator =(const PackContainer&) = delete;

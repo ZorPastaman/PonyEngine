@@ -12,8 +12,6 @@ Other stop combinations aren't handled.
 
 ### [PonyEngine.Application.Windows](Source/Main.cppm)
 
-Main interfaces:
-
 #### [IMainData](Source/Main-IMainData.cppm)
 
 Provides the data that was passed into `WinMain()`. 

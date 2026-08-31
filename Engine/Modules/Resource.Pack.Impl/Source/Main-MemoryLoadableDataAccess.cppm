@@ -15,7 +15,6 @@ export module PonyEngine.Resource.Pack.Impl:MemoryLoadableDataAccess;
 
 import std;
 
-import PonyEngine.Math;
 import PonyEngine.Resource.Ext;
 
 import :LoadableDataAccessRequest;
@@ -23,9 +22,15 @@ import :LoadableDataAccessRequestWorker;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Memory loadable data access.
 	class MemoryLoadableDataAccess final : public ILoadableDataAccess
 	{
 	public:
+		/// @brief Creates a memory loadable data access.
+		/// @param worker Loadable data access request worker.
+		/// @param loadedData Pack data.
+		/// @param offset Data offset.
+		/// @param size Data size.
 		[[nodiscard("Pure constructor")]]
 		MemoryLoadableDataAccess(LoadableDataAccessRequestWorker& worker, std::shared_ptr<const std::byte[]> loadedData, std::size_t offset, std::size_t size) noexcept;
 		MemoryLoadableDataAccess(const MemoryLoadableDataAccess&) = delete;
@@ -44,10 +49,10 @@ export namespace PonyEngine::Resource::Pack
 		MemoryLoadableDataAccess& operator =(MemoryLoadableDataAccess&&) = delete;
 
 	private:
-		LoadableDataAccessRequestWorker* worker;
+		LoadableDataAccessRequestWorker* worker; ///< Loadable data access request worker.
 
-		std::shared_ptr<const std::byte[]> loadedData;
-		std::span<const std::byte> buffer;
+		std::shared_ptr<const std::byte[]> loadedData; ///< Pack data.
+		std::span<const std::byte> buffer; ///< Pack data segment.
 	};
 }
 
@@ -59,7 +64,6 @@ namespace PonyEngine::Resource::Pack
 		loadedData(std::move(loadedData)),
 		buffer(&loadedData[offset], size)
 	{
-		assert(this->worker && "Worker is nullptr.");
 		assert(this->loadedData && "Data is nullptr.");
 	}
 

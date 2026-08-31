@@ -418,26 +418,16 @@ namespace PonyEngine::Resource
 
 	Async::RequestStatus OngoingResourceRequest::Status() const noexcept
 	{
-		return canceled.load(std::memory_order::relaxed) ? Async::RequestStatus::Canceled : loadProcess->Status();
+		return loadProcess->Status();
 	}
 
 	std::shared_ptr<const void> OngoingResourceRequest::Resource(const std::type_index type) const
 	{
-		if (canceled.load(std::memory_order::relaxed))
-		{
-			throw std::logic_error("Invalid status");
-		}
-
 		return loadProcess->Resource(type);
 	}
 
 	const std::exception_ptr& OngoingResourceRequest::Exception() const
 	{
-		if (canceled.load(std::memory_order::relaxed))
-		{
-			throw std::logic_error("Invalid status");
-		}
-
 		return loadProcess->Exception();
 	}
 
@@ -451,11 +441,6 @@ namespace PonyEngine::Resource
 
 	void OngoingResourceRequest::Wait() const noexcept
 	{
-		if (canceled.load(std::memory_order::relaxed))
-		{
-			return;
-		}
-
 		loadProcess->Wait();
 	}
 

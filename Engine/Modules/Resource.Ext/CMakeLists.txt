@@ -12,7 +12,6 @@ add_library(PonyEngine.Resource.Ext STATIC)
 target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-CollectionResource.cppm"
-	"Source/Main-EngineResourceType.cppm"
 	"Source/Main-IFileDataAccess.cppm"
 	"Source/Main-ILoadableDataAccess.cppm"
 	"Source/Main-ILoadableResource.cppm"
@@ -23,7 +22,6 @@ target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Main-IResourceLoadRequest.cppm"
 	"Source/Main-IResourceProvider.cppm"
 	"Source/Main-ResourceCollection.cppm"
-	"Source/Main-ResourceLoadRequestStatus.cppm"
 	"Source/Main-ResourceType.cppm"
 )
 

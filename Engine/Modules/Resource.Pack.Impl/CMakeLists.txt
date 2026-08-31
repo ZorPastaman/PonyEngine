@@ -41,17 +41,22 @@ target_sources(PonyEngine.Resource.Pack.Impl PRIVATE
 )
 target_sources(PonyEngine.Resource.Pack.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Main.cppm"
+	"Source/Main-DataAccessWorker.cppm"
 	"Source/Main-FileDataAccess.cppm"
 	"Source/Main-FileLoadableDataAccess.cppm"
+	"Source/Main-FileLoadableDataAccessRequest.cppm"
+	"Source/Main-FilePackMountRequest.cppm"
 	"Source/Main-LoadableDataAccessRequest.cppm"
 	"Source/Main-LoadableDataAccessRequestWorker.cppm"
 	"Source/Main-MemoryDataAccess.cppm"
+	"Source/Main-MemoryLoadableDataAccess.cppm"
 	"Source/Main-Pack.cppm"
 	"Source/Main-PackContainer.cppm"
+	"Source/Main-PackMountRequest.cppm"
 	"Source/Main-PackService.cppm"
 	"Source/Main-PackServiceModule.cppm"
 	"Source/Main-PackUnmountRequest.cppm"
-  "Source/Main-MemoryLoadableDataAccess.cppm" "Source/Main-FileLoadableDataAccessRequest.cppm"  "Source/Main-FilePackMountRequest.cppm" "Source/Main-PackMountRequest.cppm")
+)
 
 pony_validate_module_order(PONY_ENGINE_RESOURCE_PACK_ORDER)
 target_compile_definitions(PonyEngine.Resource.Pack.Impl PUBLIC

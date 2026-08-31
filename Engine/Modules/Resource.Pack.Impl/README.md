@@ -1,16 +1,17 @@
 # PonyEngine.Resource.Pack.Impl module
 
-Pack resource provider implementation module. 
-It's a provider that manages resource packs - files that contain many resources.
+Pack resource provider module.
 
 ## Dependencies
 
-- [PonyEngine.Core](../Core)
-- [PonyEngine.Log](../Log)
 - [PonyEngine.Application](../Application)
+- [PonyEngine.Core](../Core)
 - [PonyEngine.File](../File)
+- [PonyEngine.Job](../Job)
+- [PonyEngine.Log](../Log)
 - [PonyEngine.Resource](../Resource)
 - [PonyEngine.Resource.Ext](../Resource.Ext)
+- [PonyEngine.Resource.Pack](../Resource.Pack)
 
 ## CMake variables
 
@@ -19,7 +20,6 @@ These variables are used to configure the build of the module:
 | Variable name                            | Default value             | Description                                                |
 |:-----------------------------------------|:-------------------------:|:-----------------------------------------------------------|
 | `PONY_ENGINE_RESOURCE_PACK_ORDER`        | p                         | PonyEngine.Resource.Pack.Impl module initialization order. |
-| `PONY_ENGINE_RESOURCE_PACK_MANIFEST_DIR` | "Manifests/Resource/Pack" | Pack resource manifest directory.                          |
 
 ## For Pony Engine developers
 

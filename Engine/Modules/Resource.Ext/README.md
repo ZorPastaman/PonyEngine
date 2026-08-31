@@ -9,86 +9,32 @@ It allows to add different ways of resource delivery.
 ## Dependencies
 
 - [PonyEngine.Core](../Core)
-- [PonyEngine.Log](../Log)
-- [PonyEngine.Application](../Application)
 - [PonyEngine.Resource](../Resource)
 
 ## C\++ modules
 
-### [PonyEngine.RawInput.Ext](Source/Main.cppm)
+### [PonyEngine.Resource.Ext](Source/Main.cppm)
 
-Main interfaces:
+#### [IResourceHub](Source/Main-IResourceHub.cppm)
+
+Central service where resource collections and loaders are added to.
 
 #### [IResourceProvider](Source/Main-IResourceProvider.cppm)
 
-Resource provider interface. Each resource provider added to the resource service must implement it.
+Provides resource data. It submits resources and tells how it's ready to provide an access to them.
 
-#### [IResourceContext](Source/Main-IResourceContext.cppm)
+#### [IResourceLoader](Source/Main-IResourceLoader.cppm)
 
-Interface representing the resource service context. Provides access to the application, logger and resource management functions.
+Loads resources. It knows how to create runtime resources out of raw data from resource providers.
 
-#### [IResourceModuleContext](Source/Main-IResourceModuleContext.cppm)
+#### [ILoadableDataAccess](Source/Main-ILoadableDataAccess.cppm)
 
-Interface representing the resource service module context. This interface is used by modules to add resource providers. It may be accessed via module data after the resource service module initialization.
+The most abstract data access that lets load data from an unknown source in async manner.
 
-#### [IResourceRegistry](Source/Main-IResourceRegistry.cppm)
+#### [IFileDataAccess](Source/Main-IFileDataAccess.cppm)
 
-Interface that's used to register and unregister resources.
-If a resource is loaded and kept alive, the resource provider must still keep the resource valid even if it unregistered the resource.
+Data access that provides direct access to a resource data in a file.
 
-#### [ResourceParams](Source/Main-ResourceParams.cppm)
+#### [IMemoryDataAccess](Source/Main-IMemoryDataAccess.cppm)
 
-Resource parameters that are used to register a resource. The most important here is index cause later the resource will be loaded just by it for better performance.
-
-The resource availability is very important as well. If the resource provider stated that a resource is available in some form, it must then return a correct corresponding data access:
-
-- [ILoadableResourceData](Source/Main-ILoadableResourceData.cppm)
-- [IFileResourceData](Source/Main-IFileResourceData.cppm)
-- [IMemoryResourceData](Source/Main-IMemoryResourceData.cppm)
-
-## Custom input provider
-
-Input providers are ticked every frame, and they must update devices and input of their devices in their tick. They mustn't do it out of their ticks.
-
-How to add a resource provider:
-
-1. Create a class that implements `PonyEngine::Resource::IResourceProvider` interface;
-2. Create an engine module and add it to the engine application;
-3. Set the module initialization order after the resource service module initialization order;
-4. In the module `StartUp()` get `PonyEngine::Resource::IResourceModuleContext`;
-5. Add the resource provider to the resource service module context and save the returned `ResourceProviderHandle`.
-
-The module must remove its resource provider on `ShutDown()`:
-
-1. In the module `ShutDown()` get `PonyEngine::Resource::IResourceModuleContext`;
-2. Remove the resource provider using an `ResourceProviderHandle` that was returned on adding.
-
-Example:
-
-```
-void InputProviderModule::StartUp(Application::IModuleContext& context)
-{
-	IResourceModuleContext* const resourceModuleContext = context.GetData<IResourceModuleContext>();
-	providerHandle = resourceModuleContext->AddProvider([](IResourceContext& resourceContext)
-	{
-		return std::make_shared<MyResourceProvider>(resourceContext);
-	});
-}
-
-void InputProviderModule::ShutDown(Application::IModuleContext& context)
-{
-	IResourceModuleContext* const resourceModuleContext = context.GetData<IResourceModuleContext>();
-	resourceModuleContext->RemoveProvider(providerHandle);
-}
-```
-
-## Resource provider lifecycle
-
-1. On resource service begin, `IResourceProvider.Begin()` is called on each resource provider in the order they were added;
-2. Every frame, `IResourceProvider.Tick()` is called on each resource provider in the order they were added;
-3. On resource service end, `IResourceProvider.End()` is called on each resource provider in the reverse order.
-
-How to add a resource:
-
-Resource providers get [IResourceRegistry](Source/Main-IResourceRegistry.cppm) in its `Begin()`, `End()` and `Tick()`.
-It must add and remove resources only via the provided interface and only on a main thread.
+Data access that provides direct access to a resource data in the memory.

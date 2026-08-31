@@ -4,9 +4,9 @@ Resource implementation module.
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
-- [PonyEngine.Application](../Application)
 - [PonyEngine.Resource](../Resource)
 - [PonyEngine.Resource.Ext](../Resource.Ext)
 

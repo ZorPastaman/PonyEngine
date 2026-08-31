@@ -57,6 +57,7 @@ pony_apply_flags(PonyEngine.Resource)
 pony_apply_flags(PonyEngine.Resource.Ext)
 pony_apply_flags(PonyEngine.Resource.Impl)
 pony_add_to_module_list(PonyEngine.Resource.Impl PONY_RESOURCE_MODULES)
+pony_apply_flags(PonyEngine.Resource.Pack)
 pony_apply_flags(PonyEngine.Resource.Pack.Impl)
 pony_add_to_module_list(PonyEngine.Resource.Pack.Impl PONY_RESOURCE_MODULES)
 

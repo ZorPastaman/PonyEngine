@@ -15,7 +15,7 @@ export module PonyEngine.Resource.Ext:IResourceLoadRequest;
 
 import std;
 
-import :ResourceLoadRequestStatus;
+import PonyEngine.Async;
 
 export namespace PonyEngine::Resource
 {
@@ -27,7 +27,7 @@ export namespace PonyEngine::Resource
 		/// @brief Gets the request status.
 		/// @return Request status.
 		[[nodiscard("Pure function")]]
-		virtual ResourceLoadRequestStatus Status() const noexcept = 0;
+		virtual Async::RequestStatus Status() const noexcept = 0;
 		/// @brief Gets a main resource.
 		/// @return Main resource.
 		/// @not It's valid to call it only if the request status is success.

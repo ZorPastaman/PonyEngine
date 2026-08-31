@@ -20,9 +20,17 @@ import PonyEngine.Resource.Pack;
 
 export namespace PonyEngine::Resource::Pack
 {
+	/// @brief Pack mount request.
 	class PackMountRequest : public IPackMountRequest
 	{
 	public:
+		/// @brief Creates a pack mount request.
+		/// @param accessType Access type.
+		/// @param manifest Pack manifest.
+		/// @param manifestSize Pack manifest size.
+		/// @param dataBuffer Pack data. If it's nullptr, the request count will be 1, otherwise it'll be 2.
+		/// @param dataSize Pack data size.
+		/// @param callback Callback.
 		[[nodiscard("Pure constructor")]]
 		PackMountRequest(enum AccessType accessType, const std::byte* manifest, std::size_t manifestSize, std::shared_ptr<std::byte[]> dataBuffer, std::size_t dataSize, 
 			std::move_only_function<void(const IPackMountRequest&) noexcept> callback) noexcept;
@@ -42,83 +50,129 @@ export namespace PonyEngine::Resource::Pack
 
 		virtual void Wait() const noexcept override final;
 
+		/// @brief Checks if the request has a file source.
+		/// @return @a True if it's a file source; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsFileSource() const noexcept;
 
+		/// @brief Gets the access type.
+		/// @return Access type.
 		[[nodiscard("Pure function")]]
 		enum AccessType AccessType() const noexcept;
 
+		/// @brief Gets the manifest size.
+		/// @return Manifest size.
 		[[nodiscard("Pure function")]]
 		std::size_t ManifestSize() const noexcept;
+		/// @brief Gets the manifest view.
+		/// @return Manifest view.
 		[[nodiscard("Pure function")]]
 		std::span<const std::byte> Manifest() const noexcept;
+		/// @brief Gets the data buffer.
+		/// @return Data buffer.
 		[[nodiscard("Pure function")]]
 		const std::shared_ptr<std::byte[]>& DataBuffer() const noexcept;
+		/// @brief Gets the data size.
+		/// @return Data size.
 		[[nodiscard("Pure function")]]
 		std::size_t DataSize() const noexcept;
+		/// @brief Gets the data.
+		/// @return Data.
 		[[nodiscard("Pure function")]]
 		std::span<std::byte> Data() const noexcept;
 
+		/// @brief Checks if the cancel was requested.
+		/// @return @a True if it was requested; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsCancelRequested() const noexcept;
+		/// @brief Gets the read request count.
+		/// @return Read request count.
 		[[nodiscard("Pure function")]]
 		std::uint8_t ReadRequestCount() const noexcept;
+		/// @brief Decrements the read request count.
+		/// @return @a True if it's reached 0; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool DecrementRequestCount() noexcept;
 
+		/// @brief Checks if the request has a manifest exception.
+		/// @return @a True if it has; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasManifestException() const noexcept;
+		/// @brief Gets the manifest track exception.
+		/// @return Manifest track exception.
 		[[nodiscard("Pure function")]]
 		const std::exception_ptr& ManifestException() const noexcept;
+		/// @brief Sets the manifest track exception.
+		/// @param exception Manifest track exception.
 		void ManifestException(std::exception_ptr exception) noexcept;
+		/// @brief Checks if the request has a data exception.
+		/// @return @a True if it has; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasDataException() const noexcept;
+		/// @brief Gets the data track exception.
+		/// @return Data track exception.
 		[[nodiscard("Pure function")]]
 		const std::exception_ptr& DataException() const noexcept;
+		/// @brief Sets the data track exception.
+		/// @param exception Data track exception.
 		void DataException(std::exception_ptr exception) noexcept;
 
+		/// @brief Gets the collection resources.
+		/// @return Collection resources.
 		[[nodiscard("Pure function")]]
 		std::vector<CollectionResource>& CollectionResources() noexcept;
+		/// @brief Gets the collection resources.
+		/// @return Collection resources.
 		[[nodiscard("Pure function")]]
 		std::span<const CollectionResource> CollectionResources() const noexcept;
+		/// @brief Gets the ranges.
+		/// @return Ranges.
 		[[nodiscard("Pure function")]]
 		std::vector<std::pair<std::size_t, std::size_t>>& Ranges() noexcept;
+		/// @brief Gets the ranges.
+		/// @return Ranges.
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::size_t, std::size_t>> Ranges() const noexcept;
 
+		/// @brief Sets the status to success.
+		/// @param packHandle Pack handle.
 		void SetSuccess(PackHandle packHandle) noexcept;
+		/// @brief Sets the status to failure.
+		/// @param exception Exception.
 		void SetFailure(std::exception_ptr exception) noexcept;
+		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
 		PackMountRequest& operator =(const PackMountRequest&) = delete;
 		PackMountRequest& operator =(PackMountRequest&&) = delete;
 
 	private:
+		/// @brief Invokes a callback if it's not nullptr.
 		void InvokeCallback() noexcept;
 
-		const std::byte* manifest;
-		std::size_t manifestSize;
-		std::shared_ptr<std::byte[]> dataBuffer;
-		std::size_t dataSize;
+		const std::byte* manifest; ///< Manifest.
+		std::size_t manifestSize; ///< Manifest size.
+		std::shared_ptr<std::byte[]> dataBuffer; ///< Data buffer.
+		std::size_t dataSize; ///< Data size.
 
-		PackHandle packHandle;
-		std::exception_ptr exception;
-		std::atomic<Async::RequestStatus> status;
+		PackHandle packHandle; ///< Pack handle.
+		std::exception_ptr exception; ///< Exception.
+		std::atomic<Async::RequestStatus> status; ///< Status.
 
-		enum AccessType accessType;
+		enum AccessType accessType; ///< Access type.
 
-		std::atomic_bool cancelRequested;
-		std::atomic_uint8_t readRequestCount;
-		std::atomic_bool hasManifestException;
-		std::atomic_bool hasDataException;
+		std::atomic_bool cancelRequested; ///< Is the cancel requested?
+		std::atomic_uint8_t readRequestCount; ///< Read request count.
+		std::atomic_bool hasManifestException; ///< Does it have a manifest track exception?
+		std::atomic_bool hasDataException; ///< Does it have a data track exception?
 
-		std::exception_ptr manifestException;
-		std::exception_ptr dataException;
+		std::exception_ptr manifestException; ///< Manifest track exception.
+		std::exception_ptr dataException; ///< Data track exception.
 
-		std::vector<CollectionResource> collectionResources;
-		std::vector<std::pair<std::size_t, std::size_t>> ranges;
+		std::vector<CollectionResource> collectionResources; ///< Collection resources.
+		std::vector<std::pair<std::size_t, std::size_t>> ranges; ///< Ranges.
 
-		std::move_only_function<void(const IPackMountRequest&) noexcept> callback;
+		std::move_only_function<void(const IPackMountRequest&) noexcept> callback; ///< Callback.
 	};
 }
 

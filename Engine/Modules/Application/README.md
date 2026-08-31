@@ -11,8 +11,6 @@ It also controls the engine initialization and main loop.
 
 ### [PonyEngine.Application](Source/Main.cppm)
 
-Main interfaces:
-
 #### [IApplication](Source/Main-IApplication.cppm)
 
 Interface representing the engine application. Provides access to application metadata, environment information, and the current application state.
