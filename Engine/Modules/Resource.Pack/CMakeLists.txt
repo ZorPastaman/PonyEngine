@@ -15,6 +15,7 @@ add_library(PonyEngine.Resource.Pack STATIC)
 target_sources(PonyEngine.Resource.Pack PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Main.cppm"
 	"Source/Main-AccessType.cppm"
+	"Source/Main-Format.cppm"
 	"Source/Main-IPackMountRequest.cppm"
 	"Source/Main-IPackService.cppm"
 	"Source/Main-IPackUnmountRequest.cppm"

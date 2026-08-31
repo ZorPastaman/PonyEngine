@@ -4,8 +4,10 @@ Resource module extension that provides resources in packs.
 
 Every pack consists of two files:
 
-1. Manifest - contains meta info;
-2. Data - contains actual resource data.
+1. Manifest (.prpm) - contains meta info;
+2. Data (.prpd) - contains actual resource data.
+
+Both files must have the same name and be in the same folder. For more info, refer to the [EngineFormats](../../../EngineFormats).
 
 Packs may be loaded from files and from memory.
 

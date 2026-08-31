@@ -58,10 +58,6 @@ export namespace PonyEngine::Resource::Pack
 		PackService& operator =(PackService&&) = delete;
 
 	private:
-		static constexpr std::string_view PackManifestExtension = ".prpm"; ///< Pack manifest file extension.
-		static constexpr std::string_view PackDataExtension = ".prpd"; ///< Pack data file extension.
-		static constexpr std::string_view MagicWord = "PonyEngineRPM"; ///< Pack manifest magic word.
-
 		/// @brief Manifest resource.
 		struct ManifestResource final
 		{

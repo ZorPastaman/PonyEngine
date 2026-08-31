@@ -7,13 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Pack;
+export module PonyEngine.Resource.Pack:Format;
 
-export import PonyEngine.Resource.Ext;
+import std;
 
-export import :AccessType;
-export import :Format;
-export import :IPackMountRequest;
-export import :IPackService;
-export import :IPackUnmountRequest;
-export import :PackHandle;
+export namespace PonyEngine::Resource::Pack
+{
+	constexpr std::string_view PackManifestExtension = ".prpm"; ///< Pack manifest file extension.
+	constexpr std::string_view PackDataExtension = ".prpd"; ///< Pack data file extension.
+	constexpr std::string_view MagicWord = "PonyEngineRPM"; ///< Pack manifest magic word.
+}

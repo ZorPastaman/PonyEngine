@@ -25,5 +25,5 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [PackResourceProvider](Source/Main-PackResourceProvider.cppm) - pack resource provider;
-- [PackResourceProviderModule](Source/Main-PackResourceProviderModule.cppm) - pack resource provider module.
+- [PackService](Source/Main-PackService.cppm) - pack resource service;
+- [PackServiceModule](Source/Main-PackServiceModule.cppm) - pack resource service module.
