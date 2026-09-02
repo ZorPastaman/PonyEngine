@@ -9,7 +9,7 @@
 
 export module PonyEngine.Application.Impl.Windows;
 
-export import PonyEngine.Application.Windows;
+export import PonyEngine.Application.WinAPI;
 export import PonyEngine.Application.Impl;
 
 export import :CommandLine;

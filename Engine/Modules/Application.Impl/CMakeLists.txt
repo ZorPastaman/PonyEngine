@@ -18,12 +18,12 @@ set(PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD "0.002" CACHE STRING "Applicatio
 add_executable(PonyEngine.Application.Impl)
 
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES FILES
-	"Source/Main.cppm"
-	"Source/Main-App.cppm"
-	"Source/Main-Buffer.cppm"
-	"Source/Main-IdentityUtility.cppm"
-	"Source/Main-IProcess.cppm"
-	"Source/Main-PathUtility.cppm"
+	"Source/Application.cppm"
+	"Source/Application-App.cppm"
+	"Source/Application-Buffer.cppm"
+	"Source/Application-IdentityUtility.cppm"
+	"Source/Application-IProcess.cppm"
+	"Source/Application-PathUtility.cppm"
 )
 
 pony_validate_path(PONY_ENGINE_APPLICATION_ROOT_PATH CAN_BE_RELATIVE CAN_BE_EMPTY)

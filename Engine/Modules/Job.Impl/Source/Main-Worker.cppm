@@ -11,6 +11,7 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Macro/Text.h"
 
 export module PonyEngine.Job.Impl:Worker;
@@ -135,10 +136,20 @@ namespace PonyEngine::Job
 	{
 		assert(!thread && "The thread was already started.");
 		assert(running.load(std::memory_order::relaxed) && "The worker is stopped.");
+		
+		const Log::ILogService* const logService = application.FindInterface<Log::ILogService>();
 		thread = application.CreateThread([this] { Work(); }, Application::ThreadParams
 		{
 			.role = PONY_STRINGIFY_VALUE(PONY_ENGINE_JOB_THREAD_ROLE),
-			.logService = application.FindInterface<Log::ILogService>()
+			.onBeginException = [ls = logService](const std::exception_ptr& exception) noexcept
+			{
+				PONY_LOG(ls, Log::LogType::Error, exception, "On beginning worker thread. ID: '{}'.", std::this_thread::get_id());
+				return true;
+			},
+			.onEndException = [ls = logService](const std::exception_ptr& exception) noexcept
+			{
+				PONY_LOG(ls, Log::LogType::Error, exception, "On ending worker thread. ID: '{}'.", std::this_thread::get_id());
+			}
 		});
 	}
 

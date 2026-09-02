@@ -7,18 +7,28 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application:ThreadParams;
+module;
+
+#include "PonyEngine/Utility/Body.h"
+
+export module PonyEngine.Application.Impl:IProcess;
 
 import std;
 
-import PonyEngine.Log;
+import PonyEngine.Application;
 
 export namespace PonyEngine::Application
 {
-	/// @brief Thread parameters.
-	struct ThreadParams final
+	/// @brief Process.
+	class IProcess
 	{
-		std::string_view role = ""; ///< Thread role. Must be valid. Empty role means a default role.
-		Log::ILogService* logService = nullptr; ///< Log service that the thread must use in system calls. May be nullptr.
+		PONY_INTERFACE_BODY(IProcess)
+
+		/// @brief Creates a thread.
+		/// @param func Thread function.
+		/// @param params Thread parameters.
+		/// @return Thread.
+		[[nodiscard("Pure function")]]
+		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params) = 0;
 	};
 }

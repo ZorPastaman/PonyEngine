@@ -1,5 +1,9 @@
 message(STATUS "Configuring PonyEngine.Application.Impl for Windows")
 
+if(NOT TARGET PonyEngine.Application.Impl)
+	message(FATAL_ERROR "PonyEngine.Application.Impl wasn't configured")
+endif()
+
 set(PONY_ENGINE_APPLICATION_MODE "GUI" CACHE STRING "Application mode. Must be Console or GUI.")
 option(PONY_ENGINE_APPLICATION_CREATE_CONSOLE "Enable console. Can be used only in GUI builds." OFF)
 set(PONY_ENGINE_APPLICATION_PROCESS_PRIORITY "ABOVE_NORMAL_PRIORITY_CLASS" CACHE STRING "Application process priority. Must be DWORD or predefined priority class.")
@@ -18,9 +22,9 @@ include("CMake/Resource.cmake")
 include("CMake/ThreadRole.cmake")
 
 target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-	"Source/Main.cppm"
-	"Source/Main-CommandLine.cppm"
-	"Source/Main-Process.cppm"
+	"Source/Application.cppm"
+	"Source/Application-CommandLine.cppm"
+	"Source/Application-Process.cppm"
 )
 
 if(PONY_ENGINE_APPLICATION_ADD_DEFAULT_MANIFEST)
@@ -42,14 +46,14 @@ if(PONY_ENGINE_APPLICATION_MODE STREQUAL "Console")
 		"Source/Launch.Console.cpp"
 	)
 	target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-		"Source/Main-ConsoleProcess.cppm"
+		"Source/Application-ConsoleProcess.cppm"
 	)
 elseif(PONY_ENGINE_APPLICATION_MODE STREQUAL "GUI")
 	target_sources(PonyEngine.Application.Impl PRIVATE
 		"Source/Launch.GUI.cpp"
 	)
 	target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
-		"Source/Main-GUIProcess.cppm"
+		"Source/Application-GUIProcess.cppm"
 	)
 	set_target_properties(PonyEngine.Application.Impl PROPERTIES
 		WIN32_EXECUTABLE TRUE

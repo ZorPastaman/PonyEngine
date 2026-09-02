@@ -78,7 +78,7 @@ export namespace PonyEngine::Application
 
 	private:
 		[[nodiscard("Pure function")]] 
-		virtual std::thread CreateThread(std::move_only_function<void()> func, const ThreadParams& params) override final;
+		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params) override final;
 
 		/// @brief Gets a list of thread roles.
 		/// @return Thread roles.
@@ -110,17 +110,23 @@ export namespace PonyEngine::Application
 		/// @return Thread role. Nullptr if the @p role is empty.
 		[[nodiscard("Pure function")]]
 		static const ThreadRole* FindThreadRole(std::string_view role);
-		/// @brief Sets the thread role.
-		/// @param thread Target thread.
-		/// @param role Role to set.
-		/// @param logService Log service.
-		/// @return MMCSS handle. May be nullptr. If it's not nullptr, you must call @p RevertMmcss on the caller thread before setting another role or thread destruction.
+		/// @brief Sets the thread priority.
+		/// @param thread Thread handle.
+		/// @param threadPriority Thread priority.
+		static void SetThreadPriority(HANDLE thread, int threadPriority);
+		/// @brief Sets the thread MMCSS task.
+		/// @param thread Thread handle.
+		/// @param mmcssTask MMCSS task.
+		/// @return MMCSS handle.May be nullptr. If it's not nullptr, you must call @p RevertMMCSS on the caller thread before setting another role or thread destruction.
 		[[nodiscard("Must be used")]]
-		static HANDLE SetThreadRole(HANDLE thread, const ThreadRole& role, const Log::ILogService* logService) noexcept;
-		/// @brief Reverts the mmcss task.
-		/// @param mmcssHandle MMCSS handle. May be nullptr. In this case, the function does nothing.
-		/// @param logService Log service.
-		static void RevertMmcss(HANDLE mmcssHandle, const Log::ILogService* logService) noexcept;
+		static HANDLE SetThreadMMCSS(HANDLE thread, std::string_view mmcssTask);
+		/// @brief Sets the MMCSS priority.
+		/// @param mmcssHandle MMCSS handle.
+		/// @param mmcssPriority MMCSS priority.
+		static void SetThreadMMCSSPriority(HANDLE mmcssHandle, AVRT_PRIORITY mmcssPriority);
+		/// @brief Reverts the MMCSS task.
+		/// @param mmcssHandle MMCSS handle. May be nullptr.
+		static void RevertThreadMMCSS(HANDLE mmcssHandle);
 
 		/// @brief Initializes the application.
 		void Initialize();
@@ -191,7 +197,7 @@ namespace PonyEngine::Application
 		return *application;
 	}
 
-	std::thread Process::CreateThread(std::move_only_function<void()> func, const ThreadParams& params)
+	std::thread Process::CreateThread(std::move_only_function<void()> func, ThreadParams params)
 	{
 		const ThreadRole* const threadRole = FindThreadRole(params.role);
 		if (!threadRole)
@@ -199,11 +205,48 @@ namespace PonyEngine::Application
 			return std::thread(std::move(func));
 		}
 
-		return std::thread([f = std::move(func), tr = threadRole, ls = params.logService]() mutable
+		return std::thread([f = std::move(func), beginError = std::move(params.onBeginException), endError = std::move(params.onEndException), role = threadRole]() mutable
 		{
-			const HANDLE mmcssHandle = SetThreadRole(GetCurrentThread(), *tr, ls);
-			f();
-			RevertMmcss(mmcssHandle, ls);
+			HANDLE mmcssHandle = nullptr;
+			bool execute = true;
+
+			try
+			{
+				const HANDLE threadHandle = GetCurrentThread();
+				SetThreadPriority(threadHandle, role->threadPriority);
+				mmcssHandle = SetThreadMMCSS(threadHandle, role->mmcssTask);
+				if (mmcssHandle)
+				{
+					SetThreadMMCSSPriority(mmcssHandle, role->mmcssPriority);
+				}
+			}
+			catch (...)
+			{
+				if (beginError)
+				{
+					execute = beginError(std::current_exception());
+				}
+			}
+
+			if (execute) [[likely]]
+			{
+				f();
+			}
+
+			if (mmcssHandle)
+			{
+				try
+				{
+					RevertThreadMMCSS(mmcssHandle);
+				}
+				catch (...)
+				{
+					if (endError)
+					{
+						endError(std::current_exception());
+					}
+				}
+			}
 		});
 	}
 
@@ -258,50 +301,50 @@ namespace PonyEngine::Application
 		return &roleDesc->second;
 	}
 
-	HANDLE Process::SetThreadRole(const HANDLE thread, const ThreadRole& role, const Log::ILogService* const logService) noexcept
+	void Process::SetThreadPriority(const HANDLE thread, const int threadPriority)
 	{
-		PONY_LOG(logService, Log::LogType::Info, "Setting thread role. ThreadID: '{}'; Priority: '0x{:X}'; MMCSS task name: '{}'; MMCSS priority: {}.", 
-			GetThreadId(thread), role.threadPriority, role.mmcssTask, std::to_underlying(role.mmcssPriority));
-
-		if (!SetThreadPriority(thread, role.threadPriority)) [[unlikely]]
+		if (!::SetThreadPriority(thread, threadPriority)) [[unlikely]]
 		{
-			PONY_LOG(logService, Log::LogType::Error, "Failed to set thread priority. Priority: '0x{:X}'; Error code: '0x{:X}'.", role.threadPriority, GetLastError());
+			throw std::runtime_error(std::format("Failed to set thread priority. Priority: '0x{:X}'; Error code: '0x{:X}'", threadPriority, GetLastError()));
 		}
+	}
 
-		if (role.mmcssTask.empty())
+	HANDLE Process::SetThreadMMCSS(const HANDLE thread, const std::string_view mmcssTask)
+	{
+		if (mmcssTask.empty())
 		{
 			return nullptr;
 		}
 
 		DWORD index = 0;
-		const HANDLE mmcssHandle = AvSetMmThreadCharacteristicsA(role.mmcssTask.data(), &index);
+		const HANDLE mmcssHandle = AvSetMmThreadCharacteristicsA(mmcssTask.data(), &index);
 		if (!mmcssHandle) [[unlikely]]
 		{
-			PONY_LOG(logService, Log::LogType::Error, "Failed to set mmcss thread task. Task: '{}'; Error code: '0x{:X}'.", role.mmcssTask, GetLastError());
-			return nullptr;
-		}
-		PONY_LOG(logService, Log::LogType::Info, "MMCSS task set to thread. ThreadID: '{}'; Task handle: '0x{:X}'.", 
-			GetThreadId(thread), reinterpret_cast<std::uintptr_t>(mmcssHandle));
-
-		if (!AvSetMmThreadPriority(mmcssHandle, role.mmcssPriority)) [[unlikely]]
-		{
-			PONY_LOG(logService, Log::LogType::Error, "Failed to set mmcss thread priority. Task: '{}'; Priority: '{}'; Error code: '0x{:X}'.", 
-				role.mmcssTask, std::to_underlying(role.mmcssPriority), GetLastError());
+			throw std::runtime_error(std::format("Failed to set mmcss thread task. Task: '{}'; Error code: '0x{:X}'", mmcssTask, GetLastError()));
 		}
 
 		return mmcssHandle;
 	}
 
-	void Process::RevertMmcss(const HANDLE mmcssHandle, const Log::ILogService* const logService) noexcept
+	void Process::SetThreadMMCSSPriority(const HANDLE mmcssHandle, const AVRT_PRIORITY mmcssPriority)
 	{
-		if (mmcssHandle)
+		if (!AvSetMmThreadPriority(mmcssHandle, mmcssPriority)) [[unlikely]]
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Reverting thread MMCSS task. Task handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mmcssHandle));
+			throw std::runtime_error(std::format("Failed to set mmcss thread priority. TaskHandle: '0x{:X}'; Priority: '{}'; Error code: '0x{:X}'",
+				reinterpret_cast<std::uintptr_t>(mmcssHandle), std::to_underlying(mmcssPriority), GetLastError()));
+		}
+	}
 
-			if (!AvRevertMmThreadCharacteristics(mmcssHandle)) [[unlikely]]
-			{
-				PONY_LOG(logService, Log::LogType::Error, "Failed to revert mmcss task. Error code: '0x{:X}'.", GetLastError());
-			}
+	void Process::RevertThreadMMCSS(const HANDLE mmcssHandle)
+	{
+		if (!mmcssHandle)
+		{
+			return;
+		}
+
+		if (!AvRevertMmThreadCharacteristics(mmcssHandle)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to revert mmcss task. Error code: '0x{:X}'", GetLastError()));
 		}
 	}
 
@@ -405,8 +448,23 @@ namespace PonyEngine::Application
 		PONY_LOG(application->LogService(), Log::LogType::Info, "Setting main thread role. Role: '{}'.", mainThreadRole);
 		try
 		{
-			const ThreadRole* const role = FindThreadRole(mainThreadRole);
-			mainThreadMmcss = role ? SetThreadRole(GetCurrentThread(), *role, application->LogService()) : nullptr;
+			if (const ThreadRole* const role = FindThreadRole(mainThreadRole))
+			{
+				try
+				{
+					const HANDLE threadHandle = GetCurrentThread();
+					SetThreadPriority(threadHandle, role->threadPriority);
+					mainThreadMmcss = SetThreadMMCSS(threadHandle, role->mmcssTask);
+					if (mainThreadMmcss)
+					{
+						SetThreadMMCSSPriority(mainThreadMmcss, role->mmcssPriority);
+					}
+				}
+				catch (...)
+				{
+					PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On setting main thread role.");
+				}
+			}
 		}
 		catch (...)
 		{
@@ -420,7 +478,14 @@ namespace PonyEngine::Application
 		if (mainThreadMmcss)
 		{
 			PONY_LOG(application->LogService(), Log::LogType::Info, "Reverting main thread mmcss.");
-			RevertMmcss(mainThreadMmcss, application->LogService());
+			try
+			{
+				RevertThreadMMCSS(mainThreadMmcss);
+			}
+			catch (...)
+			{
+				PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On reverting main thread MMCSS.");
+			}
 			mainThreadMmcss = nullptr;
 		}
 	}

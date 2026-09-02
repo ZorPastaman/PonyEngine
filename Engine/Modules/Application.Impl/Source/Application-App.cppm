@@ -104,6 +104,9 @@ export namespace PonyEngine::Application
 		virtual const std::filesystem::path& TempDataDirectory() const noexcept override;
 
 		[[nodiscard("Pure function")]] 
+		virtual std::filesystem::path AddPathTail(std::filesystem::path path) const noexcept override;
+
+		[[nodiscard("Pure function")]] 
 		virtual std::thread::id MainThreadID() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const std::string_view> CommandLine() const noexcept override;
@@ -146,7 +149,7 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const std::string_view> ThreadRoles() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::thread CreateThread(std::move_only_function<void()> func, const ThreadParams& params) override;
+		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params) override;
 
 		/// @brief Initializes early modules.
 		void InitializeEarly();
@@ -509,6 +512,11 @@ namespace PonyEngine::Application
 		return tempDataDirectory;
 	}
 
+	std::filesystem::path App::AddPathTail(const std::filesystem::path path) const noexcept
+	{
+		return AddTail(path);
+	}
+
 	std::thread::id App::MainThreadID() const noexcept
 	{
 		return mainThreadId;
@@ -668,9 +676,9 @@ namespace PonyEngine::Application
 		return threadRoles;
 	}
 
-	std::thread App::CreateThread(std::move_only_function<void()> func, const ThreadParams& params)
+	std::thread App::CreateThread(std::move_only_function<void()> func, ThreadParams params)
 	{
-		return process->CreateThread(std::move(func), params);
+		return process->CreateThread(std::move(func), std::move(params));
 	}
 
 	void App::InitializeEarly()

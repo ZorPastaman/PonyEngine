@@ -15,7 +15,7 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.Application.Windows:IMessagePump;
+export module PonyEngine.Application.WinAPI:IMessagePump;
 
 import std;
 

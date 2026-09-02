@@ -20,7 +20,7 @@ export module PonyEngine.RawInput.Keyboard.Impl.Windows:KeyboardProvider;
 
 import std;
 
-import PonyEngine.Application.Windows;
+import PonyEngine.Application.WinAPI;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Memory;

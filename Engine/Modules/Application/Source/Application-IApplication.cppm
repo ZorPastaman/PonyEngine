@@ -110,6 +110,12 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual const std::filesystem::path& TempDataDirectory() const noexcept = 0;
 
+		/// @brief Adds a default tail to the path.
+		/// @param path Source path.
+		/// @return Path with a tail.
+		[[nodiscard("Pure function")]]
+		virtual std::filesystem::path AddPathTail(std::filesystem::path path) const noexcept = 0;
+
 		/// @brief Gets the main thread ID.
 		/// @return Main thread ID.
 		/// @note The function is thread-safe.
@@ -280,7 +286,7 @@ export namespace PonyEngine::Application
 		/// @param params Thread parameters.
 		/// @return Thread.
 		[[nodiscard("Pure function")]]
-		virtual std::thread CreateThread(std::move_only_function<void()> func, const ThreadParams& params = ThreadParams{}) = 0;
+		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params = ThreadParams{}) = 0;
 	};
 }
 

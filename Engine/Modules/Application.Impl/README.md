@@ -2,7 +2,10 @@
 
 Application implementation module.
 
-The module requires a platform specific implementation.
+Adds `PonyEngine.Application.Impl` target as an executable.
+
+The module requires a platform specific implementation. 
+The implementation must have a main() function and provide a context to the app.
 
 ## Dependencies
 
@@ -21,10 +24,8 @@ These variables are used to configure the build of the module:
 
 ## For Pony Engine developers
 
-Main modules:
+### [PonyEngine.Application.Impl](Source/Application.cppm)
 
-### [PonyEngine.Application.Impl](Source/Main.cppm)
-
-#### [App](Source/Main-App.cppm)
+#### [App](Source/Application-App.cppm)
 
 Implements `IApplication`. It must be controlled by a platform specific process.

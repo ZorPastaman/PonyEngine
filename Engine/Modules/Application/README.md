@@ -3,21 +3,23 @@
 Application API module. Provides interfaces to access main engine info, to register interfaces and tickables.
 It also controls the engine initialization and main loop.
 
+Adds `PonyEngine.Application` target as a static library.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)
 
 ## C\++ modules
 
-### [PonyEngine.Application](Source/Main.cppm)
+### [PonyEngine.Application](Source/Application.cppm)
 
-#### [IApplication](Source/Main-IApplication.cppm)
+#### [IApplication](Source/Application-IApplication.cppm)
 
 Interface representing the engine application. Provides access to application metadata, environment information, and the current application state.
 
 Exposes the registered interfaces, and allows control over the application lifecycle (e.g., stopping the application).
 
-#### [IModule](Source/Main-IModule.cppm)
+#### [IModule](Source/Application-IModule.cppm)
 
 Base interface for engine application modules. All application modules must implement this interface.
 
@@ -25,13 +27,13 @@ It has `StartUp()` and `ShutDown()` functions, which are called during the corre
 
 See [Module lifecycle](#module-lifecycle) for details.
 
-#### [IModuleContext](Source/Main-IModuleContext.cppm)
+#### [IModuleContext](Source/Application-IModuleContext.cppm)
 
 Interface representing a module context. It's passed as an argument to `IModule.StartUp()` and `IModule.ShuftDown()`.
 
 Exposes functions to register interfaces and tickables.
 
-#### [ITickable](Source/Main-ITickable.cppm)
+#### [ITickable](Source/Application-ITickable.cppm)
 
 Tickable interface. A tickable is an object that reacts to the application main loop: `Begin()`, `End()` and `Tick()` functions.
 

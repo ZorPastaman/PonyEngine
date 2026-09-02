@@ -133,7 +133,15 @@ namespace PonyEngine::File
 			thread = application.CreateThread([this] { Work(); }, Application::ThreadParams
 			{
 				.role = role,
-				.logService = logService
+				.onBeginException = [ls = logService](const std::exception_ptr& exception) noexcept
+				{
+					PONY_LOG(ls, Log::LogType::Error, exception, "On beginning IO thread. ID: '{}'.", std::this_thread::get_id());
+					return true;
+				},
+				.onEndException = [ls = logService](const std::exception_ptr& exception) noexcept
+				{
+					PONY_LOG(ls, Log::LogType::Error, exception, "On ending IO thread. ID: '{}'.", std::this_thread::get_id());
+				}
 			});
 		}
 		catch (...)

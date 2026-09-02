@@ -23,7 +23,7 @@ export module PonyEngine.Application.Impl.Windows:GUIProcess;
 
 import std;
 
-import PonyEngine.Application.Windows;
+import PonyEngine.Application.WinAPI;
 import PonyEngine.Log;
 
 import :Process;

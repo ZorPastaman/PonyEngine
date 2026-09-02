@@ -13,7 +13,6 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Container;
-import PonyEngine.Math;
 
 export namespace PonyEngine::Application
 {

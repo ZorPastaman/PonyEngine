@@ -15,7 +15,7 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.Application.Windows:IMainData;
+export module PonyEngine.Application.WinAPI:IMainData;
 
 export namespace PonyEngine::Application
 {

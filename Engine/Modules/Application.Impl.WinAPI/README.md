@@ -1,8 +1,13 @@
-# PonyEngine.Application.Impl module for Windows
+# PonyEngine.Application.Impl.WinAPI module
 
-Platform independent module: [PonyEngine.Application.Impl](../../../Modules/Application.Impl).
+Adds WinAPI application support to [PonyEngine.Application.Impl](../Application.Impl).
 
 The main() function returns an application exit code or -1 on any uncaught exception.
+
+## Dependencies
+
+- [PonyEngine.Application.Impl](../Application.Impl)
+- Windows SDK 10.0.26100.0+
 
 ## CMake variables
 
@@ -32,21 +37,23 @@ These variables are used to configure the build of the module:
 
 ## C\++ modules
 
-### [PonyEngine.Application.Impl.Windows](Source/Main.cppm)
+### [PonyEngine.Application.Impl.Windows](Source/Application.cppm)
 
-Main submodules:
-
-#### [ConsoleProcess](Source/Main-ConsoleProcess.cppm)
+#### [ConsoleProcess](Source/Application-ConsoleProcess.cppm)
 
 Console process implementation.
 
-#### [GUIProcess](Source/Main-GUIProcess.cppm)
+#### [GUIProcess](Source/Application-GUIProcess.cppm)
 
 GUI process implementation.
 
-## [Launch](Source/Launch.cpp)
+## [Launch.Console](Source/Launch.Console.cpp)
 
-C\++ main() function.
+C\++ main() function for a console application.
+
+## [Launch.GUI](Source/Launch.GUI.cpp)
+
+C\++ main() function for a GUI application.
 
 ### Data:
 
