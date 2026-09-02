@@ -113,7 +113,13 @@ Users can provide their own platform implementations by setting the CMake flag `
 ### Compiler modules
 
 Unfortunately, some functions are not implemented in the C++ standard and require to use compiler specific operations.
-The only module that needs them is [PonyEngine.Core](Modules/Core). See its readme for details.
+That's why the engine build must start with a target `PonyCompiler` and it must contain `PonyCompiler.h` which contains all the required defines:
+
+- `PONY_DLL_EXPORT` - translates to compiler dll export attribute if `PONY_DLL` is defined, empty otherwise.
+- `PONY_PRESERVE(symbol)` - preserves the symbol. The symbol is a string.
+- `PONY_SECTION_DELIMITER` - returns a section delimiter that is set between a section name and an order.
+- `PONY_SECTION(name)` - declares a section with the given name.
+- `PONY_ALLOCATE(segment)` - allocates a segment.
 
 Supported compilers:
 
@@ -121,6 +127,7 @@ Supported compilers:
 
 The engine automatically applies compiler-specific configuration based on CMake compiler variables. The compiler must be supported.
 Users can provide their own compiler implementations by setting CMake flag `PONY_ENGINE_CUSTOM_COMPILER` to `true`. In this case, the built-in compiler configuration is disabled, and users are responsible for configuring the modules themselves.
+The compiler module must be configured before the engine configuration.
 
 ### Application module linking
 

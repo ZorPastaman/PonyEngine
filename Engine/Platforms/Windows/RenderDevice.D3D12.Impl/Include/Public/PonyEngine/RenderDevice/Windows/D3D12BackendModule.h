@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyCompiler.h"
 
 import PonyEngine.Application;
 

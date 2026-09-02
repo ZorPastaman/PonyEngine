@@ -69,7 +69,7 @@ How to add an application module:
 Example of `PONY_PROJECT_MODULE` usage in a `.cpp` file:
 ```
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyCompiler.h"
 
 import std;
 

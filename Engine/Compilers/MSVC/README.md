@@ -1,21 +1,12 @@
-# MSVC compiler support
+# MSVC compiler module
 
-MSVC compiler support module. It adds required compiler-dependent defines to [PonyEngine.Core](../../Modules/Core).
+MSVC compiler support module.
 
 ## C\++ headers
 
-### [PonyEngine/Macro/MSVC/Compiler.h](Include/Public/PonyEngine/Macro/MSVC/Compiler.h)
+### [PonyCompiler.h](Include/Public/PonyCompiler.h)
 
 Contains required compiler defines.
-
-## Public defines
-
-Sets public defines to [PonyEngine.Core](../../Modules/Core).
-
-| Define                  | Value                              |
-|:------------------------|:----------------------------------:|
-| `PONY_COMPILER_INCLUDE` | "PonyEngine/Macro/MSVC/Compiler.h" |
-| `PONY_MSVC`             | N/A                                |
 
 ## Build
 

@@ -6,6 +6,9 @@ endif()
 if(NOT TARGET PonyEngine.Log)
 	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
 endif()
+if(NOT TARGET PonyCompiler)
+	message(FATAL_ERROR "PonyCompiler wasn't configured")
+endif()
 
 include("CMake/Module.cmake")
 
@@ -33,4 +36,5 @@ set_target_properties(PonyEngine.Application PROPERTIES
 target_link_libraries(PonyEngine.Application PUBLIC
 	PonyEngine.Core
 	PonyEngine.Log
+	PonyCompiler
 )

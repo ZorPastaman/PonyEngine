@@ -1,10 +1,7 @@
-message(STATUS "Configuring PonyEngine.Core for MSVC")
+message(STATUS "Configuring PonyCompiler for MSVC")
 
-target_include_directories(PonyEngine.Core PUBLIC 
+add_library(PonyCompiler INTERFACE)
+
+target_include_directories(PonyCompiler INTERFACE 
 	"Include/Public"
-)
-
-target_compile_definitions(PonyEngine.Core PUBLIC
-	PONY_COMPILER_INCLUDE="PonyEngine/Macro/MSVC/Compiler.h"
-	PONY_MSVC
 )
