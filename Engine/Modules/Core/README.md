@@ -2,7 +2,9 @@
 
 Core utilities module.
 
-The module requires a compiler specific implementation.
+Adds `PonyEngine.Core` target as a static library.
+
+The module requires a compiler specific implementation. See [Custom compiler](#custom-compiler) for details.
 
 ## C\++ modules
 
@@ -86,14 +88,13 @@ Classes:
 - [Arena](Source/Memory-Arena.cppm) - arena memory allocator;
 - [Utility](Source/Memory-Utility.cppm) - utilities for memory management.
 
-### [PonyEngine.Type](Source/Type.cppm)
+### [PonyEngine.Utilty](Source/Utility.cppm)
 
-Utilities for C\++ type system.
+Basic utilities.
 
 Utilities:
-- [Common](Source/Type-Common.cppm) - common type utlities: basic type concepts;
-- [Limits](Source/Type-Limits.cppm) - extension for `std::numeric_limits`;
-- [Variant](Source/Type-Variant.cppm) - utilities for `std::variant`.
+- [Concepts](Source/Utility-Concepts.cppm) - basic concepts;
+- [Overload](Source/Utility-Overload.cppm) - overload pattern implementation.
 
 ## C\++ headers
 
@@ -101,16 +102,17 @@ Utilities:
 
 Compiler utilities.
 
-| Define                   | Description                                          |
-|:-------------------------|:-----------------------------------------------------|
-| `PONY_DLL_EXPORT`        | Sets `dllexport` attribute if `PONY_DLL` is defined. |
-| `PONY_PRESERVE(symbol)`  | Prevents a compiler from removing the symbol.        |
-| `PONY_SECTION(name)`     | Declares a section with the name.                    |
-| `PONY_ALLOCATE(segment)` | Allocates the segment.                               |
+| Define                   | Description                                                        |
+|:-------------------------|:-------------------------------------------------------------------|
+| `PONY_DLL_EXPORT`        | Sets `dllexport` attribute if `PONY_DLL` is defined.               |
+| `PONY_PRESERVE(symbol)`  | Prevents a compiler from removing the symbol.                      |
+| `PONY_SECTION_DELIMITER` | Section delimiter that is set between a section name and an order. |
+| `PONY_SECTION(name)`     | Declares a section with the name.                                  |
+| `PONY_ALLOCATE(segment)` | Allocates the segment.                                             |
 
 ### [PonyEngine/Macro/Text.h](Include/Public/PonyEngine/Macro/Text.h)
 
-Text utilities.
+Macro text utilities.
 
 | Define                     | Description                                                   |
 |:---------------------------|:--------------------------------------------------------------|
@@ -119,7 +121,7 @@ Text utilities.
 | `PONY_CONCAT(a, b)`        | Returns a C-style string that contains `ab`.                  |
 | `PONY_CONCAT_VALUES(a, b)` | Returns a C-style string that contains values of `a` and `b`. |
 
-### [PonyEngine/Object/Body.h](Include/Public/PonyEngine/Object/Body.h)
+### [PonyEngine/Utility/Body.h](Include/Public/PonyEngine/Utility/Body.h)
 
 Object body utilities.
 
@@ -128,7 +130,7 @@ Object body utilities.
 | `PONY_INTERFACE_BODY(interfaceName)`      | Adds default constructors, destructor and assignment operators for an interface and makes next members public. Must be used inside a class named `interfaceName`. |
 | `PONY_NON_CONSTRUCTIBLE_BODY(objectName)` | Makes an object non-constructible. Must be used inside a class named `objectName`.                                                                                |
 
-### [PonyEngine/Type/Enum.h](Include/Public/PonyEngine/Type/Enum.h)
+### [PonyEngine/Utility/Enum.h](Include/Public/PonyEngine/Utility/Enum.h)
 
 Enum utilities.
 
@@ -151,14 +153,15 @@ Enum utilities.
 
 ## Custom compiler
 
-The module requires a compiler specific implementation. For that, some defines must be implemented by a compiler module.
+The module requires a compiler specific implementation. For that, some defines must be implemented by a compiler module that modifies `PonyEngine.Core`.
 
 1. The define `PONY_COMPILER_INCLUDE` must be set and contain a valid path a compiler implementation header file.
 2. The header file must contain and implement these defines:
 
-| Define                        | Description                                   |
-|:------------------------------|:----------------------------------------------|
-| `PONY_DLL_EXPORT_IMPL`        | Sets `dllexport` attribute.                   |
-| `PONY_PRESERVE_IMPL(symbol)`  | Prevents a compiler from removing the symbol. |
-| `PONY_SECTION_IMPL(name)`     | Declares a section with the name.             |
-| `PONY_ALLOCATE_IMPL(segment)` | Allocates the segment.                        |
+| Define                        | Description                                                        |
+|:------------------------------|:-------------------------------------------------------------------|
+| `PONY_DLL_EXPORT_IMPL`        | Sets `dllexport` attribute.                                        |
+| `PONY_PRESERVE_IMPL(symbol)`  | Prevents a compiler from removing the symbol.                      |
+| `PONY_SECTION_DELIMITER_IMPL` | Section delimiter that is set between a section name and an order. |
+| `PONY_SECTION_IMPL(name)`     | Declares a section with the name.                                  |
+| `PONY_ALLOCATE_IMPL(segment)` | Allocates the segment.                                             |

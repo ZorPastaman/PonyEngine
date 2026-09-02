@@ -9,15 +9,16 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
-
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 #include <shellapi.h>
 
 export module PonyEngine.Application.Impl.Windows:CommandLine;
 
 import std;
 
-import PonyEngine.Platform.Windows;
+import PonyEngine.Text.WinAPI;
 
 export namespace PonyEngine::Application
 {
@@ -64,10 +65,10 @@ namespace PonyEngine::Application
 		for (int i = 0; i < argc; ++i)
 		{
 			const std::wstring_view source = argv.get()[i];
-			const std::size_t size = Platform::GetStringSize(source);
+			const std::size_t size = Text::GetStringSize(source);
 			std::string arg;
 			arg.resize(size);
-			const std::size_t copied = Platform::ConvertToString(source, arg);
+			const std::size_t copied = Text::ConvertToString(source, arg);
 			arg.resize(copied);
 			arg.shrink_to_fit();
 

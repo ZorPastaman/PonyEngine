@@ -11,7 +11,7 @@ export module PonyEngine.Math:Vector;
 
 import std;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :Common;
 import :InternalUtility;
@@ -21,7 +21,7 @@ export namespace PonyEngine::Math
 	/// @brief Vector.
 	/// @tparam T Component type.
 	/// @tparam Size Component count.
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	class Vector final
 	{
 	public:
@@ -39,7 +39,7 @@ export namespace PonyEngine::Math
 		/// @brief Creates a vector and assigns its components from the arguments.
 		/// @tparam Ts Component types.
 		/// @param components Vector components
-		template<Type::Arithmetic... Ts>[[nodiscard("Pure constructor")]]
+		template<Utility::Arithmetic... Ts>[[nodiscard("Pure constructor")]]
 		explicit constexpr Vector(Ts... components) noexcept requires (sizeof...(Ts) == Size);
 		/// @brief Creates a vector and assigns its components from the @p span.
 		/// @param span Components.
@@ -253,7 +253,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Casts all the components to the @p U and returns a new vector with those components.
 		/// @tparam U Target component type.
-		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
+		template<Utility::Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Vector<U, Size>() const noexcept;
 
 		/// @brief Gets a component by the @p index.
@@ -307,19 +307,19 @@ export namespace PonyEngine::Math
 
 	/// @brief One-dimensional vector.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Vector1 = Vector<T, 1uz>;
 	/// @brief Two-dimensional vector.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Vector2 = Vector<T, 2uz>;
 	/// @brief Three-dimensional vector.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Vector3 = Vector<T, 3uz>;
 	/// @brief Four-dimensional vector.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Vector4 = Vector<T, 4uz>;
 
 	/// @brief Checks if all the components are finite numbers.
@@ -336,21 +336,21 @@ export namespace PonyEngine::Math
 	/// @param lhs Left vector.
 	/// @param rhs Right vector.
 	/// @return Dot product.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 	/// @brief Computes a cross vector and returns its z component.
 	/// @tparam T Component type.
 	/// @param lhs Left vector.
 	/// @param rhs Right vector.
 	/// @return Cross product z component.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T CrossZ(const Vector2<T>& lhs, const Vector2<T>& rhs) noexcept;
 	/// @brief Computes a cross vector.
 	/// @tparam T Component type.
 	/// @param lhs Left vector.
 	/// @param rhs Right vector.
 	/// @return Cross product.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Cross(const Vector3<T>& lhs, const Vector3<T>& rhs) noexcept;
 	/// @brief Computes a distance between two points.
 	/// @tparam T Component type.
@@ -376,7 +376,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Left vector.
 	/// @param rhs Right vector.
 	/// @return Distance
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr T DistanceSquared(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 
 	/// @brief Computes an angle between the two vectors.
@@ -405,11 +405,11 @@ export namespace PonyEngine::Math
 
 	/// @brief Computes a vector rotated by 90 degrees clockwise.
 	/// @return Vector rotated by 90 degrees clockwise.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Rotate90CW(const Vector2<T>& vector) noexcept;
 	/// @brief Computes a vector rotated by 90 degrees counter-clockwise.
 	/// @return Vector rotated by 90 degrees counter-clockwise.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Rotate90CCW(const Vector2<T>& vector) noexcept;
 
 	/// @brief Projects the @p vector onto the @p normal.
@@ -443,7 +443,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Multiplicand.
 	/// @param rhs Multiplier.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Multiply(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 	/// @brief Divides the @p lhs vector by the @p rhs vector component-wise.
 	/// @tparam T Component type.
@@ -451,7 +451,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Dividend.
 	/// @param rhs Divisor.
 	/// @return Quotient.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Divide(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 
 	/// @brief Computes absolute values of the @p vector components.
@@ -459,7 +459,7 @@ export namespace PonyEngine::Math
 	/// @tparam Size Component count.
 	/// @param vector Source.
 	/// @return Absolute vector.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Abs(const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
 
 	/// @brief Creates a vector consisting of minimal elements of the two vectors.
@@ -468,7 +468,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Left vector.
 	/// @param rhs Right vector.
 	/// @return Vector of minimal elements.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Min(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 	/// @brief Creates a vector consisting of maximal elements of the two vectors.
 	/// @tparam T Component type.
@@ -476,7 +476,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Left vector.
 	/// @param rhs Right vector.
 	/// @return Vector of maximal elements.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Max(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 	/// @brief Clamps the @p value between the @p min and @p max component-wise.
 	/// @tparam T Component type.
@@ -485,7 +485,7 @@ export namespace PonyEngine::Math
 	/// @param min Minimum.
 	/// @param max Maximum.
 	/// @return Clamped vector.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr Vector<T, Size> Clamp(const Vector<T, Size>& value, const Vector<T, Size>& min, const Vector<T, Size>& max) noexcept requires (Size >= 1uz);
 	/// @brief Clamps the @p vector magnitude.
 	/// @tparam T Component type.
@@ -541,7 +541,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Augend.
 	/// @param rhs Addend.
 	/// @return Sum.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator +(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 
 	/// @brief Negates the @p vector.
@@ -549,7 +549,7 @@ export namespace PonyEngine::Math
 	/// @tparam Size Component count.
 	/// @param vector Vector to negate.
 	/// @return Negated vector.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator -(const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
 
 	/// @brief Subtracts the @p rhs vector from the @p lhs one.
@@ -558,7 +558,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Minuend.
 	/// @param rhs Subtrahend.
 	/// @return Difference.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator -(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz);
 
 	/// @brief Multiplies the @p vector components by the @p multiplier.
@@ -567,7 +567,7 @@ export namespace PonyEngine::Math
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator *(const Vector<T, Size>& vector, T multiplier) noexcept requires (Size >= 1uz);
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
@@ -584,7 +584,7 @@ export namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator *(T multiplier, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
@@ -602,7 +602,7 @@ export namespace PonyEngine::Math
 	/// @param vector Dividend.
 	/// @param divisor Divisor.
 	/// @return Quotient.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator /(const Vector<T, Size>& vector, T divisor) noexcept requires (Size >= 1uz);
 	/// @brief Divides the @p vector components by the @p divisor.
 	/// @tparam T Component type.
@@ -619,7 +619,7 @@ export namespace PonyEngine::Math
 	/// @param dividend Dividend.
 	/// @param vector Divisor.
 	/// @return Quotient.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, Size> operator /(T dividend, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz);
 	/// @brief Divides the @p dividend by the @p vector components.
 	/// @tparam T Component type.
@@ -635,7 +635,7 @@ export namespace PonyEngine::Math
 /// @details The format is ":<range_args>:<component_args>". The default brackets are (). The default separator is ", ".
 /// @tparam T Component type.
 /// @tparam Size Component count.
-export template<PonyEngine::Type::Arithmetic T, std::size_t Size>
+export template<PonyEngine::Utility::Arithmetic T, std::size_t Size>
 struct std::formatter<PonyEngine::Math::Vector<T, Size>, char>
 {
 private:
@@ -683,7 +683,7 @@ public:
 
 namespace PonyEngine::Math
 {
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr Vector<T, Size>::Vector(const T value) noexcept
 	{
 		for (T& component : components)
@@ -692,14 +692,14 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	template<Type::Arithmetic... Ts>
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic... Ts>
 	constexpr Vector<T, Size>::Vector(Ts... components) noexcept requires (sizeof...(Ts) == Size) :
 		components{ConvertTo<T>(components)...}
 	{
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr Vector<T, Size>::Vector(const std::span<const T, Size> span) noexcept
 	{
 		if consteval
@@ -712,7 +712,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr Vector<T, Size> Vector<T, Size>::CreateOneValue(const T value, const std::size_t index) noexcept
 	{
 		auto vector = Vector();
@@ -721,7 +721,7 @@ namespace PonyEngine::Math
 		return vector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Zero() noexcept
 	{
 		static constexpr auto ZeroVector = Vector(T{0});
@@ -729,7 +729,7 @@ namespace PonyEngine::Math
 		return ZeroVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::One() noexcept
 	{
 		static constexpr auto OneVector = Vector(T{1});
@@ -737,7 +737,7 @@ namespace PonyEngine::Math
 		return OneVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Negative() noexcept requires (std::is_signed_v<T>)
 	{
 		static constexpr auto NegativeVector = Vector(T{-1});
@@ -745,7 +745,7 @@ namespace PonyEngine::Math
 		return NegativeVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Right() noexcept requires (Size <= 3uz)
 	{
 		static constexpr Vector RightVector = CreateOneValue(T{1}, 0uz);
@@ -753,7 +753,7 @@ namespace PonyEngine::Math
 		return RightVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Left() noexcept requires (Size <= 3uz && std::is_signed_v<T>)
 	{
 		static constexpr Vector LeftVector = CreateOneValue(T{-1}, 0uz);
@@ -761,7 +761,7 @@ namespace PonyEngine::Math
 		return LeftVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Up() noexcept requires (Size == 2uz || Size == 3uz)
 	{
 		static constexpr Vector UpVector = CreateOneValue(T{1}, 1uz);
@@ -769,7 +769,7 @@ namespace PonyEngine::Math
 		return UpVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Down() noexcept requires ((Size == 2uz || Size == 3uz) && std::is_signed_v<T>)
 	{
 		static constexpr Vector DownVector = CreateOneValue(T{-1}, 1uz);
@@ -777,7 +777,7 @@ namespace PonyEngine::Math
 		return DownVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Forward() noexcept requires (Size == 3uz)
 	{
 		static constexpr Vector ForwardVector = CreateOneValue(T{1}, 2uz);
@@ -785,7 +785,7 @@ namespace PonyEngine::Math
 		return ForwardVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const Vector<T, Size>& Vector<T, Size>::Back() noexcept requires (Size == 3uz && std::is_signed_v<T>)
 	{
 		static constexpr Vector BackVector = CreateOneValue(T{-1}, 2uz);
@@ -793,110 +793,110 @@ namespace PonyEngine::Math
 		return BackVector;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T& Vector<T, Size>::X() noexcept
 	{
 		return components[0];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const T& Vector<T, Size>::X() const noexcept
 	{
 		return components[0];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T& Vector<T, Size>::Y() noexcept requires (Size >= 2uz)
 	{
 		return components[1];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const T& Vector<T, Size>::Y() const noexcept requires (Size >= 2uz)
 	{
 		return components[1];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T& Vector<T, Size>::Z() noexcept requires (Size >= 3uz)
 	{
 		return components[2];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const T& Vector<T, Size>::Z() const noexcept requires (Size >= 3uz)
 	{
 		return components[2];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T& Vector<T, Size>::W() noexcept requires (Size >= 4uz)
 	{
 		return components[3];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const T& Vector<T, Size>::W() const noexcept requires (Size >= 4uz)
 	{
 		return components[3];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr std::span<T, Size> Vector<T, Size>::Span() noexcept
 	{
 		return components;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr std::span<const T, Size> Vector<T, Size>::Span() const noexcept
 	{
 		return components;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	T Vector<T, Size>::Magnitude() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return std::sqrt(MagnitudeSquared());
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	template<std::floating_point U>
 	U Vector<T, Size>::Magnitude() const noexcept requires (std::is_integral_v<T>)
 	{
 		return std::sqrt(static_cast<U>(MagnitudeSquared()));
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T Vector<T, Size>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	Vector<T, Size> Vector<T, Size>::Normalized() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return *this * (T{1} / Magnitude());
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	void Vector<T, Size>::Normalize() noexcept requires (std::is_floating_point_v<T>)
 	{
 		*this = Normalized();
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	Vector<T, Size> Vector<T, Size>::Normalized(const Vector& fallback) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return IsAlmostZero() ? fallback : Normalized();
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	void Vector<T, Size>::Normalize(const Vector& fallback) noexcept requires (std::is_floating_point_v<T>)
 	{
 		*this = Normalized(fallback);
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	Vector<T, Size> Vector<T, Size>::Normalized(const T minMagnitude, const T maxMagnitude) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		const T magnitudeSqr = MagnitudeSquared();
@@ -910,13 +910,13 @@ namespace PonyEngine::Math
 		return std::clamp(normalizedMagnitude, 0.f, 1.f) / magnitude * *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T& Vector<T, Size>::Min() noexcept
 	{
 		return const_cast<T&>(const_cast<const Vector&>(*this).Min());
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const T& Vector<T, Size>::Min() const noexcept
 	{
 		const T* min = &(*this)[0];
@@ -928,13 +928,13 @@ namespace PonyEngine::Math
 		return *min;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T& Vector<T, Size>::Max() noexcept
 	{
 		return const_cast<T&>(const_cast<const Vector&>(*this).Max());
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const T& Vector<T, Size>::Max() const noexcept
 	{
 		const T* max = &(*this)[0];
@@ -946,7 +946,7 @@ namespace PonyEngine::Math
 		return *max;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr std::pair<T&, T&> Vector<T, Size>::MinMax() noexcept
 	{
 		const std::pair<const T&, const T&> minMax = const_cast<const Vector&>(*this).MinMax();
@@ -954,7 +954,7 @@ namespace PonyEngine::Math
 		return std::pair<T&, T&>(const_cast<T&>(minMax.first), const_cast<T&>(minMax.second));
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr std::pair<const T&, const T&> Vector<T, Size>::MinMax() const noexcept
 	{
 		const T* min = &(*this)[0];
@@ -968,7 +968,7 @@ namespace PonyEngine::Math
 		return std::pair<const T&, const T&>(*min, *max);
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T Vector<T, Size>::Sum() const noexcept
 	{
 		T answer = T{0};
@@ -980,7 +980,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T Vector<T, Size>::Product() const noexcept
 	{
 		T answer = T{1};
@@ -992,33 +992,33 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr bool Vector<T, Size>::IsZero() const noexcept
 	{
 		return *this == Zero();
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	template<std::same_as<T> U>
 	constexpr bool Vector<T, Size>::IsAlmostZero(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Zero(), tolerance);
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr bool Vector<T, Size>::IsUnit() const noexcept
 	{
 		return MagnitudeSquared() == T{1};
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	template<std::same_as<T> U>
 	constexpr bool Vector<T, Size>::IsAlmostUnit(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(MagnitudeSquared(), T{1}, tolerance);
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr bool Vector<T, Size>::IsUniform() const noexcept
 	{
 		for (std::size_t i = 1uz; i < Size; ++i)
@@ -1032,7 +1032,7 @@ namespace PonyEngine::Math
 		return true;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	template<std::same_as<T> U>
 	constexpr bool Vector<T, Size>::IsAlmostUniform(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
@@ -1041,7 +1041,7 @@ namespace PonyEngine::Math
 		return AreAlmostEqual(min, max, tolerance);
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr bool Vector<T, Size>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		for (const T component : components)
@@ -1055,7 +1055,7 @@ namespace PonyEngine::Math
 		return true;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr void Vector<T, Size>::Multiply(const Vector& multiplier) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1064,7 +1064,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr void Vector<T, Size>::Divide(const Vector& divisor) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1079,19 +1079,19 @@ namespace PonyEngine::Math
 		return vector.IsFinite();
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr T Dot(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		return Multiply(lhs, rhs).Sum();
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr T CrossZ(const Vector2<T>& lhs, const Vector2<T>& rhs) noexcept
 	{
 		return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr Vector3<T> Cross(const Vector3<T>& lhs, const Vector3<T>& rhs) noexcept
 	{
 		Vector3<T> cross;
@@ -1102,7 +1102,7 @@ namespace PonyEngine::Math
 		return cross;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	typename Vector<T, Size>::ComputationalType Distance(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		return std::sqrt(static_cast<typename Vector<T, Size>::ComputationalType>(DistanceSquared(lhs, rhs)));
@@ -1120,7 +1120,7 @@ namespace PonyEngine::Math
 		return std::sqrt(static_cast<U>(DistanceSquared(lhs, rhs)));
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr T DistanceSquared(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		if constexpr (std::is_floating_point_v<T>)
@@ -1166,13 +1166,13 @@ namespace PonyEngine::Math
 		return std::copysign(angle, dot);
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr Vector2<T> Rotate90CW(const Vector2<T>& vector) noexcept
 	{
 		return Vector2<T>(vector.Y(), -vector.X());
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr Vector2<T> Rotate90CCW(const Vector2<T>& vector) noexcept
 	{
 		return Vector2<T>(-vector.Y(), vector.X());
@@ -1196,7 +1196,7 @@ namespace PonyEngine::Math
 		return vector + T{-2} * Dot(vector, normal) * normal;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> Multiply(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> product;
@@ -1208,7 +1208,7 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> Divide(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> quotient;
@@ -1220,7 +1220,7 @@ namespace PonyEngine::Math
 		return quotient;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> Abs(const Vector<T, Size>& vector) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> answer;
@@ -1232,7 +1232,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> Min(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> answer;
@@ -1244,7 +1244,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> Max(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> answer;
@@ -1256,7 +1256,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> Clamp(const Vector<T, Size>& value, const Vector<T, Size>& min, const Vector<T, Size>& max) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> answer;
@@ -1322,8 +1322,8 @@ namespace PonyEngine::Math
 		return true;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
-	template<Type::Arithmetic U>
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic U>
 	constexpr Vector<T, Size>::operator Vector<U, Size>() const noexcept
 	{
 		Vector<U, Size> cast;
@@ -1335,19 +1335,19 @@ namespace PonyEngine::Math
 		return cast;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr T& Vector<T, Size>::operator [](const std::size_t index) noexcept
 	{
 		return components[index];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr const T& Vector<T, Size>::operator [](const std::size_t index) const noexcept
 	{
 		return components[index];
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr Vector<T, Size>& Vector<T, Size>::operator +=(const Vector& other) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1358,7 +1358,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr Vector<T, Size>& Vector<T, Size>::operator -=(const Vector& other) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1369,7 +1369,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr Vector<T, Size>& Vector<T, Size>::operator *=(const T multiplier) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1380,7 +1380,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	template<std::floating_point U>
 	constexpr Vector<T, Size>& Vector<T, Size>::operator *=(const U multiplier) noexcept requires (std::is_integral_v<T>)
 	{
@@ -1392,7 +1392,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	constexpr Vector<T, Size>& Vector<T, Size>::operator /=(const T divisor) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1403,7 +1403,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	template<std::floating_point U>
 	constexpr Vector<T, Size>& Vector<T, Size>::operator /=(const U divisor) noexcept requires (std::is_integral_v<T>)
 	{
@@ -1415,7 +1415,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> operator +(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> sum;
@@ -1427,7 +1427,7 @@ namespace PonyEngine::Math
 		return sum;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> operator -(const Vector<T, Size>& vector) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> negated;
@@ -1439,7 +1439,7 @@ namespace PonyEngine::Math
 		return negated;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> operator -(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> difference;
@@ -1451,7 +1451,7 @@ namespace PonyEngine::Math
 		return difference;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> operator *(const Vector<T, Size>& vector, const T multiplier) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> product;
@@ -1475,7 +1475,7 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> operator *(const T multiplier, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz)
 	{
 		return vector * multiplier;
@@ -1487,7 +1487,7 @@ namespace PonyEngine::Math
 		return vector * multiplier;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> operator /(const Vector<T, Size>& vector, const T divisor) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> quotient;
@@ -1511,7 +1511,7 @@ namespace PonyEngine::Math
 		return quotient;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Vector<T, Size> operator /(const T dividend, const Vector<T, Size>& vector) noexcept requires (Size >= 1uz)
 	{
 		Vector<T, Size> quotient;

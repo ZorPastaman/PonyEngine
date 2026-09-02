@@ -10,7 +10,10 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 
 export module PonyEngine.File.Impl.Windows:File;
 

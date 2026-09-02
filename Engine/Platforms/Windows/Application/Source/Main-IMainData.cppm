@@ -9,8 +9,11 @@
 
 module;
 
-#include "PonyEngine/Object/Body.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
+#include "PonyEngine/Utility/Body.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 
 export module PonyEngine.Application.Windows:IMainData;
 

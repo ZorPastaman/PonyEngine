@@ -11,7 +11,7 @@ export module PonyEngine.Math:Matrix;
 
 import std;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :Common;
 import :InternalUtility;
@@ -24,7 +24,7 @@ export namespace PonyEngine::Math
 	/// @tparam T Component type.
 	/// @tparam RowSize Row count.
 	/// @tparam ColumnSize Column count.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	class Matrix final
 	{
 	public:
@@ -46,7 +46,7 @@ export namespace PonyEngine::Math
 		/// @brief Creates a matrix and assigns its components from the arguments.
 		/// @tparam Ts Component types.
 		/// @param components Matrix components
-		template<Type::Arithmetic... Ts> [[nodiscard("Pure constructor")]]
+		template<Utility::Arithmetic... Ts> [[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix(Ts... components) noexcept requires (sizeof...(Ts) == RowSize * ColumnSize);
 		/// @brief Creates a matrix and assigns its columns from the arguments.
 		/// @tparam Ts Column types.
@@ -295,7 +295,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Casts all the components to the @p U.
 		/// @tparam U Target component type.
-		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
+		template<Utility::Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Matrix<U, RowSize, ColumnSize>() const noexcept;
 
 		/// @brief Gets a component by indices.
@@ -355,31 +355,31 @@ export namespace PonyEngine::Math
 
 	/// @brief Matrix 1x1.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Matrix1x1 = Matrix<T, 1uz, 1uz>;
 	/// @brief Matrix 1x2.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Matrix1x2 = Matrix<T, 1uz, 2uz>;
 	/// @brief Matrix 2x2.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Matrix2x2 = Matrix<T, 2uz, 2uz>;
 	/// @brief Matrix 2x3.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Matrix2x3 = Matrix<T, 2uz, 3uz>;
 	/// @brief Matrix 3x3.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Matrix3x3 = Matrix<T, 3uz, 3uz>;
 	/// @brief Matrix 3x4.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Matrix3x4 = Matrix<T, 3uz, 4uz>;
 	/// @brief Matrix 4x4.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using Matrix4x4 = Matrix<T, 4uz, 4uz>;
 
 	/// @brief Checks if all the components are finite numbers.
@@ -398,7 +398,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Multiplicand.
 	/// @param rhs Multiplier.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
 	constexpr Matrix<T, RowSize, ColumnSize> Multiply(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 	/// @brief Divides the @p lhs matrix by the @p rhs matrix component-wise.
 	/// @tparam T Component type.
@@ -407,7 +407,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Dividend.
 	/// @param rhs Divisor.
 	/// @return Quotient.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure function")]]
 	constexpr Matrix<T, RowSize, ColumnSize> Divide(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 
 	/// @brief Multiplies a transpose of the @p lhs matrix by the @p rhs matrix component-wise.
@@ -418,7 +418,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Multiplicand.
 	/// @param rhs Multiplier.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize> [[nodiscard("Pure function")]]
 	constexpr Matrix<T, RowSize, RightColumnSize> MultiplyTranspose(const Matrix<T, ColumnSize, RowSize>& lhs, const Matrix<T, ColumnSize, RightColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz && RightColumnSize >= 1uz);
 
 	/// @brief Computes absolute values of the @p matrix components.
@@ -464,7 +464,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Augend.
 	/// @param rhs Addend.
 	/// @return Sum.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, ColumnSize> operator +(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 
 	/// @brief Negates the @p matrix.
@@ -473,7 +473,7 @@ export namespace PonyEngine::Math
 	/// @tparam ColumnSize Column count.
 	/// @param matrix Matrix to negate.
 	/// @return Negated matrix.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, ColumnSize> operator -(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 	/// @brief Subtracts the @p rhs matrix from the @p lhs matrix.
 	/// @tparam T Component type.
@@ -482,7 +482,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Minuend.
 	/// @param rhs Subtrahend.
 	/// @return Difference.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, ColumnSize> operator -(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
@@ -492,7 +492,7 @@ export namespace PonyEngine::Math
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, ColumnSize> operator *(const Matrix<T, RowSize, ColumnSize>& matrix, T multiplier) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
@@ -511,7 +511,7 @@ export namespace PonyEngine::Math
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, ColumnSize> operator *(T multiplier, const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
@@ -532,7 +532,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Multiplicand.
 	/// @param rhs Multiplier.
 	/// @return Product.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, RightColumnSize> operator *(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, ColumnSize, RightColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz && RightColumnSize >= 1uz);
 	/// @brief Multiplies the @p matrix by the @p vector.
 	/// @tparam T Component type.
@@ -541,7 +541,7 @@ export namespace PonyEngine::Math
 	/// @param matrix Matrix.
 	/// @param vector Vector.
 	/// @return Product vector.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Vector<T, RowSize> operator *(const Matrix<T, RowSize, ColumnSize>& matrix, const Vector<T, ColumnSize>& vector) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 
 	/// @brief Divides the @p matrix by the @p divisor.
@@ -551,7 +551,7 @@ export namespace PonyEngine::Math
 	/// @param matrix Dividend.
 	/// @param divisor Divisor.
 	/// @return Quotient.
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> [[nodiscard("Pure operator")]]
 	constexpr Matrix<T, RowSize, ColumnSize> operator /(const Matrix<T, RowSize, ColumnSize>& matrix, T divisor) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz);
 	/// @brief Divides the @p matrix by the @p divisor.
 	/// @tparam T Component type.
@@ -572,7 +572,7 @@ export namespace PonyEngine::Math
 /// @tparam T Component type.
 /// @tparam RowSize Row count.
 /// @tparam ColumnSize Column count.
-export template<PonyEngine::Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+export template<PonyEngine::Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 struct std::formatter<PonyEngine::Math::Matrix<T, RowSize, ColumnSize>, char>
 {
 private:
@@ -663,28 +663,28 @@ public:
 
 namespace PonyEngine::Math
 {
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>::Matrix(const T value) noexcept requires (RowSize == ColumnSize) :
 		Matrix()
 	{
 		Diagonal(Vector<T, RowSize>(value));
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
-	template<Type::Arithmetic... Ts>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic... Ts>
 	constexpr Matrix<T, RowSize, ColumnSize>::Matrix(Ts... components) noexcept requires (sizeof...(Ts) == RowSize * ColumnSize) :
 		Matrix(std::array<T, RowSize * ColumnSize>{ConvertTo<T>(components)...})
 	{
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	template<typename... Ts>
 	constexpr Matrix<T, RowSize, ColumnSize>::Matrix(Ts&&... columns) noexcept requires (sizeof...(Ts) == ColumnSize && (std::is_convertible_v<Ts, Vector<T, RowSize>> && ...)) :
 		columns{{static_cast<Vector<T, RowSize>>(std::forward<Ts>(columns))...}}
 	{
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>::Matrix(const std::span<const T, RowSize * ColumnSize> span) noexcept
 	{
 		if consteval
@@ -700,7 +700,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>::Matrix(const std::mdspan<const T, std::extents<std::size_t, ColumnSize, RowSize>> span) noexcept
 	{
 		if consteval
@@ -719,7 +719,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>::Matrix(const std::span<const Vector<T, RowSize>, ColumnSize> span) noexcept
 	{
 		if consteval
@@ -735,7 +735,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr const Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::Zero() noexcept
 	{
 		static constexpr auto ZeroMatrix = Matrix();
@@ -743,7 +743,7 @@ namespace PonyEngine::Math
 		return ZeroMatrix;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr const Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::Identity() noexcept requires (RowSize == ColumnSize)
 	{
 		static constexpr auto IdentityMatrix = Matrix(T{1});
@@ -751,55 +751,55 @@ namespace PonyEngine::Math
 		return IdentityMatrix;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T& Matrix<T, RowSize, ColumnSize>::Component(const std::size_t index) noexcept
 	{
 		return (*this)[index % RowSize, index / RowSize];
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr const T& Matrix<T, RowSize, ColumnSize>::Component(const std::size_t index) const noexcept
 	{
 		return (*this)[index % RowSize, index / RowSize];
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	std::span<T, RowSize * ColumnSize> Matrix<T, RowSize, ColumnSize>::Span() noexcept
 	{
 		return std::span<T, RowSize * ColumnSize>(reinterpret_cast<T*>(this), RowSize * ColumnSize);
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	std::span<const T, RowSize * ColumnSize> Matrix<T, RowSize, ColumnSize>::Span() const noexcept
 	{
 		return std::span<const T, RowSize * ColumnSize>(reinterpret_cast<const T*>(this), RowSize * ColumnSize);
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	std::mdspan<T, std::extents<std::size_t, ColumnSize, RowSize>> Matrix<T, RowSize, ColumnSize>::SpanMD() noexcept
 	{
 		return std::mdspan<T, std::extents<std::size_t, ColumnSize, RowSize>>(&columns[0][0], ColumnSize, RowSize);
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	std::mdspan<const T, std::extents<std::size_t, ColumnSize, RowSize>> Matrix<T, RowSize, ColumnSize>::SpanMD() const noexcept
 	{
 		return std::mdspan<const T, std::extents<std::size_t, ColumnSize, RowSize>>(&columns[0][0], ColumnSize, RowSize);
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr std::span<T, RowSize> Matrix<T, RowSize, ColumnSize>::Span(const std::size_t columnIndex) noexcept
 	{
 		return columns[columnIndex].Span();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr std::span<const T, RowSize> Matrix<T, RowSize, ColumnSize>::Span(const std::size_t columnIndex) const noexcept
 	{
 		return columns[columnIndex].Span();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, ColumnSize> Matrix<T, RowSize, ColumnSize>::Row(const std::size_t rowIndex) const noexcept
 	{
 		Vector<T, ColumnSize> answer;
@@ -811,7 +811,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::Row(const std::size_t rowIndex, const Vector<T, ColumnSize>& value) noexcept
 	{
 		for (std::size_t i = 0uz; i < ColumnSize; ++i)
@@ -820,37 +820,37 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, RowSize>& Matrix<T, RowSize, ColumnSize>::Column(const std::size_t columnIndex) noexcept
 	{
 		return columns[columnIndex];
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr const Vector<T, RowSize>& Matrix<T, RowSize, ColumnSize>::Column(const std::size_t columnIndex) const noexcept
 	{
 		return columns[columnIndex];
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::Column(const std::size_t columnIndex, const Vector<T, RowSize>& value) noexcept
 	{
 		columns[columnIndex] = value;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr std::span<Vector<T, RowSize>, ColumnSize> Matrix<T, RowSize, ColumnSize>::Columns() noexcept
 	{
 		return columns;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr std::span<const Vector<T, RowSize>, ColumnSize> Matrix<T, RowSize, ColumnSize>::Columns() const noexcept
 	{
 		return columns;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, RowSize> Matrix<T, RowSize, ColumnSize>::Diagonal() const noexcept requires (RowSize == ColumnSize)
 	{
 		Vector<T, RowSize> answer;
@@ -862,7 +862,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::Diagonal(const Vector<T, RowSize>& value) noexcept requires (RowSize == ColumnSize)
 	{
 		for (std::size_t i = 0uz; i < RowSize; ++i)
@@ -871,7 +871,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, RowSize> Matrix<T, RowSize, ColumnSize>::CounterDiagonal() const noexcept requires (RowSize == ColumnSize)
 	{
 		Vector<T, RowSize> answer;
@@ -883,7 +883,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::CounterDiagonal(const Vector<T, RowSize>& value) noexcept requires (RowSize == ColumnSize)
 	{
 		for (std::size_t i = 0uz; i < RowSize; ++i)
@@ -892,13 +892,13 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Trace() const noexcept requires (RowSize == ColumnSize)
 	{
 		return Diagonal().Sum();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Determinant() const noexcept requires (RowSize == ColumnSize)
 	{
 		if constexpr (RowSize == 1uz)
@@ -945,7 +945,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, ColumnSize, RowSize> Matrix<T, RowSize, ColumnSize>::Transpose() const noexcept
 	{
 		Matrix<T, ColumnSize, RowSize> answer;
@@ -960,7 +960,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, std::max(RowSize - 1uz, 1uz), std::max(ColumnSize - 1uz, 1uz)> Matrix<T, RowSize, ColumnSize>::Submatrix(const std::size_t rowIndex, const std::size_t columnIndex) const noexcept requires (RowSize > 1uz && ColumnSize > 1uz)
 	{
 		Matrix<T, RowSize - 1uz, ColumnSize - 1uz> answer;
@@ -997,7 +997,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, std::max(RowSize - 1uz, 1uz), ColumnSize> Matrix<T, RowSize, ColumnSize>::SubmatrixRow(const std::size_t rowIndex) const noexcept requires (RowSize > 1uz)
 	{
 		Matrix<T, RowSize - 1uz, ColumnSize> answer;
@@ -1023,7 +1023,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, std::max(ColumnSize - 1uz, 1uz)> Matrix<T, RowSize, ColumnSize>::SubmatrixColumn(const std::size_t columnIndex) const noexcept requires (ColumnSize > 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize - 1uz> answer;
@@ -1049,25 +1049,25 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Minor(const std::size_t rowIndex, const std::size_t columnIndex) const noexcept requires (RowSize == ColumnSize && RowSize > 1uz)
 	{
 		return Submatrix(rowIndex, columnIndex).Determinant();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Minor(const std::size_t rowIndex) const noexcept requires (RowSize == ColumnSize + 1uz)
 	{
 		return SubmatrixRow(rowIndex).Determinant();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Minor(const std::size_t columnIndex) const noexcept requires (ColumnSize == RowSize + 1uz)
 	{
 		return SubmatrixColumn(columnIndex).Determinant();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize> Matrix<T, RowSize, ColumnSize>::MinorMatrix() const noexcept requires (RowSize == ColumnSize && RowSize > 1uz)
 	{
 		Matrix answer;
@@ -1082,7 +1082,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, RowSize> Matrix<T, RowSize, ColumnSize>::MinorVector() const noexcept requires (RowSize == ColumnSize + 1uz)
 	{
 		Vector<T, RowSize> answer;
@@ -1094,7 +1094,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, ColumnSize> Matrix<T, RowSize, ColumnSize>::MinorVector() const noexcept requires (ColumnSize == RowSize + 1uz)
 	{
 		Vector<T, ColumnSize> answer;
@@ -1106,7 +1106,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Cofactor(const std::size_t rowIndex, const std::size_t columnIndex) const noexcept requires (RowSize == ColumnSize && RowSize > 1uz)
 	{
 		const T minor = Minor(rowIndex, columnIndex);
@@ -1114,7 +1114,7 @@ namespace PonyEngine::Math
 		return IsOdd(rowIndex + columnIndex) ? -minor : minor;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Cofactor(const std::size_t rowIndex) const noexcept requires (RowSize == ColumnSize + 1uz)
 	{
 		const T minor = Minor(rowIndex);
@@ -1122,7 +1122,7 @@ namespace PonyEngine::Math
 		return IsOdd(rowIndex) ? -minor : minor;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T Matrix<T, RowSize, ColumnSize>::Cofactor(const std::size_t columnIndex) const noexcept requires (ColumnSize == RowSize + 1uz)
 	{
 		const T minor = Minor(columnIndex);
@@ -1130,7 +1130,7 @@ namespace PonyEngine::Math
 		return IsOdd(columnIndex) ? -minor : minor;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize> Matrix<T, RowSize, ColumnSize>::CofactorMatrix() const noexcept requires (RowSize == ColumnSize && RowSize > 1uz)
 	{
 		Matrix answer;
@@ -1145,7 +1145,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, RowSize> Matrix<T, RowSize, ColumnSize>::CofactorVector() const noexcept requires (RowSize == ColumnSize + 1uz)
 	{
 		Vector<T, RowSize> answer;
@@ -1157,7 +1157,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Vector<T, ColumnSize> Matrix<T, RowSize, ColumnSize>::CofactorVector() const noexcept requires (ColumnSize == RowSize + 1uz)
 	{
 		Vector<T, ColumnSize> answer;
@@ -1169,45 +1169,45 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize> Matrix<T, RowSize, ColumnSize>::Adjugate() const noexcept requires (RowSize == ColumnSize && RowSize > 1uz)
 	{
 		return CofactorMatrix().Transpose();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize> Matrix<T, RowSize, ColumnSize>::Inverse() const noexcept requires (std::is_floating_point_v<T> && RowSize == ColumnSize && RowSize > 1uz)
 	{
 		return Adjugate() * (T{1} / Determinant());
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr bool Matrix<T, RowSize, ColumnSize>::IsZero() const noexcept
 	{
 		return *this == Zero();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	template<std::same_as<T> U>
 	constexpr bool Matrix<T, RowSize, ColumnSize>::IsAlmostZero(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Zero(), tolerance);
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr bool Matrix<T, RowSize, ColumnSize>::IsIdentity() const noexcept requires (RowSize == ColumnSize)
 	{
 		return *this == Identity();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	template<std::same_as<T> U>
 	constexpr bool Matrix<T, RowSize, ColumnSize>::IsAlmostIdentity(const Tolerance<U>& tolerance) const noexcept requires (std::is_floating_point_v<T> && RowSize == ColumnSize)
 	{
 		return AreAlmostEqual(*this, Identity(), tolerance);
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr bool Matrix<T, RowSize, ColumnSize>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		for (std::size_t i = 0uz; i < ColumnSize; ++i)
@@ -1221,7 +1221,7 @@ namespace PonyEngine::Math
 		return true;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::Multiply(const Matrix& multiplier) noexcept
 	{
 		for (std::size_t j = 0uz; j < ColumnSize; ++j)
@@ -1233,7 +1233,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr void Matrix<T, RowSize, ColumnSize>::Divide(const Matrix& divisor) noexcept
 	{
 		for (std::size_t j = 0uz; j < ColumnSize; ++j)
@@ -1245,8 +1245,8 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
-	template<Type::Arithmetic U>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic U>
 	constexpr Matrix<T, RowSize, ColumnSize>::operator Matrix<U, RowSize, ColumnSize>() const noexcept
 	{
 		Matrix<U, RowSize, ColumnSize> answer;
@@ -1261,19 +1261,19 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr T& Matrix<T, RowSize, ColumnSize>::operator [](const std::size_t rowIndex, const std::size_t columnIndex) noexcept
 	{
 		return columns[columnIndex][rowIndex];
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr const T& Matrix<T, RowSize, ColumnSize>::operator [](const std::size_t rowIndex, const std::size_t columnIndex) const noexcept
 	{
 		return columns[columnIndex][rowIndex];
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator +=(const Matrix& other) noexcept
 	{
 		for (std::size_t j = 0uz; j < ColumnSize; ++j)
@@ -1287,7 +1287,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator -=(const Matrix& other) noexcept
 	{
 		for (std::size_t j = 0uz; j < ColumnSize; ++j)
@@ -1301,7 +1301,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator *=(const T multiplier) noexcept
 	{
 		for (std::size_t j = 0uz; j < ColumnSize; ++j)
@@ -1315,7 +1315,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	template<std::floating_point U>
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator *=(const U multiplier) noexcept requires (std::is_integral_v<T>)
 	{
@@ -1330,13 +1330,13 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator *=(const Matrix& other) noexcept requires (RowSize == ColumnSize)
 	{
 		return *this = *this * other;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator /=(const T divisor) noexcept
 	{
 		for (std::size_t j = 0uz; j < ColumnSize; ++j)
@@ -1350,7 +1350,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize> requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	template<std::floating_point U>
 	constexpr Matrix<T, RowSize, ColumnSize>& Matrix<T, RowSize, ColumnSize>::operator /=(const U divisor) noexcept requires (std::is_integral_v<T>)
 	{
@@ -1371,7 +1371,7 @@ namespace PonyEngine::Math
 		return matrix.IsFinite();
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> Multiply(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
@@ -1386,7 +1386,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> Divide(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
@@ -1401,7 +1401,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize>
 	constexpr Matrix<T, RowSize, RightColumnSize> MultiplyTranspose(const Matrix<T, ColumnSize, RowSize>& lhs, const Matrix<T, ColumnSize, RightColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz && RightColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, RightColumnSize> answer;
@@ -1472,7 +1472,7 @@ namespace PonyEngine::Math
 		return true;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> operator +(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
@@ -1487,7 +1487,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> operator -(const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
@@ -1502,7 +1502,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> operator -(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, RowSize, ColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
@@ -1517,7 +1517,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> operator *(const Matrix<T, RowSize, ColumnSize>& matrix, const T multiplier) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;
@@ -1547,7 +1547,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> operator *(const T multiplier, const Matrix<T, RowSize, ColumnSize>& matrix) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		return matrix * multiplier;
@@ -1559,13 +1559,13 @@ namespace PonyEngine::Math
 		return matrix * multiplier;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize, std::size_t RightColumnSize>
 	constexpr Matrix<T, RowSize, RightColumnSize> operator *(const Matrix<T, RowSize, ColumnSize>& lhs, const Matrix<T, ColumnSize, RightColumnSize>& rhs) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz && RightColumnSize >= 1uz)
 	{
 		return MultiplyTranspose(lhs.Transpose(), rhs);
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Vector<T, RowSize> operator *(const Matrix<T, RowSize, ColumnSize>& matrix, const Vector<T, ColumnSize>& vector) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		auto answer = Vector<T, RowSize>::Zero();
@@ -1577,7 +1577,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+	template<Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 	constexpr Matrix<T, RowSize, ColumnSize> operator /(const Matrix<T, RowSize, ColumnSize>& matrix, const T divisor) noexcept requires (RowSize >= 1uz && ColumnSize >= 1uz)
 	{
 		Matrix<T, RowSize, ColumnSize> answer;

@@ -11,7 +11,7 @@ export module PonyEngine.Math:CornerBox;
 
 import std;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :Box;
 import :Common;
@@ -22,7 +22,7 @@ export namespace PonyEngine::Math
 	/// @brief Box which origin is minimal point.
 	/// @tparam T Component type.
 	/// @tparam Dim Dimension.
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	class CornerBox final
 	{
 	public:
@@ -131,7 +131,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Casts the box to a box of another type.
 		/// @tparam U Target type.
-		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
+		template<Utility::Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator CornerBox<U, Dim>() const noexcept;
 		/// @brief Casts the box to a box of another type.
 		[[nodiscard("Pure operator")]]
@@ -150,11 +150,11 @@ export namespace PonyEngine::Math
 
 	/// @brief Corner rectangle.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using CornerRect = CornerBox<T, 2>;
 	/// @brief Corner cuboid.
 	/// @tparam T Component type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	using CornerCuboid = CornerBox<T, 3>;
 
 	/// @brief Checks if the two boxes are almost equal with the tolerance value.
@@ -170,88 +170,88 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::CornerBox(const Vector<T, Dim>& size) noexcept :
 		position(Vector<T, Dim>::Zero()),
 		size(size)
 	{
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::CornerBox(const Vector<T, Dim>& position, const Vector<T, Dim>& size) noexcept :
 		position(position),
 		size(size)
 	{
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::CornerBox(const Box<T, Dim>& box) noexcept :
 		position(box.Min()),
 		size(box.Edges())
 	{
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr const Vector<T, Dim>& CornerBox<T, Dim>::Position() const noexcept
 	{
 		return position;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr void CornerBox<T, Dim>::Position(const Vector<T, Dim>& position) noexcept
 	{
 		this->position = position;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr const Vector<T, Dim>& CornerBox<T, Dim>::Size() const noexcept
 	{
 		return size;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr void CornerBox<T, Dim>::Size(const Vector<T, Dim>& size) noexcept
 	{
 		this->size = size;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr T CornerBox<T, Dim>::Surface() const noexcept
 	{
 		return Box<T, Dim>(Abs(size / T{2})).Surface();
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr T CornerBox<T, Dim>::Volume() const noexcept
 	{
 		return Box<T, Dim>(Abs(size / T{2})).Volume();
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr T CornerBox<T, Dim>::Min(const std::size_t index) const noexcept
 	{
 		return position[index];
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr Vector<T, Dim> CornerBox<T, Dim>::Min() const noexcept
 	{
 		return position;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr T CornerBox<T, Dim>::Max(const std::size_t index) const noexcept
 	{
 		return position[index] + size[index];
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr Vector<T, Dim> CornerBox<T, Dim>::Max() const noexcept
 	{
 		return position + size;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr Vector<T, Dim> CornerBox<T, Dim>::Corner(std::size_t index) const noexcept requires (Dim <= std::numeric_limits<std::size_t>::digits)
 	{
 		Vector<T, Dim> corner;
@@ -263,7 +263,7 @@ namespace PonyEngine::Math
 		return corner;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::CornersType CornerBox<T, Dim>::Corners() const noexcept requires (Dim <= std::numeric_limits<std::size_t>::digits)
 	{
 		const Vector<T, Dim> min = Min();
@@ -282,7 +282,7 @@ namespace PonyEngine::Math
 		return corners;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr void CornerBox<T, Dim>::ResolveNegativeSize() noexcept
 	{
 		for (std::size_t i = 0; i < Dim; ++i)
@@ -292,13 +292,13 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr bool CornerBox<T, Dim>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return position.IsFinite() && size.IsFinite();
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr bool CornerBox<T, Dim>::Contains(const Vector<T, Dim>& point) const noexcept
 	{
 		for (std::size_t i = 0; i < Dim; ++i)
@@ -312,7 +312,7 @@ namespace PonyEngine::Math
 		return true;
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr Vector<T, Dim> CornerBox<T, Dim>::ClosestPoint(const Vector<T, Dim>& point) const noexcept
 	{
 		const Vector<T, Dim> min = Min();
@@ -321,14 +321,14 @@ namespace PonyEngine::Math
 		return Clamp(point, Math::Min(min, max), Math::Max(min, max));
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
-	template<Type::Arithmetic U>
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic U>
 	constexpr CornerBox<T, Dim>::operator CornerBox<U, Dim>() const noexcept
 	{
 		return CornerBox<U, Dim>(static_cast<Vector<U, Dim>>(position), static_cast<Vector<U, Dim>>(size));
 	}
 
-	template<Type::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
+	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::operator Box<T, Dim>() const noexcept
 	{
 		const Vector<T, Dim> extents = size / T{2};

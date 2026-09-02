@@ -9,14 +9,16 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 
 export module PonyEngine.File.Impl.Windows:OverlappedRequest;
 
 import std;
 
 import PonyEngine.File.Impl;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :OverlappedReadRequest;
 import :OverlappedWriteRequest;
@@ -129,7 +131,7 @@ namespace PonyEngine::File
 
 	OVERLAPPED& OverlappedRequest::Overlapped() noexcept
 	{
-		return std::visit<OVERLAPPED&>(Type::Overload
+		return std::visit<OVERLAPPED&>(Utility::Overload
 		{
 			[](OverlappedReadRequest& readRequest) -> OVERLAPPED&
 			{
@@ -144,7 +146,7 @@ namespace PonyEngine::File
 
 	const OVERLAPPED& OverlappedRequest::Overlapped() const noexcept
 	{
-		return std::visit<const OVERLAPPED&>(Type::Overload
+		return std::visit<const OVERLAPPED&>(Utility::Overload
 		{
 			[](const OverlappedReadRequest& readRequest) -> const OVERLAPPED&
 			{
@@ -159,7 +161,7 @@ namespace PonyEngine::File
 
 	void OverlappedRequest::SetSuccess(const std::size_t byteCount) noexcept
 	{
-		std::visit(Type::Overload
+		std::visit(Utility::Overload
 		{
 			[&](OverlappedReadRequest& readRequest)
 			{
@@ -174,7 +176,7 @@ namespace PonyEngine::File
 
 	void OverlappedRequest::SetFailure(std::exception_ptr exception) noexcept
 	{
-		std::visit(Type::Overload
+		std::visit(Utility::Overload
 		{
 			[&](OverlappedReadRequest& readRequest)
 			{
@@ -189,7 +191,7 @@ namespace PonyEngine::File
 
 	void OverlappedRequest::SetCanceled() noexcept
 	{
-		std::visit(Type::Overload
+		std::visit(Utility::Overload
 		{
 			[](ReadRequest& readRequest)
 			{

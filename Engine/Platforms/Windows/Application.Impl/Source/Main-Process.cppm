@@ -13,8 +13,10 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Macro/Text.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 #include <avrt.h>
 #include <KnownFolders.h>
 
@@ -24,8 +26,8 @@ import std;
 
 import PonyEngine.Application.Impl;
 import PonyEngine.Chrono;
+import PonyEngine.FileSystem.WinAPI;
 import PonyEngine.Log;
-import PonyEngine.Platform.Windows;
 
 import :ThreadRole;
 
@@ -213,22 +215,22 @@ namespace PonyEngine::Application
 
 	std::filesystem::path Process::GetExecutablePath()
 	{
-		return Platform::GetModulePath(nullptr).lexically_normal();
+		return FileSystem::GetModulePath(nullptr).lexically_normal();
 	}
 
 	std::filesystem::path Process::GetLocalDataDirectory()
 	{
-		return AddTail(Platform::GetKnownPath(FOLDERID_LocalAppData));
+		return AddTail(FileSystem::GetKnownPath(FOLDERID_LocalAppData));
 	}
 
 	std::filesystem::path Process::GetUserDataDirectory()
 	{
-		return AddTail(Platform::GetKnownPath(FOLDERID_SavedGames));
+		return AddTail(FileSystem::GetKnownPath(FOLDERID_SavedGames));
 	}
 
 	std::filesystem::path Process::GetTempDataDirectory()
 	{
-		return AddTail(Platform::GetTemporaryPath());
+		return AddTail(FileSystem::GetTemporaryPath());
 	}
 
 	void Process::SetProcessPriority() const noexcept

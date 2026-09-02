@@ -10,8 +10,10 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 #include <hidusage.h>
 
 export module PonyEngine.RawInput.Mouse.Impl.Windows:MouseProvider;
@@ -22,7 +24,6 @@ import PonyEngine.Application.Windows;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Memory;
-import PonyEngine.Platform.Windows;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Mouse.Impl;
 import PonyEngine.WinAPIInput.Windows;
@@ -153,11 +154,11 @@ namespace PonyEngine::RawInput::Mouse
 	{
 		if (isConnected)
 		{
-			const std::size_t nameLength = Platform::GetDeviceNameSize(device);
+			const std::size_t nameLength = WinAPIInput::GetDeviceNameSize(device);
 			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(nameLength);
 			auto arena = Memory::Arena(buffer->Span());
 			const std::span<char> name = arena.AllocateArray<char>(nameLength);
-			const std::size_t nameSize = Platform::GetDeviceName(device, name);
+			const std::size_t nameSize = WinAPIInput::GetDeviceName(device, name);
 
 			const std::size_t initialSize = nativeHandles.size();
 			try

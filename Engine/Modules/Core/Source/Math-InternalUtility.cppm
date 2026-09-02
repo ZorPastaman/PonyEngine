@@ -9,7 +9,7 @@
 
 export module PonyEngine.Math:InternalUtility;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 export namespace PonyEngine::Math
 {
@@ -19,13 +19,13 @@ export namespace PonyEngine::Math
 	/// @tparam U Source type.
 	/// @param value Value to convert.
 	/// @return Converted value.
-	template<Type::Arithmetic T, Type::Arithmetic U>
+	template<Utility::Arithmetic T, Utility::Arithmetic U>
 	constexpr T ConvertTo(U value) noexcept;
 }
 
 namespace PonyEngine::Math
 {
-	template<Type::Arithmetic T, Type::Arithmetic U>
+	template<Utility::Arithmetic T, Utility::Arithmetic U>
 	constexpr T ConvertTo(const U value) noexcept
 	{
 		return value;

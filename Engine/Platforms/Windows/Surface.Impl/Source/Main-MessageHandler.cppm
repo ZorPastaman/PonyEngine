@@ -12,7 +12,7 @@ module;
 #include <cassert>
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Utility/Body.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Surface.Impl.Windows:MessageHandler;

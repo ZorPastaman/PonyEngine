@@ -11,11 +11,11 @@ module;
 
 #include <unknwn.h>
 
-export module PonyEngine.Platform.Windows:ComPtr;
+export module PonyEngine.Memory.WinAPI:ComPtr;
 
 import std;
 
-export namespace PonyEngine::Platform
+export namespace PonyEngine::Memory
 {
 	/// @brief Smart pointer to manipulate COM objects.
 	/// @tparam T Object type.
@@ -117,7 +117,7 @@ export namespace PonyEngine::Platform
 	};
 }
 
-namespace PonyEngine::Platform
+namespace PonyEngine::Memory
 {
 	template<std::derived_from<IUnknown> T>
 	ComPtr<T>::ComPtr() noexcept :

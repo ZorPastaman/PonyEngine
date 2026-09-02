@@ -9,7 +9,9 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 
 export module PonyEngine.RawInput.Keyboard.Impl.Windows:KeyboardAxisMap;
 

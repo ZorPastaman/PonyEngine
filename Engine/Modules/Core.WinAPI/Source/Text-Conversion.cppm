@@ -9,13 +9,15 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 
-export module PonyEngine.Platform.Windows:Text;
+export module PonyEngine.Text.WinAPI:Conversion;
 
 import std;
 
-export namespace PonyEngine::Platform
+export namespace PonyEngine::Text
 {
 	/// @brief Gets a size of a converted string.
 	/// @param source Wide string.
@@ -28,19 +30,19 @@ export namespace PonyEngine::Platform
 	[[nodiscard("Pure function")]]
 	std::size_t GetWideStringSize(std::string_view source);
 
-	/// @brief Converts std::wstring_view to char array with UTF-8 encoding.
+	/// @brief Converts the wide string to the char array with UTF-8 encoding.
 	/// @param source Source.
 	/// @param target Converted string. Must be enough size.
 	/// @return Actual target string size.
 	std::size_t ConvertToString(std::wstring_view source, std::span<char> target);
-	/// @brief Converts std::string_view to std::wstring.
+	/// @brief Converts the UTF-8 string to the wide char array.
 	/// @param source Source with UTF-8 encoding.
 	/// @param target Converted string.
 	/// @return Actual target string size.
 	std::size_t ConvertToWideString(std::string_view source, std::span<wchar_t> target);
 }
 
-namespace PonyEngine::Platform
+namespace PonyEngine::Text
 {
 	std::size_t GetStringSize(const std::wstring_view source)
 	{
@@ -52,7 +54,7 @@ namespace PonyEngine::Platform
 		const int length = WideCharToMultiByte(CP_UTF8, 0, source.data(), static_cast<int>(source.size()), nullptr, 0, nullptr, nullptr);
 		if (length <= 0) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to get utf8 string length: ErrorCode = '0x{:X}'", GetLastError()));
+			throw std::runtime_error(std::format("Failed to get UTF-8 string length: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(length);
@@ -84,7 +86,7 @@ namespace PonyEngine::Platform
 		const int length = WideCharToMultiByte(CP_UTF8, 0, source.data(), static_cast<int>(source.size()), target.data(), static_cast<int>(target.size()), nullptr, nullptr);
 		if (length <= 0) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to convert to utf8 string: ErrorCode = '0x{:X}'", GetLastError()));
+			throw std::runtime_error(std::format("Failed to convert to UTF-8 string: ErrorCode = '0x{:X}'", GetLastError()));
 		}
 
 		return static_cast<std::size_t>(length);

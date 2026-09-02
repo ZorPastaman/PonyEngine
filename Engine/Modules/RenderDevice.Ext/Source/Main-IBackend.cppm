@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Utility/Body.h"
 
 export module PonyEngine.RenderDevice.Ext:IBackend;
 

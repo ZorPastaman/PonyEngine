@@ -9,8 +9,9 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
-
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 #include <avrt.h>
 
 export module PonyEngine.Application.Impl.Windows:ThreadRole;

@@ -13,7 +13,7 @@ import std;
 
 import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :MouseAxis;
 import :MouseAxisMap;
@@ -181,7 +181,7 @@ namespace PonyEngine::RawInput::Mouse
 	{
 		while (!events.empty())
 		{
-			std::visit(Type::Overload
+			std::visit(Utility::Overload
 			{
 				[&](const ButtonEvent& button)
 				{

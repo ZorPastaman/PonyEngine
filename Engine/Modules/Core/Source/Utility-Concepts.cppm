@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Type:Common;
+export module PonyEngine.Utility:Concepts;
 
 import std;
 
-export namespace PonyEngine::Type
+export namespace PonyEngine::Utility
 {
 	/// @brief The concept is satisfied if @p T is an arithmetic type.
 	template<typename T>

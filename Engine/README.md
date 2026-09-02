@@ -20,7 +20,8 @@ To a module to a build, a specific CMake flag must be `true`.
 |:----------------------------------------------------------------------|:---------------------------------------|:------------------------------------------------------------------------------------------------------------------------------|
 | [PonyEngine.Application](Modules/Application)                         | `PONY_ENGINE_APPLICATION`              | Application API module. Provides interfaces to access main engine info, to register interfaces and tickables.                 |
 | [PonyEngine.Application.Impl](Modules/Application.Impl)               | `PONY_ENGINE_APPLICATION_IMPL`         | Application implementation module. Contains `main()` and a default logger as well.                                            |
-| [PonyEngine.Core](Modules/Core)                                       | `PONY_ENGINE_CORE`                     | Core utilities module: Math, Hash, Meta, Memory and Type utilities.                                                           |
+| [PonyEngine.Core](Modules/Core)                                       | `PONY_ENGINE_CORE`                     | Core utilities module: Math, Hash, Meta, Memory and other utilities.                                                          |
+| [PonyEngine.Core.MSVC](Modules/Core.MSVC)                             | `PONY_ENGINE_CORE_MSVC`                | Adds MSVC support to Core module.                                                                                             |
 | [PonyEngine.File](Modules/File)                                       | `PONY_ENGINE_FILE`                     | File service API module. The file service is a simple way to utilize modern SSDs with totally async read/write operations.    |
 | [PonyEngine.File.Impl](Modules/File.Impl)                             | `PONY_ENGINE_FILE_IMPL`                | File service implementation module.                                                                                           |
 | [PonyEngine.Job](Modules/Job)                                         | `PONY_ENGINE_JOB`                      | Job service API module. The job service is a simple way to utilize multi-threaded CPUs.                                       |
@@ -115,12 +116,13 @@ Users can provide their own platform implementations by setting the CMake flag `
 Unfortunately, some functions are not implemented in the C++ standard and require to use compiler specific operations.
 The only module that needs them is [PonyEngine.Core](Modules/Core). See its readme for details.
 
+If the variable `PONY_ENGINE_AUTO_SELECT_COMPILER_MODULES` is ON, the engine will select compiler modules automatically.
+
 Supported compilers:
 
-- [MSVC](Compilers/MSVC)
+- [MSVC](Modules/Core.MSVC)
 
-The engine automatically applies compiler-specific configuration based on CMake compiler variables. The compiler must be supported.
-Users can provide their own compiler implementations by setting CMake flag `PONY_ENGINE_CUSTOM_COMPILER` to `true`. In this case, the built-in compiler configuration is disabled, and users are responsible for configuring the modules themselves.
+If the variable `PONY_ENGINE_AUTO_SELECT_COMPILER_MODULE` is OFF, you have to manually turn on compiler modules or provide your own.
 
 ### Application module linking
 

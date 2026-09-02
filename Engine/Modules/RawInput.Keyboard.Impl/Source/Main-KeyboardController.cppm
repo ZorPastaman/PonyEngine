@@ -13,7 +13,7 @@ import std;
 
 import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 export namespace PonyEngine::RawInput::Keyboard
 {
@@ -136,7 +136,7 @@ namespace PonyEngine::RawInput::Keyboard
 	{
 		while (!events.empty())
 		{
-			std::visit(Type::Overload
+			std::visit(Utility::Overload
 			{
 				[&](const InputEvent& input)
 				{

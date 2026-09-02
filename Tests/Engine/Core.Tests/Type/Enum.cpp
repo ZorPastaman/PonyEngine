@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Type/Enum.h"
+#include "PonyEngine/Utility/Enum.h"
 
 #include <catch2/catch_test_macros.hpp>
 

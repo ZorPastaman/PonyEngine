@@ -22,7 +22,7 @@ import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :InputDeviceContainer;
 import :RawInputQueue;
@@ -546,7 +546,7 @@ namespace PonyEngine::RawInput
 			const std::variant<RawInputEvent, ConnectionEvent> event = inputQueue.Event(eventIndex);
 			const std::size_t deviceIndex = devices.IndexOf(device);
 
-			std::visit(Type::Overload
+			std::visit(Utility::Overload
 			{
 				[&](const RawInputEvent& inputEvent)
 				{

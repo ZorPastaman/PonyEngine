@@ -11,7 +11,7 @@ export module PonyEngine.Math:Common;
 
 import std;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 export namespace PonyEngine::Math
 {
@@ -31,7 +31,7 @@ export namespace PonyEngine::Math
 
 	/// @brief Value range.
 	/// @tparam T Value type.
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	struct Range final
 	{
 		T min = T{0}; ///< Minimal value.
@@ -39,7 +39,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Casts the range to a range of another type.
 		/// @tparam U Target type.
-		template<Type::Arithmetic U> [[nodiscard("Pure operator")]]
+		template<Utility::Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Range<U>() const noexcept;
 	};
 
@@ -70,33 +70,33 @@ export namespace PonyEngine::Math
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is positive or zero; @a -1 if the @p value is negative.
-	template<Type::Signed T> [[nodiscard("Pure function")]]
+	template<Utility::Signed T> [[nodiscard("Pure function")]]
 	constexpr T Sign(T value) noexcept;
 	/// @brief Sign function that returns output as a value of another type.
 	/// @tparam To Output type.
 	/// @tparam From Value type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is positive or zero; @a -1 if the @p value is negative.
-	template<Type::Signed To, Type::Signed From> [[nodiscard("Pure function")]]
+	template<Utility::Signed To, Utility::Signed From> [[nodiscard("Pure function")]]
 	constexpr To Sign(From value) noexcept;
 	/// @brief Sign function that transforms a @p bool to a value.
 	/// @tparam T Output type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is @a true; @a -1 if the @p value is @a false.
-	template<Type::Signed T> [[nodiscard("Pure function")]]
+	template<Utility::Signed T> [[nodiscard("Pure function")]]
 	constexpr T Sign(bool value) noexcept;
 	/// @brief Signum function.
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is positive, @a -1 if the @p value is negative and 0 if the @p value is 0.
-	template<Type::Signed T> [[nodiscard("Pure function")]]
+	template<Utility::Signed T> [[nodiscard("Pure function")]]
 	constexpr T Signum(T value) noexcept;
 	/// @brief Signum function that returns output as a value of another type.
 	/// @tparam To Output type.
 	/// @tparam From Input type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is positive, @a -1 if the @p value is negative and 0 if the @p value is 0.
-	template<Type::Signed To, Type::Signed From> [[nodiscard("Pure function")]]
+	template<Utility::Signed To, Utility::Signed From> [[nodiscard("Pure function")]]
 	constexpr To Signum(From value) noexcept;
 
 	/// @brief Rounds the floating point value to an integral value and returns it as an integral value.
@@ -203,7 +203,7 @@ export namespace PonyEngine::Math
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return Absolute value.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Abs(T value) noexcept;
 
 	/// @brief Computes a factorial.
@@ -218,28 +218,28 @@ export namespace PonyEngine::Math
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a True if the value is infinite; @a false otherwise.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool IsInf(T value) noexcept;
 	/// @brief Checks if the @p value is nan.
 	/// @remark In non-constexpr context it just calls std::isnan.
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a True if the value is nan; @a false otherwise.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool IsNan(T value) noexcept;
 	/// @brief Checks if the @p value is normal.
 	/// @remark In non-constexpr context it just calls std::isnormal.
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a True if the value is normal; @a false otherwise.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool IsNormal(T value) noexcept;
 	/// @brief Checks if the @p value is finite.
 	/// @remark In non-constexpr context it just calls std::isfinite.
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a True if the value is finite; @a false otherwise.
-	template<Type::Arithmetic T> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool IsFinite(T value) noexcept;
 
 	/// @brief Checks if the @p value is even.
@@ -266,8 +266,8 @@ namespace PonyEngine::Math
 	}
 
 
-	template<Type::Arithmetic T>
-	template<Type::Arithmetic U>
+	template<Utility::Arithmetic T>
+	template<Utility::Arithmetic U>
 	constexpr Range<T>::operator Range<U>() const noexcept
 	{
 		return Range<U>{.min = static_cast<U>(min), .max = static_cast<U>(max)};
@@ -279,31 +279,31 @@ namespace PonyEngine::Math
 		return Abs(lhs - rhs) <= std::max(std::max(Abs(lhs), Abs(rhs)) * tolerance.relative, tolerance.absolute);
 	}
 
-	template<Type::Signed T>
+	template<Utility::Signed T>
 	constexpr T Sign(const T value) noexcept
 	{
 		return value < T{0} ? T{-1} : T{1};
 	}
 
-	template<Type::Signed To, Type::Signed From>
+	template<Utility::Signed To, Utility::Signed From>
 	constexpr To Sign(const From value) noexcept
 	{
 		return value < From{0} ? To{-1} : To{1};
 	}
 
-	template<Type::Signed T>
+	template<Utility::Signed T>
 	constexpr T Sign(const bool value) noexcept
 	{
 		return value ? T{1} : T{-1};
 	}
 
-	template<Type::Signed T>
+	template<Utility::Signed T>
 	constexpr T Signum(const T value) noexcept
 	{
 		return static_cast<T>((T{0} < value) - (value < T{0}));
 	}
 
-	template<Type::Signed To, Type::Signed From>
+	template<Utility::Signed To, Utility::Signed From>
 	constexpr To Signum(const From value) noexcept
 	{
 		return static_cast<To>((From{0} < value) - (value < From{0}));
@@ -424,7 +424,7 @@ namespace PonyEngine::Math
 		return value + alignmentValue & ~alignmentValue;
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr T Abs(const T value) noexcept
 	{
 		if constexpr (std::is_unsigned_v<T>)
@@ -456,7 +456,7 @@ namespace PonyEngine::Math
 		return answer;
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr bool IsInf(const T value) noexcept
 	{
 		if consteval
@@ -474,7 +474,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr bool IsNan(const T value) noexcept
 	{
 		if consteval
@@ -492,7 +492,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr bool IsNormal(const T value) noexcept
 	{
 		if consteval
@@ -510,7 +510,7 @@ namespace PonyEngine::Math
 		}
 	}
 
-	template<Type::Arithmetic T>
+	template<Utility::Arithmetic T>
 	constexpr bool IsFinite(const T value) noexcept
 	{
 		if consteval

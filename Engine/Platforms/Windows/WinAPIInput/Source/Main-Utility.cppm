@@ -9,13 +9,15 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 
-export module PonyEngine.Platform.Windows:Device;
+export module PonyEngine.WinAPIInput.Windows:Utility;
 
 import std;
 
-export namespace PonyEngine::Platform
+export namespace PonyEngine::WinAPIInput
 {
 	/// @brief Gets a device name size.
 	/// @param deviceHandle Device handle.
@@ -29,7 +31,7 @@ export namespace PonyEngine::Platform
 	std::size_t GetDeviceName(HANDLE deviceHandle, std::span<char> deviceName);
 }
 
-namespace PonyEngine::Platform
+namespace PonyEngine::WinAPIInput
 {
 	std::size_t GetDeviceNameSize(const HANDLE deviceHandle)
 	{

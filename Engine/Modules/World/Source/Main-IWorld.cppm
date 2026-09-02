@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Utility/Body.h"
 
 export module PonyEngine.World:IWorld;
 

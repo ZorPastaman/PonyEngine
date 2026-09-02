@@ -12,8 +12,10 @@ module;
 #include <cassert>
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 #include <hidusage.h>
 
 export module PonyEngine.WinAPIInput.Impl.Windows:InputDispatcher;
@@ -21,7 +23,7 @@ export module PonyEngine.WinAPIInput.Impl.Windows:InputDispatcher;
 import std;
 
 import PonyEngine.Application;
-import PonyEngine.Platform.Windows;
+import PonyEngine.FileSystem.WinAPI;
 import PonyEngine.Log;
 import PonyEngine.WinAPIInput.Windows;
 
@@ -138,7 +140,7 @@ namespace PonyEngine::WinAPIInput
 	InputDispatcher::InputDispatcher(Application::IApplication& application) :
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
-		moduleHandle{Platform::GetModule()}
+		moduleHandle{FileSystem::GetModule()}
 	{
 		const auto wc = WNDCLASSEXA
 		{

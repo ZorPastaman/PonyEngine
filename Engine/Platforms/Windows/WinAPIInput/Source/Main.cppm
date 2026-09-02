@@ -11,3 +11,4 @@ export module PonyEngine.WinAPIInput.Windows;
 
 export import :IInputDispatcher;
 export import :IRawInputObserver;
+export import :Utility;

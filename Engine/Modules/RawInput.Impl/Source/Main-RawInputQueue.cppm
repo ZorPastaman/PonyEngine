@@ -17,7 +17,7 @@ import std;
 
 import PonyEngine.Math;
 import PonyEngine.RawInput;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 export namespace PonyEngine::RawInput
 {
@@ -117,7 +117,7 @@ namespace PonyEngine::RawInput
 		const std::variant<InputData, ConnectionData>& event = events[eventIndex];
 		const std::chrono::time_point<std::chrono::steady_clock> time = eventTimes[eventIndex];
 
-		return std::visit<std::variant<RawInputEvent, ConnectionEvent>>(Type::Overload
+		return std::visit<std::variant<RawInputEvent, ConnectionEvent>>(Utility::Overload
 		{
 			[&](const InputData& inputData) noexcept
 			{

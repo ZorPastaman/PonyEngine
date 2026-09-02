@@ -8,6 +8,7 @@ target_sources(PonyEngine.WinAPIInput PUBLIC FILE_SET CXX_MODULES BASE_DIRS "${C
 	"Source/Main.cppm"
 	"Source/Main-IInputDispatcher.cppm"
 	"Source/Main-IRawInputObserver.cppm"
+	"Source/Main-Utility.cppm"
 )
 
 target_link_libraries(PonyEngine.WinAPIInput PUBLIC

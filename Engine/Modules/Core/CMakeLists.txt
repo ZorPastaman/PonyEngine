@@ -43,10 +43,9 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Memory-Utility.cppm"
 	"Source/Meta.cppm"
 	"Source/Meta-Version.cppm"
-	"Source/Type.cppm"
-	"Source/Type-Common.cppm"
-	"Source/Type-Limits.cppm"
-	"Source/Type-Variant.cppm"
+	"Source/Utility.cppm"
+	"Source/Utility-Concepts.cppm"
+	"Source/Utility-Overload.cppm"
 )
 
 set_target_properties(PonyEngine.Core PROPERTIES

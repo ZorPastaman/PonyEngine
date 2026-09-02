@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Utility/Body.h"
 #include "PonyEngine/RawInput/Mouse.h"
 
 export module PonyEngine.RawInput:Mouse;

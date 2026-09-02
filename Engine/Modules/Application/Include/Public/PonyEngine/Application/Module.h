@@ -17,7 +17,7 @@
 /// @brief Creates an early module section name.
 /// @param order Section order.
 /// @note For internal use only.
-#define PONY_EARLY_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PonyModuleEarly$, order))
+#define PONY_EARLY_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PONY_CONCAT_VALUES(PonyModuleEarly, PONY_SECTION_DELIMITER), order))
 /// @brief Allocates an early module segment.
 /// @param order Segment order.
 /// @note For internal use only.
@@ -25,7 +25,7 @@
 /// @brief Creates a normal module section name.
 /// @param order Section order.
 /// @note For internal use only.
-#define PONY_NORMAL_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PonyModuleNormal$, order))
+#define PONY_NORMAL_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PONY_CONCAT_VALUES(PonyModuleNormal, PONY_SECTION_DELIMITER), order))
 /// @brief Allocates a normal module segment.
 /// @param order Segment order.
 /// @note For internal use only.
@@ -33,7 +33,7 @@
 /// @brief Creates a late module section name.
 /// @param order Section order.
 /// @note For internal use only.
-#define PONY_LATE_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PonyModuleLate$, order))
+#define PONY_LATE_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PONY_CONCAT_VALUES(PonyModuleLate, PONY_SECTION_DELIMITER), order))
 /// @brief Allocates a late module segment.
 /// @param order Segment order.
 /// @note For internal use only.

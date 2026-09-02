@@ -7,10 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Platform.Windows;
+export module PonyEngine.Utility:Overload;
 
-export import :ComPtr;
-export import :Device;
-export import :File;
-export import :GUID;
-export import :Text;
+import std;
+
+export namespace PonyEngine::Utility
+{
+	/// @brief Overload.
+	/// @tparam Ts Types.
+	template<typename... Ts>
+	struct Overload : Ts...
+	{
+		using Ts::operator()...;
+	};
+	/// @brief Overload helper.
+	/// @tparam Ts Types.
+	/// @return Overload.
+	template<typename... Ts>
+	Overload(Ts...) -> Overload<Ts...>;
+}

@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Object/Body.h"
+#include "PonyEngine/Utility/Body.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Surface.Windows:IRawInputObserver;

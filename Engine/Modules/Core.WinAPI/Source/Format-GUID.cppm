@@ -11,19 +11,9 @@ module;
 
 #include <objbase.h>
 
-export module PonyEngine.Platform.Windows:GUID;
+export module PonyEngine.Format.WinAPI:GUID;
 
 import std;
-
-export namespace PonyEngine::Platform
-{
-	constexpr std::size_t GuidTextSize = 36uz; ///< GUID text representation length. It doesn't include brackets.
-
-	/// @brief Acquires GUID.
-	/// @return GUID.
-	[[nodiscard("Pure function")]]
-	GUID AcquireGUID();
-}
 
 /// @brief COM GUID formatter.
 /// @details The format is ":<guid_args>". The default brackets are {}.
@@ -88,17 +78,3 @@ public:
 		return it;
 	}
 };
-
-namespace PonyEngine::Platform
-{
-	GUID AcquireGUID()
-	{
-		GUID acquiredGuid;
-		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to get guid: Result = '0x{:X}'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		return acquiredGuid;
-	}
-}

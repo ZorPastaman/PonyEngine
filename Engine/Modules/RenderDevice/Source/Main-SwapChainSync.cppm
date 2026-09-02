@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Type/Enum.h"
+#include "PonyEngine/Utility/Enum.h"
 
 export module PonyEngine.RenderDevice:SwapChainSync;
 

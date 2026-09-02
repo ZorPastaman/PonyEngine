@@ -9,29 +9,19 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
-
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
 #include <shlobj.h>
 
-export module PonyEngine.Platform.Windows:File;
+export module PonyEngine.FileSystem.WinAPI:Path;
 
 import std;
 
-import :GUID;
+import PonyEngine.Format.WinAPI;
 
-export namespace PonyEngine::Platform
+export namespace PonyEngine::FileSystem
 {
-	/// @brief Gets this exe/dll module.
-	/// @return Exe/dll module.
-	[[nodiscard("Pure function")]]
-	HMODULE GetModule();
-
-	/// @brief Gets a module path.
-	/// @param module Module. If it's null, the path to the executable module of the current process is returned.
-	/// @return Module path.
-	[[nodiscard("Pure function")]]
-	std::filesystem::path GetModulePath(HMODULE module);
-
 	/// @brief Gets a known path.
 	/// @param folderId Folder id.
 	/// @return Known path.
@@ -43,30 +33,8 @@ export namespace PonyEngine::Platform
 	std::filesystem::path GetTemporaryPath();
 }
 
-namespace PonyEngine::Platform
+namespace PonyEngine::FileSystem
 {
-	HMODULE GetModule()
-	{
-		HMODULE moduleHandle;
-		if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(&GetModule), &moduleHandle) || !moduleHandle)
-		{
-			throw std::runtime_error(std::format("Failed to find module: ErrorCode = '0x{:X}'", GetLastError()));
-		}
-
-		return moduleHandle;
-	}
-
-	std::filesystem::path GetModulePath(const HMODULE module)
-	{
-		auto path = std::array<wchar_t, MAX_PATH>();
-		if (!GetModuleFileNameW(module, path.data(), static_cast<DWORD>(path.size()))) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to get module name: ErrorCode = '0x{:X}'", GetLastError()));
-		}
-
-		return std::filesystem::path(path.data());
-	}
-
 	std::filesystem::path GetKnownPath(REFKNOWNFOLDERID folderId)
 	{
 		wchar_t* pathRaw = nullptr;

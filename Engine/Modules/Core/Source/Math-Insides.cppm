@@ -11,7 +11,7 @@ export module PonyEngine.Math:Insides;
 
 import std;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :Ball;
 import :Bounds;
@@ -55,7 +55,7 @@ export namespace PonyEngine::Math
 	/// @param small Small box.
 	/// @param large Large box.
 	/// @return @a True if the @p small is fully inside the @p large.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr bool IsInside(const Box<T, Size>& small, const Box<T, Size>& large) noexcept;
 	/// @brief Checks if the @p small box is fully inside the @p large ball.
 	/// @tparam T Value type.
@@ -138,7 +138,7 @@ namespace PonyEngine::Math
 		return true;
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr bool IsInside(const Box<T, Size>& small, const Box<T, Size>& large) noexcept
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
