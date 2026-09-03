@@ -13,7 +13,7 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.File.Impl.Windows:OverlappedReadRequest;
+export module PonyEngine.File.Impl.WinAPI:OverlappedWriteRequest;
 
 import std;
 
@@ -23,20 +23,20 @@ import :OverlappedUtility;
 
 export namespace PonyEngine::File
 {
-	/// @brief Overlapped read request.
-	class OverlappedReadRequest final : public ReadRequest
+	/// @brief Overlapped write request.
+	class OverlappedWriteRequest final : public WriteRequest
 	{
 	public:
-		/// @brief Creates an overlapped read request.
-		/// @param params Read parameters.
+		/// @brief Creates an overlapped write request.
+		/// @param params Write parameters.
 		/// @param callback Callback.
 		/// @param file File that created this request.
 		[[nodiscard("Pure constructor")]]
-		OverlappedReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, HANDLE file) noexcept;
-		OverlappedReadRequest(const OverlappedReadRequest&) = delete;
-		OverlappedReadRequest(OverlappedReadRequest&&) = delete;
+		OverlappedWriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, HANDLE file) noexcept;
+		OverlappedWriteRequest(const OverlappedWriteRequest&) = delete;
+		OverlappedWriteRequest(OverlappedWriteRequest&&) = delete;
 
-		virtual ~OverlappedReadRequest() noexcept override = default;
+		virtual ~OverlappedWriteRequest() noexcept override = default;
 
 		virtual void Cancel() override;
 
@@ -45,8 +45,8 @@ export namespace PonyEngine::File
 		[[nodiscard("Pure function")]]
 		const OVERLAPPED& Overlapped() const noexcept;
 
-		OverlappedReadRequest& operator =(const OverlappedReadRequest&) = delete;
-		OverlappedReadRequest& operator =(OverlappedReadRequest&&) = delete;
+		OverlappedWriteRequest& operator =(const OverlappedWriteRequest&) = delete;
+		OverlappedWriteRequest& operator =(OverlappedWriteRequest&&) = delete;
 
 	private:
 		HANDLE file; ///< File that created this request.
@@ -56,14 +56,14 @@ export namespace PonyEngine::File
 
 namespace PonyEngine::File
 {
-	OverlappedReadRequest::OverlappedReadRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, const HANDLE file) noexcept :
-		ReadRequest(params, std::move(callback)),
+	OverlappedWriteRequest::OverlappedWriteRequest(const WriteParams& params, std::move_only_function<void(const IWriteRequest&) noexcept> callback, const HANDLE file) noexcept :
+		WriteRequest(params, std::move(callback)),
 		file(file),
 		overlapped(CreateOverlapped(params.offset))
 	{
 	}
 
-	void OverlappedReadRequest::Cancel()
+	void OverlappedWriteRequest::Cancel()
 	{
 		if (!CancelIoEx(file, &overlapped)) [[unlikely]]
 		{
@@ -74,12 +74,12 @@ namespace PonyEngine::File
 		}
 	}
 
-	OVERLAPPED& OverlappedReadRequest::Overlapped() noexcept
+	OVERLAPPED& OverlappedWriteRequest::Overlapped() noexcept
 	{
 		return overlapped;
 	}
 
-	const OVERLAPPED& OverlappedReadRequest::Overlapped() const noexcept
+	const OVERLAPPED& OverlappedWriteRequest::Overlapped() const noexcept
 	{
 		return overlapped;
 	}

@@ -1,15 +1,5 @@
 message(STATUS "Configuring PonyEngine.Application.Impl")
 
-if(NOT TARGET PonyEngine.Application)
-	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Log)
-	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
-endif()
-
 include("CMake/Module.cmake")
 
 set(PONY_ENGINE_APPLICATION_ROOT_PATH "" CACHE STRING "Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid.")

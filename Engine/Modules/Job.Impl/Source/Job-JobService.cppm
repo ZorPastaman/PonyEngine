@@ -127,6 +127,11 @@ namespace PonyEngine::Job
 
 	JobHandle JobService::Schedule(std::move_only_function<void() noexcept> task, const std::span<const JobHandle> dependencies)
 	{
+		if (!task) [[unlikely]]
+		{
+			throw std::invalid_argument("Task is nullptr");
+		}
+
 		const std::size_t workerIndex = targetWorkerIndex.fetch_add(1uz, std::memory_order::relaxed) % workers.size();
 		const JobID jobId = GetFreeJob(workerIndex);
 		Worker& worker = *workers[jobId.poolIndex];
@@ -145,14 +150,31 @@ namespace PonyEngine::Job
 		{
 			for (std::size_t i = 0uz; i < dependencies.size(); ++i)
 			{
-				const JobHandle& dependency = dependencies[i];
-				const JobID dependencyId = ToJobID(dependency);
-				assert(dependencyId.poolIndex < workers.size() && dependencyId.jobIndex < PONY_ENGINE_JOB_POOL_SIZE && "Invalid dependency handle");
-				const bool isAdded = GetJob(dependencyId).AddDependent(jobId, dependency.version);
-
-				if (!isAdded && job.Unblock())
+				try
 				{
-					worker.AddToQueue(jobId);
+					const JobHandle& dependency = dependencies[i];
+					const JobID dependencyId = ToJobID(dependency);
+					assert(dependencyId.poolIndex < workers.size() && dependencyId.jobIndex < PONY_ENGINE_JOB_POOL_SIZE && "Invalid dependency handle");
+					const bool isAdded = GetJob(dependencyId).AddDependent(jobId, dependency.version);
+
+					if (!isAdded && job.Unblock()) [[unlikely]]
+					{
+						worker.AddToQueue(jobId);
+					}
+				}
+				catch (...)
+				{
+					job.Task(nullptr);
+
+					for (; i < dependencies.size(); ++i)
+					{
+						if (job.Unblock()) [[unlikely]]
+						{
+							worker.AddToQueue(jobId);
+						}
+					}
+
+					throw;
 				}
 			}
 		}

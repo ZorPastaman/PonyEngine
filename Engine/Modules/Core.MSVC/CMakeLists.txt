@@ -1,9 +1,5 @@
 message(STATUS "Configuring PonyEngine.Core for MSVC")
 
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-
 target_include_directories(PonyEngine.Core PUBLIC 
 	"Include/Public"
 )

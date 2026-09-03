@@ -14,7 +14,7 @@ module;
 #include <windows.h>
 #include <shellapi.h>
 
-export module PonyEngine.Application.Impl.Windows:CommandLine;
+export module PonyEngine.Application.Impl.WinAPI:CommandLine;
 
 import std;
 

@@ -2,10 +2,6 @@ if(TARGET PonyEngine.Log.PConsole.Impl)
 	add_subdirectory("Log.PConsole.Impl")
 endif()
 
-if(TARGET PonyEngine.File.Impl)
-	add_subdirectory("File.Impl")
-endif()
-
 if(TARGET PonyEngine.Surface)
 	add_subdirectory("Surface")
 endif()

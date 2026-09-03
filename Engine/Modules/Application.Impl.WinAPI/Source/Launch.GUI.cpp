@@ -13,7 +13,7 @@
 
 import std;
 
-import PonyEngine.Application.Impl.Windows;
+import PonyEngine.Application.Impl.WinAPI;
 
 int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PSTR lpCmdLine, const int nShowCmd)
 {

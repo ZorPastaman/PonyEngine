@@ -7,14 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/File/Windows/FileServiceModule.h"
+export module PonyEngine.File.Impl.WinAPI;
 
-import PonyEngine.File.Impl.Windows;
+export import PonyEngine.File.Impl;
 
-namespace PonyEngine::File
-{
-	std::shared_ptr<Application::IModule> CreateFileServiceModule()
-	{
-		return std::make_shared<FileServiceModule>();
-	}
-}
+export import :FileServiceModule;

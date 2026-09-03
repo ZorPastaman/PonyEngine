@@ -72,7 +72,7 @@ export namespace PonyEngine::Job
 		/// @param version Waited version of this job.
 		/// @return @a True if the dependent was added; @a false otherwise - the job has a different version.
 		[[nodiscard("Must be used")]]
-		bool AddDependent(const JobID& dependent, std::size_t version) noexcept;
+		bool AddDependent(const JobID& dependent, std::size_t version);
 		/// @brief Process dependents.
 		/// @tparam F Invocable type.
 		/// @param func Process function.
@@ -136,8 +136,10 @@ namespace PonyEngine::Job
 
 	void Job::Execute() noexcept
 	{
-		assert(task && "The task is nullptr.");
-		task();
+		if (task) [[likely]]
+		{
+			task();
+		}
 	}
 
 	bool Job::Unblock() noexcept
@@ -164,7 +166,7 @@ namespace PonyEngine::Job
 		this->blockCount.store(blockCount, std::memory_order::release);
 	}
 
-	bool Job::AddDependent(const JobID& dependent, const std::size_t version) noexcept // It may throw, but it's intentionally noexcept to fail the program
+	bool Job::AddDependent(const JobID& dependent, const std::size_t version)
 	{
 		if (Version() != version)
 		{

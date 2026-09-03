@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.File.Impl.Windows:FileServiceModule;
+export module PonyEngine.File.Impl.WinAPI:FileServiceModule;
 
 import std;
 

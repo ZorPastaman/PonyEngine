@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.Impl.Windows;
+export module PonyEngine.Application.Impl.WinAPI;
 
 export import PonyEngine.Application.WinAPI;
 export import PonyEngine.Application.Impl;

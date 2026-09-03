@@ -14,7 +14,7 @@ module;
 #include <windows.h>
 #include <avrt.h>
 
-export module PonyEngine.Application.Impl.Windows:ThreadRole;
+export module PonyEngine.Application.Impl.WinAPI:ThreadRole;
 
 import std;
 

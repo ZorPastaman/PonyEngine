@@ -19,7 +19,7 @@ module;
 #include <windows.h>
 #include <shellapi.h>
 
-export module PonyEngine.Application.Impl.Windows:GUIProcess;
+export module PonyEngine.Application.Impl.WinAPI:GUIProcess;
 
 import std;
 

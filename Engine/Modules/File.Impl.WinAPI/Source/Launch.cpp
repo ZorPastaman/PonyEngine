@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Application/Module.h"
-#include "PonyEngine/File/Windows/FileServiceModule.h"
+#include "PonyEngine/File/WinAPI/FileServiceModule.h"
 
 PONY_ENGINE_MODULE(PonyEngine::File::CreateFileServiceModule, PonyEngineFileService, PONY_ENGINE_FILE_ORDER);

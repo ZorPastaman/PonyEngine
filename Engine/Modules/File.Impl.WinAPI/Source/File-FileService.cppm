@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.File.Impl.Windows:FileService;
+export module PonyEngine.File.Impl.WinAPI:FileService;
 
 import std;
 

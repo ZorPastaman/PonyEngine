@@ -1,9 +1,5 @@
 message(STATUS "Configuring PonyEngine.Core for WinAPI")
 
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/FileSystem.cppm"
 	"Source/FileSystem-Module.cppm"

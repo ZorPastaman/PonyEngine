@@ -4,20 +4,22 @@ File API module. Provides interfaces for a file service.
 
 The file service is a simple way to utilize modern SSDs with totally async read/write operations.
 
+Adds `PonyEngine.File` target as a static library.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)
 
 ## C\++ modules
 
-### [PonyEngine.File](Source/Main.cppm)
+### [PonyEngine.File](Source/File.cppm)
 
 Main sub-modules:
 
-#### [IFile](Source/Main-IFile.cppm)
+#### [IFile](Source/File-IFile.cppm)
 
 File interface. Creates requests to a file.
 
-#### [IFileService](Source/Main-IFileService.cppm)
+#### [IFileService](Source/File-IFileService.cppm)
 
 File service interface. Opens files.

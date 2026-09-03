@@ -13,7 +13,7 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.File.Impl.Windows:OverlappedRequest;
+export module PonyEngine.File.Impl.WinAPI:OverlappedRequest;
 
 import std;
 

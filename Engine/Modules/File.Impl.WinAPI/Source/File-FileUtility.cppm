@@ -13,7 +13,7 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.File.Impl.Windows:FileUtility;
+export module PonyEngine.File.Impl.WinAPI:FileUtility;
 
 import std;
 

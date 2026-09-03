@@ -9,7 +9,7 @@
 
 import std;
 
-import PonyEngine.Application.Impl.Windows;
+import PonyEngine.Application.Impl.WinAPI;
 
 int main(const int argc, const char* const argv[])
 {

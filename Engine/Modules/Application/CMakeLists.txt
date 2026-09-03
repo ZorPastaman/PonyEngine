@@ -1,9 +1,5 @@
 message(STATUS "Configuring PonyEngine.Application")
 
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-
 include("CMake/Module.cmake")
 
 add_library(PonyEngine.Application STATIC)

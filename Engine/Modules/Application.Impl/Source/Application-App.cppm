@@ -678,6 +678,11 @@ namespace PonyEngine::Application
 
 	std::thread App::CreateThread(std::move_only_function<void()> func, ThreadParams params)
 	{
+		if (!func) [[unlikely]]
+		{
+			throw std::invalid_argument("Func is nullptr");
+		}
+
 		return process->CreateThread(std::move(func), std::move(params));
 	}
 

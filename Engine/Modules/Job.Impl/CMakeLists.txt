@@ -1,18 +1,5 @@
 message(STATUS "Configuring PonyEngine.Job.Impl")
 
-if(NOT TARGET PonyEngine.Application)
-	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Job)
-	message(FATAL_ERROR "PonyEngine.Job wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Log)
-	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
-endif()
-
 set(PONY_ENGINE_JOB_ORDER "p" CACHE STRING "PonyEngine.Job.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_JOB_RESERVED_THREAD_COUNT "3" CACHE STRING "PonyEngine.Job.Impl service reserved thread count. Those are threads reserved for other purposes.")
 set(PONY_ENGINE_JOB_MIN_THREAD_COUNT "2" CACHE STRING "PonyEngine.Job.Impl service minimal thread count.")
@@ -32,14 +19,14 @@ target_sources(PonyEngine.Job.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.Job.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-Job.cppm"
-	"Source/Main-JobID.cppm"
-	"Source/Main-JobPool.cppm"
-	"Source/Main-JobQueue.cppm"
-	"Source/Main-JobService.cppm"
-	"Source/Main-JobServiceModule.cppm"
-	"Source/Main-Worker.cppm"
+	"Source/Job.cppm"
+	"Source/Job-Job.cppm"
+	"Source/Job-JobID.cppm"
+	"Source/Job-JobPool.cppm"
+	"Source/Job-JobQueue.cppm"
+	"Source/Job-JobService.cppm"
+	"Source/Job-JobServiceModule.cppm"
+	"Source/Job-Worker.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_JOB_ORDER)
@@ -61,7 +48,7 @@ target_link_libraries(PonyEngine.Job.Impl PUBLIC
 	PonyEngine.Application
 )
 target_link_libraries(PonyEngine.Job.Impl PRIVATE
-	PonyEngine.Job
 	PonyEngine.Core
+	PonyEngine.Job
 	PonyEngine.Log
 )

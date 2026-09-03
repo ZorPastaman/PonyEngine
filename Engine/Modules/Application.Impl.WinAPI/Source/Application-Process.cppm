@@ -20,7 +20,7 @@ module;
 #include <avrt.h>
 #include <KnownFolders.h>
 
-export module PonyEngine.Application.Impl.Windows:Process;
+export module PonyEngine.Application.Impl.WinAPI:Process;
 
 import std;
 

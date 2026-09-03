@@ -1,20 +1,13 @@
 message(STATUS "Configuring PonyEngine.File.Impl")
 
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.File)
-	message(FATAL_ERROR "PonyEngine.File wasn't configured")
-endif()
-
 add_library(PonyEngine.File.Impl STATIC)
 
 target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-FileInfo.cppm"
-	"Source/Main-ReadRequest.cppm"
-	"Source/Main-Request.cppm"
-	"Source/Main-WriteRequest.cppm"
+	"Source/File.cppm"
+	"Source/File-FileInfo.cppm"
+	"Source/File-ReadRequest.cppm"
+	"Source/File-Request.cppm"
+	"Source/File-WriteRequest.cppm"
 )
 
 set_target_properties(PonyEngine.File.Impl PROPERTIES

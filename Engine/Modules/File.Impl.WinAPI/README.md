@@ -1,11 +1,15 @@
-# PonyEngine.File.Impl module for Windows
+# PonyEngine.File.Impl.WinAPI module
 
-Platform independent module: [PonyEngine.File.Impl](../../../Modules/File.Impl).
+Adds WinAPI implementation support to [PonyEngine.File.Impl](../File.Impl).
+
+Modifies `PonyEngine.File.Impl` target.
 
 ## Dependencies
 
 - [PonyEngine.Application](../Application)
-- [PonyEngine.Log](../../../Modules/Log)
+- [PonyEngine.File.Impl](../File.Impl)
+- [PonyEngine.Log](../Log)
+- Windows SDK 10.0.26100.0+
 
 ## CMake variables
 
@@ -20,18 +24,18 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-### [File](Source/Main-File.cppm)
+### [File](Source/File-File.cppm)
 
 File wrapper.
 
-### [FileService](Source/Main-FileService.cppm)
+### [FileService](Source/File-FileService.cppm)
 
 File service implementation.
 
-### [FileServiceModule](Source/Main-FileServiceModule.cppm)
+### [FileServiceModule](Source/File-FileServiceModule.cppm)
 
 File service module.
 
-### [Worker](Source/Main-Worker.cppm)
+### [Worker](Source/File-Worker.cppm)
 
 Worker that manages IO thread.

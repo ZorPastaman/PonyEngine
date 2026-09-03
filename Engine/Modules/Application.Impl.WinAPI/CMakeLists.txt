@@ -1,9 +1,5 @@
 message(STATUS "Configuring PonyEngine.Application.Impl for Windows")
 
-if(NOT TARGET PonyEngine.Application.Impl)
-	message(FATAL_ERROR "PonyEngine.Application.Impl wasn't configured")
-endif()
-
 set(PONY_ENGINE_APPLICATION_MODE "GUI" CACHE STRING "Application mode. Must be Console or GUI.")
 option(PONY_ENGINE_APPLICATION_CREATE_CONSOLE "Enable console. Can be used only in GUI builds." OFF)
 set(PONY_ENGINE_APPLICATION_PROCESS_PRIORITY "ABOVE_NORMAL_PRIORITY_CLASS" CACHE STRING "Application process priority. Must be DWORD or predefined priority class.")
