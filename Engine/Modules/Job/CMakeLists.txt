@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Job")
+message(STATUS "Configuring PonyEngine.Job feature module")
 
 add_library(PonyEngine.Job STATIC)
 

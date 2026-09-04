@@ -439,6 +439,13 @@ namespace PonyEngine::Application
 	{
 		application->LogBasicInfo();
 		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
+
+		PONY_LOG(application->LogService(), Log::LogType::Info, "Thread roles:");
+		for (const auto& [role, threadRole] : ThreadRoles)
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Info, "Role: '{}'; Priority: '{}'; MMCSS task: '{}'; MMCSS task priority: '{}'.",
+				role, threadRole.threadPriority, threadRole.mmcssTask, std::to_underlying(threadRole.mmcssPriority));
+		}
 	}
 
 	void Process::SetMainThreadRole()

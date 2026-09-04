@@ -1,6 +1,8 @@
-# PonyEngine.Job.Impl module
+# PonyEngine.Job.Impl feature module
 
 Job implementation module.
+
+Adds `PonyEngine.Job.Impl` target as a static library.
 
 ## Dependencies
 

@@ -1,4 +1,4 @@
-# PonyEngine.Application module
+# PonyEngine.Application feature module
 
 Application API module. Provides interfaces to access main engine info, to register interfaces and tickables.
 It also controls the engine initialization and main loop.

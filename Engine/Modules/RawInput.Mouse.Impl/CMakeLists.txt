@@ -1,22 +1,12 @@
-message(STATUS "Configuring PonyEngine.RawInput.Mouse.Impl")
-
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.RawInput)
-	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.RawInput.Ext)
-	message(FATAL_ERROR "PonyEngine.RawInput.Ext wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.RawInput.Mouse.Impl feature module")
 
 add_library(PonyEngine.RawInput.Mouse.Impl STATIC)
 
 target_sources(PonyEngine.RawInput.Mouse.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-MouseAxis.cppm"
-	"Source/Main-MouseAxisMap.cppm"
-	"Source/Main-MouseController.cppm"
+	"Source/Mouse.cppm"
+	"Source/Mouse-MouseAxis.cppm"
+	"Source/Mouse-MouseAxisMap.cppm"
+	"Source/Mouse-MouseController.cppm"
 )
 
 set_target_properties(PonyEngine.RawInput.Mouse.Impl PROPERTIES

@@ -1,8 +1,10 @@
-# PonyEngine.Log.File.Impl module
+# PonyEngine.Log.File.Impl feature module
 
 Logger implementation that logs to a standard console.
 
 The log file is created in a local data folder. If a file with the same name exists, it will be renamed to `<file_name>_prev.<file_extension>`.
+
+Adds `PonyEngine.Log.File.Impl` target as a static library.
 
 ## Dependencies
 

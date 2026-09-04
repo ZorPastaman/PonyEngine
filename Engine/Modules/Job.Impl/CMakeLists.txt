@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Job.Impl")
+message(STATUS "Configuring PonyEngine.Job.Impl feature module")
 
 set(PONY_ENGINE_JOB_ORDER "p" CACHE STRING "PonyEngine.Job.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_JOB_RESERVED_THREAD_COUNT "3" CACHE STRING "PonyEngine.Job.Impl service reserved thread count. Those are threads reserved for other purposes.")

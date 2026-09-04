@@ -23,7 +23,6 @@
 				"PONY_ENGINE_LOG_EXT": true,
 				"PONY_ENGINE_LOG_IMPL": true,
 				"PONY_ENGINE_LOG_CONSOLE_IMPL": true,
-				"PONY_ENGINE_LOG_PCONSOLE_IMPL": true,
 				"PONY_ENGINE_LOG_FILE_IMPL": true,
 				"PONY_ENGINE_TIME": true,
 				"PONY_ENGINE_TIME_IMPL": true,
@@ -40,7 +39,6 @@
 				"PONY_ENGINE_WORLD_IMPL": true,
 				"PONY_ENGINE_LOG_ORDER": "b",
 				"PONY_ENGINE_LOG_CONSOLE_ORDER": "c",
-				"PONY_ENGINE_LOG_PCONSOLE_ORDER": "d",
 				"PONY_ENGINE_LOG_FILE_ORDER": "f",
 				"PONY_ENGINE_TIME_ORDER": "ba",
 				"PONY_ENGINE_JOB_ORDER": "ca",
@@ -133,7 +131,11 @@
 		},
 		{
 			"name": "Runtime-Windows",
-			"hidden": true
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_ENGINE_LOG_WINDEBUG_IMPL": true,
+				"PONY_ENGINE_LOG_WINDEBUG_ORDER": "d"
+			}
 		},
 		{
 			"name": "Runtime-Windows-GUI",

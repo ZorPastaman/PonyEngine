@@ -1,6 +1,8 @@
-# PonyEngine.RawInput.Keyboard.Impl module
+# PonyEngine.RawInput.Keyboard.Impl feature module
 
 Raw input keyboard provider module. It reads keyboard input and pushes it into a raw input service.
+
+Adds `PonyEngine.RawInput.Keyboard.Impl` target as a static library.
 
 The module requires a platform specific implementation.
 

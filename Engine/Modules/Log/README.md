@@ -1,6 +1,8 @@
-# PonyEngine.Log module
+# PonyEngine.Log feature module
 
 Log API module. Provides interfaces for logging.
+
+Adds `PonyEngine.Log` target as a static library.
 
 ## Dependencies
 

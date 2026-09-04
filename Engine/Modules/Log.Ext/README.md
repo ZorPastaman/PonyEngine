@@ -1,6 +1,8 @@
-# PonyEngine.Log.Ext module
+# PonyEngine.Log.Ext feature module
 
 Log extension API module. Provides interfaces for loggers that can be added to a log hub.
+
+Adds `PonyEngine.Log.Ext` target as a static library.
 
 ## Dependencies
 

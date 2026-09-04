@@ -1,8 +1,4 @@
-message(STATUS "Configuring PonyEngine.Log")
-
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.Log feature module")
 
 include("CMake/Log.cmake")
 
@@ -13,10 +9,10 @@ target_include_directories(PonyEngine.Log PUBLIC
 )
 
 target_sources(PonyEngine.Log PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-ILogService.cppm"
-	"Source/Main-LogHelper.cppm"
-	"Source/Main-LogType.cppm"
+	"Source/Log.cppm"
+	"Source/Log-ILogService.cppm"
+	"Source/Log-LogHelper.cppm"
+	"Source/Log-LogType.cppm"
 )
 
 set_target_properties(PonyEngine.Log PROPERTIES

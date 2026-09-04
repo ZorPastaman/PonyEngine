@@ -1,4 +1,4 @@
-# PonyEngine.Core module
+# PonyEngine.Core feature module
 
 Core utilities module.
 

@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Core")
+message(STATUS "Configuring PonyEngine.Core feature module")
 
 include("CMake/Target.cmake")
 

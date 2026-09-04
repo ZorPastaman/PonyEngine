@@ -1,6 +1,8 @@
-# PonyEngine.Log.Impl module
+# PonyEngine.Log.Impl feature module
 
 Log implementation module.
+
+Adds `PonyEngine.Log.Impl` target as a static library.
 
 ## Dependencies
 

@@ -1,6 +1,8 @@
-# PonyEngine.RawInput.Mouse.Impl module
+# PonyEngine.RawInput.Mouse.Impl feature module
 
 Raw input mouse provider module. It reads mouse input and pushes it into a raw input service.
+
+Adds `PonyEngine.RawInput.Mouse.Impl` target as a static library.
 
 The module requires a platform specific implementation.
 

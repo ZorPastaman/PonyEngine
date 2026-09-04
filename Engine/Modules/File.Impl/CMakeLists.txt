@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.File.Impl")
+message(STATUS "Configuring PonyEngine.File.Impl feature module")
 
 add_library(PonyEngine.File.Impl STATIC)
 

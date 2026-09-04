@@ -1,17 +1,4 @@
-message(STATUS "Configuring PonyEngine.Log.Console.Impl")
-
-if(NOT TARGET PonyEngine.Application)
-	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Log)
-	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Log.Ext)
-	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.Log.Console.Impl feature module")
 
 set(PONY_ENGINE_LOG_CONSOLE_ORDER "p" CACHE STRING "PonyEngine.Log.Console.Impl module initialization order. Its first character must be in range [b-y].")
 
@@ -28,9 +15,9 @@ target_sources(PonyEngine.Log.Console.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.Log.Console.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-ConsoleLogger.cppm"
-	"Source/Main-ConsoleLoggerModule.cppm"
+	"Source/Console.cppm"
+	"Source/Console-ConsoleLogger.cppm"
+	"Source/Console-ConsoleLoggerModule.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_LOG_CONSOLE_ORDER)

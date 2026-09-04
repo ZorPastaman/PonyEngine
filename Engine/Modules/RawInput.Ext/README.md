@@ -1,8 +1,10 @@
-# PonyEngine.RawInput.Ext module
+# PonyEngine.RawInput.Ext feature module
 
 Raw input extension API module. Provides interfaces for a raw input controller that can be added to a raw input device hub.
 
 The raw input service doesn't know about specific devices, it's just a middle service that aggregates input from different input controller and exposes it to other services.
+
+Adds `PonyEngine.RawInput.Ext` target as a static library.
 
 ## Dependencies
 

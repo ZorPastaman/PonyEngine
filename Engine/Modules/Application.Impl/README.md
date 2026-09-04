@@ -1,4 +1,4 @@
-# PonyEngine.Application.Impl module
+# PonyEngine.Application.Impl feature module
 
 Application implementation module.
 

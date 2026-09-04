@@ -1,8 +1,4 @@
-message(STATUS "Configuring PonyEngine.RawInput")
-
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.RawInput feature module")
 
 add_library(PonyEngine.RawInput STATIC)
 
@@ -11,22 +7,22 @@ target_include_directories(PonyEngine.RawInput PUBLIC
 )
 
 target_sources(PonyEngine.RawInput PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Main.cppm"
-	"Source/Main-Axis.cppm"
-	"Source/Main-ConnectionEvent.cppm"
-	"Source/Main-DeviceHandle.cppm"
-	"Source/Main-DeviceStyle.cppm"
-	"Source/Main-DeviceType.cppm"
-	"Source/Main-Gamepad.cppm"
-	"Source/Main-InputEventType.cppm"
-	"Source/Main-IRawInputObserver.cppm"
-	"Source/Main-IRawInputService.cppm"
-	"Source/Main-IVibrating.cppm"
-	"Source/Main-Keyboard.cppm"
-	"Source/Main-Layout.cppm"
-	"Source/Main-Mouse.cppm"
-	"Source/Main-RawInputEvent.cppm"
-	"Source/Main-Style.cppm"
+	"Source/RawInput.cppm"
+	"Source/RawInput-Axis.cppm"
+	"Source/RawInput-ConnectionEvent.cppm"
+	"Source/RawInput-DeviceHandle.cppm"
+	"Source/RawInput-DeviceStyle.cppm"
+	"Source/RawInput-DeviceType.cppm"
+	"Source/RawInput-Gamepad.cppm"
+	"Source/RawInput-InputEventType.cppm"
+	"Source/RawInput-IRawInputObserver.cppm"
+	"Source/RawInput-IRawInputService.cppm"
+	"Source/RawInput-IVibrating.cppm"
+	"Source/RawInput-Keyboard.cppm"
+	"Source/RawInput-Layout.cppm"
+	"Source/RawInput-Mouse.cppm"
+	"Source/RawInput-RawInputEvent.cppm"
+	"Source/RawInput-Style.cppm"
 )
 
 set_target_properties(PonyEngine.RawInput PROPERTIES

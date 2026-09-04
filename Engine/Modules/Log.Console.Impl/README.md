@@ -1,6 +1,8 @@
-# PonyEngine.Log.Console.Impl module
+# PonyEngine.Log.Console.Impl feature module
 
 Logger implementation that logs to a standard console.
+
+Adds `PonyEngine.Log.Console.Impl` target as a static library.
 
 ## Dependencies
 

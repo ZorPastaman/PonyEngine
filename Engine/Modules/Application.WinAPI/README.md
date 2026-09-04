@@ -1,4 +1,4 @@
-# PonyEngine.Application.WinAPI module
+# PonyEngine.Application.WinAPI modification module
 
 Adds WinAPI application interfaces to [PonyEngine.Application](../Application).
 
@@ -13,7 +13,7 @@ Modifies `PonyEngine.Application` target.
 ## Dependencies
 
 - [PonyEngine.Application](../Application)
-- Windows SDK 10.0.26100.0+
+- Windows SDK 10.0.26100.0
 
 ## C\++ modules
 

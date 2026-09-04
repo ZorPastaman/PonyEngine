@@ -1,4 +1,4 @@
-# PonyEngine.File module
+# PonyEngine.File feature module
 
 File API module. Provides interfaces for a file service.
 

@@ -1,21 +1,14 @@
-message(STATUS "Configuring PonyEngine.RawInput.Ext")
-
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.RawInput)
-	message(FATAL_ERROR "PonyEngine.RawInput wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.RawInput.Ext feature module")
 
 add_library(PonyEngine.RawInput.Ext STATIC)
 
 target_sources(PonyEngine.RawInput.Ext PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Main.cppm"
-	"Source/Main-DeviceParams.cppm"
-	"Source/Main-FeatureEntry.cppm"
-	"Source/Main-IDeviceController.cppm"
-	"Source/Main-IDeviceHub.cppm"
-	"Source/Main-IInputRegistry.cppm"
+	"Source/RawInput.cppm"
+	"Source/RawInput-DeviceParams.cppm"
+	"Source/RawInput-FeatureEntry.cppm"
+	"Source/RawInput-IDeviceController.cppm"
+	"Source/RawInput-IDeviceHub.cppm"
+	"Source/RawInput-IInputRegistry.cppm"
 )
 
 set_target_properties(PonyEngine.RawInput.Ext PROPERTIES

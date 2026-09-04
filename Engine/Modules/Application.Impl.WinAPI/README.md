@@ -1,4 +1,4 @@
-# PonyEngine.Application.Impl.WinAPI module
+# PonyEngine.Application.Impl.WinAPI modification module
 
 Adds WinAPI application support to [PonyEngine.Application.Impl](../Application.Impl).
 
@@ -11,7 +11,7 @@ Modifies `PonyEngine.Application.Impl` target.
 - [PonyEngine.Application.WinAPI](../Application.WinAPI)
 - [PonyEngine.Application.Impl](../Application.Impl)
 - [PonyEngine.Core.WinAPI](../Core.WinAPI)
-- Windows SDK 10.0.26100.0+
+- Windows SDK 10.0.26100.0
 
 ## CMake variables
 

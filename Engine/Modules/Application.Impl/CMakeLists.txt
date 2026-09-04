@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Application.Impl")
+message(STATUS "Configuring PonyEngine.Application.Impl feature module")
 
 include("CMake/Module.cmake")
 

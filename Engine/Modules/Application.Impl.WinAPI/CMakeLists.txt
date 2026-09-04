@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Application.Impl for Windows")
+message(STATUS "Configuring PonyEngine.Application.Impl.WinAPI modification module")
 
 set(PONY_ENGINE_APPLICATION_MODE "GUI" CACHE STRING "Application mode. Must be Console or GUI.")
 option(PONY_ENGINE_APPLICATION_CREATE_CONSOLE "Enable console. Can be used only in GUI builds." OFF)

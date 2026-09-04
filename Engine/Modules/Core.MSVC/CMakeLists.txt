@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.Core for MSVC")
+message(STATUS "Configuring PonyEngine.Core.MSVC modification module")
 
 target_include_directories(PonyEngine.Core PUBLIC 
 	"Include/Public"

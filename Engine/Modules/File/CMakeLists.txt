@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.File")
+message(STATUS "Configuring PonyEngine.File feature module")
 
 add_library(PonyEngine.File STATIC)
 

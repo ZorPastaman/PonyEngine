@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.File.Impl for Windows")
+message(STATUS "Configuring PonyEngine.File.Impl.WinAPI modification module")
 
 set(PONY_ENGINE_FILE_ORDER "p" CACHE STRING "PonyEngine.File.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_FILE_THREAD_ROLE "IO" CACHE STRING "PonyEngine.File.Impl io thread role.")

@@ -1,4 +1,4 @@
-# PonyEngine.Core.WinAPI module
+# PonyEngine.Core.WinAPI modification module
 
 Adds WinAPI utilities to [PonyEngine.Core](../Core).
 
@@ -7,7 +7,7 @@ Modifies `PonyEngine.Core` target.
 ## Dependencies
 
 - [PonyEngine.Core](../Core)
-- Windows SDK 10.0.26100.0+
+- Windows SDK 10.0.26100.0
 
 ## C\++ modules
 

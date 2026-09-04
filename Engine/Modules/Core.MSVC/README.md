@@ -1,4 +1,4 @@
-# PonyEngine.Core.MSVC module
+# PonyEngine.Core.MSVC modification module
 
 Adds MSVC compiler support to [PonyEngine.Core](../Core).
 

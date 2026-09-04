@@ -1,4 +1,4 @@
-# PonyEngine.RawInput module
+# PonyEngine.RawInput feature module
 
 Raw input API module. Provides interfaces for a raw input service.
 
@@ -8,6 +8,8 @@ The input type can be either State or Delta. A state input is remembered by the 
 A delta input is added to a current delta input sum, and every tick delta inputs are zeroed.
 
 Devices may have special features like vibration, for example. These features can be found via the raw input service interface.
+
+Adds `PonyEngine.RawInput` target as a static library.
 
 ## Dependencies
 

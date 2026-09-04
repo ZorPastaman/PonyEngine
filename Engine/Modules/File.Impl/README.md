@@ -1,4 +1,4 @@
-# PonyEngine.File.Impl module
+# PonyEngine.File.Impl feature module
 
 File implementation module.
 

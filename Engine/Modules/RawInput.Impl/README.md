@@ -1,6 +1,8 @@
-# PonyEngine.RawInput.Impl module
+# PonyEngine.RawInput.Impl feature module
 
 Raw input implementation module.
+
+Adds `PonyEngine.RawInput.Impl` target as a static library.
 
 ## Dependencies
 
