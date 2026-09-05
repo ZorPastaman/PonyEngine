@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.WinAPIInput.Impl.Windows:InputDispatcherModule;
+export module PonyEngine.WinInput.Impl:InputDispatcherModule;
 
 import std;
 
@@ -15,7 +15,7 @@ import PonyEngine.Application;
 
 import :InputDispatcher;
 
-export namespace PonyEngine::WinAPIInput
+export namespace PonyEngine::WinInput
 {
 	/// @brief WinAPI input dispatcher module.
 	class InputDispatcherModule final : public Application::IModule
@@ -39,7 +39,7 @@ export namespace PonyEngine::WinAPIInput
 	};
 }
 
-namespace PonyEngine::WinAPIInput
+namespace PonyEngine::WinInput
 {
 	void InputDispatcherModule::StartUp(Application::IModuleContext& context)
 	{

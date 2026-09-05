@@ -1,17 +1,4 @@
-message(STATUS "Configuring PonyEngine.World.Impl")
-
-if(NOT TARGET PonyEngine.Application)
-	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Log)
-	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.World)
-	message(FATAL_ERROR "PonyEngine.World wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.World.Impl feature module")
 
 set(PONY_ENGINE_WORLD_ORDER "p" CACHE STRING "PonyEngine.World.Impl module initialization order. Its first character must be in range [b-y].")
 
@@ -28,13 +15,13 @@ target_sources(PonyEngine.World.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.World.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-ComponentTable.cppm"
-	"Source/Main-ObjectTable.cppm"
-	"Source/Main-TypeRegistry.cppm"
-	"Source/Main-World.cppm"
-	"Source/Main-WorldService.cppm"
-	"Source/Main-WorldServiceModule.cppm"
+	"Source/World.cppm"
+	"Source/World-ComponentTable.cppm"
+	"Source/World-ObjectTable.cppm"
+	"Source/World-TypeRegistry.cppm"
+	"Source/World-World.cppm"
+	"Source/World-WorldService.cppm"
+	"Source/World-WorldServiceModule.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_WORLD_ORDER)

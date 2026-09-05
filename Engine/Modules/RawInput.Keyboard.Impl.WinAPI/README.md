@@ -10,7 +10,7 @@ Modifies `PonyEngine.RawInput.Keyboard.Impl` target.
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](..//Log)
 - [PonyEngine.RawInput.Keyboard.Impl](../RawInput.Keyboard.Impl)
-- [PonyEngine.WinAPIInput](../WinAPIInput)
+- [PonyEngine.WinInput](../WinInput)
 - Windows SDK 10.0.26100.0
  
 ## CMake variables

@@ -30,5 +30,5 @@ target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PUBLIC
 target_link_libraries(PonyEngine.RawInput.Keyboard.Impl PRIVATE
 	PonyEngine.Core
 	PonyEngine.Log
-	PonyEngine.WinAPIInput
+	PonyEngine.WinInput
 )

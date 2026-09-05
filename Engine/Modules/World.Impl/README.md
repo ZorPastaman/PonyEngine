@@ -1,4 +1,4 @@
-# PonyEngine.World.Impl module
+# PonyEngine.World.Impl feature module
 
 World service implementation module.
 
@@ -21,9 +21,9 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [ComponentTable](Source/Main-ComponentTable.cppm) - typeless component table, it manages them using component size and alignment;
-- [ObjectTable](Source/Main-ObjectTable.cppm) - typeless object table;
-- [TypeRegistry](Source/Main-TypeRegistry.cppm) - registry that holds info about component and object types;
-- [World](Source/Main-World.cppm) - world container;
-- [WorldService](Source/Main-WorldService.cppm) - world service;
-- [WorldServiceModule](Source/Main-WorldServiceModule.cppm) - world service module.
+- [ComponentTable](Source/World-ComponentTable.cppm) - typeless component table, it manages them using component size and alignment;
+- [ObjectTable](Source/World-ObjectTable.cppm) - typeless object table;
+- [TypeRegistry](Source/World-TypeRegistry.cppm) - registry that holds info about component and object types;
+- [World](Source/World-World.cppm) - world container;
+- [WorldService](Source/World-WorldService.cppm) - world service;
+- [WorldServiceModule](Source/World-WorldServiceModule.cppm) - world service module.

@@ -7,14 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/WinAPIInput/Windows/WinAPIInputModule.h"
+#pragma once
 
-import PonyEngine.WinAPIInput.Impl.Windows;
+#include "PonyEngine/Macro/Compiler.h"
 
-namespace PonyEngine::WinAPIInput
+import std;
+
+import PonyEngine.Application;
+
+namespace PonyEngine::WinInput
 {
-	std::shared_ptr<Application::IModule> CreateWinAPIInputModule()
-	{
-		return std::make_shared<InputDispatcherModule>();
-	}
+	/// @brief Creates a WinInput module.
+	/// @return WinInput module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateWinInputModule();
 }

@@ -8,107 +8,74 @@ To build a game, create your own project, set Pony Engine module variables, add 
 Some modules or cmake functions require tools built for a host platform. Build them first, and then build the engine and a game.
 See [Tools](../Tools) docs for more info.
 
-Path to built tools must be assigned to `PONY_TOOLS_INSTALL_DIR`.
+The folder with tools must be added to the environment.
 
 ## Modules
 
-Each module is a separate CMake target. A module name is its target name in CMake scripts as well.
+There are two types of modules: feature modules and modification modules. Feature modules add targets while modification modules modify targets added by feature modules.
 
-To a module to a build, a specific CMake flag must be `true`.
+To configure a module, a specific CMake flag must be `true`.
 
-| Module name                                                           | Build flag                             | Description                                                                                                                   |
-|:----------------------------------------------------------------------|:---------------------------------------|:------------------------------------------------------------------------------------------------------------------------------|
-| [PonyEngine.Application](Modules/Application)                         | `PONY_ENGINE_APPLICATION`              | Application API module. Provides interfaces to access main engine info, to register interfaces and tickables.                 |
-| [PonyEngine.Application.Impl](Modules/Application.Impl)               | `PONY_ENGINE_APPLICATION_IMPL`         | Application implementation module. Contains `main()` and a default logger as well.                                            |
-| [PonyEngine.Core](Modules/Core)                                       | `PONY_ENGINE_CORE`                     | Core utilities module: Math, Hash, Meta, Memory and other utilities.                                                          |
-| [PonyEngine.Core.MSVC](Modules/Core.MSVC)                             | `PONY_ENGINE_CORE_MSVC`                | Adds MSVC support to Core module.                                                                                             |
-| [PonyEngine.File](Modules/File)                                       | `PONY_ENGINE_FILE`                     | File service API module. The file service is a simple way to utilize modern SSDs with totally async read/write operations.    |
-| [PonyEngine.File.Impl](Modules/File.Impl)                             | `PONY_ENGINE_FILE_IMPL`                | File service implementation module.                                                                                           |
-| [PonyEngine.Job](Modules/Job)                                         | `PONY_ENGINE_JOB`                      | Job service API module. The job service is a simple way to utilize multi-threaded CPUs.                                       |
-| [PonyEngine.Job.Impl](Modules/Job.Impl)                               | `PONY_ENGINE_JOB_IMPL`                 | Job service implementation module.                                                                                            |
-| [PonyEngine.Log](Modules/Log)                                         | `PONY_ENGINE_LOG`                      | Logging API module.                                                                                                           |
-| [PonyEngine.Log.Ext](Modules/Log.Ext)                                 | `PONY_ENGINE_LOG_EXT`                  | Logger extension API module. Provides interfaces for the logger extensions.                                                   |
-| [PonyEngine.Log.Impl](Modules/Log.Impl)                               | `PONY_ENGINE_LOG_IMPL`                 | Logger module. Replaces the default logger. Logs to a console and sub-loggers that are added as extensions.                   |
-| [PonyEngine.Log.Console.Impl](Modules/Log.Console.Impl)               | `PONY_ENGINE_LOG_CONSOLE_IMPL`         | Logger implementation that logs to a standard console.                                                                        |
-| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                     | `PONY_ENGINE_LOG_FILE_IMPL`            | File sub-logger module. That sub-logger logs to a log file.                                                                   |
-| [PonyEngine.Log.PConsole.Impl](Modules/Log.PConsole.Impl)             | `PONY_ENGINE_LOG_PCONSOLE_IMPL`        | Logger implementation that logs to a platform console.                                                                        |
-| [PonyEngine.RawInput](Modules/RawInput)                               | `PONY_ENGINE_RAW_INPUT`                | Raw input service API module. The service provides input from different devices via input providers.                          |
-| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                       | `PONY_ENGINE_RAW_INPUT_EXT`            | Raw input service extension API module. Provides interfaces for input providers that implement support for different devices. |
-| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                     | `PONY_ENGINE_RAW_INPUT_IMPL`           | Raw input service implementation module. Gets input from input providers that are added as extensions.                        |
-| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)   | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL`  | Raw input keyboard provider module. Reads input from keyboard devices and provides it to a raw input service.                 |
-| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)         | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`     | Raw input mouse provider module. Reads input from mouse devices and provides it to a raw input service.                       |
-| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)       | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`    | Raw input XInput provider module. Reads input from XInput devices and provides it to a raw input service.                     |
-| [PonyEngine.Resource](Modules/Resource)                               | `PONY_ENGINE_RESOURCE`                 | Resource service API module. The service provides resources.                                                                  |
-| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                       | `PONY_ENGINE_RESOURCE_EXT`             | Resource service extension API module. Provides interfaces for resource providers.                                            |
-| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                     | `PONY_ENGINE_RESOURCE_IMPL`            | Resource service implementation module.                                                                                       |
-| [PonyEngine.Resource.Pack](Modules/Resource.Pack)                     | `PONY_ENGINE_RESOURCE_PACK`            | Pack resource provider module API.                                                                                            |
-| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)           | `PONY_ENGINE_RESOURCE_PACK_IMPL`       | Pack resource provider module.                                                                                                |
-| [PonyEngine.Time](Modules/Time)                                       | `PONY_ENGINE_TIME`                     | Time service API module. The service provides info about delta time, fixed time step and other time info.                     |
-| [PonyEngine.Time.Impl](Modules/Time.Impl)                             | `PONY_ENGINE_TIME_IMPL`                | Time service implementation module.                                                                                           |
-| [PonyEngine.WinAPIInput](Modules/WinAPIInput)                         | `PONY_ENGINE_WINAPI_INPUT`             | The module provides interfaces to register for WinAPI raw input events.                                                       |
-| [PonyEngine.WinAPIInput.Impl](Modules/WinAPIInput.Impl)               | `PONY_ENGINE_WINAPI_INPUT_IMPL`        | WinAPI input module implementation.                                                                                           |
-| [PonyEngine.World](Modules/World)                                     | `PONY_ENGINE_WORLD`                    | World service API module. The service manages game worlds.                                                                    |
-| [PonyEngine.World.Impl](Modules/World.Impl)                           | `PONY_ENGINE_WORLD_IMPL`               | World service implementation module.                                                                                          |
+### Feature modules
 
-### Platform modules
+| Module name                                                         | Build flag                            |
+|:--------------------------------------------------------------------|:--------------------------------------|
+| [PonyEngine.Application](Modules/Application)                       | `PONY_ENGINE_APPLICATION`             |
+| [PonyEngine.Application.Impl](Modules/Application.Impl)             | `PONY_ENGINE_APPLICATION_IMPL`        |
+| [PonyEngine.Core](Modules/Core)                                     | `PONY_ENGINE_CORE`                    |
+| [PonyEngine.File](Modules/File)                                     | `PONY_ENGINE_FILE`                    |
+| [PonyEngine.File.Impl](Modules/File.Impl)                           | `PONY_ENGINE_FILE_IMPL`               |
+| [PonyEngine.Job](Modules/Job)                                       | `PONY_ENGINE_JOB`                     |
+| [PonyEngine.Job.Impl](Modules/Job.Impl)                             | `PONY_ENGINE_JOB_IMPL`                |
+| [PonyEngine.Log](Modules/Log)                                       | `PONY_ENGINE_LOG`                     |
+| [PonyEngine.Log.Ext](Modules/Log.Ext)                               | `PONY_ENGINE_LOG_EXT`                 |
+| [PonyEngine.Log.Impl](Modules/Log.Impl)                             | `PONY_ENGINE_LOG_IMPL`                |
+| [PonyEngine.Log.Console.Impl](Modules/Log.Console.Impl)             | `PONY_ENGINE_LOG_CONSOLE_IMPL`        |
+| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                   | `PONY_ENGINE_LOG_FILE_IMPL`           |
+| [PonyEngine.Log.WinDebug.Impl](Modules/Log.PConsole.Impl)           | `PONY_ENGINE_LOG_WinDebug_IMPL`       |
+| [PonyEngine.RawInput](Modules/RawInput)                             | `PONY_ENGINE_RAW_INPUT`               |
+| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                     | `PONY_ENGINE_RAW_INPUT_EXT`           |
+| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                   | `PONY_ENGINE_RAW_INPUT_IMPL`          |
+| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl) | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL` |
+| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)       | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`    |
+| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)     | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`   |
+| [PonyEngine.Resource](Modules/Resource)                             | `PONY_ENGINE_RESOURCE`                |
+| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                     | `PONY_ENGINE_RESOURCE_EXT`            |
+| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                   | `PONY_ENGINE_RESOURCE_IMPL`           |
+| [PonyEngine.Resource.Pack](Modules/Resource.Pack)                   | `PONY_ENGINE_RESOURCE_PACK`           |
+| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)         | `PONY_ENGINE_RESOURCE_PACK_IMPL`      |
+| [PonyEngine.Time](Modules/Time)                                     | `PONY_ENGINE_TIME`                    |
+| [PonyEngine.Time.Impl](Modules/Time.Impl)                           | `PONY_ENGINE_TIME_IMPL`               |
+| [PonyEngine.WinInput](Modules/WinInput)                             | `PONY_ENGINE_WININPUT`                |
+| [PonyEngine.WinInput.Impl](Modules/WinInput.Impl)                   | `PONY_ENGINE_WININPUT_IMPL`           |
+| [PonyEngine.World](Modules/World)                                   | `PONY_ENGINE_WORLD`                   |
+| [PonyEngine.World.Impl](Modules/World.Impl)                         | `PONY_ENGINE_WORLD_IMPL`              |
 
-Platform support is configured via CMake scripts. These scripts adjust the build by selecting implementations, adding platform-specific code, and configuring existing modules.
-Some modules are completely platform-independent. Others require platform-specific implementations, while some can optionally provide a platform-specific behavior.
+Some modules may require modifications to work because they need implementation for a specific platform or a compiler or due to other things.
+
+### Modification modules
+
+| Module name                                                                       | Build flag                                   |
+|:----------------------------------------------------------------------------------|:---------------------------------------------|
+| [PonyEngine.Application.WinAPI](Modules/Application.WinAPI)                       | `PONY_ENGINE_APPLICATION_WINAPI`             |
+| [PonyEngine.Application.Impl.WinAPI](Modules/Application.Impl.WinAPI)             | `PONY_ENGINE_APPLICATION_IMPL_WINAPI`        |
+| [PonyEngine.Core.MSVC](Modules/Core.MSVC)                                         | `PONY_ENGINE_CORE_MSVC`                      |
+| [PonyEngine.Core.WinAPI](Modules/Core.WinAPI)                                     | `PONY_ENGINE_CORE_WINAPI`                    |
+| [PonyEngine.File.Impl.WinAPI](Modules/File.Impl.WinAPI)                           | `PONY_ENGINE_FILE_IMPL_WINAPI`               |
+| [PonyEngine.RawInput.Keyboard.Impl.WinAPI](Modules/RawInput.Keyboard.Impl.WinAPI) | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL_WINAPI` |
+| [PonyEngine.RawInput.Mouse.Impl.WinAPI](Modules/RawInput.Mouse.Impl.WinAPI)       | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL_WINAPI`    |
+
+If the variable `PONY_ENGINE_AUTO_SELECT_PLATFORM_MODULES` is ON, the engine will select platform modification modules automatically.
 
 Supported platforms:
 
-- [Windows](Platforms/Windows)
+- Windows
 
-The table of the module-platform compatibility:
-
-| Module name                                                           | Requires platform implementation | [Windows](Platforms/Windows) |
-|:----------------------------------------------------------------------|:--------------------------------:|:----------------------------:|
-| [PonyEngine.Application](Modules/Application)                         | -                                | &check;                      |
-| [PonyEngine.Application.Impl](Modules/Application.Impl)               | &check;                          | &check;                      |
-| [PonyEngine.Core](Modules/Core)                                       | -                                | &check;                      |
-| [PonyEngine.File](Modules/File)                                       | -                                | &check;                      |
-| [PonyEngine.File.Impl](Modules/File.Impl)                             | &check;                          | &check;                      |
-| [PonyEngine.Job](Modules/Job)                                         | -                                | &check;                      |
-| [PonyEngine.Job.Impl](Modules/Job.Impl)                               | -                                | &check;                      |
-| [PonyEngine.Log](Modules/Log)                                         | -                                | &check;                      |
-| [PonyEngine.Log.Ext](Modules/Log.Ext)                                 | -                                | &check;                      |
-| [PonyEngine.Log.Impl](Modules/Log.Impl)                               | -                                | &check;                      |
-| [PonyEngine.Log.Console.Impl](Modules/Log.Console.Impl)               | -                                | &check;                      |
-| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                     | -                                | &check;                      |
-| [PonyEngine.Log.PConsole.Impl](Modules/Log.PConsole.Impl)             | &check;                          | &check;                      |
-| [PonyEngine.RawInput](Modules/RawInput)                               | -                                | &check;                      |
-| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                       | -                                | &check;                      |
-| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                     | -                                | &check;                      |
-| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)   | &check;                          | &check;                      |
-| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)         | &check;                          | &check;                      |
-| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)       | &check;                          | &check;                      |
-| [PonyEngine.Resource](Modules/Resource)                               | -                                | &check;                      |
-| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                       | -                                | &check;                      |
-| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                     | -                                | &check;                      |
-| [PonyEngine.Resource.Pack](Modules/Resource.Pack)                     | -                                | &check;                      |
-| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)           | -                                | &check;                      |
-| [PonyEngine.Time](Modules/Time)                                       | -                                | &check;                      |
-| [PonyEngine.Time.Impl](Modules/Time.Impl)                             | -                                | &check;                      |
-| [PonyEngine.WinAPIInput](Modules/WinAPIInput)                         | &check;                          | &check;                      |
-| [PonyEngine.WinAPIInput.Impl](Modules/WinAPIInput.Impl)               | &check;                          | &check;                      |
-| [PonyEngine.World](Modules/World)                                     | -                                | &check;                      |
-| [PonyEngine.World.Impl](Modules/World.Impl)                           | -                                | &check;                      |
-
-The engine automatically applies platform-specific configuration based on `CMAKE_SYSTEM_NAME`. The value must match one of the supported platforms.
-Users can provide their own platform implementations by setting the CMake flag `PONY_ENGINE_CUSTOM_PLATFORM` to `true`. In this case, the built-in platform configuration is disabled, and users are responsible for configuring the modules themselves.
-
-### Compiler modules
-
-Unfortunately, some functions are not implemented in the C++ standard and require to use compiler specific operations.
-The only module that needs them is [PonyEngine.Core](Modules/Core). See its readme for details.
-
-If the variable `PONY_ENGINE_AUTO_SELECT_COMPILER_MODULES` is ON, the engine will select compiler modules automatically.
+If the variable `PONY_ENGINE_AUTO_SELECT_COMPILER_MODULES` is ON, the engine will select compiler modification modules automatically.
 
 Supported compilers:
 
-- [MSVC](Modules/Core.MSVC)
-
-If the variable `PONY_ENGINE_AUTO_SELECT_COMPILER_MODULE` is OFF, you have to manually turn on compiler modules or provide your own.
+- MSVC
 
 ### Application module linking
 
@@ -192,18 +159,5 @@ The engine has some useful CMake functions:
 | `pony_validate_name`                            | [File](CMake/Project.cmake)  | Validates if the name variable is correct.              |
 | `pony_validate_title`                           | [File](CMake/Project.cmake)  | Validates if the title variable is correct.             |
 | `pony_validate_version`                         | [File](CMake/Project.cmake)  | Validates if the version variable is correct.           |
-| `pony_create_file_resource_manifest`            | [File](CMake/Resource.cmake) | Creates a file resource manifest.                       |
-| `pony_add_to_file_resource_manifest`            | [File](CMake/Resource.cmake) | Adds resources to a file resource manifest.             |
-| `pony_remove_from_file_resource_manifest`       | [File](CMake/Resource.cmake) | Removes resources from a file resource manifest.        |
-| `pony_upgrade_file_resource_manifest`           | [File](CMake/Resource.cmake) | Upgrades a file resource manifest to an actual version. |
-| `pony_make_resource_for_file_resource_manifest` | [File](CMake/Resource.cmake) | Makes a resource string for a file resource manifest.   |
-| `pony_compile_file_resource_manifest`           | [File](CMake/Resource.cmake) | Compiles a file resource manifest.                      |
-| `pony_create_pack_resource_manifest`            | [File](CMake/Resource.cmake) | Creates a pack resource manifest.                       |
-| `pony_add_to_pack_resource_manifest`            | [File](CMake/Resource.cmake) | Adds resources to a pack resource manifest.             |
-| `pony_remove_from_pack_resource_manifest`       | [File](CMake/Resource.cmake) | Removes resources from a pack resource manifest.        |
-| `pony_upgrade_pack_resource_manifest`           | [File](CMake/Resource.cmake) | Upgrades a pack resource manifest to an actual version. |
-| `pony_make_resource_for_pack_resource_manifest` | [File](CMake/Resource.cmake) | Makes a resource string for a pack resource manifest.   |
-| `pony_compile_pack_resource_manifest`           | [File](CMake/Resource.cmake) | Compiles a pack resource manifest.                      |
-| `pony_compile_shader_with_dxc`                  | [File](CMake/Shader.cmake)   | Compiles a shader using DXC compiler.                   |
 
 Some modules may add their own functions. Refer to their documentation to find out.

@@ -13,11 +13,11 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.WinAPIInput.Windows:Utility;
+export module PonyEngine.WinInput:Utility;
 
 import std;
 
-export namespace PonyEngine::WinAPIInput
+export namespace PonyEngine::WinInput
 {
 	/// @brief Gets a device name size.
 	/// @param deviceHandle Device handle.
@@ -31,7 +31,7 @@ export namespace PonyEngine::WinAPIInput
 	std::size_t GetDeviceName(HANDLE deviceHandle, std::span<char> deviceName);
 }
 
-namespace PonyEngine::WinAPIInput
+namespace PonyEngine::WinInput
 {
 	std::size_t GetDeviceNameSize(const HANDLE deviceHandle)
 	{

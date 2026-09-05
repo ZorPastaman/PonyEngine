@@ -18,16 +18,16 @@ module;
 #include <windows.h>
 #include <hidusage.h>
 
-export module PonyEngine.WinAPIInput.Impl.Windows:InputDispatcher;
+export module PonyEngine.WinInput.Impl:InputDispatcher;
 
 import std;
 
 import PonyEngine.Application;
 import PonyEngine.FileSystem.WinAPI;
 import PonyEngine.Log;
-import PonyEngine.WinAPIInput.Windows;
+import PonyEngine.WinInput;
 
-namespace PonyEngine::WinAPIInput
+namespace PonyEngine::WinInput
 {
 	/// @brief Window proc for the @p InputDispatcher.
 	/// @param hwnd Window handle.
@@ -39,7 +39,7 @@ namespace PonyEngine::WinAPIInput
 	LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 }
 
-export namespace PonyEngine::WinAPIInput
+export namespace PonyEngine::WinInput
 {
 	/// @brief WinAPI input dispatcher.
 	class InputDispatcher final : public IInputDispatcher
@@ -109,7 +109,7 @@ export namespace PonyEngine::WinAPIInput
 	};
 }
 
-namespace PonyEngine::WinAPIInput
+namespace PonyEngine::WinInput
 {
 	LRESULT WindowProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) noexcept
 	{

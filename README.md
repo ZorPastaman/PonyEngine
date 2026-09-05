@@ -46,10 +46,7 @@ FetchContent_MakeAvailable(PonyEngineTools)
 #### Build runtime (build for a target platform)
 
 1. Build C++ std module;
-2. Set a path to the build tools:
-```
-set(PONY_TOOLS_INSTALL_DIR <path_to_tools>)
-```
+2. Add a path to build tools to environment;
 3. Add the engine runtime as a dependency to your CMake project. Add this to your project `CMakeLists.txt`:
 ```
 set(PONY_BUILD_MODE "Runtime")

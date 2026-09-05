@@ -26,12 +26,12 @@ import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Mouse.Impl;
-import PonyEngine.WinAPIInput.Windows;
+import PonyEngine.WinInput;
 
 export namespace PonyEngine::RawInput::Mouse
 {
 	/// @brief Mouse provider.
-	class MouseProvider final : private WinAPIInput::IRawInputObserver
+	class MouseProvider final : private WinInput::IRawInputObserver
 	{
 	public:
 		/// @brief Creates a mouse provider.
@@ -78,7 +78,7 @@ export namespace PonyEngine::RawInput::Mouse
 		Application::IApplication* application; ///< Application.
 		IDeviceHub* hub; ///< Device hub.
 		Log::ILogService* logService; ///< Log service.
-		WinAPIInput::IInputDispatcher* inputDispatcher; ///< WinAPI input dispatcher.
+		WinInput::IInputDispatcher* inputDispatcher; ///< WinAPI input dispatcher.
 		Application::IMessagePump* messagePump; ///< WinAPI message pump.
 
 		DeviceType deviceType; ///< Mouse device type.
@@ -97,7 +97,7 @@ namespace PonyEngine::RawInput::Mouse
 		application{&application},
 		hub{&this->application->GetInterface<IDeviceHub>()},
 		logService{this->application->FindInterface<Log::ILogService>()},
-		inputDispatcher{&this->application->GetInterface<WinAPIInput::IInputDispatcher>()},
+		inputDispatcher{&this->application->GetInterface<WinInput::IInputDispatcher>()},
 		messagePump{&this->application->GetInterface<Application::IMessagePump>()},
 		deviceType(hub->MakeDeviceType(MouseDevice::GenericType)),
 		deviceStyle(hub->MakeDeviceStyle(Style::None)),
@@ -154,11 +154,11 @@ namespace PonyEngine::RawInput::Mouse
 	{
 		if (isConnected)
 		{
-			const std::size_t nameLength = WinAPIInput::GetDeviceNameSize(device);
+			const std::size_t nameLength = WinInput::GetDeviceNameSize(device);
 			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(nameLength);
 			auto arena = Memory::Arena(buffer->Span());
 			const std::span<char> name = arena.AllocateArray<char>(nameLength);
-			const std::size_t nameSize = WinAPIInput::GetDeviceName(device, name);
+			const std::size_t nameSize = WinInput::GetDeviceName(device, name);
 
 			const std::size_t initialSize = nativeHandles.size();
 			try

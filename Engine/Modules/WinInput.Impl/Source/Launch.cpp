@@ -7,8 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.WinAPIInput.Windows;
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/WinInput/WinInputModule.h"
 
-export import :IInputDispatcher;
-export import :IRawInputObserver;
-export import :Utility;
+PONY_ENGINE_MODULE(PonyEngine::WinInput::CreateWinInputModule, PonyEngineWinInput, PONY_ENGINE_WININPUT_ORDER);

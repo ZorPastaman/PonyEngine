@@ -15,11 +15,11 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.WinAPIInput.Windows:IInputDispatcher;
+export module PonyEngine.WinInput:IInputDispatcher;
 
 import :IRawInputObserver;
 
-export namespace PonyEngine::WinAPIInput
+export namespace PonyEngine::WinInput
 {
 	/// @brief Input dispatcher.
 	class IInputDispatcher

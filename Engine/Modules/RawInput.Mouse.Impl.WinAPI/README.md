@@ -9,6 +9,7 @@ Modifies `PonyEngine.RawInput.Mouse.Impl` target.
 - [PonyEngine.Application](../Application)
 - [PonyEngine.Log](../Log)
 - [PonyEngine.RawInput.Mouse.Impl](../RawInput.Mouse.Impl)
+- [PonyEngine.WinInput](../WinInput)
 - Windows SDK 10.0.26100.0
 
 ## CMake variables

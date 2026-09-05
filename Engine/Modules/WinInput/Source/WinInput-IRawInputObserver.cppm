@@ -15,9 +15,9 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-export module PonyEngine.WinAPIInput.Windows:IRawInputObserver;
+export module PonyEngine.WinInput:IRawInputObserver;
 
-export namespace PonyEngine::WinAPIInput
+export namespace PonyEngine::WinInput
 {
 	/// @brief Raw input observer.
 	class IRawInputObserver

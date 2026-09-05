@@ -26,14 +26,14 @@ import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Keyboard.Impl;
-import PonyEngine.WinAPIInput.Windows;
+import PonyEngine.WinInput;
 
 import :KeyboardAxisMap;
 
 export namespace PonyEngine::RawInput::Keyboard
 {
 	/// @brief Windows keyboard provider.
-	class KeyboardProvider final : private WinAPIInput::IRawInputObserver
+	class KeyboardProvider final : private WinInput::IRawInputObserver
 	{
 	public:
 		/// @brief Creates a keyboard provider.
@@ -55,7 +55,7 @@ export namespace PonyEngine::RawInput::Keyboard
 		Application::IApplication* application; ///< Application.
 		IDeviceHub* hub; ///< Device hub.
 		Log::ILogService* logService; ///< Log service.
-		WinAPIInput::IInputDispatcher* inputDispatcher; ///< WinAPI input dispatcher.
+		WinInput::IInputDispatcher* inputDispatcher; ///< WinAPI input dispatcher.
 		Application::IMessagePump* messagePump; ///< WinAPI message pump.
 
 		DeviceType deviceType; ///< Keyboard device type.
@@ -74,7 +74,7 @@ namespace PonyEngine::RawInput::Keyboard
 		application{&application},
 		hub{&this->application->GetInterface<IDeviceHub>()},
 		logService{this->application->FindInterface<Log::ILogService>()},
-		inputDispatcher{&this->application->GetInterface<WinAPIInput::IInputDispatcher>()},
+		inputDispatcher{&this->application->GetInterface<WinInput::IInputDispatcher>()},
 		messagePump{&this->application->GetInterface<Application::IMessagePump>()},
 		deviceType(hub->MakeDeviceType(KeyboardDevice::GenericType)),
 		deviceStyle(hub->MakeDeviceStyle(Style::None)),
@@ -129,11 +129,11 @@ namespace PonyEngine::RawInput::Keyboard
 	{
 		if (isConnected)
 		{
-			const std::size_t nameLength = WinAPIInput::GetDeviceNameSize(device);
+			const std::size_t nameLength = WinInput::GetDeviceNameSize(device);
 			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(nameLength);
 			auto arena = Memory::Arena(buffer->Span());
 			const std::span<char> name = arena.AllocateArray<char>(nameLength);
-			const std::size_t nameSize = WinAPIInput::GetDeviceName(device, name);
+			const std::size_t nameSize = WinInput::GetDeviceName(device, name);
 
 			const std::size_t initialSize = nativeHandles.size();
 			try

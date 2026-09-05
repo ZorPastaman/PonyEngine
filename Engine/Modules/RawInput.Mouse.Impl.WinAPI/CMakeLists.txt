@@ -28,5 +28,5 @@ target_link_libraries(PonyEngine.RawInput.Mouse.Impl PUBLIC
 )
 target_link_libraries(PonyEngine.RawInput.Mouse.Impl PRIVATE
 	PonyEngine.Log
-	PonyEngine.WinAPIInput
+	PonyEngine.WinInput
 )

@@ -1,4 +1,4 @@
-# PonyEngine.World module
+# PonyEngine.World feature module
 
 World service API module.
 
@@ -12,20 +12,20 @@ they can be implemented as needed for a game project.
 
 ## C\++ modules
 
-### [PonyEngine.World](Source/Main.cppm)
+### [PonyEngine.World](Source/World.cppm)
 
-#### [Entity](Source/Main-Entity.cppm)
+#### [Entity](Source/World-Entity.cppm)
 
 Entity struct. It's just an ID and a generation.
 
 The ID is the main part of an entity. Its generation is used for validation to ensure that an entity isn't used after its death. 
 It allows to reuse the same ID for another entity.
 
-#### [Component](Source/Main-Component.cppm)
+#### [Component](Source/World-Component.cppm)
 
 Component concept. It requires a component to be a pod-like struct.
 
-#### [ObjectHandle](Source/Main-ObjectHandle.cppm)
+#### [ObjectHandle](Source/World-ObjectHandle.cppm)
 
 Because components must be pod, you can't have object references like `std::shared_ptr` in the them.
 But the components sometimes need to have them to reference meshes, materials and other game resources.
@@ -33,7 +33,7 @@ But the components sometimes need to have them to reference meshes, materials an
 To solve this problem, you can register an object inside a world and get an object handle which is a pure data struct
 that can be used inside components.
 
-#### [QueryParams](Source/Main-QueryParams.cppm)
+#### [QueryParams](Source/World-QueryParams.cppm)
 
 Different structs and functions for world queries.
 
@@ -41,12 +41,12 @@ The main ones are `PonyEngine::World::QueryParams` and `PonyEngine::World::Query
 But they are too abstract and may be hard to use in a game code. That's why the API provides useful template helpers like
 `PonyEngine::World::Query` and `PonyEngine::World::MakeQuery()`.
 
-#### [IWorld](Source/Main-IWorld.cppm)
+#### [IWorld](Source/World-IWorld.cppm)
 
 World interface. Each world is a totally separate from other worlds. It has its own entities and components.
 Also, each world has its own object storage.
 
-#### [IWorldService](Source/Main-IWorldService.cppm)
+#### [IWorldService](Source/World-IWorldService.cppm)
 
 World service public interface. It provides functions for component registration and world creation.
 
