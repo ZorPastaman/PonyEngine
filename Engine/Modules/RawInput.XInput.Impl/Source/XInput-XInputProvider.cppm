@@ -16,7 +16,7 @@ module;
 #include <windows.h>
 #include <xinput.h>
 
-export module PonyEngine.RawInput.XInput.Impl.Windows:XInputProvider;
+export module PonyEngine.RawInput.XInput.Impl:XInputProvider;
 
 import std;
 

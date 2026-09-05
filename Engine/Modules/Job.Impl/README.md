@@ -27,8 +27,8 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [Job](Source/Main-Job.cppm) - job implementation;
-- [JobPool](Source/Main-JobPool.cppm) - job pool;
-- [Worker](Source/Main-Worker.cppm) - worker thread implementation;
-- [JobService](Source/Main-JobService.cppm) - job service implementation;
-- [JobServiceModule](Source/Main-JobServiceModule.cppm) - job service implementation module.
+- [Job](Source/Job-Job.cppm) - job implementation;
+- [JobPool](Source/Job-JobPool.cppm) - job pool;
+- [Worker](Source/Job-Worker.cppm) - worker thread implementation;
+- [JobService](Source/Job-JobService.cppm) - job service implementation;
+- [JobServiceModule](Source/Job-JobServiceModule.cppm) - job service implementation module.

@@ -14,7 +14,7 @@ target_sources(PonyEngine.Log.WinDebug.Impl PUBLIC
 target_sources(PonyEngine.Log.WinDebug.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
-target_sources(PonyEngine.Log.WinDebug.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
+target_sources(PonyEngine.Log.WinDebug.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/WinDebug.cppm"
 	"Source/WinDebug-WinDebugLogger.cppm"
 	"Source/WinDebug-WinDebugLoggerModule.cppm"

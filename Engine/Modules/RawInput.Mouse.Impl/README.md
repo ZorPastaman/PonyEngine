@@ -16,6 +16,6 @@ The module requires a platform specific implementation.
 
 The module contains some utilities that can be useful for mouse implementations on any platform:
 
-- [MouseAxis](Source/Main-MouseAxis.cppm);
-- [MouseAxisMap](Source/Main-MouseAxisMap.cppm);
-- [MouseController](Source/Main-MouseController.cppm).
+- [MouseAxis](Source/Mouse-MouseAxis.cppm);
+- [MouseAxisMap](Source/Mouse-MouseAxisMap.cppm);
+- [MouseController](Source/Mouse-MouseController.cppm).

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput.XInput.Impl.Windows:XInputProviderModule;
+export module PonyEngine.RawInput.XInput.Impl:XInputProviderModule;
 
 import std;
 

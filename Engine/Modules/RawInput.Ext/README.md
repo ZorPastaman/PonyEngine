@@ -13,16 +13,16 @@ Adds `PonyEngine.RawInput.Ext` target as a static library.
 
 ## C\++ modules
 
-### [PonyEngine.RawInput.Ext](Source/Main.cppm)
+### [PonyEngine.RawInput.Ext](Source/RawInput.cppm)
 
-#### [IDeviceController](Source/Main-IDeviceController.cppm)
+#### [IDeviceController](Source/RawInput-IDeviceController.cppm)
 
 Interface that receives requests about its devices.
 
-#### [IDeviceHub](Source/Main-IDeviceHub.cppm)
+#### [IDeviceHub](Source/RawInput-IDeviceHub.cppm)
 
 Interface that provides API to register and unregister devices.
 
-#### [IInputRegistry](Source/Main-IInputRegistry.cppm)
+#### [IInputRegistry](Source/RawInput-IInputRegistry.cppm)
 
 Interface that's used to report input including connection changes.

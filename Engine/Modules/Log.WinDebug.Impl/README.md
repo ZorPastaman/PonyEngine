@@ -26,6 +26,6 @@ These variables are used to configure the build of the module:
 
 The module has a simple implementation:
 
-- [WinDebugLogger](Source/Main-WinDebugLogger.cppm) - WinDebug logger;
-- [WinDebugLoggerModule](Source/Main-WinDebugLoggerModule.cppm) - WinDebug logger module.
+- [WinDebugLogger](Source/WinDebug-WinDebugLogger.cppm) - WinDebug logger;
+- [WinDebugLoggerModule](Source/WinDebug-WinDebugLoggerModule.cppm) - WinDebug logger module.
 

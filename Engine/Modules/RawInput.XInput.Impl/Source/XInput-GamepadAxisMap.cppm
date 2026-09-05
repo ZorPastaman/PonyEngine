@@ -14,7 +14,7 @@ module;
 #include <windows.h>
 #include <xinput.h>
 
-export module PonyEngine.RawInput.XInput.Impl.Windows:GamepadAxisMap;
+export module PonyEngine.RawInput.XInput.Impl:GamepadAxisMap;
 
 import std;
 

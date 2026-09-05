@@ -26,5 +26,5 @@ These variables are used to configure the build of the module:
 
 The module has a simple implementation:
 
-- [FileLogger](Source/Main-FileLogger.cppm) - file logger;
-- [FileLoggerModule](Source/Main-FileLoggerModule.cppm) - file logger module.
+- [FileLogger](Source/File-FileLogger.cppm) - file logger;
+- [FileLoggerModule](Source/File-FileLoggerModule.cppm) - file logger module.

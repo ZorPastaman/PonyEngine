@@ -10,15 +10,15 @@ Adds `PonyEngine.Log` target as a static library.
 
 ## C\++ modules
 
-### [PonyEngine.Log](Source/Main.cppm)
+### [PonyEngine.Log](Source/Log.cppm)
 
 Main sub-modules:
 
-#### [ILogService](Source/Main-ILogService.cppm)
+#### [ILogService](Source/Log-ILogService.cppm)
 
 Log service interface. It has functions to log messages and exceptions.
 
-#### [LogType](Source/Main-LogType.cppm)
+#### [LogType](Source/Log-LogType.cppm)
 
 Log types (from lowest to highest level):
 

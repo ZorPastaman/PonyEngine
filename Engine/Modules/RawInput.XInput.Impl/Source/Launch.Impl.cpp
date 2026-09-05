@@ -7,8 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput.XInput.Impl.Windows;
+#include "PonyEngine/RawInput/XInput/XInputProviderModule.h"
 
-export import PonyEngine.RawInput.Ext;
+import PonyEngine.RawInput.XInput.Impl;
 
-export import :XInputProviderModule;
+namespace PonyEngine::RawInput::XInput
+{
+	std::shared_ptr<Application::IModule> CreateXInputProviderModule()
+	{
+		return std::make_shared<XInputProviderModule>();
+	}
+}

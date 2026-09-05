@@ -11,19 +11,19 @@ Adds `PonyEngine.Log.Ext` target as a static library.
 
 ## C\++ modules
 
-### [PonyEngine.Log.Ext](Source/Main.cppm)
+### [PonyEngine.Log.Ext](Source/Log.cppm)
 
 Main sub-modules:
 
-#### [LogEntry](Source/Main-LogEntry.cppm)
+#### [LogEntry](Source/Log-LogEntry.cppm)
 
 Log info that is passed to each logger on a log event.
 It contains different data of a log request.
 
-#### [ILogger](Source/Main-ILogger.cppm)
+#### [ILogger](Source/Log-ILogger.cppm)
 
 Object that logs data to different outputs.
 
-#### [ILogHub](Source/Main-ILogHub.cppm)
+#### [ILogHub](Source/Log-ILogHub.cppm)
 
 Object that receives log requests and sends them to registered loggers. All the loggers must be added to it.

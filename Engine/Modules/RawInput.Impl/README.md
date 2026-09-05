@@ -25,8 +25,8 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [RawInputService](Source/Main-RawInputService.cppm) - raw input service;
-- [RawInputServiceModule](Source/Main-RawInputServiceModule.cppm) - raw input service module.
+- [RawInputService](Source/RawInput-RawInputService.cppm) - raw input service;
+- [RawInputServiceModule](Source/RawInput-RawInputServiceModule.cppm) - raw input service module.
 
 The raw input service's tick steps:
 

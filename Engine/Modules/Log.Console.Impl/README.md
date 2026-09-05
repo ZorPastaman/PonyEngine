@@ -23,5 +23,5 @@ These variables are used to configure the build of the module:
 
 The module has a simple implementation:
 
-- [ConsoleLogger](Source/Main-ConsoleLogger.cppm) - console logger;
-- [ConsoleLoggerModule](Source/Main-ConsoleLoggerModule.cppm) - console logger module.
+- [ConsoleLogger](Source/Console-ConsoleLogger.cppm) - console logger;
+- [ConsoleLoggerModule](Source/Console-ConsoleLoggerModule.cppm) - console logger module.

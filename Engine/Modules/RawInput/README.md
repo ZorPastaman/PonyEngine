@@ -17,49 +17,49 @@ Adds `PonyEngine.RawInput` target as a static library.
 
 ## C\++ modules
 
-### [PonyEngine.RawInput](Source/Main.cppm)
+### [PonyEngine.RawInput](Source/RawInput.cppm)
 
 Main sub-modules:
 
-#### [IRawInputService](Source/Main-IRawInputService.cppm)
+#### [IRawInputService](Source/RawInput-IRawInputService.cppm)
 
 Raw input service public interface.
 
-#### [Axis](Source/Main-Axis.cppm)
+#### [Axis](Source/RawInput-Axis.cppm)
 
 Input axis. It's a hash value of a axis string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Axes](#axes) for details details.
 
-#### [DeviceHandle](Source/Main-DeviceHandle.cppm)
+#### [DeviceHandle](Source/RawInput-DeviceHandle.cppm)
 
 Device handle. It's an integer, and it's a special handle that is used to access an input device.
 
-#### [DeviceType](Source/Main-DeviceType.cppm)
+#### [DeviceType](Source/RawInput-DeviceType.cppm)
 
 Device type. It's a hash value of a device type string representation. The engine uses this everywhere 'cause it's much faster to work with integers than with strings.
 
 See [Devices](#devices) for details details.
 
-#### [IDeviceObserver](Source/Main-IDeviceObserver.cppm)
+#### [IDeviceObserver](Source/RawInput-IDeviceObserver.cppm)
 
 Device observer interface. It can be added (and must be removed before the object destruction) to the [IRawInputService](Source/Main-IRawInputService.cppm).
 The added device observers receive different events on a device state change.
 
-#### [IRawInputObserver](Source/Main-IRawInputObserver.cppm)
+#### [IRawInputObserver](Source/RawInput-IRawInputObserver.cppm)
 
 Raw input observer interface. It can be added (and must be removed before the object destruction) to the [IRawInputService](Source/Main-IRawInputService.cppm).
 The added raw input observers receive raw input events.
 
-#### [IVibrating](Source/Main-IVibrating.cppm)
+#### [IVibrating](Source/RawInput-IVibrating.cppm)
 
 Device feature interface for vibration control.
 
 ## Axes
 
 Axes are represented as strings. That allows to add as many axes at runtime as possible.
-However, working directly with strings is inefficient, so axes are hashed internally. The [Axis](Source/Main-Axis.cppm) wrapper simplifies working with these hash values.
-The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing axes, retrieving original strings from hash values, and validating those hashes. It also provides additional utility functions for working with axes.
+However, working directly with strings is inefficient, so axes are hashed internally. The [Axis](Source/RawInput-Axis.cppm) wrapper simplifies working with these hash values.
+The [IRawInputService](Source/RawInput-IRawInputService.cppm) exposes functions for hashing axes, retrieving original strings from hash values, and validating those hashes. It also provides additional utility functions for working with axes.
 
 Example of usage:
 
@@ -77,8 +77,8 @@ The raw input service provides info about devices via different functions.
 The devices may be enumerated via these functions: `IRawInputService.DeviceCount()` and `IRawInputService.Device(deviceIndex)`.
 
 The devices have types that are represented as strings. That allows to add as many device types at runtime as possible.
-However, working directly with strings is inefficient, so device types are hashed internally. The [DeviceType](Source/Main-DeviceType.cppm) wrapper simplifies working with these hash values.
-The [IRawInputService](Source/Main-IRawInputService.cppm) exposes functions for hashing device types, retrieving original strings from hash values, and validating those hashes.
+However, working directly with strings is inefficient, so device types are hashed internally. The [DeviceType](Source/RawInput-DeviceType.cppm) wrapper simplifies working with these hash values.
+The [IRawInputService](Source/RawInput-IRawInputService.cppm) exposes functions for hashing device types, retrieving original strings from hash values, and validating those hashes.
 
 The devices may have custom features. Those may be accessed via `IRawInputService.FindFeature()` functions.
 
@@ -86,7 +86,7 @@ The devices may have custom features. Those may be accessed via `IRawInputServic
 
 The API provides default string for axes and device types. Use them wherever it's possible:
 
-- [Layout](Source/Main-Layout.cppm) - layout(axis) element names;
-- [KeyboardLayout](Source/Main-Keyboard.cppm) - keyboard axis names;
-- [MouseLayout](Source/Main-Mouse.cppm) - mouse axis names;
-- [GamepadLayout](Source/Main-Gamepad.cppm) - gamepad axis names;
+- [Layout](Source/RawInput-Layout.cppm) - layout(axis) element names;
+- [KeyboardLayout](Source/RawInput-Keyboard.cppm) - keyboard axis names;
+- [MouseLayout](Source/RawInput-Mouse.cppm) - mouse axis names;
+- [GamepadLayout](Source/RawInput-Gamepad.cppm) - gamepad axis names;

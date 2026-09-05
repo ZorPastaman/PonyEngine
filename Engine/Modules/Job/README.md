@@ -13,14 +13,14 @@ Adds `PonyEngine.Job` target as a static library.
 
 ## C\++ modules
 
-### [PonyEngine.Job](Source/Main.cppm)
+### [PonyEngine.Job](Source/Job.cppm)
 
 Main sub-modules:
 
-#### [IJobService](Source/Main-IJobService.cppm)
+#### [IJobService](Source/Job-IJobService.cppm)
 
 Job service interface.
 
-#### [JobHandle](Source/Main-JobHandle.cppm)
+#### [JobHandle](Source/Job-JobHandle.cppm)
 
 Handle of a scheduled job.

@@ -17,6 +17,6 @@ Main modules:
 
 ### [PonyEngine.RawInput.Keyboard.Impl](Source/Main.cppm)
 
-#### [KeyboardController](Source/Main-KeyboardController.cppm)
+Main submodules:
 
-Platform independent keyboard controller.
+- [KeyboardController](Source/Keyboard-KeyboardController.cppm) - platform independent keyboard controller..

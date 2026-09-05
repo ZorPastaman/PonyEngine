@@ -19,8 +19,5 @@ endif()
 if(TARGET PonyEngine.WinAPIInput.Impl)
 	add_subdirectory("WinAPIInput.Impl")
 endif()
-if(TARGET PonyEngine.RawInput.XInput.Impl)
-	add_subdirectory("RawInput.XInput.Impl")
-endif()
 
 set(PONY_ENGINE_APPLICATION_DEFAULT_ICON "${PONY_ENGINE_APPLICATION_ICON_COLLECTION_PATH}/Windows/Logo.ico" CACHE PATH "Default application icon for Windows." FORCE)
