@@ -1,17 +1,4 @@
-message(STATUS "Configuring PonyEngine.Time.Impl")
-
-if(NOT TARGET PonyEngine.Application)
-	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Log)
-	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Time)
-	message(FATAL_ERROR "PonyEngine.Time wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.Time.Impl feature module")
 
 set(PONY_ENGINE_TIME_ORDER "p" CACHE STRING "PonyEngine.Time.Impl module initialization order. Its first character must be in range [b-y].")
 set(PONY_ENGINE_TIME_TICK_ORDER "0" CACHE STRING "PonyEngine.Time.Impl service tick order. It must be an int32 number.")
@@ -32,9 +19,9 @@ target_sources(PonyEngine.Time.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.Time.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-TimeService.cppm"
-	"Source/Main-TimeServiceModule.cppm"
+	"Source/Time.cppm"
+	"Source/Time-TimeService.cppm"
+	"Source/Time-TimeServiceModule.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_TIME_ORDER)

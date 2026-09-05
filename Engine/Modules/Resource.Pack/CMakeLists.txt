@@ -1,25 +1,15 @@
-message(STATUS "Configuring PonyEngine.Resource.Pack")
-
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Resource)
-	message(FATAL_ERROR "PonyEngine.Resource wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Resource.Ext)
-	message(FATAL_ERROR "PonyEngine.Resource.Ext wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.Resource.Pack feature module")
 
 add_library(PonyEngine.Resource.Pack STATIC)
 
 target_sources(PonyEngine.Resource.Pack PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-AccessType.cppm"
-	"Source/Main-Format.cppm"
-	"Source/Main-IPackMountRequest.cppm"
-	"Source/Main-IPackService.cppm"
-	"Source/Main-IPackUnmountRequest.cppm"
-	"Source/Main-PackHandle.cppm"
+	"Source/Pack.cppm"
+	"Source/Pack-AccessType.cppm"
+	"Source/Pack-Format.cppm"
+	"Source/Pack-IPackMountRequest.cppm"
+	"Source/Pack-IPackService.cppm"
+	"Source/Pack-IPackUnmountRequest.cppm"
+	"Source/Pack-PackHandle.cppm"
 )
 
 set_target_properties(PonyEngine.Resource.Pack PROPERTIES

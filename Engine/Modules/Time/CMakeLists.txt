@@ -1,14 +1,10 @@
-message(STATUS "Configuring PonyEngine.Time")
-
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.Time feature module")
 
 add_library(PonyEngine.Time STATIC)
 
 target_sources(PonyEngine.Time PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Main.cppm"
-	"Source/Main-ITimeService.cppm"
+	"Source/Time.cppm"
+	"Source/Time-ITimeService.cppm"
 )
 
 set_target_properties(PonyEngine.Time PROPERTIES

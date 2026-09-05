@@ -25,8 +25,6 @@ These variables are used to configure the build of the module:
 
 ## For Pony Engine developers
 
-Main sub-modules:
-
 - [Job](Source/Job-Job.cppm) - job implementation;
 - [JobPool](Source/Job-JobPool.cppm) - job pool;
 - [Worker](Source/Job-Worker.cppm) - worker thread implementation;

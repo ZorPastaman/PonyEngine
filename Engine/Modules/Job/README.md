@@ -15,8 +15,6 @@ Adds `PonyEngine.Job` target as a static library.
 
 ### [PonyEngine.Job](Source/Job.cppm)
 
-Main sub-modules:
-
 #### [IJobService](Source/Job-IJobService.cppm)
 
 Job service interface.

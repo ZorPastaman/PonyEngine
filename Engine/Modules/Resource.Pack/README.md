@@ -1,4 +1,4 @@
-# PonyEngine.Resource.Pack module
+# PonyEngine.Resource.Pack feature module
 
 Resource module extension that provides resources in packs.
 
@@ -11,6 +11,8 @@ Both files must have the same name and be in the same folder. For more info, ref
 
 Packs may be loaded from files and from memory.
 
+Adds `PonyEngine.Resource.Pack` target as a static library.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)
@@ -19,8 +21,8 @@ Packs may be loaded from files and from memory.
 
 ## C\++ modules
 
-### [PonyEngine.Resource.Pack](Source/Main.cppm)
+### [PonyEngine.Resource.Pack](Source/Pack.cppm)
 
-#### [IPackService](Source/Main-IPackService.cppm)
+#### [IPackService](Source/Pack-IPackService.cppm)
 
 Pack service. Mounts and unmounts packs. Both operations are done in async manner.

@@ -19,8 +19,6 @@ Adds `PonyEngine.RawInput` target as a static library.
 
 ### [PonyEngine.RawInput](Source/RawInput.cppm)
 
-Main sub-modules:
-
 #### [IRawInputService](Source/RawInput-IRawInputService.cppm)
 
 Raw input service public interface.

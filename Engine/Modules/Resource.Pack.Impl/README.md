@@ -1,6 +1,8 @@
-# PonyEngine.Resource.Pack.Impl module
+# PonyEngine.Resource.Pack.Impl feature module
 
 Pack resource provider module.
+
+Adds `PonyEngine.Resource.Pack.Impl` target as a static library.
 
 ## Dependencies
 
@@ -25,5 +27,5 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [PackService](Source/Main-PackService.cppm) - pack resource service;
-- [PackServiceModule](Source/Main-PackServiceModule.cppm) - pack resource service module.
+- [PackService](Source/Pack-PackService.cppm) - pack resource service;
+- [PackServiceModule](Source/Pack-PackServiceModule.cppm) - pack resource service module.

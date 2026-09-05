@@ -22,8 +22,6 @@ These variables are used to configure the build of the module:
 
 ## For Pony Engine developers
 
-Main sub-modules:
-
 ### [File](Source/File-File.cppm)
 
 File wrapper.

@@ -1,6 +1,8 @@
-# PonyEngine.Time.Impl module
+# PonyEngine.Time.Impl feature module
 
 Time service implementation module.
+
+Adds `PonyEngine.Time.Impl` target as a static library.
 
 ## Dependencies
 
@@ -25,5 +27,5 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [TimeService](Source/Main-TimeService.cppm) - time service;
-- [TimeServiceModule](Source/Main-TimeServiceModule.cppm) - time service module.
+- [TimeService](Source/Time-TimeService.cppm) - time service;
+- [TimeServiceModule](Source/Time-TimeServiceModule.cppm) - time service module.

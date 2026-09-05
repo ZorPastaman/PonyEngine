@@ -14,8 +14,6 @@ Adds `PonyEngine.File` target as a static library.
 
 ### [PonyEngine.File](Source/File.cppm)
 
-Main sub-modules:
-
 #### [IFile](Source/File-IFile.cppm)
 
 File interface. Creates requests to a file.

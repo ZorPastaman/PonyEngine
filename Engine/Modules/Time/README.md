@@ -1,8 +1,10 @@
-# PonyEngine.Time module
+# PonyEngine.Time feature module
 
 Time service API module. Provides interfaces for a time service.
 
 The time service provides different types of time: real time, virtual time and fixed time steps.
+
+Adds `PonyEngine.Time` target as a static library.
 
 ## Dependencies
 
@@ -10,11 +12,9 @@ The time service provides different types of time: real time, virtual time and f
 
 ## C\++ modules
 
-### [PonyEngine.Time](Source/Main.cppm)
+### [PonyEngine.Time](Source/Time.cppm)
 
-Main sub-modules:
-
-#### [ITimeService](Source/Main-ITimeService.cppm)
+#### [ITimeService](Source/Time-ITimeService.cppm)
 
 Time service public interface. It provides different types of time and has function to control their calculations.
 The time service gets a current real time in its tick and calculates all the properties using current parameters.

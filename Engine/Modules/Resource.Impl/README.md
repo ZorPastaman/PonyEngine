@@ -1,6 +1,8 @@
-# PonyEngine.Resource.Impl module
+# PonyEngine.Resource.Impl feature module
 
 Resource implementation module.
+
+Adds `PonyEngine.Resource.Impl` target as a static library.
 
 ## Dependencies
 
@@ -23,5 +25,5 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
-- [ResourceService](Source/Main-ResourceService.cppm) - resource service;
-- [ResourceServiceModule](Source/Main-ResourceServiceModule.cppm) - resource service module.
+- [ResourceService](Source/Resource-ResourceService.cppm) - resource service;
+- [ResourceServiceModule](Source/Resource-ResourceServiceModule.cppm) - resource service module.

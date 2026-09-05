@@ -1,20 +1,4 @@
-message(STATUS "Configuring PonyEngine.Resource.Impl")
-
-if(NOT TARGET PonyEngine.Application)
-	message(FATAL_ERROR "PonyEngine.Application wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Core)
-	message(FATAL_ERROR "PonyEngine.Core wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Log)
-	message(FATAL_ERROR "PonyEngine.Log wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Resource)
-	message(FATAL_ERROR "PonyEngine.Resource wasn't configured")
-endif()
-if(NOT TARGET PonyEngine.Resource.Ext)
-	message(FATAL_ERROR "PonyEngine.Resource.Ext wasn't configured")
-endif()
+message(STATUS "Configuring PonyEngine.Resource.Impl feature module")
 
 set(PONY_ENGINE_RESOURCE_ORDER "p" CACHE STRING "PonyEngine.Resource.Impl module initialization order. Its first character must be in range [b-y].")
 
@@ -31,17 +15,17 @@ target_sources(PonyEngine.Resource.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
 target_sources(PonyEngine.Resource.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-CollectionContainer.cppm"
-	"Source/Main-CompletedResourceRequest.cppm"
-	"Source/Main-LoadableResource.cppm"
-	"Source/Main-LoaderContainer.cppm"
-	"Source/Main-Resource.cppm"
-	"Source/Main-ResourceContainer.cppm"
-	"Source/Main-ResourceLoadProcess.cppm"
-	"Source/Main-ResourceService.cppm"
-	"Source/Main-ResourceServiceModule.cppm"
-	"Source/Main-Utility.cppm"
+	"Source/Resource.cppm"
+	"Source/Resource-CollectionContainer.cppm"
+	"Source/Resource-CompletedResourceRequest.cppm"
+	"Source/Resource-LoadableResource.cppm"
+	"Source/Resource-LoaderContainer.cppm"
+	"Source/Resource-Resource.cppm"
+	"Source/Resource-ResourceContainer.cppm"
+	"Source/Resource-ResourceLoadProcess.cppm"
+	"Source/Resource-ResourceService.cppm"
+	"Source/Resource-ResourceServiceModule.cppm"
+	"Source/Resource-Utility.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_RESOURCE_ORDER)

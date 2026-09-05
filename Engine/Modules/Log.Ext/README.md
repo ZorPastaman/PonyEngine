@@ -13,8 +13,6 @@ Adds `PonyEngine.Log.Ext` target as a static library.
 
 ### [PonyEngine.Log.Ext](Source/Log.cppm)
 
-Main sub-modules:
-
 #### [LogEntry](Source/Log-LogEntry.cppm)
 
 Log info that is passed to each logger on a log event.

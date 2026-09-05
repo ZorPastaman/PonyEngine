@@ -12,8 +12,6 @@ Adds `PonyEngine.Log` target as a static library.
 
 ### [PonyEngine.Log](Source/Log.cppm)
 
-Main sub-modules:
-
 #### [ILogService](Source/Log-ILogService.cppm)
 
 Log service interface. It has functions to log messages and exceptions.

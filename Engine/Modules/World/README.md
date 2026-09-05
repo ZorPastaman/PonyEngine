@@ -14,8 +14,6 @@ they can be implemented as needed for a game project.
 
 ### [PonyEngine.World](Source/Main.cppm)
 
-Main sub-modules:
-
 #### [Entity](Source/Main-Entity.cppm)
 
 Entity struct. It's just an ID and a generation.
