@@ -38,18 +38,11 @@ To a module to a build, a specific CMake flag must be `true`.
 | [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)   | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL`  | Raw input keyboard provider module. Reads input from keyboard devices and provides it to a raw input service.                 |
 | [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)         | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`     | Raw input mouse provider module. Reads input from mouse devices and provides it to a raw input service.                       |
 | [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)       | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`    | Raw input XInput provider module. Reads input from XInput devices and provides it to a raw input service.                     |
-| [PonyEngine.RenderDevice](Modules/RenderDevice)                       | `PONY_ENGINE_RENDER_DEVICE`            | Render device service API module. The service provides a low level access to a GPU.                                           |
-| [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)               | `PONY_ENGINE_RENDER_DEVICE_EXT`        | Render device service extension API module. Provides interfaces for backends.                                                 |
-| [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)             | `PONY_ENGINE_RENDER_DEVICE_IMPL`       | Render device service implementation module. Provides a low level access to a GPU via added backends.                         |
-| [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl) | `PONY_ENGINE_RENDER_DEVICE_D3D12_IMPL` | Direct3D12 backend implementation.                                                                                            |
 | [PonyEngine.Resource](Modules/Resource)                               | `PONY_ENGINE_RESOURCE`                 | Resource service API module. The service provides resources.                                                                  |
 | [PonyEngine.Resource.Ext](Modules/Resource.Ext)                       | `PONY_ENGINE_RESOURCE_EXT`             | Resource service extension API module. Provides interfaces for resource providers.                                            |
 | [PonyEngine.Resource.Impl](Modules/Resource.Impl)                     | `PONY_ENGINE_RESOURCE_IMPL`            | Resource service implementation module.                                                                                       |
 | [PonyEngine.Resource.Pack](Modules/Resource.Pack)                     | `PONY_ENGINE_RESOURCE_PACK`            | Pack resource provider module API.                                                                                            |
 | [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)           | `PONY_ENGINE_RESOURCE_PACK_IMPL`       | Pack resource provider module.                                                                                                |
-| [PonyEngine.Shader](Modules/Shader)                                   | `PONY_ENGINE_SHADER`                   | Shader utilities module. Provides utility functions and classes for both C\++ and hlsl.                                       |
-| [PonyEngine.Surface](Modules/Surface)                                 | `PONY_ENGINE_SURFACE`                  | Surface service API module. The service controls an output video surface.                                                     |
-| [PonyEngine.Surface.Impl](Modules/Surface.Impl)                       | `PONY_ENGINE_SURFACE_IMPL`             | Surface service implementation module.                                                                                        |
 | [PonyEngine.Time](Modules/Time)                                       | `PONY_ENGINE_TIME`                     | Time service API module. The service provides info about delta time, fixed time step and other time info.                     |
 | [PonyEngine.Time.Impl](Modules/Time.Impl)                             | `PONY_ENGINE_TIME_IMPL`                | Time service implementation module.                                                                                           |
 | [PonyEngine.WinAPIInput](Modules/WinAPIInput)                         | `PONY_ENGINE_WINAPI_INPUT`             | The module provides interfaces to register for WinAPI raw input events.                                                       |
@@ -89,18 +82,11 @@ The table of the module-platform compatibility:
 | [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)   | &check;                          | &check;                      |
 | [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)         | &check;                          | &check;                      |
 | [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)       | &check;                          | &check;                      |
-| [PonyEngine.RenderDevice](Modules/RenderDevice)                       | -                                | &check;                      |
-| [PonyEngine.RenderDevice.Ext](Modules/RenderDevice.Ext)               | -                                | &check;                      |
-| [PonyEngine.RenderDevice.Impl](Modules/RenderDevice.Impl)             | -                                | &check;                      |
-| [PonyEngine.RenderDevice.D3D12.Impl](Modules/RenderDevice.D3D12.Impl) | &check;                          | &check;                      |
 | [PonyEngine.Resource](Modules/Resource)                               | -                                | &check;                      |
 | [PonyEngine.Resource.Ext](Modules/Resource.Ext)                       | -                                | &check;                      |
 | [PonyEngine.Resource.Impl](Modules/Resource.Impl)                     | -                                | &check;                      |
 | [PonyEngine.Resource.Pack](Modules/Resource.Pack)                     | -                                | &check;                      |
 | [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)           | -                                | &check;                      |
-| [PonyEngine.Shader](Modules/Shader)                                   | -                                | &check;                      |
-| [PonyEngine.Surface](Modules/Surface)                                 | -                                | &check;                      |
-| [PonyEngine.Surface.Impl](Modules/Surface.Impl)                       | &check;                          | &check;                      |
 | [PonyEngine.Time](Modules/Time)                                       | -                                | &check;                      |
 | [PonyEngine.Time.Impl](Modules/Time.Impl)                             | -                                | &check;                      |
 | [PonyEngine.WinAPIInput](Modules/WinAPIInput)                         | &check;                          | &check;                      |

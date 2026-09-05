@@ -103,17 +103,9 @@
 			"name": "Runtime-GUI",
 			"hidden": true,
 			"cacheVariables": {
-				"PONY_ENGINE_SURFACE": false,
-				"PONY_ENGINE_SURFACE_IMPL": false,
-				"PONY_ENGINE_RENDER_DEVICE": false,
-				"PONY_ENGINE_RENDER_DEVICE_EXT": false,
-				"PONY_ENGINE_RENDER_DEVICE_IMPL": false,
-				"PONY_ENGINE_SHADER": false,
 				"PONY_ENGINE_RAW_INPUT": true,
 				"PONY_ENGINE_RAW_INPUT_EXT": true,
 				"PONY_ENGINE_RAW_INPUT_IMPL": true,
-				"PONY_ENGINE_SURFACE_ORDER": "ra",
-				"PONY_ENGINE_RENDER_DEVICE_ORDER": "rd",
 				"PONY_ENGINE_RAW_INPUT_ORDER": "ri",
 				"PONY_ENGINE_RAW_INPUT_TICK_ORDER": "-500"
 			}
@@ -143,11 +135,9 @@
 			"hidden": true,
 			"cacheVariables": {
 				"PONY_ENGINE_APPLICATION_MODE": "GUI",
-				"PONY_ENGINE_RENDER_DEVICE_D3D12_IMPL": false,
 				"PONY_ENGINE_WINAPI_INPUT": true,
 				"PONY_ENGINE_WINAPI_INPUT_IMPL": true,
 				"PONY_ENGINE_RAW_INPUT_XINPUT_IMPL": true,
-				"PONY_ENGINE_RENDER_DEVICE_D3D12_ORDER": "rdd",
 				"PONY_ENGINE_WINAPI_INPUT_ORDER": "qa",
 				"PONY_ENGINE_RAW_INPUT_XINPUT_ORDER": "rix"
 			}
