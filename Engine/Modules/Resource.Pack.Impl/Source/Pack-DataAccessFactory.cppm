@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Resource.Pack.Impl:DataAccessWorker;
+export module PonyEngine.Resource.Pack.Impl:DataAccessFactory;
 
 import std;
 
@@ -23,40 +23,63 @@ import :MemoryLoadableDataAccess;
 
 export namespace PonyEngine::Resource::Pack
 {
-	class DataAccessWorker final
+	/// @brief Data access factory.
+	class DataAccessFactory final
 	{
 	public:
+		/// @brief Creates a data access factory.
+		/// @param requestWorker Loadable data access request worker.
 		[[nodiscard("Pure constructor")]]
-		explicit DataAccessWorker(LoadableDataAccessRequestWorker& requestWorker) noexcept;
-		DataAccessWorker(const DataAccessWorker&) = delete;
-		DataAccessWorker(DataAccessWorker&&) = delete;
+		explicit DataAccessFactory(LoadableDataAccessRequestWorker& requestWorker) noexcept;
+		DataAccessFactory(const DataAccessFactory&) = delete;
+		DataAccessFactory(DataAccessFactory&&) = delete;
 
-		~DataAccessWorker() noexcept;
+		~DataAccessFactory() noexcept;
 
+		/// @brief Creates a file loadable data access.
+		/// @param dataFile Data file. Must be valid.
+		/// @param offset Data offset.
+		/// @param size Data size.
+		/// @return File loadable data access.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<FileLoadableDataAccess> CreateFileLoadableDataAccess(std::shared_ptr<File::IFile> dataFile, std::size_t offset, std::size_t size) const;
+		/// @brief Creates a memory loadable data access.
+		/// @param loadedData Loaded data. Must be valid.
+		/// @param offset Data offset.
+		/// @param size Data size.
+		/// @return Memory loadable data access.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<MemoryLoadableDataAccess> CreateMemoryLoadableDataAccess(std::shared_ptr<const std::byte[]> loadedData, std::size_t offset, std::size_t size) const;
+		/// @brief Creates a file data access.
+		/// @param path File path. Must be valid.
+		/// @param offset Data offset.
+		/// @param size Data size.
+		/// @return File data access.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<FileDataAccess> CreateFileDataAccess(std::filesystem::path path, std::size_t offset, std::size_t size) const;
+		/// @brief Creates a memory data access.
+		/// @param loadedData Loaded data. Must be valid.
+		/// @param offset Data offset.
+		/// @param size Data size.
+		/// @return Memory data access.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<MemoryDataAccess> CreateMemoryDataAccess(std::shared_ptr<const std::byte[]> loadedData, std::size_t offset, std::size_t size) const;
 
-		DataAccessWorker& operator =(const DataAccessWorker&) = delete;
-		DataAccessWorker& operator =(DataAccessWorker&&) = delete;
+		DataAccessFactory& operator =(const DataAccessFactory&) = delete;
+		DataAccessFactory& operator =(DataAccessFactory&&) = delete;
 
 	private:
-		LoadableDataAccessRequestWorker* requestWorker;
+		LoadableDataAccessRequestWorker* requestWorker; ///< Loadable data access request worker.
 
 #ifndef NDEBUG
-		mutable std::atomic_size_t accessCount;
+		mutable std::atomic_size_t accessCount; ///< Access count.
 #endif
 	};
 }
 
 namespace PonyEngine::Resource::Pack
 {
-	DataAccessWorker::DataAccessWorker(LoadableDataAccessRequestWorker& requestWorker) noexcept :
+	DataAccessFactory::DataAccessFactory(LoadableDataAccessRequestWorker& requestWorker) noexcept :
 #ifndef NDEBUG
 		accessCount(0uz),
 #endif
@@ -64,14 +87,14 @@ namespace PonyEngine::Resource::Pack
 	{
 	}
 
-	DataAccessWorker::~DataAccessWorker() noexcept
+	DataAccessFactory::~DataAccessFactory() noexcept
 	{
 #ifndef NDEBUG
 		assert(accessCount.load(std::memory_order::relaxed) == 0uz && "Some pack data accesses are still alive.");
 #endif
 	}
 
-	std::shared_ptr<FileLoadableDataAccess> DataAccessWorker::CreateFileLoadableDataAccess(std::shared_ptr<File::IFile> dataFile,
+	std::shared_ptr<FileLoadableDataAccess> DataAccessFactory::CreateFileLoadableDataAccess(std::shared_ptr<File::IFile> dataFile,
 		const std::size_t offset, const std::size_t size) const
 	{
 #ifndef NDEBUG
@@ -96,7 +119,7 @@ namespace PonyEngine::Resource::Pack
 #endif
 	}
 
-	std::shared_ptr<MemoryLoadableDataAccess> DataAccessWorker::CreateMemoryLoadableDataAccess(std::shared_ptr<const std::byte[]> loadedData, 
+	std::shared_ptr<MemoryLoadableDataAccess> DataAccessFactory::CreateMemoryLoadableDataAccess(std::shared_ptr<const std::byte[]> loadedData, 
 		const std::size_t offset, const std::size_t size) const
 	{
 #ifndef NDEBUG
@@ -121,7 +144,7 @@ namespace PonyEngine::Resource::Pack
 #endif
 	}
 
-	std::shared_ptr<FileDataAccess> DataAccessWorker::CreateFileDataAccess(std::filesystem::path path, const std::size_t offset, const std::size_t size) const
+	std::shared_ptr<FileDataAccess> DataAccessFactory::CreateFileDataAccess(std::filesystem::path path, const std::size_t offset, const std::size_t size) const
 	{
 #ifndef NDEBUG
 		const auto access = new FileDataAccess(std::move(path), offset, size);
@@ -145,7 +168,7 @@ namespace PonyEngine::Resource::Pack
 #endif
 	}
 
-	std::shared_ptr<MemoryDataAccess> DataAccessWorker::CreateMemoryDataAccess(std::shared_ptr<const std::byte[]> loadedData, 
+	std::shared_ptr<MemoryDataAccess> DataAccessFactory::CreateMemoryDataAccess(std::shared_ptr<const std::byte[]> loadedData, 
 		const std::size_t offset, const std::size_t size) const
 	{
 #ifndef NDEBUG

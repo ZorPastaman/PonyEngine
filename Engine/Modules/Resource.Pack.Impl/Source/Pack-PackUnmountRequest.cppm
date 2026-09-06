@@ -102,7 +102,7 @@ namespace PonyEngine::Resource::Pack
 
 	const std::exception_ptr& PackUnmountRequest::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure)
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}

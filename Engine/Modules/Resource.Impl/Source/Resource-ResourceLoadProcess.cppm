@@ -117,9 +117,9 @@ export namespace PonyEngine::Resource
 		void SetSuccess(std::shared_ptr<const void> mainResource, std::span<const void* const> resourceInterfaces) noexcept;
 		/// @brief Sets failure.
 		/// @param exception Exception.
-		void SetFailure(std::exception_ptr exception);
+		void SetFailure(std::exception_ptr exception) noexcept;
 		/// @brief Sets canceled.
-		void SetCanceled();
+		void SetCanceled() noexcept;
 
 		ResourceLoadProcess& operator =(const ResourceLoadProcess&) = delete;
 		ResourceLoadProcess& operator =(ResourceLoadProcess&&) = delete;
@@ -262,7 +262,7 @@ namespace PonyEngine::Resource
 
 	std::shared_ptr<const void> ResourceLoadProcess::Resource(const std::type_index type) const
 	{
-		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Success)
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Success) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -272,7 +272,7 @@ namespace PonyEngine::Resource
 
 	const std::exception_ptr& ResourceLoadProcess::Exception() const
 	{
-		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure)
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
@@ -350,7 +350,7 @@ namespace PonyEngine::Resource
 		InvokeCallback();
 	}
 
-	void ResourceLoadProcess::SetFailure(std::exception_ptr exception)
+	void ResourceLoadProcess::SetFailure(std::exception_ptr exception) noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
@@ -362,7 +362,7 @@ namespace PonyEngine::Resource
 		InvokeCallback();
 	}
 
-	void ResourceLoadProcess::SetCanceled()
+	void ResourceLoadProcess::SetCanceled() noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 

@@ -16,7 +16,7 @@ target_sources(PonyEngine.Resource.Pack.Impl PRIVATE
 )
 target_sources(PonyEngine.Resource.Pack.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Pack.cppm"
-	"Source/Pack-DataAccessWorker.cppm"
+	"Source/Pack-DataAccessFactory.cppm"
 	"Source/Pack-FileDataAccess.cppm"
 	"Source/Pack-FileLoadableDataAccess.cppm"
 	"Source/Pack-FileLoadableDataAccessRequest.cppm"

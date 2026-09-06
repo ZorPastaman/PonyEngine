@@ -14,7 +14,7 @@ import std;
 import PonyEngine.File;
 import PonyEngine.Resource.Pack;
 
-import :DataAccessWorker;
+import :DataAccessFactory;
 import :FileDataAccess;
 import :FileLoadableDataAccess;
 import :MemoryDataAccess;
@@ -33,7 +33,7 @@ export namespace PonyEngine::Resource::Pack
 		/// @param loadedData Loaded pack data. If set, the pack will provide @p ILoadableDataAccess and @p IMemoryDataAccess. It has a priority over the file loadable access.
 		/// @param resourceRanges Resource ranges. Must be valid.
 		[[nodiscard("Pure constructor")]]
-		Pack(DataAccessWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
+		Pack(DataAccessFactory& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
 			std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges) noexcept;
 		Pack(const Pack&) = delete;
 		Pack(Pack&&) = delete;
@@ -47,7 +47,7 @@ export namespace PonyEngine::Resource::Pack
 		Pack& operator =(Pack&&) = delete;
 
 	private:
-		DataAccessWorker* worker; ///< Data access worker.
+		DataAccessFactory* factory; ///< Data access factory.
 
 		std::filesystem::path packDataPath; ///< Pack data path.
 		std::shared_ptr<File::IFile> dataFile; ///< Pack data file.
@@ -59,9 +59,9 @@ export namespace PonyEngine::Resource::Pack
 
 namespace PonyEngine::Resource::Pack
 {
-	Pack::Pack(DataAccessWorker& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
+	Pack::Pack(DataAccessFactory& worker, std::filesystem::path packDataPath, std::shared_ptr<File::IFile> dataFile,
 		std::shared_ptr<const std::byte[]> loadedData, std::vector<std::pair<std::size_t, std::size_t>>&& resourceRanges) noexcept :
-		worker{&worker},
+		factory{&worker},
 		packDataPath(std::move(packDataPath)),
 		dataFile(std::move(dataFile)),
 		loadedData(std::move(loadedData)),
@@ -77,25 +77,25 @@ namespace PonyEngine::Resource::Pack
 		{
 			if (loadedData)
 			{
-				return worker->CreateMemoryLoadableDataAccess(loadedData, offset, size);
+				return factory->CreateMemoryLoadableDataAccess(loadedData, offset, size);
 			}
 			if (dataFile) [[likely]]
 			{
-				return worker->CreateFileLoadableDataAccess(dataFile, offset, size);
+				return factory->CreateFileLoadableDataAccess(dataFile, offset, size);
 			}
 		}
 		else if (accessType == typeid(IFileDataAccess))
 		{
 			if (!packDataPath.empty()) [[likely]]
 			{
-				return worker->CreateFileDataAccess(packDataPath, offset, size);
+				return factory->CreateFileDataAccess(packDataPath, offset, size);
 			}
 		}
 		else if (accessType == typeid(IMemoryDataAccess))
 		{
 			if (loadedData) [[likely]]
 			{
-				return worker->CreateMemoryDataAccess(loadedData, offset, size);
+				return factory->CreateMemoryDataAccess(loadedData, offset, size);
 			}
 		}
 

@@ -157,7 +157,7 @@ namespace PonyEngine::Resource::Pack
 				std::shared_ptr<LoadableDataAccessRequest> finishedRequest = RemoveRequest(req);
 				switch (readRequest.Status())
 				{
-				case Async::RequestStatus::Success:
+				case Async::RequestStatus::Success: [[likely]]
 					finishedRequest->SetSuccess(readRequest.ByteCount());
 					break;
 				case Async::RequestStatus::Failure:

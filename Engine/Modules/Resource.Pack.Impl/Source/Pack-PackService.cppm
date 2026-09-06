@@ -26,7 +26,7 @@ import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Resource.Pack;
 
-import :DataAccessWorker;
+import :DataAccessFactory;
 import :FilePackMountRequest;
 import :LoadableDataAccessRequestWorker;
 import :PackContainer;
@@ -175,7 +175,7 @@ export namespace PonyEngine::Resource::Pack
 		Job::IJobService* jobService; ///< Job service.
 
 		LoadableDataAccessRequestWorker loadableDataAccessRequestWorker; ///< Loadable data access request worker.
-		DataAccessWorker dataAccessWorker; ///< Data access worker.
+		DataAccessFactory dataAccessFactory; ///< Data access factory.
 
 		PackContainer packContainer; ///< Pack container.
 		std::vector<PackVersion> packVersions; ///< Pack versions.
@@ -204,7 +204,7 @@ namespace PonyEngine::Resource::Pack
 		fileService{&this->application->GetInterface<File::IFileService>()},
 		jobService{&this->application->GetInterface<Job::IJobService>()},
 		loadableDataAccessRequestWorker(this->application->GetInterface<Job::IJobService>()),
-		dataAccessWorker(loadableDataAccessRequestWorker),
+		dataAccessFactory(loadableDataAccessRequestWorker),
 		ongoingRequestCount(0uz)
 	{
 	}
@@ -262,15 +262,15 @@ namespace PonyEngine::Resource::Pack
 			{
 				switch (readRequest.Status())
 				{
-				case Async::RequestStatus::Success:
-					if (CheckCancel(req))
+				case Async::RequestStatus::Success: [[likely]]
+					if (CheckCancel(req)) [[likely]]
 					{
 						ParseManifest(*req);
 					}
 					break;
 				case Async::RequestStatus::Failure:
 					req->ManifestException(readRequest.Exception());
-					if (req->DecrementRequestCount())
+					if (req->DecrementRequestCount()) [[likely]]
 					{
 						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 						mountRequest->SetFailure(req->ManifestException());
@@ -279,14 +279,14 @@ namespace PonyEngine::Resource::Pack
 					}
 					break;
 				case Async::RequestStatus::Canceled:
-					if (req->DecrementRequestCount())
+					if (req->DecrementRequestCount()) [[likely]]
 					{
 						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-						if (mountRequest->HasDataException())
+						if (mountRequest->HasDataException()) [[unlikely]]
 						{
 							mountRequest->SetFailure(req->DataException());
 						}
-						else
+						else [[likely]]
 						{
 							mountRequest->SetCanceled();
 						}
@@ -315,10 +315,10 @@ namespace PonyEngine::Resource::Pack
 				{
 					switch (readRequest.Status())
 					{
-					case Async::RequestStatus::Success:
-						if (CheckCancel(req))
+					case Async::RequestStatus::Success: [[likely]]
+						if (CheckCancel(req)) [[likely]]
 						{
-							if (req->DecrementRequestCount())
+							if (req->DecrementRequestCount()) [[likely]]
 							{
 								CreatePack(*req);
 							}
@@ -326,7 +326,7 @@ namespace PonyEngine::Resource::Pack
 						break;
 					case Async::RequestStatus::Failure:
 						req->DataException(readRequest.Exception());
-						if (req->DecrementRequestCount())
+						if (req->DecrementRequestCount()) [[likely]]
 						{
 							std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 							mountRequest->SetFailure(req->HasManifestException() ? req->ManifestException() : req->DataException());
@@ -338,11 +338,11 @@ namespace PonyEngine::Resource::Pack
 						if (req->DecrementRequestCount())
 						{
 							std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-							if (mountRequest->HasManifestException())
+							if (mountRequest->HasManifestException()) [[unlikely]]
 							{
 								mountRequest->SetFailure(mountRequest->ManifestException());
 							}
-							else
+							else [[likely]]
 							{
 								mountRequest->SetCanceled();
 							}
@@ -398,7 +398,7 @@ namespace PonyEngine::Resource::Pack
 		{
 			jobService->Schedule([this, req = request.get(), src = packData.data()]() noexcept
 			{
-				if (!CheckCancel(req))
+				if (!CheckCancel(req)) [[unlikely]]
 				{
 					return;
 				}
@@ -406,9 +406,9 @@ namespace PonyEngine::Resource::Pack
 				const std::span<std::byte> data = req->Data();
 				std::memcpy(data.data(), src, data.size());
 
-				if (CheckCancel(req))
+				if (CheckCancel(req)) [[likely]]
 				{
-					if (req->DecrementRequestCount())
+					if (req->DecrementRequestCount()) [[likely]]
 					{
 						CreatePack(*req);
 					}
@@ -436,7 +436,7 @@ namespace PonyEngine::Resource::Pack
 		{
 			jobService->Schedule([this, req = request.get()]() noexcept
 			{
-				if (req->IsCancelRequested())
+				if (req->IsCancelRequested()) [[unlikely]]
 				{
 					const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
 					unmountRequest->SetCanceled();
@@ -548,9 +548,9 @@ namespace PonyEngine::Resource::Pack
 
 	bool PackService::CheckCancel(PackMountRequest* const request)
 	{
-		if (request->IsCancelRequested())
+		if (request->IsCancelRequested()) [[unlikely]]
 		{
-			if (request->DecrementRequestCount())
+			if (request->DecrementRequestCount()) [[likely]]
 			{
 				std::shared_ptr<PackMountRequest> req = RemoveMountRequest(request);
 				req->SetCanceled();
@@ -570,7 +570,7 @@ namespace PonyEngine::Resource::Pack
 		{
 			jobService->Schedule([this, req = &request]() noexcept
 			{
-				if (!CheckCancel(req))
+				if (!CheckCancel(req)) [[unlikely]]
 				{
 					return;
 				}
@@ -711,9 +711,9 @@ namespace PonyEngine::Resource::Pack
 					}
 				}
 
-				if (CheckCancel(req))
+				if (CheckCancel(req)) [[likely]]
 				{
-					if (req->DecrementRequestCount())
+					if (req->DecrementRequestCount()) [[likely]]
 					{
 						CreatePack(*req);
 					}
@@ -823,7 +823,7 @@ namespace PonyEngine::Resource::Pack
 		{
 			jobService->Schedule([this, req = &request]() noexcept
 			{
-				if (!CheckCancel(req))
+				if (!CheckCancel(req)) [[unlikely]]
 				{
 					return;
 				}
@@ -843,7 +843,7 @@ namespace PonyEngine::Resource::Pack
 						? req->DataBuffer() 
 						: nullptr;
 
-					auto pack = std::make_shared<class Pack>(dataAccessWorker, std::move(dataFilePath), std::move(dataFile),
+					auto pack = std::make_shared<class Pack>(dataAccessFactory, std::move(dataFilePath), std::move(dataFile),
 						std::move(loadedData), std::move(req->Ranges()));
 
 					std::vector<std::type_index> accessTypes;

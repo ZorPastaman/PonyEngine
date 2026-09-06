@@ -42,7 +42,7 @@ export namespace PonyEngine::Resource
 		/// @brief Creates a resource service.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit ResourceService(Application::IApplication& application);
+		explicit ResourceService(Application::IApplication& application) noexcept;
 		ResourceService(const ResourceService&) = delete;
 		ResourceService(ResourceService&&) = delete;
 
@@ -120,7 +120,22 @@ export namespace PonyEngine::Resource
 		void AddLoadProcess(std::shared_ptr<ResourceLoadProcess> loadProcess) const;
 		/// @brief Removes the load process.
 		/// @param loadProcess Load process to remove.
-		void RemoveLoadProcess(const ResourceLoadProcess* loadProcess) const noexcept;
+		/// @return Removed load process.
+		std::shared_ptr<ResourceLoadProcess> RemoveLoadProcess(const ResourceLoadProcess* loadProcess) const noexcept;
+
+		/// @brief Creates a completed resource request.
+		/// @param resource Resource. Must be alive.
+		/// @param mainResource Main resource. Must be alive.
+		/// @return Completed resource request.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<CompletedResourceRequest> CreateResourceRequest(std::shared_ptr<const class Resource> resource, std::shared_ptr<const void> mainResource) const;
+		/// @brief Creates an ongoing resource request.
+		/// @param loadProcess Load process. Must be alive.
+		/// @param callback Callback. Can be nullptr.
+		/// @return Ongoing resource request.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<OngoingResourceRequest> CreateResourceRequest(std::shared_ptr<ResourceLoadProcess> loadProcess, 
+			std::move_only_function<void(const IResourceRequest&) noexcept> callback) const;
 
 		/// @brief Increment the load process count.
 		void IncrementLoadProcessCount() const noexcept;
@@ -149,13 +164,20 @@ export namespace PonyEngine::Resource
 		std::unordered_map<ResourceType, std::string> resourceTypeToStringMap; ///< Resource type to resource type string map.
 		mutable std::shared_mutex resourceTypeToStringMapMutex; ///< Resource type map mutex.
 
+#ifndef NDEBUG
+		mutable std::atomic_size_t requestCount; ///< Request count.
+#endif
+
 		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 }
 
 namespace PonyEngine::Resource
 {
-	ResourceService::ResourceService(Application::IApplication& application) :
+	ResourceService::ResourceService(Application::IApplication& application) noexcept :
+#ifndef NDEBUG
+		requestCount(0uz),
+#endif
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
 		loadProcessCount(0uz)
@@ -166,6 +188,9 @@ namespace PonyEngine::Resource
 	{
 		WaitForLoadProcessesToFinish();
 
+#ifndef NDEBUG
+		assert(requestCount.load(std::memory_order::relaxed) == 0uz && "Some resource requests are still alive.");
+#endif
 		assert(collectionContainer.Size() == 0uz && "Collections weren't removed.");
 		assert(loaderContainer.Size() == 0uz && "Loaders weren't removed.");
 	}
@@ -223,7 +248,7 @@ namespace PonyEngine::Resource
 
 		if (std::shared_ptr<const void> mainResource = resource->MainResource())
 		{
-			const auto request = std::make_shared<CompletedResourceRequest>(resource, std::move(mainResource));
+			std::shared_ptr<CompletedResourceRequest> request = CreateResourceRequest(resource, std::move(mainResource));
 
 			if (callback)
 			{
@@ -237,7 +262,7 @@ namespace PonyEngine::Resource
 		{
 			if (loadProcess->IncrementCancelCount())
 			{
-				return std::make_shared<OngoingResourceRequest>(std::move(loadProcess), std::move(callback));
+				return CreateResourceRequest(std::move(loadProcess), std::move(callback));
 			}
 		}
 
@@ -248,62 +273,51 @@ namespace PonyEngine::Resource
 		IResourceLoader* const loader = FindLoader(resource->Type());
 		assert(loader && "Loader not found.");
 
-		const auto rawLoadProcess = new ResourceLoadProcess(resource, dataAccess);
-		IncrementLoadProcessCount();
-		std::shared_ptr<ResourceLoadProcess> loadProcess;
-		try
-		{
-			loadProcess = std::shared_ptr<ResourceLoadProcess>(rawLoadProcess, [this](const ResourceLoadProcess* const process) noexcept
-			{
-				delete process;
-				DecrementLoadProcessCount();
-			});
-		}
-		catch (...)
-		{
-			delete rawLoadProcess;
-			DecrementLoadProcessCount();
-			throw;
-		}
+		auto loadProcess = std::make_shared<ResourceLoadProcess>(resource, std::move(dataAccess));
 		AddLoadProcess(loadProcess);
+		IncrementLoadProcessCount();
 
 		try
 		{
 			loadProcess->SetLoadRequest(loader->Load(*loadProcess, [this, process = loadProcess.get()](const IResourceLoadRequest& request) noexcept
 			{
-				if (process->IncrementCancelCount())
+				std::shared_ptr<ResourceLoadProcess> proc = RemoveLoadProcess(process);
+
+				if (proc->IncrementCancelCount()) [[likely]]
 				{
 					switch (request.Status())
 					{
-					case Async::RequestStatus::Success:
-						process->SetSuccess(request.MainResource(), request.ResourceInterfaces());
+					case Async::RequestStatus::Success: [[likely]]
+						proc->SetSuccess(request.MainResource(), request.ResourceInterfaces());
 						break;
 					case Async::RequestStatus::Failure:
-						process->SetFailure(request.Exception());
+						proc->SetFailure(request.Exception());
 						break;
 					case Async::RequestStatus::Canceled:
-						process->SetCanceled();
+						proc->SetCanceled();
 						break;
 					default: [[unlikely]]
 						assert(false && "Unexpected status.");
 						break;
 					}
 				}
-				else
+				else [[unlikely]]
 				{
-					process->SetCanceled();
+					proc->SetCanceled();
 				}
 
-				RemoveLoadProcess(process);
+				proc.reset();
+				DecrementLoadProcessCount();
 			}));
 		}
 		catch (...)
 		{
 			RemoveLoadProcess(loadProcess.get());
+			DecrementLoadProcessCount();
 			throw;
 		}
 
-		return std::make_shared<OngoingResourceRequest>(std::move(loadProcess), std::move(callback));
+		return CreateResourceRequest(std::move(loadProcess), std::move(callback));
 	}
 
 	ResourceCollection ResourceService::RegisterCollection(IResourceProvider& provider,
@@ -600,7 +614,7 @@ namespace PonyEngine::Resource
 		processes.push_back(std::move(loadProcess));
 	}
 
-	void ResourceService::RemoveLoadProcess(const ResourceLoadProcess* const loadProcess) const noexcept
+	std::shared_ptr<ResourceLoadProcess> ResourceService::RemoveLoadProcess(const ResourceLoadProcess* const loadProcess) const noexcept
 	{
 		const auto lock = std::lock_guard(loadProcessMutex);
 
@@ -608,6 +622,7 @@ namespace PonyEngine::Resource
 		assert(resourcePosition != loadProcesses.cend() && "Load process resource not found.");
 		const auto processPosition = std::ranges::find_if(resourcePosition->second, [&](const std::shared_ptr<ResourceLoadProcess>& p) { return p.get() == loadProcess; });
 		assert(processPosition != resourcePosition->second.cend() && "Load process not found.");
+		std::shared_ptr<ResourceLoadProcess> process = std::move(*processPosition);
 
 		if (resourcePosition->second.size() == 1uz) [[likely]]
 		{
@@ -617,6 +632,57 @@ namespace PonyEngine::Resource
 		{
 			resourcePosition->second.erase(processPosition);
 		}
+
+		return process;
+	}
+
+	std::shared_ptr<CompletedResourceRequest> ResourceService::CreateResourceRequest(std::shared_ptr<const Resource> resource, std::shared_ptr<const void> mainResource) const
+	{
+#ifndef NDEBUG
+		const auto request = new CompletedResourceRequest(std::move(resource), std::move(mainResource));
+		requestCount.fetch_add(1uz, std::memory_order::relaxed);
+		try
+		{
+			return std::shared_ptr<CompletedResourceRequest>(request, [this](const CompletedResourceRequest* const req) noexcept
+			{
+				delete req;
+				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			});
+		}
+		catch (...)
+		{
+			delete request;
+			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
+		return std::make_shared<CompletedResourceRequest>(std::move(resource), std::move(mainResource));
+#endif
+	}
+
+	std::shared_ptr<OngoingResourceRequest> ResourceService::CreateResourceRequest(std::shared_ptr<ResourceLoadProcess> loadProcess,
+		std::move_only_function<void(const IResourceRequest&) noexcept> callback) const
+	{
+#ifndef NDEBUG
+		const auto request = new OngoingResourceRequest(std::move(loadProcess), std::move(callback));
+		requestCount.fetch_add(1uz, std::memory_order::relaxed);
+		try
+		{
+			return std::shared_ptr<OngoingResourceRequest>(request, [this](const OngoingResourceRequest* const req) noexcept
+			{
+				delete req;
+				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			});
+		}
+		catch (...)
+		{
+			delete request;
+			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
+		return std::make_shared<OngoingResourceRequest>(std::move(loadProcess), std::move(callback));
+#endif
 	}
 
 	void ResourceService::IncrementLoadProcessCount() const noexcept
