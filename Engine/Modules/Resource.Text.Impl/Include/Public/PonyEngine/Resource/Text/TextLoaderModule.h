@@ -7,12 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Pack:Format;
+#pragma once
+
+#include "PonyEngine/Macro/Compiler.h"
 
 import std;
 
-export namespace PonyEngine::Resource::Pack
+import PonyEngine.Application;
+
+namespace PonyEngine::Resource::Text
 {
-	constexpr std::string_view PackManifestExtension = ".prpm"; ///< Pack manifest file extension.
-	constexpr std::string_view PackDataExtension = ".prpd"; ///< Pack data file extension.
+	/// @brief Creates the text loader module.
+	/// @return Text loader module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateTextLoaderModule();
 }

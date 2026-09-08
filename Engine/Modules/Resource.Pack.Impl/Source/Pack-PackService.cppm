@@ -88,6 +88,38 @@ export namespace PonyEngine::Resource::Pack
 		/// @param packHandle Pack handle to kill.
 		void KillPackHandle(PackHandle packHandle) noexcept;
 
+		/// @brief Creates a pack mount request.
+		/// @param accessType Access type.
+		/// @param manifest Pack manifest.
+		/// @param manifestSize Pack manifest size.
+		/// @param dataBuffer Pack data. If it's nullptr, the request count will be 1, otherwise it'll be 2.
+		/// @param dataSize Pack data size.
+		/// @param callback Callback.
+		/// @return Pack mount request.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<PackMountRequest> CreatePackMountRequest(AccessType accessType, const std::byte* manifest, std::size_t manifestSize, 
+			std::shared_ptr<std::byte[]> dataBuffer, std::size_t dataSize, std::move_only_function<void(const IPackMountRequest&) noexcept> callback);
+		/// @brief Creates a file pack mount request.
+		/// @param manifestFile Manifest file.
+		/// @param dataFile Data file.
+		/// @param accessType Access type.
+		/// @param manifestBuffer Manifest buffer.
+		/// @param manifestSize Manifest size in bytes.
+		/// @param dataBuffer Data buffer.
+		/// @param dataSize Data size in bytes.
+		/// @param callback Request callback.
+		/// @return File pack mount request.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<FilePackMountRequest> CreateFilePackMountRequest(std::shared_ptr<File::IFile> manifestFile, std::shared_ptr<File::IFile> dataFile, 
+			AccessType accessType, std::unique_ptr<std::byte[]> manifestBuffer, std::size_t manifestSize, std::shared_ptr<std::byte[]> dataBuffer, std::size_t dataSize,
+			std::move_only_function<void(const IPackMountRequest&) noexcept> callback);
+		/// @brief Creates a pack unmount request.
+		/// @param packHandle Pack handle.
+		/// @param callback Callback.
+		/// @return Pack unmount request.
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<PackUnmountRequest> CreatePackUnmountRequest(PackHandle packHandle, std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback);
+
 		/// @brief Adds the mount request.
 		/// @param request Mount request to add.
 		void AddMountRequest(const std::shared_ptr<PackMountRequest>& request);
@@ -168,6 +200,8 @@ export namespace PonyEngine::Resource::Pack
 		/// @brief Wait till the ongoing request count reaches 0.
 		void WaitForOngoingRequestCountToFinish() const noexcept;
 
+		static constexpr std::string_view MagicWord = "PonyEngineRPM"; ///< Pack manifest magic word.
+
 		Application::IApplication* application; ///< Application.
 		const Log::ILogService* logService; ///< Log service.
 		IResourceHub* resourceHub; ///< Resource hub.
@@ -191,6 +225,10 @@ export namespace PonyEngine::Resource::Pack
 
 		mutable std::atomic_size_t ongoingRequestCount; ///< Ongoing request count.
 
+#ifndef NDEBUG
+		std::atomic_size_t requestCount; ///< Request count.
+#endif
+
 		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
 	};
 }
@@ -198,6 +236,9 @@ export namespace PonyEngine::Resource::Pack
 namespace PonyEngine::Resource::Pack
 {
 	PackService::PackService(Application::IApplication& application) :
+#ifndef NDEBUG
+		requestCount(0uz),
+#endif
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
 		resourceHub{&this->application->GetInterface<IResourceHub>()},
@@ -212,6 +253,10 @@ namespace PonyEngine::Resource::Pack
 	PackService::~PackService() noexcept
 	{
 		WaitForOngoingRequestCountToFinish();
+
+#ifndef NDEBUG
+		assert(requestCount.load(std::memory_order::relaxed) == 0uz && "Some mount/unmount requests are still alive.");
+#endif
 
 		for (std::size_t i = packContainer.Size(); i-- > 0uz; )
 		{
@@ -251,7 +296,7 @@ namespace PonyEngine::Resource::Pack
 		auto manifestBuffer = std::make_unique<std::byte[]>(manifestSize);
 		const std::size_t dataSize = std::filesystem::file_size(data->Path());
 		std::shared_ptr<std::byte[]> dataBuffer = loadedData ? std::make_shared<std::byte[]>(dataSize) : nullptr;
-		auto request = std::make_shared<FilePackMountRequest>(std::move(manifest), std::move(data), accessType, 
+		auto request = CreateFilePackMountRequest(std::move(manifest), std::move(data), accessType,
 			std::move(manifestBuffer), manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
 		AddMountRequest(request);
 		IncrementOngoingRequestCount();
@@ -390,7 +435,7 @@ namespace PonyEngine::Resource::Pack
 
 		auto dataBuffer = std::make_shared<std::byte[]>(packData.size());
 
-		auto request = std::make_shared<PackMountRequest>(accessType, packManifest.data(), packManifest.size(), std::move(dataBuffer), packData.size(), std::move(callback));
+		auto request = CreatePackMountRequest(accessType, packManifest.data(), packManifest.size(), std::move(dataBuffer), packData.size(), std::move(callback));
 		AddMountRequest(request);
 		IncrementOngoingRequestCount();
 
@@ -429,7 +474,7 @@ namespace PonyEngine::Resource::Pack
 
 	std::shared_ptr<IPackUnmountRequest> PackService::UnmountPack(const PackHandle packHandle, std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback)
 	{
-		auto request = std::make_shared<PackUnmountRequest>(packHandle, std::move(callback));
+		auto request = CreatePackUnmountRequest(packHandle, std::move(callback));
 		AddUnmountRequest(request);
 
 		try
@@ -526,6 +571,85 @@ namespace PonyEngine::Resource::Pack
 		}
 	}
 
+	std::shared_ptr<PackMountRequest> PackService::CreatePackMountRequest(const AccessType accessType,
+		const std::byte* const manifest, const std::size_t manifestSize, std::shared_ptr<std::byte[]> dataBuffer,
+		const std::size_t dataSize, std::move_only_function<void(const IPackMountRequest&) noexcept> callback)
+	{
+#ifndef NDEBUG
+		const auto request = new PackMountRequest(accessType, manifest, manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
+		requestCount.fetch_add(1uz, std::memory_order::relaxed);
+		try
+		{
+			return std::shared_ptr<PackMountRequest>(request, [this](const PackMountRequest* const req) noexcept
+			{
+				delete req;
+				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			});
+		}
+		catch (...)
+		{
+			delete request;
+			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
+		return std::make_shared<PackMountRequest>(accessType, manifest, manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
+#endif
+	}
+
+	std::shared_ptr<FilePackMountRequest> PackService::CreateFilePackMountRequest(std::shared_ptr<File::IFile> manifestFile, std::shared_ptr<File::IFile> dataFile, 
+		const AccessType accessType, std::unique_ptr<std::byte[]> manifestBuffer, const std::size_t manifestSize, std::shared_ptr<std::byte[]> dataBuffer,
+		const std::size_t dataSize, std::move_only_function<void(const IPackMountRequest&) noexcept> callback)
+	{
+#ifndef NDEBUG
+		const auto request = new FilePackMountRequest(std::move(manifestFile), std::move(dataFile), accessType,
+			std::move(manifestBuffer), manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
+		requestCount.fetch_add(1uz, std::memory_order::relaxed);
+		try
+		{
+			return std::shared_ptr<FilePackMountRequest>(request, [this](const FilePackMountRequest* const req) noexcept
+			{
+				delete req;
+				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			});
+		}
+		catch (...)
+		{
+			delete request;
+			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
+		return std::make_shared<FilePackMountRequest>(std::move(manifestFile), std::move(dataFile), accessType,
+			std::move(manifestBuffer), manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
+#endif
+	}
+
+	std::shared_ptr<PackUnmountRequest> PackService::CreatePackUnmountRequest(const PackHandle packHandle,
+		std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback)
+	{
+#ifndef NDEBUG
+		const auto request = new PackUnmountRequest(packHandle, std::move(callback));
+		requestCount.fetch_add(1uz, std::memory_order::relaxed);
+		try
+		{
+			return std::shared_ptr<PackUnmountRequest>(request, [this](const PackUnmountRequest* const req) noexcept
+			{
+				delete req;
+				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			});
+		}
+		catch (...)
+		{
+			delete request;
+			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
+			throw;
+		}
+#else
+		return std::make_shared<PackUnmountRequest>(packHandle, std::move(callback));
+#endif
+	}
+
 	void PackService::AddMountRequest(const std::shared_ptr<PackMountRequest>& request)
 	{
 		const auto lock = std::lock_guard(mountRequestMutex);
@@ -587,34 +711,26 @@ namespace PonyEngine::Resource::Pack
 					const std::size_t dataMetaCount = ReadManifestData<std::size_t>(manifest);
 					const std::size_t loadMetaCount = ReadManifestData<std::size_t>(manifest);
 					const std::size_t rangeCount = ReadManifestData<std::size_t>(manifest);
-					const std::size_t resourceCount = ReadManifestData<std::size_t>(manifest);
 
 					const std::size_t typeSizeSize = typeCount * sizeof(std::uint8_t);
 					const std::size_t dataMetaSizeSize = dataMetaCount * sizeof(std::size_t);
 					const std::size_t loadMetaSizeSize = loadMetaCount * sizeof(std::size_t);
 					const std::size_t rangeSize = rangeCount * sizeof(std::pair<std::size_t, std::size_t>);
-					const std::size_t idSizeSize = resourceCount * sizeof(std::uint8_t);
-					const std::size_t infoCountSize = typeSizeSize + dataMetaSizeSize + loadMetaSizeSize + rangeSize + idSizeSize;
+					const std::size_t infoCountSize = typeSizeSize + dataMetaSizeSize + loadMetaSizeSize + rangeSize;
 					ValidateManifestSize(manifest, manifestEnd, infoCountSize);
 					const std::byte* const typeSizes = MoveManifestData(manifest, typeSizeSize);
 					const std::byte* const dataMetaSizes = MoveManifestData(manifest, dataMetaSizeSize);
 					const std::byte* const loadMetaSizes = MoveManifestData(manifest, loadMetaSizeSize);
 					const std::byte* const ranges = MoveManifestData(manifest, rangeSize);
-					const std::byte* const idSizes = MoveManifestData(manifest, idSizeSize);
 
 					const std::size_t totalTypeSize = SumManifestData<std::uint8_t>(typeSizes, typeCount);
 					const std::size_t totalDataMetaSize = SumManifestData<std::size_t>(dataMetaSizes, dataMetaCount);
 					const std::size_t totalLoadMetaSize = SumManifestData<std::size_t>(loadMetaSizes, loadMetaCount);
-					const std::size_t totalIdSize = SumManifestData<std::uint8_t>(idSizes, resourceCount);
-					const std::size_t resourceSize = resourceCount * sizeof(ManifestResource);
-					const std::size_t totalInfoSize = totalTypeSize + totalDataMetaSize + totalLoadMetaSize + totalIdSize + resourceSize;
+					const std::size_t totalInfoSize = totalTypeSize + totalDataMetaSize + totalLoadMetaSize;
 					ValidateManifestSize(manifest, manifestEnd, totalInfoSize);
 					const std::byte* const types = MoveManifestData(manifest, totalTypeSize);
 					const std::byte* const dataMetas = MoveManifestData(manifest, totalDataMetaSize);
 					const std::byte* const loadMetas = MoveManifestData(manifest, totalLoadMetaSize);
-					const std::byte* const ids = MoveManifestData(manifest, totalIdSize);
-					const std::byte* const resources = MoveManifestData(manifest, resourceSize);
-					PONY_LOG_IF(manifest != manifestEnd, logService, Log::LogType::Warning, "Resource pack manifest read operation hasn't reached the end. Maybe, manifest is invalid.")
 
 					const std::size_t tempBufferSize = Memory::CalculateBufferSize<ResourceType>(typeCount) +
 						Memory::CalculateBufferSize<std::span<const std::byte>, ResourceType>(dataMetaCount) +
@@ -661,14 +777,15 @@ namespace PonyEngine::Resource::Pack
 						}
 					}
 
-					const std::byte* idSize = idSizes;
-					const std::byte* id = ids;
-					const std::byte* resource = resources;
 					std::vector<CollectionResource>& collectionResources = req->CollectionResources();
-					collectionResources.resize(resourceCount);
-					for (CollectionResource& collectionResource : collectionResources)
+					while (manifest < manifestEnd)
 					{
-						const ManifestResource manifestResource = ReadManifestData<ManifestResource>(resource);
+						ValidateManifestSize(manifest, manifestEnd, sizeof(ManifestResource) + sizeof(std::uint8_t));
+						const ManifestResource manifestResource = ReadManifestData<ManifestResource>(manifest);
+						const std::uint8_t idSize = ReadManifestData<std::uint8_t>(manifest);
+						ValidateManifestSize(manifest, manifestEnd, idSize);
+						const std::string_view id = ReadManifestString(manifest, idSize);
+
 						if (manifestResource.typeIndex >= typeCount) [[unlikely]]
 						{
 							throw std::runtime_error("Invalid manifest resource type index");
@@ -686,18 +803,16 @@ namespace PonyEngine::Resource::Pack
 							throw std::runtime_error("Invalid manifest resource range index");
 						}
 
-						const std::uint8_t resourceIdSize = ReadManifestData<std::uint8_t>(idSize);
-						const std::string_view resourceId = ReadManifestString(id, resourceIdSize);
-
-						collectionResource = CollectionResource
+						collectionResources.push_back(CollectionResource
 						{
-							.id = resourceHub->MakeResourceID(resourceId),
+							.id = resourceHub->MakeResourceID(id),
 							.type = resourceTypes[manifestResource.typeIndex],
 							.dataMeta = resourceDataMetas[manifestResource.dataMetaIndex],
 							.loadMeta = resourceLoadMetas[manifestResource.loadMetaIndex],
 							.dataIndex = manifestResource.rangeIndex
-						};
+						});
 					}
+					collectionResources.shrink_to_fit();
 				}
 				catch (...)
 				{

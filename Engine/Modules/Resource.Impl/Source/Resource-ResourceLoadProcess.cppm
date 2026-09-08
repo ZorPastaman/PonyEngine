@@ -41,7 +41,7 @@ export namespace PonyEngine::Resource
 		~ResourceLoadProcess() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
-		virtual void* ResourceDataAccess() const noexcept override;
+		virtual const std::shared_ptr<void>& ResourceDataAccess() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::type_index ResourceDataAccessType() const noexcept override;
 
@@ -205,9 +205,9 @@ namespace PonyEngine::Resource
 		assert(this->resourceDataAccess && "Resource data access is nullptr.");
 	}
 
-	void* ResourceLoadProcess::ResourceDataAccess() const noexcept
+	const std::shared_ptr<void>& ResourceLoadProcess::ResourceDataAccess() const noexcept
 	{
-		return resourceDataAccess.get();
+		return resourceDataAccess;
 	}
 
 	std::type_index ResourceLoadProcess::ResourceDataAccessType() const noexcept

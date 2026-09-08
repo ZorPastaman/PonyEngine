@@ -52,6 +52,10 @@ export namespace PonyEngine::Resource
 		/// @brief Adds the resource interface types.
 		/// @param interfaceTypes Resource interface types.
 		virtual void AddInterfaceTypes(std::span<const std::type_index> interfaceTypes) = 0;
+		/// @brief Adds the resource interface types.
+		/// @tparam Args Resource interface types.
+		template<typename... Args>
+		void AddInterfaceTypes();
 		/// @brief Adds the load data.
 		/// @param loadData Load data.
 		/// @param loadDataType Load data type.
@@ -64,5 +68,11 @@ namespace PonyEngine::Resource
 	void ILoadableResource::AddInterfaceType(const std::type_index interfaceType)
 	{
 		AddInterfaceTypes(std::span(&interfaceType, 1uz));
+	}
+
+	template<typename... Args>
+	void ILoadableResource::AddInterfaceTypes()
+	{
+		AddInterfaceTypes(std::array<std::type_index, sizeof...(Args)>{typeid(Args)...});
 	}
 }

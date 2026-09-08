@@ -165,7 +165,7 @@ namespace PonyEngine::RawInput::XInput
 		else
 		{
 			PONY_LOG_IF(stateResult != ERROR_DEVICE_NOT_CONNECTED, logService, Log::LogType::Error,
-				"Failed to get XInput gamepad state. X user index: '{}'; Error code: '0x{:X}'.", gamepadIndex, stateResult);
+				"Failed to get XInput gamepad state. XInput user index: '{}'; Error code: '0x{:X}'.", gamepadIndex, stateResult);
 			UpdateConnection(false, now, inputRegistry);
 		}
 	}

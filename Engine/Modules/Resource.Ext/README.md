@@ -4,7 +4,11 @@ Resource extension API module. Provides interfaces for resource providers.
 
 The resource service doesn't know how to load or access resource, it's just a mediator.
 The resource providers know how to do that, they register resources and then provide them when requested.
+The resource loaders know how to make game runtime resources out of those bytes.
 It allows to add different ways of resource delivery.
+
+Every resource has its resource type. The loaders are linked to the types.
+And that's why loaders must be added first and only then the resources of those types.
 
 Adds `PonyEngine.Resource.Ext` target as a static library.
 

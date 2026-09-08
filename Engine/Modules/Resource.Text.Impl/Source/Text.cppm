@@ -7,12 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.Pack:Format;
+export module PonyEngine.Resource.Text.Impl;
 
-import std;
+export import PonyEngine.Resource.Ext;
 
-export namespace PonyEngine::Resource::Pack
-{
-	constexpr std::string_view PackManifestExtension = ".prpm"; ///< Pack manifest file extension.
-	constexpr std::string_view PackDataExtension = ".prpd"; ///< Pack data file extension.
-}
+export import :TextLoaderModule;

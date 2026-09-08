@@ -299,7 +299,7 @@ namespace PonyEngine::RawInput
 
 			if (axisPosition == axes.cend()) [[unlikely]]
 			{
-				PONY_LOG(logService, Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
+				PONY_LOG(logService, Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '0x{:X}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
 				if (axes.size() >= std::numeric_limits<std::uint64_t>::max()) [[unlikely]]
 				{
 					throw std::overflow_error("Max number of axis with the same hash has been reached");
@@ -311,7 +311,7 @@ namespace PonyEngine::RawInput
 		else
 		{
 			axisId.index = 0u;
-			PONY_LOG(logService, Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '{}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
+			PONY_LOG(logService, Log::LogType::Info, "Adding new input axis. Axis: '{}'; AxisHash: '0x{:X}'; AxisIndex: '{}'.", axis, axisId.hash, axisId.index);
 			axisHashMap.emplace(hash, std::vector<std::string>{ std::string(axis) });
 		}
 
@@ -352,7 +352,7 @@ namespace PonyEngine::RawInput
 		}
 		else
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '{}'.", deviceType, deviceTypeId.hash);
+			PONY_LOG(logService, Log::LogType::Info, "Adding new input device type. DeviceType: '{}'; DeviceTypeHash: '0x{:X}'.", deviceType, deviceTypeId.hash);
 			deviceTypeHashMap.emplace(deviceTypeId, deviceType);
 		}
 
@@ -393,7 +393,7 @@ namespace PonyEngine::RawInput
 		}
 		else
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Adding new input device style. DeviceStyle: '{}'; DeviceStyleHash: '{}'.", deviceStyle, deviceStyleId.hash);
+			PONY_LOG(logService, Log::LogType::Info, "Adding new input device style. DeviceStyle: '{}'; DeviceStyleHash: '0x{:X}'.", deviceStyle, deviceStyleId.hash);
 			deviceStyleHashMap.emplace(deviceStyleId, deviceStyle);
 		}
 

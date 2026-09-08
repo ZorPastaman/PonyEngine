@@ -397,6 +397,13 @@ namespace PonyEngine::Resource
 			throw;
 		}
 
+		PONY_LOG(logService, Log::LogType::Info, "Resource collection registered. CollectionID: '0x{:X}'; Provider: '{}'.", collection.id, typeid(provider).name());
+		PONY_LOG(logService, Log::LogType::Debug, "Resource IDs:");
+		for (const ResourceID id : collectionContainer.Resources(collectionContainer.IndexOf(collection.id)))
+		{
+			PONY_LOG(logService, Log::LogType::Debug, "ID: '0x{:X}'.", id.value);
+		}
+
 		return collection;
 	}
 
@@ -419,6 +426,8 @@ namespace PonyEngine::Resource
 		collectionContainer.Remove(index);
 
 		KillCollection(collection);
+
+		PONY_LOG(logService, Log::LogType::Info, "Resource collection unregistered. CollectionID: '0x{:X}'.", collection.id);
 	}
 
 	void ResourceService::RegisterLoader(IResourceLoader& loader, const std::span<const ResourceType> types)
@@ -434,6 +443,13 @@ namespace PonyEngine::Resource
 		assert(loaderContainer.IndexOf(loader) >= loaderContainer.Size() && "Resource loader is already added.");
 
 		loaderContainer.Add(loader, types);
+
+		PONY_LOG(logService, Log::LogType::Info, "Resource loader registered. Loader: '{}'.", typeid(loader).name());
+		PONY_LOG(logService, Log::LogType::Debug, "Resource types:");
+		for (const ResourceType type : loaderContainer.Types(loaderContainer.IndexOf(loader)))
+		{
+			PONY_LOG(logService, Log::LogType::Debug, "Type: '0x{:X}'.", type.value);
+		}
 	}
 
 	void ResourceService::UnregisterLoader(IResourceLoader& loader)
@@ -454,6 +470,8 @@ namespace PonyEngine::Resource
 		}
 
 		loaderContainer.Remove(index);
+
+		PONY_LOG(logService, Log::LogType::Info, "Resource loader unregistered. Loader: '{}'.", typeid(loader).name());
 	}
 
 	ResourceID ResourceService::MakeResourceID(const std::string_view resourceId)
@@ -471,7 +489,7 @@ namespace PonyEngine::Resource
 		}
 		else
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Adding new resource ID. ID: '{}'; ID hash: '{}'.", resourceId, id.value);
+			PONY_LOG(logService, Log::LogType::Info, "Adding new resource ID. ID: '{}'; ID hash: '0x{:X}'.", resourceId, id.value);
 			resourceIdToStringMap.emplace(id, resourceId);
 		}
 
@@ -512,7 +530,7 @@ namespace PonyEngine::Resource
 		}
 		else
 		{
-			PONY_LOG(logService, Log::LogType::Info, "Adding new resource type. Type: '{}'; Type hash: '{}'.", resourceType, type.value);
+			PONY_LOG(logService, Log::LogType::Info, "Adding new resource type. Type: '{}'; Type hash: '0x{:X}'.", resourceType, type.value);
 			resourceTypeToStringMap.emplace(type, resourceType);
 		}
 

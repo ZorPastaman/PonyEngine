@@ -27,7 +27,7 @@ export namespace PonyEngine::Resource
 		/// @brief Gets a resource data access.
 		/// @return Resource data access.
 		[[nodiscard("Pure function")]]
-		virtual void* ResourceDataAccess() const noexcept = 0;
+		virtual const std::shared_ptr<void>& ResourceDataAccess() const noexcept = 0;
 		/// @brief Gets a type of an object returned from @p ResourceDataAccess().
 		/// @return Resource data access type.
 		[[nodiscard("Pure function")]]

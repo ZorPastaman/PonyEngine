@@ -37,6 +37,6 @@ export namespace PonyEngine::Resource
 		/// @return Resource load request.
 		/// @note The context, request, callback and loader must be kept alive till the finish of the operation.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IResourceLoadRequest> Load(ILoadContext& context, std::move_only_function<void(const IResourceLoadRequest&) noexcept> callback = nullptr) = 0;
+		virtual std::shared_ptr<IResourceLoadRequest> Load(const ILoadContext& context, std::move_only_function<void(const IResourceLoadRequest&) noexcept> callback = nullptr) = 0;
 	};
 }
