@@ -30,13 +30,14 @@ export namespace PonyEngine::Resource::Pack
 		PONY_INTERFACE_BODY(IPackService)
 
 		/// @brief Mounts a pack.
-		/// @param packPath Path to a pack manifest. If it's relative it's resolved relative to the application root.
+		/// @param packManifestPath Path to a pack manifest. If it's relative it's resolved relative to the application root.
+		/// @param packDataPath Path to a pack data. If it's relative it's resolved relative to the application root.
 		/// @param accessType Access type. If it has Memory flag, the pack data will be loaded to memory.
 		/// @param callback Callback. Can be nullptr.
 		/// @return Pack mount request.
 		/// @note The request and callback must be kept alive till the end of the operation.
 		/// @note The function is thread-safe.
-		virtual std::shared_ptr<IPackMountRequest> MountPack(std::filesystem::path packPath, enum AccessType accessType,
+		virtual std::shared_ptr<IPackMountRequest> MountPack(std::filesystem::path packManifestPath, std::filesystem::path packDataPath, enum AccessType accessType,
 			std::move_only_function<void(const IPackMountRequest&) noexcept> callback = nullptr) = 0;
 		/// @brief Mounts a pack.
 		/// @param packManifest Pack manifest.

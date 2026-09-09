@@ -48,7 +48,7 @@ export namespace PonyEngine::Resource::Pack
 
 		~PackService() noexcept;
 
-		virtual std::shared_ptr<IPackMountRequest> MountPack(std::filesystem::path packPath, AccessType accessType, 
+		virtual std::shared_ptr<IPackMountRequest> MountPack(std::filesystem::path packManifestPath, std::filesystem::path packDataPath, AccessType accessType,
 			std::move_only_function<void(const IPackMountRequest&) noexcept> callback) override;
 		virtual std::shared_ptr<IPackMountRequest> MountPack(std::span<const std::byte> packManifest, std::span<const std::byte> packData, AccessType accessType,
 			std::move_only_function<void(const IPackMountRequest&) noexcept> callback) override;
@@ -272,25 +272,25 @@ namespace PonyEngine::Resource::Pack
 		}
 	}
 
-	std::shared_ptr<IPackMountRequest> PackService::MountPack(std::filesystem::path packPath, const AccessType accessType, 
+	std::shared_ptr<IPackMountRequest> PackService::MountPack(std::filesystem::path packManifestPath, std::filesystem::path packDataPath, const AccessType accessType,
 		std::move_only_function<void(const IPackMountRequest&) noexcept> callback)
 	{
-		if (packPath.extension() != PackManifestExtension) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid pack path");
-		}
 		if (None(AccessType::Loadable | AccessType::File | AccessType::Memory, accessType)) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid access type");
 		}
 
-		if (packPath.is_relative())
+		if (packManifestPath.is_relative())
 		{
-			packPath = application->RootDirectory() / packPath;
+			packManifestPath = application->RootDirectory() / packManifestPath;
+		}
+		if (packDataPath.is_relative())
+		{
+			packDataPath = application->RootDirectory() / packDataPath;
 		}
 
-		std::shared_ptr<File::IFile> manifest = fileService->OpenFile(packPath, File::FileParams::Read());
-		std::shared_ptr<File::IFile> data = fileService->OpenFile(packPath.stem() / PackDataExtension, File::FileParams::Read());
+		std::shared_ptr<File::IFile> manifest = fileService->OpenFile(std::move(packManifestPath), File::FileParams::Read());
+		std::shared_ptr<File::IFile> data = fileService->OpenFile(std::move(packDataPath), File::FileParams::Read());
 		const bool loadedData = Any(AccessType::Memory, accessType);
 		const std::size_t manifestSize = std::filesystem::file_size(manifest->Path());
 		auto manifestBuffer = std::make_unique<std::byte[]>(manifestSize);
