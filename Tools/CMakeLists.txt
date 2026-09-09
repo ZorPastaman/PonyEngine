@@ -11,27 +11,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(tomlplusplus)
 
-add_subdirectory("FileResourceManifestCompiler")
-add_subdirectory("FileResourceManifestGenerator")
+add_subdirectory("DepFile")
 
-add_subdirectory("PackResourceManifestCompiler")
-add_subdirectory("PackResourceManifestGenerator")
+add_subdirectory("TextCompiler")
 
 set(PONY_INSTALL_TARGETS "")
-list(APPEND PONY_INSTALL_TARGETS PonyTools.FileResourceManifestCompiler)
-list(APPEND PONY_INSTALL_TARGETS PonyTools.FileResourceManifestGenerator)
-list(APPEND PONY_INSTALL_TARGETS PonyTools.PackResourceManifestCompiler)
-list(APPEND PONY_INSTALL_TARGETS PonyTools.PackResourceManifestGenerator)
+list(APPEND PONY_INSTALL_TARGETS PonyTools.TextCompiler)
 
-if(PONY_TOOLS_INSTALL_DEFAULT)
-	install(TARGETS ${PONY_INSTALL_TARGETS}
-		RUNTIME DESTINATION .
-		LIBRARY DESTINATION
-	)
-endif()
-if(PONY_TOOLS_INSTALL_DIR)
-	install(TARGETS ${PONY_INSTALL_TARGETS}
-		RUNTIME DESTINATION ${PONY_TOOLS_INSTALL_DIR}
-		LIBRARY DESTINATION
-	)
-endif()
+install(TARGETS ${PONY_INSTALL_TARGETS}
+	RUNTIME DESTINATION ${PONY_TOOLS_INSTALL_DIR}
+	LIBRARY DESTINATION
+)

@@ -4,5 +4,9 @@ The engine uses different custom formats for different purposes.
 
 ## Resource formats
 
-- [Resource](Resource.md)
+- [ResourceContainer](ResourceContainer.md)
 - [ResourcePack](ResourcePack.md)
+
+## Resource types
+
+- [PonyText](PonyText.md)

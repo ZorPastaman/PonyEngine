@@ -15,7 +15,3 @@ This repo uses the following third-party libraries:
 - License: https://github.com/marzer/tomlplusplus/blob/v3.4.0/LICENSE
 - Integration: CMake Git dependency.
 - Modules that use it:
-	- [PonyTools.FileResourceManifestCompiler](Tools/FileResourceManifestCompiler)
-	- [PonyTools.FileResourceManifestGenerator](Tools/FileResourceManifestGenerator)
-	- [PonyTools.PackResourceManifestCompiler](Tools/PackResourceManifestCompiler)
-	- [PonyTools.PackResourceManifestGenerator](Tools/PackResourceManifestGenerator)

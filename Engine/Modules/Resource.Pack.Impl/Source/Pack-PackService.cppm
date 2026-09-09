@@ -200,7 +200,7 @@ export namespace PonyEngine::Resource::Pack
 		/// @brief Wait till the ongoing request count reaches 0.
 		void WaitForOngoingRequestCountToFinish() const noexcept;
 
-		static constexpr std::string_view MagicWord = "PonyEngineRPM"; ///< Pack manifest magic word.
+		static constexpr std::string_view MagicWord = "PonyEngineResourcePackManifest"; ///< Pack manifest magic word.
 
 		Application::IApplication* application; ///< Application.
 		const Log::ILogService* logService; ///< Log service.
