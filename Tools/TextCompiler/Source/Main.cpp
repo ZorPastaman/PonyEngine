@@ -70,9 +70,9 @@ void PrintHelp(const Command& command);
 
 void Compile(const Command& command);
 [[nodiscard("Pure function")]]
-std::ifstream OpenInput(std::string_view path, bool binary);
+std::ifstream OpenInput(std::string_view path, std::ios::openmode openMode = 0);
 [[nodiscard("Pure function")]]
-std::ofstream OpenOutput(std::string_view path, bool binary);
+std::ofstream OpenOutput(std::string_view path, std::ios::openmode openMode = 0);
 [[nodiscard("Pure function")]]
 Params ReadParams(std::string_view path);
 [[nodiscard("Pure function")]]
@@ -247,14 +247,14 @@ void Compile(const Command& command)
 		return;
 	}
 
-	std::ifstream input = OpenInput(command.input, false);
+	std::ifstream input = OpenInput(command.input);
 
 	if (command.output.empty()) [[unlikely]]
 	{
 		return;
 	}
 
-	std::ofstream output = OpenOutput(command.output, true);
+	std::ofstream output = OpenOutput(command.output, std::ios::binary | std::ios::trunc);
 
 	if (!command.depFile.empty()) [[likely]]
 	{
@@ -267,7 +267,7 @@ void Compile(const Command& command)
 			depRule.AddDependency(std::filesystem::path(command.params));
 		}
 
-		std::ofstream depFile = OpenOutput(command.depFile, false);
+		std::ofstream depFile = OpenOutput(command.depFile, std::ios::trunc);
 		depData.Write(depFile);
 	}
 
@@ -293,13 +293,14 @@ void Compile(const Command& command)
 		output.write(reinterpret_cast<const char*>(&directResourceAccess), sizeof(directResourceAccess));
 	}
 
-	output << input.rdbuf();
+	auto inputData = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
+	const std::size_t inputWriteCount = inputData.size() - (inputData.size() > 0uz && inputData.back() == '\n');
+	output.write(inputData.data(), inputWriteCount);
 }
 
-std::ifstream OpenInput(const std::string_view path, const bool binary)
+std::ifstream OpenInput(const std::string_view path, const std::ios::openmode openMode)
 {
 	const auto inputPath = std::filesystem::absolute(std::filesystem::path(path)).lexically_normal();
-	const std::ios::openmode openMode = binary ? std::ios::binary : 0;
 	auto input = std::ifstream(inputPath, openMode);
 	if (!input) [[unlikely]]
 	{
@@ -309,10 +310,9 @@ std::ifstream OpenInput(const std::string_view path, const bool binary)
 	return input;
 }
 
-std::ofstream OpenOutput(const std::string_view path, const bool binary)
+std::ofstream OpenOutput(const std::string_view path, const std::ios::openmode openMode)
 {
 	const auto outputPath = std::filesystem::absolute(std::filesystem::path(path)).lexically_normal();
-	const std::ios::openmode openMode = std::ios::trunc | (binary ? std::ios::binary : 0);
 	auto output = std::ofstream(outputPath, openMode);
 	if (!output) [[unlikely]]
 	{

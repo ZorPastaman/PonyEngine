@@ -221,8 +221,7 @@
 			"inherits": "Base",
 			"hidden": true,
 			"cacheVariables": {
-				"PONY_BUILD_MODE": "Tools",
-				"PONY_TOOLS_INSTALL_DEFAULT": true
+				"PONY_BUILD_MODE": "Tools"
 			}
 		},
 		{
