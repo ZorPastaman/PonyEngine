@@ -15,6 +15,7 @@ import :DepRule;
 
 export namespace PonyTools::DepFile
 {
+	/// @brief Dep file data.
 	class DepData final
 	{
 	public:
@@ -27,24 +28,38 @@ export namespace PonyTools::DepFile
 
 		~DepData() noexcept = default;
 
+		/// @brief Gets the rules.
+		/// @return Rules.
 		[[nodiscard("Pure function")]]
 		std::span<DepRule> Rules() noexcept;
+		/// @brief Gets the rules.
+		/// @return Rules.
 		[[nodiscard("Pure function")]]
 		std::span<const DepRule> Rules() const noexcept;
 
+		/// @brief Adds a new rule.
+		/// @return Added rule.
 		DepRule& AddRule();
 
+		/// @brief Writes to the stream in dep file format.
+		/// @param stream Target stream.
 		void Write(std::ostream& stream) const;
 
 		DepData& operator =(const DepData& other);
 		DepData& operator =(DepData&& other) noexcept = default;
 
 	private:
+		/// @brief Writes @p paths to the @p stream in dep file format.
+		/// @param stream Target stream.
+		/// @param paths Paths.
 		static void WritePaths(std::ostream& stream, std::span<const std::filesystem::path> paths);
 
+		/// @brief Converts the @p path to a path in dep file format.
+		/// @param path Path.
+		/// @return Path in dep file format.
 		static std::string ConvertPathToDepPath(const std::filesystem::path& path);
 
-		std::vector<DepRule> rules;
+		std::vector<DepRule> rules; ///< Rules.
 	};
 }
 

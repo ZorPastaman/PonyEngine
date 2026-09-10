@@ -13,6 +13,7 @@ import std;
 
 export namespace PonyTools::DepFile
 {
+	/// @brief Dep file rule.
 	class DepRule final
 	{
 	public:
@@ -25,32 +26,50 @@ export namespace PonyTools::DepFile
 
 		~DepRule() noexcept = default;
 
+		/// @brief Checks if it has a target at the @p path.
+		/// @param path Path to check.
+		/// @return @a True if it has; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasTarget(const std::filesystem::path& path);
+		/// @brief Checks if it has a dependency at the @p path.
+		/// @param path Path to check.
+		/// @return @a True if it has; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool HasDependency(const std::filesystem::path& path);
 
+		/// @brief Gets the targets.
+		/// @return Targets.
 		[[nodiscard("Pure function")]]
 		std::span<const std::filesystem::path> Targets() const noexcept;
+		/// @brief Gets the dependencies.
+		/// @return Dependencies.
 		[[nodiscard("Pure function")]]
 		std::span<const std::filesystem::path> Dependencies() const noexcept;
 
+		/// @brief Adds the @p path as a target.
+		/// @param path Path to add.
 		void AddTarget(const std::filesystem::path& path);
+		/// @brief Adds the @p path as a dependency.
+		/// @param path Path to add.
 		void AddDependency(const std::filesystem::path& path);
 
 		DepRule& operator =(const DepRule& other);
 		DepRule& operator =(DepRule&& other) noexcept = default;
 
 	private:
+		/// @brief Checks if the @p checkPaths contains the @p path.
+		/// @param checkPaths Check paths.
+		/// @param path Path to check.
+		/// @return @a True if they contain; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		static bool HasPath(std::span<const std::filesystem::path> checkPaths, const std::filesystem::path& path);
+		/// @brief Adds the @p path to the @p list.
+		/// @param list Path list.
+		/// @param path Path to add.
 		void AddPath(std::vector<std::filesystem::path>& list, const std::filesystem::path& path);
 
-		[[nodiscard("Pure function")]]
-		static std::filesystem::path NormalPath(const std::filesystem::path& path);
-
-		std::vector<std::filesystem::path> targets;
-		std::vector<std::filesystem::path> dependencies;
+		std::vector<std::filesystem::path> targets; ///< Targets. Always have lexically normal absolute paths.
+		std::vector<std::filesystem::path> dependencies; /// Dependencies. Always have lexically normal absolute paths.
 	};
 }
 
@@ -112,11 +131,6 @@ namespace PonyTools::DepFile
 			throw std::invalid_argument("Path already added");
 		}
 
-		list.push_back(NormalPath(path));
-	}
-
-	std::filesystem::path DepRule::NormalPath(const std::filesystem::path& path)
-	{
-		return std::filesystem::absolute(path).lexically_normal();
+		list.push_back(std::filesystem::absolute(path).lexically_normal());
 	}
 }
