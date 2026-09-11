@@ -1,6 +1,6 @@
 # PonyTools.TextCompiler tool
 
-Compiles any file to a resource of `PonyText` type.
+Compiles any file to a resource container of `PonyText` type.
 
 ## How to use
 
@@ -8,53 +8,37 @@ Compiles any file to a resource of `PonyText` type.
 PonyTextCompiler <input> [options]
 
 Arguments:
-	<input>          Input asset file, can be any file.
+	<input>                          Input asset file path, can be any file.
 
 Options:
-	-p <path>        Text resource params file.
-	-o <path>        Resource output file.
-	-d <path>        Dep file path.
-	--version        Display version information and exit.
-	--verbose        Enable verbose output.
-	--help           Display this help message and exit.
+	-p <path>                        Text resource data params file path.
+	-o <path>                        Resource data output file path.
+	-l <params_path> <output_path>   Resource load params and load output file paths.
+	-d <path>                        Dep file path.
+	--version                        Display version information and exit.
+	--verbose                        Enable verbose output.
+	--help                           Display this help message and exit.
 ```
 
-Put an asset file as `<input>`, parameters as `-p` and output as `-o`.
+Put an asset file as `<input>`, data parameters as `-p` and data output as `-o`.
+You can add as many load parameters as you like but it's required to add at least one.
+Every load arguments consists of load parameters and load output.
 You also would like to use `-d` to make CMake or other tool to track dependencies.
 
-## Parameters
+## Data parameters
 
-The parameters file is a TOML file.
+TOML layout:
 
-Example:
+| Field name         | Type   | Description                                                        |
+|:-------------------|:-------|:-------------------------------------------------------------------|
+| schema             | string | Must be `PonyEngine/Resource/Text/Data/v0`                         |
+| removeFinalNewLine | bool   | Optional. If true, the final new line in the data will be removed. |
 
-```
-schema = 'PonyEngine/Resource/Text/v0'
+## Load parameters
 
-[[variant]]
-id = 'Text'
+TOML layout:
 
-[[variant]]
-id = 'TextIndirect'
-directResourceAccess = false
-
-[[variant]]
-id = 'TextDirect'
-directResourceAccess = true
-```
-
-### Layout
-
-Root layout:
-
-| Field name | Type   | Description                           |
-|:-----------|:-------|:--------------------------------------|
-| schema     | string | Must be `PonyEngine/Resource/Text/v0` |
-| variant    | array  | See its layout below.                 |
-
-Variant layout:
-
-| Field name           | Type   | Description                                                       |
-|:---------------------|:-------|:------------------------------------------------------------------|
-| id                   | string | Variant ID. Must be unique.                                       |
-| directResourceAccess | bool   | Enable direct resource access. Optional, by default it's `false`. |
+| Field name           | Type   | Description                                                      |
+|:---------------------|:-------|:-----------------------------------------------------------------|
+| schema               | string | Must be `PonyEngine/Resource/Text/Load/v0`                       |
+| directResourceAccess | bool   | Optional. Corresponds to direct resouce access in the load meta. |

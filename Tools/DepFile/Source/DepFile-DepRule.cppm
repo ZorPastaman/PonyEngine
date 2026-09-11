@@ -68,6 +68,11 @@ export namespace PonyTools::DepFile
 		/// @param path Path to add.
 		void AddPath(std::vector<std::filesystem::path>& list, const std::filesystem::path& path);
 
+		/// @brief Normalized the @p path.
+		/// @return Normalized path.
+		[[nodiscard("Pure function")]]
+		static std::filesystem::path NormalizePath(const std::filesystem::path& path);
+
 		std::vector<std::filesystem::path> targets; ///< Targets. Always have lexically normal absolute paths.
 		std::vector<std::filesystem::path> dependencies; /// Dependencies. Always have lexically normal absolute paths.
 	};
@@ -77,12 +82,12 @@ namespace PonyTools::DepFile
 {
 	bool DepRule::HasTarget(const std::filesystem::path& path)
 	{
-		return HasPath(targets, path);
+		return HasPath(targets, NormalizePath(path));
 	}
 
 	bool DepRule::HasDependency(const std::filesystem::path& path)
 	{
-		return HasPath(dependencies, path);
+		return HasPath(dependencies, NormalizePath(path));
 	}
 
 	std::span<const std::filesystem::path> DepRule::Targets() const noexcept
@@ -115,7 +120,7 @@ namespace PonyTools::DepFile
 	{
 		for (const std::filesystem::path& checkPath : checkPaths)
 		{
-			if (std::filesystem::equivalent(checkPath, path))
+			if (checkPath == path)
 			{
 				return true;
 			}
@@ -126,11 +131,18 @@ namespace PonyTools::DepFile
 
 	void DepRule::AddPath(std::vector<std::filesystem::path>& list, const std::filesystem::path& path)
 	{
-		if (HasTarget(path) || HasDependency(path)) [[unlikely]]
+		std::filesystem::path normalizedPath = NormalizePath(path);
+
+		if (HasPath(targets, normalizedPath) || HasPath(targets, normalizedPath)) [[unlikely]]
 		{
 			throw std::invalid_argument("Path already added");
 		}
 
-		list.push_back(std::filesystem::absolute(path).lexically_normal());
+		list.push_back(std::move(normalizedPath));
+	}
+
+	std::filesystem::path DepRule::NormalizePath(const std::filesystem::path& path)
+	{
+		return std::filesystem::absolute(path).lexically_normal();
 	}
 }
