@@ -18,6 +18,6 @@ set_target_properties(PonyTools.TextCompiler PROPERTIES
 )
 
 target_link_libraries(PonyTools.TextCompiler PRIVATE
-	PonyTools.DepFile
+	PonyTools.Utility
 	tomlplusplus::tomlplusplus
 )

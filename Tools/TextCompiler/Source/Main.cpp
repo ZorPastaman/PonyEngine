@@ -7,11 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include <cstdlib>
+
 #include "toml++/toml.hpp"
 
 import std;
 
 import PonyTools.DepFile;
+import PonyTools.FileSystem;
 
 /// @brief Parsed load command.
 struct LoadCommand final
@@ -97,19 +100,6 @@ void CompileData(std::string_view inputPath, std::string_view outputPath, const 
 /// @param params Load parameters.
 void CompileLoad(std::string_view outputPath, const LoadParams& params);
 
-/// @brief Opens an input file.
-/// @param path File path.
-/// @param openMode Open mode.
-/// @return Input file stream.
-[[nodiscard("Pure function")]]
-std::ifstream OpenInput(std::string_view path, std::ios::openmode openMode = 0);
-/// @brief Opens an output file.
-/// @param path File path.
-/// @param openMode Open mode.
-/// @return Output file stream.
-[[nodiscard("Pure function")]]
-std::ofstream OpenOutput(std::string_view path, std::ios::openmode openMode = 0);
-
 /// @brief Reads data parameters.
 /// @param path Data parameter file path.
 /// @return Data parameters.
@@ -145,15 +135,15 @@ int main(const int argc, const char* const argv[])
 	catch (const std::exception& e)
 	{
 		std::println(std::cerr, "Exception of type '{}': '{}'.", typeid(e).name(), e.what());
-		return 1;
+		return EXIT_FAILURE;
 	}
 	catch (...)
 	{
 		std::println(std::cerr, "Unexpected exception.");
-		return 1;
+		return EXIT_FAILURE;
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 Command ParseCommandLine(const int argc, const char* const argv[])
@@ -346,14 +336,19 @@ void WriteDepFile(const Command& command)
 	for (const LoadCommand& loadCommand : command.loadCommands)
 	{
 		depRule.AddTarget(std::filesystem::path(loadCommand.output));
-		depRule.AddDependency(std::filesystem::path(loadCommand.params));
+
+		auto params = std::filesystem::path(loadCommand.params);
+		if (!depRule.HasDependency(params))
+		{
+			depRule.AddDependency(std::move(params));
+		}
 	}
 
 	if (Verbose) [[unlikely]]
 	{
 		std::println("Writing to dep file at '{}'.", command.depFile);
 	}
-	std::ofstream depFile = OpenOutput(command.depFile, std::ios::trunc);
+	std::ofstream depFile = PonyTools::FileSystem::OpenOutput(command.depFile, std::ios::trunc);
 	depData.Write(depFile);
 }
 
@@ -373,13 +368,13 @@ void CompileData(const std::string_view inputPath, const std::string_view output
 	{
 		std::println("Opening data input file at '{}'.", inputPath);
 	}
-	std::ifstream input = OpenInput(inputPath);
+	std::ifstream input = PonyTools::FileSystem::OpenInput(inputPath);
 
 	if (Verbose) [[unlikely]]
 	{
 		std::println("Opening data output file at '{}'.", outputPath);
 	}
-	std::ofstream output = OpenOutput(outputPath, std::ios::binary | std::ios::trunc);
+	std::ofstream output = PonyTools::FileSystem::OpenOutput(outputPath, std::ios::binary | std::ios::trunc);
 
 	auto data = std::string(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>());
 
@@ -406,7 +401,7 @@ void CompileLoad(const std::string_view outputPath, const LoadParams& params)
 	{
 		std::println("Opening load output file at '{}'.", outputPath);
 	}
-	std::ofstream output = OpenOutput(outputPath, std::ios::binary | std::ios::trunc);
+	std::ofstream output = PonyTools::FileSystem::OpenOutput(outputPath, std::ios::binary | std::ios::trunc);
 
 	output.write(LoadMagicWord.data(), LoadMagicWord.size());
 
@@ -415,30 +410,6 @@ void CompileLoad(const std::string_view outputPath, const LoadParams& params)
 	
 	const std::uint8_t directResourceAccess = params.directResourceAccess;
 	output.write(reinterpret_cast<const char*>(&directResourceAccess), sizeof(directResourceAccess));
-}
-
-std::ifstream OpenInput(const std::string_view path, const std::ios::openmode openMode)
-{
-	const auto inputPath = std::filesystem::absolute(std::filesystem::path(path)).lexically_normal();
-	auto input = std::ifstream(inputPath, openMode);
-	if (!input) [[unlikely]]
-	{
-		throw std::runtime_error(std::format("Failed to open input file at path '{}'", inputPath.string()));
-	}
-
-	return input;
-}
-
-std::ofstream OpenOutput(const std::string_view path, const std::ios::openmode openMode)
-{
-	const auto outputPath = std::filesystem::absolute(std::filesystem::path(path)).lexically_normal();
-	auto output = std::ofstream(outputPath, openMode);
-	if (!output) [[unlikely]]
-	{
-		throw std::runtime_error(std::format("Failed to open output file at path '{}'", outputPath.string()));
-	}
-
-	return output;
 }
 
 DataParams ReadDataParams(const std::string_view path)

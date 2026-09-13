@@ -7,6 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include <cstdlib>
+
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
@@ -26,11 +28,11 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 	catch (const std::exception& e)
 	{
 		MessageBoxA(nullptr, std::format("{}:\n{}", typeid(e).name(), e.what()).c_str(), "Exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
-		return -1;
+		return EXIT_FAILURE;
 	}
 	catch (...)
 	{
 		MessageBoxA(nullptr, "Unexpected exception", "Unexpected exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
-		return -1;
+		return EXIT_FAILURE;
 	}
 }

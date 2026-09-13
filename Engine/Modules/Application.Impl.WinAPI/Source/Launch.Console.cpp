@@ -7,6 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include <cstdlib>
+
 import std;
 
 import PonyEngine.Application.Impl.WinAPI;
@@ -20,11 +22,11 @@ int main(const int argc, const char* const argv[])
 	catch (const std::exception& e)
 	{
 		std::println(std::cerr, "{}:\n{}", typeid(e).name(), e.what());
-		return -1;
+		return EXIT_FAILURE;
 	}
 	catch (...)
 	{
 		std::println(std::cerr, "Unexpected exception");
-		return -1;
+		return EXIT_FAILURE;
 	}
 }

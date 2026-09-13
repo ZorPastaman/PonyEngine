@@ -29,16 +29,16 @@ You also would like to use `-d` to make CMake or other tool to track dependencie
 
 TOML layout:
 
-| Field name         | Type   | Description                                                        |
-|:-------------------|:-------|:-------------------------------------------------------------------|
-| schema             | string | Must be `PonyEngine/Resource/Text/Data/v0`                         |
-| removeFinalNewLine | bool   | Optional. If true, the final new line in the data will be removed. |
+| Field name         | Type   | Default value | Description                                              |
+|:-------------------|:-------|:--------------|:---------------------------------------------------------|
+| schema             | string | N/A           | Must be `PonyEngine/Resource/Text/Data/v0`.              |
+| removeFinalNewLine | bool   | true          | If true, the final new line in the data will be removed. |
 
 ## Load parameters
 
 TOML layout:
 
-| Field name           | Type   | Description                                                      |
-|:---------------------|:-------|:-----------------------------------------------------------------|
-| schema               | string | Must be `PonyEngine/Resource/Text/Load/v0`                       |
-| directResourceAccess | bool   | Optional. Corresponds to direct resouce access in the load meta. |
+| Field name           | Type   | Default value | Description                                            |
+|:---------------------|:-------|:--------------|:-------------------------------------------------------|
+| schema               | string | N/A           | Must be `PonyEngine/Resource/Text/Load/v0`.            |
+| directResourceAccess | bool   | false         | Corresponds to direct resouce access in the load meta. |
