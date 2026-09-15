@@ -9,7 +9,7 @@ It consists of two files:
 1. Data - contains resource data and data meta
 2. Load - contains resource load meta
 
-Both files are binary.
+Both files are binary and optimized for a host platform.
 
 One resource may have many load files but only one data file.
 

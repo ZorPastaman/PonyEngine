@@ -4,6 +4,8 @@ include("CMake/Target.cmake")
 include("CMake/Path.cmake")
 include("CMake/Project.cmake")
 
+include("CMake/TextCompiler.cmake")
+
 set(PONY_COMPANY_NAME "PonyEngine" CACHE STRING "Company name. It's used to create project folders. So, it must be a valid directory name.")
 set(PONY_PROJECT_NAME "PonyEngineGame" CACHE STRING "Project name. It's used to create project folders. So, it must be a valid directory name. It's also used for an executable name.")
 set(PONY_PROJECT_VERSION_MAJOR "0" CACHE STRING "Project major version.")

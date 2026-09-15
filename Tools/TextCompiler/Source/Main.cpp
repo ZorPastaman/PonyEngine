@@ -126,7 +126,7 @@ int main(const int argc, const char* const argv[])
 		PrintHowToUse(command);
 		PrintHelp(command);
 
-		if (!command.input.empty()) [[likely]]
+		if (!command.output.empty()) [[likely]]
 		{
 			WriteDepFile(command);
 			Compile(command);
@@ -257,24 +257,10 @@ Command ParseCommandLine(const int argc, const char* const argv[])
 		}
 	}
 
-	if (!command.input.empty()) [[likely]]
+	const std::uint8_t mainParamCount = !command.input.empty() + !command.params.empty() + !command.output.empty() + !command.loadCommands.empty();
+	if (mainParamCount != 0u && mainParamCount != 4u) [[unlikely]]
 	{
-		if (command.params.empty()) [[unlikely]]
-		{
-			throw std::invalid_argument("Data params file not set");
-		}
-		if (command.output.empty()) [[unlikely]]
-		{
-			throw std::invalid_argument("Data output file not set");
-		}
-		if (command.loadCommands.empty()) [[unlikely]]
-		{
-			throw std::invalid_argument("No load command set");
-		}
-	}
-	else if (Verbose) [[unlikely]]
-	{
-		std::println("No input file set - compilation will be skipped.");
+		throw std::invalid_argument("Invalid argument set");
 	}
 
 	return command;

@@ -22,8 +22,8 @@ Layout:
 | 30                                                        | Magic word. Must be `PonyEngineResourcePackManifest`.                                                                             |
 | sizeof(std::size_t)                                       | Resource type count.                                                                                                              |
 | sizeof(std::size_t)                                       | Resource data meta count.                                                                                                         |
-| sizeof(std::size_t)                                       | Load meta count.                                                                                                                  |
-| sizeof(std::size_t)                                       | Range count.                                                                                                                      |
+| sizeof(std::size_t)                                       | Resource load meta count.                                                                                                         |
+| sizeof(std::size_t)                                       | Resource range count.                                                                                                             |
 | 1 * resource type count                                   | Resource type size array.                                                                                                         |
 | sizeof(std::size_t) * resource data meta count            | Resource data meta size array.                                                                                                    |
 | sizeof(std::size_t) * resource load meta count            | Resource load meta size array.                                                                                                    |

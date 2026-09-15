@@ -7,7 +7,7 @@ target_sources(PonyTools.ResourcePacker PRIVATE
 )
 
 target_sources(PonyTools.ResourcePacker PRIVATE FILE_SET CXX_MODULES FILES
-	"Source/Manifest.cppm"
+	"Source/PackManifest.cppm"
 )
 
 target_compile_definitions(PonyTools.ResourcePacker PRIVATE

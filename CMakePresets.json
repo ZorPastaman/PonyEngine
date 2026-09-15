@@ -5,10 +5,7 @@
 			"name": "Base",
 			"hidden": true,
 			"binaryDir": "${sourceDir}/Build/${presetName}",
-			"installDir": "${sourceDir}/Install/${presetName}",
-			"cacheVariables": {
-				"PONY_TOOLS_INSTALL_DIR": "${sourceDir}/Install/Tools"
-			}
+			"installDir": "${sourceDir}/Install/${presetName}"
 		},
 		{
 			"name": "Runtime",

@@ -41,7 +41,7 @@ export namespace PonyEngine::Log::File
 namespace PonyEngine::Log::File
 {
 	FileLogger::FileLogger(const std::filesystem::path& path) :
-		logFile(path)
+		logFile(path, std::ios::trunc)
 	{
 		if (!logFile) [[unlikely]]
 		{
