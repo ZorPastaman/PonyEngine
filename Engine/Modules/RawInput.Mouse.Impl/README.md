@@ -1,6 +1,8 @@
-# PonyEngine.RawInput.Mouse.Impl module
+# PonyEngine.RawInput.Mouse.Impl feature module
 
 Raw input mouse provider module. It reads mouse input and pushes it into a raw input service.
+
+Adds `PonyEngine.RawInput.Mouse.Impl` target as a static library.
 
 The module requires a platform specific implementation.
 
@@ -14,8 +16,6 @@ The module requires a platform specific implementation.
 
 The module contains some utilities that can be useful for mouse implementations on any platform:
 
-- [MouseAxis](Source/Main-MouseAxis.cppm);
-- [MouseAxisMap](Source/Main-MouseAxisMap.cppm);
-- [MouseContainer](Source/Main-MouseContainer.cppm);
-- [MouseEvent](Source/Main-MouseEvent.cppm);
-- [MouseEventQueue](Source/Main-MouseEventQueue.cppm).
+- [MouseAxis](Source/Mouse-MouseAxis.cppm);
+- [MouseAxisMap](Source/Mouse-MouseAxisMap.cppm);
+- [MouseController](Source/Mouse-MouseController.cppm).

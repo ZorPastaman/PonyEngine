@@ -11,7 +11,7 @@ export module PonyEngine.Math:Intersections;
 
 import std;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :Ball;
 import :Bounds;
@@ -482,7 +482,7 @@ export namespace PonyEngine::Math
 	/// @param lhs Left box.
 	/// @param rhs Right box.
 	/// @return @a True if they are intersecting; @a false otherwise.
-	template<Type::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
+	template<Utility::Arithmetic T, std::size_t Size> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Box<T, Size>& lhs, const Box<T, Size>& rhs) noexcept requires (Size >= 1);
 	/// @brief Checks if the ray and the box are intersecting.
 	/// @tparam Mode Ray intersection mode.
@@ -1006,7 +1006,7 @@ namespace PonyEngine::Math
 		return (delta - point).MagnitudeSquared() <= ball.Radius() * ball.Radius();
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr bool AreIntersecting(const Box<T, Size>& lhs, const Box<T, Size>& rhs) noexcept requires (Size >= 1)
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)

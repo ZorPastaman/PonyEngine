@@ -128,12 +128,10 @@ public:
 	{
 		auto it = context.begin();
 
-#ifndef NDEBUG
 		if (it == context.end()) [[unlikely]]
 		{
 			throw std::format_error("Unexpected context end");
 		}
-#endif
 
 		for (; *it != '}'; ++it)
 		{
@@ -156,19 +154,11 @@ public:
 					numbers = 4;
 					break;
 				default: [[unlikely]]
-#ifndef NDEBUG
 					throw std::format_error("Unexpected version number count specifier");
-#else
-					break;
-#endif
 				}
 				break;
 			default: [[unlikely]]
-#ifndef NDEBUG
 				throw std::format_error("Unexpected format specifier");
-#else
-				break;
-#endif
 			}
 		}
 

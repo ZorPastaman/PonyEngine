@@ -7,16 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/LoggerModule.h"
+#include "PonyEngine/Log/LogServiceModule.h"
 
-import PonyEngine.Application.Ext;
 import PonyEngine.Log.Impl;
 
 namespace PonyEngine::Log
 {
-	Application::IModule* GetLoggerModule()
+	std::shared_ptr<Application::IModule> CreateLogServiceModule()
 	{
-		static LoggerModule loggerModule;
-		return &loggerModule;
+		return std::make_shared<LogServiceModule>();
 	}
 }

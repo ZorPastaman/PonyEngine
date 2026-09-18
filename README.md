@@ -23,8 +23,7 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 
 ### Simple way
 
-1. Download any sample project from [here](Samples);
-2. Follow instructions of the chosen sample.
+TODO: reference samples
 
 ### Advanced way
 
@@ -47,10 +46,7 @@ FetchContent_MakeAvailable(PonyEngineTools)
 #### Build runtime (build for a target platform)
 
 1. Build C++ std module;
-2. Set a path to the build tools:
-```
-set(PONY_TOOLS_INSTALL_DIR <path_to_tools>)
-```
+2. Add a path to build tools to environment;
 3. Add the engine runtime as a dependency to your CMake project. Add this to your project `CMakeLists.txt`:
 ```
 set(PONY_BUILD_MODE "Runtime")
@@ -80,9 +76,9 @@ There are these module types:
 | Extension API  | .Ext        | Modules that contain interfaces for extensions of implementation modules. They also may contain some utilities.              |
 
 The engine runtime is built around services.
-Modules register services in a global application context, and the application ticks them every frame.
+Modules register services in a global application, and the application ticks them every frame.
 Services interact with each other via interfaces only.
-See more in the [Application.Ext](Modules/Application.Ext) readme.
+See more in the [Application](Modules/Application) readme.
 
 The key idea behind cross-service interaction is strict separation of interfaces and implementations.
 Services communicate only through interfaces, while implementations live in separate modules.
@@ -148,10 +144,7 @@ This section is intended for Pony Engine developers and developers of its forks.
 ### Presets
 
 The repo uses CMake presets to control build pipelines. The presets are chosen based on the target platform, compiler, and engine build type.
-The engine build type determines `CMAKE_BUILD_TYPE`, engine optimization level, game optimization level, engine log level, game log level, and some other flags.
-
-Presets use different toolchains for each platform–compiler combination. The toolchains must set required variables, compile and link flags, and provide functions to control them.
-Each toolchain must define `PONY_COMPILE_FLAGS_DEBUG`, `PONY_COMPILE_FLAGS_RELEASE`, `PONY_LINK_FLAGS_DEBUG`, and `PONY_LINK_FLAGS_RELEASE`, and include [Compiler.cmake](CMake/Toolchains/Compiler.cmake).
+The engine build type determines `CMAKE_BUILD_TYPE`, engine optimization level, engine log level and some other flags.
 
 #### Windows MSVC toolchain
 
@@ -163,9 +156,3 @@ Refer to Microsoft documentation: https://learn.microsoft.com/en-us/cpp/build/bu
 The repo uses Catch2 for unit tests with CMake integration. See the [Tests](Tests) section to find the tests.
 
 The repo uses Catch2 benchmark tools as well. The benchmarks are compiled and run only if the `PONY_ENGINE_TESTING_BENCHMARK` define is set to `true`.
-
-### Games
-
-The engine testing can be easier if you build one of game samples to the engine build.
-To add it, set `PONY_ENGINE_ADD_GAME` CMake variable to `true` and `PONY_ENGINE_GAME_NAME` to a name of game sample.
-The presets already have them.

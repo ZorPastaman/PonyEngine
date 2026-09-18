@@ -11,7 +11,7 @@ export module PonyEngine.Math:Bounds;
 
 import std;
 
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 import :Ball;
 import :Box;
@@ -50,7 +50,7 @@ export namespace PonyEngine::Math
 	/// @tparam Size Dimension.
 	/// @param points Points to bound.
 	/// @return Axis-aligned bounding box.
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Box<T, Size> AxisAlignedBoundingBox(std::span<const Vector<T, Size>> points) noexcept requires (Size >= 1);
 	/// @brief Converts the bounding ball to an axis-aligned bounding box.
 	/// @tparam T Component type.
@@ -158,7 +158,7 @@ namespace PonyEngine::Math
 		return Ball<T, Size>(box.Center(), std::nextafter(box.Extents().Magnitude(), std::numeric_limits<T>::max()));
 	}
 
-	template<Type::Arithmetic T, std::size_t Size>
+	template<Utility::Arithmetic T, std::size_t Size>
 	constexpr Box<T, Size> AxisAlignedBoundingBox(const std::span<const Vector<T, Size>> points) noexcept requires (Size >= 1)
 	{
 		if (points.size() == 0uz) [[unlikely]]

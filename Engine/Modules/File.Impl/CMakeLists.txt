@@ -1,29 +1,20 @@
-message(STATUS "Configuring PonyEngine.File.Impl")
+message(STATUS "Configuring PonyEngine.File.Impl feature module")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.File.Impl STATIC)
 
 target_sources(PonyEngine.File.Impl PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-FileInfo.cppm"
-	"Source/Main-ReadRequest.cppm"
-	"Source/Main-Request.cppm"
-	"Source/Main-RequestVariant.cppm"
-	"Source/Main-WriteRequest.cppm"
+	"Source/File.cppm"
+	"Source/File-FileInfo.cppm"
+	"Source/File-ReadRequest.cppm"
+	"Source/File-Request.cppm"
+	"Source/File-WriteRequest.cppm"
 )
 
-message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.File.Impl PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.File.Impl PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
-if(NOT TARGET PonyEngine.File)
-	message(FATAL_ERROR "PonyEngine.File wasn't configured")
-endif()
 target_link_libraries(PonyEngine.File.Impl PRIVATE
-	PonyEngine.File
 	PonyEngine.Core
+	PonyEngine.File
 )

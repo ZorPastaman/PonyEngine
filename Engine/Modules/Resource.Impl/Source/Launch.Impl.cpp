@@ -9,14 +9,12 @@
 
 #include "PonyEngine/Resource/ResourceServiceModule.h"
 
-import PonyEngine.Application.Ext;
 import PonyEngine.Resource.Impl;
 
 namespace PonyEngine::Resource
 {
-	Application::IModule* GetResourceServiceModule()
+	std::shared_ptr<Application::IModule> CreateResourceServiceModule()
 	{
-		static ResourceServiceModule resourceServiceModule;
-		return &resourceServiceModule;
+		return std::make_shared<ResourceServiceModule>();
 	}
 }

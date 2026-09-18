@@ -1,0 +1,559 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include <cassert>
+
+#include "PonyEngine/Log/Log.h"
+#include "PonyEngine/Macro/Text.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <avrt.h>
+#include <KnownFolders.h>
+
+export module PonyEngine.Application.Impl.WinAPI:Process;
+
+import std;
+
+import PonyEngine.Application.Impl;
+import PonyEngine.Chrono;
+import PonyEngine.FileSystem.WinAPI;
+import PonyEngine.Log;
+
+import :ThreadRole;
+
+export namespace PonyEngine::Application
+{
+	/// @brief Windows process.
+	class Process : private IProcess
+	{
+	public:
+		Process(const Process&) = delete;
+		Process(Process&&) = delete;
+
+		virtual ~Process() noexcept = default;
+
+		/// @brief Runs the process.
+		/// @return Exit code.
+		[[nodiscard("Must be returned from main")]]
+		int Run();
+
+		Process& operator =(const Process&) = delete;
+		Process& operator =(Process&&) = delete;
+
+	protected:
+		/// @brief Creates a process.
+		/// @param commandLine Command line.
+		[[nodiscard("Pure constructor")]]
+		explicit Process(std::span<const std::string_view> commandLine);
+
+		/// @brief Creates and/or sets up a console.
+		virtual void CreateConsole() noexcept {}
+		/// @brief Destroys a console.
+		virtual void DestroyConsole() noexcept {}
+
+		/// @brief Adds the process interfaces to the application.
+		virtual void AddProcessInterfaces() {}
+		/// @brief Removes the process interfaces from the application.
+		virtual void RemoveProcessInterfaces() {}
+
+		/// @brief Ticks the platform.
+		/// @return Exit code or nullopt if the process shouldn't exit.
+		[[nodiscard("Must be used")]]
+		virtual void TickPlatform() = 0;
+
+		/// @brief Gets the application.
+		/// @return Application.
+		[[nodiscard("Pure function")]]
+		App& Application() const noexcept;
+
+	private:
+		[[nodiscard("Pure function")]] 
+		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params) override final;
+
+		/// @brief Gets a list of thread roles.
+		/// @return Thread roles.
+		[[nodiscard("Pure function")]]
+		static std::vector<std::string_view> GetThreadRoles();
+
+		/// @brief Gets a path to the executable.
+		/// @return Path to the executable.
+		[[nodiscard("Pure function")]]
+		static std::filesystem::path GetExecutablePath();
+		/// @brief Gets a path to the project local data directory.
+		/// @return Path to the project local data directory.
+		[[nodiscard("Pure function")]]
+		static std::filesystem::path GetLocalDataDirectory();
+		/// @brief Gets a path to the project user data directory.
+		/// @return Path to the project user data directory.
+		[[nodiscard("Pure function")]]
+		static std::filesystem::path GetUserDataDirectory();
+		/// @brief Gets a path to the project temp data directory.
+		/// @return Path to the project temp data directory.
+		[[nodiscard("Pure function")]]
+		static std::filesystem::path GetTempDataDirectory();
+
+		/// @brief Sets this process priority.
+		void SetProcessPriority() const noexcept;
+
+		/// @brief Finds a thread role.
+		/// @param role Thread role name. Empty means no role.
+		/// @return Thread role. Nullptr if the @p role is empty.
+		[[nodiscard("Pure function")]]
+		static const ThreadRole* FindThreadRole(std::string_view role);
+		/// @brief Sets the thread priority.
+		/// @param thread Thread handle.
+		/// @param threadPriority Thread priority.
+		static void SetThreadPriority(HANDLE thread, int threadPriority);
+		/// @brief Sets the thread MMCSS task.
+		/// @param thread Thread handle.
+		/// @param mmcssTask MMCSS task.
+		/// @return MMCSS handle.May be nullptr. If it's not nullptr, you must call @p RevertMMCSS on the caller thread before setting another role or thread destruction.
+		[[nodiscard("Must be used")]]
+		static HANDLE SetThreadMMCSS(HANDLE thread, std::string_view mmcssTask);
+		/// @brief Sets the MMCSS priority.
+		/// @param mmcssHandle MMCSS handle.
+		/// @param mmcssPriority MMCSS priority.
+		static void SetThreadMMCSSPriority(HANDLE mmcssHandle, AVRT_PRIORITY mmcssPriority);
+		/// @brief Reverts the MMCSS task.
+		/// @param mmcssHandle MMCSS handle. May be nullptr.
+		static void RevertThreadMMCSS(HANDLE mmcssHandle);
+
+		/// @brief Initializes the application.
+		void Initialize();
+		/// @brief Finalizes the application.
+		void Finalize();
+		/// @brief Runs the main loop.
+		/// @return Exit code.
+		[[nodiscard("Pure function")]]
+		int RunMainLoop();
+
+		/// @brief Logs basic info.
+		void LogProcessBasicInfo() const noexcept;
+
+		/// @brief Sets the main thread role.
+		void SetMainThreadRole();
+		/// @brief Reverts the main thread mmcss if it's set.
+		void RevertMainThreadMmcss() noexcept;
+
+		/// @brief Creates a main loop timer.
+		void CreateMainLoopTimer() noexcept;
+		/// @brief Destroys a main loop timer.
+		void DestroyMainLoopTimer() noexcept;
+		/// @brief Waits for the next frame to start.
+		void WaitForNextFrame() const noexcept;
+
+		HANDLE mainThreadMmcss; ///< Main thread mmcss.
+		HANDLE mainThreadTimer; ///< Main loop timer handle.
+
+		std::unique_ptr<App> application; ///< Application.
+	};
+}
+
+namespace PonyEngine::Application
+{
+	Process::Process(const std::span<const std::string_view> commandLine) :
+		mainThreadMmcss{nullptr},
+		mainThreadTimer{nullptr},
+		application(std::make_unique<App>(commandLine, GetThreadRoles(), GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), GetTempDataDirectory(), 
+			static_cast<IProcess&>(*this)))
+	{
+	}
+
+	int Process::Run()
+	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Wrong thread.");
+
+		int exitCode;
+
+		Initialize();
+
+		try
+		{
+			exitCode = RunMainLoop();
+		}
+		catch (...)
+		{
+			Finalize();
+			throw;
+		}
+
+		Finalize();
+
+		return exitCode;
+	}
+
+	App& Process::Application() const noexcept
+	{
+		return *application;
+	}
+
+	std::thread Process::CreateThread(std::move_only_function<void()> func, ThreadParams params)
+	{
+		const ThreadRole* const threadRole = FindThreadRole(params.role);
+		if (!threadRole)
+		{
+			return std::thread(std::move(func));
+		}
+
+		return std::thread([f = std::move(func), beginError = std::move(params.onBeginException), endError = std::move(params.onEndException), role = threadRole]() mutable
+		{
+			HANDLE mmcssHandle = nullptr;
+			bool execute = true;
+
+			try
+			{
+				const HANDLE threadHandle = GetCurrentThread();
+				SetThreadPriority(threadHandle, role->threadPriority);
+				mmcssHandle = SetThreadMMCSS(threadHandle, role->mmcssTask);
+				if (mmcssHandle)
+				{
+					SetThreadMMCSSPriority(mmcssHandle, role->mmcssPriority);
+				}
+			}
+			catch (...)
+			{
+				if (beginError)
+				{
+					execute = beginError(std::current_exception());
+				}
+			}
+
+			if (execute) [[likely]]
+			{
+				f();
+			}
+
+			if (mmcssHandle)
+			{
+				try
+				{
+					RevertThreadMMCSS(mmcssHandle);
+				}
+				catch (...)
+				{
+					if (endError)
+					{
+						endError(std::current_exception());
+					}
+				}
+			}
+		});
+	}
+
+	std::vector<std::string_view> Process::GetThreadRoles()
+	{
+		constexpr auto roleView = std::views::keys(ThreadRoles);
+		return std::vector<std::string_view>(roleView.cbegin(), roleView.cend());
+	}
+
+	std::filesystem::path Process::GetExecutablePath()
+	{
+		return FileSystem::GetModulePath(nullptr).lexically_normal();
+	}
+
+	std::filesystem::path Process::GetLocalDataDirectory()
+	{
+		return AddTail(FileSystem::GetKnownPath(FOLDERID_LocalAppData));
+	}
+
+	std::filesystem::path Process::GetUserDataDirectory()
+	{
+		return AddTail(FileSystem::GetKnownPath(FOLDERID_SavedGames));
+	}
+
+	std::filesystem::path Process::GetTempDataDirectory()
+	{
+		return AddTail(FileSystem::GetTemporaryPath());
+	}
+
+	void Process::SetProcessPriority() const noexcept
+	{
+		PONY_LOG(application->LogService(), Log::LogType::Info, "Setting process priority. Priority: '{}'.", PONY_ENGINE_APPLICATION_PROCESS_PRIORITY);
+		if (!SetPriorityClass(GetCurrentProcess(), PONY_ENGINE_APPLICATION_PROCESS_PRIORITY)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "Failed to set process priority. ErrorCode: '0x{:X}'.", GetLastError());
+		}
+	}
+
+	const ThreadRole* Process::FindThreadRole(const std::string_view role)
+	{
+		if (role.empty())
+		{
+			return nullptr;
+		}
+
+		const auto roleDesc = ThreadRoles.find(role);
+		if (roleDesc == ThreadRoles.cend()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid role");
+		}
+
+		return &roleDesc->second;
+	}
+
+	void Process::SetThreadPriority(const HANDLE thread, const int threadPriority)
+	{
+		if (!::SetThreadPriority(thread, threadPriority)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to set thread priority. Priority: '0x{:X}'; Error code: '0x{:X}'", threadPriority, GetLastError()));
+		}
+	}
+
+	HANDLE Process::SetThreadMMCSS(const HANDLE thread, const std::string_view mmcssTask)
+	{
+		if (mmcssTask.empty())
+		{
+			return nullptr;
+		}
+
+		DWORD index = 0;
+		const HANDLE mmcssHandle = AvSetMmThreadCharacteristicsA(mmcssTask.data(), &index);
+		if (!mmcssHandle) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to set mmcss thread task. Task: '{}'; Error code: '0x{:X}'", mmcssTask, GetLastError()));
+		}
+
+		return mmcssHandle;
+	}
+
+	void Process::SetThreadMMCSSPriority(const HANDLE mmcssHandle, const AVRT_PRIORITY mmcssPriority)
+	{
+		if (!AvSetMmThreadPriority(mmcssHandle, mmcssPriority)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to set mmcss thread priority. TaskHandle: '0x{:X}'; Priority: '{}'; Error code: '0x{:X}'",
+				reinterpret_cast<std::uintptr_t>(mmcssHandle), std::to_underlying(mmcssPriority), GetLastError()));
+		}
+	}
+
+	void Process::RevertThreadMMCSS(const HANDLE mmcssHandle)
+	{
+		if (!mmcssHandle)
+		{
+			return;
+		}
+
+		if (!AvRevertMmThreadCharacteristics(mmcssHandle)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to revert mmcss task. Error code: '0x{:X}'", GetLastError()));
+		}
+	}
+
+	void Process::Initialize()
+	{
+		application->InitializeEarly();
+		CreateConsole();
+		LogProcessBasicInfo();
+		SetProcessPriority();
+		try
+		{
+			SetMainThreadRole();
+			CreateMainLoopTimer();
+			try
+			{
+				AddProcessInterfaces();
+				try
+				{
+					application->InitializeNormal();
+					try
+					{
+						application->InitializeLate();
+					}
+					catch (...)
+					{
+						application->FinalizeNormal();
+						throw;
+					}
+				}
+				catch (...)
+				{
+					RemoveProcessInterfaces();
+					throw;
+				}
+			}
+			catch (...)
+			{
+				DestroyMainLoopTimer();
+				RevertMainThreadMmcss();
+				throw;
+			}
+		}
+		catch (...)
+		{
+			DestroyConsole();
+			application->FinalizeEarly();
+			throw;
+		}
+	}
+
+	void Process::Finalize()
+	{
+		application->FinalizeLate();
+		application->FinalizeNormal();
+		RemoveProcessInterfaces();
+		DestroyMainLoopTimer();
+		RevertMainThreadMmcss();
+		DestroyConsole();
+		application->FinalizeEarly();
+	}
+
+	int Process::RunMainLoop()
+	{
+		std::optional<int> exitCode;
+
+		application->Begin();
+
+		try
+		{
+			do
+			{
+				WaitForNextFrame();
+				application->BeginFrame();
+				TickPlatform();
+				application->Tick();
+				application->EndFrame();
+				exitCode = application->ExitCode();
+			} while (!exitCode);
+		}
+		catch (...)
+		{
+			application->End();
+			throw;
+		}
+
+		application->End();
+
+		return *exitCode;
+	}
+
+	void Process::LogProcessBasicInfo() const noexcept
+	{
+		application->LogBasicInfo();
+		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
+
+		PONY_LOG(application->LogService(), Log::LogType::Info, "Thread roles:");
+		for (const auto& [role, threadRole] : ThreadRoles)
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Info, "Role: '{}'; Priority: '{}'; MMCSS task: '{}'; MMCSS task priority: '{}'.",
+				role, threadRole.threadPriority, threadRole.mmcssTask, std::to_underlying(threadRole.mmcssPriority));
+		}
+	}
+
+	void Process::SetMainThreadRole()
+	{
+		constexpr std::string_view mainThreadRole = PONY_STRINGIFY_VALUE(PONY_ENGINE_APPLICATION_MAIN_THREAD_ROLE);
+
+		PONY_LOG(application->LogService(), Log::LogType::Info, "Setting main thread role. Role: '{}'.", mainThreadRole);
+		try
+		{
+			if (const ThreadRole* const role = FindThreadRole(mainThreadRole))
+			{
+				try
+				{
+					const HANDLE threadHandle = GetCurrentThread();
+					SetThreadPriority(threadHandle, role->threadPriority);
+					mainThreadMmcss = SetThreadMMCSS(threadHandle, role->mmcssTask);
+					if (mainThreadMmcss)
+					{
+						SetThreadMMCSSPriority(mainThreadMmcss, role->mmcssPriority);
+					}
+				}
+				catch (...)
+				{
+					PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On setting main thread role.");
+				}
+			}
+		}
+		catch (...)
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On setting main thread role.");
+			throw;
+		}
+	}
+
+	void Process::RevertMainThreadMmcss() noexcept
+	{
+		if (mainThreadMmcss)
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Info, "Reverting main thread mmcss.");
+			try
+			{
+				RevertThreadMMCSS(mainThreadMmcss);
+			}
+			catch (...)
+			{
+				PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On reverting main thread MMCSS.");
+			}
+			mainThreadMmcss = nullptr;
+		}
+	}
+
+	void Process::CreateMainLoopTimer() noexcept
+	{
+		PONY_LOG(application->LogService(), Log::LogType::Info, "Creating main loop timer.");
+
+		mainThreadTimer = CreateWaitableTimerExA(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
+		if (!mainThreadTimer) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to create main loop timer. Error code: '0x{:X}'.", GetLastError());
+		}
+	}
+
+	void Process::DestroyMainLoopTimer() noexcept
+	{
+		if (mainThreadTimer) [[likely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Info, "Destroying main loop timer.");
+
+			if (!CloseHandle(mainThreadTimer)) [[unlikely]]
+			{
+				PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to destroy main loop timer. Error code: '0x{:X}'.", GetLastError());
+			}
+
+			mainThreadTimer = nullptr;
+		}
+	}
+
+	void Process::WaitForNextFrame() const noexcept
+	{
+		if (!mainThreadTimer) [[unlikely]]
+		{
+			return;
+		}
+
+		constexpr std::chrono::nanoseconds busySpinLength = Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH});
+		const std::chrono::time_point<std::chrono::steady_clock> nextFrameTimePoint = application->NextFrameTimePoint();
+		const std::chrono::time_point<std::chrono::steady_clock> waitTill = nextFrameTimePoint - busySpinLength;
+		const std::chrono::nanoseconds waitLength = std::chrono::duration_cast<std::chrono::nanoseconds>(waitTill - std::chrono::steady_clock::now());
+		const auto waitTime = LARGE_INTEGER{.QuadPart = -waitLength.count() / 100ll};
+		if (waitTime.QuadPart >= 0ll)
+		{
+			return;
+		}
+
+		if (!SetWaitableTimer(mainThreadTimer, &waitTime, 0, nullptr, nullptr, FALSE)) [[unlikely]]
+		{
+			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to set a high resolution waitable timer. Error code: '0x{:X}'.", GetLastError());
+		}
+		if (const DWORD result = WaitForSingleObject(mainThreadTimer, INFINITE); result != WAIT_OBJECT_0) [[unlikely]]
+		{
+			if (result == WAIT_FAILED)
+			{
+				PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to wait for a high resolution waitable timer. Error code: '0x{:X}'.", GetLastError());
+			}
+			else
+			{
+				PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to wait for a high resolution waitable timer. Result: '0x{:X}'.", result);
+			}
+		}
+	}
+}

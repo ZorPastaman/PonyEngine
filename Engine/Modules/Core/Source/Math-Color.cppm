@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Type/Enum.h"
+#include "PonyEngine/Utility/Enum.h"
 
 export module PonyEngine.Math:Color;
 
@@ -734,12 +734,10 @@ public:
 	{
 		auto it = context.begin();
 
-#ifndef NDEBUG
 		if (it == context.end()) [[unlikely]]
 		{
 			throw std::format_error("Unexpected context end");
 		}
-#endif
 
 		for (; *it != '}' && *it != ':'; ++it)
 		{
@@ -749,11 +747,7 @@ public:
 				colorName = true;
 				break;
 			default: [[unlikely]]
-#ifndef NDEBUG
 				throw std::format_error("Unexpected format specifier");
-#else
-				break;
-#endif
 			}
 		}
 

@@ -1,34 +1,19 @@
-message(STATUS "Configuring PonyEngine.Log.Ext")
+message(STATUS "Configuring PonyEngine.Log.Ext feature module")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.Log.Ext STATIC)
 
-message(VERBOSE "Configuring headers")
-target_include_directories(PonyEngine.Log.Ext PUBLIC
-	"Include/Public"
-)
-
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Ext PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-ILoggerContext.cppm"
-	"Source/Main-ILoggerModuleContext.cppm"
-	"Source/Main-ISubLogger.cppm"
-	"Source/Main-LogEntry.cppm"
-	"Source/Main-LogHelper.cppm"
-	"Source/Main-SubLoggerHandle.cppm"
+	"Source/Log.cppm"
+	"Source/Log-ILogger.cppm"
+	"Source/Log-ILogHub.cppm"
+	"Source/Log-LogEntry.cppm"
 )
 
-message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Log.Ext PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Log.Ext PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Ext PUBLIC
-	PonyEngine.Log
 	PonyEngine.Core
-	PonyEngine.Application.Ext
+	PonyEngine.Log
 )

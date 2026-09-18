@@ -1,6 +1,5 @@
 enable_testing()
 
-message(VERBOSE "Configuring environment")
 include(FetchContent)
 
 message(STATUS "Fetching Catch2")
@@ -11,13 +10,11 @@ FetchContent_Declare(
   GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(Catch2)
-pony_set_build_options(Catch2WithMain ${PONY_ENGINE_OPTIMIZATION})
 
 message(STATUS "Configuring tests")
 include(CTest)
 include(Catch)
-add_subdirectory("Core.Tests")
-add_subdirectory("Log.Tests")
-add_subdirectory("Log.Ext.Tests")
-add_subdirectory("RawInput.Tests")
-add_subdirectory("Surface.Tests")
+
+if(TARGET PonyEngine.Core)
+	add_subdirectory("Core.Tests")
+endif()

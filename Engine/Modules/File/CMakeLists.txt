@@ -1,33 +1,26 @@
-message(STATUS "Configuring PonyEngine.File")
+message(STATUS "Configuring PonyEngine.File feature module")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.File STATIC)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.File PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-FileAccess.cppm"
-	"Source/Main-FileFlag.cppm"
-	"Source/Main-FileOpenMode.cppm"
-	"Source/Main-FileParams.cppm"
-	"Source/Main-IFile.cppm"
-	"Source/Main-IFileService.cppm"
-	"Source/Main-IReadRequest.cppm"
-	"Source/Main-IRequest.cppm"
-	"Source/Main-IWriteRequest.cppm"
-	"Source/Main-ReadParams.cppm"
-	"Source/Main-RequestStatus.cppm"
-	"Source/Main-WriteParams.cppm"
+	"Source/File.cppm"
+	"Source/File-FileAccess.cppm"
+	"Source/File-FileFlag.cppm"
+	"Source/File-FileOpenMode.cppm"
+	"Source/File-FileParams.cppm"
+	"Source/File-IFile.cppm"
+	"Source/File-IFileService.cppm"
+	"Source/File-IReadRequest.cppm"
+	"Source/File-IRequest.cppm"
+	"Source/File-IWriteRequest.cppm"
+	"Source/File-ReadParams.cppm"
+	"Source/File-WriteParams.cppm"
 )
 
-message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.File PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.File PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.File PUBLIC
 	PonyEngine.Core
 )

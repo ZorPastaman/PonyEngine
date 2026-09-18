@@ -22,6 +22,10 @@
 #ifndef PONY_PRESERVE_IMPL
 #error "PONY_PRESERVE_IMPL macro not found!"
 #endif
+
+#ifndef PONY_SECTION_DELIMITER_IMPL
+#error "PONY_SECTION_DELIMITER_IMPL macro not found!"
+#endif
 #ifndef PONY_SECTION_IMPL
 #error "PONY_SECTION_IMPL macro not found!"
 #endif
@@ -40,6 +44,9 @@
 /// @brief Prevents a compiler from removing the symbol.
 /// @param symbol Symbol to preserve.
 #define PONY_PRESERVE(symbol) PONY_PRESERVE_IMPL(symbol)
+
+ /// @brief Section delimiter that is set between a section name and an order.
+#define PONY_SECTION_DELIMITER PONY_SECTION_DELIMITER_IMPL
 /// @brief Declares a section.
 /// @param name Section name.
 #define PONY_SECTION(name) PONY_SECTION_IMPL(name)

@@ -1,20 +1,23 @@
-message(STATUS "Configuring PonyEngine.Core")
+message(STATUS "Configuring PonyEngine.Core feature module")
 
-message(VERBOSE "Configuring environment")
 include("CMake/Target.cmake")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.Core STATIC)
 
-message(VERBOSE "Configuring headers")
 target_include_directories(PonyEngine.Core PUBLIC 
 	"Include/Public"
 )
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+	"Source/Async.cppm"
+	"Source/Async-IRequest.cppm"
+	"Source/Async-RequestStatus.cppm"
 	"Source/Chrono.cppm"
 	"Source/Chrono-Conversion.cppm"
+	"Source/Container.cppm"
+	"Source/Container-AlignedAllocator.cppm"
+	"Source/Format.cppm"
+	"Source/Format-Optional.cppm"
 	"Source/Hash.cppm"
 	"Source/Hash-FNV1a.cppm"
 	"Source/Math.cppm"
@@ -40,15 +43,11 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Memory-Utility.cppm"
 	"Source/Meta.cppm"
 	"Source/Meta-Version.cppm"
-	"Source/Type.cppm"
-	"Source/Type-Common.cppm"
-	"Source/Type-Limits.cppm"
-	"Source/Type-Variant.cppm"
+	"Source/Utility.cppm"
+	"Source/Utility-Concepts.cppm"
+	"Source/Utility-Overload.cppm"
 )
 
-message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Core PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Core PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )

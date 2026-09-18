@@ -1,37 +1,28 @@
-message(STATUS "Configuring PonyEngine.Resource.Ext")
+message(STATUS "Configuring PonyEngine.Resource.Ext feature module")
 
-message(VERBOSE "Configuring target")
 add_library(PonyEngine.Resource.Ext STATIC)
 
-message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Resource.Ext PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Main.cppm"
-	"Source/Main-IFileResourceData.cppm"
-	"Source/Main-ILoadableResourceData.cppm"
-	"Source/Main-IMemoryResourceData.cppm"
-	"Source/Main-IResourceContext.cppm"
-	"Source/Main-IResourceModuleContext.cppm"
-	"Source/Main-IResourceProvider.cppm"
-	"Source/Main-IResourceRegistry.cppm"
-	"Source/Main-ResourceHandle.cppm"
-	"Source/Main-ResourceParams.cppm"
-	"Source/Main-ResourceProviderHandle.cppm"
+	"Source/Resource.cppm"
+	"Source/Resource-CollectionResource.cppm"
+	"Source/Resource-IFileDataAccess.cppm"
+	"Source/Resource-ILoadableDataAccess.cppm"
+	"Source/Resource-ILoadableResource.cppm"
+	"Source/Resource-ILoadContext.cppm"
+	"Source/Resource-IMemoryDataAccess.cppm"
+	"Source/Resource-IResourceHub.cppm"
+	"Source/Resource-IResourceLoader.cppm"
+	"Source/Resource-IResourceLoadRequest.cppm"
+	"Source/Resource-IResourceProvider.cppm"
+	"Source/Resource-ResourceCollection.cppm"
+	"Source/Resource-ResourceType.cppm"
 )
 
-message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Resource.Ext PROPERTIES 
-	CXX_STANDARD 23
-	CXX_STANDARD_REQUIRED ON
+set_target_properties(PonyEngine.Resource.Ext PROPERTIES
 	POSITION_INDEPENDENT_CODE TRUE
 )
 
-message(VERBOSE "Configuring dependencies")
-if(NOT TARGET PonyEngine.Resource)
-	message(FATAL_ERROR "PonyEngine.Resource wasn't configured")
-endif()
 target_link_libraries(PonyEngine.Resource.Ext PUBLIC
-	PonyEngine.Resource
 	PonyEngine.Core
-	PonyEngine.Application.Ext
-	PonyEngine.Log
+	PonyEngine.Resource
 )
