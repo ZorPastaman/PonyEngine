@@ -190,7 +190,7 @@ namespace PonyEngine::File
 			throw std::runtime_error(std::format("Failed to create file iocp association: Error code = '0x{:X}'", GetLastError()));
 		}
 
-		PONY_LOG(logService, Log::LogType::Debug, "Associating file with iocp done. Handle: '0x{:X}; IOCP: '0x{:X}''.",
+		PONY_LOG(logService, Log::LogType::Debug, "Associating file with iocp done. Handle: '0x{:X}'; IOCP: '0x{:X}'.",
 			reinterpret_cast<std::uintptr_t>(file), reinterpret_cast<std::uintptr_t>(iocp));
 	}
 

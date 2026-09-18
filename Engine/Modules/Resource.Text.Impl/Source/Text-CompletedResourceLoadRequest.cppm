@@ -51,13 +51,15 @@ export namespace PonyEngine::Resource::Text
 
 	private:
 		std::shared_ptr<const TextResource> textResource; ///< Text resource.
+		const void* resourceInterface; ///< Resource interface.
 	};
 }
 
 namespace PonyEngine::Resource::Text
 {
 	CompletedResourceLoadRequest::CompletedResourceLoadRequest(std::shared_ptr<const TextResource> textResource) noexcept :
-		textResource(std::move(textResource))
+		textResource(std::move(textResource)),
+		resourceInterface{&this->textResource->View()}
 	{
 	}
 
@@ -73,8 +75,7 @@ namespace PonyEngine::Resource::Text
 
 	std::span<const void* const> CompletedResourceLoadRequest::ResourceInterfaces() const
 	{
-		const void* const view = &textResource->View();
-		return std::span(&view, 1uz);
+		return std::span(&resourceInterface, 1uz);
 	}
 
 	const std::exception_ptr& CompletedResourceLoadRequest::Exception() const

@@ -771,7 +771,7 @@ namespace PonyEngine::Resource::Pack
 					std::memcpy(reqRanges.data(), ranges, rangeSize);
 					for (const auto [offset, size] : reqRanges)
 					{
-						if (Math::SumClamp(offset, size) >= req->DataSize()) [[unlikely]]
+						if (Math::SumClamp(offset, size) > req->DataSize()) [[unlikely]]
 						{
 							throw std::runtime_error("Invalid manifest data range");
 						}

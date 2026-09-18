@@ -383,12 +383,25 @@ void Pack(const Command& command)
 		const ManifestParams manifestParams = ReadManifestParams(manifestCommand.params);
 		manifests.push_back(PonyTools::PackManifest::PackManifest(manifestParams.deduplicateTypes, manifestParams.deduplicateDataMetas,
 			manifestParams.deduplicateLoadMetas, manifestParams.deduplicateRanges));
+
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Opening manifest output file at '{}'.", manifestCommand.output);
+		}
 		manifestOutputs.push_back(PonyTools::FileSystem::OpenOutput(manifestCommand.output, std::ios::binary | std::ios::trunc));
 	}
 
+	if (Verbose) [[unlikely]]
+	{
+		std::println("Opening data output file at '{}'.", command.output);
+	}
 	std::ofstream dataOutput = PonyTools::FileSystem::OpenOutput(command.output, std::ios::binary | std::ios::trunc);
 	std::unordered_map<std::filesystem::path, std::pair<std::uintmax_t, std::uintmax_t>> dataRanges;
 
+	if (Verbose) [[unlikely]]
+	{
+		std::println("Writing to pack data file.");
+	}
 	std::string dataMagicWord;
 	dataMagicWord.resize(DataMagicWord.size());
 	std::string loadMagicWord;
@@ -399,6 +412,11 @@ void Pack(const Command& command)
 	std::uintmax_t outputOffset = 0u;
 	for (const Resource& resource : resources)
 	{
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Reading resource. ID: '{}'; Data: '{}'; Load: '{}'.", resource.id, resource.dataPath.string(), resource.loadPath.string());
+		}
+
 		std::ifstream dataInput = PonyTools::FileSystem::OpenInput(resource.dataPath, std::ios::binary);
 
 		dataInput.read(dataMagicWord.data(), dataMagicWord.size());
@@ -469,6 +487,11 @@ void Pack(const Command& command)
 
 	for (std::size_t i = 0uz; i < manifests.size(); ++i)
 	{
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Writing to pack manifest file at '{}'.", command.manifestCommands[i].output);
+		}
+
 		const PonyTools::PackManifest::PackManifest& manifest = manifests[i];
 		const std::span<const std::string> types = manifest.Types();
 		const std::span<const std::vector<std::byte>> dataMetas = manifest.DataMetas();
@@ -576,6 +599,12 @@ std::vector<Resource> GetManifestResources(const std::span<const ManifestCommand
 
 		const ManifestCommand& manifestCommand = manifestCommands[i];
 		const std::string_view inputPath = manifestCommand.input;
+
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Getting resources. Resource list: '{}'.", inputPath);
+		}
+
 		std::ifstream input = PonyTools::FileSystem::OpenInput(inputPath);
 
 		std::string line;
@@ -598,6 +627,11 @@ std::vector<Resource> GetManifestResources(const std::span<const ManifestCommand
 				{
 					throw std::runtime_error(std::format("ID '{}' at '{}' is used at least twice", id, inputPath));
 				}
+			}
+
+			if (Verbose) [[unlikely]]
+			{
+				std::println("Resource. ID: '{}'; Data: '{}'; Load: '{}'.", parsedLine[0], parsedLine[1], parsedLine[2]);
 			}
 
 			resources.push_back(Resource
@@ -686,6 +720,11 @@ void WriteDepFile(const Command& command, const std::span<const Resource> resour
 
 DataParams ReadDataParams(const std::string_view path)
 {
+	if (Verbose) [[unlikely]]
+	{
+		std::println("Reading data parameters from '{}'.", path);
+	}
+
 	const toml::table table = ParseParams(path);
 	if (table[SchemaPropertyName].value<std::string_view>() != DataParamsSchema) [[unlikely]]
 	{
@@ -716,6 +755,11 @@ DataParams ReadDataParams(const std::string_view path)
 
 ManifestParams ReadManifestParams(std::string_view path)
 {
+	if (Verbose) [[unlikely]]
+	{
+		std::println("Reading manifest parameters from '{}'.", path);
+	}
+
 	const toml::table table = ParseParams(path);
 	if (table[SchemaPropertyName].value<std::string_view>() != ManifestParamsSchema) [[unlikely]]
 	{

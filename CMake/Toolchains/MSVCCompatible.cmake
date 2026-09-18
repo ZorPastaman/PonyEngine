@@ -1,4 +1,4 @@
-set(CMAKE_CXX_FLAGS "-DWIN32 -D_WINDOWS -arch:AVX2 -EHsc -fp:fast -GR -permissive- -utf-8 -W3 -Zc:__cplusplus -Zc:preprocessor -Zc:throwingNew" CACHE STRING "Flags used by the CXX compiler during all build types." FORCE)
+set(CMAKE_CXX_FLAGS "-arch:AVX2 -EHsc -fp:fast -GR -permissive- -utf-8 -W3 -Zc:__cplusplus -Zc:preprocessor -Zc:throwingNew" CACHE STRING "Flags used by the CXX compiler during all build types." FORCE)
 set(CMAKE_CXX_FLAGS_DEBUG "-Ob0 -Od -RTC1" CACHE STRING "Flags used by the CXX compiler during DEBUG builds." FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -GL -Gw -Gy -Ob3 -O2 -Zc:inline" CACHE STRING "Flags used by the CXX compiler during RELEASE builds." FORCE)
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-DNDEBUG -GL -Gw -Gy -Ob3 -O2 -Zc:inline" CACHE STRING "Flags used by the CXX compiler during RELWITHDEBINFO builds." FORCE)

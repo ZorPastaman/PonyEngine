@@ -72,6 +72,7 @@ export namespace PonyEngine::Resource::Text
 		void InvokeCallback() noexcept;
 
 		std::shared_ptr<const TextResource> textResource; ///< Text resource.
+		const void* resourceInterface; ///< Resource interface.
 
 		std::exception_ptr exception; ///< Exception.
 		std::atomic<Async::RequestStatus> status; ///< Status.
@@ -87,6 +88,7 @@ namespace PonyEngine::Resource::Text
 	OngoingResourceLoadRequest::OngoingResourceLoadRequest(std::shared_ptr<const TextResource> textResource, 
 		std::move_only_function<void(const IResourceLoadRequest&) noexcept> callback) noexcept :
 		textResource(std::move(textResource)),
+		resourceInterface{&this->textResource->View()},
 		status(Async::RequestStatus::Pending),
 		callback(std::move(callback))
 	{
@@ -114,8 +116,7 @@ namespace PonyEngine::Resource::Text
 			throw std::logic_error("Invalid status");
 		}
 
-		const void* const view = &textResource->View();
-		return std::span(&view, 1uz);
+		return std::span(&resourceInterface, 1uz);
 	}
 
 	const std::exception_ptr& OngoingResourceLoadRequest::Exception() const

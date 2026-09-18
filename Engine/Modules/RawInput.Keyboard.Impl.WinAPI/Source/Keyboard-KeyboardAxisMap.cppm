@@ -21,7 +21,7 @@ import PonyEngine.RawInput.Ext;
 
 export namespace PonyEngine::RawInput::Keyboard
 {
-	/// @brief Windows keyboard axis map.
+	/// @brief WinAPI keyboard axis map.
 	class KeyboardAxisMap final
 	{
 	public:

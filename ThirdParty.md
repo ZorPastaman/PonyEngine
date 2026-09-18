@@ -16,3 +16,4 @@ This repo uses the following third-party libraries:
 - Integration: CMake Git dependency.
 - Modules that use it:
 	- [PonyTools.TextCompiler](Tools/TextCompiler)
+	- [PonyTools.ResourcePacker](Tools/ResourcePacker)

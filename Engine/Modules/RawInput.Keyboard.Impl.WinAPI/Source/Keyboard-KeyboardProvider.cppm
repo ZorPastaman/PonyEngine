@@ -32,7 +32,7 @@ import :KeyboardAxisMap;
 
 export namespace PonyEngine::RawInput::Keyboard
 {
-	/// @brief Windows keyboard provider.
+	/// @brief WinAPI keyboard provider.
 	class KeyboardProvider final : private WinInput::IRawInputObserver
 	{
 	public:
