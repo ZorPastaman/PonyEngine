@@ -7,9 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Job;
+export module PonyEngine.Job:JobParams;
 
-export import :IJobService;
-export import :JobHandle;
-export import :JobParams;
-export import :JobPriority;
+import std;
+
+import :JobHandle;
+import :JobPriority;
+
+export namespace PonyEngine::Job
+{
+	/// @brief Job parameters.
+	struct JobParams final
+	{
+		std::span<const JobHandle> dependencies; ///< Job dependencies.
+		JobPriority priority = JobPriority::Normal; ///< Job priority.
+	};
+}

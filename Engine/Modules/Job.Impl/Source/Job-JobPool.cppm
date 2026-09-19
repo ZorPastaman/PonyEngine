@@ -44,6 +44,11 @@ export namespace PonyEngine::Job
 		/// @return Job.
 		[[nodiscard("Pure function")]]
 		Job& GetJob(std::size_t index) noexcept;
+		/// @brief Gets a job.
+		/// @param index Job index.
+		/// @return Job.
+		[[nodiscard("Pure function")]]
+		const Job& GetJob(std::size_t index) const noexcept;
 
 		JobPool& operator =(const JobPool&) = delete;
 		JobPool& operator =(JobPool&&) = delete;
@@ -93,6 +98,11 @@ namespace PonyEngine::Job
 	}
 
 	Job& JobPool::GetJob(const std::size_t index) noexcept
+	{
+		return jobs[index];
+	}
+
+	const Job& JobPool::GetJob(const std::size_t index) const noexcept
 	{
 		return jobs[index];
 	}

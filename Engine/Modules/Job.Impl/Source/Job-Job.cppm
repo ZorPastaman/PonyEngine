@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Job;
 
+import :FutureJob;
 import :JobID;
 
 export namespace PonyEngine::Job
@@ -72,12 +73,12 @@ export namespace PonyEngine::Job
 		/// @param version Waited version of this job.
 		/// @return @a True if the dependent was added; @a false otherwise - the job has a different version.
 		[[nodiscard("Must be used")]]
-		bool AddDependent(const JobID& dependent, std::size_t version);
+		bool AddDependent(const FutureJob& dependent, std::size_t version);
 		/// @brief Process dependents.
 		/// @tparam F Invocable type.
 		/// @param func Process function.
 		/// @note The function clears the dependent list after processing.
-		template<std::invocable<const JobID&> F>
+		template<std::invocable<const FutureJob&> F>
 		void ProcessDependents(F&& func);
 
 		Job& operator =(const Job&) = delete;
@@ -88,7 +89,7 @@ export namespace PonyEngine::Job
 		std::move_only_function<void() noexcept> task; ///< Job task.
 
 		std::atomic_size_t blockCount; ///< Block count. How many dependencies must be completed before starting this job.
-		std::vector<JobID> dependents; ///< Dependents.
+		std::vector<FutureJob> dependents; ///< Dependents.
 		std::mutex dependentMutex; ///< Mutex that must be used while working with the @p dependents.
 
 		static_assert(std::atomic_size_t::is_always_lock_free, "Size_t is not lock-free");
@@ -166,7 +167,7 @@ namespace PonyEngine::Job
 		this->blockCount.store(blockCount, std::memory_order::release);
 	}
 
-	bool Job::AddDependent(const JobID& dependent, const std::size_t version)
+	bool Job::AddDependent(const FutureJob& dependent, const std::size_t version)
 	{
 		if (Version() != version)
 		{
@@ -184,12 +185,12 @@ namespace PonyEngine::Job
 		return true;
 	}
 
-	template<std::invocable<const JobID&> F>
+	template<std::invocable<const FutureJob&> F>
 	void Job::ProcessDependents(F&& func)
 	{
 		const auto lock = std::lock_guard(dependentMutex);
 
-		for (const JobID& dependent : dependents)
+		for (const FutureJob& dependent : dependents)
 		{
 			std::invoke(std::forward<F>(func), dependent);
 		}
