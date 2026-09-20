@@ -558,7 +558,7 @@ namespace PonyEngine::Resource
 
 	bool ResourceService::IsValid(const ResourceCollection collection) const noexcept
 	{
-		return Math::IsOdd(collection.id) && collection.id < resourceCollectionVersions.size() && collection.version == resourceCollectionVersions[collection.id];
+		return Math::IsOdd(collection.version) && collection.id < resourceCollectionVersions.size() && collection.version == resourceCollectionVersions[collection.id];
 	}
 
 	ResourceCollection ResourceService::CreateCollection()

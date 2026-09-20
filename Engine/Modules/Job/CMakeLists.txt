@@ -6,6 +6,8 @@ target_sources(PonyEngine.Job PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Job.cppm"
 	"Source/Job-IJobService.cppm"
 	"Source/Job-JobHandle.cppm"
+	"Source/Job-JobParams.cppm"
+	"Source/Job-JobPriority.cppm"
 )
 
 set_target_properties(PonyEngine.Job PROPERTIES

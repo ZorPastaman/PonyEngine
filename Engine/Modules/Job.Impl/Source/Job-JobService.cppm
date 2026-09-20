@@ -23,6 +23,7 @@ import PonyEngine.Job;
 import PonyEngine.Log;
 import PonyEngine.Math;
 
+import :FutureJob;
 import :Job;
 import :JobID;
 import :Worker;
@@ -46,7 +47,7 @@ export namespace PonyEngine::Job
 		[[nodiscard("Pure function")]]
 		virtual std::size_t WorkerCount() const noexcept override;
 
-		virtual JobHandle Schedule(std::move_only_function<void() noexcept> task, std::span<const JobHandle> dependencies) override;
+		virtual JobHandle Schedule(std::move_only_function<void() noexcept> task, const JobParams& params) override;
 
 		virtual void Wait(std::span<const JobHandle> handles) const override;
 		[[nodiscard("Pure function")]]
@@ -125,7 +126,7 @@ namespace PonyEngine::Job
 		return workers.size();
 	}
 
-	JobHandle JobService::Schedule(std::move_only_function<void() noexcept> task, const std::span<const JobHandle> dependencies)
+	JobHandle JobService::Schedule(std::move_only_function<void() noexcept> task, const JobParams& params)
 	{
 		if (!task) [[unlikely]]
 		{
@@ -138,39 +139,40 @@ namespace PonyEngine::Job
 		Job& job = worker.GetJob(jobId.jobIndex);
 		const std::size_t version = job.Version();
 		job.Task(std::move(task));
-		job.Block(dependencies.size());
+		job.Block(params.dependencies.size());
 
 		const auto handle = ToJobHandle(jobId, version);
 
-		if (dependencies.empty())
+		if (params.dependencies.empty())
 		{
-			worker.AddToQueue(jobId);
+			worker.AddToQueue(jobId, params.priority);
 		}
 		else
 		{
-			for (std::size_t i = 0uz; i < dependencies.size(); ++i)
+			auto futureJob = FutureJob{.jobId = jobId, .priority = params.priority};
+			for (std::size_t i = 0uz; i < params.dependencies.size(); ++i)
 			{
 				try
 				{
-					const JobHandle& dependency = dependencies[i];
+					const JobHandle& dependency = params.dependencies[i];
 					const JobID dependencyId = ToJobID(dependency);
 					assert(dependencyId.poolIndex < workers.size() && dependencyId.jobIndex < PONY_ENGINE_JOB_POOL_SIZE && "Invalid dependency handle");
-					const bool isAdded = GetJob(dependencyId).AddDependent(jobId, dependency.version);
+					const bool isAdded = GetJob(dependencyId).AddDependent(futureJob, dependency.version);
 
 					if (!isAdded && job.Unblock()) [[unlikely]]
 					{
-						worker.AddToQueue(jobId);
+						worker.AddToQueue(jobId, params.priority);
 					}
 				}
 				catch (...)
 				{
 					job.Task(nullptr);
 
-					for (; i < dependencies.size(); ++i)
+					for (; i < params.dependencies.size(); ++i)
 					{
 						if (job.Unblock()) [[unlikely]]
 						{
-							worker.AddToQueue(jobId);
+							worker.AddToQueue(jobId, params.priority);
 						}
 					}
 

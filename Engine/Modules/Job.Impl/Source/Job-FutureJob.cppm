@@ -7,9 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Job;
+export module PonyEngine.Job.Impl:FutureJob;
 
-export import :IJobService;
-export import :JobHandle;
-export import :JobParams;
-export import :JobPriority;
+import PonyEngine.Job;
+
+import :JobID;
+
+export namespace PonyEngine::Job
+{
+	/// @brief Info about a created but not scheduled job.
+	struct FutureJob final
+	{
+		JobID jobId; ///< Job ID.
+		JobPriority priority = JobPriority::Normal; ///< Job priority.
+	};
+}

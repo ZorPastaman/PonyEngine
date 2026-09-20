@@ -4,6 +4,7 @@ set(PONY_ENGINE_JOB_ORDER "p" CACHE STRING "PonyEngine.Job.Impl module initializ
 set(PONY_ENGINE_JOB_RESERVED_THREAD_COUNT "3" CACHE STRING "PonyEngine.Job.Impl service reserved thread count. Those are threads reserved for other purposes.")
 set(PONY_ENGINE_JOB_MIN_THREAD_COUNT "2" CACHE STRING "PonyEngine.Job.Impl service minimal thread count.")
 set(PONY_ENGINE_JOB_POOL_SIZE "64" CACHE STRING "PonyEngine.Job.Impl pool size of jobs per thread.")
+set(PONY_ENGINE_JOB_MAX_NORMAL_JOB_STREAK "8" CACHE STRING "PonyEngine.Job.Impl maximum number of normal jobs in a row.")
 set(PONY_ENGINE_JOB_THREAD_ROLE "Worker" CACHE STRING "PonyEngine.Job.Impl worker thread role.")
 
 add_library(PonyEngine.Job.Impl STATIC)
@@ -20,6 +21,7 @@ target_sources(PonyEngine.Job.Impl PRIVATE
 )
 target_sources(PonyEngine.Job.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Job.cppm"
+	"Source/Job-FutureJob.cppm"
 	"Source/Job-Job.cppm"
 	"Source/Job-JobID.cppm"
 	"Source/Job-JobPool.cppm"
@@ -37,6 +39,7 @@ target_compile_definitions(PonyEngine.Job.Impl PRIVATE
 	PONY_ENGINE_JOB_RESERVED_THREAD_COUNT=${PONY_ENGINE_JOB_RESERVED_THREAD_COUNT}
 	PONY_ENGINE_JOB_MIN_THREAD_COUNT=${PONY_ENGINE_JOB_MIN_THREAD_COUNT}
 	PONY_ENGINE_JOB_POOL_SIZE=${PONY_ENGINE_JOB_POOL_SIZE}
+	PONY_ENGINE_JOB_MAX_NORMAL_JOB_STREAK=${PONY_ENGINE_JOB_MAX_NORMAL_JOB_STREAK}
 	PONY_ENGINE_JOB_THREAD_ROLE=${PONY_ENGINE_JOB_THREAD_ROLE}
 )
 

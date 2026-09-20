@@ -22,6 +22,7 @@ import PonyEngine.Application;
 import PonyEngine.Job;
 import PonyEngine.Log;
 
+import :FutureJob;
 import :Job;
 import :JobID;
 import :JobPool;
@@ -70,7 +71,8 @@ export namespace PonyEngine::Job
 		Job& GetJob(std::size_t index) noexcept;
 		/// @brief Adds a job to a queue.
 		/// @param jobId Job ID. Must be a job acquired from this worker.
-		void AddToQueue(const JobID& jobId) noexcept;
+		/// @param priority Job priority.
+		void AddToQueue(const JobID& jobId, JobPriority priority) noexcept;
 
 		Worker& operator =(const Worker&) = delete;
 		Worker& operator =(Worker&&) = delete;
@@ -79,28 +81,45 @@ export namespace PonyEngine::Job
 		/// @brief Worker main function.
 		void Work() noexcept;
 
+		/// @brief Gets a job queue by priority.
+		/// @param priority priority.
+		/// @return Job queue.
+		[[nodiscard("Pure function")]]
+		JobQueue& GetJobQueue(JobPriority priority) noexcept;
+
 		/// @brief Finds a next job to execute.
 		/// @return Next job.
 		[[nodiscard("Must be used")]]
 		JobID FindJob() noexcept;
+		/// @brief Finds a next job to execute.
+		/// @param priority priority.
+		/// @return Next job.
+		[[nodiscard("Must be used")]]
+		JobID FindJob(JobPriority priority) noexcept;
 		/// @brief Gets a job from the local queue.
+		/// @param priority priority.
 		/// @return Next job.
 		[[nodiscard("Must be used")]]
-		JobID GetJob() noexcept;
+		JobID GetJob(JobPriority priority) noexcept;
 		/// @brief Tries to steal a job from other workers.
+		/// @param priority priority.
 		/// @return Next job.
 		[[nodiscard("Must be used")]]
-		JobID StealJob() const noexcept;
+		JobID StealJob(JobPriority priority) const noexcept;
 		/// @brief Tries to get a job from the local queue.
+		/// @param priority priority.
 		/// @return Next job.
 		[[nodiscard("Must be used")]]
-		JobID GrabJob() noexcept;
+		JobID GrabJob(JobPriority priority) noexcept;
 
 		/// @brief Increments the global job queue version.
 		void IncrementJobQueueVersion() const noexcept;
 
 		JobPool jobPool; ///< Job pool.
-		JobQueue jobQueue; ///< Job queue.
+		JobQueue highJobQueue; ///< Queue of jobs with high priority.
+		JobQueue normalJobQueue; ///< Queue of jobs with normal priority.
+		JobQueue lowJobQueue; ///< Queue of jobs with low priority.
+		std::uint32_t executedNormalJobCount; ///< How many jobs with normal priority executed.
 		std::atomic_size_t* jobQueueVersion; ///< Global job queue version.
 
 		std::span<const std::unique_ptr<Worker>> workers; ///< All workers list.
@@ -117,6 +136,7 @@ export namespace PonyEngine::Job
 namespace PonyEngine::Job
 {
 	Worker::Worker(const std::span<const std::unique_ptr<Worker>> workers, const std::size_t myIndex, std::atomic_size_t* const jobQueueVersion) :
+		executedNormalJobCount{0u},
 		jobQueueVersion{jobQueueVersion},
 		workers(workers),
 		myIndex{myIndex},
@@ -176,11 +196,12 @@ namespace PonyEngine::Job
 		return jobPool.GetJob(index);
 	}
 
-	void Worker::AddToQueue(const JobID& jobId) noexcept
+	void Worker::AddToQueue(const JobID& jobId, const JobPriority priority) noexcept
 	{
 		assert(jobId.poolIndex == myIndex && "Wrong pool index.");
 
-		jobQueue.AddJob(jobId);
+		GetJobQueue(priority).AddJob(jobId);
+
 		IncrementJobQueueVersion();
 	}
 
@@ -196,12 +217,12 @@ namespace PonyEngine::Job
 				job.Execute();
 				job.Task(nullptr);
 				job.IncrementVersion();
-				job.ProcessDependents([&](const JobID& dependentId) noexcept
+				job.ProcessDependents([&](const FutureJob& dependentJob) noexcept
 				{
-					Worker& dependentWorker = *workers[dependentId.poolIndex];
-					if (Job& dependent = dependentWorker.jobPool.GetJob(dependentId.jobIndex); dependent.Unblock())
+					Worker& dependentWorker = *workers[dependentJob.jobId.poolIndex];
+					if (Job& dependent = dependentWorker.jobPool.GetJob(dependentJob.jobId.jobIndex); dependent.Unblock())
 					{
-						dependentWorker.AddToQueue(dependentId);
+						dependentWorker.AddToQueue(dependentJob.jobId, dependentJob.priority);
 					}
 				});
 				executedJobPool.ReleaseJob(jobId.jobIndex);
@@ -213,15 +234,65 @@ namespace PonyEngine::Job
 		}
 	}
 
-	JobID Worker::FindJob() noexcept
+	JobQueue& Worker::GetJobQueue(const JobPriority priority) noexcept
 	{
-		const JobID job = GetJob();
-		return job.IsValid() ? job : StealJob();
+		switch (priority)
+		{
+		case JobPriority::Low:
+			return lowJobQueue;
+		case JobPriority::Normal:
+			return normalJobQueue;
+		case JobPriority::High:
+			return highJobQueue;
+		default: [[unlikely]]
+			assert(false && "Invalid job priority.");
+			return normalJobQueue;
+		}
 	}
 
-	JobID Worker::GetJob() noexcept
+	JobID Worker::FindJob() noexcept
 	{
-		const JobID job = jobQueue.GetJob();
+		constexpr std::array<JobPriority, 3> defaultPriorityOrder = { JobPriority::High, JobPriority::Normal, JobPriority::Low };
+		constexpr std::array<JobPriority, 3> modifiedPriorityOrder = { JobPriority::High, JobPriority::Low, JobPriority::Normal };
+		const std::array<JobPriority, 3>& priorityOrder = executedNormalJobCount >= PONY_ENGINE_JOB_MAX_NORMAL_JOB_STREAK
+			? modifiedPriorityOrder
+			: defaultPriorityOrder;
+
+		auto jobId = JobID{};
+		auto priority = JobPriority::Normal;
+
+		for (std::size_t i = 0uz; i < priorityOrder.size() && !jobId.IsValid(); ++i)
+		{
+			priority = priorityOrder[i];
+			jobId = FindJob(priority);
+		}
+
+		if (jobId.IsValid())
+		{
+			executedNormalJobCount += priority == JobPriority::Normal;
+			executedNormalJobCount = priority == JobPriority::Low ? 0u : executedNormalJobCount;
+		}
+
+		return jobId;
+	}
+
+	JobID Worker::FindJob(const JobPriority priority) noexcept
+	{
+		if (const JobID job = GetJob(priority); job.IsValid())
+		{
+			return job;
+		}
+		if (const JobID job = StealJob(priority); job.IsValid())
+		{
+			return job;
+		}
+
+		return JobID{};
+	}
+
+	JobID Worker::GetJob(const JobPriority priority) noexcept
+	{
+		const JobID job = GetJobQueue(priority).GetJob();
 
 		if (job.IsValid())
 		{
@@ -231,23 +302,22 @@ namespace PonyEngine::Job
 		return job;
 	}
 
-	JobID Worker::StealJob() const noexcept
+	JobID Worker::StealJob(const JobPriority priority) const noexcept
 	{
-		for (std::size_t i = 1uz; i < workers.size(); ++i)
+		auto job = JobID{};
+
+		for (std::size_t i = 1uz; i < workers.size() && !job.IsValid(); ++i)
 		{
 			const std::size_t workerIndex = (myIndex + i) % workers.size();
-			if (const JobID job = workers[workerIndex]->GrabJob(); job.IsValid())
-			{
-				return job;
-			}
+			job = workers[workerIndex]->GrabJob(priority);
 		}
 
-		return JobID{};
+		return job;
 	}
 
-	JobID Worker::GrabJob() noexcept
+	JobID Worker::GrabJob(const JobPriority priority) noexcept
 	{
-		const JobID job = jobQueue.StealJob();
+		const JobID job = GetJobQueue(priority).StealJob();
 
 		if (job.IsValid())
 		{
