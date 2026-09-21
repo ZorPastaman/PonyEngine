@@ -114,7 +114,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			if (Abs(small.Center()[i] - large.Center()[i]) > large.Extent(i) - small.Radius())
+			if (Abs(small.Center()[i] - large.Center()[i]) > large.HalfExtent(i) - small.Radius())
 			{
 				return false;
 			}
@@ -129,7 +129,7 @@ namespace PonyEngine::Math
 		const Vector<T, Size> delta = small.Center() - large.Center();
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			if (const T distance = Dot(delta, large.Axis(i)); Abs(distance) > large.Extent(i) - small.Radius())
+			if (const T distance = Dot(delta, large.Axis(i)); Abs(distance) > large.HalfExtent(i) - small.Radius())
 			{
 				return false;
 			}
@@ -143,7 +143,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			if (Abs(small.Center()[i] - large.Center()[i]) > large.Extent(i) - small.Extent(i))
+			if (Abs(small.Center()[i] - large.Center()[i]) > large.HalfExtent(i) - small.HalfExtent(i))
 			{
 				return false;
 			}
@@ -170,7 +170,7 @@ namespace PonyEngine::Math
 		const Matrix<T, Size, Size> transpose = large.Axes().Transpose();
 		const Vector<T, Size> center = transpose * (small.Center() - large.Center());
 
-		return IsInside(OrientedBox<T, Size>(center, small.Extents(), transpose), Box<T, Size>(large.Extents()));
+		return IsInside(OrientedBox<T, Size>(center, small.HalfExtents(), transpose), Box<T, Size>(large.HalfExtents()));
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -179,14 +179,14 @@ namespace PonyEngine::Math
 		const Vector<T, Size> center = TransformTranspose(large.Axes(), small.Center() - large.Center());
 		const Matrix<T, Size, Size> axes = MultiplyTranspose(large.Axes(), small.Axes());
 
-		return IsInside(OrientedBox<T, Size>(center, small.Extents(), axes), Box<T, Size>(large.Extents()));
+		return IsInside(OrientedBox<T, Size>(center, small.HalfExtents(), axes), Box<T, Size>(large.HalfExtents()));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	constexpr bool IsInside(const OrientedBox<T, Size>& small, const Ball<T, Size>& large) noexcept
 	{
 		const Vector<T, Size> center = TransformTranspose(small.Axes(), large.Center() - small.Center());
-		return IsInside(Box<T, Size>(small.Extents()), Ball<T, Size>(center, large.Radius()));
+		return IsInside(Box<T, Size>(small.HalfExtents()), Ball<T, Size>(center, large.Radius()));
 	}
 
 	template<std::floating_point T, std::size_t Size>

@@ -89,7 +89,7 @@ TEST_CASE("CornerBox copy constructor", "[Math][CornerBox]")
 
 TEST_CASE("CornerBox move constructor", "[Math][CornerBox]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::CornerBox<T, Size>& cornerbox) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::CornerBox<T, Size>& cornerbox) constexpr
 	{
 		auto copy = cornerbox;
 		auto moved = std::move(copy);
@@ -106,7 +106,7 @@ TEST_CASE("CornerBox move constructor", "[Math][CornerBox]")
 
 TEST_CASE("CornerBox access", "[Math][CornerBox]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::CornerBox<T, Size>& cornerbox) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::CornerBox<T, Size>& cornerbox) constexpr
 	{
 		auto copy = cornerbox;
 		copy.Position(cornerbox.Position() + PonyEngine::Math::Vector<T, Size>(T{1}));

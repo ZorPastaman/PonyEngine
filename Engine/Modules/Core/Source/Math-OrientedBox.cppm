@@ -40,20 +40,20 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr OrientedBox() noexcept;
 		/// @brief Creates an oriented box with a zero center and default axes.
-		/// @param extents Extents.
+		/// @param halfExtents half-extents.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr OrientedBox(const Vector<T, Size>& extents) noexcept;
+		explicit constexpr OrientedBox(const Vector<T, Size>& halfExtents) noexcept;
 		/// @brief Creates an oriented box with default axes.
 		/// @param center Center.
-		/// @param extents Extents.
+		/// @param halfExtents half-extents.
 		[[nodiscard("Pure constructor")]]
-		constexpr OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& extents) noexcept;
+		constexpr OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& halfExtents) noexcept;
 		/// @brief Creates an oriented box.
 		/// @param center Center.
-		/// @param extents Extents.
+		/// @param halfExtents Half-extents.
 		/// @param axes Axes. Must be mutually perpendicular. They are normalized automatically with a fallback to a zero vector.
 		[[nodiscard("Pure constructor")]]
-		OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& extents, const Matrix<T, Size, Size>& axes) noexcept;
+		OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& halfExtents, const Matrix<T, Size, Size>& axes) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr OrientedBox(const OrientedBox& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -68,22 +68,22 @@ export namespace PonyEngine::Math
 		/// @brief Sets the center.
 		/// @param center Center.
 		constexpr void Center(const Vector<T, Size>& center) noexcept;
-		/// @brief Gets the extents.
-		/// @return Extents.
+		/// @brief Gets the half-extents.
+		/// @return Half-extents.
 		[[nodiscard("Pure function")]]
-		constexpr const Vector<T, Size>& Extents() const noexcept;
-		/// @brief Sets the extents.
-		/// @param extents Extents.
-		constexpr void Extents(const Vector<T, Size>& extents) noexcept;
-		/// @brief Gets the extent.
-		/// @param index Extent index. Must be in range [0, Size).
-		/// @return Extent.
+		constexpr const Vector<T, Size>& HalfExtents() const noexcept;
+		/// @brief Sets the half-extents.
+		/// @param halfExtents Half-extents.
+		constexpr void HalfExtents(const Vector<T, Size>& halfExtents) noexcept;
+		/// @brief Gets the half-extent.
+		/// @param index Half-extent index. Must be in range [0, Size).
+		/// @return Half-extent.
 		[[nodiscard("Pure function")]]
-		constexpr const T& Extent(std::size_t index) const noexcept;
-		/// @brief Sets the extent.
-		/// @param index Extent index. Must be in range [0, Size).
-		/// @param extent Extent.
-		constexpr void Extent(std::size_t index, T extent) noexcept;
+		constexpr const T& HalfExtent(std::size_t index) const noexcept;
+		/// @brief Sets the half-extent.
+		/// @param index Half-extent index. Must be in range [0, Size).
+		/// @param halfExtent Half-extent.
+		constexpr void HalfExtent(std::size_t index, T halfExtent) noexcept;
 		/// @brief Gets the axes.
 		/// @return Axes.
 		[[nodiscard("Pure function")]]
@@ -101,15 +101,15 @@ export namespace PonyEngine::Math
 		/// @param axis Axis. Must be perpendicular to other axes. It is normalized automatically with a fallback to a zero vector.
 		void Axis(std::size_t index, const Vector<T, Size>& axis) noexcept;
 
-		/// @brief Calculates the edge length.
-		/// @param index Edge index. Must be in range [0, Size).
-		/// @return Edge length.
+		/// @brief Calculates the extent.
+		/// @param index Extent index. Must be in range [0, Size).
+		/// @return Extent.
 		[[nodiscard("Pure function")]]
-		constexpr T Edge(std::size_t index) const noexcept;
-		/// @brief Calculates the edge lengths.
-		/// @return Edge lengths.
+		constexpr T Extent(std::size_t index) const noexcept;
+		/// @brief Calculates the extents.
+		/// @return Extents.
 		[[nodiscard("Pure function")]]
-		constexpr Vector<T, Size> Edges() const noexcept;
+		constexpr Vector<T, Size> Extents() const noexcept;
 		/// @brief Calculates a surface area.
 		/// @return Surface area.
 		[[nodiscard("Pure function")]]
@@ -128,6 +128,13 @@ export namespace PonyEngine::Math
 		/// @return Corners.
 		[[nodiscard("Pure function")]]
 		constexpr CornersType Corners() const noexcept requires (Size <= std::numeric_limits<std::size_t>::digits);
+
+		/// @brief Normalizes the oriented box: normalizes the axes and modifies the half-extents.
+		void Normalize() noexcept;
+		/// @brief Gets a normalized oriented box: normalizes the axes and modifies the half-extents.
+		/// @return Normalized oriented box.
+		[[nodiscard("Pure function")]]
+		OrientedBox Normalized() const noexcept;
 
 		/// @brief Checks if all the data is finite.
 		/// @return @a True if they are finite; @a false otherwise.
@@ -166,7 +173,7 @@ export namespace PonyEngine::Math
 
 	private:
 		Vector<T, Size> center; ///< Center.
-		Vector<T, Size> extents; ///< Extents.
+		Vector<T, Size> halfExtents; ///< Half-extents.
 		Matrix<T, Size, Size> axes; ///< Axes.
 	};
 
@@ -195,33 +202,33 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr OrientedBox<T, Size>::OrientedBox() noexcept :
 		center(Vector<T, Size>::Zero()),
-		extents(Vector<T, Size>::Zero()),
+		halfExtents(Vector<T, Size>::Zero()),
 		axes(Box<T, Size>::Axes)
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr OrientedBox<T, Size>::OrientedBox(const Vector<T, Size>& extents) noexcept :
+	constexpr OrientedBox<T, Size>::OrientedBox(const Vector<T, Size>& halfExtents) noexcept :
 		center(Vector<T, Size>::Zero()),
-		extents(Abs(extents)),
+		halfExtents(Abs(halfExtents)),
 		axes(Box<T, Size>::Axes)
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr OrientedBox<T, Size>::OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& extents) noexcept :
+	constexpr OrientedBox<T, Size>::OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& halfExtents) noexcept :
 		center(center),
-		extents(Abs(extents)),
+		halfExtents(Abs(halfExtents)),
 		axes(Box<T, Size>::Axes)
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	OrientedBox<T, Size>::OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& extents, const Matrix<T, Size, Size>& axes) noexcept :
+	OrientedBox<T, Size>::OrientedBox(const Vector<T, Size>& center, const Vector<T, Size>& halfExtents, const Matrix<T, Size, Size>& axes) noexcept :
 		center(center),
-		extents(Abs(extents))
+		halfExtents(Abs(halfExtents)),
+		axes(axes)
 	{
-		Axes(axes);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
@@ -237,33 +244,27 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr const Vector<T, Size>& OrientedBox<T, Size>::Extents() const noexcept
+	constexpr const Vector<T, Size>& OrientedBox<T, Size>::HalfExtents() const noexcept
 	{
-		return extents;
+		return halfExtents;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr void OrientedBox<T, Size>::Extents(const Vector<T, Size>& extents) noexcept
+	constexpr void OrientedBox<T, Size>::HalfExtents(const Vector<T, Size>& halfExtents) noexcept
 	{
-		for (std::size_t i = 0; i < Size; ++i)
-		{
-			Extent(i, extents[i]);
-		}
+		this->halfExtents = Abs(halfExtents);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr const T& OrientedBox<T, Size>::Extent(const std::size_t index) const noexcept
+	constexpr const T& OrientedBox<T, Size>::HalfExtent(const std::size_t index) const noexcept
 	{
-		return extents[index];
+		return halfExtents[index];
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr void OrientedBox<T, Size>::Extent(const std::size_t index, const T extent) noexcept
+	constexpr void OrientedBox<T, Size>::HalfExtent(const std::size_t index, const T halfExtent) noexcept
 	{
-		if (!axes.Column(index).IsZero()) [[likely]]
-		{
-			extents[index] = Abs(extent);
-		}
+		halfExtents[index] = Abs(halfExtent);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
@@ -275,10 +276,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	void OrientedBox<T, Size>::Axes(const Matrix<T, Size, Size>& axes) noexcept
 	{
-		for (std::size_t i = 0; i < Size; ++i)
-		{
-			Axis(i, axes.Column(i));
-		}
+		this->axes = axes;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
@@ -290,50 +288,40 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	void OrientedBox<T, Size>::Axis(const std::size_t index, const Vector<T, Size>& axis) noexcept
 	{
-		const T magnitude = axis.Magnitude();
-		if (AreAlmostEqual(magnitude, T{0})) [[unlikely]]
-		{
-			extents[index] = T{0};
-			axes.Column(index, Vector<T, Size>::Zero());
-		}
-		else [[likely]]
-		{
-			extents[index] *= magnitude;
-			axes.Column(index, axis * (T{1} / magnitude));
-		}
+		axes.Column(index, axis);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr T OrientedBox<T, Size>::Edge(const std::size_t index) const noexcept
+	constexpr T OrientedBox<T, Size>::Extent(const std::size_t index) const noexcept
 	{
-		return extents[index] * T{2};
+		return halfExtents[index] * T{2};
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
-	constexpr Vector<T, Size> OrientedBox<T, Size>::Edges() const noexcept
+	constexpr Vector<T, Size> OrientedBox<T, Size>::Extents() const noexcept
 	{
-		return extents * T{2};
+		return halfExtents * T{2};
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr T OrientedBox<T, Size>::Surface() const noexcept
 	{
-		return Box<T, Size>(extents).Surface();
+		return Box<T, Size>(axes * halfExtents).Surface();
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr T OrientedBox<T, Size>::Volume() const noexcept
 	{
-		return Box<T, Size>(extents).Volume();
+		return Box<T, Size>(axes * halfExtents).Volume();
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr Vector<T, Size> OrientedBox<T, Size>::Corner(std::size_t index) const noexcept requires (Size <= std::numeric_limits<std::size_t>::digits)
 	{
 		Vector<T, Size> delta;
-		for (std::size_t i = 0uz; i < Size; ++i, index >>= 1uz)
+		for (std::size_t i = 0uz; i < Size; ++i, index >>= 1)
 		{
-			delta[i] = index & 1uz ? extents[i] : -extents[i];
+			delta[i] = IsOdd(index) ? halfExtents[i] : -halfExtents[i];
 		}
 
 		return center + axes * delta;
@@ -345,7 +333,7 @@ namespace PonyEngine::Math
 		std::array<Vector<T, Size>, Size> scaledAxes;
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			scaledAxes[i] = axes.Column(i) * extents[i];
+			scaledAxes[i] = axes.Column(i) * halfExtents[i];
 		}
 
 		std::array<Vector<T, Size>, CornerCount> corners;
@@ -374,9 +362,33 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
+	void OrientedBox<T, Size>::Normalize() noexcept
+	{
+		for (std::size_t i = 0uz; i < Size; ++i)
+		{
+			const Vector<T, Size>& axis = axes.Column(i);
+			const T magnitude = axis.Magnitude();
+			const bool isMagnitudeZero = AreAlmostEqual(magnitude, T{0});
+			const T extentMultiplier = isMagnitudeZero ? T{0} : magnitude;
+			const T axisMultiplier = isMagnitudeZero ? T{0} : T{1} / magnitude;
+
+			halfExtents[i] *= magnitude;
+			axes.Column(i, axis * axisMultiplier);
+		}
+	}
+
+	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
+	OrientedBox<T, Size> OrientedBox<T, Size>::Normalized() const noexcept
+	{
+		OrientedBox box = *this;
+		box.Normalize();
+		return box;
+	}
+
+	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr bool OrientedBox<T, Size>::IsFinite() const noexcept
 	{
-		return center.IsFinite() && extents.IsFinite() && axes.IsFinite();
+		return center.IsFinite() && halfExtents.IsFinite() && axes.IsFinite();
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
@@ -405,7 +417,7 @@ namespace PonyEngine::Math
 		const Vector<T, Size> delta = point - center;
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			if (Abs(Dot(delta, axes.Column(i))) > extents[i])
+			if (Abs(Dot(delta, axes.Column(i))) > halfExtents[i])
 			{
 				return false;
 			}
@@ -417,8 +429,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size> requires (Size >= 1)
 	constexpr Vector<T, Size> OrientedBox<T, Size>::ClosestPoint(const Vector<T, Size>& point) const noexcept
 	{
-		const Vector<T, Size> delta = Clamp(TransformTranspose(axes, point - center), -extents, extents);
-
+		const Vector<T, Size> delta = Clamp(TransformTranspose(axes, point - center), -halfExtents, halfExtents);
 		return center + axes * delta;
 	}
 
@@ -426,20 +437,13 @@ namespace PonyEngine::Math
 	template<std::floating_point U>
 	constexpr OrientedBox<T, Size>::operator OrientedBox<U, Size>() const noexcept
 	{
-		return OrientedBox<U, Size>(static_cast<Vector<U, Size>>(center), static_cast<Vector<U, Size>>(extents), static_cast<Matrix<U, Size, Size>>(axes));
+		return OrientedBox<U, Size>(static_cast<Vector<U, Size>>(center), static_cast<Vector<U, Size>>(halfExtents), static_cast<Matrix<U, Size, Size>>(axes));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	constexpr bool AreAlmostEqual(const OrientedBox<T, Size>& lhs, const OrientedBox<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
-		for (std::size_t i = 0uz; i < Size; ++i)
-		{
-			if (!AreAlmostEqual(std::min(std::abs(Dot(lhs.Axis(i), rhs.Axis(i))), T{1}), T{1}, tolerance))
-			{
-				return false;
-			}
-		}
-
-		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.Extents(), rhs.Extents(), tolerance);
+		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.HalfExtents(), rhs.HalfExtents(), tolerance) &&
+			AreAlmostEqual(lhs.Axes(), rhs.Axes(), tolerance);
 	}
 }

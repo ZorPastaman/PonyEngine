@@ -724,7 +724,7 @@ namespace PonyEngine::Math
 		const Vector<T, Size> rayOrigin = TransformTranspose(box.Axes(), ray.Origin() - box.Center());
 		const Vector<T, Size> rayDirection = TransformTranspose(box.Axes(), ray.Direction());
 		const auto newRay = Ray<T, Size>(rayOrigin, rayDirection);
-		const auto newBox = Box<T, Size>(box.Extents());
+		const auto newBox = Box<T, Size>(box.HalfExtents());
 
 		return IntersectionTimes(newRay, newBox, rayBounds);
 	}
@@ -964,13 +964,13 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	bool AreIntersecting(const Flat<T, Size>& flat, const Box<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		return std::abs(flat.Distance(box.Center())) <= Dot(box.Extents(), Abs(flat.Normal()));
+		return std::abs(flat.Distance(box.Center())) <= Dot(box.HalfExtents(), Abs(flat.Normal()));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	bool AreIntersecting(const Flat<T, Size>& flat, const OrientedBox<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		return std::abs(flat.Distance(box.Center())) <= Dot(box.Extents(), Abs(TransformTranspose(box.Axes(), flat.Normal())));
+		return std::abs(flat.Distance(box.Center())) <= Dot(box.HalfExtents(), Abs(TransformTranspose(box.Axes(), flat.Normal())));
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -1002,7 +1002,7 @@ namespace PonyEngine::Math
 	constexpr bool AreIntersecting(const Ball<T, Size>& ball, const OrientedBox<T, Size>& box) noexcept requires (Size >= 1)
 	{
 		const Vector<T, Size> delta = TransformTranspose(box.Axes(), ball.Center() - box.Center());
-		const Vector<T, Size> point = Clamp(delta, -box.Extents(), box.Extents());
+		const Vector<T, Size> point = Clamp(delta, -box.HalfExtents(), box.HalfExtents());
 		return (delta - point).MagnitudeSquared() <= ball.Radius() * ball.Radius();
 	}
 
@@ -1011,7 +1011,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			if (Abs(lhs.Center()[i] - rhs.Center()[i]) > lhs.Extent(i) + rhs.Extent(i))
+			if (Abs(lhs.Center()[i] - rhs.Center()[i]) > lhs.HalfExtent(i) + rhs.HalfExtent(i))
 			{
 				return false;
 			}
@@ -1044,10 +1044,10 @@ namespace PonyEngine::Math
 		const Vector<T, Size> delta = rhs.Center() - lhs.Center();
 		const Matrix<T, Size, Size> absAxes = Abs(rhs.Axes());
 
-		const Vector<T, Size> rightProjections = absAxes * rhs.Extents();
+		const Vector<T, Size> rightProjections = absAxes * rhs.HalfExtents();
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			if (Abs(delta[i]) > lhs.Extent(i) + rightProjections[i])
+			if (Abs(delta[i]) > lhs.HalfExtent(i) + rightProjections[i])
 			{
 				return false;
 			}
@@ -1055,10 +1055,10 @@ namespace PonyEngine::Math
 
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			const T leftProjection = Dot(absAxes.Column(i), lhs.Extents());
+			const T leftProjection = Dot(absAxes.Column(i), lhs.HalfExtents());
 			const T projection = Dot(rhs.Axis(i), delta);
 
-			if (Abs(projection) > leftProjection + rhs.Extent(i))
+			if (Abs(projection) > leftProjection + rhs.HalfExtent(i))
 			{
 				return false;
 			}
@@ -1070,8 +1070,8 @@ namespace PonyEngine::Math
 			{
 				for (std::size_t j = 0uz; j < Size; ++j)
 				{
-					const T leftProjection = lhs.Extent((i + 1) % 3) * absAxes[(i + 2) % 3, j] + lhs.Extent((i + 2) % 3) * absAxes[(i + 1) % 3, j];
-					const T rightProjection = rhs.Extent((j + 1) % 3) * absAxes[i, (j + 2) % 3] + rhs.Extent((j + 2) % 3) * absAxes[i, (j + 1) % 3];
+					const T leftProjection = lhs.HalfExtent((i + 1) % 3) * absAxes[(i + 2) % 3, j] + lhs.HalfExtent((i + 2) % 3) * absAxes[(i + 1) % 3, j];
+					const T rightProjection = rhs.HalfExtent((j + 1) % 3) * absAxes[i, (j + 2) % 3] + rhs.HalfExtent((j + 2) % 3) * absAxes[i, (j + 1) % 3];
 					const T projection = delta[(i + 2) % 3] * rhs.Axes()[(i + 1) % 3, j] - delta[(i + 1) % 3] * rhs.Axes()[(i + 2) % 3, j];
 
 					if (Abs(projection) > leftProjection + rightProjection)
@@ -1093,10 +1093,10 @@ namespace PonyEngine::Math
 		const Vector<T, Size> delta = rhs.Center() - lhs.Center();
 		const Vector<T, Size> rotatedDelta = TransformTranspose(lhs.Axes(), delta);
 
-		const Vector<T, Size> rightProjections = rotationAbs * rhs.Extents();
+		const Vector<T, Size> rightProjections = rotationAbs * rhs.HalfExtents();
 		for (std::size_t i = 0; i < Size; ++i)
 		{
-			if (Abs(rotatedDelta[i]) > lhs.Extent(i) + rightProjections[i])
+			if (Abs(rotatedDelta[i]) > lhs.HalfExtent(i) + rightProjections[i])
 			{
 				return false;
 			}
@@ -1104,10 +1104,10 @@ namespace PonyEngine::Math
 
 		for (std::size_t i = 0; i < Size; ++i)
 		{
-			const T leftProjection = Dot(lhs.Extents(), rotationAbs.Column(i));
+			const T leftProjection = Dot(lhs.HalfExtents(), rotationAbs.Column(i));
 			const T projection = Dot(rotation.Column(i), rotatedDelta);
 
-			if (Abs(projection) > leftProjection + rhs.Extent(i))
+			if (Abs(projection) > leftProjection + rhs.HalfExtent(i))
 			{
 				return false;
 			}
@@ -1119,8 +1119,8 @@ namespace PonyEngine::Math
 			{
 				for (std::size_t j = 0; j < Size; ++j)
 				{
-					const T leftProjection = lhs.Extent((i + 1) % 3) * rotationAbs[(i + 2) % 3, j] + lhs.Extent((i + 2) % 3) * rotationAbs[(i + 1) % 3, j];
-					const T rightProjection = rhs.Extent((j + 1) % 3) * rotationAbs[i, (j + 2) % 3] + rhs.Extent((j + 2) % 3) * rotationAbs[i, (j + 1) % 3];
+					const T leftProjection = lhs.HalfExtent((i + 1) % 3) * rotationAbs[(i + 2) % 3, j] + lhs.HalfExtent((i + 2) % 3) * rotationAbs[(i + 1) % 3, j];
+					const T rightProjection = rhs.HalfExtent((j + 1) % 3) * rotationAbs[i, (j + 2) % 3] + rhs.HalfExtent((j + 2) % 3) * rotationAbs[i, (j + 1) % 3];
 					const T projection = rotatedDelta[(i + 2) % 3] * rotation[(i + 1) % 3, j] - rotatedDelta[(i + 1) % 3] * rotation[(i + 2) % 3, j];
 
 					if (Abs(projection) > leftProjection + rightProjection)

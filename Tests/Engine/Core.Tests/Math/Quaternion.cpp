@@ -13,7 +13,7 @@
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 TEST_CASE("Quaternion static", "[Math][Quaternion]")
 {
@@ -440,7 +440,7 @@ TEST_CASE("Quaternion cast to vector", "[Math][Quaternion]")
 
 TEST_CASE("Quaternion access by index", "[Math][Quaternion]")
 {
-	auto access = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Quaternion<T>& quaternion) constexpr
+	auto access = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Quaternion<T>& quaternion) constexpr
 	{
 		auto copy = quaternion;
 		copy[0] -= 2.f;
@@ -469,7 +469,7 @@ TEST_CASE("Quaternion access by index", "[Math][Quaternion]")
 
 TEST_CASE("Quaternion copy assignment", "[Math][Quaternion]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Quaternion<T>& quaternion) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Quaternion<T>& quaternion) constexpr
 	{
 		auto copy = PonyEngine::Math::Quaternion<T>();
 		copy = quaternion;
@@ -491,7 +491,7 @@ TEST_CASE("Quaternion copy assignment", "[Math][Quaternion]")
 
 TEST_CASE("Quaternion move assignment", "[Math][Quaternion]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Quaternion<T>&quaternion) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Quaternion<T>&quaternion) constexpr
 	{
 		auto copy = quaternion;
 		auto moved = PonyEngine::Math::Quaternion<T>();
@@ -513,7 +513,7 @@ TEST_CASE("Quaternion move assignment", "[Math][Quaternion]")
 
 TEST_CASE("Quaternion product assignment", "[Math][Quaternion]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Quaternion<T>& quaternion, const PonyEngine::Math::Quaternion<T>& other) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Quaternion<T>& quaternion, const PonyEngine::Math::Quaternion<T>& other) constexpr
 	{
 		auto copy = quaternion;
 		copy *= other;

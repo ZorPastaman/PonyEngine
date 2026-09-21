@@ -13,7 +13,7 @@
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 TEST_CASE("Color static", "[Math][Color]")
 {
@@ -194,7 +194,7 @@ TEST_CASE("Color predefined", "[Math][Color]")
 
 TEST_CASE("Color access", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = color;
 		if constexpr (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::HasRed)
@@ -246,7 +246,7 @@ TEST_CASE("Color access", "[Math][Color]")
 
 TEST_CASE("Color access span", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = color;
 		if constexpr (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::HasRed)
@@ -291,7 +291,7 @@ TEST_CASE("Color access span", "[Math][Color]")
 
 TEST_CASE("Color access vector", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = color;
 		if constexpr (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::HasRed)
@@ -353,7 +353,7 @@ TEST_CASE("Color grayscale", "[Math][Color]")
 
 TEST_CASE("Color min this", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = color;
 		return copy.Min();
@@ -370,7 +370,7 @@ TEST_CASE("Color min this", "[Math][Color]")
 
 TEST_CASE("Color max this", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = color;
 		return copy.Max();
@@ -387,7 +387,7 @@ TEST_CASE("Color max this", "[Math][Color]")
 
 TEST_CASE("Color minmax", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = color;
 		const std::pair<float, float> p = copy.MinMax();
@@ -523,7 +523,7 @@ TEST_CASE("Color cast to vector", "[Math][Color]")
 
 TEST_CASE("Color index access", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = color;
 		if constexpr (PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>::HasRed)
@@ -560,7 +560,7 @@ TEST_CASE("Color index access", "[Math][Color]")
 
 TEST_CASE("Color copy assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>();
 		copy = color;
@@ -574,7 +574,7 @@ TEST_CASE("Color copy assignment", "[Math][Color]")
 
 TEST_CASE("Color move assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color) constexpr
 	{
 		auto copy = PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>();
 		copy = color;
@@ -590,7 +590,7 @@ TEST_CASE("Color move assignment", "[Math][Color]")
 
 TEST_CASE("Color sum assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color1) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color1) constexpr
 	{
 		auto copy = color;
 		copy += color1;
@@ -623,7 +623,7 @@ TEST_CASE("Color sum assignment", "[Math][Color]")
 
 TEST_CASE("Color subtraction assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color1) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color1) constexpr
 	{
 		auto copy = color;
 		copy -= color1;
@@ -656,7 +656,7 @@ TEST_CASE("Color subtraction assignment", "[Math][Color]")
 
 TEST_CASE("Color multiply assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color1) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color1) constexpr
 	{
 		auto copy = color;
 		copy *= color1;
@@ -679,7 +679,7 @@ TEST_CASE("Color multiply assignment", "[Math][Color]")
 
 TEST_CASE("Color multiply value assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const T multiplier) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>& color, const T multiplier) constexpr
 	{
 		auto copy = color;
 		copy *= multiplier;
@@ -701,7 +701,7 @@ TEST_CASE("Color multiply value assignment", "[Math][Color]")
 
 TEST_CASE("Color divide assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>&color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>&color1) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>&color, const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>&color1) constexpr
 	{
 		auto copy = color;
 		copy /= color1;
@@ -724,7 +724,7 @@ TEST_CASE("Color divide assignment", "[Math][Color]")
 
 TEST_CASE("Color divide value assignment", "[Math][Color]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>&color, const T multiplier) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>(const PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>&color, const T multiplier) constexpr
 	{
 		auto copy = color;
 		copy /= multiplier;

@@ -116,7 +116,7 @@ TEST_CASE("Bounding ball to box", "[Math][Bounds]")
 	constexpr auto sphere = PonyEngine::Math::Sphere<float>(center, radius);
 	constexpr auto cuboid = PonyEngine::Math::AxisAlignedBoundingBox(sphere);
 	STATIC_REQUIRE(cuboid.Center() == center);
-	STATIC_REQUIRE(cuboid.Extents() == PonyEngine::Math::Vector3<float>(radius));
+	STATIC_REQUIRE(cuboid.HalfExtents() == PonyEngine::Math::Vector3<float>(radius));
 	STATIC_REQUIRE(cuboid.Contains(center));
 	STATIC_REQUIRE(cuboid.Contains(center + PonyEngine::Math::Vector3<float>(radius)));
 	STATIC_REQUIRE(cuboid.Contains(center - PonyEngine::Math::Vector3<float>(radius)));
@@ -137,7 +137,7 @@ TEST_CASE("Bounding oriented box to box", "[Math][Bounds]")
 	const auto cuboid = PonyEngine::Math::OrientedCuboid<float>(center, extents, axes);
 	const auto aabb = PonyEngine::Math::AxisAlignedBoundingBox(cuboid);
 	REQUIRE(aabb.Center() == center);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(aabb.Extents(), PonyEngine::Math::Vector3<float>(6.936f, 4.392f, 5.226f), PonyEngine::Math::Tolerance{ .relative = 0.001f }));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(aabb.HalfExtents(), PonyEngine::Math::Vector3<float>(6.936f, 4.392f, 5.226f), PonyEngine::Math::Tolerance{ .relative = 0.001f }));
 	REQUIRE(aabb.Contains(center));
 	for (std::size_t i = 0; i < PonyEngine::Math::OrientedCuboid<float>::CornerCount; ++i)
 	{
@@ -147,7 +147,7 @@ TEST_CASE("Bounding oriented box to box", "[Math][Bounds]")
 	constexpr auto cuboid1 = PonyEngine::Math::OrientedCuboid<float>(center, extents);
 	constexpr auto aabb1 = PonyEngine::Math::AxisAlignedBoundingBox(cuboid1);
 	STATIC_REQUIRE(aabb1.Center() == center);
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(aabb1.Extents(), extents));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(aabb1.HalfExtents(), extents));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -164,7 +164,7 @@ TEST_CASE("Bounding ball to oriented box", "[Math][Bounds]")
 	constexpr auto sphere = PonyEngine::Math::Sphere<float>(center, radius);
 	constexpr auto cuboid = PonyEngine::Math::OrientedBoundingBox(sphere);
 	STATIC_REQUIRE(cuboid.Center() == center);
-	STATIC_REQUIRE(cuboid.Extents() == PonyEngine::Math::Vector3<float>(radius));
+	STATIC_REQUIRE(cuboid.HalfExtents() == PonyEngine::Math::Vector3<float>(radius));
 	STATIC_REQUIRE(cuboid.Contains(center));
 	STATIC_REQUIRE(cuboid.Contains(center + PonyEngine::Math::Vector3<float>(radius)));
 	STATIC_REQUIRE(cuboid.Contains(center - PonyEngine::Math::Vector3<float>(radius)));
@@ -184,7 +184,7 @@ TEST_CASE("Bounding box to oriented box", "[Math][Bounds]")
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
 	const auto orientedBox = PonyEngine::Math::OrientedBoundingBox(cuboid);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Center(), center));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Extents(), extents));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.HalfExtents(), extents));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::Matrix3x3<float>::Identity()));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
@@ -203,7 +203,7 @@ TEST_CASE("Bounding box to oriented box with rs", "[Math][Bounds]")
 	const auto axes = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(3.f, -2.f, -1.1f));
 	const auto orientedBox = PonyEngine::Math::OrientedBoundingBox(cuboid, axes);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Center(), axes * center));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Extents(), extents));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.HalfExtents(), extents));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), axes));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
@@ -225,8 +225,8 @@ TEST_CASE("Bounding box to oriented box with compact trs", "[Math][Bounds]")
 	const auto axes = PonyEngine::Math::TRSMatrixCompact(translation, rotation, scaling);
 	const auto orientedBox = PonyEngine::Math::OrientedBoundingBox(cuboid, axes);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Center(), PonyEngine::Math::TransformPoint(axes, center)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Extents(), PonyEngine::Math::Vector3<float>(3.f, 4.f, 30.f)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRotationMatrixFromTRS(axes)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.HalfExtents(), cuboid.HalfExtents()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRSMatrixFromTRS(axes)));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -247,8 +247,8 @@ TEST_CASE("Bounding box to oriented box with trs", "[Math][Bounds]")
 	const auto axes = PonyEngine::Math::TRSMatrix(translation, rotation, scaling);
 	const auto orientedBox = PonyEngine::Math::OrientedBoundingBox(cuboid, axes);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Center(), PonyEngine::Math::TransformPoint(axes, center)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Extents(), PonyEngine::Math::Vector3<float>(3.f, 4.f, 30.f)));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRotationMatrixFromTRS(axes)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.HalfExtents(), cuboid.HalfExtents()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(orientedBox.Axes(), PonyEngine::Math::ExtractRSMatrixFromTRS(axes)));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")

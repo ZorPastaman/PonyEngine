@@ -13,7 +13,7 @@
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 TEST_CASE("Matrix static", "[Math][Matrix]")
 {
@@ -41,7 +41,7 @@ TEST_CASE("Matrix static", "[Math][Matrix]")
 
 TEST_CASE("Matrix default constructor", "[Math][Matrix]")
 {
-	auto areAllEqual = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const T value) constexpr
+	auto areAllEqual = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const T value) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -63,7 +63,7 @@ TEST_CASE("Matrix default constructor", "[Math][Matrix]")
 
 TEST_CASE("Matrix diagonal constructor", "[Math][Matrix]")
 {
-	auto IsDiagonalEqual = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const T value) constexpr
+	auto IsDiagonalEqual = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const T value) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -109,7 +109,7 @@ TEST_CASE("Matrix diagonal constructor", "[Math][Matrix]")
 
 TEST_CASE("Matrix component constructor", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -143,7 +143,7 @@ TEST_CASE("Matrix component constructor", "[Math][Matrix]")
 
 TEST_CASE("Matrix column constructor", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -193,7 +193,7 @@ TEST_CASE("Matrix span constructor", "[Math][Matrix]")
 		}
 		return answer;
 	};
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -228,7 +228,7 @@ TEST_CASE("Matrix span constructor", "[Math][Matrix]")
 
 TEST_CASE("Matrix span md constructor", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -267,7 +267,7 @@ TEST_CASE("Matrix span md constructor", "[Math][Matrix]")
 
 TEST_CASE("Matrix column span constructor", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -311,7 +311,7 @@ TEST_CASE("Matrix predefined", "[Math][Matrix]")
 
 TEST_CASE("Matrix component", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -353,7 +353,7 @@ TEST_CASE("Matrix component", "[Math][Matrix]")
 
 TEST_CASE("Matrix span", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t i = 0; i < RowCount * ColumnCount; ++i)
 		{
@@ -384,7 +384,7 @@ TEST_CASE("Matrix span", "[Math][Matrix]")
 
 TEST_CASE("Matrix spanMD", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -421,7 +421,7 @@ TEST_CASE("Matrix spanMD", "[Math][Matrix]")
 
 TEST_CASE("Matrix column span", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t j = 0; j < ColumnCount; ++j)
 		{
@@ -458,7 +458,7 @@ TEST_CASE("Matrix column span", "[Math][Matrix]")
 
 TEST_CASE("Matrix span column", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, std::span<const U, ComponentCount> values) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U, std::size_t ComponentCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, std::span<const U, ComponentCount> values) constexpr
 	{
 		for (std::size_t j = 0; j < ColumnCount; ++j)
 		{
@@ -495,7 +495,7 @@ TEST_CASE("Matrix span column", "[Math][Matrix]")
 
 TEST_CASE("Matrix row", "[Math][Matrix]")
 {
-	auto rowTest = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Vector4<T>& row0, const PonyEngine::Math::Vector4<T>& row1, const PonyEngine::Math::Vector4<T>& row2, const PonyEngine::Math::Vector4<T>& row3) constexpr
+	auto rowTest = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Vector4<T>& row0, const PonyEngine::Math::Vector4<T>& row1, const PonyEngine::Math::Vector4<T>& row2, const PonyEngine::Math::Vector4<T>& row3) constexpr
 	{
 		auto matrix = PonyEngine::Math::Matrix<T, RowCount, ColumnCount>();
 		matrix.Row(0uz, row0);
@@ -548,7 +548,7 @@ TEST_CASE("Matrix row", "[Math][Matrix]")
 
 TEST_CASE("Matrix column", "[Math][Matrix]")
 {
-	auto columnTest = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Vector4<T>& column0, const PonyEngine::Math::Vector4<T>& column1, const PonyEngine::Math::Vector4<T>& column2, const PonyEngine::Math::Vector4<T>& column3) constexpr
+	auto columnTest = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Vector4<T>& column0, const PonyEngine::Math::Vector4<T>& column1, const PonyEngine::Math::Vector4<T>& column2, const PonyEngine::Math::Vector4<T>& column3) constexpr
 	{
 		auto matrix = PonyEngine::Math::Matrix<T, RowCount, ColumnCount>();
 		matrix.Column(0uz, column0);
@@ -601,13 +601,13 @@ TEST_CASE("Matrix column", "[Math][Matrix]")
 
 TEST_CASE("Matrix diagonal", "[Math][Matrix]")
 {
-	auto diagonal = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& diagonal) constexpr
+	auto diagonal = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& diagonal) constexpr
 	{
 		auto copy = matrix;
 		copy.Diagonal(diagonal);
 		return copy;
 	};
-	auto diagCheck = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& diagonal) constexpr
+	auto diagCheck = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& diagonal) constexpr
 	{
 		auto copy = matrix;
 		for (std::size_t j = 0uz; j < Size; ++j)
@@ -651,13 +651,13 @@ TEST_CASE("Matrix diagonal", "[Math][Matrix]")
 
 TEST_CASE("Matrix counterdiagonal", "[Math][Matrix]")
 {
-	auto counterdiagonal = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& counterdiagonal) constexpr
+	auto counterdiagonal = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& counterdiagonal) constexpr
 	{
 		auto copy = matrix;
 		copy.CounterDiagonal(counterdiagonal);
 		return copy;
 	};
-	auto diagCheck = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& counterdiagonal) constexpr
+	auto diagCheck = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Matrix<T, Size, Size>& matrix, const PonyEngine::Math::Vector<T, Size>& counterdiagonal) constexpr
 	{
 		auto copy = matrix;
 		for (std::size_t j = 0uz; j < Size; ++j)
@@ -785,7 +785,7 @@ TEST_CASE("Matrix determinant", "[Math][Matrix]")
 
 TEST_CASE("Matrix transpose", "[Math][Matrix]")
 {
-	auto checkValues = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, ColumnCount, RowCount>& matrixT) constexpr
+	auto checkValues = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, ColumnCount, RowCount>& matrixT) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -962,7 +962,7 @@ TEST_CASE("Matrix minor column", "[Math][Matrix]")
 
 TEST_CASE("Matrix minor matrix", "[Math][Matrix]")
 {
-	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& minors) constexpr
+	auto check = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& minors) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1006,7 +1006,7 @@ TEST_CASE("Matrix minor matrix", "[Math][Matrix]")
 
 TEST_CASE("Matrix minor vector row", "[Math][Matrix]")
 {
-	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Vector<T, RowCount>& minors) constexpr
+	auto check = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Vector<T, RowCount>& minors) constexpr
 	{
 		for (std::size_t i = 0uz; i < RowCount; ++i)
 		{
@@ -1047,7 +1047,7 @@ TEST_CASE("Matrix minor vector row", "[Math][Matrix]")
 
 TEST_CASE("Matrix minor vector column", "[Math][Matrix]")
 {
-	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Vector<T, ColumnCount>& minors) constexpr
+	auto check = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Vector<T, ColumnCount>& minors) constexpr
 	{
 		for (std::size_t i = 0uz; i < ColumnCount; ++i)
 		{
@@ -1151,7 +1151,7 @@ TEST_CASE("Matrix cofactor column", "[Math][Matrix]")
 
 TEST_CASE("Matrix cofactor matrix", "[Math][Matrix]")
 {
-	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& cofactors) constexpr
+	auto check = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& cofactors) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1195,7 +1195,7 @@ TEST_CASE("Matrix cofactor matrix", "[Math][Matrix]")
 
 TEST_CASE("Matrix cofactor vector row", "[Math][Matrix]")
 {
-	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Vector<T, RowCount>&cofactors) constexpr
+	auto check = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Vector<T, RowCount>&cofactors) constexpr
 	{
 		for (std::size_t i = 0uz; i < RowCount; ++i)
 		{
@@ -1236,7 +1236,7 @@ TEST_CASE("Matrix cofactor vector row", "[Math][Matrix]")
 
 TEST_CASE("Matrix cofactor vector column", "[Math][Matrix]")
 {
-	auto check = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Vector<T, ColumnCount>&cofactors) constexpr
+	auto check = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Vector<T, ColumnCount>&cofactors) constexpr
 	{
 		for (std::size_t i = 0uz; i < ColumnCount; ++i)
 		{
@@ -1353,7 +1353,7 @@ TEST_CASE("Matrix isZero, isIdentity", "[Math][Matrix]")
 
 TEST_CASE("Matrix isFinite", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
 	{
 		if (!matrix.IsFinite())
 		{
@@ -1390,7 +1390,7 @@ TEST_CASE("Matrix isFinite", "[Math][Matrix]")
 
 TEST_CASE("Matrix multiply this", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrixM) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrixM) constexpr
 	{
 		auto copy = matrix;
 		copy.Multiply(matrixM);
@@ -1445,7 +1445,7 @@ TEST_CASE("Matrix multiply this", "[Math][Matrix]")
 
 TEST_CASE("Matrix divide this", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrixM) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrixM) constexpr
 	{
 		auto copy = matrix;
 		copy.Divide(matrixM);
@@ -1520,7 +1520,7 @@ TEST_CASE("Matrix to string", "[Math][Matrix]")
 
 TEST_CASE("Matrix cast", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, PonyEngine::Type::Arithmetic U, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<U, RowCount, ColumnCount>& matrixO) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Utility::Arithmetic U, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<U, RowCount, ColumnCount>& matrixO) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1544,7 +1544,7 @@ TEST_CASE("Matrix cast", "[Math][Matrix]")
 
 TEST_CASE("Matrix access by index", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const std::span<const U, RowCount * ColumnCount> span) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const std::span<const U, RowCount * ColumnCount> span) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1581,7 +1581,7 @@ TEST_CASE("Matrix access by index", "[Math][Matrix]")
 
 TEST_CASE("Matrix copy assignment", "[Math][Matrix]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
 	{
 		auto copy = PonyEngine::Math::Matrix<T, RowCount, ColumnCount>();
 		copy = matrix;
@@ -1598,7 +1598,7 @@ TEST_CASE("Matrix copy assignment", "[Math][Matrix]")
 
 TEST_CASE("Matrix move assignment", "[Math][Matrix]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
 	{
 		auto copy = matrix;
 		auto moved = PonyEngine::Math::Matrix<T, RowCount, ColumnCount>();
@@ -1616,7 +1616,7 @@ TEST_CASE("Matrix move assignment", "[Math][Matrix]")
 
 TEST_CASE("Matrix sum assignment", "[Math][Matrix]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& other) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& other) constexpr
 	{
 		auto copy = matrix;
 		copy += other;
@@ -1651,7 +1651,7 @@ TEST_CASE("Matrix sum assignment", "[Math][Matrix]")
 
 TEST_CASE("Matrix subtraction assignment", "[Math][Matrix]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&other) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&other) constexpr
 	{
 		auto copy = matrix;
 		copy -= other;
@@ -1686,7 +1686,7 @@ TEST_CASE("Matrix subtraction assignment", "[Math][Matrix]")
 
 TEST_CASE("Matrix product assignment", "[Math][Matrix]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const U multiplier) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const U multiplier) constexpr
 	{
 		auto copy = matrix;
 		copy *= multiplier;
@@ -1722,7 +1722,7 @@ TEST_CASE("Matrix product assignment", "[Math][Matrix]")
 
 TEST_CASE("Matrix product matrix assignment", "[Math][Matrix]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& other) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& other) constexpr
 	{
 		auto copy = matrix;
 		copy *= other;
@@ -1758,7 +1758,7 @@ TEST_CASE("Matrix product matrix assignment", "[Math][Matrix]")
 
 TEST_CASE("Matrix division assignment", "[Math][Matrix]")
 {
-	auto assign = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const U multiplier) constexpr
+	auto assign = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const U multiplier) constexpr
 	{
 		auto copy = matrix;
 		copy /= multiplier;
@@ -1794,7 +1794,7 @@ TEST_CASE("Matrix division assignment", "[Math][Matrix]")
 
 TEST_CASE("Matrix equals", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix) constexpr
 	{
 		auto copy = matrix;
 		if (copy != matrix)
@@ -1843,7 +1843,7 @@ TEST_CASE("Matrix equals", "[Math][Matrix]")
 
 TEST_CASE("Matrix multiply", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& other, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& result) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& other, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& result) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1895,7 +1895,7 @@ TEST_CASE("Matrix multiply", "[Math][Matrix]")
 
 TEST_CASE("Matrix divide", "[Math][Matrix]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&other, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&result) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&matrix, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&other, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&result) constexpr
 	{
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
 		{
@@ -1973,7 +1973,7 @@ TEST_CASE("Matrix multiply transpose", "[Math][Matrix]")
 
 TEST_CASE("Matrix abs", "[Math][Matrix]")
 {
-	auto abs = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix)
+	auto abs = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix)
 	{
 		auto copy = matrix;
 		for (std::size_t i = 0uz; i < ColumnCount; ++i)
@@ -2000,7 +2000,7 @@ TEST_CASE("Matrix abs", "[Math][Matrix]")
 
 TEST_CASE("Matrix normalize columns", "[Math][Matrix]")
 {
-	auto normalize = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix)
+	auto normalize = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& matrix)
 	{
 		auto copy = matrix;
 		for (std::size_t i = 0uz; i < ColumnCount; ++i)
@@ -2106,7 +2106,7 @@ TEST_CASE("Matrix are almost equal", "[Math][Matrix]")
 
 TEST_CASE("Matrix sum", "[Math][Matrix]")
 {
-	auto sum = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& rhs) constexpr
+	auto sum = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& rhs) constexpr
 	{
 		PonyEngine::Math::Matrix<T, RowCount, ColumnCount> result;
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
@@ -2144,7 +2144,7 @@ TEST_CASE("Matrix sum", "[Math][Matrix]")
 
 TEST_CASE("Matrix negate", "[Math][Matrix]")
 {
-	auto negate = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs) constexpr
+	auto negate = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs) constexpr
 	{
 		PonyEngine::Math::Matrix<T, RowCount, ColumnCount> result;
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
@@ -2179,7 +2179,7 @@ TEST_CASE("Matrix negate", "[Math][Matrix]")
 
 TEST_CASE("Matrix subtraction", "[Math][Matrix]")
 {
-	auto subtract = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& rhs) constexpr
+	auto subtract = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs, const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& rhs) constexpr
 	{
 		PonyEngine::Math::Matrix<T, RowCount, ColumnCount> result;
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
@@ -2217,7 +2217,7 @@ TEST_CASE("Matrix subtraction", "[Math][Matrix]")
 
 TEST_CASE("Matrix product", "[Math][Matrix]")
 {
-	auto multiply = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs, const U multiplier) constexpr
+	auto multiply = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>& lhs, const U multiplier) constexpr
 	{
 		PonyEngine::Math::Matrix<T, RowCount, ColumnCount> result;
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)
@@ -2312,7 +2312,7 @@ TEST_CASE("Matrix product vector", "[Math][Matrix]")
 
 TEST_CASE("Matrix division", "[Math][Matrix]")
 {
-	auto divide = []<PonyEngine::Type::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&lhs, const U divisor) constexpr
+	auto divide = []<PonyEngine::Utility::Arithmetic T, std::size_t RowCount, std::size_t ColumnCount, PonyEngine::Utility::Arithmetic U>(const PonyEngine::Math::Matrix<T, RowCount, ColumnCount>&lhs, const U divisor) constexpr
 	{
 		PonyEngine::Math::Matrix<T, RowCount, ColumnCount> result;
 		for (std::size_t j = 0uz; j < ColumnCount; ++j)

@@ -35,7 +35,7 @@ TEST_CASE("OrientedBox default constructor", "[Math][OrientedBox]")
 {
 	constexpr auto obb = PonyEngine::Math::OrientedCuboid<float>();
 	STATIC_REQUIRE(obb.Center() == PonyEngine::Math::Vector3<float>::Zero());
-	STATIC_REQUIRE(obb.Extents() == PonyEngine::Math::Vector3<float>::Zero());
+	STATIC_REQUIRE(obb.HalfExtents() == PonyEngine::Math::Vector3<float>::Zero());
 	STATIC_REQUIRE(obb.Axis(0) == PonyEngine::Math::Vector3<float>::Right());
 	STATIC_REQUIRE(obb.Axis(1) == PonyEngine::Math::Vector3<float>::Up());
 	STATIC_REQUIRE(obb.Axis(2) == PonyEngine::Math::Vector3<float>::Forward());
@@ -53,7 +53,7 @@ TEST_CASE("OrientedBox extents constructor", "[Math][OrientedBox]")
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
 	constexpr auto obb = PonyEngine::Math::OrientedCuboid<float>(extents);
 	STATIC_REQUIRE(obb.Center() == PonyEngine::Math::Vector3<float>::Zero());
-	STATIC_REQUIRE(obb.Extents() == PonyEngine::Math::Abs(extents));
+	STATIC_REQUIRE(obb.HalfExtents() == PonyEngine::Math::Abs(extents));
 	STATIC_REQUIRE(obb.Axis(0) == PonyEngine::Math::Vector3<float>::Right());
 	STATIC_REQUIRE(obb.Axis(1) == PonyEngine::Math::Vector3<float>::Up());
 	STATIC_REQUIRE(obb.Axis(2) == PonyEngine::Math::Vector3<float>::Forward());
@@ -72,7 +72,7 @@ TEST_CASE("OrientedBox center extents constructor", "[Math][OrientedBox]")
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
 	constexpr auto obb = PonyEngine::Math::OrientedCuboid<float>(center, extents);
 	STATIC_REQUIRE(obb.Center() == center);
-	STATIC_REQUIRE(obb.Extents() == PonyEngine::Math::Abs(extents));
+	STATIC_REQUIRE(obb.HalfExtents() == PonyEngine::Math::Abs(extents));
 	STATIC_REQUIRE(obb.Axis(0) == PonyEngine::Math::Vector3<float>::Right());
 	STATIC_REQUIRE(obb.Axis(1) == PonyEngine::Math::Vector3<float>::Up());
 	STATIC_REQUIRE(obb.Axis(2) == PonyEngine::Math::Vector3<float>::Forward());
@@ -94,12 +94,12 @@ TEST_CASE("OrientedBox main constructor", "[Math][OrientedBox]")
 	constexpr auto forward = PonyEngine::Math::Vector3<float>(-4.f, 1.f, 2.f);
 	const auto obb = PonyEngine::Math::OrientedCuboid<float>(center, extents, PonyEngine::Math::Matrix3x3<float>(right, up, forward));
 	REQUIRE(obb.Center() == center);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(0), -extents[0] * right.Magnitude()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(1), extents[1] * up.Magnitude()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(2), extents[2] * forward.Magnitude()));
-	REQUIRE(obb.Axis(0) == right.Normalized());
-	REQUIRE(obb.Axis(1) == up.Normalized());
-	REQUIRE(obb.Axis(2) == forward.Normalized());
+	REQUIRE(obb.HalfExtent(0) == -extents[0]);
+	REQUIRE(obb.HalfExtent(1) == extents[1]);
+	REQUIRE(obb.HalfExtent(2) == extents[2]);
+	REQUIRE(obb.Axis(0) == right);
+	REQUIRE(obb.Axis(1) == up);
+	REQUIRE(obb.Axis(2) == forward);
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -146,28 +146,28 @@ TEST_CASE("OrientedBox access extent", "[Math][OrientedBox]")
 {
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
 	auto obb = PonyEngine::Math::OrientedCuboid<float>();
-	obb.Extent(1, extents[1]);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(1), extents[1]));
+	obb.HalfExtent(1, extents[1]);
+	REQUIRE(obb.HalfExtent(1) == extents[1]);
 	obb.Axis(0, PonyEngine::Math::Vector3<float>::Zero());
-	obb.Extent(0, extents[0]);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(0), 0.f));
+	obb.HalfExtent(0, extents[0]);
+	REQUIRE(obb.HalfExtent(0) == -extents[0]);
 
 	obb = PonyEngine::Math::OrientedCuboid<float>();
 	obb.Axes(PonyEngine::Math::Matrix3x3<float>(PonyEngine::Math::Vector3<float>::Right(), PonyEngine::Math::Vector3<float>::Forward(), PonyEngine::Math::Vector3<float>::Zero()));
-	obb.Extents(extents);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extents(), PonyEngine::Math::Vector3<float>(-extents[0], extents[1], 0.f)));
+	obb.HalfExtents(extents);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.HalfExtents(), PonyEngine::Math::Vector3<float>(-extents[0], extents[1], extents[2])));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("One")
 	{
 		auto cuboid = PonyEngine::Math::OrientedCuboid<float>();
-		cuboid.Extent(2, -3.f);
+		cuboid.HalfExtent(2, -3.f);
 		return cuboid;
 	};
 	BENCHMARK("Many")
 	{
 		auto cuboid = PonyEngine::Math::OrientedCuboid<float>();
-		cuboid.Extents(PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f));
+		cuboid.HalfExtents(PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f));
 		return cuboid;
 	};
 #endif
@@ -180,31 +180,31 @@ TEST_CASE("OrientedBox access axis", "[Math][OrientedBox]")
 	constexpr auto forward = PonyEngine::Math::Vector3<float>(-4.f, 1.f, 2.f);
 	auto obb = PonyEngine::Math::OrientedCuboid<float>();
 	obb.Axis(1, up);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(1), up.Normalized()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(1), 0.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(1), up));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.HalfExtent(1), 0.f));
 
-	obb.Extent(2, 5.f);
+	obb.HalfExtent(2, 5.f);
 	obb.Axis(2, forward);
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(2), forward.Normalized()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(2), 5.f * forward.Magnitude()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(2), forward));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.HalfExtent(2), 5.f));
 
-	obb.Extent(0, 8.f);
+	obb.HalfExtent(0, 8.f);
 	obb.Axis(0, PonyEngine::Math::Vector3<float>::Zero());
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(0), PonyEngine::Math::Vector3<float>::Zero()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(0), 0.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.HalfExtent(0), 8.f));
 
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
 	obb = PonyEngine::Math::OrientedCuboid<float>(extents);
 	obb.Axes(PonyEngine::Math::Matrix3x3<float>(right, up, forward));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(0), right.Normalized()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(1), up.Normalized()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(2), forward.Normalized()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(0), right));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(1), up));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Axis(2), forward));
 	REQUIRE(obb.Axes().Column(0) == obb.Axis(0));
 	REQUIRE(obb.Axes().Column(1) == obb.Axis(1));
 	REQUIRE(obb.Axes().Column(2) == obb.Axis(2));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(0), -extents[0] * right.Magnitude()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(1), extents[1] * up.Magnitude()));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.Extent(2), extents[2] * forward.Magnitude()));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.HalfExtent(0), -extents[0]));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.HalfExtent(1), extents[1]));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(obb.HalfExtent(2), extents[2]));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("One")
@@ -222,14 +222,14 @@ TEST_CASE("OrientedBox access axis", "[Math][OrientedBox]")
 #endif
 }
 
-TEST_CASE("OrientedBox edge", "[Math][OrientedBox]")
+TEST_CASE("OrientedBox extent", "[Math][OrientedBox]")
 {
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
 	constexpr auto cuboid = PonyEngine::Math::OrientedCuboid<float>(extents);
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(6.f, cuboid.Edge(0)));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(4.f, cuboid.Edge(1)));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(12.f, cuboid.Edge(2)));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(6.f, 4.f, 12.f), cuboid.Edges()));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(6.f, cuboid.Extent(0)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(4.f, cuboid.Extent(1)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(12.f, cuboid.Extent(2)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(6.f, 4.f, 12.f), cuboid.Extents()));
 }
 
 TEST_CASE("OrientedBox surface", "[Math][OrientedBox]")
@@ -326,6 +326,54 @@ TEST_CASE("OrientedBox corner", "[Math][OrientedBox]")
 #endif
 }
 
+TEST_CASE("OrientedBox normalize", "[Math][OrientedBox]")
+{
+	constexpr auto center = PonyEngine::Math::Vector3<float>::Zero();
+	constexpr auto halfExtents = PonyEngine::Math::Vector3<float>::One();
+	constexpr auto axes = PonyEngine::Math::Matrix3x3<float>(
+		PonyEngine::Math::Vector3<float>(2.f, 0.f, 0.f),
+		PonyEngine::Math::Vector3<float>(0.f, 0.f, 0.f),
+		PonyEngine::Math::Vector3<float>(0.f, 0.f, 4.f)
+	);
+	auto box = PonyEngine::Math::OrientedCuboid<float>(center, halfExtents, axes);
+	const auto normalized = box.Normalized();
+	box.Normalize();
+
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(box.Axis(0).Magnitude(), 1.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(box.Axis(1).Magnitude(), 0.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(box.Axis(2).Magnitude(), 1.f));
+
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(box.HalfExtent(0), 2.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(box.HalfExtent(1), 0.f));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(box.HalfExtent(2), 4.f));
+
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(normalized, box));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Normalize")
+	{
+		auto testBox = PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(41.f, 5.f, 12.f), 
+			PonyEngine::Math::Matrix3x3<float>(
+				PonyEngine::Math::Vector3<float>(2.f, 0.f, 0.f),
+				PonyEngine::Math::Vector3<float>(0.f, 0.f, 0.f),
+				PonyEngine::Math::Vector3<float>(0.f, 0.f, 4.f)
+		));
+		testBox.Normalize();
+		return testBox;
+	};
+	BENCHMARK("Normalized")
+	{
+		const auto testBox = PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f), PonyEngine::Math::Vector3<float>(41.f, 5.f, 12.f),
+			PonyEngine::Math::Matrix3x3<float>(
+				PonyEngine::Math::Vector3<float>(2.f, 0.f, 0.f),
+				PonyEngine::Math::Vector3<float>(0.f, 0.f, 0.f),
+				PonyEngine::Math::Vector3<float>(0.f, 0.f, 4.f)
+		));
+		return testBox.Normalized();
+	};
+#endif
+}
+
 TEST_CASE("OrientedBox isFinite", "[Math][OrientedBox]")
 {
 	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
@@ -346,12 +394,12 @@ TEST_CASE("OrientedBox isFinite", "[Math][OrientedBox]")
 
 	for (std::size_t i = 0; i < 3; ++i)
 	{
-		auto e = cuboid.Extents();
+		auto e = cuboid.HalfExtents();
 		e[i] = std::numeric_limits<float>::quiet_NaN();
-		cuboid.Extents(e);
+		cuboid.HalfExtents(e);
 		REQUIRE_FALSE(cuboid.IsFinite());
 		e[i] = extents[i];
-		cuboid.Extents(e);
+		cuboid.HalfExtents(e);
 	}
 }
 
@@ -412,10 +460,10 @@ TEST_CASE("OrientedBox contains", "[Math][OrientedBox]")
 {
 	const auto obb = PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(3.f, 5.f, 7.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, 1.f), PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.1f, 0.7f, -1.2f)));
 	REQUIRE(obb.Contains(obb.Center()));
-	REQUIRE(obb.Contains(obb.Center() + obb.Axis(0) * obb.Extent(0) * 0.75f - obb.Axis(1) * obb.Extent(1) * 0.5f + obb.Axis(2) * obb.Extent(2) * 0.2f));
-	REQUIRE(obb.Contains(obb.Center() - obb.Axis(0) * obb.Extent(0) * 0.75f + obb.Axis(1) * obb.Extent(1) * 0.5f - obb.Axis(2) * obb.Extent(2) * 0.2f));
-	REQUIRE_FALSE(obb.Contains(obb.Center() + obb.Axis(0) * obb.Extent(0) * 1.75f - obb.Axis(1) * obb.Extent(1) * 0.5f + obb.Axis(2) * obb.Extent(2) * 0.2f));
-	REQUIRE_FALSE(obb.Contains(obb.Center() + obb.Axis(0) * obb.Extent(0) * 0.75f - obb.Axis(1) * obb.Extent(1) * 1.05f - obb.Axis(2) * obb.Extent(2) * 1.2f));
+	REQUIRE(obb.Contains(obb.Center() + obb.Axis(0) * obb.HalfExtent(0) * 0.75f - obb.Axis(1) * obb.HalfExtent(1) * 0.5f + obb.Axis(2) * obb.HalfExtent(2) * 0.2f));
+	REQUIRE(obb.Contains(obb.Center() - obb.Axis(0) * obb.HalfExtent(0) * 0.75f + obb.Axis(1) * obb.HalfExtent(1) * 0.5f - obb.Axis(2) * obb.HalfExtent(2) * 0.2f));
+	REQUIRE_FALSE(obb.Contains(obb.Center() + obb.Axis(0) * obb.HalfExtent(0) * 1.75f - obb.Axis(1) * obb.HalfExtent(1) * 0.5f + obb.Axis(2) * obb.HalfExtent(2) * 0.2f));
+	REQUIRE_FALSE(obb.Contains(obb.Center() + obb.Axis(0) * obb.HalfExtent(0) * 0.75f - obb.Axis(1) * obb.HalfExtent(1) * 1.05f - obb.Axis(2) * obb.HalfExtent(2) * 1.2f));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -449,7 +497,7 @@ TEST_CASE("OrientedBox cast", "[Math][OrientedBox]")
 	const auto obb = PonyEngine::Math::OrientedCuboid<float>(PonyEngine::Math::Vector3<float>(3.f, 5.f, 7.f), PonyEngine::Math::Vector3<float>(2.f, 5.f, 1.f), PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(1.1f, 0.7f, -1.2f)));
 	const auto cast = static_cast<PonyEngine::Math::OrientedCuboid<double>>(obb);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(cast.Center(), PonyEngine::Math::Vector3<double>(obb.Center())));
-	REQUIRE(PonyEngine::Math::AreAlmostEqual(cast.Extents(), PonyEngine::Math::Vector3<double>(obb.Extents())));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(cast.HalfExtents(), PonyEngine::Math::Vector3<double>(obb.HalfExtents())));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(cast.Axes(), PonyEngine::Math::Matrix3x3<double>(obb.Axes())));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
@@ -502,12 +550,12 @@ TEST_CASE("OrientedBox equals", "[Math][OrientedBox]")
 	{
 		auto ext = extents;
 		ext[i] += 0.000001f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE(copy != obb);
 		ext[i] -= 1.f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE(copy != obb);
-		copy.Extents(extents);
+		copy.HalfExtents(extents);
 	}
 
 	for (std::size_t i = 0; i < 3; ++i)
@@ -515,14 +563,14 @@ TEST_CASE("OrientedBox equals", "[Math][OrientedBox]")
 		auto ax = axes;
 		ax.Column(i) = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(0.000001f, -0.000002f, -0.00001f)) * ax.Column(i);
 		copy.Axes(ax);
-		copy.Extents(extents);
+		copy.HalfExtents(extents);
 		REQUIRE(copy != obb);
 		ax.Column(i) += PonyEngine::Math::Vector3<float>(-1.f, 2.f, -3.f);
 		copy.Axes(ax);
-		copy.Extents(extents);
+		copy.HalfExtents(extents);
 		REQUIRE(copy != obb);
 		copy.Axes(axes);
-		copy.Extents(extents);
+		copy.HalfExtents(extents);
 	}
 }
 
@@ -553,28 +601,12 @@ TEST_CASE("OrientedBox are almost equal", "[Math][OrientedBox]")
 	{
 		auto ext = extents;
 		ext[i] += 0.0000001f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb));
 		ext[i] -= 1.f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, obb));
 		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, PonyEngine::Math::Tolerance{.absolute = 5.f}));
-		copy.Extents(extents);
-	}
-
-	for (std::size_t i = 0; i < 3; ++i)
-	{
-		auto ax = axes;
-		ax.Column(i) = PonyEngine::Math::RotationMatrix(PonyEngine::Math::Vector3<float>(0.000001f, -0.000002f, -0.00001f)) * ax.Column(i);
-		copy.Axes(ax);
-		copy.Extents(extents);
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb));
-		ax.Column(i) += PonyEngine::Math::Vector3<float>(-1.f, 2.f, -3.f);
-		copy.Axes(ax);
-		copy.Extents(extents);
-		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, obb));
-		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, obb, PonyEngine::Math::Tolerance{.absolute = 10.f}));
-		copy.Axes(axes);
-		copy.Extents(extents);
+		copy.HalfExtents(extents);
 	}
 }

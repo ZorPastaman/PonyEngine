@@ -13,7 +13,7 @@
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.Type;
+import PonyEngine.Utility;
 
 TEST_CASE("Vector static", "[Math][Vector]")
 {
@@ -217,7 +217,7 @@ TEST_CASE("Vector copy constructor", "[Math][Vector]")
 
 TEST_CASE("Vector move constructor", "[Math][Vector]")
 {
-	auto moveTest = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Vector<T, Size>& vector) constexpr
+	auto moveTest = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Vector<T, Size>& vector) constexpr
 	{
 		auto copy = vector;
 		auto moved = std::move(copy);
@@ -325,7 +325,7 @@ TEST_CASE("Vector predefined", "[Math][Vector]")
 
 TEST_CASE("Vector access", "[Math][Vector]")
 {
-	auto accessTest = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector) constexpr
+	auto accessTest = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector) constexpr
 	{
 		PonyEngine::Math::Vector4<T> copy = vector;
 		copy.X() -= T{2};
@@ -366,7 +366,7 @@ TEST_CASE("Vector access", "[Math][Vector]")
 
 TEST_CASE("Vector span", "[Math][Vector]")
 {
-	auto spanTest = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector4<T>&vector) constexpr
+	auto spanTest = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector4<T>&vector) constexpr
 	{
 		PonyEngine::Math::Vector4<T> copy = vector;
 		copy.Span()[0] -= T{2};
@@ -721,7 +721,7 @@ TEST_CASE("Vector isFinite", "[Math][Vector]")
 
 TEST_CASE("Vector multiply this", "[Math][Vector]")
 {
-	auto multiply = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector4<T>& lhs, const PonyEngine::Math::Vector4<T>& rhs) constexpr
+	auto multiply = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector4<T>& lhs, const PonyEngine::Math::Vector4<T>& rhs) constexpr
 	{
 		auto copy = lhs;
 		copy.Multiply(rhs);
@@ -758,7 +758,7 @@ TEST_CASE("Vector multiply this", "[Math][Vector]")
 
 TEST_CASE("Vector divide this", "[Math][Vector]")
 {
-	auto divide = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector4<T>&lhs, const PonyEngine::Math::Vector4<T>&rhs) constexpr
+	auto divide = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector4<T>&lhs, const PonyEngine::Math::Vector4<T>&rhs) constexpr
 	{
 		auto copy = lhs;
 		copy.Divide(rhs);
@@ -840,7 +840,7 @@ TEST_CASE("Vector cast", "[Math][Vector]")
 
 TEST_CASE("Vector access by index", "[Math][Vector]")
 {
-	auto accessTest = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector) constexpr
+	auto accessTest = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector) constexpr
 	{
 		PonyEngine::Math::Vector4<T> copy = vector;
 		copy[0] -= T{2};
@@ -880,7 +880,7 @@ TEST_CASE("Vector access by index", "[Math][Vector]")
 
 TEST_CASE("Vector copy assignment", "[Math][Vector]")
 {
-	auto assignment = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector) constexpr
+	auto assignment = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector) constexpr
 	{
 		auto copy = PonyEngine::Math::Vector4<T>();
 		return copy = vector;
@@ -900,7 +900,7 @@ TEST_CASE("Vector copy assignment", "[Math][Vector]")
 
 TEST_CASE("Vector move assignment", "[Math][Vector]")
 {
-	auto assignment = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector2<T>& vector) constexpr
+	auto assignment = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector2<T>& vector) constexpr
 	{
 		PonyEngine::Math::Vector2<T> copy = vector;
 		PonyEngine::Math::Vector2<T> moved = PonyEngine::Math::Vector2<T>();
@@ -919,7 +919,7 @@ TEST_CASE("Vector move assignment", "[Math][Vector]")
 
 TEST_CASE("Vector sum assignment", "[Math][Vector]")
 {
-	auto assignment = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector, const PonyEngine::Math::Vector4<T>& other) constexpr
+	auto assignment = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector4<T>& vector, const PonyEngine::Math::Vector4<T>& other) constexpr
 	{
 		PonyEngine::Math::Vector4<T> copy = vector;
 		return copy += other;
@@ -960,7 +960,7 @@ TEST_CASE("Vector sum assignment", "[Math][Vector]")
 
 TEST_CASE("Vector subtraction assignment", "[Math][Vector]")
 {
-	auto assignment = []<PonyEngine::Type::Arithmetic T>(const PonyEngine::Math::Vector2<T>&vector, const PonyEngine::Math::Vector2<T>&other) constexpr
+	auto assignment = []<PonyEngine::Utility::Arithmetic T>(const PonyEngine::Math::Vector2<T>&vector, const PonyEngine::Math::Vector2<T>&other) constexpr
 	{
 		PonyEngine::Math::Vector2<T> copy = vector;
 		return copy -= other;
@@ -997,7 +997,7 @@ TEST_CASE("Vector subtraction assignment", "[Math][Vector]")
 
 TEST_CASE("Vector product assignment", "[Math][Vector]")
 {
-	auto assignment = []<PonyEngine::Type::Arithmetic T, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Vector2<T>&vector, U multiplier) constexpr
+	auto assignment = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Utility::Arithmetic U>(const PonyEngine::Math::Vector2<T>&vector, U multiplier) constexpr
 	{
 		PonyEngine::Math::Vector2<T> copy = vector;
 		return copy *= multiplier;
@@ -1035,7 +1035,7 @@ TEST_CASE("Vector product assignment", "[Math][Vector]")
 
 TEST_CASE("Vector division assignment", "[Math][Vector]")
 {
-	auto assignment = []<PonyEngine::Type::Arithmetic T, PonyEngine::Type::Arithmetic U>(const PonyEngine::Math::Vector2<T>& vector, const U multiplier) constexpr
+	auto assignment = []<PonyEngine::Utility::Arithmetic T, PonyEngine::Utility::Arithmetic U>(const PonyEngine::Math::Vector2<T>& vector, const U multiplier) constexpr
 	{
 		PonyEngine::Math::Vector2<T> copy = vector;
 		return copy /= multiplier;

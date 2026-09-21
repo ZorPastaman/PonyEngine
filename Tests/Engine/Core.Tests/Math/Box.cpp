@@ -13,6 +13,7 @@
 import std;
 
 import PonyEngine.Math;
+import PonyEngine.Utility;
 
 TEST_CASE("Box static", "[Math][Box]")
 {
@@ -42,12 +43,12 @@ TEST_CASE("Box extents constructor", "[Math][Box]")
 	constexpr auto extents2 = PonyEngine::Math::Vector2<float>(-3.f, 2.f);
 	constexpr auto rect = PonyEngine::Math::Rect<float>(extents2);
 	STATIC_REQUIRE(rect.Center() == PonyEngine::Math::Vector2<float>::Zero());
-	STATIC_REQUIRE(rect.Extents() == PonyEngine::Math::Abs(extents2));
+	STATIC_REQUIRE(rect.HalfExtents() == PonyEngine::Math::Abs(extents2));
 
 	constexpr auto extents3 = PonyEngine::Math::Vector3<std::int32_t>(-3, 2, 6);
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<std::int32_t>(extents3);
 	STATIC_REQUIRE(cuboid.Center() == PonyEngine::Math::Vector3<std::int32_t>::Zero());
-	STATIC_REQUIRE(cuboid.Extents() == PonyEngine::Math::Abs(extents3));
+	STATIC_REQUIRE(cuboid.HalfExtents() == PonyEngine::Math::Abs(extents3));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -63,13 +64,13 @@ TEST_CASE("Box main constructor", "[Math][Box]")
 	constexpr auto extents2 = PonyEngine::Math::Vector2<float>(-3.f, 2.f);
 	constexpr auto rect = PonyEngine::Math::Rect<float>(center2, extents2);
 	STATIC_REQUIRE(rect.Center() == center2);
-	STATIC_REQUIRE(rect.Extents() == PonyEngine::Math::Abs(extents2));
+	STATIC_REQUIRE(rect.HalfExtents() == PonyEngine::Math::Abs(extents2));
 
 	constexpr auto center3 = PonyEngine::Math::Vector3<std::int32_t>(4, -5, 1);
 	constexpr auto extents3 = PonyEngine::Math::Vector3<std::int32_t>(-3, 2, 6);
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<std::int32_t>(center3, extents3);
 	STATIC_REQUIRE(cuboid.Center() == center3);
-	STATIC_REQUIRE(cuboid.Extents() == PonyEngine::Math::Abs(extents3));
+	STATIC_REQUIRE(cuboid.HalfExtents() == PonyEngine::Math::Abs(extents3));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
@@ -86,12 +87,12 @@ TEST_CASE("Box copy constructor", "[Math][Box]")
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
 	constexpr auto copy = cuboid;
 	STATIC_REQUIRE(copy.Center() == center);
-	STATIC_REQUIRE(copy.Extents() == PonyEngine::Math::Abs(extents));
+	STATIC_REQUIRE(copy.HalfExtents() == PonyEngine::Math::Abs(extents));
 }
 
 TEST_CASE("Box move constructor", "[Math][Box]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Box<T, Size>& box) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Box<T, Size>& box) constexpr
 	{
 		auto copy = box;
 		auto moved = std::move(copy);
@@ -103,17 +104,17 @@ TEST_CASE("Box move constructor", "[Math][Box]")
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
 	constexpr auto moved = test(cuboid);
 	STATIC_REQUIRE(moved.Center() == center);
-	STATIC_REQUIRE(moved.Extents() == PonyEngine::Math::Abs(extents));
+	STATIC_REQUIRE(moved.HalfExtents() == PonyEngine::Math::Abs(extents));
 }
 
 TEST_CASE("Box access", "[Math][Box]")
 {
-	auto test = []<PonyEngine::Type::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Box<T, Size>& box) constexpr
+	auto test = []<PonyEngine::Utility::Arithmetic T, std::size_t Size>(const PonyEngine::Math::Box<T, Size>& box) constexpr
 	{
 		auto copy = box;
 		copy.Center(box.Center() + PonyEngine::Math::Vector<T, Size>(T{1}));
-		copy.Extents(box.Extents() - PonyEngine::Math::Vector<T, Size>(T{1}));
-		copy.Extent(0, T{-3});
+		copy.HalfExtents(box.HalfExtents() - PonyEngine::Math::Vector<T, Size>(T{1}));
+		copy.HalfExtent(0, T{-3});
 		return copy;
 	};
 
@@ -121,17 +122,17 @@ TEST_CASE("Box access", "[Math][Box]")
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
 	STATIC_REQUIRE(cuboid.Center() == center);
-	STATIC_REQUIRE(cuboid.Extents() == PonyEngine::Math::Abs(extents));
-	STATIC_REQUIRE(cuboid.Extent(0) == PonyEngine::Math::Abs(extents[0]));
-	STATIC_REQUIRE(cuboid.Extent(1) == PonyEngine::Math::Abs(extents[1]));
-	STATIC_REQUIRE(cuboid.Extent(2) == PonyEngine::Math::Abs(extents[2]));
+	STATIC_REQUIRE(cuboid.HalfExtents() == PonyEngine::Math::Abs(extents));
+	STATIC_REQUIRE(cuboid.HalfExtent(0) == PonyEngine::Math::Abs(extents[0]));
+	STATIC_REQUIRE(cuboid.HalfExtent(1) == PonyEngine::Math::Abs(extents[1]));
+	STATIC_REQUIRE(cuboid.HalfExtent(2) == PonyEngine::Math::Abs(extents[2]));
 
 	constexpr auto copy = test(cuboid);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(center + PonyEngine::Math::Vector3<float>(1.f), copy.Center()));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(3.f, 1.f, 5.f), copy.Extents()));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(copy.Extent(0), 3.f));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(copy.Extent(1), 1.f));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(copy.Extent(2), 5.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(3.f, 1.f, 5.f), copy.HalfExtents()));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(copy.HalfExtent(0), 3.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(copy.HalfExtent(1), 1.f));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(copy.HalfExtent(2), 5.f));
 }
 
 TEST_CASE("Box edge", "[Math][Box]")
@@ -139,13 +140,13 @@ TEST_CASE("Box edge", "[Math][Box]")
 	constexpr auto center = PonyEngine::Math::Vector3<float>(4.f, -5.f, 1.f);
 	constexpr auto extents = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 6.f);
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(6.f, cuboid.Edge(0)));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(4.f, cuboid.Edge(1)));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(12.f, cuboid.Edge(2)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(6.f, cuboid.Extent(0)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(4.f, cuboid.Extent(1)));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(12.f, cuboid.Extent(2)));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(6.f, cuboid.Width()));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(4.f, cuboid.Height()));
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(12.f, cuboid.Depth()));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(6.f, 4.f, 12.f), cuboid.Edges()));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Vector3<float>(6.f, 4.f, 12.f), cuboid.Extents()));
 }
 
 TEST_CASE("Box surface", "[Math][Box]")
@@ -280,9 +281,9 @@ TEST_CASE("Box isFinite", "[Math][Box]")
 
 		auto ext = extents;
 		ext[i] = std::numeric_limits<float>::quiet_NaN();
-		cube.Extents(ext);
+		cube.HalfExtents(ext);
 		REQUIRE_FALSE(cube.IsFinite());
-		cube.Extents(extents);
+		cube.HalfExtents(extents);
 	}
 }
 
@@ -355,7 +356,7 @@ TEST_CASE("Box cast", "[Math][Box]")
 	constexpr auto cuboid = PonyEngine::Math::Cuboid<float>(center, extents);
 	constexpr auto cast = static_cast<PonyEngine::Math::Cuboid<double>>(cuboid);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(cast.Center(), static_cast<PonyEngine::Math::Vector3<double>>(center)));
-	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(cast.Extents(), static_cast<PonyEngine::Math::Vector3<double>>(PonyEngine::Math::Abs(extents))));
+	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(cast.HalfExtents(), static_cast<PonyEngine::Math::Vector3<double>>(PonyEngine::Math::Abs(extents))));
 }
 
 TEST_CASE("Box equals", "[Math][Box]")
@@ -380,12 +381,12 @@ TEST_CASE("Box equals", "[Math][Box]")
 
 		auto ext = extents;
 		ext[i] -= 0.000001f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE(copy != cuboid);
 		ext[i] -= 1.f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE(copy != cuboid);
-		copy.Extents(extents);
+		copy.HalfExtents(extents);
 	}
 }
 
@@ -412,13 +413,13 @@ TEST_CASE("Box are almost equal", "[Math][Box]")
 
 		auto ext = extents;
 		ext[i] -= 0.000001f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, cuboid));
 		ext[i] -= 1.f;
-		copy.Extents(ext);
+		copy.HalfExtents(ext);
 		REQUIRE_FALSE(PonyEngine::Math::AreAlmostEqual(copy, cuboid));
 		REQUIRE(PonyEngine::Math::AreAlmostEqual(copy, cuboid, PonyEngine::Math::Tolerance{ .absolute = 5.f }));
-		copy.Extents(extents);
+		copy.HalfExtents(extents);
 	}
 
 #if PONY_ENGINE_TESTING_BENCHMARK

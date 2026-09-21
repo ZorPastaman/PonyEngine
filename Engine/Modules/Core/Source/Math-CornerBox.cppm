@@ -187,7 +187,7 @@ namespace PonyEngine::Math
 	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::CornerBox(const Box<T, Dim>& box) noexcept :
 		position(box.Min()),
-		size(box.Edges())
+		size(box.HalfExtents())
 	{
 	}
 
@@ -331,8 +331,8 @@ namespace PonyEngine::Math
 	template<Utility::Arithmetic T, std::size_t Dim> requires (Dim >= 1)
 	constexpr CornerBox<T, Dim>::operator Box<T, Dim>() const noexcept
 	{
-		const Vector<T, Dim> extents = size / T{2};
-		return Box<T, Dim>(position + extents, extents);
+		const Vector<T, Dim> halfExtents = size / T{2};
+		return Box<T, Dim>(position + halfExtents, halfExtents);
 	}
 
 	template<std::floating_point T, std::size_t Size>

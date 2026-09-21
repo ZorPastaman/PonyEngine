@@ -149,13 +149,13 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	Ball<T, Size> BoundingBall(const Box<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		return Ball<T, Size>(box.Center(), std::nextafter(box.Extents().Magnitude(), std::numeric_limits<T>::max()));
+		return Ball<T, Size>(box.Center(), std::nextafter(box.HalfExtents().Magnitude(), std::numeric_limits<T>::max()));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	Ball<T, Size> BoundingBall(const OrientedBox<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		return Ball<T, Size>(box.Center(), std::nextafter(box.Extents().Magnitude(), std::numeric_limits<T>::max()));
+		return Ball<T, Size>(box.Center(), std::nextafter(box.HalfExtents().Magnitude(), std::numeric_limits<T>::max()));
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size>
@@ -176,13 +176,13 @@ namespace PonyEngine::Math
 
 		using TimeType = std::conditional_t<std::is_floating_point_v<T>, T, double>;
 		const Vector<T, Size> center = Lerp(min, max, TimeType{0.5});
-		Vector<T, Size> extents;
+		Vector<T, Size> halfExtents;
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			extents[i] = std::max(max[i] - center[i], center[i] - min[i]);
+			halfExtents[i] = std::max(max[i] - center[i], center[i] - min[i]);
 		}
 
-		return Box(center, extents);
+		return Box(center, halfExtents);
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -194,7 +194,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr Box<T, Size> AxisAlignedBoundingBox(const OrientedBox<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		return Box<T, Size>(box.Center(), Abs(box.Axes()) * box.Extents());
+		return Box<T, Size>(box.Center(), Abs(box.Axes()) * box.HalfExtents());
 	}
 
 	template<std::floating_point T, std::size_t Size>
@@ -206,24 +206,24 @@ namespace PonyEngine::Math
 	template<std::floating_point T, std::size_t Size>
 	constexpr OrientedBox<T, Size> OrientedBoundingBox(const Box<T, Size>& box) noexcept requires (Size >= 1)
 	{
-		return OrientedBox<T, Size>(box.Center(), box.Extents());
+		return OrientedBox<T, Size>(box.Center(), box.HalfExtents());
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	OrientedBox<T, Size> OrientedBoundingBox(const Box<T, Size>& box, const Matrix<T, Size, Size>& rs) noexcept requires (Size >= 1)
 	{
-		return OrientedBox<T, Size>(rs * box.Center(), box.Extents(), rs);
+		return OrientedBox<T, Size>(rs * box.Center(), box.HalfExtents(), rs);
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	OrientedBox<T, Size> OrientedBoundingBox(const Box<T, Size>& box, const Matrix<T, Size, Size + 1>& trs) noexcept requires (Size >= 1)
 	{
-		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.Extents(), ExtractRSMatrixFromTRS(trs));
+		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.HalfExtents(), ExtractRSMatrixFromTRS(trs));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	OrientedBox<T, Size> OrientedBoundingBox(const Box<T, Size>& box, const Matrix<T, Size + 1, Size + 1>& trs) noexcept requires (Size >= 1)
 	{
-		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.Extents(), ExtractRSMatrixFromTRS(trs));
+		return OrientedBox<T, Size>(TransformPoint(trs, box.Center()), box.HalfExtents(), ExtractRSMatrixFromTRS(trs));
 	}
 }

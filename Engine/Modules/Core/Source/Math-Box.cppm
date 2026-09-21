@@ -46,14 +46,14 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Box() noexcept = default;
 		/// @brief Creates a box with a zero center.
-		/// @param extents Extents.
+		/// @param halfExtents Half-extents.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Box(const Vector<T, Size>& extents) noexcept;
+		explicit constexpr Box(const Vector<T, Size>& halfExtents) noexcept;
 		/// @brief Creates a box.
 		/// @param center Center.
-		/// @param extents Extents.
+		/// @param halfExtents Half-extents.
 		[[nodiscard("Pure constructor")]]
-		constexpr Box(const Vector<T, Size>& center, const Vector<T, Size>& extents) noexcept;
+		constexpr Box(const Vector<T, Size>& center, const Vector<T, Size>& halfExtents) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Box(const Box& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -68,22 +68,22 @@ export namespace PonyEngine::Math
 		/// @brief Sets the center.
 		/// @param center Center.
 		constexpr void Center(const Vector<T, Size>& center) noexcept;
-		/// @brief Gets the extents.
-		/// @return Extents.
+		/// @brief Gets the half-extents.
+		/// @return Half-extents.
 		[[nodiscard("Pure function")]]
-		constexpr const Vector<T, Size>& Extents() const noexcept;
-		/// @brief Sets the extents.
-		/// @param extents Extents.
-		constexpr void Extents(const Vector<T, Size>& extents) noexcept;
-		/// @brief Gets the extent.
-		/// @param index Extent index. Must be in range [0, Size).
-		/// @return Extent.
+		constexpr const Vector<T, Size>& HalfExtents() const noexcept;
+		/// @brief Sets the half-extents.
+		/// @param halfExtents Half-extents.
+		constexpr void HalfExtents(const Vector<T, Size>& halfExtents) noexcept;
+		/// @brief Gets the half-extent.
+		/// @param index Half-extent index. Must be in range [0, Size).
+		/// @return Half-extent.
 		[[nodiscard("Pure function")]]
-		constexpr const T& Extent(std::size_t index) const noexcept;
-		/// @brief Sets the extent.
-		/// @param index Extent index. Must be in range [0, Size).
-		/// @param extent Extent.
-		constexpr void Extent(std::size_t index, T extent) noexcept;
+		constexpr const T& HalfExtent(std::size_t index) const noexcept;
+		/// @brief Sets the half-extent.
+		/// @param index Half-extent index. Must be in range [0, Size).
+		/// @param halfExtent Half-extent.
+		constexpr void HalfExtent(std::size_t index, T halfExtent) noexcept;
 
 		/// @brief Calculates the width.
 		/// @return Width.
@@ -97,15 +97,15 @@ export namespace PonyEngine::Math
 		/// @return Depth.
 		[[nodiscard("Pure function")]]
 		constexpr T Depth() const noexcept requires (Size >= 3);
-		/// @brief Calculates the edge length.
-		/// @param index Edge index. Must be in range [0, Size).
-		/// @return Edge length.
+		/// @brief Calculates the extent.
+		/// @param index Extent index. Must be in range [0, Size).
+		/// @return Extent.
 		[[nodiscard("Pure function")]]
-		constexpr T Edge(std::size_t index) const noexcept;
-		/// @brief Calculates the edge lengths.
-		/// @return Edge lengths.
+		constexpr T Extent(std::size_t index) const noexcept;
+		/// @brief Calculates the extents.
+		/// @return Extents.
 		[[nodiscard("Pure function")]]
-		constexpr Vector<T, Size> Edges() const noexcept;
+		constexpr Vector<T, Size> Extents() const noexcept;
 		/// @brief Calculates a surface area.
 		/// @return Surface area.
 		[[nodiscard("Pure function")]]
@@ -172,7 +172,7 @@ export namespace PonyEngine::Math
 
 	private:
 		Vector<T, Size> center; ///< Center.
-		Vector<T, Size> extents; ///< Extents.
+		Vector<T, Size> halfExtents; ///< Half-extents.
 	};
 
 	/// @brief Rectangle.
@@ -210,16 +210,16 @@ namespace PonyEngine::Math
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr Box<T, Size>::Box(const Vector<T, Size>& extents) noexcept :
+	constexpr Box<T, Size>::Box(const Vector<T, Size>& halfExtents) noexcept :
 		center(Vector<T, Size>::Zero()),
-		extents(Abs(extents))
+		halfExtents(Abs(halfExtents))
 	{
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr Box<T, Size>::Box(const Vector<T, Size>& center, const Vector<T, Size>& extents) noexcept :
+	constexpr Box<T, Size>::Box(const Vector<T, Size>& center, const Vector<T, Size>& halfExtents) noexcept :
 		center(center),
-		extents(Abs(extents))
+		halfExtents(Abs(halfExtents))
 	{
 	}
 
@@ -236,57 +236,57 @@ namespace PonyEngine::Math
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr const Vector<T, Size>& Box<T, Size>::Extents() const noexcept
+	constexpr const Vector<T, Size>& Box<T, Size>::HalfExtents() const noexcept
 	{
-		return extents;
+		return halfExtents;
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr void Box<T, Size>::Extents(const Vector<T, Size>& extents) noexcept
+	constexpr void Box<T, Size>::HalfExtents(const Vector<T, Size>& halfExtents) noexcept
 	{
-		this->extents = Abs(extents);
+		this->halfExtents = Abs(halfExtents);
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr const T& Box<T, Size>::Extent(const std::size_t index) const noexcept
+	constexpr const T& Box<T, Size>::HalfExtent(const std::size_t index) const noexcept
 	{
-		return extents[index];
+		return halfExtents[index];
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr void Box<T, Size>::Extent(const std::size_t index, const T extent) noexcept
+	constexpr void Box<T, Size>::HalfExtent(const std::size_t index, const T halfExtent) noexcept
 	{
-		extents[index] = Abs(extent);
+		halfExtents[index] = Abs(halfExtent);
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr T Box<T, Size>::Width() const noexcept
 	{
-		return Edge(0uz);
+		return Extent(0uz);
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr T Box<T, Size>::Height() const noexcept requires (Size >= 2)
 	{
-		return Edge(1uz);
+		return Extent(1uz);
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr T Box<T, Size>::Depth() const noexcept requires (Size >= 3)
 	{
-		return Edge(2uz);
+		return Extent(2uz);
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr T Box<T, Size>::Edge(const std::size_t index) const noexcept
+	constexpr T Box<T, Size>::Extent(const std::size_t index) const noexcept
 	{
-		return extents[index] * T{2};
+		return halfExtents[index] * T{2};
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
-	constexpr Vector<T, Size> Box<T, Size>::Edges() const noexcept
+	constexpr Vector<T, Size> Box<T, Size>::Extents() const noexcept
 	{
-		return extents * T{2};
+		return halfExtents * T{2};
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
@@ -298,11 +298,11 @@ namespace PonyEngine::Math
 			T product = T{1};
 			for (std::size_t j = 0uz; j < i; ++j)
 			{
-				product *= Edge(j);
+				product *= Extent(j);
 			}
 			for (std::size_t j = i + 1uz; j < Size; ++j)
 			{
-				product *= Edge(j);
+				product *= Extent(j);
 			}
 			answer += product;
 		}
@@ -316,7 +316,7 @@ namespace PonyEngine::Math
 		T answer = T{1};
 		for (std::size_t i = 0uz; i < Size; ++i)
 		{
-			answer *= Edge(i);
+			answer *= Extent(i);
 		}
 
 		return answer;
@@ -325,7 +325,7 @@ namespace PonyEngine::Math
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr T Box<T, Size>::Min(const std::size_t index) const noexcept
 	{
-		return center[index] - extents[index];
+		return center[index] - halfExtents[index];
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
@@ -343,7 +343,7 @@ namespace PonyEngine::Math
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr T Box<T, Size>::Max(const std::size_t index) const noexcept
 	{
-		return center[index] + extents[index];
+		return center[index] + halfExtents[index];
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
@@ -392,7 +392,7 @@ namespace PonyEngine::Math
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
 	constexpr bool Box<T, Size>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
-		return center.IsFinite() && extents.IsFinite();
+		return center.IsFinite() && halfExtents.IsFinite();
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1)
@@ -400,7 +400,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < Size; ++i)
 		{
-			if (Abs(point[i] - center[i]) > extents[i])
+			if (Abs(point[i] - center[i]) > halfExtents[i])
 			{
 				return false;
 			}
@@ -419,12 +419,12 @@ namespace PonyEngine::Math
 	template<Utility::Arithmetic U>
 	constexpr Box<T, Size>::operator Box<U, Size>() const noexcept
 	{
-		return Box<U, Size>(static_cast<Vector<U, Size>>(center), static_cast<Vector<U, Size>>(extents));
+		return Box<U, Size>(static_cast<Vector<U, Size>>(center), static_cast<Vector<U, Size>>(halfExtents));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	constexpr bool AreAlmostEqual(const Box<T, Size>& lhs, const Box<T, Size>& rhs, const Tolerance<T>& tolerance) noexcept
 	{
-		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.Extents(), rhs.Extents(), tolerance);
+		return AreAlmostEqual(lhs.Center(), rhs.Center(), tolerance) && AreAlmostEqual(lhs.HalfExtents(), rhs.HalfExtents(), tolerance);
 	}
 }
