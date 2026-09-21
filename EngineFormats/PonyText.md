@@ -1,4 +1,4 @@
-# PonyText resource type
+# Pony.Text resource type
 
 Text resource type.
 

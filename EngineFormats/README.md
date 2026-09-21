@@ -9,4 +9,4 @@ The engine uses different custom formats for different purposes.
 
 ## Resource types
 
-- [PonyText](PonyText.md)
+- [Pony.Text](PonyText.md)

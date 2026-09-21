@@ -1,6 +1,6 @@
 # PonyTools.TextCompiler tool
 
-Compiles any file to a resource container of `PonyText` type.
+Compiles any file to a resource container of `Pony.Text` type.
 
 ## How to use
 

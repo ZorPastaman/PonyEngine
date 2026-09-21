@@ -62,7 +62,7 @@ constexpr std::string_view DirectResourceAccessPropertyName = "directResourceAcc
 
 constexpr std::string_view DataMagicWord = "PonyEngineResourceData"; ///< Resource data magic word.
 constexpr std::string_view LoadMagicWord = "PonyEngineResourceLoad"; ///< Resource load magic word.
-constexpr std::string_view TextResourceType = "PonyText"; ///< Text resource type.
+constexpr std::string_view TextResourceType = "Pony.Text"; ///< Text resource type.
 
 bool Verbose = false; ///< Verbose flag.
 

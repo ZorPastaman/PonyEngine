@@ -1,6 +1,6 @@
 # PonyEngine.Resource.Text.Impl feature module
 
-Text resource loader module. It supports `PonyText` resource type.
+Text resource loader module. It supports `Pony.Text` resource type.
 
 Adds `PonyEngine.Resource.Text.Impl` target as a static library.
 

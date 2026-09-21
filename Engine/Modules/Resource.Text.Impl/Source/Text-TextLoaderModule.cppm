@@ -36,7 +36,7 @@ export namespace PonyEngine::Resource::Text
 		TextLoaderModule& operator =(TextLoaderModule&&) = delete;
 
 	private:
-		static constexpr std::string_view TextResourceType = "PonyText"; ///< Text resource type.
+		static constexpr std::string_view TextResourceType = "Pony.Text"; ///< Text resource type.
 
 		std::unique_ptr<TextLoader> textLoader; ///< Text loader.
 	};
