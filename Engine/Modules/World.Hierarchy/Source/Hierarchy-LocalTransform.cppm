@@ -7,60 +7,56 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math:Transform;
+export module PonyEngine.World.Hierarchy:LocalTransform;
 
 import std;
 
-import :Common;
-import :Matrix;
-import :Quaternion;
-import :Transformations;
-import :Vector;
+import PonyEngine.Math;
 
-export namespace PonyEngine::Math
+export namespace PonyEngine::World::Hierarchy
 {
-	/// @brief Transform 3D.
+	/// @brief Local transform.
 	/// @tparam T Component type.
 	/// @tparam Size Dimension.
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	class Transform final
+	class LocalTransform final
 	{
 	public:
 		using ValueType = T; ///< Component type.
-		using PositionType = Vector<T, Size>; ///< Position type.
-		using RotationType = std::conditional_t<Size == 3, Quaternion<T>, T>; ///< Rotation type.
-		using ScaleType = Vector<T, Size>; ///< Scale type.
-		using TRSMatrixType = std::conditional_t<Size == 3, Matrix4x4<T>, Matrix3x3<T>>; ///< TRS matrix type.
-		using TRSMatrixCompactType = std::conditional_t<Size == 3, Matrix3x4<T>, Matrix2x3<T>>; ///< Compact TRS matrix type.
+		using PositionType = Math::Vector<T, Size>; ///< Position type.
+		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<T>, T>; ///< Rotation type.
+		using ScaleType = Math::Vector<T, Size>; ///< Scale type.
+		using TRSMatrixType = std::conditional_t<Size == 3, Math::Matrix4x4<T>, Math::Matrix3x3<T>>; ///< TRS matrix type.
+		using TRSMatrixCompactType = std::conditional_t<Size == 3, Math::Matrix3x4<T>, Math::Matrix2x3<T>>; ///< Compact TRS matrix type.
 
 		/// @brief Creates a transform with a zero position, zero rotation and scale of one.
 		[[nodiscard("Pure constructor")]]
-		Transform() noexcept;
+		LocalTransform() noexcept;
 		/// @brief Creates a transform with arguments.
 		/// @param position Position.
 		/// @param rotation Rotation.
 		/// @param scale Scale.
 		[[nodiscard("Pure constructor")]]
-		Transform(const Vector<T, Size>& position, const RotationType& rotation, const Vector<T, Size>& scale) noexcept;
+		LocalTransform(const Math::Vector<T, Size>& position, const RotationType& rotation, const Math::Vector<T, Size>& scale) noexcept;
 		[[nodiscard("Pure constructor")]]
-		Transform(const Transform& other) noexcept = default;
+		LocalTransform(const LocalTransform& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		Transform(Transform&& other) noexcept = default;
+		LocalTransform(LocalTransform&& other) noexcept = default;
 
-		~Transform() noexcept = default;
+		~LocalTransform() noexcept = default;
 
 		/// @brief Gets an identity transform.
 		/// @return Identity transform.
 		[[nodiscard("Pure function")]]
-		static const Transform& Identity() noexcept;
+		static const LocalTransform& Identity() noexcept;
 
 		/// @brief Gets the position.
 		/// @return Position.
 		[[nodiscard("Pure function")]]
-		const Vector<T, Size>& Position() const noexcept;
+		const Math::Vector<T, Size>& Position() const noexcept;
 		/// @brief Sets the position.
 		/// @param position Position.
-		void Position(const Vector<T, Size>& position) noexcept;
+		void Position(const Math::Vector<T, Size>& position) noexcept;
 		/// @brief Gets the rotation.
 		/// @return Rotation in radians.
 		[[nodiscard("Pure function")]]
@@ -72,10 +68,10 @@ export namespace PonyEngine::Math
 		/// @brief Gets the scale.
 		/// @return Scale.
 		[[nodiscard("Pure function")]]
-		const Vector<T, Size>& Scale() const noexcept;
+		const Math::Vector<T, Size>& Scale() const noexcept;
 		/// @brief Sets the scale.
 		/// @param scale Scale.
-		void Scale(const Vector<T, Size>& scale) noexcept;
+		void Scale(const Math::Vector<T, Size>& scale) noexcept;
 
 		/// @brief Computes a translation-rotation-scaling matrix.
 		/// @return Translation-rotation-scaling matrix.
@@ -94,69 +90,69 @@ export namespace PonyEngine::Math
 		/// @brief Gets the transform right vector.
 		/// @return Right.
 		[[nodiscard("Pure function")]]
-		Vector<T, Size> Right() const noexcept;
+		Math::Vector<T, Size> Right() const noexcept;
 		/// @brief Gets the transform left vector.
 		/// @return Left.
 		[[nodiscard("Pure function")]]
-		Vector<T, Size> Left() const noexcept;
+		Math::Vector<T, Size> Left() const noexcept;
 		/// @brief Gets the transform up vector.
 		/// @return Up.
 		[[nodiscard("Pure function")]]
-		Vector<T, Size> Up() const noexcept;
+		Math::Vector<T, Size> Up() const noexcept;
 		/// @brief Gets the transform down vector.
 		/// @return Down.
 		[[nodiscard("Pure function")]]
-		Vector<T, Size> Down() const noexcept;
+		Math::Vector<T, Size> Down() const noexcept;
 		/// @brief Gets the transform forward vector.
 		/// @return Forward.
 		[[nodiscard("Pure function")]]
-		Vector<T, Size> Forward() const noexcept requires (Size == 3);
+		Math::Vector<T, Size> Forward() const noexcept requires (Size == 3);
 		/// @brief Gets the transform back vector.
 		/// @return Back.
 		[[nodiscard("Pure function")]]
-		Vector<T, Size> Back() const noexcept requires (Size == 3);
+		Math::Vector<T, Size> Back() const noexcept requires (Size == 3);
 
 		/// @brief Translates the transform.
 		/// @param translation Translation.
-		void Translate(const Vector<T, Size>& translation) noexcept;
+		void Translate(const Math::Vector<T, Size>& translation) noexcept;
 		/// @brief Rotates the transform.
 		/// @note The function normalizes the rotation.
 		/// @param rotationToAdd Rotation to add.
 		void Rotate(const RotationType& rotationToAdd) noexcept;
 		/// @brief Multiplies the current scale by the @p stretch components-wise.
 		/// @param stretch Stretch.
-		void Stretch(const Vector<T, Size>& stretch) noexcept;
+		void Stretch(const Math::Vector<T, Size>& stretch) noexcept;
 
 		/// @brief Rotates the transform so that it looks in the specific direction.
 		/// @param direction Look direction. Must be unit.
-		void LookIn(const Vector<T, Size>& direction) noexcept requires (Size == 2);
+		void LookIn(const Math::Vector<T, Size>& direction) noexcept requires (Size == 2);
 		/// @brief Rotates the transform so that it looks in the specific direction.
 		/// @param direction Look direction. Must be unit.
 		/// @param up Up vector. Must be unit.
-		void LookIn(const Vector<T, Size>& direction, const Vector<T, Size>& up) noexcept requires (Size == 3);
+		void LookIn(const Math::Vector<T, Size>& direction, const Math::Vector<T, Size>& up) noexcept requires (Size == 3);
 		/// @brief Rotates the transform so that it looks at the specific point.
 		/// @note The function does nothing if the @p point is too close to the current position.
 		/// @param point Look target.
-		void LookAt(const Vector<T, Size>& point) noexcept requires (Size == 2);
+		void LookAt(const Math::Vector<T, Size>& point) noexcept requires (Size == 2);
 		/// @brief Rotates the transform so that it looks at the specific point.
 		/// @note The function does nothing if the @p point is too close to the current position.
 		/// @param point Look target.
 		/// @param up Up vector. Must be unit.
-		void LookAt(const Vector<T, Size>& point, const Vector<T, Size>& up) noexcept requires (Size == 3);
+		void LookAt(const Math::Vector<T, Size>& point, const Math::Vector<T, Size>& up) noexcept requires (Size == 3);
 
 		/// @brief Converts the transform to another transform type.
 		/// @tparam U Target component type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
-		explicit operator Transform<U, Size>() const noexcept;
+		explicit operator LocalTransform<U, Size>() const noexcept;
 
-		Transform& operator =(const Transform& other) noexcept = default;
-		Transform& operator =(Transform&& other) noexcept = default;
+		LocalTransform& operator =(const LocalTransform& other) noexcept = default;
+		LocalTransform& operator =(LocalTransform&& other) noexcept = default;
 
 		/// @brief Checks if two transforms are the same: they have the same position, rotation and scale.
 		/// @param other Other transform.
 		/// @return @a True if they're the same; @a false otherwise.
 		[[nodiscard("Pure operator")]]
-		bool operator ==(const Transform& other) const noexcept = default;
+		bool operator ==(const LocalTransform& other) const noexcept = default;
 
 	private:
 		/// @brief Gets an identity rotation.
@@ -164,19 +160,19 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		static const RotationType& IdentityRotation() noexcept;
 
-		Vector<T, Size> position; ///< Position.
+		Math::Vector<T, Size> position; ///< Position.
 		RotationType rotation; ///< Rotation.
-		Vector<T, Size> scale; ///< Scale.
+		Math::Vector<T, Size> scale; ///< Scale.
 	};
 
-	/// @brief Transform 2D.
+	/// @brief Local transform 2D.
 	/// @tparam T Component type.
 	template<std::floating_point T>
-	using Transform2D = Transform<T, 2>;
-	/// @brief Transform 3D.
+	using LocalTransform2D = LocalTransform<T, 2>;
+	/// @brief Local transform 3D.
 	/// @tparam T Component type.
 	template<std::floating_point T>
-	using Transform3D = Transform<T, 3>;
+	using LocalTransform3D = LocalTransform<T, 3>;
 
 	/// @brief Applies the transform to the point vector.
 	/// @tparam T Value type.
@@ -185,7 +181,7 @@ export namespace PonyEngine::Math
 	/// @param vector Point.
 	/// @return Transformed point.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Vector<T, Size> TransformPoint(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept;
+	Math::Vector<T, Size> TransformPoint(const LocalTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept;
 	/// @brief Applies the transform to the direction vector.
 	/// @tparam T Value type.
 	/// @tparam Size Dimension.
@@ -193,31 +189,32 @@ export namespace PonyEngine::Math
 	/// @param vector Direction.
 	/// @return Transformed direction.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Vector<T, Size> TransformDirection(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept;
+	Math::Vector<T, Size> TransformDirection(const LocalTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept;
 
 	/// @brief Checks if positions, rotations and scales of the two transforms are almost equal.
 	/// @tparam T Component type.
 	/// @tparam Size Dimension.
-	/// @param left Left transform.
-	/// @param right Right transform.
+	/// @param lhs Left transform.
+	/// @param rhs Right transform.
 	/// @param tolerance Tolerance.
 	/// @return @a True if they're almost equal; @a false otherwise.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const Transform<T, Size>& left, const Transform<T, Size>& right, const Tolerance<T>& tolerance = Tolerance<T>()) noexcept requires (Size == 2 || Size == 3);
+	bool AreAlmostEqual(const LocalTransform<T, Size>& lhs, const LocalTransform<T, Size>& rhs, 
+		const Math::Tolerance<T>& tolerance = Math::Tolerance<T>()) noexcept requires (Size == 2 || Size == 3);
 }
 
-namespace PonyEngine::Math
+namespace PonyEngine::World::Hierarchy
 {
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Transform<T, Size>::Transform() noexcept :
-		position(Vector<T, Size>::Zero()),
+	LocalTransform<T, Size>::LocalTransform() noexcept :
+		position(Math::Vector<T, Size>::Zero()),
 		rotation(IdentityRotation()),
-		scale(Vector<T, Size>::One())
+		scale(Math::Vector<T, Size>::One())
 	{
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Transform<T, Size>::Transform(const Vector<T, Size>& position, const RotationType& rotation, const Vector<T, Size>& scale) noexcept :
+	LocalTransform<T, Size>::LocalTransform(const Math::Vector<T, Size>& position, const RotationType& rotation, const Math::Vector<T, Size>& scale) noexcept :
 		position(position),
 		scale(scale)
 	{
@@ -225,29 +222,36 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	const Vector<T, Size>& Transform<T, Size>::Position() const noexcept
+	const LocalTransform<T, Size>& LocalTransform<T, Size>::Identity() noexcept
+	{
+		static auto identityTransform = LocalTransform();
+		return identityTransform;
+	}
+
+	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
+	const Math::Vector<T, Size>& LocalTransform<T, Size>::Position() const noexcept
 	{
 		return position;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::Position(const Vector<T, Size>& position) noexcept
+	void LocalTransform<T, Size>::Position(const Math::Vector<T, Size>& position) noexcept
 	{
 		this->position = position;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	const typename Transform<T, Size>::RotationType& Transform<T, Size>::Rotation() const noexcept
+	const LocalTransform<T, Size>::RotationType& LocalTransform<T, Size>::Rotation() const noexcept
 	{
 		return rotation;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::Rotation(const RotationType& rotation) noexcept
+	void LocalTransform<T, Size>::Rotation(const RotationType& rotation) noexcept
 	{
 		if constexpr (Size == 3)
 		{
-			this->rotation = rotation.Normalized(Quaternion<T>::Identity());
+			this->rotation = rotation.Normalized(Math::Quaternion<T>::Identity());
 		}
 		else
 		{
@@ -256,79 +260,79 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	const Vector<T, Size>& Transform<T, Size>::Scale() const noexcept
+	const Math::Vector<T, Size>& LocalTransform<T, Size>::Scale() const noexcept
 	{
 		return scale;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::Scale(const Vector<T, Size>& scale) noexcept
+	void LocalTransform<T, Size>::Scale(const Math::Vector<T, Size>& scale) noexcept
 	{
 		this->scale = scale;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	typename Transform<T, Size>::TRSMatrixType Transform<T, Size>::TRSMatrix() const noexcept
+	LocalTransform<T, Size>::TRSMatrixType LocalTransform<T, Size>::TRSMatrix() const noexcept
 	{
 		return Math::TRSMatrix(position, rotation, scale);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-		typename Transform<T, Size>::TRSMatrixCompactType Transform<T, Size>::TRSMatrixCompact() const noexcept
+	LocalTransform<T, Size>::TRSMatrixCompactType LocalTransform<T, Size>::TRSMatrixCompact() const noexcept
 	{
 		return Math::TRSMatrixCompact(position, rotation, scale);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	bool Transform<T, Size>::IsFinite() const noexcept
+	bool LocalTransform<T, Size>::IsFinite() const noexcept
 	{
 		return Math::IsFinite(position) && Math::IsFinite(rotation) && Math::IsFinite(scale);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Vector<T, Size> Transform<T, Size>::Right() const noexcept
+	Math::Vector<T, Size> LocalTransform<T, Size>::Right() const noexcept
 	{
-		return Math::Rotate(Vector<T, Size>::Right(), rotation);
+		return Math::Rotate(Math::Vector<T, Size>::Right(), rotation);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Vector<T, Size> Transform<T, Size>::Left() const noexcept
+	Math::Vector<T, Size> LocalTransform<T, Size>::Left() const noexcept
 	{
-		return Math::Rotate(Vector<T, Size>::Left(), rotation);
+		return Math::Rotate(Math::Vector<T, Size>::Left(), rotation);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Vector<T, Size> Transform<T, Size>::Up() const noexcept
+	Math::Vector<T, Size> LocalTransform<T, Size>::Up() const noexcept
 	{
-		return Math::Rotate(Vector<T, Size>::Up(), rotation);
+		return Math::Rotate(Math::Vector<T, Size>::Up(), rotation);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Vector<T, Size> Transform<T, Size>::Down() const noexcept
+	Math::Vector<T, Size> LocalTransform<T, Size>::Down() const noexcept
 	{
-		return Math::Rotate(Vector<T, Size>::Down(), rotation);
+		return Math::Rotate(Math::Vector<T, Size>::Down(), rotation);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Vector<T, Size> Transform<T, Size>::Forward() const noexcept requires (Size == 3)
+	Math::Vector<T, Size> LocalTransform<T, Size>::Forward() const noexcept requires (Size == 3)
 	{
-		return Math::Rotate(Vector<T, Size>::Forward(), rotation);
+		return Math::Rotate(Math::Vector<T, Size>::Forward(), rotation);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Vector<T, Size> Transform<T, Size>::Back() const noexcept requires (Size == 3)
+	Math::Vector<T, Size> LocalTransform<T, Size>::Back() const noexcept requires (Size == 3)
 	{
-		return Math::Rotate(Vector<T, Size>::Back(), rotation);
+		return Math::Rotate(Math::Vector<T, Size>::Back(), rotation);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::Translate(const Vector<T, Size>& translation) noexcept
+	void LocalTransform<T, Size>::Translate(const Math::Vector<T, Size>& translation) noexcept
 	{
 		position += translation;
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::Rotate(const RotationType& rotationToAdd) noexcept
+	void LocalTransform<T, Size>::Rotate(const RotationType& rotationToAdd) noexcept
 	{
 		if constexpr (Size == 3)
 		{
@@ -341,73 +345,57 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::Stretch(const Vector<T, Size>& stretch) noexcept
+	void LocalTransform<T, Size>::Stretch(const Math::Vector<T, Size>& stretch) noexcept
 	{
 		scale.Multiply(stretch);
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::LookIn(const Vector<T, Size>& direction) noexcept requires (Size == 2)
+	void LocalTransform<T, Size>::LookIn(const Math::Vector<T, Size>& direction) noexcept requires (Size == 2)
 	{
-		Rotation(AngleSigned(Vector<T, Size>::Right(), direction));
+		Rotation(Math::AngleSigned(Math::Vector<T, Size>::Right(), direction));
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::LookIn(const Vector<T, Size>& direction, const Vector<T, Size>& up) noexcept requires (Size == 3)
+	void LocalTransform<T, Size>::LookIn(const Math::Vector<T, Size>& direction, const Math::Vector<T, Size>& up) noexcept requires (Size == 3)
 	{
-		Rotation(LookInRotationQuaternion(direction, up));
+		Rotation(Math::LookInRotationQuaternion(direction, up));
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::LookAt(const Vector<T, Size>& point) noexcept requires (Size == 2)
+	void LocalTransform<T, Size>::LookAt(const Math::Vector<T, Size>& point) noexcept requires (Size == 2)
 	{
-		if (const Vector<T, Size> direction = point - position; !direction.IsAlmostZero()) [[likely]]
+		if (const Math::Vector<T, Size> direction = point - position; !direction.IsAlmostZero()) [[likely]]
 		{
 			LookIn(direction.Normalized());
 		}
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	void Transform<T, Size>::LookAt(const Vector<T, Size>& point, const Vector<T, Size>& up) noexcept requires (Size == 3)
+	void LocalTransform<T, Size>::LookAt(const Math::Vector<T, Size>& point, const Math::Vector<T, Size>& up) noexcept requires (Size == 3)
 	{
-		if (const Vector<T, Size> direction = point - position; !direction.IsAlmostZero()) [[likely]]
+		if (const Math::Vector<T, Size> direction = point - position; !direction.IsAlmostZero()) [[likely]]
 		{
 			LookIn(direction.Normalized(), up);
 		}
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	const Transform<T, Size>& Transform<T, Size>::Identity() noexcept
-	{
-		static auto identityTransform = Transform();
-		return identityTransform;
-	}
-
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
 	template<std::floating_point U>
-	Transform<T, Size>::operator Transform<U, Size>() const noexcept
+	LocalTransform<T, Size>::operator LocalTransform<U, Size>() const noexcept
 	{
-		return Transform<U, Size>(static_cast<Vector<U, Size>>(position), static_cast<typename Transform<U, Size>::RotationType>(rotation), static_cast<Vector<U, Size>>(scale));
-	}
-
-	template<std::floating_point T, std::size_t Size>
-	Vector<T, Size> TransformPoint(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept
-	{
-		return transform.Position() + Math::Rotate(Multiply(vector, transform.Scale()), transform.Rotation());
-	}
-
-	template<std::floating_point T, std::size_t Size>
-	Vector<T, Size> TransformDirection(const Transform<T, Size>& transform, const Vector<T, Size>& vector) noexcept
-	{
-		return Math::Rotate(vector, transform.Rotation());
+		return LocalTransform<U, Size>(
+			static_cast<Math::Vector<U, Size>>(position), 
+			static_cast<LocalTransform<U, Size>::RotationType>(rotation), 
+			static_cast<Math::Vector<U, Size>>(scale));
 	}
 
 	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	const Transform<T, Size>::RotationType& Transform<T, Size>::IdentityRotation() noexcept
+	const LocalTransform<T, Size>::RotationType& LocalTransform<T, Size>::IdentityRotation() noexcept
 	{
 		if constexpr (Size == 3)
 		{
-			return Quaternion<T>::Identity();
+			return Math::Quaternion<T>::Identity();
 		}
 		else
 		{
@@ -417,9 +405,22 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	bool AreAlmostEqual(const Transform<T, Size>& left, const Transform<T, Size>& right, const Tolerance<T>& tolerance) noexcept requires (Size == 2 || Size == 3)
+	Math::Vector<T, Size> TransformPoint(const LocalTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept
 	{
-		return AreAlmostEqual(left.Position(), right.Position(), tolerance) && AreAlmostEqual(left.Rotation(), right.Rotation(), tolerance) && 
-			AreAlmostEqual(left.Scale(), right.Scale(), tolerance);
+		return transform.Position() + Math::Rotate(Multiply(vector, transform.Scale()), transform.Rotation());
+	}
+
+	template<std::floating_point T, std::size_t Size>
+	Math::Vector<T, Size> TransformDirection(const LocalTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept
+	{
+		return Math::Rotate(vector, transform.Rotation());
+	}
+
+	template<std::floating_point T, std::size_t Size>
+	bool AreAlmostEqual(const LocalTransform<T, Size>& lhs, const LocalTransform<T, Size>& rhs, 
+		const Math::Tolerance<T>& tolerance) noexcept requires (Size == 2 || Size == 3)
+	{
+		return AreAlmostEqual(lhs.Position(), rhs.Position(), tolerance) && AreAlmostEqual(lhs.Rotation(), rhs.Rotation(), tolerance) &&
+			AreAlmostEqual(lhs.Scale(), rhs.Scale(), tolerance);
 	}
 }

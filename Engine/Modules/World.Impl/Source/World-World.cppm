@@ -45,26 +45,42 @@ export namespace PonyEngine::World
 		virtual std::size_t GetEntities(std::span<Entity> entities) const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual bool AreValid(std::span<const Entity> entities) const noexcept override;
-		virtual void AreValid(std::span<const Entity> entities, std::span<bool> valid) const noexcept override;
+		virtual bool AreValid(std::span<const Entity> entities, std::span<bool> valid) const noexcept override;
 		virtual void CreateEntities(std::span<Entity> entities) override;
 		virtual void DestroyEntities(std::span<const Entity> entities) override;
 
 		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType) override;
-		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, const void* componentData) override;
-		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> componentData) override;
+		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<const std::byte> componentData) override;
+		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components) override;
+		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<const std::byte> componentData, std::span<void*> components) override;
 
 		virtual void RemoveComponents(std::span<const Entity> entities, std::type_index componentType) override;
 
 		[[nodiscard("Pure function")]] 
 		virtual bool HasComponents(std::span<const Entity> entities, std::type_index componentType) const noexcept override;
-		virtual void HasComponents(std::span<const Entity> entities, std::type_index componentType, std::span<bool> has) const noexcept override;
+		virtual bool HasComponents(std::span<const Entity> entities, std::type_index componentType, std::span<bool> has) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t CountComponents(std::type_index componentType) const noexcept override;
 
-		virtual std::size_t GetEntities(std::type_index componentType, std::span<Entity> entities) const noexcept override;
-		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> componentData) const noexcept override;
-		virtual std::size_t GetEntitiesAndComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> componentData) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<Entity> entities) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<Entity> entities, std::span<std::byte> componentData) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<Entity> entities, std::span<void*> components) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<Entity> entities, std::span<std::byte> componentData, 
+			std::span<void*> components) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<std::byte> componentData) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<std::byte> componentData, std::span<void*> components) const noexcept override;
+		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> components) const noexcept override;
+
+		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData) const noexcept override;
+		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, 
+			std::span<bool> has) const noexcept override;
+		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, 
+			std::span<std::byte> componentData, std::span<void*> components) const noexcept override;
+		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, std::span<void*> components,
+			std::span<bool> has) const noexcept override;
+		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components) const noexcept override;
+		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components, std::span<bool> has) const noexcept override;
 
 		virtual void DropComponents(std::type_index componentType) override;
 
@@ -142,10 +158,41 @@ export namespace PonyEngine::World
 		/// @param table Component table.
 		/// @param entities Entities.
 		void CopyEntities(const ComponentTable& table, std::span<Entity> entities) const noexcept;
-		/// @brief Copies component pointers from the table to the external array.
+		/// @brief Copies component data from the table to the external array.
 		/// @param table Component table.
 		/// @param componentData Component data.
-		static void CopyComponents(const ComponentTable& table, std::span<void*> componentData) noexcept;
+		static void CopyComponentData(const ComponentTable& table, std::span<std::byte> componentData) noexcept;
+		/// @brief Copies component data from the table to the external array.
+		/// @param table Component table.
+		/// @param componentData Component data.
+		/// @param entities Entities.
+		/// @param indices Entity indices.
+		static void CopyComponentData(const ComponentTable& table, std::span<std::byte> componentData, std::span<const Entity> entities, std::span<std::size_t> indices) noexcept;
+		/// @brief Copies component pointers from the table to the external array.
+		/// @param table Component table.
+		/// @param components Components.
+		static void CopyComponents(const ComponentTable& table, std::span<void*> components) noexcept;
+		/// @brief Copies component pointers from the table to the external array.
+		/// @param table Component table.
+		/// @param components Components.
+		/// @param entities Entities.
+		/// @param indices Entity indices.
+		static void CopyComponents(const ComponentTable& table, std::span<void*> components, std::span<const Entity> entities, std::span<std::size_t> indices) noexcept;
+		/// @brief Gets valid indices, indices of entities that are contained in the table.
+		/// @param table Component table.
+		/// @param entities Entities to find.
+		/// @param indices Valid indices.
+		/// @return Valid index count.
+		[[nodiscard("Pure function")]]
+		static std::size_t GetValidIndices(const ComponentTable& table, std::span<const Entity> entities, std::span<std::size_t> indices) noexcept;
+		/// @brief Gets valid indices, indices of entities that are contained in the table.
+		/// @param table Component table.
+		/// @param entities Entities to find.
+		/// @param indices Valid indices.
+		/// @param has Has flags.
+		/// @return Valid index count.
+		[[nodiscard("Pure function")]]
+		static std::size_t GetValidIndices(const ComponentTable& table, std::span<const Entity> entities, std::span<std::size_t> indices, std::span<bool> has) noexcept;
 
 		/// @brief Finds required tables.
 		/// @param types Component types.
@@ -288,14 +335,18 @@ namespace PonyEngine::World
 		return true;
 	}
 
-	void World::AreValid(const std::span<const Entity> entities, const std::span<bool> valid) const noexcept
+	bool World::AreValid(const std::span<const Entity> entities, const std::span<bool> valid) const noexcept
 	{
 		assert(entities.size() == valid.size() && "Entity and valid span sizes are mismatched");
 
+		bool isValid = true;
+
 		for (std::size_t i = 0; i < entities.size(); ++i)
 		{
-			valid[i] = !IsInvalid(entities[i]);
+			isValid &= (valid[i] = !IsInvalid(entities[i]));
 		}
+
+		return isValid;
 	}
 
 	void World::CreateEntities(const std::span<Entity> entities)
@@ -307,7 +358,6 @@ namespace PonyEngine::World
 			{
 				throw std::invalid_argument("Entity count is too great");
 			}
-
 
 			entityGenerations.reserve(requiredSize);
 		}
@@ -350,14 +400,14 @@ namespace PonyEngine::World
 		UpdateComponents(entities, componentType);
 	}
 
-	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const void* const componentData)
+	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<const std::byte> componentData)
 	{
-		assert(componentData && "Component data is nullptr");
-
 		const ComponentTable& table = UpdateComponents(entities, componentType);
-
-		auto byteData = static_cast<const std::byte*>(componentData);
 		const std::size_t componentSize = table.ComponentSize();
+
+		assert((componentData.size() == entities.size() * componentSize) && "Entity and component data span sizes are mismatched.");
+
+		const std::byte* byteData = componentData.data();
 		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += componentSize)
 		{
 			const EntityID index = table.Index(entities[i].id);
@@ -365,16 +415,35 @@ namespace PonyEngine::World
 		}
 	}
 
-	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> componentData)
+	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> components)
 	{
-		assert(entities.size() == componentData.size() && "Entity and component data span sizes are mismatched");
+		assert(entities.size() == components.size() && "Entity and component span sizes are mismatched");
 
 		const ComponentTable& table = UpdateComponents(entities, componentType);
 
 		for (std::size_t i = 0uz; i < entities.size(); ++i)
 		{
 			const EntityID index = table.Index(entities[i].id);
-			componentData[i] = table.Component(index);
+			components[i] = table.Component(index);
+		}
+	}
+
+	void World::AddComponents(const std::span<const Entity> entities, const std::type_index componentType,
+		const std::span<const std::byte> componentData, const std::span<void*> components)
+	{
+		assert(entities.size() == components.size() && "Entity and component span sizes are mismatched");
+
+		const ComponentTable& table = UpdateComponents(entities, componentType);
+		const std::size_t componentSize = table.ComponentSize();
+
+		assert((componentData.size() == entities.size() * componentSize) && "Entity and component data span sizes are mismatched.");
+
+		const std::byte* byteData = componentData.data();
+		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += componentSize)
+		{
+			const EntityID index = table.Index(entities[i].id);
+			void* const component = components[i] = table.Component(index);
+			std::memcpy(component, byteData, componentSize);
 		}
 	}
 
@@ -412,23 +481,27 @@ namespace PonyEngine::World
 		return false;
 	}
 
-	void World::HasComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<bool> has) const noexcept
+	bool World::HasComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<bool> has) const noexcept
 	{
 		CheckIfValid(entities);
-
 		assert(entities.size() == has.size() && "Entity and has span sizes are mismatched");
+
+		bool hasAll = true;
 
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
 			for (std::size_t i = 0uz; i < entities.size(); ++i)
 			{
-				has[i] = table->Contains(entities[i].id);
+				hasAll &= (has[i] = table->Contains(entities[i].id));
 			}
 		}
 		else
 		{
 			std::ranges::fill(has, false);
+			hasAll = false;
 		}
+
+		return hasAll;
 	}
 
 	std::size_t World::CountComponents(const std::type_index componentType) const noexcept
@@ -441,12 +514,16 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
-	std::size_t World::GetEntities(const std::type_index componentType, const std::span<Entity> entities) const noexcept
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<Entity> entities) const noexcept
 	{
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
-			const EntityID count = static_cast<EntityID>(std::min(static_cast<std::size_t>(table->Size()), entities.size()));
-			CopyEntities(*table, entities.subspan(0uz, count));
+			const std::size_t count = std::min(static_cast<std::size_t>(table->Size()), entities.size());
+
+			if (count > 0uz)
+			{
+				CopyEntities(*table, entities.subspan(0uz, count));
+			}
 
 			return count;
 		}
@@ -454,12 +531,39 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
-	std::size_t World::GetComponents(const std::type_index componentType, const std::span<void*> componentData) const noexcept
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<Entity> entities, const std::span<std::byte> componentData) const noexcept
 	{
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
-			const EntityID count = static_cast<EntityID>(std::min(static_cast<std::size_t>(table->Size()), componentData.size()));
-			CopyComponents(*table, componentData.subspan(0uz, count));
+			assert((entities.size() * table->ComponentSize() == componentData.size()) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t count = std::min(static_cast<std::size_t>(table->Size()), entities.size());
+
+			if (count > 0uz)
+			{
+				CopyEntities(*table, entities.subspan(0uz, count));
+				CopyComponentData(*table, componentData.subspan(0uz, count * table->ComponentSize()));
+			}
+
+			return count;
+		}
+		
+		return 0uz;
+	}
+
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<Entity> entities, const std::span<void*> components) const noexcept
+	{
+		assert(entities.size() == components.size() && "Entity and component data span sizes are mismatched");
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			const std::size_t count = std::min(static_cast<std::size_t>(table->Size()), entities.size());
+
+			if (count > 0uz)
+			{
+				CopyEntities(*table, entities.subspan(0uz, count));
+				CopyComponents(*table, components.subspan(0uz, count));
+			}
 
 			return count;
 		}
@@ -467,20 +571,236 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
-	std::size_t World::GetEntitiesAndComponents(const std::type_index componentType, const std::span<Entity> entities, const std::span<void*> componentData) const noexcept
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<Entity> entities, const std::span<std::byte> componentData, 
+		const std::span<void*> components) const noexcept
 	{
-		assert(entities.size() == componentData.size() && "Entity and component data span sizes are mismatched");
+		assert(entities.size() == components.size() && "Entity and component data span sizes are mismatched");
 
 		if (const ComponentTable* const table = FindComponentTable(componentType))
 		{
-			const EntityID count = static_cast<EntityID>(std::min(static_cast<std::size_t>(table->Size()), entities.size()));
-			CopyEntities(*table, entities.subspan(0uz, count));
-			CopyComponents(*table, componentData.subspan(0uz, count));
+			assert((entities.size() * table->ComponentSize() == componentData.size()) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t count = std::min(static_cast<std::size_t>(table->Size()), entities.size());
+
+			if (count > 0uz)
+			{
+				CopyEntities(*table, entities.subspan(0uz, count));
+				CopyComponentData(*table, componentData.subspan(0uz, count * table->ComponentSize()));
+				CopyComponents(*table, components.subspan(0uz, count));
+			}
 
 			return count;
 		}
 
 		return 0uz;
+	}
+
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<std::byte> componentData) const noexcept
+	{
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			assert((componentData.size() % table->ComponentSize() == 0uz) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t count = std::min(static_cast<std::size_t>(table->Size()), componentData.size() / table->ComponentSize());
+
+			if (count > 0uz)
+			{
+				CopyComponentData(*table, componentData.subspan(0uz, count * table->ComponentSize()));
+			}
+
+			return count;
+		}
+
+		return 0uz;
+	}
+
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<std::byte> componentData, const std::span<void*> components) const noexcept
+	{
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			assert((components.size() * table->ComponentSize() == componentData.size()) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t count = std::min(static_cast<std::size_t>(table->Size()), components.size());
+
+			if (count > 0uz)
+			{
+				CopyComponentData(*table, componentData.subspan(0uz, count * table->ComponentSize()));
+				CopyComponents(*table, components.subspan(0uz, count));
+			}
+
+			return count;
+		}
+
+		return 0uz;
+	}
+
+	std::size_t World::GetComponents(const std::type_index componentType, const std::span<void*> components) const noexcept
+	{
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			const std::size_t count = std::min(static_cast<std::size_t>(table->Size()), components.size());
+
+			if (count > 0uz)
+			{
+				CopyComponents(*table, components.subspan(0uz, count));
+			}
+
+			return count;
+		}
+
+		return 0uz;
+	}
+
+	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData) const noexcept
+	{
+		CheckIfValid(entities);
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			assert((entities.size() * table->ComponentSize() == componentData.size()) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t bufferSize = Memory::CalculateBufferSize<std::size_t>(entities.size());
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
+
+			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
+			CopyComponentData(*table, componentData, entities, indices);
+
+			return validIndexCount == entities.size();
+		}
+
+		return false;
+	}
+
+	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData, 
+		const std::span<bool> has) const noexcept
+	{
+		CheckIfValid(entities);
+		assert(entities.size() == has.size() && "Entity and has span sizes are mismatched");
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			assert((entities.size() * table->ComponentSize() == componentData.size()) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t bufferSize = Memory::CalculateBufferSize<std::size_t>(entities.size());
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
+
+			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
+			CopyComponentData(*table, componentData, entities, indices);
+
+			return validIndexCount == entities.size();
+		}
+
+		std::ranges::fill(has, false);
+		return false;
+	}
+
+	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData, 
+		const std::span<void*> components) const noexcept
+	{
+		CheckIfValid(entities);
+		assert(entities.size() == components.size() && "Entity and component span sizes are mismatched");
+
+		std::ranges::fill(components, nullptr);
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			assert((entities.size() * table->ComponentSize() == componentData.size()) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t bufferSize = Memory::CalculateBufferSize<std::size_t>(entities.size());
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
+
+			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
+			CopyComponentData(*table, componentData, entities, indices);
+			CopyComponents(*table, components, entities, indices);
+
+			return validIndexCount == entities.size();
+		}
+
+		return false;
+	}
+
+	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData, 
+		const std::span<void*> components, const std::span<bool> has) const noexcept
+	{
+		CheckIfValid(entities);
+		assert(entities.size() == components.size() && "Entity and component span sizes are mismatched");
+		assert(entities.size() == has.size() && "Entity and has span sizes are mismatched");
+
+		std::ranges::fill(components, nullptr);
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			assert((entities.size() * table->ComponentSize() == componentData.size()) && "Entity and component data span sizes are mismatched");
+
+			const std::size_t bufferSize = Memory::CalculateBufferSize<std::size_t>(entities.size());
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
+
+			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
+			CopyComponentData(*table, componentData, entities, indices);
+			CopyComponents(*table, components, entities, indices);
+
+			return validIndexCount == entities.size();
+		}
+
+		std::ranges::fill(has, false);
+		return false;
+	}
+
+	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> components) const noexcept
+	{
+		CheckIfValid(entities);
+		assert(entities.size() == components.size() && "Entity and component span sizes are mismatched");
+
+		std::ranges::fill(components, nullptr);
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			const std::size_t bufferSize = Memory::CalculateBufferSize<std::size_t>(entities.size());
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
+
+			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
+			CopyComponents(*table, components, entities, indices);
+
+			return validIndexCount == entities.size();
+		}
+
+		return false;
+	}
+
+	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> components, 
+		const std::span<bool> has) const noexcept
+	{
+		CheckIfValid(entities);
+		assert(entities.size() == components.size() && "Entity and component span sizes are mismatched");
+		assert(entities.size() == has.size() && "Entity and has span sizes are mismatched");
+
+		std::ranges::fill(components, nullptr);
+
+		if (const ComponentTable* const table = FindComponentTable(componentType))
+		{
+			const std::size_t bufferSize = Memory::CalculateBufferSize<std::size_t>(entities.size());
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
+
+			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
+			CopyComponents(*table, components, entities, indices);
+
+			return validIndexCount == entities.size();
+		}
+
+		std::ranges::fill(has, false);
+		return false;
 	}
 
 	void World::DropComponents(const std::type_index componentType)
@@ -706,12 +1026,62 @@ namespace PonyEngine::World
 		}
 	}
 
-	void World::CopyComponents(const ComponentTable& table, const std::span<void*> componentData) noexcept
+	void World::CopyComponentData(const ComponentTable& table, std::span<std::byte> componentData) noexcept
 	{
-		for (EntityID i = 0u; i < componentData.size(); ++i)
+		std::memcpy(componentData.data(), table.Component(0u), componentData.size());
+	}
+
+	void World::CopyComponentData(const ComponentTable& table, const std::span<std::byte> componentData, const std::span<const Entity> entities, 
+		const std::span<std::size_t> indices) noexcept
+	{
+		for (const std::size_t index : indices)
 		{
-			componentData[i] = table.Component(i);
+			const EntityID tableIndex = table.Index(entities[index].id);
+			std::memcpy(&componentData[index * table.ComponentSize()], table.Component(tableIndex), table.ComponentSize());
 		}
+	}
+
+	void World::CopyComponents(const ComponentTable& table, const std::span<void*> components) noexcept
+	{
+		auto component = static_cast<std::byte*>(table.Component(0u));
+		for (EntityID i = 0u; i < components.size(); ++i, component += table.ComponentSize())
+		{
+			components[i] = component;
+		}
+	}
+
+	void World::CopyComponents(const ComponentTable& table, const std::span<void*> components, const std::span<const Entity> entities, const std::span<std::size_t> indices) noexcept
+	{
+		for (const std::size_t index : indices)
+		{
+			const EntityID tableIndex = table.Index(entities[index].id);
+			components[index] = table.Component(tableIndex);
+		}
+	}
+
+	std::size_t World::GetValidIndices(const ComponentTable& table, const std::span<const Entity> entities, const std::span<std::size_t> indices) noexcept
+	{
+		std::size_t validIndexCount = 0uz;
+		for (std::size_t i = 0uz; i < entities.size(); ++i)
+		{
+			indices[validIndexCount] = i;
+			validIndexCount += table.Contains(entities[i].id);
+		}
+
+		return validIndexCount;
+	}
+
+	std::size_t World::GetValidIndices(const ComponentTable& table, const std::span<const Entity> entities, const std::span<std::size_t> indices, const std::span<bool> has) noexcept
+	{
+		std::size_t validIndexCount = 0uz;
+		for (std::size_t i = 0uz; i < entities.size(); ++i)
+		{
+			indices[validIndexCount] = i;
+			const bool contains = (has[i] = table.Contains(entities[i].id));
+			validIndexCount += contains;
+		}
+
+		return validIndexCount;
 	}
 
 	bool World::FindRequired(const std::span<const std::type_index> types, const std::span<const ComponentTable*> requiredTables) const noexcept

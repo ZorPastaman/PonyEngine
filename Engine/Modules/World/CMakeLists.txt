@@ -1,4 +1,4 @@
-message(STATUS "Configuring PonyEngine.World feature")
+message(STATUS "Configuring PonyEngine.World feature module")
 
 add_library(PonyEngine.World STATIC)
 

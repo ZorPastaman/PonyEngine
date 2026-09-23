@@ -527,7 +527,7 @@ export namespace PonyEngine::Math
 	/// @param trsMatrix Translation-rotation-scaling matrix. 
 	/// @return Compact translation-rotation-scaling matrix.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	constexpr Matrix<T, Size - 1, Size> ExtractTRSMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
+	constexpr Matrix<T, Size - 1, Size> ExtractTRSMatrixCompactFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1);
 
 	/// @brief Extracts a field of view from the perspective projection matrix.
 	/// @tparam T Value type.
@@ -579,6 +579,27 @@ export namespace PonyEngine::Math
 	/// @return Rotated vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> Rotate(const Vector2<T>& vector, T angle) noexcept;
+	/// @brief Rotates the @p vector with the @p matrix.
+	/// @tparam T Value type.
+	/// @param vector Vector to rotate.
+	/// @param matrix Rotation matrix.
+	/// @return Rotated vector.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Vector2<T> Rotate(const Vector2<T>& vector, const Matrix2x2<T>& matrix) noexcept;
+	/// @brief Transforms the @p vector with the @p quaternion.
+	/// @tparam T Component type.
+	/// @param quaternion Quaternion.
+	/// @param vector Vector to transform.
+	/// @return Transformed vector.
+	template<std::floating_point T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> Rotate(const Vector3<T>& vector, const Quaternion<T>& quaternion) noexcept;
+	/// @brief Rotates the @p vector with the @p matrix.
+	/// @tparam T Value type.
+	/// @param vector Vector to rotate.
+	/// @param matrix Rotation matrix.
+	/// @return Rotated vector.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Vector3<T> Rotate(const Vector3<T>& vector, const Matrix3x3<T>& matrix) noexcept;
 	/// @brief Rotates the @p vector with the @p euler.
 	/// @tparam T Value type.
 	/// @param vector Vector to rotate.
@@ -1426,7 +1447,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	constexpr Matrix<T, Size - 1, Size> ExtractTRSMatrixFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
+	constexpr Matrix<T, Size - 1, Size> ExtractTRSMatrixCompactFromTRS(const Matrix<T, Size, Size>& trsMatrix) noexcept requires (Size > 1)
 	{
 		Matrix<T, Size - 1, Size> trsMatrixCompact;
 		for (std::size_t i = 0uz; i < Size; ++i)
@@ -1486,6 +1507,24 @@ namespace PonyEngine::Math
 	Vector2<T> Rotate(const Vector2<T>& vector, const T angle) noexcept
 	{
 		return RotationMatrix(angle) * vector;
+	}
+
+	template<std::floating_point T>
+	constexpr Vector2<T> Rotate(const Vector2<T>& vector, const Matrix2x2<T>& matrix) noexcept
+	{
+		return matrix * vector;
+	}
+
+	template<std::floating_point T>
+	constexpr Vector3<T> Rotate(const Vector3<T>& vector, const Quaternion<T>& quaternion) noexcept
+	{
+		return quaternion * vector;
+	}
+
+	template<std::floating_point T>
+	constexpr Vector3<T> Rotate(const Vector3<T>& vector, const Matrix3x3<T>& matrix) noexcept
+	{
+		return matrix * vector;
 	}
 
 	template<std::floating_point T>

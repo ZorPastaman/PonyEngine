@@ -27,7 +27,8 @@ export namespace PonyEngine::World
 	};
 
 	/// @brief Object handle. Can be used in components to reference objects.
-	template<typename>
+	/// @tparam T Object type.
+	template<typename T>
 	struct ObjectHandle final
 	{
 		TypelessObjectHandle typeless; ///< Typeless handle.

@@ -18,3 +18,7 @@ include(Catch)
 if(TARGET PonyEngine.Core)
 	add_subdirectory("Core.Tests")
 endif()
+
+if(TARGET PonyEngine.World.Hierarchy)
+	add_subdirectory("World.Hierarchy.Tests")
+endif()
