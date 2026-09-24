@@ -230,15 +230,15 @@ namespace PonyEngine::World::Hierarchy
 		}
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(localTransformCount) +
-			Memory::CalculateBufferSize<LocalTransform3D<float>, Entity>(localTransformCount) +
-			Memory::CalculateBufferSize<WorldTransform3D<float>*, LocalTransform3D<float>>(localTransformCount) +
+			Memory::CalculateBufferSize<LocalTransform3D, Entity>(localTransformCount) +
+			Memory::CalculateBufferSize<WorldTransform3D<float>*, LocalTransform3D>(localTransformCount) +
 			Memory::CalculateBufferSize<Parent*, WorldTransform3D<float>*>(localTransformCount) +
 			Memory::CalculateBufferSize<std::size_t, Parent*>(localTransformCount);
 		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
 		auto arena = Memory::Arena(buffer->Span());
 
 		const std::span<Entity> entities = arena.AllocateArray<Entity>(localTransformCount);
-		const std::span<LocalTransform3D<float>> localTransforms = arena.AllocateArray<LocalTransform3D<float>>(localTransformCount);
+		const std::span<LocalTransform3D> localTransforms = arena.AllocateArray<LocalTransform3D>(localTransformCount);
 		const std::span<WorldTransform3D<float>*> worldTransforms = arena.AllocateArray<WorldTransform3D<float>*>(localTransformCount);
 		const std::span<Parent*> parents = arena.AllocateArray<Parent*>(localTransformCount);
 		const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(localTransformCount);

@@ -8,6 +8,7 @@ target_sources(PonyEngine.World.Hierarchy PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Hierarchy-IHierarchyService.cppm"
 	"Source/Hierarchy-LocalTransform.cppm"
 	"Source/Hierarchy-Parent.cppm"
+	"Source/Hierarchy-Types.cppm"
 	"Source/Hierarchy-WorldTransform.cppm"
 )
 

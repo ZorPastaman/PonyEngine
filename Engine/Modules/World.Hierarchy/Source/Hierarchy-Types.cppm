@@ -7,13 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.World.Hierarchy;
+export module PonyEngine.World.Hierarchy:Types;
 
-export import PonyEngine.World;
-
-export import :Children;
-export import :IHierarchyService;
-export import :LocalTransform;
-export import :Parent;
-export import :Types;
-export import :WorldTransform;
+export namespace PonyEngine::World::Hierarchy
+{
+	using PositionComponentType = double; ///< Component type used for positions.
+	using RotationScaleComponentType = float; ///< Component type used for rotations and scales.
+}
