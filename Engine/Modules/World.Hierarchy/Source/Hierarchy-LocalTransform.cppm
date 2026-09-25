@@ -56,12 +56,12 @@ export namespace PonyEngine::World::Hierarchy
 		/// @param position Position.
 		void Position(const PositionType& position) noexcept;
 		/// @brief Gets the rotation.
-		/// @return Rotation in radians.
+		/// @return Rotation.
 		[[nodiscard("Pure function")]]
 		const RotationType& Rotation() const noexcept;
 		/// @brief Sets the rotation.
 		/// @note The function normalizes the rotation.
-		/// @param rotation Rotation in radians.
+		/// @param rotation Rotation.
 		void Rotation(const RotationType& rotation) noexcept;
 		/// @brief Gets the scale.
 		/// @return Scale.
@@ -220,7 +220,7 @@ namespace PonyEngine::World::Hierarchy
 	template<std::size_t Size> requires (Size == 2 || Size == 3)
 	const LocalTransform<Size>& LocalTransform<Size>::Identity() noexcept
 	{
-		static auto identityTransform = LocalTransform();
+		static const auto identityTransform = LocalTransform();
 		return identityTransform;
 	}
 
@@ -401,35 +401,29 @@ namespace PonyEngine::World::Hierarchy
 	template<std::floating_point T, std::size_t Size>
 	Math::Vector<T, Size> TransformPoint(const LocalTransform<Size>& transform, const Math::Vector<T, Size>& vector) noexcept
 	{
-		using Component = std::conditional_t<(sizeof(T) > sizeof(PositionComponentType)), T, PositionComponentType>;
-		using VectorType = Math::Vector<Component, Size>;
-		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<Component>, Component>;
+		using PositionComponent = std::conditional_t<(sizeof(T) > sizeof(PositionComponentType)), T, PositionComponentType>;
+		using PositionType = Math::Vector<PositionComponent, Size>;
+		using RotationScaleComponent = std::conditional_t<(sizeof(T) > sizeof(RotationScaleComponentType)), T, RotationScaleComponentType>;
+		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<RotationScaleComponent>, RotationScaleComponent>;
+		using ScaleType = Math::Vector<RotationScaleComponent, Size>;
 
-		const VectorType position = static_cast<VectorType>(transform.Position());
-		const RotationType rotation = static_cast<RotationType>(transform.Rotation());
-		const VectorType scale = static_cast<VectorType>(transform.Scale());
+		ScaleType result = static_cast<ScaleType>(vector);
+		result.Multiply(static_cast<ScaleType>(transform.Scale()));
+		result = Math::Rotate(result, static_cast<RotationType>(transform.Rotation()));
 
-		VectorType result = static_cast<VectorType>(vector);
-		result.Multiply(scale);
-		result = Math::Rotate(result, rotation);
-		result += position;
-
-		return static_cast<Math::Vector<T, Size>>(result);
+		return static_cast<Math::Vector<T, Size>>(static_cast<PositionType>(result) + static_cast<PositionType>(transform.Position()));
 	}
 
 	template<std::floating_point T, std::size_t Size>
 	Math::Vector<T, Size> TransformDirection(const LocalTransform<Size>& transform, const Math::Vector<T, Size>& vector) noexcept
 	{
-		using Component = std::conditional_t<(sizeof(T) > sizeof(RotationScaleComponentType)), T, RotationScaleComponentType>;
-		using VectorType = Math::Vector<Component, Size>;
-		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<Component>, Component>;
+		using RotationScaleComponent = std::conditional_t<(sizeof(T) > sizeof(RotationScaleComponentType)), T, RotationScaleComponentType>;
+		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<RotationScaleComponent>, RotationScaleComponent>;
+		using ScaleType = Math::Vector<RotationScaleComponent, Size>;
 
-		const RotationType rotation = static_cast<RotationType>(transform.Rotation());
-		const VectorType scale = static_cast<VectorType>(transform.Scale());
-
-		VectorType result = static_cast<VectorType>(vector);
-		result.Multiply(scale);
-		result = Math::Rotate(result, rotation);
+		ScaleType result = static_cast<ScaleType>(vector);
+		result.Multiply(static_cast<ScaleType>(transform.Scale()));
+		result = Math::Rotate(result, static_cast<RotationType>(transform.Rotation()));
 
 		return static_cast<Math::Vector<T, Size>>(result);
 	}
@@ -437,14 +431,12 @@ namespace PonyEngine::World::Hierarchy
 	template<std::floating_point T, std::size_t Size>
 	Math::Vector<T, Size> TransformOrientation(const LocalTransform<Size>& transform, const Math::Vector<T, Size>& vector) noexcept
 	{
-		using Component = std::conditional_t<(sizeof(T) > sizeof(RotationScaleComponentType)), T, RotationScaleComponentType>;
-		using VectorType = Math::Vector<Component, Size>;
-		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<Component>, Component>;
+		using RotationScaleComponent = std::conditional_t<(sizeof(T) > sizeof(RotationScaleComponentType)), T, RotationScaleComponentType>;
+		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<RotationScaleComponent>, RotationScaleComponent>;
+		using ScaleType = Math::Vector<RotationScaleComponent, Size>;
 
-		const RotationType rotation = static_cast<RotationType>(transform.Rotation());
-
-		VectorType result = static_cast<VectorType>(vector);
-		result = Math::Rotate(result, rotation);
+		ScaleType result = static_cast<ScaleType>(vector);
+		result = Math::Rotate(result, static_cast<RotationType>(transform.Rotation()));
 
 		return static_cast<Math::Vector<T, Size>>(result);
 	}

@@ -3,6 +3,7 @@ add_executable(PonyEngine.World.Hierarchy.Tests)
 
 target_sources(PonyEngine.World.Hierarchy.Tests PRIVATE
 	"Hierarchy/LocalTransform.cpp"
+	"Hierarchy/WorldTransform.cpp"
 )
 
 target_compile_definitions(PonyEngine.World.Hierarchy.Tests PRIVATE 

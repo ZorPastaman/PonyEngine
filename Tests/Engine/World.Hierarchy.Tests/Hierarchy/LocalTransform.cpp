@@ -55,7 +55,7 @@ TEST_CASE("LocalTransform2D main constructor", "[World][Hierarchy][LocalTransfor
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::World::Hierarchy::LocalTransform2D(PonyEngine::Math::Vector2<float>(4.f, -2.f), -0.5f, PonyEngine::Math::Vector2<float>(-2.f, 3.f));
+		return PonyEngine::World::Hierarchy::LocalTransform2D(PonyEngine::Math::Vector2<double>(4.f, -2.f), -0.5f, PonyEngine::Math::Vector2<float>(-2.f, 3.f));
 	};
 #endif
 }
@@ -173,7 +173,7 @@ TEST_CASE("LocalTransform2D isFinite", "[World][Hierarchy][LocalTransform]")
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::World::Hierarchy::LocalTransform2D(PonyEngine::Math::Vector2<float>(4.f, -2.f), 0.4f, PonyEngine::Math::Vector2<float>(-2.f, 3.f)).IsFinite();
+		return PonyEngine::World::Hierarchy::LocalTransform2D(PonyEngine::Math::Vector2<double>(4.f, -2.f), 0.4f, PonyEngine::Math::Vector2<float>(-2.f, 3.f)).IsFinite();
 	};
 #endif
 }
@@ -374,6 +374,17 @@ TEST_CASE("LocalTransform2D TransformPoint", "[World][Hierarchy][LocalTransform]
 	constexpr auto point = PonyEngine::Math::Vector2<double>(1., 1.);
 	const auto expectedTransformedPoint = position + PonyEngine::Math::Rotate(PonyEngine::Math::Multiply(point, static_cast<PonyEngine::Math::Vector2<double>>(scale)), static_cast<double>(rotation));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::World::Hierarchy::TransformPoint(transform, point), expectedTransformedPoint));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Float")
+	{
+		return PonyEngine::World::Hierarchy::TransformPoint(transform, PonyEngine::Math::Vector2<float>(-3.f, 1.f));
+	};
+	BENCHMARK("Double")
+	{
+		return PonyEngine::World::Hierarchy::TransformPoint(transform, PonyEngine::Math::Vector2<double>(-3., 1.));
+	};
+#endif
 }
 
 TEST_CASE("LocalTransform2D TransformDirection", "[World][Hierarchy][LocalTransform]")
@@ -385,6 +396,17 @@ TEST_CASE("LocalTransform2D TransformDirection", "[World][Hierarchy][LocalTransf
 	constexpr auto direction = PonyEngine::Math::Vector2<float>(0.5f, -0.7f);
 	const auto expectedTransformedDir = PonyEngine::Math::Rotate(PonyEngine::Math::Multiply(direction, scale), rotation);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::World::Hierarchy::TransformDirection(transform, direction), expectedTransformedDir));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Float")
+	{
+		return PonyEngine::World::Hierarchy::TransformDirection(transform, PonyEngine::Math::Vector2<float>(-3.f, 1.f));
+	};
+	BENCHMARK("Double")
+	{
+		return PonyEngine::World::Hierarchy::TransformDirection(transform, PonyEngine::Math::Vector2<double>(-3., 1.));
+	};
+#endif
 }
 
 TEST_CASE("LocalTransform2D TransformOrientation", "[World][Hierarchy][LocalTransform]")
@@ -396,6 +418,17 @@ TEST_CASE("LocalTransform2D TransformOrientation", "[World][Hierarchy][LocalTran
 	constexpr auto direction = PonyEngine::Math::Vector2<float>(0.5f, -0.7f);
 	const auto expectedTransformedDir = PonyEngine::Math::Rotate(direction, rotation);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::World::Hierarchy::TransformOrientation(transform, direction), expectedTransformedDir));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Float")
+	{
+		return PonyEngine::World::Hierarchy::TransformOrientation(transform, PonyEngine::Math::Vector2<float>(-3.f, 1.f));
+	};
+	BENCHMARK("Double")
+	{
+		return PonyEngine::World::Hierarchy::TransformOrientation(transform, PonyEngine::Math::Vector2<double>(-3., 1.));
+	};
+#endif
 }
 
 TEST_CASE("LocalTransform2D are almost equal", "[World][Hierarchy][LocalTransform]")
@@ -483,7 +516,7 @@ TEST_CASE("LocalTransform3D main constructor", "[World][Hierarchy][LocalTransfor
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::World::Hierarchy::LocalTransform3D(PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f), PonyEngine::Math::Quaternion<float>(4.f, -3.f, 5.f, -1.f), PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f));
+		return PonyEngine::World::Hierarchy::LocalTransform3D(PonyEngine::Math::Vector3<double>(4., -2., 2.), PonyEngine::Math::Quaternion<float>(4.f, -3.f, 5.f, -1.f), PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f));
 	};
 #endif
 }
@@ -594,7 +627,7 @@ TEST_CASE("LocalTransform3D isFinite", "[World][Hierarchy][LocalTransform]")
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::World::Hierarchy::LocalTransform3D(PonyEngine::Math::Vector3<float>(4.f, -2.f, 2.f), PonyEngine::Math::Quaternion<float>(4.f, 6.f, -2.f, -3.f), PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f)).IsFinite();
+		return PonyEngine::World::Hierarchy::LocalTransform3D(PonyEngine::Math::Vector3<double>(4., -2., 2.), PonyEngine::Math::Quaternion<float>(4.f, 6.f, -2.f, -3.f), PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f)).IsFinite();
 	};
 #endif
 }
@@ -796,6 +829,17 @@ TEST_CASE("LocalTransform3D TransformPoint", "[World][Hierarchy][LocalTransform]
 	constexpr auto point = PonyEngine::Math::Vector3<double>(1., 1., 1.);
 	const auto expectedTransformedPoint = position + (static_cast<PonyEngine::Math::Quaternion<double>>(rotation) * PonyEngine::Math::Multiply(point, static_cast<PonyEngine::Math::Vector3<double>>(scale)));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::World::Hierarchy::TransformPoint(transform, point), expectedTransformedPoint));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Float")
+	{
+		return PonyEngine::World::Hierarchy::TransformPoint(transform, PonyEngine::Math::Vector3<float>(-3.f, 1.f, 10.f));
+	};
+	BENCHMARK("Double")
+	{
+		return PonyEngine::World::Hierarchy::TransformPoint(transform, PonyEngine::Math::Vector3<double>(-3., 1., 10.));
+	};
+#endif
 }
 
 TEST_CASE("LocalTransform3D TransformDirection", "[World][Hierarchy][LocalTransform]")
@@ -808,6 +852,17 @@ TEST_CASE("LocalTransform3D TransformDirection", "[World][Hierarchy][LocalTransf
 	constexpr auto direction = PonyEngine::Math::Vector3<float>(0.5f, -0.7f, 0.2f);
 	const auto expectedTransformedDir = rotation * PonyEngine::Math::Multiply(direction, scale);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::World::Hierarchy::TransformDirection(transform, direction), expectedTransformedDir));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Float")
+	{
+		return PonyEngine::World::Hierarchy::TransformDirection(transform, PonyEngine::Math::Vector3<float>(-3.f, 1.f, 10.f));
+	};
+	BENCHMARK("Double")
+	{
+		return PonyEngine::World::Hierarchy::TransformDirection(transform, PonyEngine::Math::Vector3<double>(-3., 1., 10.));
+	};
+#endif
 }
 
 TEST_CASE("LocalTransform3D TransformOrientation", "[World][Hierarchy][LocalTransform]")
@@ -820,6 +875,17 @@ TEST_CASE("LocalTransform3D TransformOrientation", "[World][Hierarchy][LocalTran
 	constexpr auto direction = PonyEngine::Math::Vector3<float>(0.5f, -0.7f, 0.2f);
 	const auto expectedTransformedDir = rotation * direction;
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::World::Hierarchy::TransformOrientation(transform, direction), expectedTransformedDir));
+
+#if PONY_ENGINE_TESTING_BENCHMARK
+	BENCHMARK("Float")
+	{
+		return PonyEngine::World::Hierarchy::TransformOrientation(transform, PonyEngine::Math::Vector3<float>(-3.f, 1.f, 10.f));
+	};
+	BENCHMARK("Double")
+	{
+		return PonyEngine::World::Hierarchy::TransformOrientation(transform, PonyEngine::Math::Vector3<double>(-3., 1., 10.));
+	};
+#endif
 }
 
 TEST_CASE("LocalTransform3D are almost equal", "[World][Hierarchy][LocalTransform]")

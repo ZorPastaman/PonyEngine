@@ -13,33 +13,46 @@ import std;
 
 import PonyEngine.Math;
 
+import :LocalTransform;
+import :Types;
+
 export namespace PonyEngine::World::Hierarchy
 {
 	/// @brief World transform.
-	/// @tparam T Component type.
 	/// @tparam Size Dimension.
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
 	class WorldTransform final
 	{
 	public:
-		using ValueType = T; ///< Component type.
-		using PositionType = Math::Vector<T, Size>; ///< Position type.
-		using RotationType = std::conditional_t<Size == 3, Math::Quaternion<T>, T>; ///< Rotation type.
-		using ScaleType = Math::Vector<T, Size>; ///< Scale type.
-		using TRSMatrixType = std::conditional_t<Size == 3, Math::Matrix4x4<T>, Math::Matrix3x3<T>>; ///< TRS matrix type.
-		using TRSMatrixCompactType = std::conditional_t<Size == 3, Math::Matrix3x4<T>, Math::Matrix2x3<T>>; ///< Compact TRS matrix type.
+		using PositionType = Math::Vector<PositionComponentType, Size>; ///< Position type.
+		using RSMatrixType = Math::Matrix<RotationScaleComponentType, Size, Size>; ///< Rotation-scaling matrix type.
+		using ScaleType = Math::Vector<RotationScaleComponentType, Size>; ///< Scale type.
 
 		/// @brief Creates a transform with a zero position, zero rotation and scale of one.
 		[[nodiscard("Pure constructor")]]
 		WorldTransform() noexcept;
-		/// @brief Creates a transform.
-		/// @param matrix TRS matrix.
+		/// @brief Creates a transform with the given position, zero rotation and scale of one.
+		/// @param position Position.
 		[[nodiscard("Pure constructor")]]
-		explicit WorldTransform(const TRSMatrixType& matrix) noexcept;
-		/// @brief Creates a transform.
-		/// @param matrix TRS matrix.
+		explicit WorldTransform(const PositionType& position) noexcept;
+		/// @brief Creates a transform with a zero position and given rotation and scale.
+		/// @param rotationScaling Rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
-		explicit WorldTransform(const TRSMatrixCompactType& matrix) noexcept;
+		explicit WorldTransform(const RSMatrixType& rotationScaling) noexcept;
+		/// @brief Creates a transform.
+		/// @param position Position.
+		/// @param rotationScaling Rotation-scaling matrix.
+		[[nodiscard("Pure constructor")]]
+		WorldTransform(const PositionType& position, const RSMatrixType& rotationScaling) noexcept;
+		/// @brief Creates a world transform from the local transform.
+		/// @param transform Local transform.
+		[[nodiscard("Pure constructor")]]
+		explicit WorldTransform(const LocalTransform<Size>& transform) noexcept;
+		/// @brief Creates a world transform from the local transform.
+		/// @param transform Local transform.
+		/// @param parentTransform Parent world transform.
+		[[nodiscard("Pure constructor")]]
+		WorldTransform(const LocalTransform<Size>& transform, const WorldTransform& parentTransform) noexcept;
 		[[nodiscard("Pure constructor")]]
 		WorldTransform(const WorldTransform& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -55,24 +68,17 @@ export namespace PonyEngine::World::Hierarchy
 		/// @brief Gets the position.
 		/// @return Position.
 		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Position() const noexcept;
-		/// @brief Gets the rotation.
-		/// @return Rotation in radians.
+		const PositionType& Position() const noexcept;
+		/// @brief Sets the position.
+		/// @param position Position.
+		void Position(const PositionType& position) noexcept;
+		/// @brief Gets the rotation-scaling matrix.
+		/// @return Rotation-scaling matrix.
 		[[nodiscard("Pure function")]]
-		RotationType Rotation() const noexcept;
-		/// @brief Gets the scale.
-		/// @return Scale.
-		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Scale() const noexcept;
-
-		/// @brief Computes a translation-rotation-scaling matrix.
-		/// @return Translation-rotation-scaling matrix.
-		[[nodiscard("Pure function")]]
-		const TRSMatrixType& TRSMatrix() const noexcept;
-		/// @brief Computes a compact translation-rotation-scaling matrix.
-		/// @return Compact translation-rotation-scaling matrix.
-		[[nodiscard("Pure function")]]
-		TRSMatrixCompactType TRSMatrixCompact() const noexcept;
+		const RSMatrixType& RotationScaling() const noexcept;
+		/// @brief Sets the rotation-scaling matrix.
+		/// @param rsMatrix Rotation-scaling matrix.
+		void RotationScaling(const RSMatrixType& rsMatrix) noexcept;
 
 		/// @brief Check if all the components of the transform are finite.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -81,39 +87,34 @@ export namespace PonyEngine::World::Hierarchy
 
 		/// @brief Gets the transform right vector.
 		/// @return Right.
-		/// @remark It may be non-normalized.
+		/// @remark It's scaled.
 		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Right() const noexcept;
+		ScaleType Right() const noexcept;
 		/// @brief Gets the transform left vector.
 		/// @return Left.
-		/// @remark It may be non-normalized.
+		/// @remark It's scaled.
 		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Left() const noexcept;
+		ScaleType Left() const noexcept;
 		/// @brief Gets the transform up vector.
 		/// @return Up.
-		/// @remark It may be non-normalized.
+		/// @remark It's scaled.
 		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Up() const noexcept;
+		ScaleType Up() const noexcept;
 		/// @brief Gets the transform down vector.
 		/// @return Down.
-		/// @remark It may be non-normalized.
+		/// @remark It's scaled.
 		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Down() const noexcept;
+		ScaleType Down() const noexcept;
 		/// @brief Gets the transform forward vector.
 		/// @return Forward.
-		/// @remark It may be non-normalized.
+		/// @remark It's scaled.
 		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Forward() const noexcept requires (Size == 3);
+		ScaleType Forward() const noexcept requires (Size == 3);
 		/// @brief Gets the transform back vector.
 		/// @return Back.
-		/// @remark It may be non-normalized.
+		/// @remark It's scaled.
 		[[nodiscard("Pure function")]]
-		Math::Vector<T, Size> Back() const noexcept requires (Size == 3);
-
-		/// @brief Converts the transform to another transform type.
-		/// @tparam U Target component type.
-		template<std::floating_point U> [[nodiscard("Pure operator")]]
-		explicit operator WorldTransform<U, Size>() const noexcept;
+		ScaleType Back() const noexcept requires (Size == 3);
 
 		WorldTransform& operator =(const WorldTransform& other) noexcept = default;
 		WorldTransform& operator =(WorldTransform&& other) noexcept = default;
@@ -125,176 +126,229 @@ export namespace PonyEngine::World::Hierarchy
 		bool operator ==(const WorldTransform& other) const noexcept = default;
 
 	private:
-		TRSMatrixType matrix; ///< TRS matrix.
+		PositionType position; ///< Position.
+		RSMatrixType rotationScaling; ///< Rotation-scaling.
 	};
 
 	/// @brief World transform 2D.
-	/// @tparam T Component type.
-	template<std::floating_point T>
-	using WorldTransform2D = WorldTransform<T, 2>;
+	using WorldTransform2D = WorldTransform<2>;
 	/// @brief World transform 3D.
-	/// @tparam T Component type.
-	template<std::floating_point T>
-	using WorldTransform3D = WorldTransform<T, 3>;
+	using WorldTransform3D = WorldTransform<3>;
 
 	/// @brief Applies the transform to the point vector.
-	/// @tparam T Value type.
+	/// @tparam T Vector component type.
 	/// @tparam Size Dimension.
 	/// @param transform Transform.
 	/// @param vector Point.
 	/// @return Transformed point.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Math::Vector<T, Size> TransformPoint(const WorldTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept;
-	/// @brief Applies the transform to the direction vector.
-	/// @tparam T Value type.
+	Math::Vector<T, Size> TransformPoint(const WorldTransform<Size>& transform, const Math::Vector<T, Size>& vector) noexcept;
+	/// @brief Applies the transform rotation and scale to the direction vector.
+	/// @tparam T Vector component type.
 	/// @tparam Size Dimension.
 	/// @param transform Transform.
 	/// @param vector Direction.
 	/// @return Transformed direction.
 	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	Math::Vector<T, Size> TransformDirection(const WorldTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept;
+	Math::Vector<T, Size> TransformDirection(const WorldTransform<Size>& transform, const Math::Vector<T, Size>& vector) noexcept;
+
+	/// @brief Combines the transforms.
+	/// @tparam Size Dimension.
+	/// @param lhs Left transform.
+	/// @param rhs Right transform.
+	/// @return Combined transform.
+	template<std::size_t Size> [[nodiscard("Pure function")]]
+	WorldTransform<Size> Combine(const WorldTransform<Size>& lhs, const WorldTransform<Size>& rhs) noexcept;
+	/// @brief Combines the transforms.
+	/// @tparam Size Dimension.
+	/// @param lhs Left transform.
+	/// @param rhs Right transform.
+	/// @return Combined transform.
+	template<std::size_t Size> [[nodiscard("Pure function")]]
+	WorldTransform<Size> Combine(const WorldTransform<Size>& lhs, const LocalTransform<Size>& rhs) noexcept;
 
 	/// @brief Checks if positions, rotations and scales of the two transforms are almost equal.
-	/// @tparam T Component type.
 	/// @tparam Size Dimension.
 	/// @param lhs Left transform.
 	/// @param rhs Right transform.
 	/// @param tolerance Tolerance.
 	/// @return @a True if they're almost equal; @a false otherwise.
-	template<std::floating_point T, std::size_t Size> [[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const WorldTransform<T, Size>& lhs, const WorldTransform<T, Size>& rhs,
-		const Math::Tolerance<T>& tolerance = Math::Tolerance<T>()) noexcept requires (Size == 2 || Size == 3);
+	template<std::size_t Size> [[nodiscard("Pure function")]]
+	bool AreAlmostEqual(const WorldTransform<Size>& lhs, const WorldTransform<Size>& rhs,
+		const Math::Tolerance<PositionComponentType>& tolerance = Math::Tolerance<PositionComponentType>()) noexcept requires (Size == 2 || Size == 3);
 }
 
 namespace PonyEngine::World::Hierarchy
 {
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	WorldTransform<T, Size>::WorldTransform() noexcept :
-		matrix(TRSMatrixType::Identity())
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::WorldTransform() noexcept :
+		position(PositionType::Zero()),
+		rotationScaling(RSMatrixType::Identity())
 	{
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	WorldTransform<T, Size>::WorldTransform(const TRSMatrixType& matrix) noexcept :
-		matrix(matrix)
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::WorldTransform(const PositionType& position) noexcept :
+		position(position),
+		rotationScaling(RSMatrixType::Identity())
 	{
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	WorldTransform<T, Size>::WorldTransform(const TRSMatrixCompactType& matrix) noexcept :
-		WorldTransform(Math::TRSMatrix(matrix))
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::WorldTransform(const RSMatrixType& rotationScaling) noexcept :
+		position(PositionType::Zero()),
+		rotationScaling(rotationScaling)
 	{
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	const WorldTransform<T, Size>& WorldTransform<T, Size>::Identity() noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::WorldTransform(const PositionType& position, const RSMatrixType& rotationScaling) noexcept :
+		position(position),
+		rotationScaling(rotationScaling)
 	{
-		static auto identityTransform = WorldTransform();
-		return identityTransform;
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Position() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::WorldTransform(const LocalTransform<Size>& transform) noexcept :
+		position(transform.Position()),
+		rotationScaling(Math::RSMatrix(transform.Rotation(), transform.Scale()))
 	{
-		return Math::ExtractTranslationFromTRS(matrix);
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	WorldTransform<T, Size>::RotationType WorldTransform<T, Size>::Rotation() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::WorldTransform(const LocalTransform<Size>& transform, const WorldTransform& parentTransform) noexcept
 	{
-		if constexpr (Size == 3)
-		{
-			return Math::ExtractRotationQuaternionFromTRS(matrix);
-		}
-		else
-		{
-			return Math::ExtractAngleFromTRS(matrix);
-		}
+		*this = Combine(parentTransform, transform);
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Scale() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	const WorldTransform<Size>& WorldTransform<Size>::Identity() noexcept
 	{
-		return Math::ExtractScalingFromTRS(matrix);
+		static const auto identity = WorldTransform();
+		return identity;
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	const WorldTransform<T, Size>::TRSMatrixType& WorldTransform<T, Size>::TRSMatrix() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	const WorldTransform<Size>::PositionType& WorldTransform<Size>::Position() const noexcept
 	{
-		return matrix;
+		return position;
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	WorldTransform<T, Size>::TRSMatrixCompactType WorldTransform<T, Size>::TRSMatrixCompact() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	void WorldTransform<Size>::Position(const PositionType& position) noexcept
 	{
-		return Math::ExtractTRSMatrixCompactFromTRS(matrix);
+		this->position = position;
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	bool WorldTransform<T, Size>::IsFinite() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	const WorldTransform<Size>::RSMatrixType& WorldTransform<Size>::RotationScaling() const noexcept
 	{
-		return matrix.IsFinite();
+		return rotationScaling;
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Right() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	void WorldTransform<Size>::RotationScaling(const RSMatrixType& rsMatrix) noexcept
 	{
-		return matrix * Math::Vector<T, Size>::Right();
+		rotationScaling = rsMatrix;
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Left() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	bool WorldTransform<Size>::IsFinite() const noexcept
 	{
-		return matrix * Math::Vector<T, Size>::Left();
+		return position.IsFinite() && rotationScaling.IsFinite();
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Up() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::ScaleType WorldTransform<Size>::Right() const noexcept
 	{
-		return matrix * Math::Vector<T, Size>::Up();
+		return TransformDirection(*this, ScaleType::Right());
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Down() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::ScaleType WorldTransform<Size>::Left() const noexcept
 	{
-		return matrix * Math::Vector<T, Size>::Down();
+		return TransformDirection(*this, ScaleType::Left());
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Forward() const noexcept requires (Size == 3)
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::ScaleType WorldTransform<Size>::Up() const noexcept
 	{
-		return matrix * Math::Vector<T, Size>::Forward();
+		return TransformDirection(*this, ScaleType::Up());
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	Math::Vector<T, Size> WorldTransform<T, Size>::Back() const noexcept requires (Size == 3)
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::ScaleType WorldTransform<Size>::Down() const noexcept
 	{
-		return matrix * Math::Vector<T, Size>::Back();
+		return TransformDirection(*this, ScaleType::Down());
 	}
 
-	template<std::floating_point T, std::size_t Size> requires (Size == 2 || Size == 3)
-	template<std::floating_point U>
-	WorldTransform<T, Size>::operator WorldTransform<U, Size>() const noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::ScaleType WorldTransform<Size>::Forward() const noexcept requires (Size == 3)
 	{
-		return WorldTransform<U, Size>(static_cast<WorldTransform<U, Size>::TRSMatrixType>(matrix));
+		return TransformDirection(*this, ScaleType::Forward());
 	}
 
-	template<std::floating_point T, std::size_t Size>
-	Math::Vector<T, Size> TransformPoint(const WorldTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept
+	template<std::size_t Size> requires (Size == 2 || Size == 3)
+	WorldTransform<Size>::ScaleType WorldTransform<Size>::Back() const noexcept requires (Size == 3)
 	{
-		return Math::TransformPoint(transform.TRSMatrix(), vector);
+		return TransformDirection(*this, ScaleType::Back());
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	Math::Vector<T, Size> TransformDirection(const WorldTransform<T, Size>& transform, const Math::Vector<T, Size>& vector) noexcept
+	Math::Vector<T, Size> TransformPoint(const WorldTransform<Size>& transform, const Math::Vector<T, Size>& vector) noexcept
 	{
-		return Math::TransformDirection(transform.TRSMatrix(), vector);
+		using PositionComponent = std::conditional_t<(sizeof(T) > sizeof(PositionComponentType)), T, PositionComponentType>;
+		using PositionType = Math::Vector<PositionComponent, Size>;
+		using RotationScaleComponent = std::conditional_t<(sizeof(T) > sizeof(RotationScaleComponentType)), T, RotationScaleComponentType>;
+		using RSMatrixType = Math::Matrix<RotationScaleComponent, Size, Size>;
+		using VectorType = Math::Vector<RotationScaleComponent, Size>;
+
+		VectorType result = static_cast<VectorType>(vector);
+		result = static_cast<RSMatrixType>(transform.RotationScaling()) * result;
+
+		return static_cast<Math::Vector<T, Size>>(static_cast<PositionType>(result) + static_cast<PositionType>(transform.Position()));
 	}
 
 	template<std::floating_point T, std::size_t Size>
-	bool AreAlmostEqual(const WorldTransform<T, Size>& lhs, const WorldTransform<T, Size>& rhs,
-		const Math::Tolerance<T>& tolerance) noexcept requires (Size == 2 || Size == 3)
+	Math::Vector<T, Size> TransformDirection(const WorldTransform<Size>& transform, const Math::Vector<T, Size>& vector) noexcept
 	{
-		return Math::AreAlmostEqual(lhs.TRSMatrix(), rhs.TRSMatrix(), tolerance);
+		using RotationScaleComponent = std::conditional_t<(sizeof(T) > sizeof(RotationScaleComponentType)), T, RotationScaleComponentType>;
+		using RSMatrixType = Math::Matrix<RotationScaleComponent, Size, Size>;
+		using VectorType = Math::Vector<RotationScaleComponent, Size>;
+
+		VectorType result = static_cast<VectorType>(vector);
+		result = static_cast<RSMatrixType>(transform.RotationScaling()) * result;
+
+		return static_cast<Math::Vector<T, Size>>(result);
+	}
+
+	template<std::size_t Size>
+	WorldTransform<Size> Combine(const WorldTransform<Size>& lhs, const WorldTransform<Size>& rhs) noexcept
+	{
+		using PositionMatrix = Math::Matrix<PositionComponentType, Size, Size>;
+
+		const typename WorldTransform<Size>::PositionType position = lhs.Position() + static_cast<PositionMatrix>(lhs.RotationScaling()) * rhs.Position();
+		const typename WorldTransform<Size>::RSMatrixType rotationScaling = lhs.RotationScaling() * rhs.RotationScaling();
+
+		return WorldTransform<Size>(position, rotationScaling);
+	}
+
+	template<std::size_t Size>
+	WorldTransform<Size> Combine(const WorldTransform<Size>& lhs, const LocalTransform<Size>& rhs) noexcept
+	{
+		using PositionMatrix = Math::Matrix<PositionComponentType, Size, Size>;
+
+		const typename WorldTransform<Size>::PositionType position = lhs.Position() + static_cast<PositionMatrix>(lhs.RotationScaling()) * rhs.Position();
+		const typename WorldTransform<Size>::RSMatrixType rotationScaling = lhs.RotationScaling() * Math::RSMatrix(rhs.Rotation(), rhs.Scale());
+
+		return WorldTransform<Size>(position, rotationScaling);
+	}
+
+	template<std::size_t Size>
+	bool AreAlmostEqual(const WorldTransform<Size>& lhs, const WorldTransform<Size>& rhs,
+		const Math::Tolerance<PositionComponentType>& tolerance) noexcept requires (Size == 2 || Size == 3)
+	{
+		const auto smallTolerance = static_cast<Math::Tolerance<RotationScaleComponentType>>(tolerance);
+		return AreAlmostEqual(lhs.Position(), rhs.Position(), tolerance) && AreAlmostEqual(lhs.RotationScaling(), rhs.RotationScaling(), smallTolerance);
 	}
 }

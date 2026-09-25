@@ -42,6 +42,7 @@ export namespace PonyEngine::World::Hierarchy
 		/// @param entity Entity. Must be valid.
 		/// @note The hierarchy must be valid.
 		virtual void DestroyEntity(IWorld& world, Entity entity) const = 0;
+
 		/// @brief Updates world transforms.
 		/// @param world World.
 		/// @note The hierarchy must be valid.

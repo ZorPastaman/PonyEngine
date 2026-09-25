@@ -29,10 +29,14 @@ export namespace PonyEngine::World::Hierarchy
 		virtual void UpdateChildren(IWorld& world) const override;
 
 		virtual void DestroyEntity(IWorld& world, Entity entity) const override;
+
 		virtual void UpdateWorldTransforms(IWorld& world) const override;
 
 	private:
 		static void AddEntitiesToRemove(IWorld& world, const Entity entity, std::span<Entity> entitiesToRemove, std::size_t& entityToRemoveCount);
+
+		template<std::size_t Size>
+		void UpdateWorldTransforms(IWorld& world) const;
 
 		Application::IApplication* application;
 	};
@@ -223,35 +227,8 @@ namespace PonyEngine::World::Hierarchy
 
 	void HierarchyService::UpdateWorldTransforms(IWorld& world) const
 	{
-		const std::size_t localTransformCount = world.CountComponents<LocalTransform3D<float>>();
-		if (localTransformCount == 0uz)
-		{
-			return;
-		}
-
-		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(localTransformCount) +
-			Memory::CalculateBufferSize<LocalTransform3D, Entity>(localTransformCount) +
-			Memory::CalculateBufferSize<WorldTransform3D<float>*, LocalTransform3D>(localTransformCount) +
-			Memory::CalculateBufferSize<Parent*, WorldTransform3D<float>*>(localTransformCount) +
-			Memory::CalculateBufferSize<std::size_t, Parent*>(localTransformCount);
-		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
-		auto arena = Memory::Arena(buffer->Span());
-
-		const std::span<Entity> entities = arena.AllocateArray<Entity>(localTransformCount);
-		const std::span<LocalTransform3D> localTransforms = arena.AllocateArray<LocalTransform3D>(localTransformCount);
-		const std::span<WorldTransform3D<float>*> worldTransforms = arena.AllocateArray<WorldTransform3D<float>*>(localTransformCount);
-		const std::span<Parent*> parents = arena.AllocateArray<Parent*>(localTransformCount);
-		const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(localTransformCount);
-
-		world.GetComponents(entities, localTransforms);
-		world.AddComponents(entities, worldTransforms);
-		world.TryGetComponents(entities, parents);
-		std::ranges::iota(indices, 0uz);
-		std::ranges::sort(indices, [&](const std::size_t lhs, const std::size_t rhs) { return !parents[lhs] || parents[lhs]->value != entities[rhs]; });
-
-		for (const std::size_t index : indices)
-		{
-		}
+		UpdateWorldTransforms<2>(world);
+		UpdateWorldTransforms<3>(world);
 	}
 
 	void HierarchyService::AddEntitiesToRemove(IWorld& world, const Entity entity, std::span<Entity> entitiesToRemove,
@@ -265,6 +242,61 @@ namespace PonyEngine::World::Hierarchy
 			{
 				AddEntitiesToRemove(world, child, entitiesToRemove, entityToRemoveCount);
 			}
+		}
+	}
+
+	template<std::size_t Size>
+	void HierarchyService::UpdateWorldTransforms(IWorld& world) const
+	{
+		const std::size_t localTransformCount = world.CountComponents<LocalTransform<Size>>();
+		if (localTransformCount == 0uz)
+		{
+			return;
+		}
+
+		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(localTransformCount) +
+			Memory::CalculateBufferSize<LocalTransform<Size>, Entity>(localTransformCount) +
+			Memory::CalculateBufferSize<WorldTransform<Size>*, LocalTransform<Size>>(localTransformCount) +
+			Memory::CalculateBufferSize<Parent*, WorldTransform<Size>*>(localTransformCount) +
+			Memory::CalculateBufferSize<std::size_t, Parent*>(localTransformCount) +
+			Memory::CalculateBufferSize<std::size_t, std::size_t>(localTransformCount);
+		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+		auto arena = Memory::Arena(buffer->Span());
+
+		const std::span<Entity> entities = arena.AllocateArray<Entity>(localTransformCount);
+		const std::span<LocalTransform<Size>> localTransforms = arena.AllocateArray<LocalTransform<Size>>(localTransformCount);
+		const std::span<WorldTransform<Size>*> worldTransforms = arena.AllocateArray<WorldTransform<Size>*>(localTransformCount);
+		const std::span<Parent*> parents = arena.AllocateArray<Parent*>(localTransformCount);
+		const std::span<std::size_t> rootEntityIndicesProto = arena.AllocateArray<std::size_t>(localTransformCount);
+		const std::span<std::size_t> entityIndicesProto = arena.AllocateArray<std::size_t>(localTransformCount);
+
+		world.GetComponents(entities, localTransforms);
+		world.AddComponents(entities, worldTransforms);
+		world.TryGetComponents(entities, parents);
+
+		std::size_t rootEntityCount = 0uz;
+		std::size_t entityCount = 0uz;
+		for (std::size_t i = 0uz; i < entities.size(); ++i)
+		{
+			rootEntityIndicesProto[rootEntityCount] = i;
+			entityIndicesProto[entityCount] = i;
+			const bool hasParent = parents[i];
+			rootEntityCount += !hasParent;
+			entityCount += hasParent;
+		}
+
+		const std::span<std::size_t> rootEntityIndices = rootEntityIndicesProto.subspan(0uz, rootEntityCount);
+		for (const std::size_t rootEntityIndex : rootEntityIndices)
+		{
+			*worldTransforms[rootEntityIndex] = WorldTransform<Size>(localTransforms[rootEntityIndex]);
+		}
+
+		std::span<std::size_t> entityIndices = entityIndicesProto.subspan(0uz, entityCount);
+		std::ranges::sort(entityIndices, [&](const std::size_t lhs, const std::size_t rhs) noexcept { return parents[lhs]->value != entities[rhs]; });
+		for (const std::size_t entityIndex : entityIndices)
+		{
+			const std::size_t parentIndex = std::ranges::find(entities, parents[entityIndex]->value) - entities.cbegin();
+			*worldTransforms[entityIndex] = WorldTransform<Size>(localTransforms[entityIndex], *worldTransforms[parentIndex]);
 		}
 	}
 }
