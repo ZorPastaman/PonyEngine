@@ -184,6 +184,18 @@ TEST_CASE("LocalTransform2D directions", "[World][Hierarchy][LocalTransform]")
 	constexpr float rotation = 0.4f;
 	constexpr auto scale = PonyEngine::Math::Vector2<float>(-2.f, 3.f);
 	const auto transform = PonyEngine::World::Hierarchy::LocalTransform2D(position, rotation, scale);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Left<true>(), PonyEngine::Math::Rotate(PonyEngine::Math::Multiply(PonyEngine::Math::Vector2<float>::Left(), scale), rotation)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Right<true>(), PonyEngine::Math::Rotate(PonyEngine::Math::Multiply(PonyEngine::Math::Vector2<float>::Right(), scale), rotation)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Up<true>(), PonyEngine::Math::Rotate(PonyEngine::Math::Multiply(PonyEngine::Math::Vector2<float>::Up(), scale), rotation)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Down<true>(), PonyEngine::Math::Rotate(PonyEngine::Math::Multiply(PonyEngine::Math::Vector2<float>::Down(), scale), rotation)));
+}
+
+TEST_CASE("LocalTransform2D orientations", "[World][Hierarchy][LocalTransform]")
+{
+	constexpr auto position = PonyEngine::Math::Vector2<double>(4., -2.);
+	constexpr float rotation = 0.4f;
+	constexpr auto scale = PonyEngine::Math::Vector2<float>(-2.f, 3.f);
+	const auto transform = PonyEngine::World::Hierarchy::LocalTransform2D(position, rotation, scale);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Left(), PonyEngine::Math::Rotate(PonyEngine::Math::Vector2<float>::Left(), rotation)));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Right(), PonyEngine::Math::Rotate(PonyEngine::Math::Vector2<float>::Right(), rotation)));
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Up(), PonyEngine::Math::Rotate(PonyEngine::Math::Vector2<float>::Up(), rotation)));
@@ -588,6 +600,20 @@ TEST_CASE("LocalTransform3D isFinite", "[World][Hierarchy][LocalTransform]")
 }
 
 TEST_CASE("LocalTransform3D directions", "[World][Hierarchy][LocalTransform]")
+{
+	constexpr auto position = PonyEngine::Math::Vector3<double>(4., -2., 2.);
+	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
+	constexpr auto scale = PonyEngine::Math::Vector3<float>(-2.f, 3.f, 0.5f);
+	auto transform = PonyEngine::World::Hierarchy::LocalTransform3D(position, rotation, scale);
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Left<true>(), rotation * PonyEngine::Math::Multiply(PonyEngine::Math::Vector3<float>::Left(), scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Right<true>(), rotation * PonyEngine::Math::Multiply(PonyEngine::Math::Vector3<float>::Right(), scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Up<true>(), rotation * PonyEngine::Math::Multiply(PonyEngine::Math::Vector3<float>::Up(), scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Down<true>(), rotation * PonyEngine::Math::Multiply(PonyEngine::Math::Vector3<float>::Down(), scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Forward<true>(), rotation * PonyEngine::Math::Multiply(PonyEngine::Math::Vector3<float>::Forward(), scale)));
+	REQUIRE(PonyEngine::Math::AreAlmostEqual(transform.Back<true>(), rotation * PonyEngine::Math::Multiply(PonyEngine::Math::Vector3<float>::Back(), scale)));
+}
+
+TEST_CASE("LocalTransform3D orientations", "[World][Hierarchy][LocalTransform]")
 {
 	constexpr auto position = PonyEngine::Math::Vector3<double>(4., -2., 2.);
 	const auto rotation = PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(-1.f, 0.5f, 2.7f));
