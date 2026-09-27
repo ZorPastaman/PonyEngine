@@ -5,7 +5,8 @@
 			"name": "Base",
 			"hidden": true,
 			"binaryDir": "${sourceDir}/Build/${presetName}",
-			"installDir": "${sourceDir}/Install/${presetName}"
+			"installDir": "${sourceDir}/Install/${presetName}",
+			"generator": "Ninja"
 		},
 		{
 			"name": "Runtime",

@@ -106,6 +106,12 @@ export namespace PonyEngine::World
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<void> GetObjectShared(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 
+		virtual bool HasWorldData(std::type_index type) const noexcept override;
+		virtual void* GetWorldData(std::type_index type) const override;
+		virtual std::shared_ptr<void> GetWorldDataShared(std::type_index type) const override;
+		virtual void AddWorldData(std::type_index type, std::shared_ptr<void> data) override;
+		virtual void RemoveWorldData(std::type_index type) override;
+
 	private:
 		/// @brief Checks if the entity is invalid.
 		/// @param entity Entity to check.
@@ -292,6 +298,8 @@ export namespace PonyEngine::World
 
 		ObjectTable objectTable; ///< Object table.
 
+		std::unordered_map<std::type_index, std::shared_ptr<void>> worldData; ///< World data.
+
 		static_assert(sizeof(std::size_t) >= sizeof(EntityID), "std::size_t is less than EntityID.");
 	};
 }
@@ -405,10 +413,11 @@ namespace PonyEngine::World
 		const ComponentTable& table = UpdateComponents(entities, componentType);
 		const std::size_t componentSize = table.ComponentSize();
 
-		assert((componentData.size() == entities.size() * componentSize) && "Entity and component data span sizes are mismatched.");
+		assert((componentData.size() == componentSize || componentData.size() == entities.size() * componentSize) && "Entity and component data span sizes are mismatched.");
 
 		const std::byte* byteData = componentData.data();
-		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += componentSize)
+		const std::size_t byteDataShift = componentData.size() == componentSize ? 0uz : componentSize;
+		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += byteDataShift)
 		{
 			const EntityID index = table.Index(entities[i].id);
 			std::memcpy(table.Component(index), byteData, componentSize);
@@ -436,10 +445,11 @@ namespace PonyEngine::World
 		const ComponentTable& table = UpdateComponents(entities, componentType);
 		const std::size_t componentSize = table.ComponentSize();
 
-		assert((componentData.size() == entities.size() * componentSize) && "Entity and component data span sizes are mismatched.");
+		assert((componentData.size() == componentSize || componentData.size() == entities.size() * componentSize) && "Entity and component data span sizes are mismatched.");
 
 		const std::byte* byteData = componentData.data();
-		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += componentSize)
+		const std::size_t byteDataShift = componentData.size() == componentSize ? 0uz : componentSize;
+		for (std::size_t i = 0uz; i < entities.size(); ++i, byteData += byteDataShift)
 		{
 			const EntityID index = table.Index(entities[i].id);
 			void* const component = components[i] = table.Component(index);
@@ -905,6 +915,49 @@ namespace PonyEngine::World
 	std::shared_ptr<void> World::GetObjectShared(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
 	{
 		return objectTable.GetObject(objectType, handle);
+	}
+
+	bool World::HasWorldData(const std::type_index type) const noexcept
+	{
+		return worldData.contains(type);
+	}
+
+	void* World::GetWorldData(const std::type_index type) const
+	{
+		if (const auto position = worldData.find(type); position != worldData.cend()) [[likely]]
+		{
+			return position->second.get();
+		}
+
+		throw std::invalid_argument("World doesn't contain data of given type");
+	}
+
+	std::shared_ptr<void> World::GetWorldDataShared(const std::type_index type) const
+	{
+		if (const auto position = worldData.find(type); position != worldData.cend()) [[likely]]
+		{
+			return position->second;
+		}
+
+		throw std::invalid_argument("World doesn't contain data of given type");
+	}
+
+	void World::AddWorldData(const std::type_index type, std::shared_ptr<void> data)
+	{
+		const auto [iterator, added] = worldData.try_emplace(type, std::move(data));
+		if (!added) [[unlikely]]
+		{
+			throw std::invalid_argument("World already contains data of given type");
+		}
+	}
+
+	void World::RemoveWorldData(const std::type_index type)
+	{
+		const std::size_t removedCount = worldData.erase(type);
+		if (removedCount == 0uz) [[unlikely]]
+		{
+			throw std::invalid_argument("World doesn't contain data of given type");
+		}
 	}
 
 	bool World::IsInvalid(const Entity entity) const noexcept

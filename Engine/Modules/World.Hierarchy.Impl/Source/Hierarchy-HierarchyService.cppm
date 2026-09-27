@@ -11,11 +11,14 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
+
 export module PonyEngine.World.Hierarchy.Impl:HierarchyService;
 
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Log;
 import PonyEngine.Memory;
 import PonyEngine.World.Hierarchy;
 
@@ -24,26 +27,46 @@ export namespace PonyEngine::World::Hierarchy
 	class HierarchyService final : public IHierarchyService
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
+		explicit HierarchyService(Application::IApplication& application);
+		HierarchyService(const HierarchyService&) = delete;
+		HierarchyService(HierarchyService&&) = delete;
+
+		~HierarchyService() noexcept = default;
+
 		virtual void RemoveInvalidParents(IWorld& world) const override;
-		virtual void RemoveInvalidChildren(IWorld& world) const override;
-		virtual void UpdateChildren(IWorld& world) const override;
 
-		virtual void DestroyEntity(IWorld& world, Entity entity) const override;
+		virtual void UpdateTransforms2D(IWorld& world) const override;
+		virtual void UpdateTransforms3D(IWorld& world) const override;
 
-		virtual void UpdateWorldTransforms(IWorld& world) const override;
+		HierarchyService& operator =(const HierarchyService&) = delete;
+		HierarchyService& operator =(HierarchyService&&) = delete;
 
 	private:
-		static void AddEntitiesToRemove(IWorld& world, const Entity entity, std::span<Entity> entitiesToRemove, std::size_t& entityToRemoveCount);
-
 		template<std::size_t Size>
-		void UpdateWorldTransforms(IWorld& world) const;
+		void AddLocalTransforms(IWorld& world) const;
+		template<std::size_t Size>
+		void UpdateTransforms(IWorld& world) const;
 
 		Application::IApplication* application;
+		Log::ILogService* logService;
 	};
 }
 
 namespace PonyEngine::World::Hierarchy
 {
+	HierarchyService::HierarchyService(Application::IApplication& application) :
+		application{&application},
+		logService{this->application->FindInterface<Log::ILogService>()}
+	{
+		IWorldService& worldService = this->application->GetInterface<IWorldService>();
+		worldService.RegisterComponent<Parent>();
+		worldService.RegisterComponent<LocalTransform2D>();
+		worldService.RegisterComponent<LocalTransform3D>();
+		worldService.RegisterComponent<WorldTransform2D>();
+		worldService.RegisterComponent<WorldTransform3D>();
+	}
+
 	void HierarchyService::RemoveInvalidParents(IWorld& world) const
 	{
 		static_assert(sizeof(Entity) == sizeof(Parent) && alignof(Entity) == alignof(Parent), "Invalid parent component");
@@ -75,228 +98,86 @@ namespace PonyEngine::World::Hierarchy
 				invalidCount += !areValid[i];
 			}
 
+			PONY_LOG(logService, Log::LogType::Debug, "Removing '{}' invalid parent components.", invalidCount);
 			world.RemoveComponents<Parent>(entities.subspan(0uz, invalidCount));
 		}
 	}
 
-	void HierarchyService::RemoveInvalidChildren(IWorld& world) const
+	void HierarchyService::UpdateTransforms2D(IWorld& world) const
 	{
-		static_assert(sizeof(Children) == sizeof(ObjectHandle<std::vector<Entity>>) && alignof(Children) == alignof(ObjectHandle<std::vector<Entity>>), "Invalid children component");
-
-		const std::size_t childrenCount = world.CountComponents<Children>();
-		if (childrenCount == 0uz)
-		{
-			return;
-		}
-
-		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(childrenCount) +
-			Memory::CalculateBufferSize<ObjectHandle<std::vector<Entity>>, Entity>(childrenCount) +
-			Memory::CalculateBufferSize<bool, ObjectHandle<std::vector<Entity>>>(childrenCount);
-		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
-		auto arena = Memory::Arena(buffer->Span());
-
-		const std::span<Entity> entities = arena.AllocateArray<Entity>(childrenCount);
-		const std::span<ObjectHandle<std::vector<Entity>>> children = arena.AllocateArray<ObjectHandle<std::vector<Entity>>>(childrenCount);
-		const std::span<bool> areValid = arena.AllocateArray<bool>(childrenCount);
-
-		world.GetComponents(entities, std::span(reinterpret_cast<Children*>(children.data()), children.size()));
-
-		bool areAllValid = true;
-		for (std::size_t i = 0uz; i < childrenCount; ++i)
-		{
-			areAllValid = (areValid[i] = world.IsObjectValid(children[i]));
-		}
-
-		if (!areAllValid)
-		{
-			std::size_t invalidCount = 0uz;
-			for (std::size_t i = 0uz; i < childrenCount; ++i)
-			{
-				entities[invalidCount] = entities[i];
-				invalidCount += !areValid[i];
-			}
-
-			world.RemoveComponents<Children>(entities.subspan(0uz, invalidCount));
-		}
+		AddLocalTransforms<2>(world);
+		UpdateTransforms<2>(world);
 	}
 
-	void HierarchyService::UpdateChildren(IWorld& world) const
+	void HierarchyService::UpdateTransforms3D(IWorld& world) const
+	{
+		AddLocalTransforms<3>(world);
+		UpdateTransforms<3>(world);
+	}
+
+	template<std::size_t Size>
+	void HierarchyService::AddLocalTransforms(IWorld& world) const
 	{
 		static_assert(sizeof(Entity) == sizeof(Parent) && alignof(Entity) == alignof(Parent), "Invalid parent component");
 
-		const std::size_t childrenCount = world.CountComponents<Children>();
-		const std::size_t parentCount = world.CountComponents<Parent>();
+		using LTransform = LocalTransform<Size>;
 
-		if (childrenCount == 0uz && parentCount == 0uz)
+		const std::size_t parentCount = world.CountComponents<Parent>();
+		if (parentCount == 0uz)
 		{
 			return;
 		}
 
-		const std::size_t childrenClearBufferSize = Memory::CalculateBufferSize<Children*>(childrenCount);
-		const std::size_t childrenUpdateBufferSize = Memory::CalculateBufferSize<Entity>(parentCount) +
+		const std::size_t maxEntityCount = parentCount * 2uz;
+		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(maxEntityCount) +
 			Memory::CalculateBufferSize<Entity, Entity>(parentCount) +
-			Memory::CalculateBufferSize<Entity, Entity>(parentCount) +
-			Memory::CalculateBufferSize<std::size_t, Entity>(parentCount) +
-			Memory::CalculateBufferSize<Children*, std::size_t>(parentCount) +
-			Memory::CalculateBufferSize<Entity, Children*>(parentCount) +
-			Memory::CalculateBufferSize<bool, Entity>(parentCount);
-		const std::size_t bufferSize = std::max(childrenClearBufferSize, childrenUpdateBufferSize);
+			Memory::CalculateBufferSize<bool, Entity>(maxEntityCount);
 		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
 		auto arena = Memory::Arena(buffer->Span());
 
-		const Memory::Arena::Marker marker = arena.GetMarker();
+		const std::span<Entity> entities = arena.AllocateArray<Entity>(maxEntityCount);
+		const std::span<Entity> children = entities.subspan(0uz, parentCount);
+		const std::span<Entity> parents = arena.AllocateArray<Entity>(parentCount);
 
-		if (childrenCount > 0uz)
+		world.GetComponents(children, std::span(reinterpret_cast<Parent*>(parents.data()), parents.size()));
+
+		std::size_t uniqueParentCount = 0uz;
+		for (const Entity parent : parents)
 		{
-			const std::span<Children> children = arena.AllocateArray<Children>(childrenCount);
-			world.GetComponents(children);
-
-			for (const auto& [childrenObject] : children)
-			{
-				world.GetObject(childrenObject)->clear();
-			}
+			parents[uniqueParentCount] = parent;
+			uniqueParentCount += !std::ranges::contains(AsRawData(parents.subspan(0uz, uniqueParentCount)), AsRawData(parent));
 		}
 
-		if (parentCount > 0uz)
+		const std::span<Entity> uniqueParents = parents.subspan(0uz, uniqueParentCount);
+
+		std::size_t rootCount = 0uz;
+		for (const Entity parent : uniqueParents)
 		{
-			arena.Rewind(marker);
-			const std::span<Entity> entities = arena.AllocateArray<Entity>(parentCount);
-			const std::span<Entity> parents = arena.AllocateArray<Entity>(parentCount);
-			const std::span<Entity> uniqueParentsProto = arena.AllocateArray<Entity>(parentCount);
-			const std::span<std::size_t> parentToUniqueParent = arena.AllocateArray<std::size_t>(parentCount);
-
-			world.GetComponents(entities, std::span(reinterpret_cast<Parent*>(parents.data()), parents.size()));
-
-			std::size_t uniqueParentCount = 0uz;
-			for (std::size_t i = 0uz; i < parentCount; ++i)
-			{
-				const std::size_t parentIndex = std::ranges::find(uniqueParentsProto.subspan(0uz, i), parents[i]) - uniqueParentsProto.cbegin();
-				uniqueParentsProto[uniqueParentCount] = parents[i];
-				parentToUniqueParent[i] = uniqueParentCount;
-				uniqueParentCount += parentIndex == i;
-			}
-
-			const std::span<Entity> uniqueParents = uniqueParentsProto.subspan(0uz, uniqueParentCount);
-			const std::span<Children*> childContainers = arena.AllocateArray<Children*>(uniqueParentCount);
-			const std::span<Entity> newParents = arena.AllocateArray<Entity>(uniqueParentCount);
-			const std::span<bool> haveChildrenContainers = arena.AllocateArray<bool>(uniqueParentCount);
-
-			if (!world.HasComponents<Children>(uniqueParents, haveChildrenContainers))
-			{
-				std::size_t newParentCount = 0uz;
-				for (std::size_t i = 0uz; i < uniqueParents.size(); ++i)
-				{
-					newParents[newParentCount] = uniqueParents[i];
-					newParentCount += !haveChildrenContainers[i];
-				}
-
-				const std::span<Children*> newChildContainers = childContainers.subspan(0uz, newParentCount);
-				world.AddComponents(newParents.subspan(0uz, newParentCount), newChildContainers);
-
-				for (Children* const newChildContainer : newChildContainers)
-				{
-					newChildContainer->value = world.RegisterObject(std::make_shared<std::vector<Entity>>());
-				}
-			}
-
-			world.GetComponents(uniqueParents, childContainers);
-
-			for (std::size_t i = 0uz; i < entities.size(); ++i)
-			{
-				const std::size_t uniqueParentIndex = parentToUniqueParent[i];
-				Children* const children = childContainers[uniqueParentIndex];
-				world.GetObject(children->value)->push_back(entities[i]);
-			}
+			entities[parentCount + rootCount] = parent;
+			rootCount += !std::ranges::contains(AsRawData(children), AsRawData(parent));
 		}
-	}
 
-	void HierarchyService::DestroyEntity(IWorld& world, const Entity entity) const
-	{
-		const std::size_t entityCount = world.EntityCount();
+		const std::size_t hierarchyEntityCount = parentCount + rootCount;
+		const std::span<Entity> hierarchyEntities = entities.subspan(0uz, hierarchyEntityCount);
+		const std::span<bool> hasTransform = arena.AllocateArray<bool>(hierarchyEntityCount);
 
-		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(entityCount);
-		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
-		auto arena = Memory::Arena(buffer->Span());
-
-		const std::span<Entity> entitiesToRemove = arena.AllocateArray<Entity>(entityCount);
-
-		std::size_t entityToRemoveCount = 0uz;
-		AddEntitiesToRemove(world, entity, entitiesToRemove, entityToRemoveCount);
-		world.DestroyEntities(entitiesToRemove.subspan(0uz, entityToRemoveCount));
-	}
-
-	void HierarchyService::UpdateWorldTransforms(IWorld& world) const
-	{
-		UpdateWorldTransforms<2>(world);
-		UpdateWorldTransforms<3>(world);
-	}
-
-	void HierarchyService::AddEntitiesToRemove(IWorld& world, const Entity entity, std::span<Entity> entitiesToRemove,
-		std::size_t& entityToRemoveCount)
-	{
-		entitiesToRemove[entityToRemoveCount++] = entity;
-
-		if (Children children; world.TryGetComponent(entity, children))
+		if (!world.HasComponents<LTransform>(hierarchyEntities, hasTransform))
 		{
-			for (const Entity child : *world.GetObject(children.value))
+			std::size_t transformlessEntityCount = 0uz;
+			for (std::size_t i = 0uz; i < hierarchyEntityCount; ++i)
 			{
-				AddEntitiesToRemove(world, child, entitiesToRemove, entityToRemoveCount);
+				hierarchyEntities[transformlessEntityCount] = hierarchyEntities[i];
+				transformlessEntityCount += !hasTransform[i];
 			}
+
+			world.AddComponents(hierarchyEntities.subspan(0uz, transformlessEntityCount), LTransform::Identity());
 		}
 	}
 
 	template<std::size_t Size>
-	void HierarchyService::UpdateWorldTransforms(IWorld& world) const
+	void HierarchyService::UpdateTransforms(IWorld& world) const
 	{
-		const std::size_t localTransformCount = world.CountComponents<LocalTransform<Size>>();
-		if (localTransformCount == 0uz)
-		{
-			return;
-		}
-
-		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(localTransformCount) +
-			Memory::CalculateBufferSize<LocalTransform<Size>, Entity>(localTransformCount) +
-			Memory::CalculateBufferSize<WorldTransform<Size>*, LocalTransform<Size>>(localTransformCount) +
-			Memory::CalculateBufferSize<Parent*, WorldTransform<Size>*>(localTransformCount) +
-			Memory::CalculateBufferSize<std::size_t, Parent*>(localTransformCount) +
-			Memory::CalculateBufferSize<std::size_t, std::size_t>(localTransformCount);
-		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
-		auto arena = Memory::Arena(buffer->Span());
-
-		const std::span<Entity> entities = arena.AllocateArray<Entity>(localTransformCount);
-		const std::span<LocalTransform<Size>> localTransforms = arena.AllocateArray<LocalTransform<Size>>(localTransformCount);
-		const std::span<WorldTransform<Size>*> worldTransforms = arena.AllocateArray<WorldTransform<Size>*>(localTransformCount);
-		const std::span<Parent*> parents = arena.AllocateArray<Parent*>(localTransformCount);
-		const std::span<std::size_t> rootEntityIndicesProto = arena.AllocateArray<std::size_t>(localTransformCount);
-		const std::span<std::size_t> entityIndicesProto = arena.AllocateArray<std::size_t>(localTransformCount);
-
-		world.GetComponents(entities, localTransforms);
-		world.AddComponents(entities, worldTransforms);
-		world.TryGetComponents(entities, parents);
-
-		std::size_t rootEntityCount = 0uz;
-		std::size_t entityCount = 0uz;
-		for (std::size_t i = 0uz; i < entities.size(); ++i)
-		{
-			rootEntityIndicesProto[rootEntityCount] = i;
-			entityIndicesProto[entityCount] = i;
-			const bool hasParent = parents[i];
-			rootEntityCount += !hasParent;
-			entityCount += hasParent;
-		}
-
-		const std::span<std::size_t> rootEntityIndices = rootEntityIndicesProto.subspan(0uz, rootEntityCount);
-		for (const std::size_t rootEntityIndex : rootEntityIndices)
-		{
-			*worldTransforms[rootEntityIndex] = WorldTransform<Size>(localTransforms[rootEntityIndex]);
-		}
-
-		std::span<std::size_t> entityIndices = entityIndicesProto.subspan(0uz, entityCount);
-		std::ranges::sort(entityIndices, [&](const std::size_t lhs, const std::size_t rhs) noexcept { return parents[lhs]->value != entities[rhs]; });
-		for (const std::size_t entityIndex : entityIndices)
-		{
-			const std::size_t parentIndex = std::ranges::find(entities, parents[entityIndex]->value) - entities.cbegin();
-			*worldTransforms[entityIndex] = WorldTransform<Size>(localTransforms[entityIndex], *worldTransforms[parentIndex]);
-		}
+		using LTransform = LocalTransform<Size>;
+		using WTransform = WorldTransform<Size>;
 	}
 }

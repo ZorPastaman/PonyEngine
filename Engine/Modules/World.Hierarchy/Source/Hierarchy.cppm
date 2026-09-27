@@ -11,7 +11,6 @@ export module PonyEngine.World.Hierarchy;
 
 export import PonyEngine.World;
 
-export import :Children;
 export import :IHierarchyService;
 export import :LocalTransform;
 export import :Parent;

@@ -130,9 +130,16 @@ export namespace PonyEngine::World
 		template<Component T>
 		void AddComponents(std::span<const Entity> entities, std::span<const T> componentData);
 		/// @brief Adds components to the @p entities and initializes them with the @p componentData.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param componentData Component data. It will be added to all the entities.
+		template<Component T>
+		void AddComponents(std::span<const Entity> entities, const T& componentData);
+		/// @brief Adds components to the @p entities and initializes them with the @p componentData.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param componentData Component data. Must be a contiguous array of all the components synced with the @p entities by index.
+		///                      It may be one component as well. In this case, it will be added to all the entities.
 		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<const std::byte> componentData) = 0;
 		/// @brief Adds components to the @p entities but doesn't initialize them.
 		/// @tparam T Component type.
@@ -153,9 +160,17 @@ export namespace PonyEngine::World
 		template<Component T>
 		void AddComponents(std::span<const Entity> entities, std::span<const T> componentData, std::span<T*> components);
 		/// @brief Adds components to the @p entities but doesn't initialize them.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param componentData Component data. It will be added to all the entities.
+		/// @param components Components. Synced with the @p entities by index.
+		template<Component T>
+		void AddComponents(std::span<const Entity> entities, const T& componentData, std::span<T*> components);
+		/// @brief Adds components to the @p entities but doesn't initialize them.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param componentData Component data. Must be a contiguous array of all the components synced with the @p entities by index.
+		///                      It may be one component as well. In this case, it will be added to all the entities.
 		/// @param components Components. Synced with the @p entities by index.
 		virtual void AddComponents(std::span<const Entity> entities, std::type_index componentType, std::span<const std::byte> componentData, std::span<void*> components) = 0;
 
@@ -318,34 +333,136 @@ export namespace PonyEngine::World
 		/// @return Count of the returned entities.
 		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> components) const noexcept = 0;
 
+		/// @brief Tries to get a component.
+		/// @tparam T Component type.
+		/// @param entity Entity. Must be valid.
+		/// @param componentData Component data. Won't be changed if the component isn't found.
+		/// @return @a True if the component is found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponent(Entity entity, T& componentData) const noexcept;
+		/// @brief Tries to get a component.
+		/// @param entity Entity.
+		/// @param componentType Component type.
+		/// @param componentData Component data. Won't be changed if the component isn't found.
+		/// @return @a True if the component is found; @a false otherwise.
 		bool TryGetComponent(Entity entity, std::type_index componentType, std::span<std::byte> componentData) const noexcept;
+		/// @brief Tries to get a component.
+		/// @tparam T Component type.
+		/// @param entity Entity. Must be valid.
+		/// @param componentData Component data. Won't be changed if the component isn't found.
+		/// @param component Component. Will be set to nullptr if the component isn't found.
+		/// @return @a True if the component is found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponent(Entity entity, T& componentData, T*& component) const noexcept;
+		/// @brief Tries to get a component.
+		/// @param entity Entity. Must be valid.
+		/// @param componentType Component type.
+		/// @param componentData Component data. Won't be changed if the component isn't found.
+		/// @param component Component. Will be set to nullptr if the component isn't found.
+		/// @return @a True if the component is found; @a false otherwise.
 		bool TryGetComponent(Entity entity, std::type_index componentType, std::span<std::byte> componentData, void*& component) const noexcept;
+		/// @brief Tries to get a component.
+		/// @tparam T Component type.
+		/// @param entity Entity. Must be valid.
+		/// @param component Component. Will be set to nullptr if the component isn't found.
+		/// @return @a True if the component is found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponent(Entity entity, T*& component) const noexcept;
+		/// @brief Tries to get a component.
+		/// @param entity Entity. Must be valid.
+		/// @param componentType Component type.
+		/// @param component Component. Will be set to nullptr if the component isn't found.
+		/// @return @a True if the component is found; @a false otherwise.
 		bool TryGetComponent(Entity entity, std::type_index componentType, void*& component) const noexcept;
+		/// @brief Tries to get components.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @return @a True if all the components are found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData) const noexcept;
+		/// @brief Tries to get components.
+		/// @param entities Entities. Must be valid.
+		/// @param componentType Component type.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @return @a True if all the components are found; @a false otherwise.
 		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData) const noexcept = 0;
+		/// @brief Tries to get components.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @param has Has flags. Synced with the @p entities by index.
+		/// @return @a True if all the components are found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<bool> has) const noexcept;
+		/// @brief Tries to get components.
+		/// @param entities Entities. Must be valid.
+		/// @param componentType Component type.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @param has Has flags. Synced with the @p entities by index.
+		/// @return @a True if all the components are found; @a false otherwise.
 		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, std::span<bool> has) const noexcept = 0;
+		/// @brief Tries to get components.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @return @a True if all the components are found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<T*> components) const noexcept;
+		/// @brief Tries to get components.
+		/// @param entities Entities. Must be valid.
+		/// @param componentType Component type.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @return @a True if all the components are found; @a false otherwise.
 		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, 
 			std::span<std::byte> componentData, std::span<void*> components) const noexcept = 0;
+		/// @brief Tries to get components.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @param has Has flags. Synced with the @p entities by index.
+		/// @return @a True if all the components are found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<T*> components, std::span<bool> has) const noexcept;
+		/// @brief Tries to get components.
+		/// @param entities Entities. Must be valid.
+		/// @param componentType Component type.
+		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @param has Has flags. Synced with the @p entities by index.
+		/// @return @a True if all the components are found; @a false otherwise.
 		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType,
 			std::span<std::byte> componentData, std::span<void*> components, std::span<bool> has) const noexcept = 0;
+		/// @brief Tries to get components.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @return @a True if all the components are found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponents(std::span<const Entity> entities, std::span<T*> components) const noexcept;
+		/// @brief Tries to get components.
+		/// @param entities Entities. Must be valid.
+		/// @param componentType Component type.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @return @a True if all the components are found; @a false otherwise.
 		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components) const noexcept = 0;
+		/// @brief Tries to get components.
+		/// @tparam T Component type.
+		/// @param entities Entities. Must be valid.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @param has Has flags. Synced with the @p entities by index.
+		/// @return @a True if all the components are found; @a false otherwise.
 		template<Component T>
 		bool TryGetComponents(std::span<const Entity> entities, std::span<T*> components, std::span<bool> has) const noexcept;
+		/// @brief Tries to get components.
+		/// @param entities Entities. Must be valid.
+		/// @param componentType Component type.
+		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
+		/// @param has Has flags. Synced with the @p entities by index.
+		/// @return @a True if all the components are found; @a false otherwise.
 		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components, std::span<bool> has) const noexcept = 0;
 
 		/// @brief Removes all the components of the type @p T.
@@ -408,6 +525,31 @@ export namespace PonyEngine::World
 		/// @brief Collects garbage objects and removes them.
 		virtual void CollectGarbage() = 0;
 
+		/// @brief Checks if the world has a world data of type @p T.
+		/// @tparam T Data type.
+		/// @return @a True if it has; @a false otherwise.
+		template<typename T>
+		bool HasWorldData() const noexcept;
+		/// @brief Gets a world data of type @p T.
+		/// @tparam T Data type.
+		/// @return Data.
+		template<typename T>
+		T* GetWorldData() const;
+		/// @brief Gets a world data of type @p T.
+		/// @tparam T Data type.
+		/// @return Data.
+		template<typename T>
+		std::shared_ptr<T> GetWorldDataShared() const;
+		/// @brief Adds the @p data to the world.
+		/// @tparam T Data type.
+		/// @param data Data.
+		template<typename T>
+		void AddWorldData(std::shared_ptr<T> data);
+		/// @brief Removes a world data of type @p T.
+		/// @tparam T Data type.
+		template<typename T>
+		void RemoveWorldData();
+
 	protected:
 		/// @brief Registers the object.
 		/// @param objectType Object type.
@@ -443,6 +585,26 @@ export namespace PonyEngine::World
 		/// @return Object.
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<void> GetObjectShared(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
+
+		/// @brief Checks if the world has a world data of the @p type.
+		/// @param type Data type.
+		/// @return @a True if it has; @a false otherwise.
+		virtual bool HasWorldData(std::type_index type) const noexcept = 0;
+		/// @brief Gets a world data of the @p type.
+		/// @param type Data type.
+		/// @return Data.
+		virtual void* GetWorldData(std::type_index type) const = 0;
+		/// @brief Gets a world data of the @p type.
+		/// @param type Data type.
+		/// @return Data.
+		virtual std::shared_ptr<void> GetWorldDataShared(std::type_index type) const = 0;
+		/// @brief Adds the @p data to the world.
+		/// @param type Data type.
+		/// @param data Data.
+		virtual void AddWorldData(std::type_index type, std::shared_ptr<void> data) = 0;
+		/// @brief Removes a world data of the @p type.
+		/// @param type Data type.
+		virtual void RemoveWorldData(std::type_index type) = 0;
 	};
 }
 
@@ -523,6 +685,12 @@ namespace PonyEngine::World
 	}
 
 	template<Component T>
+	void IWorld::AddComponents(const std::span<const Entity> entities, const T& componentData)
+	{
+		AddComponents(entities, typeid(T), std::span(reinterpret_cast<const std::byte*>(&componentData), sizeof(componentData)));
+	}
+
+	template<Component T>
 	void IWorld::AddComponents(const std::span<const Entity> entities, const std::span<T*> components)
 	{
 		AddComponents(entities, typeid(T), std::span(reinterpret_cast<void**>(components.data()), components.size()));
@@ -533,6 +701,13 @@ namespace PonyEngine::World
 	{
 		assert(entities.size() == componentData.size() && "Entity and component span sizes are mismatched");
 		AddComponents(entities, typeid(T), std::span(reinterpret_cast<const std::byte*>(componentData.data()), componentData.size_bytes()), 
+			std::span(reinterpret_cast<void**>(components.data()), components.size()));
+	}
+
+	template<Component T>
+	void IWorld::AddComponents(const std::span<const Entity> entities, const T& componentData, const std::span<T*> components)
+	{
+		AddComponents(entities, typeid(T), std::span(reinterpret_cast<const std::byte*>(&componentData), sizeof(T)),
 			std::span(reinterpret_cast<void**>(components.data()), components.size()));
 	}
 
@@ -740,5 +915,35 @@ namespace PonyEngine::World
 	std::shared_ptr<T> IWorld::GetSharedObject(const ObjectHandle<T> handle) const noexcept
 	{
 		return std::static_pointer_cast<T>(GetObjectShared(typeid(T), handle.typeless));
+	}
+
+	template<typename T>
+	bool IWorld::HasWorldData() const noexcept
+	{
+		return HasWorldData(typeid(T));
+	}
+
+	template<typename T>
+	T* IWorld::GetWorldData() const
+	{
+		return static_cast<T*>(GetWorldData(typeid(T)));
+	}
+
+	template<typename T>
+	std::shared_ptr<T> IWorld::GetWorldDataShared() const
+	{
+		return std::static_pointer_cast<T>(GetWorldDataShared(typeid(T)));
+	}
+
+	template<typename T>
+	void IWorld::AddWorldData(std::shared_ptr<T> data)
+	{
+		AddWorldData(typeid(T), std::move(data));
+	}
+
+	template<typename T>
+	void IWorld::RemoveWorldData()
+	{
+		RemoveWorldData(typeid(T));
 	}
 }
