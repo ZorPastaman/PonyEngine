@@ -85,8 +85,8 @@ export namespace PonyEngine::Resource::Text
 		/// @brief Wait till the ongoing request count reaches 0.
 		void WaitForOngoingRequestCountToFinish() const noexcept;
 
-		static inline const std::type_index DefaultAccessType = typeid(ILoadableDataAccess); ///< Default data access type.
-		static inline const std::type_index DirectAccessType = typeid(IMemoryDataAccess); ///< Direct data access type.
+		inline static const std::type_index DefaultAccessType = typeid(ILoadableDataAccess); ///< Default data access type.
+		inline static const std::type_index DirectAccessType = typeid(IMemoryDataAccess); ///< Direct data access type.
 
 		std::unordered_map<OngoingResourceLoadRequest*, std::shared_ptr<OngoingResourceLoadRequest>> loadRequests; ///< Load requests.
 		std::mutex loadRequestsMutex; ///< Load requests mutex.

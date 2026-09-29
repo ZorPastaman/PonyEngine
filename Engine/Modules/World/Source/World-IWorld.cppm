@@ -378,45 +378,45 @@ export namespace PonyEngine::World
 		/// @tparam T Component type.
 		/// @param entities Entities. Must be valid.
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
-		/// @return @a True if all the components are found; @a false otherwise.
+		/// @return Count of entities that have a component of the requested type.
 		template<Component T>
-		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData) const noexcept;
+		std::size_t TryGetComponents(std::span<const Entity> entities, std::span<T> componentData) const noexcept;
 		/// @brief Tries to get components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
-		/// @return @a True if all the components are found; @a false otherwise.
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData) const noexcept = 0;
+		/// @return Count of entities that have a component of the requested type.
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData) const noexcept = 0;
 		/// @brief Tries to get components.
 		/// @tparam T Component type.
 		/// @param entities Entities. Must be valid.
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
 		/// @param has Has flags. Synced with the @p entities by index.
-		/// @return @a True if all the components are found; @a false otherwise.
+		/// @return Count of entities that have a component of the requested type.
 		template<Component T>
-		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<bool> has) const noexcept;
+		std::size_t TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<bool> has) const noexcept;
 		/// @brief Tries to get components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
 		/// @param has Has flags. Synced with the @p entities by index.
-		/// @return @a True if all the components are found; @a false otherwise.
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, std::span<bool> has) const noexcept = 0;
+		/// @return Count of entities that have a component of the requested type.
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, std::span<bool> has) const noexcept = 0;
 		/// @brief Tries to get components.
 		/// @tparam T Component type.
 		/// @param entities Entities. Must be valid.
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
-		/// @return @a True if all the components are found; @a false otherwise.
+		/// @return Count of entities that have a component of the requested type.
 		template<Component T>
-		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<T*> components) const noexcept;
+		std::size_t TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<T*> components) const noexcept;
 		/// @brief Tries to get components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
-		/// @return @a True if all the components are found; @a false otherwise.
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, 
+		/// @return Count of entities that have a component of the requested type.
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType,
 			std::span<std::byte> componentData, std::span<void*> components) const noexcept = 0;
 		/// @brief Tries to get components.
 		/// @tparam T Component type.
@@ -424,46 +424,46 @@ export namespace PonyEngine::World
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
 		/// @param has Has flags. Synced with the @p entities by index.
-		/// @return @a True if all the components are found; @a false otherwise.
+		/// @return Count of entities that have a component of the requested type.
 		template<Component T>
-		bool TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<T*> components, std::span<bool> has) const noexcept;
+		std::size_t TryGetComponents(std::span<const Entity> entities, std::span<T> componentData, std::span<T*> components, std::span<bool> has) const noexcept;
 		/// @brief Tries to get components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param componentData Component data. Synced with the @p entities by index. Won't be changed if the component isn't found.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
 		/// @param has Has flags. Synced with the @p entities by index.
-		/// @return @a True if all the components are found; @a false otherwise.
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType,
+		/// @return Count of entities that have a component of the requested type.
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType,
 			std::span<std::byte> componentData, std::span<void*> components, std::span<bool> has) const noexcept = 0;
 		/// @brief Tries to get components.
 		/// @tparam T Component type.
 		/// @param entities Entities. Must be valid.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
-		/// @return @a True if all the components are found; @a false otherwise.
+		/// @return Count of entities that have a component of the requested type.
 		template<Component T>
-		bool TryGetComponents(std::span<const Entity> entities, std::span<T*> components) const noexcept;
+		std::size_t TryGetComponents(std::span<const Entity> entities, std::span<T*> components) const noexcept;
 		/// @brief Tries to get components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
-		/// @return @a True if all the components are found; @a false otherwise.
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components) const noexcept = 0;
+		/// @return Count of entities that have a component of the requested type.
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components) const noexcept = 0;
 		/// @brief Tries to get components.
 		/// @tparam T Component type.
 		/// @param entities Entities. Must be valid.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
 		/// @param has Has flags. Synced with the @p entities by index.
-		/// @return @a True if all the components are found; @a false otherwise.
+		/// @return Count of entities that have a component of the requested type.
 		template<Component T>
-		bool TryGetComponents(std::span<const Entity> entities, std::span<T*> components, std::span<bool> has) const noexcept;
+		std::size_t TryGetComponents(std::span<const Entity> entities, std::span<T*> components, std::span<bool> has) const noexcept;
 		/// @brief Tries to get components.
 		/// @param entities Entities. Must be valid.
 		/// @param componentType Component type.
 		/// @param components Components. Synced with the @p entities by index. Will be set to nullptr if the component isn't found.
 		/// @param has Has flags. Synced with the @p entities by index.
-		/// @return @a True if all the components are found; @a false otherwise.
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components, std::span<bool> has) const noexcept = 0;
+		/// @return Count of entities that have a component of the requested type.
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components, std::span<bool> has) const noexcept = 0;
 
 		/// @brief Removes all the components of the type @p T.
 		/// @tparam T Component type.
@@ -838,39 +838,39 @@ namespace PonyEngine::World
 	}
 
 	template<Component T>
-	bool IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData) const noexcept
+	std::size_t IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData) const noexcept
 	{
 		return TryGetComponents(entities, typeid(T), std::span(reinterpret_cast<std::byte*>(componentData.data()), componentData.size_bytes()));
 	}
 
 	template<Component T>
-	bool IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData, const std::span<bool> has) const noexcept
+	std::size_t IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData, const std::span<bool> has) const noexcept
 	{
 		return TryGetComponents(entities, typeid(T), std::span(reinterpret_cast<std::byte*>(componentData.data()), componentData.size_bytes()), has);
 	}
 
 	template<Component T>
-	bool IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData, const std::span<T*> components) const noexcept
+	std::size_t IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData, const std::span<T*> components) const noexcept
 	{
 		return TryGetComponents(entities, typeid(T), std::span(reinterpret_cast<std::byte*>(componentData.data()), componentData.size_bytes()),
 			std::span(reinterpret_cast<void**>(components.data()), components.size()));
 	}
 
 	template<Component T>
-	bool IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData, const std::span<T*> components, const std::span<bool> has) const noexcept
+	std::size_t IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T> componentData, const std::span<T*> components, const std::span<bool> has) const noexcept
 	{
 		return TryGetComponents(entities, typeid(T), std::span(reinterpret_cast<std::byte*>(componentData.data()), componentData.size_bytes()),
 			std::span(reinterpret_cast<void**>(components.data()), components.size()), has);
 	}
 
 	template<Component T>
-	bool IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T*> components) const noexcept
+	std::size_t IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T*> components) const noexcept
 	{
 		return TryGetComponents(entities, typeid(T), std::span(reinterpret_cast<void**>(components.data()), components.size()));
 	}
 
 	template<Component T>
-	bool IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T*> components, const std::span<bool> has) const noexcept
+	std::size_t IWorld::TryGetComponents(const std::span<const Entity> entities, const std::span<T*> components, const std::span<bool> has) const noexcept
 	{
 		return TryGetComponents(entities, typeid(T), std::span(reinterpret_cast<void**>(components.data()), components.size()), has);
 	}

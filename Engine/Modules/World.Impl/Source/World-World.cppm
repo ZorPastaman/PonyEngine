@@ -72,15 +72,15 @@ export namespace PonyEngine::World
 		virtual std::size_t GetComponents(std::type_index componentType, std::span<std::byte> componentData, std::span<void*> components) const noexcept override;
 		virtual std::size_t GetComponents(std::type_index componentType, std::span<void*> components) const noexcept override;
 
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData) const noexcept override;
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, 
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData) const noexcept override;
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData,
 			std::span<bool> has) const noexcept override;
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, 
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType,
 			std::span<std::byte> componentData, std::span<void*> components) const noexcept override;
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, std::span<void*> components,
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<std::byte> componentData, std::span<void*> components,
 			std::span<bool> has) const noexcept override;
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components) const noexcept override;
-		virtual bool TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components, std::span<bool> has) const noexcept override;
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components) const noexcept override;
+		virtual std::size_t TryGetComponents(std::span<const Entity> entities, std::type_index componentType, std::span<void*> components, std::span<bool> has) const noexcept override;
 
 		virtual void DropComponents(std::type_index componentType) override;
 
@@ -661,7 +661,7 @@ namespace PonyEngine::World
 		return 0uz;
 	}
 
-	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData) const noexcept
+	std::size_t World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData) const noexcept
 	{
 		CheckIfValid(entities);
 
@@ -677,13 +677,13 @@ namespace PonyEngine::World
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
 			CopyComponentData(*table, componentData, entities, indices);
 
-			return validIndexCount == entities.size();
+			return validIndexCount;
 		}
 
-		return false;
+		return 0uz;
 	}
 
-	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData, 
+	std::size_t World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData,
 		const std::span<bool> has) const noexcept
 	{
 		CheckIfValid(entities);
@@ -701,14 +701,14 @@ namespace PonyEngine::World
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
 			CopyComponentData(*table, componentData, entities, indices);
 
-			return validIndexCount == entities.size();
+			return validIndexCount;
 		}
 
 		std::ranges::fill(has, false);
-		return false;
+		return 0uz;
 	}
 
-	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData, 
+	std::size_t World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData,
 		const std::span<void*> components) const noexcept
 	{
 		CheckIfValid(entities);
@@ -729,13 +729,13 @@ namespace PonyEngine::World
 			CopyComponentData(*table, componentData, entities, indices);
 			CopyComponents(*table, components, entities, indices);
 
-			return validIndexCount == entities.size();
+			return validIndexCount;
 		}
 
-		return false;
+		return 0uz;
 	}
 
-	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData, 
+	std::size_t World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<std::byte> componentData,
 		const std::span<void*> components, const std::span<bool> has) const noexcept
 	{
 		CheckIfValid(entities);
@@ -757,14 +757,14 @@ namespace PonyEngine::World
 			CopyComponentData(*table, componentData, entities, indices);
 			CopyComponents(*table, components, entities, indices);
 
-			return validIndexCount == entities.size();
+			return validIndexCount;
 		}
 
 		std::ranges::fill(has, false);
-		return false;
+		return 0uz;
 	}
 
-	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> components) const noexcept
+	std::size_t World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> components) const noexcept
 	{
 		CheckIfValid(entities);
 		assert(entities.size() == components.size() && "Entity and component span sizes are mismatched");
@@ -781,13 +781,13 @@ namespace PonyEngine::World
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
 			CopyComponents(*table, components, entities, indices);
 
-			return validIndexCount == entities.size();
+			return validIndexCount;
 		}
 
-		return false;
+		return 0uz;
 	}
 
-	bool World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> components, 
+	std::size_t World::TryGetComponents(const std::span<const Entity> entities, const std::type_index componentType, const std::span<void*> components,
 		const std::span<bool> has) const noexcept
 	{
 		CheckIfValid(entities);
@@ -806,11 +806,11 @@ namespace PonyEngine::World
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
 			CopyComponents(*table, components, entities, indices);
 
-			return validIndexCount == entities.size();
+			return validIndexCount;
 		}
 
 		std::ranges::fill(has, false);
-		return false;
+		return 0uz;
 	}
 
 	void World::DropComponents(const std::type_index componentType)

@@ -7,13 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.World.Hierarchy;
+export module PonyEngine.World.Hierarchy:DirtyTransform;
 
-export import PonyEngine.World;
-
-export import :DirtyTransform;
-export import :IHierarchyService;
-export import :LocalTransform;
-export import :Parent;
-export import :Types;
-export import :WorldTransform;
+export namespace PonyEngine::World::Hierarchy
+{
+	/// @brief Tag component that tells that a world transform of its entity must be updated.
+	struct DirtyTransform final
+	{
+	};
+}

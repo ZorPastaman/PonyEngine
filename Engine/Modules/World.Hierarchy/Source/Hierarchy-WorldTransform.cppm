@@ -327,10 +327,11 @@ namespace PonyEngine::World::Hierarchy
 	{
 		using PositionMatrix = Math::Matrix<PositionComponentType, Size, Size>;
 
-		const typename WorldTransform<Size>::PositionType position = lhs.Position() + static_cast<PositionMatrix>(lhs.RotationScaling()) * rhs.Position();
-		const typename WorldTransform<Size>::RSMatrixType rotationScaling = lhs.RotationScaling() * rhs.RotationScaling();
+		WorldTransform<Size> transform;
+		transform.Position(lhs.Position() + static_cast<PositionMatrix>(lhs.RotationScaling()) * rhs.Position());
+		transform.RotationScaling(lhs.RotationScaling() * rhs.RotationScaling());
 
-		return WorldTransform<Size>(position, rotationScaling);
+		return transform;
 	}
 
 	template<std::size_t Size>
@@ -338,10 +339,11 @@ namespace PonyEngine::World::Hierarchy
 	{
 		using PositionMatrix = Math::Matrix<PositionComponentType, Size, Size>;
 
-		const typename WorldTransform<Size>::PositionType position = lhs.Position() + static_cast<PositionMatrix>(lhs.RotationScaling()) * rhs.Position();
-		const typename WorldTransform<Size>::RSMatrixType rotationScaling = lhs.RotationScaling() * Math::RSMatrix(rhs.Rotation(), rhs.Scale());
+		WorldTransform<Size> transform;
+		transform.Position(lhs.Position() + static_cast<PositionMatrix>(lhs.RotationScaling()) * rhs.Position());
+		transform.RotationScaling(lhs.RotationScaling() * Math::RSMatrix(rhs.Rotation(), rhs.Scale()));
 
-		return WorldTransform<Size>(position, rotationScaling);
+		return transform;
 	}
 
 	template<std::size_t Size>

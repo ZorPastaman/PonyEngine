@@ -4,6 +4,7 @@ add_library(PonyEngine.World.Hierarchy STATIC)
 
 target_sources(PonyEngine.World.Hierarchy PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Hierarchy.cppm"
+	"Source/Hierarchy-DirtyTransform.cppm"
 	"Source/Hierarchy-IHierarchyService.cppm"
 	"Source/Hierarchy-LocalTransform.cppm"
 	"Source/Hierarchy-Parent.cppm"
