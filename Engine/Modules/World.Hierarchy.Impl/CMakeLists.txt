@@ -4,6 +4,10 @@ set(PONY_ENGINE_WORLD_HIERARCHY_ORDER "p" CACHE STRING "PonyEngine.World.Hierarc
 
 add_library(PonyEngine.World.Hierarchy.Impl STATIC)
 
+target_include_directories(PonyEngine.World.Hierarchy.Impl PUBLIC
+	"Include/Public"
+)
+
 target_sources(PonyEngine.World.Hierarchy.Impl PUBLIC
 	"Source/Launch.cpp"
 )
@@ -13,10 +17,11 @@ target_sources(PonyEngine.World.Hierarchy.Impl PRIVATE
 target_sources(PonyEngine.World.Hierarchy.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Hierarchy.cppm"
 	"Source/Hierarchy-HierarchyService.cppm"
+	"Source/Hierarchy-HierarchyServiceModule.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_WORLD_HIERARCHY_ORDER)
-target_compile_definitions(PonyEngine.Time.Impl PUBLIC
+target_compile_definitions(PonyEngine.World.Hierarchy.Impl PUBLIC
 	PONY_ENGINE_WORLD_HIERARCHY_ORDER=${PONY_ENGINE_WORLD_HIERARCHY_ORDER}
 )
 
@@ -29,7 +34,6 @@ target_link_libraries(PonyEngine.World.Hierarchy.Impl PUBLIC
 )
 target_link_libraries(PonyEngine.World.Hierarchy.Impl PRIVATE
 	PonyEngine.Core
-	PonyEngine.Log
 	PonyEngine.World
 	PonyEngine.World.Hierarchy
 )

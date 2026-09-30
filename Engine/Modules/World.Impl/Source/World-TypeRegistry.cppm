@@ -82,7 +82,7 @@ namespace PonyEngine::World
 	void TypeRegistry::AddComponentType(const std::type_index componentType, const std::size_t size, const std::size_t alignment)
 	{
 		const auto lock = std::unique_lock(mutex);
-		components[componentType] = ComponentInfo{.size = size, .alignment = std::max(alignment, alignof(std::max_align_t))};
+		components[componentType] = ComponentInfo{.size = size, .alignment = alignment};
 	}
 
 	void TypeRegistry::RegisterComponentObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)

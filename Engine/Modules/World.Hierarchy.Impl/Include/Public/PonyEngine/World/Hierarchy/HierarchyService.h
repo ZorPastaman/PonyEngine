@@ -7,14 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/World/Hierarchy/HierarchyService.h"
+#pragma once
 
-import PonyEngine.World.Hierarchy.Impl;
+#include "PonyEngine/Macro/Compiler.h"
+
+import std;
+
+import PonyEngine.Application;
 
 namespace PonyEngine::World::Hierarchy
 {
-	std::shared_ptr<Application::IModule> CreateHierarchyModule()
-	{
-		return std::make_shared<HierarchyServiceModule>();
-	}
+	/// @brief Creates a world hierarchy module.
+	/// @return Hierarchy module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateHierarchyModule();
 }

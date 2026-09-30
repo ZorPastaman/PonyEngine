@@ -10,3 +10,5 @@
 export module PonyEngine.World.Hierarchy.Impl;
 
 export import PonyEngine.World.Hierarchy;
+
+export import :HierarchyServiceModule;
