@@ -7,20 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math;
+export module PonyEngine.World.Hierarchy:Types;
 
-export import :Ball;
-export import :Bounds;
-export import :Box;
-export import :Color;
-export import :Common;
-export import :CornerBox;
-export import :Flat;
-export import :Insides;
-export import :Intersections;
-export import :Matrix;
-export import :OrientedBox;
-export import :Quaternion;
-export import :Ray;
-export import :Transformations;
-export import :Vector;
+export namespace PonyEngine::World::Hierarchy
+{
+	using PositionComponentType = double; ///< Component type used for positions.
+	using RotationScaleComponentType = float; ///< Component type used for rotations and scales.
+}

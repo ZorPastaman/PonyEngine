@@ -224,12 +224,12 @@ export namespace PonyEngine::Application
 	private:
 		using ModuleGetter = std::shared_ptr<IModule>(*)(); ///< Module getter function.
 
-		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstEarlyModule = nullptr; ///< Early module begin pointer.
-		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleGetter lastEarlyModule = nullptr; ///< Early module end pointer.
-		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstNormalModule = nullptr; ///< Normal module begin pointer.
-		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleGetter lastNormalModule = nullptr; ///< Normal module end pointer.
-		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) static inline ModuleGetter firstLateModule = nullptr; ///< Late module begin pointer.
-		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) static inline ModuleGetter lastLateModule = nullptr; ///< Late module end pointer.
+		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) inline static ModuleGetter firstEarlyModule = nullptr; ///< Early module begin pointer.
+		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) inline static ModuleGetter lastEarlyModule = nullptr; ///< Early module end pointer.
+		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) inline static ModuleGetter firstNormalModule = nullptr; ///< Normal module begin pointer.
+		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) inline static ModuleGetter lastNormalModule = nullptr; ///< Normal module end pointer.
+		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) inline static ModuleGetter firstLateModule = nullptr; ///< Late module begin pointer.
+		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) inline static ModuleGetter lastLateModule = nullptr; ///< Late module end pointer.
 
 		/// @brief Temp buffer cache.
 		struct TempBufferCache final

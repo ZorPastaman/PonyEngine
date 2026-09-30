@@ -7,20 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math;
+export module PonyEngine.World.Hierarchy:Parent;
 
-export import :Ball;
-export import :Bounds;
-export import :Box;
-export import :Color;
-export import :Common;
-export import :CornerBox;
-export import :Flat;
-export import :Insides;
-export import :Intersections;
-export import :Matrix;
-export import :OrientedBox;
-export import :Quaternion;
-export import :Ray;
-export import :Transformations;
-export import :Vector;
+import PonyEngine.World;
+
+export namespace PonyEngine::World::Hierarchy
+{
+	/// @brief Parent component.
+	struct Parent final
+	{
+		Entity value; ///< Parent entity.
+	};
+}

@@ -5388,15 +5388,15 @@ TEST_CASE("Angle from trs matrix compact", "[Math][Transformations]")
 TEST_CASE("TRS matrix compact from trs matrix", "[Math][Transformations]")
 {
 	constexpr auto origMatrix = PonyEngine::Math::Matrix4x4<float>(1.202f, 2.834f, -1.19f, 0.f, -2.785f, 2.146f, 2.298f, 0.f, 1.57f, 0.096f, 1.813f, 0.f, -3.1f, 4.6f, 9.5f, 1.f);
-	constexpr auto tRSMatrixC = PonyEngine::Math::ExtractTRSMatrixFromTRS(origMatrix);
+	constexpr auto tRSMatrixC = PonyEngine::Math::ExtractTRSMatrixCompactFromTRS(origMatrix);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x4<float>(1.202f, 2.834f, -1.19f, -2.785f, 2.146f, 2.298f, 1.57f, 0.096f, 1.813f, -3.1f, 4.6f, 9.5f), tRSMatrixC, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	auto tRSMatrix = PonyEngine::Math::ExtractTRSMatrixFromTRS(origMatrix);
+	auto tRSMatrix = PonyEngine::Math::ExtractTRSMatrixCompactFromTRS(origMatrix);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x4<float>(1.202f, 2.834f, -1.19f, -2.785f, 2.146f, 2.298f, 1.57f, 0.096f, 1.813f, -3.1f, 4.6f, 9.5f), tRSMatrix, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::Math::ExtractTRSMatrixFromTRS(origMatrix);
+		return PonyEngine::Math::ExtractTRSMatrixCompactFromTRS(origMatrix);
 	};
 #endif
 }
@@ -5649,15 +5649,15 @@ TEST_CASE("RS matrix from trs matrix compact", "[Math][Transformations]")
 TEST_CASE("Tts matrix compact from trs matrix", "[Math][Transformations]")
 {
 	constexpr auto tRSMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
-	constexpr auto tRSMatrixCompactC = PonyEngine::Math::ExtractTRSMatrixFromTRS(tRSMatrix);
+	constexpr auto tRSMatrixCompactC = PonyEngine::Math::ExtractTRSMatrixCompactFromTRS(tRSMatrix);
 	STATIC_REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x4<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f, 2.f, -3.f, 5.f), tRSMatrixCompactC, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
-	const auto tRSMatrixCompact = PonyEngine::Math::ExtractTRSMatrixFromTRS(tRSMatrix);
+	const auto tRSMatrixCompact = PonyEngine::Math::ExtractTRSMatrixCompactFromTRS(tRSMatrix);
 	REQUIRE(PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x4<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f, 2.f, -3.f, 5.f), tRSMatrixCompact, PonyEngine::Math::Tolerance{.absolute = 0.001f}));
 
 #if PONY_ENGINE_TESTING_BENCHMARK
 	BENCHMARK("Bench")
 	{
-		return PonyEngine::Math::ExtractTRSMatrixFromTRS(tRSMatrix);
+		return PonyEngine::Math::ExtractTRSMatrixCompactFromTRS(tRSMatrix);
 	};
 #endif
 }

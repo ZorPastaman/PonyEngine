@@ -16,6 +16,7 @@ export module PonyEngine.World.Impl:ObjectTable;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.World;
 
@@ -168,8 +169,8 @@ namespace PonyEngine::World
 
 	bool ObjectTable::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
 	{
-		return handle.id < objectsSparse.size() && objectsSparse[handle.id] < objectsDense.size() && objectsDense[objectsSparse[handle.id]] == handle.id && 
-			handleVersions[handle.id] == handle.version && objects[objectsSparse[handle.id]].type == objectType;
+		return Math::IsOdd(handle.id) && handle.id < objectsSparse.size() && handleVersions[handle.id] == handle.version && objectsSparse[handle.id] < objectsDense.size() &&
+			objectsDense[objectsSparse[handle.id]] == handle.id && objects[objectsSparse[handle.id]].type == objectType;
 	}
 
 	const std::shared_ptr<void>& ObjectTable::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept

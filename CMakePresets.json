@@ -5,7 +5,8 @@
 			"name": "Base",
 			"hidden": true,
 			"binaryDir": "${sourceDir}/Build/${presetName}",
-			"installDir": "${sourceDir}/Install/${presetName}"
+			"installDir": "${sourceDir}/Install/${presetName}",
+			"generator": "Ninja"
 		},
 		{
 			"name": "Runtime",
@@ -35,6 +36,8 @@
 				"PONY_ENGINE_RESOURCE_TEXT_IMPL": true,
 				"PONY_ENGINE_WORLD": true,
 				"PONY_ENGINE_WORLD_IMPL": true,
+				"PONY_ENGINE_WORLD_HIERARCHY": true,
+				"PONY_ENGINE_WORLD_HIERARCHY_IMPL": true,
 				"PONY_ENGINE_LOG_ORDER": "b",
 				"PONY_ENGINE_LOG_CONSOLE_ORDER": "c",
 				"PONY_ENGINE_LOG_FILE_ORDER": "f",
@@ -45,6 +48,7 @@
 				"PONY_ENGINE_RESOURCE_TEXT_ORDER": "fc",
 				"PONY_ENGINE_RESOURCE_PACK_ORDER": "fp",
 				"PONY_ENGINE_WORLD_ORDER": "wa",
+				"PONY_ENGINE_WORLD_HIERARCHY_ORDER": "wb",
 				"PONY_ENGINE_TIME_TICK_ORDER": "-500000",
 				"PONY_ENGINE_TESTING": true,
 				"PONY_ENGINE_TESTING_BENCHMARK": false

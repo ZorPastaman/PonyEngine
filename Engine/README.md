@@ -51,6 +51,8 @@ To configure a module, a specific CMake flag must be `true`.
 | [PonyEngine.WinInput.Impl](Modules/WinInput.Impl)                   | `PONY_ENGINE_WININPUT_IMPL`           |
 | [PonyEngine.World](Modules/World)                                   | `PONY_ENGINE_WORLD`                   |
 | [PonyEngine.World.Impl](Modules/World.Impl)                         | `PONY_ENGINE_WORLD_IMPL`              |
+| [PonyEngine.World.Hierarchy](Modules/World.Hierarchy)               | `PONY_ENGINE_WORLD_HIERARCHY`         |
+| [PonyEngine.World.Hierarchy.Impl](Modules/World.Hierarchy.Impl)     | `PONY_ENGINE_WORLD_HIERARCHY_IMPL`    |
 
 Some modules may require modifications to work because they need implementation for a specific platform or a compiler or due to other things.
 

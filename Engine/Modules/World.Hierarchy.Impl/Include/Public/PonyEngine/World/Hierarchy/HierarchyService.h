@@ -7,20 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math;
+#pragma once
 
-export import :Ball;
-export import :Bounds;
-export import :Box;
-export import :Color;
-export import :Common;
-export import :CornerBox;
-export import :Flat;
-export import :Insides;
-export import :Intersections;
-export import :Matrix;
-export import :OrientedBox;
-export import :Quaternion;
-export import :Ray;
-export import :Transformations;
-export import :Vector;
+#include "PonyEngine/Macro/Compiler.h"
+
+import std;
+
+import PonyEngine.Application;
+
+namespace PonyEngine::World::Hierarchy
+{
+	/// @brief Creates a world hierarchy module.
+	/// @return Hierarchy module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateHierarchyModule();
+}

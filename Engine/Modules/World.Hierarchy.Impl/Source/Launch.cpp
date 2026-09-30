@@ -7,20 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math;
+#include "PonyEngine/Application/Module.h"
+#include "PonyEngine/World/Hierarchy/HierarchyService.h"
 
-export import :Ball;
-export import :Bounds;
-export import :Box;
-export import :Color;
-export import :Common;
-export import :CornerBox;
-export import :Flat;
-export import :Insides;
-export import :Intersections;
-export import :Matrix;
-export import :OrientedBox;
-export import :Quaternion;
-export import :Ray;
-export import :Transformations;
-export import :Vector;
+PONY_ENGINE_MODULE(PonyEngine::World::Hierarchy::CreateHierarchyModule, PonyEngineWorldHierarchy, PONY_ENGINE_WORLD_HIERARCHY_ORDER);

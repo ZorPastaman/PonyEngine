@@ -23,18 +23,14 @@ target_sources(PonyEngine.Core.Tests PRIVATE
 	"Math/Quaternion.cpp"
 	"Math/Ray.cpp"
 	"Math/RayIntersections.cpp"
-	"Math/Transform2D.cpp"
-	"Math/Transform3D.cpp"
 	"Math/Transformations.cpp"
 	"Math/Vector.cpp"
 	"Memory/Arena.cpp"
 	"Meta/Version.cpp"
 	"Utility/Concepts.cpp"
 	"Utility/Enum.cpp"
-	
 )
 
-pony_set_log_defines(PonyEngine.Core.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
 target_compile_definitions(PonyEngine.Core.Tests PRIVATE 
 	$<$<BOOL:${PONY_ENGINE_TESTING_BENCHMARK}>:PONY_ENGINE_TESTING_BENCHMARK>
 )
