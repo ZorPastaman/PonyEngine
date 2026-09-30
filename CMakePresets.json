@@ -71,6 +71,7 @@
 			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_ENGINE_OPTIMIZED_DEBUG": true,
 				"PONY_ENGINE_LOG_LEVEL": "Info",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Fatal",
 				"PONY_MAKE_GROUPS": false
@@ -236,7 +237,8 @@
 			"name": "Tools-Optimized",
 			"inherits": "Tools",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Debug"
+				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_ENGINE_OPTIMIZED_DEBUG": true
 			}
 		},
 		{
