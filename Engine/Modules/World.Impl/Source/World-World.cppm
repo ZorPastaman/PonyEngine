@@ -675,7 +675,7 @@ namespace PonyEngine::World
 			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
 
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
-			CopyComponentData(*table, componentData, entities, indices);
+			CopyComponentData(*table, componentData, entities, indices.subspan(0uz, validIndexCount));
 
 			return validIndexCount;
 		}
@@ -699,7 +699,7 @@ namespace PonyEngine::World
 			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
 
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
-			CopyComponentData(*table, componentData, entities, indices);
+			CopyComponentData(*table, componentData, entities, indices.subspan(0uz, validIndexCount));
 
 			return validIndexCount;
 		}
@@ -726,8 +726,9 @@ namespace PonyEngine::World
 			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
 
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
-			CopyComponentData(*table, componentData, entities, indices);
-			CopyComponents(*table, components, entities, indices);
+			const std::span<std::size_t> validIndices = indices.subspan(0uz, validIndexCount);
+			CopyComponentData(*table, componentData, entities, validIndices);
+			CopyComponents(*table, components, entities, validIndices);
 
 			return validIndexCount;
 		}
@@ -754,8 +755,9 @@ namespace PonyEngine::World
 			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
 
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
-			CopyComponentData(*table, componentData, entities, indices);
-			CopyComponents(*table, components, entities, indices);
+			const std::span<std::size_t> validIndices = indices.subspan(0uz, validIndexCount);
+			CopyComponentData(*table, componentData, entities, validIndices);
+			CopyComponents(*table, components, entities, validIndices);
 
 			return validIndexCount;
 		}
@@ -779,7 +781,7 @@ namespace PonyEngine::World
 			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
 
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices);
-			CopyComponents(*table, components, entities, indices);
+			CopyComponents(*table, components, entities, indices.subspan(0uz, validIndexCount));
 
 			return validIndexCount;
 		}
@@ -804,7 +806,7 @@ namespace PonyEngine::World
 			const std::span<std::size_t> indices = arena.AllocateArray<std::size_t>(entities.size());
 
 			const std::size_t validIndexCount = GetValidIndices(*table, entities, indices, has);
-			CopyComponents(*table, components, entities, indices);
+			CopyComponents(*table, components, entities, indices.subspan(0uz, validIndexCount));
 
 			return validIndexCount;
 		}
