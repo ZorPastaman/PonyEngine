@@ -1074,16 +1074,16 @@ namespace PonyEngine::World
 
 	void World::CopyEntities(const ComponentTable& table, const std::span<Entity> entities) const noexcept
 	{
-		for (EntityID i = 0u; i < entities.size(); ++i)
+		for (std::size_t i = 0u; i < entities.size(); ++i)
 		{
-			const EntityID entityId = table.Entity(i);
+			const EntityID entityId = table.Entity(static_cast<EntityID>(i));
 			entities[i] = Entity{.id = entityId, .generation = entityGenerations[entityId]};
 		}
 	}
 
 	void World::CopyComponentData(const ComponentTable& table, std::span<std::byte> componentData) noexcept
 	{
-		std::memcpy(componentData.data(), table.Component(0u), componentData.size());
+		std::memcpy(componentData.data(), table.FirstComponent(), componentData.size());
 	}
 
 	void World::CopyComponentData(const ComponentTable& table, const std::span<std::byte> componentData, const std::span<const Entity> entities, 
@@ -1098,8 +1098,8 @@ namespace PonyEngine::World
 
 	void World::CopyComponents(const ComponentTable& table, const std::span<void*> components) noexcept
 	{
-		auto component = static_cast<std::byte*>(table.Component(0u));
-		for (EntityID i = 0u; i < components.size(); ++i, component += table.ComponentSize())
+		std::byte* component = table.FirstComponent();
+		for (std::size_t i = 0uz; i < components.size(); ++i, component += table.ComponentSize())
 		{
 			components[i] = component;
 		}

@@ -206,10 +206,9 @@ namespace PonyEngine::World
 				}
 
 				const ComponentTable& componentTable = componentTables[componentTableIndex];
-				for (EntityID entityIndex = 0uz; entityIndex < componentTable.Size(); ++entityIndex)
+				const std::byte* component = componentTable.FirstComponent();
+				for (EntityID entityIndex = 0u; entityIndex < componentTable.Size(); ++entityIndex, component += componentTable.ComponentSize())
 				{
-					const auto component = static_cast<const std::byte*>(componentTable.Component(entityIndex));
-
 					for (const auto [offset, objectType] : objectOffsets)
 					{
 						const TypelessObjectHandle handle = *reinterpret_cast<const TypelessObjectHandle*>(component + offset);

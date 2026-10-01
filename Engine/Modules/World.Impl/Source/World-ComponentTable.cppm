@@ -62,11 +62,23 @@ export namespace PonyEngine::World
 		/// @return Entity.
 		[[nodiscard("Pure function")]]
 		EntityID Entity(EntityID index) const noexcept;
+		/// @brief Gets a first component.
+		/// @return First component.
+		[[nodiscard("Pure function")]]
+		std::byte* FirstComponent() const noexcept;
 		/// @brief Gets an entity component at the index.
 		/// @param index Entity index. Must be valid.
 		/// @return Entity component.
 		[[nodiscard("Pure function")]]
-		void* Component(EntityID index) const noexcept;
+		std::byte* Component(EntityID index) const noexcept;
+		/// @brief Gets all the components.
+		/// @return Components.
+		[[nodiscard("Pure function")]]
+		std::span<std::byte> Components() const noexcept;
+		/// @brief Gets all the components.
+		/// @return Components.
+		[[nodiscard("Pure function")]]
+		std::span<std::byte> Components(EntityID offset, EntityID count) const noexcept;
 		/// @brief Adds the entities to the table.
 		/// @param entitiesToAdd Entities to add. The table mustn't contain the entities.
 		void Add(std::span<const EntityID> entitiesToAdd);
@@ -161,10 +173,26 @@ namespace PonyEngine::World
 		return entities[index];
 	}
 
-	void* ComponentTable::Component(const EntityID index) const noexcept
+	std::byte* ComponentTable::FirstComponent() const noexcept
+	{
+		return components.get();
+	}
+
+	std::byte* ComponentTable::Component(const EntityID index) const noexcept
 	{
 		assert(index < denseSize && "Out of range.");
 		return &components[index * componentSize];
+	}
+
+	std::span<std::byte> ComponentTable::Components() const noexcept
+	{
+		return std::span(components.get(), denseSize * componentSize);
+	}
+
+	std::span<std::byte> ComponentTable::Components(const EntityID offset, const EntityID count) const noexcept
+	{
+		assert(denseSize >= offset && denseSize - offset >= count && "Invalid range.");
+		return std::span(components.get() + offset * componentSize, count * componentSize);
 	}
 
 	void ComponentTable::Add(const std::span<const EntityID> entitiesToAdd)
