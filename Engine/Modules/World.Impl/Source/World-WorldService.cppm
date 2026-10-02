@@ -151,51 +151,31 @@ namespace PonyEngine::World
 
 	void WorldService::AddToWorld(World& world, const WorldDefinition& definition) const
 	{
-		std::size_t maxComponentCount = 0uz;
-		for (const std::span<const EntityID> componentBinding : definition.componentBindings)
-		{
-			maxComponentCount = std::max(maxComponentCount, componentBinding.size());
-		}
-		if (maxComponentCount > definition.entityCount) [[unlikely]]
-		{
-			throw std::invalid_argument("Invalid component binding");
-		}
-
-		if (definition.componentBindings.size() != definition.componentData.size()) [[unlikely]]
-		{
-			throw std::invalid_argument("Component bindings and component data have different sizes");
-		}
-
-		for (const std::span<const EntityID> entityBindings : definition.componentBindings)
-		{
-			for (const EntityID entityId : entityBindings)
-			{
-				if (entityId >= definition.entityCount) [[unlikely]]
-				{
-					throw std::invalid_argument("Invalid component binding");
-				}
-			}
-		}
-
 		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
 
-		for (const auto [type, componentIndex] : definition.componentIndices)
+		std::size_t maxComponentCount = 0uz;
+		for (const auto& [type, table] : definition.components)
 		{
 			if (!typeRegistry.IsValidComponent(type)) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid component type");
 			}
-			if (componentIndex >= definition.componentBindings.size()) [[unlikely]]
+
+			for (const EntityID entity : table.entityBindings)
 			{
-				throw std::invalid_argument("Invalid component binding");
+				if (entity >= definition.entityCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid component binding");
+				}
 			}
 
 			const std::size_t componentSize = typeRegistry.ComponentSize(type);
-			const std::size_t entityCount = definition.componentBindings[componentIndex].size();
-			if (definition.componentData[componentIndex].size() != componentSize * entityCount) [[unlikely]]
+			if (table.data.size() != componentSize * table.entityBindings.size()) [[unlikely]]
 			{
-				throw std::invalid_argument("Invalid component binding");
+				throw std::invalid_argument("Invalid component data");
 			}
+
+			maxComponentCount = std::max(maxComponentCount, table.entityBindings.size());
 		}
 
 		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(definition.entityCount) +
@@ -223,10 +203,10 @@ namespace PonyEngine::World
 
 		world.CreateEntities(entities);
 
-		for (const auto [type, bindingIndex] : definition.componentIndices)
+		for (const auto [type, table] : definition.components)
 		{
-			const std::span<const EntityID> bindings = definition.componentBindings[bindingIndex];
-			const std::span<const std::byte> componentData = definition.componentData[bindingIndex];
+			const std::span<const EntityID> bindings = table.entityBindings;
+			const std::span<const std::byte> componentData = table.data;
 
 			for (std::size_t i = 0uz; i < bindings.size(); ++i)
 			{
