@@ -50,6 +50,10 @@ Also, each world has its own object storage.
 
 World service public interface. It provides functions for component registration and world creation.
 
+#### [WorldDefinition](Source/World-WorldDefinition.cppm)
+
+World definition. It's a serialized data that may be used to create a world.
+
 ## How to manage components
 
 First of all each component type must be registered via `RegisterComponent()` function in `PonyEngine::World::IWorldService` before any usage.

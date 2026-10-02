@@ -19,6 +19,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log;
+import PonyEngine.Memory;
 import PonyEngine.World;
 
 import :ObjectTable;
@@ -40,23 +41,31 @@ export namespace PonyEngine::World
 
 		~WorldService() noexcept;
 
-		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) override;
-		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) override;
-
-		[[nodiscard("Weird call")]]
+		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<IWorld> CreateWorld() override;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IWorld> CreateWorld(const WorldDefinition& definition) override;
 
 		WorldService& operator =(const WorldService&) = delete;
 		WorldService& operator =(WorldService&&) = delete;
 
+	protected:
+		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) override;
+		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) override;
+		virtual void RegisterEntityReferenceMember(std::type_index componentType, std::size_t componentOffset) override;
+
 	private:
+		[[nodiscard("Pure function")]]
+		std::shared_ptr<World> MakeWorld();
+		void AddToWorld(World& world, const WorldDefinition& definition) const;
+
 		Application::IApplication* application; ///< Application.
 		const Log::ILogService* logService; ///< Log service.
 
 		TypeRegistry typeRegistry; ///< Type registry.
 
 #ifndef NDEBUG
-		std::atomic_size_t worldCount;
+		std::atomic_size_t worldCount; ///< World count.
 #endif
 	};
 }
@@ -79,10 +88,24 @@ namespace PonyEngine::World
 #endif
 	}
 
+	std::shared_ptr<IWorld> WorldService::CreateWorld()
+	{
+		return MakeWorld();
+	}
+
+	std::shared_ptr<IWorld> WorldService::CreateWorld(const WorldDefinition& definition)
+	{
+		std::shared_ptr<World> world = MakeWorld();
+		AddToWorld(*world, definition);
+
+		return world;
+	}
+
 	void WorldService::RegisterComponent(const std::type_index componentType, const std::size_t componentSize, const std::size_t componentAlignment)
 	{
-		PONY_LOG(logService, Log::LogType::Info, "Registering component type. Type name: '{}'; size: '{}'; alignment: '{}'.", 
+		PONY_LOG(logService, Log::LogType::Info, "Registering component type. Type name: '{}'; size: '{}'; alignment: '{}'.",
 			componentType.name(), componentSize, componentAlignment);
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
 		typeRegistry.AddComponentType(componentType, componentSize, componentAlignment);
 	}
 
@@ -90,10 +113,19 @@ namespace PonyEngine::World
 	{
 		PONY_LOG(logService, Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
 			componentType.name(), objectType.name(), componentOffset);
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
 		typeRegistry.RegisterComponentObjectHandleMember(objectType, componentType, componentOffset);
 	}
 
-	std::shared_ptr<IWorld> WorldService::CreateWorld()
+	void WorldService::RegisterEntityReferenceMember(const std::type_index componentType, const std::size_t componentOffset)
+	{
+		PONY_LOG(logService, Log::LogType::Info, "Registering component entity reference. Component type name: '{}'; Reference offset: '{}'.",
+			componentType.name(), componentOffset);
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
+		typeRegistry.RegisterEntityReferenceMember(componentType, componentOffset);
+	}
+
+	std::shared_ptr<World> WorldService::MakeWorld()
 	{
 #ifndef NDEBUG
 		const auto world = new World(*application, typeRegistry);
@@ -101,10 +133,10 @@ namespace PonyEngine::World
 		try
 		{
 			return std::shared_ptr<World>(world, [this](const World* const worldToDestroy) noexcept
-			{
-				delete worldToDestroy;
-				worldCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
+				{
+					delete worldToDestroy;
+					worldCount.fetch_sub(1uz, std::memory_order::relaxed);
+				});
 		}
 		catch (...)
 		{
@@ -115,5 +147,140 @@ namespace PonyEngine::World
 #else
 		return std::make_shared<World>(*application, typeRegistry);
 #endif
+	}
+
+	void WorldService::AddToWorld(World& world, const WorldDefinition& definition) const
+	{
+		std::size_t maxComponentCount = 0uz;
+		for (const std::span<const EntityID> componentBinding : definition.componentBindings)
+		{
+			maxComponentCount = std::max(maxComponentCount, componentBinding.size());
+		}
+		if (maxComponentCount > definition.entityCount) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid component binding");
+		}
+
+		if (definition.componentBindings.size() != definition.componentData.size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Component bindings and component data have different sizes");
+		}
+
+		for (const std::span<const EntityID> entityBindings : definition.componentBindings)
+		{
+			for (const EntityID entityId : entityBindings)
+			{
+				if (entityId >= definition.entityCount) [[unlikely]]
+				{
+					throw std::invalid_argument("Invalid component binding");
+				}
+			}
+		}
+
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
+
+		for (const auto [type, componentIndex] : definition.componentIndices)
+		{
+			if (!typeRegistry.IsValidComponent(type)) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid component type");
+			}
+			if (componentIndex >= definition.componentBindings.size()) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid component binding");
+			}
+
+			const std::size_t componentSize = typeRegistry.ComponentSize(type);
+			const std::size_t entityCount = definition.componentBindings[componentIndex].size();
+			if (definition.componentData[componentIndex].size() != componentSize * entityCount) [[unlikely]]
+			{
+				throw std::invalid_argument("Invalid component binding");
+			}
+		}
+
+		const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(definition.entityCount) +
+			Memory::CalculateBufferSize<Entity, Entity>(maxComponentCount) +
+			Memory::CalculateBufferSize<void*, Entity>(maxComponentCount) +
+			Memory::CalculateBufferSize<TypelessObjectHandle, void*>(definition.objects.size());
+		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+		auto arena = Memory::Arena(buffer->Span());
+
+		const std::span<Entity> entities = arena.AllocateArray<Entity>(definition.entityCount);
+		const std::span<Entity> componentEntities = arena.AllocateArray<Entity>(maxComponentCount);
+		const std::span<void*> components = arena.AllocateArray<void*>(maxComponentCount);
+		const std::span<TypelessObjectHandle> objects = arena.AllocateArray<TypelessObjectHandle>(definition.objects.size());
+
+		for (const auto& [type, data] : definition.worldData)
+		{
+			world.AddWorldData(type, data);
+		}
+
+		for (std::size_t i = 0uz; i < objects.size(); ++i)
+		{
+			const auto& [type, object] = definition.objects[i];
+			objects[i] = world.RegisterObject(type, object);
+		}
+
+		world.CreateEntities(entities);
+
+		for (const auto [type, bindingIndex] : definition.componentIndices)
+		{
+			const std::span<const EntityID> bindings = definition.componentBindings[bindingIndex];
+			const std::span<const std::byte> componentData = definition.componentData[bindingIndex];
+
+			for (std::size_t i = 0uz; i < bindings.size(); ++i)
+			{
+				componentEntities[i] = entities[bindings[i]];
+			}
+
+			const std::span<void*> thisComponents = components.subspan(0uz, bindings.size());
+			world.AddComponents(componentEntities.subspan(0uz, bindings.size()), type, componentData, thisComponents);
+
+			if (const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = typeRegistry.ObjectOffsets(type); !objectOffsets.empty())
+			{
+				for (void* const thisComponent : thisComponents)
+				{
+					const auto component = static_cast<std::byte*>(thisComponent);
+					for (const auto offset : std::views::keys(objectOffsets))
+					{
+						std::byte* const handle = component + offset;
+						const std::size_t objectIndex = static_cast<std::size_t>(*reinterpret_cast<std::uint64_t*>(handle));
+
+						if (objectIndex < objects.size()) [[likely]]
+						{
+							*reinterpret_cast<TypelessObjectHandle*>(handle) = objects[objectIndex];
+						}
+						else [[unlikely]]
+						{
+							PONY_LOG(logService, Log::LogType::Error, "Invalid object index in world definition found.");
+							*reinterpret_cast<TypelessObjectHandle*>(handle) = TypelessObjectHandle{};
+						}
+					}
+				}
+			}
+
+			if (const std::span<const std::size_t> entityOffsets = typeRegistry.EntityReferences(type); !entityOffsets.empty())
+			{
+				for (void* const thisComponent : thisComponents)
+				{
+					const auto component = static_cast<std::byte*>(thisComponent);
+					for (const std::size_t offset : entityOffsets)
+					{
+						std::byte* const reference = component + offset;
+						const std::size_t entityIndex = static_cast<std::size_t>(*reinterpret_cast<std::uint64_t*>(reference));
+
+						if (entityIndex < entities.size()) [[likely]]
+						{
+							*reinterpret_cast<Entity*>(reference) = entities[entityIndex];
+						}
+						else [[unlikely]]
+						{
+							PONY_LOG(logService, Log::LogType::Error, "Invalid entity index in world definition found.");
+							*reinterpret_cast<Entity*>(reference) = Entity{};
+						}
+					}
+				}
+			}
+		}
 	}
 }

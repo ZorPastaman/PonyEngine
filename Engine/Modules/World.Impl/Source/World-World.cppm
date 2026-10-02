@@ -88,29 +88,31 @@ export namespace PonyEngine::World
 		virtual std::size_t CountQuery(const QueryParams& params) const noexcept override;
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const override;
 
-		virtual void CollectGarbage() override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 
-		World& operator =(const World&) = delete;
-		World& operator =(World&&) = delete;
+		[[nodiscard("Pure function")]]
+		virtual void* GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<void> GetObjectShared(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
 
-	protected:
-		[[nodiscard("Weird call")]] 
+		[[nodiscard("Weird call")]]
 		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, std::shared_ptr<void> object) override;
 		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) override;
 		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, std::shared_ptr<void> object) override;
 
-		[[nodiscard("Pure function")]] 
-		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual void* GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual std::shared_ptr<void> GetObjectShared(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
+		virtual void CollectGarbage() override;
 
 		virtual bool HasWorldData(std::type_index type) const noexcept override;
+
 		virtual void* GetWorldData(std::type_index type) const override;
 		virtual std::shared_ptr<void> GetWorldDataShared(std::type_index type) const override;
+
 		virtual void AddWorldData(std::type_index type, std::shared_ptr<void> data) override;
 		virtual void RemoveWorldData(std::type_index type) override;
+
+		World& operator =(const World&) = delete;
+		World& operator =(World&&) = delete;
 
 	private:
 		/// @brief Checks if the entity is invalid.
@@ -145,6 +147,11 @@ export namespace PonyEngine::World
 		/// @return Component table.
 		[[nodiscard("Weird call")]]
 		ComponentTable& GetOrCreateComponentTable(std::type_index componentType);
+		/// @brief Creates a component table.
+		/// @param componentType Component type.
+		/// @return Component table.
+		[[nodiscard("Weird call")]]
+		ComponentTable CreateComponentTable(std::type_index componentType) const;
 		/// @brief Adds entities and components to a component table if it doesn't have them.
 		/// @param entities Entities to add.
 		/// @param componentType Component type.
@@ -884,9 +891,19 @@ namespace PonyEngine::World
 		}
 	}
 
-	void World::CollectGarbage()
+	bool World::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
 	{
-		objectTable.CollectGarbage(*application, *typeRegistry, componentTables, componentTablesIndices);
+		return objectTable.IsObjectValid(objectType, handle);
+	}
+
+	void* World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	{
+		return objectTable.GetObject(objectType, handle).get();
+	}
+
+	std::shared_ptr<void> World::GetObjectShared(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	{
+		return objectTable.GetObject(objectType, handle);
 	}
 
 	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, std::shared_ptr<void> object)
@@ -904,19 +921,9 @@ namespace PonyEngine::World
 		objectTable.ReplaceObject(handle, objectType, std::move(object));
 	}
 
-	bool World::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	void World::CollectGarbage()
 	{
-		return objectTable.IsObjectValid(objectType, handle);
-	}
-
-	void* World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
-	{
-		return objectTable.GetObject(objectType, handle).get();
-	}
-
-	std::shared_ptr<void> World::GetObjectShared(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
-	{
-		return objectTable.GetObject(objectType, handle);
+		objectTable.CollectGarbage(*application, *typeRegistry, componentTables, componentTablesIndices);
 	}
 
 	bool World::HasWorldData(const std::type_index type) const noexcept
@@ -1004,7 +1011,11 @@ namespace PonyEngine::World
 		{
 			return &componentTables[position->second];
 		}
+
+#ifndef NDEBUG
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry->Lock();
 		assert(typeRegistry->IsValidComponent(componentType) && "Component type is not registered");
+#endif
 
 		return nullptr;
 	}
@@ -1016,7 +1027,7 @@ namespace PonyEngine::World
 			return componentTables[position->second];
 		}
 		
-		ComponentTable table = typeRegistry->CreateComponentTable(componentType);
+		ComponentTable table = CreateComponentTable(componentType);
 		componentTables.push_back(std::move(table));
 		try
 		{
@@ -1029,6 +1040,12 @@ namespace PonyEngine::World
 		}
 
 		return componentTables.back();
+	}
+
+	ComponentTable World::CreateComponentTable(const std::type_index componentType) const
+	{
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry->Lock();
+		return typeRegistry->CreateComponentTable(componentType);
 	}
 
 	ComponentTable& World::UpdateComponents(const std::span<const Entity> entities, const std::type_index componentType)

@@ -15,3 +15,4 @@ export import :IWorld;
 export import :IWorldService;
 export import :ObjectHandle;
 export import :QueryParams;
+export import :WorldDefinition;

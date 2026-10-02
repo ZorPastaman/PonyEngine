@@ -128,6 +128,7 @@ namespace PonyEngine::World::Hierarchy
 		worldService.RegisterComponent<WorldTransform2D>();
 		worldService.RegisterComponent<WorldTransform3D>();
 		worldService.RegisterComponent<DirtyTransform>();
+		worldService.RegisterEntityReferenceMember(&Parent::value);
 	}
 
 	void HierarchyService::RemoveInvalidParents(IWorld& world) const
