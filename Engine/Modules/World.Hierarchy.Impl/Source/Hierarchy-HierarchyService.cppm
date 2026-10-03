@@ -28,7 +28,7 @@ export namespace PonyEngine::World::Hierarchy
 		/// @brief Creates a hierarchy service.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit HierarchyService(Application::IApplication& application);
+		explicit HierarchyService(Application::IApplication& application) noexcept;
 		HierarchyService(const HierarchyService&) = delete;
 		HierarchyService(HierarchyService&&) = delete;
 
@@ -118,17 +118,9 @@ export namespace PonyEngine::World::Hierarchy
 
 namespace PonyEngine::World::Hierarchy
 {
-	HierarchyService::HierarchyService(Application::IApplication& application) :
+	HierarchyService::HierarchyService(Application::IApplication& application) noexcept :
 		application{&application}
 	{
-		IWorldService& worldService = this->application->GetInterface<IWorldService>();
-		worldService.RegisterComponent<Parent>();
-		worldService.RegisterComponent<LocalTransform2D>();
-		worldService.RegisterComponent<LocalTransform3D>();
-		worldService.RegisterComponent<WorldTransform2D>();
-		worldService.RegisterComponent<WorldTransform3D>();
-		worldService.RegisterComponent<DirtyTransform>();
-		worldService.RegisterEntityReferenceMember(&Parent::value);
 	}
 
 	void HierarchyService::RemoveInvalidParents(IWorld& world) const

@@ -203,7 +203,7 @@ namespace PonyEngine::World
 
 		world.CreateEntities(entities);
 
-		for (const auto [type, table] : definition.components)
+		for (const auto& [type, table] : definition.components)
 		{
 			const std::span<const EntityID> bindings = table.entityBindings;
 			const std::span<const std::byte> componentData = table.data;
@@ -223,17 +223,21 @@ namespace PonyEngine::World
 					const auto component = static_cast<std::byte*>(thisComponent);
 					for (const auto offset : std::views::keys(objectOffsets))
 					{
-						std::byte* const handle = component + offset;
-						const std::size_t objectIndex = static_cast<std::size_t>(*reinterpret_cast<std::uint64_t*>(handle));
+						std::byte* const handlePointer = component + offset;
+						TypelessObjectHandle& handle = *reinterpret_cast<TypelessObjectHandle*>(handlePointer);
+						const std::uint64_t objectIndex = *reinterpret_cast<std::uint64_t*>(handlePointer);
 
-						if (objectIndex < objects.size()) [[likely]]
+						if (objectIndex == std::numeric_limits<std::uint64_t>::max())
 						{
-							*reinterpret_cast<TypelessObjectHandle*>(handle) = objects[objectIndex];
+							handle = TypelessObjectHandle{};
+						}
+						else if (objectIndex < objects.size()) [[likely]]
+						{
+							handle = objects[static_cast<std::size_t>(objectIndex)];
 						}
 						else [[unlikely]]
 						{
-							PONY_LOG(logService, Log::LogType::Error, "Invalid object index in world definition found.");
-							*reinterpret_cast<TypelessObjectHandle*>(handle) = TypelessObjectHandle{};
+							throw std::invalid_argument("Invalid object index");
 						}
 					}
 				}
@@ -246,17 +250,21 @@ namespace PonyEngine::World
 					const auto component = static_cast<std::byte*>(thisComponent);
 					for (const std::size_t offset : entityOffsets)
 					{
-						std::byte* const reference = component + offset;
-						const std::size_t entityIndex = static_cast<std::size_t>(*reinterpret_cast<std::uint64_t*>(reference));
+						std::byte* const entityPointer = component + offset;
+						Entity& entity = *reinterpret_cast<Entity*>(entityPointer);
+						const std::uint64_t entityIndex = *reinterpret_cast<std::uint64_t*>(entityPointer);
 
+						if (entityIndex == std::numeric_limits<std::uint64_t>::max())
+						{
+							entity = Entity{};
+						}
 						if (entityIndex < entities.size()) [[likely]]
 						{
-							*reinterpret_cast<Entity*>(reference) = entities[entityIndex];
+							entity = entities[static_cast<std::size_t>(entityIndex)];
 						}
 						else [[unlikely]]
 						{
-							PONY_LOG(logService, Log::LogType::Error, "Invalid entity index in world definition found.");
-							*reinterpret_cast<Entity*>(reference) = Entity{};
+							throw std::invalid_argument("Invalid entity index");
 						}
 					}
 				}

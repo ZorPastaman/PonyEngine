@@ -10,3 +10,4 @@ The engine uses different custom formats for different purposes.
 ## Resource types
 
 - [Pony.Text](PonyText.md)
+- [Pony.WorldDef](PonyWorldDef.md)

@@ -43,7 +43,18 @@ namespace PonyEngine::World::Hierarchy
 {
 	void HierarchyServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		hierarchyService = std::make_unique<HierarchyService>(context.Application());
+		Application::IApplication& application = context.Application();
+
+		IWorldService& worldService = application.GetInterface<IWorldService>();
+		worldService.RegisterComponent<Parent>();
+		worldService.RegisterComponent<LocalTransform2D>();
+		worldService.RegisterComponent<LocalTransform3D>();
+		worldService.RegisterComponent<WorldTransform2D>();
+		worldService.RegisterComponent<WorldTransform3D>();
+		worldService.RegisterComponent<DirtyTransform>();
+		worldService.RegisterEntityReferenceMember(&Parent::value);
+
+		hierarchyService = std::make_unique<HierarchyService>(application);
 		try
 		{
 			context.AddInterface<IHierarchyService>(*hierarchyService);
