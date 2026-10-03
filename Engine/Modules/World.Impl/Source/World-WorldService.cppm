@@ -258,7 +258,7 @@ namespace PonyEngine::World
 						{
 							entity = Entity{};
 						}
-						if (entityIndex < entities.size()) [[likely]]
+						else if (entityIndex < entities.size()) [[likely]]
 						{
 							entity = entities[static_cast<std::size_t>(entityIndex)];
 						}
