@@ -1013,7 +1013,7 @@ namespace PonyEngine::World
 		}
 
 #ifndef NDEBUG
-		const std::shared_lock<std::shared_mutex> lock = typeRegistry->Lock();
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry->SharedLock();
 		assert(typeRegistry->IsValidComponent(componentType) && "Component type is not registered");
 #endif
 
@@ -1044,7 +1044,7 @@ namespace PonyEngine::World
 
 	ComponentTable World::CreateComponentTable(const std::type_index componentType) const
 	{
-		const std::shared_lock<std::shared_mutex> lock = typeRegistry->Lock();
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry->SharedLock();
 		return typeRegistry->CreateComponentTable(componentType);
 	}
 

@@ -61,7 +61,6 @@ export namespace PonyEngine::World
 		/// @brief Gets object handle offsets.
 		/// @param componentType Component type.
 		/// @return Offsets in the format <offset, object type>.
-		/// @note Use @p Lock() if you access this function and keep it till you end working with the return value.
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::size_t, std::type_index>> ObjectOffsets(std::type_index componentType) const noexcept;
 		/// @brief Gets entity reference offsets.
@@ -69,10 +68,14 @@ export namespace PonyEngine::World
 		/// @return Reference offsets.
 		[[nodiscard("Pure function")]]
 		std::span<const std::size_t> EntityReferences(std::type_index componentType) const noexcept;
-		/// @brief Locks the registry.
+		/// @brief Locks the registry via a unique lock.
 		/// @return Registry lock.
 		[[nodiscard("Pure function")]]
-		std::shared_lock<std::shared_mutex> Lock() const noexcept;
+		std::unique_lock<std::shared_mutex> UniqueLock() noexcept;
+		/// @brief Locks the registry via a shared lock.
+		/// @return Registry lock.
+		[[nodiscard("Pure function")]]
+		std::shared_lock<std::shared_mutex> SharedLock() const noexcept;
 
 		TypeRegistry& operator =(const TypeRegistry&) = delete;
 		TypeRegistry& operator =(TypeRegistry&&) = delete;
@@ -178,7 +181,12 @@ namespace PonyEngine::World
 		return std::span<const std::size_t>();
 	}
 
-	std::shared_lock<std::shared_mutex> TypeRegistry::Lock() const noexcept
+	std::unique_lock<std::shared_mutex> TypeRegistry::UniqueLock() noexcept
+	{
+		return std::unique_lock(mutex);
+	}
+
+	std::shared_lock<std::shared_mutex> TypeRegistry::SharedLock() const noexcept
 	{
 		return std::shared_lock(mutex);
 	}

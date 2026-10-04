@@ -196,7 +196,7 @@ namespace PonyEngine::World
 		std::ranges::fill(aliveObjectFlags, false);
 
 		{
-			const std::shared_lock<std::shared_mutex> typeRegistryLock = typeRegistry.Lock();
+			const std::shared_lock<std::shared_mutex> typeRegistryLock = typeRegistry.SharedLock();
 			for (std::size_t foundCount = 0uz; const auto [componentType, componentTableIndex] : componentTablesIndices)
 			{
 				const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = typeRegistry.ObjectOffsets(componentType);

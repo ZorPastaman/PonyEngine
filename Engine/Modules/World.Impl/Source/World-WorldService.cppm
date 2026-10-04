@@ -105,7 +105,7 @@ namespace PonyEngine::World
 	{
 		PONY_LOG(logService, Log::LogType::Info, "Registering component type. Type name: '{}'; size: '{}'; alignment: '{}'.",
 			componentType.name(), componentSize, componentAlignment);
-		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
+		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
 		typeRegistry.AddComponentType(componentType, componentSize, componentAlignment);
 	}
 
@@ -113,7 +113,7 @@ namespace PonyEngine::World
 	{
 		PONY_LOG(logService, Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
 			componentType.name(), objectType.name(), componentOffset);
-		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
+		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
 		typeRegistry.RegisterComponentObjectHandleMember(objectType, componentType, componentOffset);
 	}
 
@@ -121,7 +121,7 @@ namespace PonyEngine::World
 	{
 		PONY_LOG(logService, Log::LogType::Info, "Registering component entity reference. Component type name: '{}'; Reference offset: '{}'.",
 			componentType.name(), componentOffset);
-		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
+		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
 		typeRegistry.RegisterEntityReferenceMember(componentType, componentOffset);
 	}
 
@@ -151,7 +151,7 @@ namespace PonyEngine::World
 
 	void WorldService::AddToWorld(World& world, const WorldDefinition& definition) const
 	{
-		const std::shared_lock<std::shared_mutex> lock = typeRegistry.Lock();
+		const std::shared_lock<std::shared_mutex> lock = typeRegistry.SharedLock();
 
 		std::size_t maxComponentCount = 0uz;
 		for (const auto& [type, table] : definition.components)
@@ -161,7 +161,7 @@ namespace PonyEngine::World
 				throw std::invalid_argument("Invalid component type");
 			}
 
-			for (const EntityID entity : table.entityBindings)
+			for (const std::size_t entity : table.entityBindings)
 			{
 				if (entity >= definition.entityCount) [[unlikely]]
 				{
@@ -205,7 +205,7 @@ namespace PonyEngine::World
 
 		for (const auto& [type, table] : definition.components)
 		{
-			const std::span<const EntityID> bindings = table.entityBindings;
+			const std::span<const std::size_t> bindings = table.entityBindings;
 			const std::span<const std::byte> componentData = table.data;
 
 			for (std::size_t i = 0uz; i < bindings.size(); ++i)
