@@ -37,7 +37,7 @@ export namespace PonyEngine::World
 		/// @param objectType Object type.
 		/// @param componentType Component type.
 		/// @param componentOffset Handle offset.
-		void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset);
+		void RegisterObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset);
 		/// @brief Registers an entity reference member.
 		/// @param componentType Component type.
 		/// @param componentOffset Entity reference member offset.
@@ -99,10 +99,15 @@ namespace PonyEngine::World
 {
 	void TypeRegistry::AddComponentType(const std::type_index componentType, const std::size_t size, const std::size_t alignment)
 	{
+		if (components.contains(componentType)) [[unlikely]]
+		{
+			throw std::logic_error("Component type is already registered");
+		}
+
 		components[componentType] = ComponentInfo{.size = size, .alignment = alignment};
 	}
 
-	void TypeRegistry::RegisterComponentObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
+	void TypeRegistry::RegisterObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
 	{
 		std::vector<std::pair<std::size_t, std::type_index>>& offsets = objectOffsets[componentType];
 
@@ -111,9 +116,9 @@ namespace PonyEngine::World
 		{
 		}
 
-		if (index < offsets.size() && offsets[index].first == componentOffset)
+		if (index < offsets.size() && offsets[index].first == componentOffset) [[unlikely]]
 		{
-			return;
+			throw std::logic_error("Object handle member is already registered");
 		}
 
 		offsets.insert(offsets.cbegin() + index, std::pair(componentOffset, objectType));
@@ -128,9 +133,9 @@ namespace PonyEngine::World
 		{
 		}
 
-		if (index < offsets.size() && offsets[index] == componentOffset)
+		if (index < offsets.size() && offsets[index] == componentOffset) [[unlikely]]
 		{
-			return;
+			throw std::logic_error("Entity reference member is already registered");
 		}
 
 		offsets.insert(offsets.cbegin() + index, componentOffset);

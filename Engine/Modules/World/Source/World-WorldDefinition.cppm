@@ -29,6 +29,5 @@ export namespace PonyEngine::World
 		std::size_t entityCount = 0u; ///< Entity count.
 		std::unordered_map<std::type_index, ComponentTableDefinition> components; ///< Components.
 		std::vector<std::pair<std::type_index, std::shared_ptr<void>>> objects; ///< World objects.
-		std::unordered_map<std::type_index, std::shared_ptr<void>> worldData; ///< World data.
 	};
 }

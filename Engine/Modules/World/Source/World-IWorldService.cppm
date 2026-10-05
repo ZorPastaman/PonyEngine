@@ -40,7 +40,7 @@ export namespace PonyEngine::World
 		/// @remark It's used for correct garbage collection.
 		/// @note The function is thread-safe.
 		template<Component Component, typename Object>
-		void RegisterComponentObjectHandleMember(ObjectHandle<Object> Component::* member);
+		void RegisterObjectHandleMember(ObjectHandle<Object> Component::* member);
 		/// @brief Register the component entity reference member.
 		/// @tparam Component Component type.
 		/// @param member Entity reference member. Mustn't be nullptr.
@@ -72,7 +72,7 @@ export namespace PonyEngine::World
 		/// @param componentType Component type.
 		/// @param componentOffset Component offset.
 		/// @note The function is thread-safe.
-		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) = 0;
+		virtual void RegisterObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) = 0;
 		/// @brief Register the component entity reference member.
 		/// @param componentType Component type.
 		/// @param componentOffset Entity reference member. Mustn't be nullptr.
@@ -90,13 +90,13 @@ namespace PonyEngine::World
 	}
 
 	template<Component Component, typename Object>
-	void IWorldService::RegisterComponentObjectHandleMember(ObjectHandle<Object> Component::* const member)
+	void IWorldService::RegisterObjectHandleMember(ObjectHandle<Object> Component::* const member)
 	{
 		assert(member && "Member is nullptr");
 
 		Component dummy{};
 		const std::size_t offset = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(&(dummy.*member).typeless) - reinterpret_cast<std::uintptr_t>(&dummy));
-		RegisterComponentObjectHandleMember(typeid(Object), typeid(Component), offset);
+		RegisterObjectHandleMember(typeid(Object), typeid(Component), offset);
 	}
 
 	template<Component Component>

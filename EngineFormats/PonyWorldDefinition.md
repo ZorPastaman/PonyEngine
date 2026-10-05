@@ -12,15 +12,13 @@ Must be empty.
 
 ## Data
 
-| Size                | Description             |
-|:-------------------:|:------------------------|
-| sizeof(std::size_t) | World object count.     |
-| variable            | World object.           |
-| sizeof(std::size_t) | Component object count. |
-| variable            | Component objects.      |
-| sizeof(std::size_t) | Entity count.           |
-| sizeof(std::size_t) | Component table count.  |
-| variable            | Component tables.       |
+| Size                      | Description             |
+|:-------------------------:|:------------------------|
+| sizeof(std::size_t)       | Entity count.           |
+| sizeof(std::size_t)       | Component table count.  |
+| sizeof(std::size_t)       | Component object count. |
+| variable                  | Component tables.       |
+| variable                  | Component objects.      |
 
 Component table layout:
 

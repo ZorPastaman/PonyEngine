@@ -103,14 +103,6 @@ export namespace PonyEngine::World
 
 		virtual void CollectGarbage() override;
 
-		virtual bool HasWorldData(std::type_index type) const noexcept override;
-
-		virtual void* GetWorldData(std::type_index type) const override;
-		virtual std::shared_ptr<void> GetWorldDataShared(std::type_index type) const override;
-
-		virtual void AddWorldData(std::type_index type, std::shared_ptr<void> data) override;
-		virtual void RemoveWorldData(std::type_index type) override;
-
 		World& operator =(const World&) = delete;
 		World& operator =(World&&) = delete;
 
@@ -304,8 +296,6 @@ export namespace PonyEngine::World
 		std::unordered_map<std::type_index, std::size_t> componentTablesIndices; ///< Component type to component tables index map.
 
 		ObjectTable objectTable; ///< Object table.
-
-		std::unordered_map<std::type_index, std::shared_ptr<void>> worldData; ///< World data.
 
 		static_assert(sizeof(std::size_t) >= sizeof(EntityID), "std::size_t is less than EntityID.");
 	};
@@ -924,49 +914,6 @@ namespace PonyEngine::World
 	void World::CollectGarbage()
 	{
 		objectTable.CollectGarbage(*application, *typeRegistry, componentTables, componentTablesIndices);
-	}
-
-	bool World::HasWorldData(const std::type_index type) const noexcept
-	{
-		return worldData.contains(type);
-	}
-
-	void* World::GetWorldData(const std::type_index type) const
-	{
-		if (const auto position = worldData.find(type); position != worldData.cend()) [[likely]]
-		{
-			return position->second.get();
-		}
-
-		throw std::invalid_argument("World doesn't contain data of given type");
-	}
-
-	std::shared_ptr<void> World::GetWorldDataShared(const std::type_index type) const
-	{
-		if (const auto position = worldData.find(type); position != worldData.cend()) [[likely]]
-		{
-			return position->second;
-		}
-
-		throw std::invalid_argument("World doesn't contain data of given type");
-	}
-
-	void World::AddWorldData(const std::type_index type, std::shared_ptr<void> data)
-	{
-		const auto [iterator, added] = worldData.try_emplace(type, std::move(data));
-		if (!added) [[unlikely]]
-		{
-			throw std::invalid_argument("World already contains data of given type");
-		}
-	}
-
-	void World::RemoveWorldData(const std::type_index type)
-	{
-		const std::size_t removedCount = worldData.erase(type);
-		if (removedCount == 0uz) [[unlikely]]
-		{
-			throw std::invalid_argument("World doesn't contain data of given type");
-		}
 	}
 
 	bool World::IsInvalid(const Entity entity) const noexcept

@@ -558,52 +558,6 @@ export namespace PonyEngine::World
 
 		/// @brief Collects garbage objects and removes them.
 		virtual void CollectGarbage() = 0;
-
-		/// @brief Checks if the world has a world data of type @p T.
-		/// @tparam T Data type.
-		/// @return @a True if it has; @a false otherwise.
-		template<typename T>
-		bool HasWorldData() const noexcept;
-		/// @brief Checks if the world has a world data of the @p type.
-		/// @param type Data type.
-		/// @return @a True if it has; @a false otherwise.
-		virtual bool HasWorldData(std::type_index type) const noexcept = 0;
-
-		/// @brief Gets a world data of type @p T.
-		/// @tparam T Data type.
-		/// @return Data.
-		template<typename T>
-		T* GetWorldData() const;
-		/// @brief Gets a world data of the @p type.
-		/// @param type Data type.
-		/// @return Data.
-		virtual void* GetWorldData(std::type_index type) const = 0;
-		/// @brief Gets a world data of type @p T.
-		/// @tparam T Data type.
-		/// @return Data.
-		template<typename T>
-		std::shared_ptr<T> GetWorldDataShared() const;
-		/// @brief Gets a world data of the @p type.
-		/// @param type Data type.
-		/// @return Data.
-		virtual std::shared_ptr<void> GetWorldDataShared(std::type_index type) const = 0;
-
-		/// @brief Adds the @p data to the world.
-		/// @tparam T Data type.
-		/// @param data Data.
-		template<typename T>
-		void AddWorldData(std::shared_ptr<T> data);
-		/// @brief Adds the @p data to the world.
-		/// @param type Data type.
-		/// @param data Data.
-		virtual void AddWorldData(std::type_index type, std::shared_ptr<void> data) = 0;
-		/// @brief Removes a world data of type @p T.
-		/// @tparam T Data type.
-		template<typename T>
-		void RemoveWorldData();
-		/// @brief Removes a world data of the @p type.
-		/// @param type Data type.
-		virtual void RemoveWorldData(std::type_index type) = 0;
 	};
 }
 
@@ -914,35 +868,5 @@ namespace PonyEngine::World
 	void IWorld::ReplaceObject(const ObjectHandle<T> handle, std::shared_ptr<T> object)
 	{
 		ReplaceObject(handle.typeless, typeid(T), std::move(object));
-	}
-
-	template<typename T>
-	bool IWorld::HasWorldData() const noexcept
-	{
-		return HasWorldData(typeid(T));
-	}
-
-	template<typename T>
-	T* IWorld::GetWorldData() const
-	{
-		return static_cast<T*>(GetWorldData(typeid(T)));
-	}
-
-	template<typename T>
-	std::shared_ptr<T> IWorld::GetWorldDataShared() const
-	{
-		return std::static_pointer_cast<T>(GetWorldDataShared(typeid(T)));
-	}
-
-	template<typename T>
-	void IWorld::AddWorldData(std::shared_ptr<T> data)
-	{
-		AddWorldData(typeid(T), std::move(data));
-	}
-
-	template<typename T>
-	void IWorld::RemoveWorldData()
-	{
-		RemoveWorldData(typeid(T));
 	}
 }

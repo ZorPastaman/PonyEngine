@@ -35,6 +35,10 @@ export namespace PonyEngine::World::Hierarchy
 		HierarchyServiceModule& operator =(HierarchyServiceModule&&) = delete;
 
 	private:
+		/// @brief Registers hierarchy component.
+		/// @param worldService World service.
+		static void RegisterComponents(IWorldService& worldService);
+
 		std::unique_ptr<HierarchyService> hierarchyService; ///< Hierarchy service.
 	};
 }
@@ -44,15 +48,7 @@ namespace PonyEngine::World::Hierarchy
 	void HierarchyServiceModule::StartUp(Application::IModuleContext& context)
 	{
 		Application::IApplication& application = context.Application();
-
-		IWorldService& worldService = application.GetInterface<IWorldService>();
-		worldService.RegisterComponent<Parent>();
-		worldService.RegisterComponent<LocalTransform2D>();
-		worldService.RegisterComponent<LocalTransform3D>();
-		worldService.RegisterComponent<WorldTransform2D>();
-		worldService.RegisterComponent<WorldTransform3D>();
-		worldService.RegisterComponent<DirtyTransform>();
-		worldService.RegisterEntityReferenceMember(&Parent::value);
+		RegisterComponents(application.GetInterface<IWorldService>());
 
 		hierarchyService = std::make_unique<HierarchyService>(application);
 		try
@@ -70,5 +66,16 @@ namespace PonyEngine::World::Hierarchy
 	{
 		context.RemoveInterface<IHierarchyService>(*hierarchyService);
 		hierarchyService.reset();
+	}
+
+	void HierarchyServiceModule::RegisterComponents(IWorldService& worldService)
+	{
+		worldService.RegisterComponent<Parent>();
+		worldService.RegisterEntityReferenceMember(&Parent::value);
+		worldService.RegisterComponent<LocalTransform2D>();
+		worldService.RegisterComponent<LocalTransform3D>();
+		worldService.RegisterComponent<WorldTransform2D>();
+		worldService.RegisterComponent<WorldTransform3D>();
+		worldService.RegisterComponent<DirtyTransform>();
 	}
 }

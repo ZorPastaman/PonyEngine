@@ -51,7 +51,7 @@ export namespace PonyEngine::World
 
 	protected:
 		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) override;
-		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) override;
+		virtual void RegisterObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) override;
 		virtual void RegisterEntityReferenceMember(std::type_index componentType, std::size_t componentOffset) override;
 
 	private:
@@ -109,12 +109,12 @@ namespace PonyEngine::World
 		typeRegistry.AddComponentType(componentType, componentSize, componentAlignment);
 	}
 
-	void WorldService::RegisterComponentObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
+	void WorldService::RegisterObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
 	{
 		PONY_LOG(logService, Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
 			componentType.name(), objectType.name(), componentOffset);
 		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
-		typeRegistry.RegisterComponentObjectHandleMember(objectType, componentType, componentOffset);
+		typeRegistry.RegisterObjectHandleMember(objectType, componentType, componentOffset);
 	}
 
 	void WorldService::RegisterEntityReferenceMember(const std::type_index componentType, const std::size_t componentOffset)
@@ -189,11 +189,6 @@ namespace PonyEngine::World
 		const std::span<Entity> componentEntities = arena.AllocateArray<Entity>(maxComponentCount);
 		const std::span<void*> components = arena.AllocateArray<void*>(maxComponentCount);
 		const std::span<TypelessObjectHandle> objects = arena.AllocateArray<TypelessObjectHandle>(definition.objects.size());
-
-		for (const auto& [type, data] : definition.worldData)
-		{
-			world.AddWorldData(type, data);
-		}
 
 		for (std::size_t i = 0uz; i < objects.size(); ++i)
 		{
