@@ -26,7 +26,7 @@ export namespace PonyEngine::World
 	/// @details It's a serialized data of a world.
 	struct WorldDefinition final
 	{
-		std::size_t entityCount = 0u; ///< Entity count.
+		std::size_t entityCount = 0uz; ///< Entity count.
 		std::unordered_map<std::type_index, ComponentTableDefinition> components; ///< Components.
 		std::vector<std::pair<std::type_index, std::shared_ptr<void>>> objects; ///< World objects.
 	};

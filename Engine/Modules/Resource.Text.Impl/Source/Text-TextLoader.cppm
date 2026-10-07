@@ -216,7 +216,7 @@ namespace PonyEngine::Resource::Text
 				std::shared_ptr<OngoingResourceLoadRequest> loadRequest = RemoveOngoingRequest(req);
 				switch (accessRequest.Status())
 				{
-				case Async::RequestStatus::Success:
+				case Async::RequestStatus::Success: [[likely]]
 					loadRequest->SetSuccess();
 					break;
 				case Async::RequestStatus::Failure:

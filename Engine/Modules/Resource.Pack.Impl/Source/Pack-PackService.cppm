@@ -458,7 +458,7 @@ namespace PonyEngine::Resource::Pack
 						CreatePack(*req);
 					}
 				}
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
@@ -511,7 +511,7 @@ namespace PonyEngine::Resource::Pack
 
 				const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
 				unmountRequest->SetSuccess();
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
@@ -833,7 +833,7 @@ namespace PonyEngine::Resource::Pack
 						CreatePack(*req);
 					}
 				}
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
@@ -1012,7 +1012,7 @@ namespace PonyEngine::Resource::Pack
 					mountRequest.reset();
 					DecrementOngoingRequestCount();
 				}
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{

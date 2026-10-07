@@ -232,7 +232,7 @@ namespace PonyEngine::Resource::Pack
 
 				finishedRequest.reset();
 				DecrementOngoingRequestCount();
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
