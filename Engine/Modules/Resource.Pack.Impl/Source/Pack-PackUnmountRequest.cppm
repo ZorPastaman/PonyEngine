@@ -40,7 +40,7 @@ export namespace PonyEngine::Resource::Pack
 		[[nodiscard("Pure function")]] 
 		virtual Async::RequestStatus Status() const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual const std::exception_ptr& Exception() const override;
+		virtual std::span<const std::exception_ptr> Exceptions() const override;
 
 		virtual void Cancel() override;
 
@@ -100,14 +100,14 @@ namespace PonyEngine::Resource::Pack
 		return status.load(std::memory_order::acquire);
 	}
 
-	const std::exception_ptr& PackUnmountRequest::Exception() const
+	std::span<const std::exception_ptr> PackUnmountRequest::Exceptions() const
 	{
 		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
 
-		return exception;
+		return std::span(&exception, 1uz);
 	}
 
 	void PackUnmountRequest::Cancel()

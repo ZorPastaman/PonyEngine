@@ -161,7 +161,7 @@ namespace PonyEngine::Resource::Pack
 					finishedRequest->SetSuccess(readRequest.ByteCount());
 					break;
 				case Async::RequestStatus::Failure:
-					finishedRequest->SetFailed(readRequest.Exception());
+					finishedRequest->SetFailure(readRequest.Exception());
 					break;
 				case Async::RequestStatus::Canceled:
 					finishedRequest->SetCanceled();

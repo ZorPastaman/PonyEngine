@@ -7,8 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.World.Impl;
+#pragma once
 
-export import PonyEngine.Resource.World;
+#include "PonyEngine/Macro/Compiler.h"
 
-export import :WorldDefinitionLoaderModule;
+import std;
+
+import PonyEngine.Application;
+
+namespace PonyEngine::Resource::World
+{
+	/// @brief Creates the world definition loader module.
+	/// @return World definition loader module.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateWorldDefinitionLoaderModule();
+}

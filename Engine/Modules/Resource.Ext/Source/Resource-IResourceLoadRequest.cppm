@@ -20,14 +20,10 @@ import PonyEngine.Async;
 export namespace PonyEngine::Resource
 {
 	/// @brief Resource load request.
-	class IResourceLoadRequest
+	class IResourceLoadRequest : public Async::IRequest
 	{
 		PONY_INTERFACE_BODY(IResourceLoadRequest)
 
-		/// @brief Gets the request status.
-		/// @return Request status.
-		[[nodiscard("Pure function")]]
-		virtual Async::RequestStatus Status() const noexcept = 0;
 		/// @brief Gets a main resource.
 		/// @return Main resource.
 		/// @not It's valid to call it only if the request status is success.
@@ -38,16 +34,10 @@ export namespace PonyEngine::Resource
 		/// @not It's valid to call it only if the request status is success.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const void* const> ResourceInterfaces() const = 0;
-		/// @brief Gets an exception that occured during the request execution.
-		/// @return Exception.
+		/// @brief Gets exceptions that occured during the request execution.
+		/// @return Exceptions.
 		/// @note It's valid to call it only if the request status is failure.
 		[[nodiscard("Pure function")]]
-		virtual const std::exception_ptr& Exception() const = 0;
-
-		/// @brief Cancels the request.
-		virtual void Cancel() = 0;
-
-		/// @brief Makes the thread sleep till the request is completed with success or failure or cancel.
-		virtual void Wait() const noexcept = 0;
+		virtual std::span<const std::exception_ptr> Exceptions() const = 0;
 	};
 }

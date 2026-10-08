@@ -44,7 +44,7 @@ export namespace PonyEngine::Resource::Pack
 		[[nodiscard("Pure function")]] 
 		virtual PackHandle Pack() const override final;
 		[[nodiscard("Pure function")]] 
-		virtual const std::exception_ptr& Exception() const override final;
+		virtual std::span<const std::exception_ptr> Exceptions() const override final;
 
 		virtual void Cancel() override;
 
@@ -138,8 +138,7 @@ export namespace PonyEngine::Resource::Pack
 		/// @param packHandle Pack handle.
 		void SetSuccess(PackHandle packHandle) noexcept;
 		/// @brief Sets the status to failure.
-		/// @param exception Exception.
-		void SetFailure(std::exception_ptr exception) noexcept;
+		void SetFailure() noexcept;
 		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
@@ -156,7 +155,7 @@ export namespace PonyEngine::Resource::Pack
 		std::size_t dataSize; ///< Data size.
 
 		PackHandle packHandle; ///< Pack handle.
-		std::exception_ptr exception; ///< Exception.
+		std::array<std::exception_ptr, 2> exceptions;
 		std::atomic<Async::RequestStatus> status; ///< Status.
 
 		enum AccessType accessType; ///< Access type.
@@ -166,13 +165,14 @@ export namespace PonyEngine::Resource::Pack
 		std::atomic_bool hasManifestException; ///< Does it have a manifest track exception?
 		std::atomic_bool hasDataException; ///< Does it have a data track exception?
 
-		std::exception_ptr manifestException; ///< Manifest track exception.
-		std::exception_ptr dataException; ///< Data track exception.
-
 		std::vector<CollectionResource> collectionResources; ///< Collection resources.
 		std::vector<std::pair<std::size_t, std::size_t>> ranges; ///< Ranges.
 
 		std::move_only_function<void(const IPackMountRequest&) noexcept> callback; ///< Callback.
+
+		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "Async::RequestStatus isn't lock-free");
+		static_assert(std::atomic_uint8_t::is_always_lock_free, "std::uint8_t isn't lock-free");
+		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free");
 	};
 }
 
@@ -209,14 +209,17 @@ namespace PonyEngine::Resource::Pack
 		return packHandle;
 	}
 
-	const std::exception_ptr& PackMountRequest::Exception() const
+	std::span<const std::exception_ptr> PackMountRequest::Exceptions() const
 	{
 		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
 
-		return exception;
+		const std::span<const std::exception_ptr, 2> answer = exceptions;
+		const bool manifestException = HasManifestException();
+		const bool dataException = HasDataException();
+		return answer.subspan(!manifestException, manifestException + dataException);
 	}
 
 	void PackMountRequest::Cancel()
@@ -289,12 +292,12 @@ namespace PonyEngine::Resource::Pack
 
 	const std::exception_ptr& PackMountRequest::ManifestException() const noexcept
 	{
-		return manifestException;
+		return exceptions[0];
 	}
 
 	void PackMountRequest::ManifestException(std::exception_ptr exception) noexcept
 	{
-		manifestException = std::move(exception);
+		exceptions[0] = std::move(exception);
 		hasManifestException.store(true, std::memory_order::release);
 	}
 
@@ -305,12 +308,12 @@ namespace PonyEngine::Resource::Pack
 
 	const std::exception_ptr& PackMountRequest::DataException() const noexcept
 	{
-		return dataException;
+		return exceptions[1];
 	}
 
 	void PackMountRequest::DataException(std::exception_ptr exception) noexcept
 	{
-		dataException = std::move(exception);
+		exceptions[1] = std::move(exception);
 		hasDataException.store(true, std::memory_order::release);
 	}
 
@@ -345,11 +348,10 @@ namespace PonyEngine::Resource::Pack
 		InvokeCallback();
 	}
 
-	void PackMountRequest::SetFailure(std::exception_ptr exception) noexcept
+	void PackMountRequest::SetFailure() noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
-		this->exception = std::move(exception);
 		status.store(Async::RequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
 

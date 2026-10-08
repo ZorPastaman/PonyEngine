@@ -11,29 +11,22 @@ module;
 
 #include "PonyEngine/Utility/Body.h"
 
-export module PonyEngine.Resource.Pack:IPackUnmountRequest;
+export module PonyEngine.Resource.World:IWorldDeserializationRequest;
 
 import std;
 
 import PonyEngine.Async;
 
-import :PackHandle;
-
-export namespace PonyEngine::Resource::Pack
+export namespace PonyEngine::Resource::World
 {
-	/// @brief Pack unmount request.
-	class IPackUnmountRequest : public Async::IRequest
+	/// @brief World data deserialization request.
+	class IWorldDeserializationRequest : public Async::IRequest
 	{
-		PONY_INTERFACE_BODY(IPackUnmountRequest)
+		PONY_INTERFACE_BODY(IWorldDeserializationRequest)
 
-		/// @brief Gets a pack.
-		/// @return Pack.
-		[[nodiscard("Pure function")]]
-		virtual PackHandle Pack() const noexcept = 0;
-
-		/// @brief Gets exceptions that occured during the request execution.
+		/// @brief Gets the request exceptions.
 		/// @return Exceptions.
-		/// @note It's valid to call it only if the request status is failure.
+		/// @note May be called only the status is failure.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const std::exception_ptr> Exceptions() const = 0;
 	};

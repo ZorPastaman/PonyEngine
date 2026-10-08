@@ -82,11 +82,11 @@ export namespace PonyEngine::Resource
 		/// @note It's valid to call only if the status is success.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<const void> Resource(std::type_index type) const;
-		/// @brief Gets an exception.
-		/// @return Exception.
+		/// @brief Gets exceptions.
+		/// @return Exceptions.
 		/// @note It's valid to call only if the status is failure.
 		[[nodiscard("Pure function")]]
-		const std::exception_ptr& Exception() const;
+		std::span<const std::exception_ptr> Exceptions() const;
 
 		/// @brief Tries to increment the cancel count.
 		/// @details If the cancel count is already 0, it will do nothing.
@@ -116,8 +116,8 @@ export namespace PonyEngine::Resource
 		/// @param resourceInterfaces Resource interfaces. Must be synced with resource interface types by index.
 		void SetSuccess(std::shared_ptr<const void> mainResource, std::span<const void* const> resourceInterfaces) noexcept;
 		/// @brief Sets failure.
-		/// @param exception Exception.
-		void SetFailure(std::exception_ptr exception) noexcept;
+		/// @param exceptions Exceptions.
+		void SetFailure(std::span<const std::exception_ptr> exceptions) noexcept;
 		/// @brief Sets canceled.
 		void SetCanceled() noexcept;
 
@@ -132,7 +132,7 @@ export namespace PonyEngine::Resource
 		std::shared_ptr<void> resourceDataAccess; ///< Resource data access.
 
 		std::shared_ptr<const void> mainResource; ///< Main resource.
-		std::exception_ptr exception; ///< Exception.
+		std::span<const std::exception_ptr> exceptions; ///< Exception.
 		std::atomic<Async::RequestStatus> status; ///< Status.
 		std::atomic_size_t cancelCount; ///< Cancel count.
 		
@@ -170,7 +170,7 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<const void> Resource(std::type_index type) const override;
 		[[nodiscard("Pure function")]] 
-		virtual const std::exception_ptr& Exception() const override;
+		virtual std::span<const std::exception_ptr> Exceptions() const override;
 
 		virtual void Cancel() override;
 
@@ -270,14 +270,14 @@ namespace PonyEngine::Resource
 		return MakeResource(type, resource->InterfaceTypes(), resource->ResourceInterfaces(), mainResource);
 	}
 
-	const std::exception_ptr& ResourceLoadProcess::Exception() const
+	std::span<const std::exception_ptr> ResourceLoadProcess::Exceptions() const
 	{
 		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
 
-		return exception;
+		return exceptions;
 	}
 
 	bool ResourceLoadProcess::IncrementCancelCount() noexcept
@@ -350,11 +350,11 @@ namespace PonyEngine::Resource
 		InvokeCallback();
 	}
 
-	void ResourceLoadProcess::SetFailure(std::exception_ptr exception) noexcept
+	void ResourceLoadProcess::SetFailure(const std::span<const std::exception_ptr> exceptions) noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
-		this->exception = std::move(exception);
+		this->exceptions = exceptions;
 
 		status.store(Async::RequestStatus::Failure, std::memory_order::release);
 		status.notify_all();
@@ -426,9 +426,9 @@ namespace PonyEngine::Resource
 		return loadProcess->Resource(type);
 	}
 
-	const std::exception_ptr& OngoingResourceRequest::Exception() const
+	std::span<const std::exception_ptr> OngoingResourceRequest::Exceptions() const
 	{
-		return loadProcess->Exception();
+		return loadProcess->Exceptions();
 	}
 
 	void OngoingResourceRequest::Cancel()

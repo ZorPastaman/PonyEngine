@@ -42,7 +42,7 @@ export namespace PonyEngine::Resource::Text
 		[[nodiscard("Pure function")]]
 		virtual std::span<const void* const> ResourceInterfaces() const override;
 		[[nodiscard("Pure function")]]
-		virtual const std::exception_ptr& Exception() const override;
+		virtual std::span<const std::exception_ptr> Exceptions() const override;
 
 		virtual void Cancel() override;
 
@@ -58,9 +58,9 @@ export namespace PonyEngine::Resource::Text
 
 		/// @brief Sets the status to success.
 		void SetSuccess() noexcept;
-		/// @brief Sets the status to exception.
+		/// @brief Sets the status to failure.
 		/// @param exception Exception.
-		void SetException(std::exception_ptr exception) noexcept;
+		void SetFailure(std::exception_ptr exception) noexcept;
 		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
@@ -119,14 +119,14 @@ namespace PonyEngine::Resource::Text
 		return std::span(&resourceInterface, 1uz);
 	}
 
-	const std::exception_ptr& OngoingResourceLoadRequest::Exception() const
+	std::span<const std::exception_ptr> OngoingResourceLoadRequest::Exceptions() const
 	{
-		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Success) [[unlikely]]
+		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
 			throw std::logic_error("Invalid status");
 		}
 
-		return exception;
+		return std::span(&exception, 1uz);
 	}
 
 	void OngoingResourceLoadRequest::Cancel()
@@ -162,7 +162,7 @@ namespace PonyEngine::Resource::Text
 		InvokeCallback();
 	}
 
-	void OngoingResourceLoadRequest::SetException(std::exception_ptr exception) noexcept
+	void OngoingResourceLoadRequest::SetFailure(std::exception_ptr exception) noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 

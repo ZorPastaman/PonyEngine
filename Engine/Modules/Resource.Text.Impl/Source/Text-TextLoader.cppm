@@ -220,7 +220,7 @@ namespace PonyEngine::Resource::Text
 					loadRequest->SetSuccess();
 					break;
 				case Async::RequestStatus::Failure:
-					loadRequest->SetException(accessRequest.Exception());
+					loadRequest->SetFailure(accessRequest.Exception());
 					break;
 				case Async::RequestStatus::Canceled:
 					loadRequest->SetCanceled();
