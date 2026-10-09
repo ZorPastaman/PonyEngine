@@ -16,6 +16,7 @@ target_sources(PonyEngine.Resource.World.Impl PRIVATE
 )
 target_sources(PonyEngine.Resource.World.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/World.cppm"
+	"Source/World-CopyComponentDeserializer.cppm"
 	"Source/World-LoadableWorldDefinitionLoadRequest.cppm"
 	"Source/World-WorldDefinitionLoader.cppm"
 	"Source/World-WorldDefinitionLoaderModule.cppm"

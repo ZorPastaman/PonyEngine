@@ -11,6 +11,8 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
+
 export module PonyEngine.Resource.World.Impl:WorldDefinitionLoader;
 
 import std;
@@ -18,11 +20,13 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Hash;
 import PonyEngine.Job;
+import PonyEngine.Log;
 import PonyEngine.Memory;
 import PonyEngine.Resource.Ext;
 import PonyEngine.Utility;
 import PonyEngine.World;
 
+import :CopyComponentDeserializer;
 import :LoadableWorldDefinitionLoadRequest;
 import :WorldDefinitionLoadRequest;
 
@@ -49,6 +53,8 @@ export namespace PonyEngine::Resource::World
 		WorldDefinitionLoader& operator =(WorldDefinitionLoader&&) = delete;
 
 	protected:
+		virtual void RegisterComponentDeserializer(std::type_index componentType, std::size_t componentSize, std::string_view type) override;
+		virtual void UnregisterComponentDeserializer(std::type_index componentType, std::string_view type) override;
 		virtual void RegisterComponentDeserializer(std::type_index componentType, std::size_t componentSize, std::string_view type, 
 			IInlineComponentDeserializer& deserializer) override;
 		virtual void UnregisterComponentDeserializer(std::type_index componentType, std::string_view type, IInlineComponentDeserializer& deserializer) override;
@@ -67,25 +73,25 @@ export namespace PonyEngine::Resource::World
 		/// @param type Type in the serialized data.
 		/// @return Deserializer slot.
 		[[nodiscard("Must be used")]]
-		std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>& RegisterComponentDeserializer(std::type_index componentType, std::size_t componentSize,
+		std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>& AddComponentDeserializer(std::type_index componentType, std::size_t componentSize,
 			std::string_view type);
 		/// @brief Unregisters the component deserializer.
 		/// @param componentType Component type.
 		/// @param type Type in the serialized data.
 		/// @param deserializer Component deserializer.
-		void UnregisterComponentDeserializer(std::type_index componentType, std::string_view type, 
+		void RemoveComponentDeserializer(std::type_index componentType, std::string_view type, 
 			const std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>& deserializer) noexcept;
 		/// @brief Registers the object deserializer.
 		/// @param objectType Object type.
 		/// @param type Type in the serialized data.
 		/// @return Deserializer slot.
 		[[nodiscard("Must be used")]]
-		std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>& RegisterObjectDeserializer(std::type_index objectType, std::string_view type);
+		std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>& AddObjectDeserializer(std::type_index objectType, std::string_view type);
 		/// @brief Unregisters the object deserializer.
 		/// @param objectType Object type.
 		/// @param type Type in the serialized data.
 		/// @param deserializer Object deserializer.
-		void UnregisterObjectDeserializer(std::type_index objectType, std::string_view type, 
+		void RemoveObjectDeserializer(std::type_index objectType, std::string_view type, 
 			const std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>& deserializer) noexcept;
 
 		/// @brief Makes a default load request.
@@ -205,6 +211,7 @@ export namespace PonyEngine::Resource::World
 
 		Application::IApplication* application; ///< Application.
 		Job::IJobService* jobService; ///< Job service.
+		Log::ILogService* logService; ///< Log service.
 
 		std::unordered_map<std::uint64_t, std::type_index> componentTypeMap; ///< Component serialized data type hash to component type map.
 		std::unordered_map<std::uint64_t, std::string> componentTypeNameMap; ///< Component serialized data type hash to component serialized data type map.
@@ -214,6 +221,8 @@ export namespace PonyEngine::Resource::World
 		std::unordered_map<std::uint64_t, std::string> objectTypeNameMap; ///< Object serialized data type hash to object serialized data type map.
 		std::unordered_map<std::type_index, std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>> objectDeserializers; ///< Object type to object deserializer map.
 		std::shared_mutex deserializerMutex; ///< Deserializer mutex.
+
+		CopyComponentDeserializer copyComponentDeserializer;
 
 		std::unordered_map<WorldDefinitionLoadRequest*, std::shared_ptr<WorldDefinitionLoadRequest>> loadRequests; ///< Load requests.
 		std::mutex loadRequestsMutex; ///< Load requests mutex.
@@ -232,7 +241,8 @@ namespace PonyEngine::Resource::World
 {
 	WorldDefinitionLoader::WorldDefinitionLoader(Application::IApplication& application) :
 		application{&application},
-		jobService{&this->application->GetInterface<Job::IJobService>()}
+		jobService{&this->application->GetInterface<Job::IJobService>()},
+		logService{this->application->FindInterface<Log::ILogService>()}
 	{
 	}
 
@@ -279,58 +289,108 @@ namespace PonyEngine::Resource::World
 		throw std::invalid_argument("Invalid access type");
 	}
 
+	void WorldDefinitionLoader::RegisterComponentDeserializer(const std::type_index componentType, const std::size_t componentSize, const std::string_view type)
+	{
+		RegisterComponentDeserializer(componentType, componentSize, type, copyComponentDeserializer);
+	}
+
+	void WorldDefinitionLoader::UnregisterComponentDeserializer(const std::type_index componentType, const std::string_view type)
+	{
+		UnregisterComponentDeserializer(componentType, type, copyComponentDeserializer);
+	}
+
 	void WorldDefinitionLoader::RegisterComponentDeserializer(const std::type_index componentType, const std::size_t componentSize, const std::string_view type, 
 		IInlineComponentDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		RegisterComponentDeserializer(componentType, componentSize, type) = &deserializer;
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			AddComponentDeserializer(componentType, componentSize, type) = &deserializer;
+		}
+
+		PONY_LOG(logService, Log::LogType::Info, "Component deserializer registered. Component type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			componentType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
 	void WorldDefinitionLoader::UnregisterComponentDeserializer(const std::type_index componentType, const std::string_view type, IInlineComponentDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		UnregisterComponentDeserializer(componentType, type, std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>(&deserializer));
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			RemoveComponentDeserializer(componentType, type, std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>(&deserializer));
+		}
+
+		PONY_LOG(logService, Log::LogType::Info, "Component deserializer unregistered. Component type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			componentType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
 	void WorldDefinitionLoader::RegisterComponentDeserializer(const std::type_index componentType, const std::size_t componentSize,
 		const std::string_view type, IComponentDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		RegisterComponentDeserializer(componentType, componentSize, type) = &deserializer;
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			AddComponentDeserializer(componentType, componentSize, type) = &deserializer;
+		}
+		
+		PONY_LOG(logService, Log::LogType::Info, "Component deserializer registered. Component type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			componentType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
 	void WorldDefinitionLoader::UnregisterComponentDeserializer(const std::type_index componentType, const std::string_view type,
 		IComponentDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		UnregisterComponentDeserializer(componentType, type, std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>(&deserializer));
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			RemoveComponentDeserializer(componentType, type, std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>(&deserializer));
+		}
+		
+		PONY_LOG(logService, Log::LogType::Info, "Component deserializer unregistered. Component type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			componentType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
 	void WorldDefinitionLoader::RegisterObjectDeserializer(const std::type_index objectType, const std::string_view type, IInlineObjectDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		RegisterObjectDeserializer(objectType, type) = &deserializer;
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			AddObjectDeserializer(objectType, type) = &deserializer;
+		}
+		
+		PONY_LOG(logService, Log::LogType::Info, "Object deserializer registered. Object type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			objectType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
 	void WorldDefinitionLoader::UnregisterObjectDeserializer(const std::type_index objectType, const std::string_view type, IInlineObjectDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		UnregisterObjectDeserializer(objectType, type, std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>(&deserializer));
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			RemoveObjectDeserializer(objectType, type, std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>(&deserializer));
+		}
+		
+		PONY_LOG(logService, Log::LogType::Info, "Object deserializer unregistered. Object type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			objectType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
 	void WorldDefinitionLoader::RegisterObjectDeserializer(const std::type_index objectType, const std::string_view type, IObjectDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		RegisterObjectDeserializer(objectType, type) = &deserializer;
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			AddObjectDeserializer(objectType, type) = &deserializer;
+		}
+		
+		PONY_LOG(logService, Log::LogType::Info, "Object deserializer registered. Object type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			objectType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
 	void WorldDefinitionLoader::UnregisterObjectDeserializer(const std::type_index objectType, const std::string_view type, IObjectDeserializer& deserializer)
 	{
-		const auto lock = std::unique_lock(deserializerMutex);
-		UnregisterObjectDeserializer(objectType, type, std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>(&deserializer));
+		{
+			const auto lock = std::unique_lock(deserializerMutex);
+			RemoveObjectDeserializer(objectType, type, std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>(&deserializer));
+		}
+		
+		PONY_LOG(logService, Log::LogType::Info, "Object deserializer unregistered. Object type: '{}'; Serialized type: '{}'; Deserializer: '0x{:X}'.",
+			objectType.name(), type, reinterpret_cast<std::uintptr_t>(&deserializer));
 	}
 
-	std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>& WorldDefinitionLoader::RegisterComponentDeserializer(
+	std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>& WorldDefinitionLoader::AddComponentDeserializer(
 		const std::type_index componentType, const std::size_t componentSize, const std::string_view type)
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);
@@ -368,7 +428,7 @@ namespace PonyEngine::Resource::World
 		}
 	}
 
-	void WorldDefinitionLoader::UnregisterComponentDeserializer(const std::type_index componentType, const std::string_view type,
+	void WorldDefinitionLoader::RemoveComponentDeserializer(const std::type_index componentType, const std::string_view type,
 		const std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>& deserializer) noexcept
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);
@@ -384,7 +444,7 @@ namespace PonyEngine::Resource::World
 		componentTypeMap.erase(typeHash);
 	}
 
-	std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>& WorldDefinitionLoader::RegisterObjectDeserializer(const std::type_index objectType, const std::string_view type)
+	std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>& WorldDefinitionLoader::AddObjectDeserializer(const std::type_index objectType, const std::string_view type)
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);
 
@@ -412,7 +472,7 @@ namespace PonyEngine::Resource::World
 		}
 	}
 
-	void WorldDefinitionLoader::UnregisterObjectDeserializer(const std::type_index objectType, const std::string_view type,
+	void WorldDefinitionLoader::RemoveObjectDeserializer(const std::type_index objectType, const std::string_view type,
 		const std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>& deserializer) noexcept
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);

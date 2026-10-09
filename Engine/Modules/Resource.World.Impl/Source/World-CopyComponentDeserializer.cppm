@@ -7,16 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.World:CopyComponentDeserializer;
+export module PonyEngine.Resource.World.Impl:CopyComponentDeserializer;
 
 import std;
 
-import :IComponentDeserializer;
+import PonyEngine.Resource.World;
 
 export namespace PonyEngine::Resource::World
 {
 	/// @brief Component deserializer that simply copies input bytes to output bytes as is.
-	class CopyComponentDeserializer final : IInlineComponentDeserializer
+	class CopyComponentDeserializer final : public IInlineComponentDeserializer
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

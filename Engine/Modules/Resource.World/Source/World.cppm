@@ -11,7 +11,6 @@ export module PonyEngine.Resource.World;
 
 export import PonyEngine.Resource.Ext;
 
-export import :CopyComponentDeserializer;
 export import :IComponentDeserializer;
 export import :IObjectDeserializer;
 export import :IWorldDefinitionLoader;

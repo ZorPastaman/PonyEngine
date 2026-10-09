@@ -27,6 +27,16 @@ export namespace PonyEngine::Resource::World
 	{
 		PONY_INTERFACE_BODY(IWorldDefinitionLoader)
 
+		/// @brief Registers a component deserializer that simply copies the input component data to its output.
+		/// @tparam T Component type.
+		/// @param type Component type in serialized data.
+		template<PonyEngine::World::Component T>
+		void RegisterComponentDeserializer(std::string_view type);
+		/// @brief Unregisters a component deserializer that simply copies the input component data to its output.
+		/// @tparam T Component type.
+		/// @param type Component type in serialized data.
+		template<PonyEngine::World::Component T>
+		void UnregisterComponentDeserializer(std::string_view type);
 		/// @brief Registers the component deserializer.
 		/// @tparam T Component type.
 		/// @param type Component type in serialized data.
@@ -78,6 +88,15 @@ export namespace PonyEngine::Resource::World
 		void UnregisterObjectDeserializer(std::string_view type, IObjectDeserializer& deserializer);
 
 	protected:
+		/// @brief Registers a component deserializer that simply copies the input component data to its output.
+		/// @param componentType Component type.
+		/// @param componentSize Component size.
+		/// @param type Component type in serialized data.
+		virtual void RegisterComponentDeserializer(std::type_index componentType, std::size_t componentSize, std::string_view type) = 0;
+		/// @brief Unregisters a component deserializer that simply copies the input component data to its output.
+		/// @param componentType Component type.
+		/// @param type Component type in serialized data.
+		virtual void UnregisterComponentDeserializer(std::type_index componentType, std::string_view type) = 0;
 		/// @brief Registers the component deserializer.
 		/// @param componentType Component type.
 		/// @param componentSize Component size.
@@ -126,6 +145,18 @@ export namespace PonyEngine::Resource::World
 
 namespace PonyEngine::Resource::World
 {
+	template<PonyEngine::World::Component T>
+	void IWorldDefinitionLoader::RegisterComponentDeserializer(const std::string_view type)
+	{
+		RegisterComponentDeserializer(typeid(T), sizeof(T), type);
+	}
+
+	template<PonyEngine::World::Component T>
+	void IWorldDefinitionLoader::UnregisterComponentDeserializer(const std::string_view type)
+	{
+		UnregisterComponentDeserializer(typeid(T), type);
+	}
+
 	template<PonyEngine::World::Component T>
 	void IWorldDefinitionLoader::RegisterComponentDeserializer(const std::string_view type, IInlineComponentDeserializer& deserializer)
 	{
