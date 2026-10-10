@@ -253,6 +253,9 @@ namespace PonyEngine::Resource::World
 #ifndef NDEBUG
 		assert(worldDefinitionResourceCount.load(std::memory_order::relaxed) == 0uz && "Some world definition resources are still alive.");
 #endif
+
+		assert(componentTypeMap.size() == 0uz && "Some component deserializers weren't unregistered.");
+		assert(objectTypeMap.size() == 0uz && "Some object deserializers weren't unregistered.");
 	}
 
 	void WorldDefinitionLoader::PrepareResource(ILoadableResource& context)

@@ -12,37 +12,23 @@ Must be empty.
 
 ## Data
 
-| Size                      | Description             |
-|:-------------------------:|:------------------------|
-| sizeof(std::size_t)       | Entity count.           |
-| sizeof(std::size_t)       | Component table count.  |
-| sizeof(std::size_t)       | Component object count. |
-| variable                  | Component tables.       |
-| variable                  | Component objects.      |
+| Size                                        | Description                    |
+|:-------------------------------------------:|:-------------------------------|
+| sizeof(std::size_t)                         | Entity count.                  |
+| sizeof(std::size_t)                         | Component table count.         |
+| sizeof(std::size_t)                         | Object count.                  |
+| 1 * component table count                   | Component table type lengths.  |
+| sizeof(std::size_t) * component table count | Component table entity counts. |
+| 1 * object count                            | Object type lengths.           |
+| sizeof(std::size_t) * component table count | Component table data sizes.    |
+| sizeof(std::size_t) * object count          | Object data sizes.             |
+| variable                                    | Component serialized types.    |
+| variable                                    | Component entity indices.      |
+| variable                                    | Object serialized types.       |
+| variable                                    | Component table data.          |
+| variable                                    | Object data.                   |
 
-Component table layout:
-
-| Size                               | Description          |
-|:----------------------------------:|:---------------------|
-| 1                                  | Type name size.      |
-| [0, 255]                           | Type name.           |
-| sizeof(std::size_t)                | Entity count.        |
-| sizeof(std::size_t) * entity count | Entity indices.      |
-| sizeof(std::size_t)                | Component data size. |
-| variable                           | Component data.      |
-
-Object layout:
-
-| Size                | Description       |
-|:-------------------:|:------------------|
-| 1                   | Type name size.   |
-| [0, 255]            | Type name.        |
-| sizeof(std::size_t) | Object data size. |
-| variable            | Object data.      |
-
-The `Pony.WorldDefinition` format is type-agnostic: it does not contain information about component or object types.
-For component deserialization, string component type names must be registered and mapped to their corresponding std::type_index. The loader then copies the serialized component data into the corresponding component definition data arrays.
-Object deserialization is handled by type-specific sub-loaders, which must be provided for each object type used by the world.
+The component and object data require separate deserializers that are added to a world definition loader.
 
 If a component has a reference to an entity or to an object, it must contain an index in its data in place of the reference.
 The index must be `std::uint64_t`. Max value means no reference.

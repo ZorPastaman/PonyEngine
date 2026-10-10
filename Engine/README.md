@@ -18,41 +18,43 @@ To configure a module, a specific CMake flag must be `true`.
 
 ### Feature modules
 
-| Module name                                                         | Build flag                            |
-|:--------------------------------------------------------------------|:--------------------------------------|
-| [PonyEngine.Application](Modules/Application)                       | `PONY_ENGINE_APPLICATION`             |
-| [PonyEngine.Application.Impl](Modules/Application.Impl)             | `PONY_ENGINE_APPLICATION_IMPL`        |
-| [PonyEngine.Core](Modules/Core)                                     | `PONY_ENGINE_CORE`                    |
-| [PonyEngine.File](Modules/File)                                     | `PONY_ENGINE_FILE`                    |
-| [PonyEngine.File.Impl](Modules/File.Impl)                           | `PONY_ENGINE_FILE_IMPL`               |
-| [PonyEngine.Job](Modules/Job)                                       | `PONY_ENGINE_JOB`                     |
-| [PonyEngine.Job.Impl](Modules/Job.Impl)                             | `PONY_ENGINE_JOB_IMPL`                |
-| [PonyEngine.Log](Modules/Log)                                       | `PONY_ENGINE_LOG`                     |
-| [PonyEngine.Log.Ext](Modules/Log.Ext)                               | `PONY_ENGINE_LOG_EXT`                 |
-| [PonyEngine.Log.Impl](Modules/Log.Impl)                             | `PONY_ENGINE_LOG_IMPL`                |
-| [PonyEngine.Log.Console.Impl](Modules/Log.Console.Impl)             | `PONY_ENGINE_LOG_CONSOLE_IMPL`        |
-| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                   | `PONY_ENGINE_LOG_FILE_IMPL`           |
-| [PonyEngine.Log.WinDebug.Impl](Modules/Log.PConsole.Impl)           | `PONY_ENGINE_LOG_WinDebug_IMPL`       |
-| [PonyEngine.RawInput](Modules/RawInput)                             | `PONY_ENGINE_RAW_INPUT`               |
-| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                     | `PONY_ENGINE_RAW_INPUT_EXT`           |
-| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                   | `PONY_ENGINE_RAW_INPUT_IMPL`          |
-| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl) | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL` |
-| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)       | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`    |
-| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)     | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`   |
-| [PonyEngine.Resource](Modules/Resource)                             | `PONY_ENGINE_RESOURCE`                |
-| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                     | `PONY_ENGINE_RESOURCE_EXT`            |
-| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                   | `PONY_ENGINE_RESOURCE_IMPL`           |
-| [PonyEngine.Resource.Pack](Modules/Resource.Pack)                   | `PONY_ENGINE_RESOURCE_PACK`           |
-| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)         | `PONY_ENGINE_RESOURCE_PACK_IMPL`      |
-| [PonyEngine.Resource.Text.Impl](Modules/Resource.Text.Impl)         | `PONY_ENGINE_RESOURCE_TEXT_IMPL`      |
-| [PonyEngine.Time](Modules/Time)                                     | `PONY_ENGINE_TIME`                    |
-| [PonyEngine.Time.Impl](Modules/Time.Impl)                           | `PONY_ENGINE_TIME_IMPL`               |
-| [PonyEngine.WinInput](Modules/WinInput)                             | `PONY_ENGINE_WININPUT`                |
-| [PonyEngine.WinInput.Impl](Modules/WinInput.Impl)                   | `PONY_ENGINE_WININPUT_IMPL`           |
-| [PonyEngine.World](Modules/World)                                   | `PONY_ENGINE_WORLD`                   |
-| [PonyEngine.World.Impl](Modules/World.Impl)                         | `PONY_ENGINE_WORLD_IMPL`              |
-| [PonyEngine.World.Hierarchy](Modules/World.Hierarchy)               | `PONY_ENGINE_WORLD_HIERARCHY`         |
-| [PonyEngine.World.Hierarchy.Impl](Modules/World.Hierarchy.Impl)     | `PONY_ENGINE_WORLD_HIERARCHY_IMPL`    |
+| Module name                                                                       | Build flag                                  |
+|:----------------------------------------------------------------------------------|:--------------------------------------------|
+| [PonyEngine.Application](Modules/Application)                                     | `PONY_ENGINE_APPLICATION`                   |
+| [PonyEngine.Application.Impl](Modules/Application.Impl)                           | `PONY_ENGINE_APPLICATION_IMPL`              |
+| [PonyEngine.Core](Modules/Core)                                                   | `PONY_ENGINE_CORE`                          |
+| [PonyEngine.File](Modules/File)                                                   | `PONY_ENGINE_FILE`                          |
+| [PonyEngine.File.Impl](Modules/File.Impl)                                         | `PONY_ENGINE_FILE_IMPL`                     |
+| [PonyEngine.Job](Modules/Job)                                                     | `PONY_ENGINE_JOB`                           |
+| [PonyEngine.Job.Impl](Modules/Job.Impl)                                           | `PONY_ENGINE_JOB_IMPL`                      |
+| [PonyEngine.Log](Modules/Log)                                                     | `PONY_ENGINE_LOG`                           |
+| [PonyEngine.Log.Ext](Modules/Log.Ext)                                             | `PONY_ENGINE_LOG_EXT`                       |
+| [PonyEngine.Log.Impl](Modules/Log.Impl)                                           | `PONY_ENGINE_LOG_IMPL`                      |
+| [PonyEngine.Log.Console.Impl](Modules/Log.Console.Impl)                           | `PONY_ENGINE_LOG_CONSOLE_IMPL`              |
+| [PonyEngine.Log.File.Impl](Modules/Log.File.Impl)                                 | `PONY_ENGINE_LOG_FILE_IMPL`                 |
+| [PonyEngine.Log.WinDebug.Impl](Modules/Log.PConsole.Impl)                         | `PONY_ENGINE_LOG_WinDebug_IMPL`             |
+| [PonyEngine.RawInput](Modules/RawInput)                                           | `PONY_ENGINE_RAW_INPUT`                     |
+| [PonyEngine.RawInput.Ext](Modules/RawInput.Ext)                                   | `PONY_ENGINE_RAW_INPUT_EXT`                 |
+| [PonyEngine.RawInput.Impl](Modules/RawInput.Impl)                                 | `PONY_ENGINE_RAW_INPUT_IMPL`                |
+| [PonyEngine.RawInput.Keyboard.Impl](Modules/RawInput.Keyboard.Impl)               | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL`       |
+| [PonyEngine.RawInput.Mouse.Impl](Modules/RawInput.Mouse.Impl)                     | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL`          |
+| [PonyEngine.RawInput.XInput.Impl](Modules/RawInput.XInput.Impl)                   | `PONY_ENGINE_RAW_INPUT_XINPUT_IMPL`         |
+| [PonyEngine.Resource](Modules/Resource)                                           | `PONY_ENGINE_RESOURCE`                      |
+| [PonyEngine.Resource.Ext](Modules/Resource.Ext)                                   | `PONY_ENGINE_RESOURCE_EXT`                  |
+| [PonyEngine.Resource.Impl](Modules/Resource.Impl)                                 | `PONY_ENGINE_RESOURCE_IMPL`                 |
+| [PonyEngine.Resource.Pack](Modules/Resource.Pack)                                 | `PONY_ENGINE_RESOURCE_PACK`                 |
+| [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)                       | `PONY_ENGINE_RESOURCE_PACK_IMPL`            |
+| [PonyEngine.Resource.Text.Impl](Modules/Resource.Text.Impl)                       | `PONY_ENGINE_RESOURCE_TEXT_IMPL`            |
+| [PonyEngine.Resource.World.Impl](Modules/Resource.World.Impl)                     | `PONY_ENGINE_RESOURCE_WORLD_IMPL`           |
+| [PonyEngine.Resource.World.Hierarchy.Impl](Modules/Resource.World.Hierarchy.Impl) | `PONY_ENGINE_RESOURCE_WORLD_HIERARCHY_IMPL` |
+| [PonyEngine.Time](Modules/Time)                                                   | `PONY_ENGINE_TIME`                          |
+| [PonyEngine.Time.Impl](Modules/Time.Impl)                                         | `PONY_ENGINE_TIME_IMPL`                     |
+| [PonyEngine.WinInput](Modules/WinInput)                                           | `PONY_ENGINE_WININPUT`                      |
+| [PonyEngine.WinInput.Impl](Modules/WinInput.Impl)                                 | `PONY_ENGINE_WININPUT_IMPL`                 |
+| [PonyEngine.World](Modules/World)                                                 | `PONY_ENGINE_WORLD`                         |
+| [PonyEngine.World.Impl](Modules/World.Impl)                                       | `PONY_ENGINE_WORLD_IMPL`                    |
+| [PonyEngine.World.Hierarchy](Modules/World.Hierarchy)                             | `PONY_ENGINE_WORLD_HIERARCHY`               |
+| [PonyEngine.World.Hierarchy.Impl](Modules/World.Hierarchy.Impl)                   | `PONY_ENGINE_WORLD_HIERARCHY_IMPL`          |
 
 Some modules may require modifications to work because they need implementation for a specific platform or a compiler or due to other things.
 

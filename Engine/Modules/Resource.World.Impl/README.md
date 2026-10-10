@@ -4,6 +4,7 @@ World resource module implementation.
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Job](../Job)
 - [PonyEngine.Log](../Log)

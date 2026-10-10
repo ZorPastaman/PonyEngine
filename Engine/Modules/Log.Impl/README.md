@@ -6,10 +6,10 @@ Adds `PonyEngine.Log.Impl` target as a static library.
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.Log](../Log)
 - [PonyEngine.Log.Ext](../Log.Ext)
-- [PonyEngine.Application](../Application)
 
 ## CMake variables
 
