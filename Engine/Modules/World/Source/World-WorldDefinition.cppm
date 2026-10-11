@@ -12,6 +12,7 @@ export module PonyEngine.World:WorldDefinition;
 import std;
 
 import :Entity;
+import :Object;
 
 export namespace PonyEngine::World
 {
@@ -28,6 +29,6 @@ export namespace PonyEngine::World
 	{
 		std::size_t entityCount = 0uz; ///< Entity count.
 		std::unordered_map<std::type_index, ComponentTableDefinition> components; ///< Components.
-		std::vector<std::pair<std::type_index, std::shared_ptr<void>>> objects; ///< World objects.
+		std::vector<Object> objects; ///< World objects.
 	};
 }

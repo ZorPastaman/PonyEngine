@@ -15,6 +15,8 @@ export module PonyEngine.Resource.World:IObjectDeserializer;
 
 import std;
 
+import PonyEngine.World;
+
 import :IWorldDeserializationRequest;
 
 export namespace PonyEngine::Resource::World
@@ -27,7 +29,7 @@ export namespace PonyEngine::Resource::World
 		/// @brief Deserializes an object.
 		/// @param input Input bytes.
 		/// @param output Output object.
-		virtual void Deserialize(std::span<const std::byte> input, std::shared_ptr<void>& output) = 0;
+		virtual void Deserialize(std::span<const std::byte> input, PonyEngine::World::Object& output) = 0;
 	};
 
 	/// @brief Object deserializer that executes in async manner.
@@ -41,7 +43,7 @@ export namespace PonyEngine::Resource::World
 		/// @param callback Callback.
 		/// @return Deserialization request.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IWorldDeserializationRequest> Deserialize(std::span<const std::byte> input, std::shared_ptr<void>& output,
+		virtual std::shared_ptr<IWorldDeserializationRequest> Deserialize(std::span<const std::byte> input, PonyEngine::World::Object& output,
 			std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback = nullptr) = 0;
 	};
 }

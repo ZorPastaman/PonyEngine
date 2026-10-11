@@ -8,6 +8,7 @@ target_sources(PonyEngine.World PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/World-Entity.cppm"
 	"Source/World-IWorld.cppm"
 	"Source/World-IWorldService.cppm"
+	"Source/World-Object.cppm"
 	"Source/World-ObjectHandle.cppm"
 	"Source/World-QueryParams.cppm"
 	"Source/World-WorldDefinition.cppm"

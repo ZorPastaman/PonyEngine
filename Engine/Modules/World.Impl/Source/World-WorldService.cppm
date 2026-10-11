@@ -51,7 +51,7 @@ export namespace PonyEngine::World
 
 	protected:
 		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) override;
-		virtual void RegisterObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) override;
+		virtual void RegisterObjectHandleMember(std::type_index objectType, bool isConst, std::type_index componentType, std::size_t componentOffset) override;
 		virtual void RegisterEntityReferenceMember(std::type_index componentType, std::size_t componentOffset) override;
 
 	private:
@@ -109,12 +109,12 @@ namespace PonyEngine::World
 		typeRegistry.AddComponentType(componentType, componentSize, componentAlignment);
 	}
 
-	void WorldService::RegisterObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
+	void WorldService::RegisterObjectHandleMember(const std::type_index objectType, const bool isConst, const std::type_index componentType, const std::size_t componentOffset)
 	{
 		PONY_LOG(logService, Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
 			componentType.name(), objectType.name(), componentOffset);
 		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
-		typeRegistry.RegisterObjectHandleMember(objectType, componentType, componentOffset);
+		typeRegistry.RegisterObjectHandleMember(objectType, isConst, componentType, componentOffset);
 	}
 
 	void WorldService::RegisterEntityReferenceMember(const std::type_index componentType, const std::size_t componentOffset)
@@ -169,7 +169,7 @@ namespace PonyEngine::World
 				}
 			}
 
-			const std::size_t componentSize = typeRegistry.ComponentSize(type);
+			const std::size_t componentSize = typeRegistry.GetComponentInfo(type).size;
 			if (table.data.size() != componentSize * table.entityBindings.size()) [[unlikely]]
 			{
 				throw std::invalid_argument("Invalid component data");
@@ -192,8 +192,7 @@ namespace PonyEngine::World
 
 		for (std::size_t i = 0uz; i < objects.size(); ++i)
 		{
-			const auto& [type, object] = definition.objects[i];
-			objects[i] = world.RegisterObject(type, object);
+			objects[i] = world.RegisterObject(definition.objects[i]);
 		}
 
 		world.CreateEntities(entities);
@@ -211,34 +210,37 @@ namespace PonyEngine::World
 			const std::span<void*> thisComponents = components.subspan(0uz, bindings.size());
 			world.AddComponents(componentEntities.subspan(0uz, bindings.size()), type, componentData, thisComponents);
 
-			if (const std::span<const std::pair<std::size_t, std::type_index>> objectOffsets = typeRegistry.ObjectOffsets(type); !objectOffsets.empty())
+			if (const std::span<const ObjectHandleInfo> objectHandleInfos = typeRegistry.GetObjectHandleInfos(type); !objectHandleInfos.empty())
 			{
 				for (void* const thisComponent : thisComponents)
 				{
 					const auto component = static_cast<std::byte*>(thisComponent);
-					for (const auto offset : std::views::keys(objectOffsets))
+					for (const ObjectHandleInfo& info : objectHandleInfos)
 					{
-						std::byte* const handlePointer = component + offset;
+						std::byte* const handlePointer = component + info.offset;
 						TypelessObjectHandle& handle = *reinterpret_cast<TypelessObjectHandle*>(handlePointer);
 						const std::uint64_t objectIndex = *reinterpret_cast<std::uint64_t*>(handlePointer);
 
 						if (objectIndex == std::numeric_limits<std::uint64_t>::max())
 						{
 							handle = TypelessObjectHandle{};
+							continue;
 						}
-						else if (objectIndex < objects.size()) [[likely]]
+						if (objectIndex < objects.size()) [[likely]]
 						{
-							handle = objects[static_cast<std::size_t>(objectIndex)];
+							if (const Object& object = definition.objects[objectIndex]; object.IsCastable(info.type, info.isConst)) [[likely]]
+							{
+								handle = objects[static_cast<std::size_t>(objectIndex)];
+								continue;
+							}
 						}
-						else [[unlikely]]
-						{
-							throw std::invalid_argument("Invalid object index");
-						}
+
+						throw std::invalid_argument("Invalid object index");
 					}
 				}
 			}
 
-			if (const std::span<const std::size_t> entityOffsets = typeRegistry.EntityReferences(type); !entityOffsets.empty())
+			if (const std::span<const std::size_t> entityOffsets = typeRegistry.GetEntityReferences(type); !entityOffsets.empty())
 			{
 				for (void* const thisComponent : thisComponents)
 				{
@@ -252,15 +254,15 @@ namespace PonyEngine::World
 						if (entityIndex == std::numeric_limits<std::uint64_t>::max())
 						{
 							entity = Entity{};
+							continue;
 						}
-						else if (entityIndex < entities.size()) [[likely]]
+						if (entityIndex < entities.size()) [[likely]]
 						{
 							entity = entities[static_cast<std::size_t>(entityIndex)];
+							continue;
 						}
-						else [[unlikely]]
-						{
-							throw std::invalid_argument("Invalid entity index");
-						}
+
+						throw std::invalid_argument("Invalid entity index");
 					}
 				}
 			}

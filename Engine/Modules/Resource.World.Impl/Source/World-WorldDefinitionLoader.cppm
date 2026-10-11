@@ -823,12 +823,12 @@ namespace PonyEngine::Resource::World
 						{
 							const std::string_view type = ReadDataString(objectTypes, objectTypeLengths[i]);
 							const std::type_index objectType = GetObjectType(type);
-							worldDefinition.objects.push_back(std::pair(objectType, std::shared_ptr<void>()));
+							worldDefinition.objects.push_back(PonyEngine::World::Object());
 
 							const std::size_t objectInputSize = ReadData<std::size_t>(objectDataSizes);
 							const std::span<const std::byte> objectInput = ReadDataSpan<const std::byte>(objectData, objectInputSize);
 
-							std::shared_ptr<void>& target = worldDefinition.objects.back().second;
+							PonyEngine::World::Object& target = worldDefinition.objects.back();
 							std::visit(Utility::Overload
 							{
 								[&](IInlineObjectDeserializer* const deserializer)

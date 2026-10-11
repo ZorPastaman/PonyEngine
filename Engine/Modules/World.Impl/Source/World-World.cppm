@@ -89,18 +89,11 @@ export namespace PonyEngine::World
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const override;
 
 		[[nodiscard("Pure function")]]
-		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual void* GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<void> GetObjectShared(std::type_index objectType, TypelessObjectHandle handle) const noexcept override;
-
-		[[nodiscard("Weird call")]]
-		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, std::shared_ptr<void> object) override;
-		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) override;
-		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, std::shared_ptr<void> object) override;
-
+		virtual bool IsObjectValid(std::type_index objectType, bool isConst, TypelessObjectHandle handle) const noexcept override;
+		[[nodiscard("Pure function")]] 
+		virtual const Object& GetObject(std::type_index objectType, bool isConst, TypelessObjectHandle handle) const noexcept override;
+		[[nodiscard("Weird call")]] 
+		virtual TypelessObjectHandle RegisterObject(Object object) override;
 		virtual void CollectGarbage() override;
 
 		World& operator =(const World&) = delete;
@@ -881,34 +874,19 @@ namespace PonyEngine::World
 		}
 	}
 
-	bool World::IsObjectValid(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	bool World::IsObjectValid(const std::type_index objectType, const bool isConst, const TypelessObjectHandle handle) const noexcept
 	{
-		return objectTable.IsObjectValid(objectType, handle);
+		return objectTable.IsObjectValid(objectType, isConst, handle);
 	}
 
-	void* World::GetObject(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	const Object& World::GetObject(const std::type_index objectType, const bool isConst, const TypelessObjectHandle handle) const noexcept
 	{
-		return objectTable.GetObject(objectType, handle).get();
+		return objectTable.GetObject(objectType, isConst, handle);
 	}
 
-	std::shared_ptr<void> World::GetObjectShared(const std::type_index objectType, const TypelessObjectHandle handle) const noexcept
+	TypelessObjectHandle World::RegisterObject(Object object)
 	{
-		return objectTable.GetObject(objectType, handle);
-	}
-
-	TypelessObjectHandle World::RegisterObject(const std::type_index objectType, std::shared_ptr<void> object)
-	{
-		return objectTable.RegisterObject(objectType, std::move(object));
-	}
-
-	void World::UnregisterObject(const std::type_index objectType, const TypelessObjectHandle handle)
-	{
-		objectTable.UnregisterObject(objectType, handle);
-	}
-
-	void World::ReplaceObject(const TypelessObjectHandle handle, const std::type_index objectType, std::shared_ptr<void> object)
-	{
-		objectTable.ReplaceObject(handle, objectType, std::move(object));
+		return objectTable.RegisterObject(std::move(object));
 	}
 
 	void World::CollectGarbage()

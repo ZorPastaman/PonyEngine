@@ -17,6 +17,21 @@ import :ComponentTable;
 
 export namespace PonyEngine::World
 {
+	/// @brief Component info.
+	struct ComponentInfo final
+	{
+		std::size_t size = 0uz; ///< Component size.
+		std::size_t alignment = 0uz; ///< Component alignment.
+	};
+
+	/// @brief Object handle info.
+	struct ObjectHandleInfo final
+	{
+		std::type_index type; ///< Object type.
+		std::size_t offset; ///< Handle offset.
+		bool isConst; ///< Is an object const?
+	};
+
 	/// @brief Type registry.
 	class TypeRegistry final
 	{
@@ -35,9 +50,10 @@ export namespace PonyEngine::World
 		void AddComponentType(std::type_index componentType, std::size_t size, std::size_t alignment);
 		/// @brief Registers the component object handle member.
 		/// @param objectType Object type.
+		/// @param isConst Is an object const?
 		/// @param componentType Component type.
 		/// @param componentOffset Handle offset.
-		void RegisterObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset);
+		void RegisterObjectHandleMember(std::type_index objectType, bool isConst, std::type_index componentType, std::size_t componentOffset);
 		/// @brief Registers an entity reference member.
 		/// @param componentType Component type.
 		/// @param componentOffset Entity reference member offset.
@@ -48,11 +64,11 @@ export namespace PonyEngine::World
 		/// @return @a True if it's valid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsValidComponent(std::type_index componentType) const noexcept;
-		/// @brief Gets the component size.
+		/// @brief Gets the component info.
 		/// @param componentType Component type.
-		/// @return Component size.
+		/// @return Component info.
 		[[nodiscard("Pure function")]]
-		std::size_t ComponentSize(std::type_index componentType) const noexcept;
+		const ComponentInfo& GetComponentInfo(std::type_index componentType) const;
 		/// @brief Creates a component table.
 		/// @param componentType Component type. Must be valid.
 		/// @return Component table.
@@ -62,12 +78,12 @@ export namespace PonyEngine::World
 		/// @param componentType Component type.
 		/// @return Offsets in the format <offset, object type>.
 		[[nodiscard("Pure function")]]
-		std::span<const std::pair<std::size_t, std::type_index>> ObjectOffsets(std::type_index componentType) const noexcept;
+		std::span<const ObjectHandleInfo> GetObjectHandleInfos(std::type_index componentType) const noexcept;
 		/// @brief Gets entity reference offsets.
 		/// @param componentType Component type.
 		/// @return Reference offsets.
 		[[nodiscard("Pure function")]]
-		std::span<const std::size_t> EntityReferences(std::type_index componentType) const noexcept;
+		std::span<const std::size_t> GetEntityReferences(std::type_index componentType) const noexcept;
 		/// @brief Locks the registry via a unique lock.
 		/// @return Registry lock.
 		[[nodiscard("Pure function")]]
@@ -81,15 +97,8 @@ export namespace PonyEngine::World
 		TypeRegistry& operator =(TypeRegistry&&) = delete;
 
 	private:
-		/// @brief Component info.
-		struct ComponentInfo final
-		{
-			std::size_t size; ///< Component size.
-			std::size_t alignment; ///< Component alignment.
-		};
-
-		std::unordered_map<std::type_index, ComponentInfo> components; ///< Component infos. <component type, info>.
-		std::unordered_map<std::type_index, std::vector<std::pair<std::size_t, std::type_index>>> objectOffsets; /// Object offsets. <componentType, <offset, objectType>>.
+		std::unordered_map<std::type_index, ComponentInfo> components; ///< Component infos.
+		std::unordered_map<std::type_index, std::vector<ObjectHandleInfo>> objectHandles; /// Object handle infos.
 		std::unordered_map<std::type_index, std::vector<std::size_t>> entityOffsets; ///< Entity offsets.
 		mutable std::shared_mutex mutex; ///< Mutex.
 	};
@@ -107,21 +116,21 @@ namespace PonyEngine::World
 		components[componentType] = ComponentInfo{.size = size, .alignment = alignment};
 	}
 
-	void TypeRegistry::RegisterObjectHandleMember(const std::type_index objectType, const std::type_index componentType, const std::size_t componentOffset)
+	void TypeRegistry::RegisterObjectHandleMember(const std::type_index objectType, const bool isConst, const std::type_index componentType, const std::size_t componentOffset)
 	{
-		std::vector<std::pair<std::size_t, std::type_index>>& offsets = objectOffsets[componentType];
+		std::vector<ObjectHandleInfo>& handleInfos = objectHandles[componentType];
 
 		std::size_t index = 0uz;
-		for (; index < offsets.size() && offsets[index].first < componentOffset; ++index) // Sorting offsets
+		for (; index < handleInfos.size() && handleInfos[index].offset < componentOffset; ++index) // Sorting offsets
 		{
 		}
 
-		if (index < offsets.size() && offsets[index].first == componentOffset) [[unlikely]]
+		if (index < handleInfos.size() && handleInfos[index].offset == componentOffset) [[unlikely]]
 		{
 			throw std::logic_error("Object handle member is already registered");
 		}
 
-		offsets.insert(offsets.cbegin() + index, std::pair(componentOffset, objectType));
+		handleInfos.insert(handleInfos.cbegin() + index, ObjectHandleInfo{.type = objectType, .offset = componentOffset, .isConst = isConst});
 	}
 
 	void TypeRegistry::RegisterEntityReferenceMember(const std::type_index componentType, const std::size_t componentOffset)
@@ -146,14 +155,14 @@ namespace PonyEngine::World
 		return components.contains(componentType);
 	}
 
-	std::size_t TypeRegistry::ComponentSize(const std::type_index componentType) const noexcept
+	const ComponentInfo& TypeRegistry::GetComponentInfo(const std::type_index componentType) const
 	{
 		if (const auto position = components.find(componentType); position != components.cend()) [[likely]]
 		{
-			return position->second.size;
+			return position->second;
 		}
 
-		return 0uz;
+		throw std::invalid_argument("Component type is not registered");
 	}
 
 	ComponentTable TypeRegistry::CreateComponentTable(const std::type_index componentType) const
@@ -166,17 +175,17 @@ namespace PonyEngine::World
 		throw std::invalid_argument("Component type is not registered");
 	}
 
-	std::span<const std::pair<std::size_t, std::type_index>> TypeRegistry::ObjectOffsets(const std::type_index componentType) const noexcept
+	std::span<const ObjectHandleInfo> TypeRegistry::GetObjectHandleInfos(const std::type_index componentType) const noexcept
 	{
-		if (const auto position = objectOffsets.find(componentType); position != objectOffsets.cend())
+		if (const auto position = objectHandles.find(componentType); position != objectHandles.cend())
 		{
 			return position->second;
 		}
 
-		return std::span<const std::pair<std::size_t, std::type_index>>();
+		return std::span<const ObjectHandleInfo>();
 	}
 
-	std::span<const std::size_t> TypeRegistry::EntityReferences(const std::type_index componentType) const noexcept
+	std::span<const std::size_t> TypeRegistry::GetEntityReferences(const std::type_index componentType) const noexcept
 	{
 		if (const auto position = entityOffsets.find(componentType); position != entityOffsets.cend())
 		{

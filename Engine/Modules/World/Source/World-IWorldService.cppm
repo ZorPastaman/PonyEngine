@@ -69,10 +69,11 @@ export namespace PonyEngine::World
 		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) = 0;
 		/// @brief Registers the component object handle member.
 		/// @param objectType Object type.
+		/// @param isConst Is an object const?
 		/// @param componentType Component type.
 		/// @param componentOffset Component offset.
 		/// @note The function is thread-safe.
-		virtual void RegisterObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) = 0;
+		virtual void RegisterObjectHandleMember(std::type_index objectType, bool isConst, std::type_index componentType, std::size_t componentOffset) = 0;
 		/// @brief Register the component entity reference member.
 		/// @param componentType Component type.
 		/// @param componentOffset Entity reference member. Mustn't be nullptr.
@@ -96,7 +97,7 @@ namespace PonyEngine::World
 
 		Component dummy{};
 		const std::size_t offset = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(&(dummy.*member).typeless) - reinterpret_cast<std::uintptr_t>(&dummy));
-		RegisterObjectHandleMember(typeid(Object), typeid(Component), offset);
+		RegisterObjectHandleMember(typeid(Object), std::is_const_v<Object>, typeid(Component), offset);
 	}
 
 	template<Component Component>
