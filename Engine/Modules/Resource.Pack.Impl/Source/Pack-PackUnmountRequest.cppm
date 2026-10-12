@@ -117,10 +117,7 @@ namespace PonyEngine::Resource::Pack
 
 	void PackUnmountRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
-		{
-			status.wait(Async::RequestStatus::Pending, std::memory_order::relaxed);
-		}
+		status.wait(Async::RequestStatus::Pending, std::memory_order::relaxed);
 	}
 
 	bool PackUnmountRequest::IsCancelRequested() const noexcept

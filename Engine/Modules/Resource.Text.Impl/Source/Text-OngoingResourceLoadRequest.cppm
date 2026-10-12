@@ -136,10 +136,7 @@ namespace PonyEngine::Resource::Text
 
 	void OngoingResourceLoadRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
-		{
-			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
-		}
+		status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 	}
 
 	const std::shared_ptr<ILoadableDataAccessRequest>& OngoingResourceLoadRequest::Request() const noexcept

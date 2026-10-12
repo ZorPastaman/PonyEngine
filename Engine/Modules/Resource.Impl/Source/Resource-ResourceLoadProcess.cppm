@@ -300,10 +300,7 @@ namespace PonyEngine::Resource
 
 	void ResourceLoadProcess::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
-		{
-			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
-		}
+		status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 	}
 
 	void ResourceLoadProcess::AddRequest(OngoingResourceRequest& request)

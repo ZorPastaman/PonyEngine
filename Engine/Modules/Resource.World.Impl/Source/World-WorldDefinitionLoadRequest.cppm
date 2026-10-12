@@ -201,10 +201,7 @@ namespace PonyEngine::Resource::World
 
 	void WorldDefinitionLoadRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
-		{
-			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
-		}
+		status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 	}
 
 	std::span<const std::byte> WorldDefinitionLoadRequest::Input() const noexcept

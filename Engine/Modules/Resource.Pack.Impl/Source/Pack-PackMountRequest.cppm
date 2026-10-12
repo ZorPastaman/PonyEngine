@@ -229,10 +229,7 @@ namespace PonyEngine::Resource::Pack
 
 	void PackMountRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
-		{
-			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
-		}
+		status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 	}
 
 	bool PackMountRequest::IsFileSource() const noexcept
