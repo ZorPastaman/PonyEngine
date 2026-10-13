@@ -11,6 +11,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(tomlplusplus)
 
+set(PONY_ENGINE_CORE ON)
+add_subdirectory("../Engine/Modules" "${CMAKE_CURRENT_BINARY_DIR}/Engine/Modules")
+
 add_subdirectory("Utility")
 
 add_subdirectory("TextCompiler")

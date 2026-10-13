@@ -481,7 +481,7 @@ void Pack(const Command& command)
 		manifest.AddResource(typeCache, dataMetaCache, loadMetaCache, range, resource.id);
 	}
 
-	std::uintmax_t sizeTMaxValue = command.sizeTSize == sizeof(std::uintmax_t)
+	const std::uintmax_t sizeTMaxValue = command.sizeTSize == sizeof(std::uintmax_t)
 		? std::numeric_limits<std::uintmax_t>::max()
 		: (std::uintmax_t{1u} << (command.sizeTSize * 8u)) - 1u;
 

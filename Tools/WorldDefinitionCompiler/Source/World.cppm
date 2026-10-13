@@ -26,9 +26,29 @@ export namespace PonyTools::World
 		~WorldDefinition() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::uint64_t GetEntity(std::string_view entityId) const;
+		std::size_t EntityCount() const noexcept;
 		[[nodiscard("Pure function")]]
-		std::vector<std::byte>& GetComponentData(std::size_t tableIndex) noexcept;
+		std::string_view EntityID(std::size_t index) const noexcept;
+
+		[[nodiscard("Pure function")]]
+		std::size_t ComponentTableCount() const noexcept;
+		[[nodiscard("Pure function")]]
+		std::string_view ComponentType(std::size_t tableIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const std::uint64_t> ComponentEntities(std::size_t tableIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::vector<std::byte>& ComponentData(std::size_t tableIndex) noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const std::byte> ComponentData(std::size_t tableIndex) const noexcept;
+
+		[[nodiscard("Pure function")]]
+		std::size_t ObjectCount() const noexcept;
+		[[nodiscard("Pure function")]]
+		std::string_view ObjectID(std::size_t objectIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::string_view ObjectType(std::size_t objectIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const std::byte> ObjectData(std::size_t objectIndex) const noexcept;
 
 		std::uint64_t AddEntity(std::string_view entityId);
 		std::size_t AddComponent(std::uint64_t entityIndex, std::string_view componentType);
@@ -46,6 +66,7 @@ export namespace PonyTools::World
 		};
 		struct Object final
 		{
+			std::string id;
 			std::string type;
 			std::vector<std::byte> data;
 		};
@@ -56,25 +77,64 @@ export namespace PonyTools::World
 		std::vector<std::string> entityIds;
 		std::vector<ComponentTable> componentTables;
 		std::vector<Object> objects;
-		std::vector<std::string> objectIds;
 	};
 }
 
 namespace PonyTools::World
 {
-	std::uint64_t WorldDefinition::GetEntity(const std::string_view entityId) const
+	std::size_t WorldDefinition::EntityCount() const noexcept
 	{
-		if (const auto position = std::ranges::find(entityIds, entityId); position != entityIds.cend()) [[likely]]
-		{
-			return static_cast<std::uint64_t>(position - entityIds.cbegin());
-		}
-
-		throw std::invalid_argument("Entity not found");
+		return entityIds.size();
 	}
 
-	std::vector<std::byte>& WorldDefinition::GetComponentData(const std::size_t tableIndex) noexcept
+	std::string_view WorldDefinition::EntityID(const std::size_t index) const noexcept
+	{
+		return entityIds[index];
+	}
+
+	std::size_t WorldDefinition::ComponentTableCount() const noexcept
+	{
+		return componentTables.size();
+	}
+
+	std::string_view WorldDefinition::ComponentType(const std::size_t tableIndex) const noexcept
+	{
+		return componentTables[tableIndex].type;
+	}
+
+	std::span<const std::uint64_t> WorldDefinition::ComponentEntities(const std::size_t tableIndex) const noexcept
+	{
+		return componentTables[tableIndex].entities;
+	}
+
+	std::vector<std::byte>& WorldDefinition::ComponentData(const std::size_t tableIndex) noexcept
 	{
 		return componentTables[tableIndex].data;
+	}
+
+	std::span<const std::byte> WorldDefinition::ComponentData(const std::size_t tableIndex) const noexcept
+	{
+		return componentTables[tableIndex].data;
+	}
+
+	std::size_t WorldDefinition::ObjectCount() const noexcept
+	{
+		return objects.size();
+	}
+
+	std::string_view WorldDefinition::ObjectID(const std::size_t objectIndex) const noexcept
+	{
+		return objects[objectIndex].id;
+	}
+
+	std::string_view WorldDefinition::ObjectType(const std::size_t objectIndex) const noexcept
+	{
+		return objects[objectIndex].type;
+	}
+
+	std::span<const std::byte> WorldDefinition::ObjectData(const std::size_t objectIndex) const noexcept
+	{
+		return objects[objectIndex].data;
 	}
 
 	std::uint64_t WorldDefinition::AddEntity(const std::string_view entityId)
@@ -109,13 +169,12 @@ namespace PonyTools::World
 
 	std::uint64_t WorldDefinition::AddObject(const std::string_view objectId, const std::string_view objectType, const std::span<const std::byte> objectData)
 	{
-		if (std::ranges::contains(objectIds, objectId)) [[unlikely]]
+		if (std::ranges::find_if(objects, [&](const Object& object) { return object.id == objectId; }) != objects.cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Object with the same id is already added");
 		}
 
-		objects.push_back(Object{.type = std::string(objectType), .data = std::vector(objectData.cbegin(), objectData.cend())});
-		objectIds.push_back(std::string(objectId));
+		objects.push_back(Object{.id = std::string(objectId), .type = std::string(objectType), .data = std::vector(objectData.cbegin(), objectData.cend())});
 		return static_cast<std::uint64_t>(objects.size() - 1uz);
 	}
 

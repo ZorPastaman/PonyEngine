@@ -9,5 +9,7 @@
 
 export module PonyEngine.FileSystem.WinAPI;
 
+export import PonyEngine.FileSystem;
+
 export import :Module;
 export import :Path;

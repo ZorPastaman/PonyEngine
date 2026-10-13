@@ -11,6 +11,8 @@
 
 import std;
 
+import PonyEngine.FileSystem;
+
 import PonyTools.DepFile;
 import PonyTools.FileSystem;
 import PonyTools.World;
@@ -20,6 +22,7 @@ struct Command final
 {
 	std::string_view input; ///< Path to an input file.
 	std::string_view output; ///< Path to an output file.
+	std::vector<std::string_view> serializers; ///< Paths to serializers.
 	std::string_view depFile; ///< Path to a dep file.
 	std::size_t sizeTSize = 0uz; ///< Size of std::size_t on a target platform.
 	bool bigEndian = false; ///< Is a target platform big-endian?
@@ -29,6 +32,7 @@ struct Command final
 };
 
 constexpr std::string_view OutputFlag = "-o"; ///< Output flag. The next argument must be a path.
+constexpr std::string_view SerializerFlag = "-s"; ///< Serializer flag. The next argument must be a path.
 constexpr std::string_view DepFileFlag = "-d"; ///< Dep file flag. The next argument must be a path.
 constexpr std::string_view SizeTSizeFlag = "--size_t-size"; ///< Target platform std::size_t size flag. The next argument must be an unsigned integer.
 constexpr std::string_view BigEndianFlag = "--big-endian"; ///< Target platform big endianness flag.
@@ -46,6 +50,21 @@ constexpr std::string_view TypePropertyName = "type"; ///< Type property name.
 
 constexpr std::string_view DataMagicWord = "PonyEngineResourceData"; ///< Resource data magic word.
 constexpr std::string_view WorldDefinitionResourceType = "Pony.WorldDefinition"; ///< World definition resource type.
+
+constexpr std::string_view GetComponentTypesFunctionName = "GetComponentTypes";
+constexpr std::string_view GetComponentSizeFunctionName = "GetComponentSize";
+constexpr std::string_view SerializeComponentFunctionName = "SerializeComponent";
+constexpr std::string_view GetObjectTypesFunctionName = "GetObjectTypes";
+constexpr std::string_view GetObjectSizeFunctionName = "GetObjectSize";
+constexpr std::string_view SerializeObjectFunctionName = "SerializeObject";
+
+using GetComponentTypesFunction = std::span<const std::string_view>(*)();
+using GetComponentSizeFunction = std::size_t(*)(std::size_t, const toml::table&);
+using SerializeComponentFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>,
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool);
+using GetObjectTypesFunction = std::span<const std::string_view>(*)();
+using GetObjectSizeFunction = std::size_t(*)(std::size_t, const toml::table&);
+using SerializeObjectFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool);
 
 bool Verbose = false; ///< Verbose flag.
 
@@ -74,10 +93,10 @@ void WriteDepFile(const Command& command);
 /// @param command Parsed command.
 void Compile(const Command& command);
 /// @brief Reads the world TOML file.
-/// @param path Path to the file.
+/// @param command Command.
 /// @return World definition
 [[nodiscard("Pure function")]]
-PonyTools::World::WorldDefinition ReadWorld(std::string_view path);
+PonyTools::World::WorldDefinition ReadWorld(const Command& command);
 /// @brief Parses the world TOML file.
 /// @param path Path to the file.
 /// @return Parsed TOML.
@@ -143,6 +162,15 @@ Command ParseCommandLine(const int argc, const char* const argv[])
 			}
 
 			command.output = argv[i];
+		}
+		else if (arg == SerializerFlag)
+		{
+			if (++i >= argc) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Missing path after serializer flag '{}'", OutputFlag));
+			}
+
+			command.serializers.push_back(argv[i]);
 		}
 		else if (arg == DepFileFlag)
 		{
@@ -265,6 +293,7 @@ void PrintHelp(const Command& command)
 		std::println("\t<input>                          Input asset file path, must be toml.");
 		std::println("\nOptions:");
 		std::println("\t-o <path>                        Resource data output file path.");
+		std::println("\t-s <path>                        Serializer library file path.");
 		std::println("\t-d <path>                        Dep file path.");
 		std::println("\t--size_t-size <number>           Target platform std::size_t size.");
 		std::println("\t--big-endian                     If set, target platform is treated as big-endian.");
@@ -299,7 +328,7 @@ void WriteDepFile(const Command& command)
 
 void Compile(const Command& command)
 {
-	const PonyTools::World::WorldDefinition world = ReadWorld(command.input);
+	const PonyTools::World::WorldDefinition world = ReadWorld(command);
 
 	if (Verbose) [[unlikely]]
 	{
@@ -315,20 +344,165 @@ void Compile(const Command& command)
 
 	constexpr std::size_t dataMetaSize = 0uz;
 	output.write(reinterpret_cast<const char*>(&dataMetaSize), sizeof(dataMetaSize));
+
+	const std::uintmax_t sizeTMaxValue = command.sizeTSize == sizeof(std::uintmax_t)
+		? std::numeric_limits<std::uintmax_t>::max()
+		: (std::uintmax_t{1u} << (command.sizeTSize * 8u)) - 1u;
+
+	const std::size_t entityCount = world.EntityCount();
+	if (entityCount > sizeTMaxValue) [[unlikely]]
+	{
+		throw std::runtime_error("Too many entities");
+	}
+	const std::size_t componentTableCount = world.ComponentTableCount();
+	if (componentTableCount > sizeTMaxValue) [[unlikely]]
+	{
+		throw std::runtime_error("Too many component tables");
+	}
+	const std::size_t objectCount = world.ObjectCount();
+	if (objectCount > sizeTMaxValue) [[unlikely]]
+	{
+		throw std::runtime_error("Too many objects");
+	}
+
+	PonyTools::FileSystem::Write(output, static_cast<std::uintmax_t>(entityCount), command.sizeTSize, command.bigEndian);
+	PonyTools::FileSystem::Write(output, static_cast<std::uintmax_t>(componentTableCount), command.sizeTSize, command.bigEndian);
+	PonyTools::FileSystem::Write(output, static_cast<std::uintmax_t>(objectCount), command.sizeTSize, command.bigEndian);
+
+	for (std::size_t i = 0uz; i < componentTableCount; ++i)
+	{
+		const std::string_view type = world.ComponentType(i);
+		if (type.size() > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Component type '{}' is too long", type));
+		}
+
+		const std::uint8_t length = type.size();
+		output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+	}
+
+	for (std::size_t i = 0uz; i < componentTableCount; ++i)
+	{
+		const std::span<const std::uint64_t> entityIndices = world.ComponentEntities(i);
+		PonyTools::FileSystem::Write(output, static_cast<std::uintmax_t>(entityIndices.size()), command.sizeTSize, command.bigEndian);
+	}
+
+	for (std::size_t i = 0uz; i < objectCount; ++i)
+	{
+		const std::string_view type = world.ObjectType(i);
+		if (type.size() > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Object type '{}' is too long", type));
+		}
+
+		const std::uint8_t length = type.size();
+		output.write(reinterpret_cast<const char*>(&length), sizeof(length));
+	}
+
+	for (std::size_t i = 0uz; i < componentTableCount; ++i)
+	{
+		const std::span<const std::byte> componentData = world.ComponentData(i);
+		if (componentData.size() > sizeTMaxValue) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Too large data on component table of type '{}'", world.ComponentType(i)));
+		}
+
+		PonyTools::FileSystem::Write(output, static_cast<std::uintmax_t>(componentData.size()), command.sizeTSize, command.bigEndian);
+	}
+
+	for (std::size_t i = 0uz; i < objectCount; ++i)
+	{
+		const std::span<const std::byte> objectData = world.ObjectData(i);
+		if (objectData.size() > sizeTMaxValue) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Too large data on object with id '{}'", world.ObjectID(i)));
+		}
+
+		PonyTools::FileSystem::Write(output, static_cast<std::uintmax_t>(objectData.size()), command.sizeTSize, command.bigEndian);
+	}
+
+	for (std::size_t i = 0uz; i < componentTableCount; ++i)
+	{
+		const std::string_view type = world.ComponentType(i);
+		output.write(type.data(), type.size());
+	}
+
+	for (std::size_t i = 0uz; i < componentTableCount; ++i)
+	{
+		for (const std::uint64_t entityIndex : world.ComponentEntities(i))
+		{
+			PonyTools::FileSystem::Write(output, entityIndex, sizeof(std::uint64_t), command.bigEndian);
+		}
+	}
+
+	for (std::size_t i = 0uz; i < objectCount; ++i)
+	{
+		const std::string_view type = world.ObjectType(i);
+		output.write(type.data(), type.size());
+	}
+
+	for (std::size_t i = 0uz; i < componentTableCount; ++i)
+	{
+		const std::span<const std::byte> componentData = world.ComponentData(i);
+		output.write(reinterpret_cast<const char*>(componentData.data()), componentData.size());
+	}
+
+	for (std::size_t i = 0uz; i < objectCount; ++i)
+	{
+		const std::span<const std::byte> objectData = world.ObjectData(i);
+		output.write(reinterpret_cast<const char*>(objectData.data()), objectData.size());
+	}
 }
 
-PonyTools::World::WorldDefinition ReadWorld(const std::string_view path)
+PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 {
+	std::vector<PonyEngine::FileSystem::DynamicLibrary> serializerLibraries;
+	for (const std::string_view serializerPath : command.serializers)
+	{
+		serializerLibraries.push_back(PonyEngine::FileSystem::DynamicLibrary(serializerPath));
+	}
+
+	std::unordered_map<std::string_view, std::tuple<GetComponentSizeFunction, SerializeComponentFunction, std::size_t>> componentSerializers;
+	std::unordered_map<std::string_view, std::tuple<GetObjectSizeFunction, SerializeObjectFunction, std::size_t>> objectSerializers;
+	for (const PonyEngine::FileSystem::DynamicLibrary& library : serializerLibraries)
+	{
+		const auto getComponentTypes = static_cast<GetComponentTypesFunction>(library.GetAddress(GetComponentTypesFunctionName));
+		const std::span<const std::string_view> componentTypes = getComponentTypes();
+		if (!componentTypes.empty())
+		{
+			const auto getComponentSize = static_cast<GetComponentSizeFunction>(library.GetAddress(GetComponentSizeFunctionName));
+			const auto serializeComponent = static_cast<SerializeComponentFunction>(library.GetAddress(SerializeComponentFunctionName));
+
+			for (std::size_t i = 0uz; i < componentTypes.size(); ++i)
+			{
+				componentSerializers[componentTypes[i]] = std::make_tuple(getComponentSize, serializeComponent, i);
+			}
+		}
+
+		const auto getObjectTypes = static_cast<GetObjectTypesFunction>(library.GetAddress(GetObjectTypesFunctionName));
+		const std::span<const std::string_view> objectTypes = getObjectTypes();
+		if (!objectTypes.empty())
+		{
+			const auto getObjectSize = static_cast<GetObjectSizeFunction>(library.GetAddress(GetObjectSizeFunctionName));
+			const auto serializeObject = static_cast<SerializeObjectFunction>(library.GetAddress(SerializeObjectFunctionName));
+
+			for (std::size_t i = 0uz; i < objectTypes.size(); ++i)
+			{
+				objectSerializers[objectTypes[i]] = std::make_tuple(getObjectSize, serializeObject, i);
+			}
+		}
+	}
+
 	if (Verbose) [[unlikely]]
 	{
-		std::println("Reading world file at '{}'.", path);
+		std::println("Reading world file at '{}'.", command.input);
 	}
 
 	PonyTools::World::WorldDefinition world;
-	const toml::table table = ParseWorld(path);
+	const toml::table table = ParseWorld(command.input);
 	if (table[SchemaPropertyName].value<std::string_view>() != WorldDefinitionSchema) [[unlikely]]
 	{
-		throw std::runtime_error(std::format("World file at '{}' doesn't have a valid schema", path));
+		throw std::runtime_error(std::format("World file at '{}' doesn't have a valid schema", command.input));
 	}
 
 	std::vector<std::pair<std::size_t, const toml::table*>> componentSources;
@@ -426,7 +600,19 @@ PonyTools::World::WorldDefinition ReadWorld(const std::string_view path)
 						throw std::runtime_error(std::format("Object '{}' doesn't have type", *objectId));
 					}
 
-					// TODO: Parse object to data.
+					const auto position = objectSerializers.find(*objectType);
+					if (position == objectSerializers.cend()) [[unlikely]]
+					{
+						throw std::runtime_error(std::format("Object serializer not found for object of type '{}'", *objectType));
+					}
+					const GetObjectSizeFunction getObjectSize = std::get<GetObjectSizeFunction>(position->second);
+					const SerializeObjectFunction serializeObject = std::get<SerializeObjectFunction>(position->second);
+					const std::size_t typeIndex = std::get<std::size_t>(position->second);
+
+					const std::size_t objectSize = getObjectSize(typeIndex, object);
+					data.resize(objectSize);
+					serializeObject(typeIndex, object, data, entityIdToIndex, command.sizeTSize, command.bigEndian);
+
 					const std::uint64_t objectIndex = world.AddObject(*objectId, *objectType, data);
 					objectIdToIndex[*objectId] = objectIndex;
 				}
@@ -444,10 +630,23 @@ PonyTools::World::WorldDefinition ReadWorld(const std::string_view path)
 
 	for (const auto [componentTableIndex, componentTable] : componentSources)
 	{
-		std::vector<std::byte>& componentData = world.GetComponentData(componentTableIndex);
+		std::vector<std::byte>& componentData = world.ComponentData(componentTableIndex);
 		const std::string_view componentType = *(*componentTable)[TypePropertyName].value<std::string_view>();
 
-		data.clear();
+		const auto position = componentSerializers.find(componentType);
+		if (position == componentSerializers.cend()) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Component serializer not found for component of type ''", componentType));
+		}
+		const GetComponentSizeFunction getComponentSize = std::get<GetComponentSizeFunction>(position->second);
+		const SerializeComponentFunction serializeComponent = std::get<SerializeComponentFunction>(position->second);
+		const std::size_t typeIndex = std::get<std::size_t>(position->second);
+
+		const std::size_t componentSize = getComponentSize(typeIndex, *componentTable);
+		data.resize(componentSize);
+		serializeComponent(typeIndex, *componentTable, data, entityIdToIndex, objectIdToIndex, command.sizeTSize, command.bigEndian);
+
+		componentData.append_range(data);
 	}
 
 	return world;

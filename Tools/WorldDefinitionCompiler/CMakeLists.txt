@@ -23,5 +23,6 @@ set_target_properties(PonyTools.WorldDefinitionCompiler PROPERTIES
 
 target_link_libraries(PonyTools.WorldDefinitionCompiler PRIVATE
 	PonyTools.Utility
+	PonyEngine.Core
 	tomlplusplus::tomlplusplus
 )
