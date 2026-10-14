@@ -9,6 +9,6 @@
 
 export module PonyEngine.Resource.World.Impl;
 
-export import PonyEngine.Resource.World;
+export import PonyEngine.Resource.World.Ext;
 
 export import :WorldDefinitionLoaderModule;

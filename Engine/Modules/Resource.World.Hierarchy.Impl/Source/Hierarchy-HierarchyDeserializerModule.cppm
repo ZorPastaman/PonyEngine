@@ -10,7 +10,7 @@
 export module PonyEngine.Resource.World.Hierarchy.Impl:HierarchyDeserializerModule;
 
 import PonyEngine.Application;
-import PonyEngine.Resource.World;
+import PonyEngine.Resource.World.Ext;
 import PonyEngine.World.Hierarchy;
 
 export namespace PonyEngine::Resource::World::Hierarchy

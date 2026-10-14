@@ -33,6 +33,6 @@ target_link_libraries(PonyEngine.Resource.World.Hierarchy.Impl PUBLIC
 )
 target_link_libraries(PonyEngine.Resource.World.Hierarchy.Impl PRIVATE
 	PonyEngine.Core
-	PonyEngine.Resource.World
+	PonyEngine.Resource.World.Ext
 	PonyEngine.World.Hierarchy
 )

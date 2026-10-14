@@ -226,7 +226,7 @@ void SerializeTransform3D(const toml::table& componentTable, const std::span<std
 	}
 
 	const auto transform = PonyEngine::World::Hierarchy::LocalTransform3D(PonyEngine::Math::Vector3<double>(*positionX, *positionY, *positionZ),
-		PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(*rotationX, *rotationY, *rotationZ)),
+		PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(*rotationX, *rotationY, *rotationZ) * PonyEngine::Math::DegToRad<float>),
 		PonyEngine::Math::Vector3<float>(*scaleX, *scaleY, *scaleZ));
 
 	auto writer = PonyTools::Memory::ByteWriter(componentData, bigEndian);

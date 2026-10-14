@@ -1,4 +1,4 @@
-# PonyEngine.Resource.World feature module
+# PonyEngine.Resource.World.Ext feature module
 
 Resource module extension that adds support of world resources.
 

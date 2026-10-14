@@ -16,7 +16,7 @@ export module PonyEngine.Resource.World.Impl:WorldDefinitionLoadRequest;
 import std;
 
 import PonyEngine.Async;
-import PonyEngine.Resource.World;
+import PonyEngine.Resource.World.Ext;
 import PonyEngine.World;
 
 export namespace PonyEngine::Resource::World
@@ -310,7 +310,7 @@ namespace PonyEngine::Resource::World
 	{
 		assert(this->status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
-		this->status.store(Async::RequestStatus::Canceled, std::memory_order::release);
+		this->status.store(status, std::memory_order::release);
 		this->status.notify_all();
 
 		InvokeCallback();

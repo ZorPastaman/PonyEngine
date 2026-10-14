@@ -45,6 +45,7 @@ To configure a module, a specific CMake flag must be `true`.
 | [PonyEngine.Resource.Pack](Modules/Resource.Pack)                                 | `PONY_ENGINE_RESOURCE_PACK`                 |
 | [PonyEngine.Resource.Pack.Impl](Modules/Resource.Pack.Impl)                       | `PONY_ENGINE_RESOURCE_PACK_IMPL`            |
 | [PonyEngine.Resource.Text.Impl](Modules/Resource.Text.Impl)                       | `PONY_ENGINE_RESOURCE_TEXT_IMPL`            |
+| [PonyEngine.Resource.World.Ext](Modules/Resource.World.Ext)                       | `PONY_ENGINE_RESOURCE_WORLD_EXT`            |
 | [PonyEngine.Resource.World.Impl](Modules/Resource.World.Impl)                     | `PONY_ENGINE_RESOURCE_WORLD_IMPL`           |
 | [PonyEngine.Resource.World.Hierarchy.Impl](Modules/Resource.World.Hierarchy.Impl) | `PONY_ENGINE_RESOURCE_WORLD_HIERARCHY_IMPL` |
 | [PonyEngine.Time](Modules/Time)                                                   | `PONY_ENGINE_TIME`                          |

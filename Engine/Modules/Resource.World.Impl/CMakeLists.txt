@@ -41,6 +41,6 @@ target_link_libraries(PonyEngine.Resource.World.Impl PRIVATE
 	PonyEngine.Log
 	PonyEngine.Resource
 	PonyEngine.Resource.Ext
-	PonyEngine.Resource.World
+	PonyEngine.Resource.World.Ext
 	PonyEngine.World
 )

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Resource.World;
+export module PonyEngine.Resource.World.Ext;
 
 export import PonyEngine.Resource.Ext;
 

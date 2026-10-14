@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Utility/Body.h"
 
-export module PonyEngine.Resource.World:IWorldDefinitionLoader;
+export module PonyEngine.Resource.World.Ext:IWorldDefinitionLoader;
 
 import std;
 

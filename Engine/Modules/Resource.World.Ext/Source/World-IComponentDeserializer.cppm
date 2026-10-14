@@ -11,39 +11,37 @@ module;
 
 #include "PonyEngine/Utility/Body.h"
 
-export module PonyEngine.Resource.World:IObjectDeserializer;
+export module PonyEngine.Resource.World.Ext:IComponentDeserializer;
 
 import std;
-
-import PonyEngine.World;
 
 import :IWorldDeserializationRequest;
 
 export namespace PonyEngine::Resource::World
 {
-	/// @brief Object deserializer that executes immediately.
-	class IInlineObjectDeserializer
+	/// @brief Component deserializer that executes immediately.
+	class IInlineComponentDeserializer
 	{
-		PONY_INTERFACE_BODY(IInlineObjectDeserializer)
+		PONY_INTERFACE_BODY(IInlineComponentDeserializer)
 
-		/// @brief Deserializes an object.
+		/// @brief Deserializes a component.
 		/// @param input Input bytes.
-		/// @param output Output object.
-		virtual void Deserialize(std::span<const std::byte> input, PonyEngine::World::Object& output) = 0;
+		/// @param output Output bytes.
+		virtual void Deserialize(std::span<const std::byte> input, std::span<std::byte> output) = 0;
 	};
 
-	/// @brief Object deserializer that executes in async manner.
-	class IObjectDeserializer
+	/// @brief Component deserializer that executes in async manner.
+	class IComponentDeserializer
 	{
-		PONY_INTERFACE_BODY(IObjectDeserializer)
+		PONY_INTERFACE_BODY(IComponentDeserializer)
 
-		/// @brief Deserializes an object.
+		/// @brief Creates a deserialization request.
 		/// @param input Input bytes.
-		/// @param output Output object.
+		/// @param output Output bytes.
 		/// @param callback Callback.
 		/// @return Deserialization request.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IWorldDeserializationRequest> Deserialize(std::span<const std::byte> input, PonyEngine::World::Object& output,
+		virtual std::shared_ptr<IWorldDeserializationRequest> Deserialize(std::span<const std::byte> input, std::span<std::byte> output,
 			std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback = nullptr) = 0;
 	};
 }

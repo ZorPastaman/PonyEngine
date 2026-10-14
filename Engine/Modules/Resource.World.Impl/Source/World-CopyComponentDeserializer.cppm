@@ -11,7 +11,7 @@ export module PonyEngine.Resource.World.Impl:CopyComponentDeserializer;
 
 import std;
 
-import PonyEngine.Resource.World;
+import PonyEngine.Resource.World.Ext;
 
 export namespace PonyEngine::Resource::World
 {
