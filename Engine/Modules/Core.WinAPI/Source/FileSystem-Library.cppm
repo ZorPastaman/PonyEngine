@@ -90,14 +90,7 @@ namespace PonyEngine::FileSystem
 			throw std::invalid_argument("Library is nullptr");
 		}
 
-		const FARPROC address = GetProcAddress(static_cast<HMODULE>(library), name);
-		if (!address) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Failed to get address: Library = '0x{:X}', Name = '{}', Error code = '{}'", 
-				reinterpret_cast<std::uintptr_t>(library), name, GetLastError()));
-		}
-
-		return address;
+		return GetProcAddress(static_cast<HMODULE>(library), name);
 	}
 
 	void* GetAddress(void* const library, const std::string_view name)

@@ -51,20 +51,20 @@ constexpr std::string_view TypePropertyName = "type"; ///< Type property name.
 constexpr std::string_view DataMagicWord = "PonyEngineResourceData"; ///< Resource data magic word.
 constexpr std::string_view WorldDefinitionResourceType = "Pony.WorldDefinition"; ///< World definition resource type.
 
-constexpr std::string_view GetComponentTypesFunctionName = "GetComponentTypes";
-constexpr std::string_view GetComponentSizeFunctionName = "GetComponentSize";
-constexpr std::string_view SerializeComponentFunctionName = "SerializeComponent";
-constexpr std::string_view GetObjectTypesFunctionName = "GetObjectTypes";
-constexpr std::string_view GetObjectSizeFunctionName = "GetObjectSize";
-constexpr std::string_view SerializeObjectFunctionName = "SerializeObject";
+constexpr std::string_view GetComponentTypesFunctionName = "GetComponentTypes"; ///< @p GetComponentTypes() function name.
+constexpr std::string_view GetComponentSizeFunctionName = "GetComponentSize"; ///< @p GetComponentSize() function name.
+constexpr std::string_view SerializeComponentFunctionName = "SerializeComponent"; ///< @p SerializeComponent() function name.
+constexpr std::string_view GetObjectTypesFunctionName = "GetObjectTypes"; ///< @p GetObjectTypes() function name.
+constexpr std::string_view GetObjectSizeFunctionName = "GetObjectSize"; ///< @p GetObjectSize() function name.
+constexpr std::string_view SerializeObjectFunctionName = "SerializeObject"; ///< @p SerializeObject() function name.
 
-using GetComponentTypesFunction = std::span<const std::string_view>(*)();
-using GetComponentSizeFunction = std::size_t(*)(std::size_t, const toml::table&);
+using GetComponentTypesFunction = std::span<const std::string_view>(*)(); ///< @p GetComponentTypes() function.
+using GetComponentSizeFunction = std::size_t(*)(std::size_t, const toml::table&, std::size_t); ///< @p GetComponentSize() function.
 using SerializeComponentFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>,
-	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool);
-using GetObjectTypesFunction = std::span<const std::string_view>(*)();
-using GetObjectSizeFunction = std::size_t(*)(std::size_t, const toml::table&);
-using SerializeObjectFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool);
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool); ///< @p SerializeComponent() function.
+using GetObjectTypesFunction = std::span<const std::string_view>(*)(); ///< @p GetObjectTypes() function.
+using GetObjectSizeFunction = std::size_t(*)(std::size_t, const toml::table&); ///< @p GetObjectSize() function.
+using SerializeObjectFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool); ///< @p SerializeObject() function.
 
 bool Verbose = false; ///< Verbose flag.
 
@@ -256,8 +256,8 @@ Command ParseCommandLine(const int argc, const char* const argv[])
 		}
 	}
 
-	const std::uint8_t mainParamCount = !command.input.empty() + !command.output.empty();
-	if (mainParamCount != 0u && mainParamCount != 2u) [[unlikely]]
+	const std::uint8_t mainParamCount = !command.input.empty() + !command.output.empty() + (command.sizeTSize != 0uz);
+	if (mainParamCount != 0u && mainParamCount != 3u) [[unlikely]]
 	{
 		throw std::invalid_argument("Invalid argument set");
 	}
@@ -466,29 +466,31 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 	std::unordered_map<std::string_view, std::tuple<GetObjectSizeFunction, SerializeObjectFunction, std::size_t>> objectSerializers;
 	for (const PonyEngine::FileSystem::DynamicLibrary& library : serializerLibraries)
 	{
-		const auto getComponentTypes = static_cast<GetComponentTypesFunction>(library.GetAddress(GetComponentTypesFunctionName));
-		const std::span<const std::string_view> componentTypes = getComponentTypes();
-		if (!componentTypes.empty())
+		if (const auto getComponentTypes = static_cast<GetComponentTypesFunction>(library.GetAddress(GetComponentTypesFunctionName)))
 		{
-			const auto getComponentSize = static_cast<GetComponentSizeFunction>(library.GetAddress(GetComponentSizeFunctionName));
-			const auto serializeComponent = static_cast<SerializeComponentFunction>(library.GetAddress(SerializeComponentFunctionName));
-
-			for (std::size_t i = 0uz; i < componentTypes.size(); ++i)
+			if (const std::span<const std::string_view> componentTypes = getComponentTypes(); !componentTypes.empty())
 			{
-				componentSerializers[componentTypes[i]] = std::make_tuple(getComponentSize, serializeComponent, i);
+				const auto getComponentSize = static_cast<GetComponentSizeFunction>(library.GetAddress(GetComponentSizeFunctionName));
+				const auto serializeComponent = static_cast<SerializeComponentFunction>(library.GetAddress(SerializeComponentFunctionName));
+
+				for (std::size_t i = 0uz; i < componentTypes.size(); ++i)
+				{
+					componentSerializers[componentTypes[i]] = std::make_tuple(getComponentSize, serializeComponent, i);
+				}
 			}
 		}
 
-		const auto getObjectTypes = static_cast<GetObjectTypesFunction>(library.GetAddress(GetObjectTypesFunctionName));
-		const std::span<const std::string_view> objectTypes = getObjectTypes();
-		if (!objectTypes.empty())
+		if (const auto getObjectTypes = static_cast<GetObjectTypesFunction>(library.GetAddress(GetObjectTypesFunctionName)))
 		{
-			const auto getObjectSize = static_cast<GetObjectSizeFunction>(library.GetAddress(GetObjectSizeFunctionName));
-			const auto serializeObject = static_cast<SerializeObjectFunction>(library.GetAddress(SerializeObjectFunctionName));
-
-			for (std::size_t i = 0uz; i < objectTypes.size(); ++i)
+			if (const std::span<const std::string_view> objectTypes = getObjectTypes(); !objectTypes.empty())
 			{
-				objectSerializers[objectTypes[i]] = std::make_tuple(getObjectSize, serializeObject, i);
+				const auto getObjectSize = static_cast<GetObjectSizeFunction>(library.GetAddress(GetObjectSizeFunctionName));
+				const auto serializeObject = static_cast<SerializeObjectFunction>(library.GetAddress(SerializeObjectFunctionName));
+
+				for (std::size_t i = 0uz; i < objectTypes.size(); ++i)
+				{
+					objectSerializers[objectTypes[i]] = std::make_tuple(getObjectSize, serializeObject, i);
+				}
 			}
 		}
 	}
@@ -530,7 +532,7 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 					const std::uint64_t entityIndex = world.AddEntity(*entityId);
 					entityIdToIndex[*entityId] = entityIndex;
 
-					if (const toml::node_view componentsProperty = table[ComponentPropertyName])
+					if (const toml::node_view componentsProperty = entity[ComponentPropertyName])
 					{
 						if (const toml::array* components = componentsProperty.as_array()) [[likely]]
 						{
@@ -540,16 +542,10 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 								{
 									const toml::table& component = *componentTable;
 
-									const std::optional<std::string_view> componentId = component[IDPropertyName].value<std::string_view>();
-									if (!componentId) [[unlikely]]
-									{
-										throw std::runtime_error(std::format("Entity '{}' has component without ID", *entityId));
-									}
-
 									const std::optional<std::string_view> componentType = component[TypePropertyName].value<std::string_view>();
 									if (!componentType) [[unlikely]]
 									{
-										throw std::runtime_error(std::format("Component '{}' on entity '{}' doesn't have type", *componentId, *entityId));
+										throw std::runtime_error(std::format("Component of type '{}' on entity '{}' doesn't have type", *componentType, *entityId));
 									}
 
 									const std::size_t tableIndex = world.AddComponent(entityIndex, *componentType);
@@ -642,7 +638,7 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 		const SerializeComponentFunction serializeComponent = std::get<SerializeComponentFunction>(position->second);
 		const std::size_t typeIndex = std::get<std::size_t>(position->second);
 
-		const std::size_t componentSize = getComponentSize(typeIndex, *componentTable);
+		const std::size_t componentSize = getComponentSize(typeIndex, *componentTable, command.sizeTSize);
 		data.resize(componentSize);
 		serializeComponent(typeIndex, *componentTable, data, entityIdToIndex, objectIdToIndex, command.sizeTSize, command.bigEndian);
 
