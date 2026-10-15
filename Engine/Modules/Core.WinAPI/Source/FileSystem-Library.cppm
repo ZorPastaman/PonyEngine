@@ -64,7 +64,7 @@ namespace PonyEngine::FileSystem
 		const HMODULE library = LoadLibrarySelector<std::filesystem::path::value_type>::Value(path.c_str());
 		if (!library)
 		{
-			throw std::runtime_error(std::format("Failed to load library at '{}': Error code = '{}'", path.string(), GetLastError()));
+			throw std::runtime_error(std::format("Failed to load library at '{}': Error code = '0x{:X}'", path.string(), GetLastError()));
 		}
 
 		return library;
@@ -79,7 +79,7 @@ namespace PonyEngine::FileSystem
 
 		if (!FreeLibrary(static_cast<HMODULE>(library))) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to free library at '0x{:X}': Error code = '{}'", reinterpret_cast<std::uintptr_t>(library), GetLastError()));
+			throw std::runtime_error(std::format("Failed to free library at '0x{:X}': Error code = '0x{:X}'", reinterpret_cast<std::uintptr_t>(library), GetLastError()));
 		}
 	}
 
@@ -90,7 +90,16 @@ namespace PonyEngine::FileSystem
 			throw std::invalid_argument("Library is nullptr");
 		}
 
-		return GetProcAddress(static_cast<HMODULE>(library), name);
+		void* const proc = GetProcAddress(static_cast<HMODULE>(library), name);
+		if (!proc)
+		{
+			if (const DWORD error = GetLastError(); error != ERROR_PROC_NOT_FOUND) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to get address: Error code = '0x{:X}'", error));
+			}
+		}
+
+		return proc;
 	}
 
 	void* GetAddress(void* const library, const std::string_view name)

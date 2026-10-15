@@ -43,7 +43,7 @@ extern "C"
 	PONY_DLL_EXPORT_IMPL std::size_t GetComponentSize(std::size_t typeIndex, const toml::table& componentTable, std::size_t sizeTSize) noexcept;
 	PONY_DLL_EXPORT_IMPL void SerializeComponent(std::size_t typeIndex, const toml::table& componentTable, std::span<std::byte> componentData,
 		const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
-		std::size_t sizeTSize, bool bigEndian) noexcept;
+		const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian) noexcept;
 }
 
 void SerializeParent(const toml::table& componentTable, std::span<std::byte> componentData, const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, 
@@ -77,7 +77,7 @@ std::size_t GetComponentSize(const std::size_t typeIndex, const toml::table& com
 
 void SerializeComponent(const std::size_t typeIndex, const toml::table& componentTable, const std::span<std::byte> componentData,
 	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
-	const std::size_t sizeTSize, const bool bigEndian) noexcept
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, const std::size_t sizeTSize, const bool bigEndian) noexcept
 {
 	try
 	{

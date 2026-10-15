@@ -1,3 +1,11 @@
+# Launches PonyWorldCompiler to compile a world asset.
+# asset - world asset.
+# data_output - path to a data output file.
+# NO_DEFAULT_SERIALIZER - if set, the default serializer won't be used.
+# SERIALIZERS - list of serializer paths.
+# DEP_FILE <path> - sets a path to a dep file. If not set, ${data_output}.d is used.
+# VERBOSE - verbose flag.
+# ADDITIONAL_DEPENDENCIES <dependencies> - adds additional dependencies to the command.
 function(pony_compiler_world_definition asset data_output)
 	set(options NO_DEFAULT_SERIALIZER VERBOSE)
 	set(oneValueArgs DEP_FILE)

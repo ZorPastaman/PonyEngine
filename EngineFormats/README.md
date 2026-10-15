@@ -11,3 +11,7 @@ The engine uses different custom formats for different purposes.
 
 - [Pony.Text](PonyText.md)
 - [Pony.WorldDefinition](PonyWorldDefinition.md)
+
+## Asset types
+
+- [World](World.md)

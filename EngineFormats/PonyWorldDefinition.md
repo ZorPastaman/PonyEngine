@@ -36,3 +36,17 @@ The index must be `std::uint64_t`. Max value means no reference.
 ## Interface types
 
 - `PonyEngine::World::WorldDefinition`
+
+## Component data layout
+
+### `PonyEngine::World::Hierarchy::Parent`
+
+Raw component data.
+
+### `PonyEngine::World::Hierarchy::LocalTransform2D`
+
+Raw component data.
+
+### `PonyEngine::World::Hierarchy::LocalTransform3D`
+
+Raw component data.

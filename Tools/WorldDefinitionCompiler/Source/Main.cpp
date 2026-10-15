@@ -40,7 +40,7 @@ constexpr std::string_view VersionFlag = "--version"; ///< Version flag.
 constexpr std::string_view HelpFlag = "--help"; ///< Help flag.
 constexpr std::string_view VerboseFlag = "--verbose"; ///< Verbose flag.
 
-constexpr std::string_view WorldDefinitionSchema = "PonyEngine/Resource/WorldDefinition/v0"; ///< World definition schema.
+constexpr std::string_view WorldDefinitionSchema = "PonyEngine/Asset/World/v0"; ///< World definition schema.
 constexpr std::string_view SchemaPropertyName = "schema"; ///< Schema property name.
 constexpr std::string_view EntityPropertyName = "entity"; ///< Entity property name.
 constexpr std::string_view ComponentPropertyName = "component"; ///< Component property name.
@@ -61,7 +61,8 @@ constexpr std::string_view SerializeObjectFunctionName = "SerializeObject"; ///<
 using GetComponentTypesFunction = std::span<const std::string_view>(*)(); ///< @p GetComponentTypes() function.
 using GetComponentSizeFunction = std::size_t(*)(std::size_t, const toml::table&, std::size_t); ///< @p GetComponentSize() function.
 using SerializeComponentFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>,
-	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool); ///< @p SerializeComponent() function.
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
+	const std::unordered_map<std::string_view, std::string_view>&, std::size_t, bool); ///< @p SerializeComponent() function.
 using GetObjectTypesFunction = std::span<const std::string_view>(*)(); ///< @p GetObjectTypes() function.
 using GetObjectSizeFunction = std::size_t(*)(std::size_t, const toml::table&); ///< @p GetObjectSize() function.
 using SerializeObjectFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool); ///< @p SerializeObject() function.
@@ -457,21 +458,40 @@ void Compile(const Command& command)
 PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 {
 	std::vector<PonyEngine::FileSystem::DynamicLibrary> serializerLibraries;
-	for (const std::string_view serializerPath : command.serializers)
-	{
-		serializerLibraries.push_back(PonyEngine::FileSystem::DynamicLibrary(serializerPath));
-	}
-
 	std::unordered_map<std::string_view, std::tuple<GetComponentSizeFunction, SerializeComponentFunction, std::size_t>> componentSerializers;
 	std::unordered_map<std::string_view, std::tuple<GetObjectSizeFunction, SerializeObjectFunction, std::size_t>> objectSerializers;
-	for (const PonyEngine::FileSystem::DynamicLibrary& library : serializerLibraries)
+	for (const std::string_view serializerPath : command.serializers)
 	{
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Opening serializer at '{}'.", serializerPath);
+		}
+		serializerLibraries.push_back(PonyEngine::FileSystem::DynamicLibrary(serializerPath));
+		const PonyEngine::FileSystem::DynamicLibrary& library = serializerLibraries.back();
+
 		if (const auto getComponentTypes = static_cast<GetComponentTypesFunction>(library.GetAddress(GetComponentTypesFunctionName)))
 		{
 			if (const std::span<const std::string_view> componentTypes = getComponentTypes(); !componentTypes.empty())
 			{
+				if (Verbose) [[unlikely]]
+				{
+					std::println("Serializer supports these component types:");
+					for (const std::string_view type : componentTypes)
+					{
+						std::println("{}", type);
+					}
+				}
+
 				const auto getComponentSize = static_cast<GetComponentSizeFunction>(library.GetAddress(GetComponentSizeFunctionName));
+				if (!getComponentSize) [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", GetComponentSizeFunctionName, serializerPath));
+				}
 				const auto serializeComponent = static_cast<SerializeComponentFunction>(library.GetAddress(SerializeComponentFunctionName));
+				if (!serializeComponent) [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", SerializeComponentFunctionName, serializerPath));
+				}
 
 				for (std::size_t i = 0uz; i < componentTypes.size(); ++i)
 				{
@@ -479,13 +499,34 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 				}
 			}
 		}
+		else if (Verbose) [[unlikely]]
+		{
+			std::println("Serializer doesn't support any component type.");
+		}
 
 		if (const auto getObjectTypes = static_cast<GetObjectTypesFunction>(library.GetAddress(GetObjectTypesFunctionName)))
 		{
 			if (const std::span<const std::string_view> objectTypes = getObjectTypes(); !objectTypes.empty())
 			{
+				if (Verbose) [[unlikely]]
+				{
+					std::println("Serializer supports these object types:");
+					for (const std::string_view type : objectTypes)
+					{
+						std::println("{}", type);
+					}
+				}
+
 				const auto getObjectSize = static_cast<GetObjectSizeFunction>(library.GetAddress(GetObjectSizeFunctionName));
+				if (!getObjectSize) [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", GetObjectSizeFunctionName, serializerPath));
+				}
 				const auto serializeObject = static_cast<SerializeObjectFunction>(library.GetAddress(SerializeObjectFunctionName));
+				if (!serializeObject) [[unlikely]]
+				{
+					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", SerializeObjectFunctionName, serializerPath));
+				}
 
 				for (std::size_t i = 0uz; i < objectTypes.size(); ++i)
 				{
@@ -493,13 +534,16 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 				}
 			}
 		}
+		else if (Verbose) [[unlikely]]
+		{
+			std::println("Serializer doesn't support any object type.");
+		}
 	}
 
 	if (Verbose) [[unlikely]]
 	{
 		std::println("Reading world file at '{}'.", command.input);
 	}
-
 	PonyTools::World::WorldDefinition world;
 	const toml::table table = ParseWorld(command.input);
 	if (table[SchemaPropertyName].value<std::string_view>() != WorldDefinitionSchema) [[unlikely]]
@@ -510,11 +554,17 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 	std::vector<std::pair<std::size_t, const toml::table*>> componentSources;
 	std::unordered_map<std::string_view, std::uint64_t> entityIdToIndex;
 	std::unordered_map<std::string_view, std::uint64_t> objectIdToIndex;
+	std::unordered_map<std::string_view, std::string_view> objectIdToType;
 
 	std::vector<std::byte> data;
 
 	if (const toml::node_view entitiesProperty = table[EntityPropertyName])
 	{
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Reading entities.");
+		}
+
 		if (const toml::array* const entities = entitiesProperty.as_array()) [[likely]]
 		{
 			for (const toml::node& entityProperty : *entities)
@@ -529,11 +579,21 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 						throw std::runtime_error("Entity doesn't have ID");
 					}
 
+					if (Verbose) [[unlikely]]
+					{
+						std::println("Reading entity '{}'.", *entityId);
+					}
+
 					const std::uint64_t entityIndex = world.AddEntity(*entityId);
 					entityIdToIndex[*entityId] = entityIndex;
 
 					if (const toml::node_view componentsProperty = entity[ComponentPropertyName])
 					{
+						if (Verbose) [[unlikely]]
+						{
+							std::println("Reading components.");
+						}
+
 						if (const toml::array* components = componentsProperty.as_array()) [[likely]]
 						{
 							for (const toml::node& componentProperty : *components)
@@ -546,6 +606,11 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 									if (!componentType) [[unlikely]]
 									{
 										throw std::runtime_error(std::format("Component of type '{}' on entity '{}' doesn't have type", *componentType, *entityId));
+									}
+
+									if (Verbose) [[unlikely]]
+									{
+										std::println("Reading component of type '{}'.", *componentType);
 									}
 
 									const std::size_t tableIndex = world.AddComponent(entityIndex, *componentType);
@@ -576,6 +641,11 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 	}
 	if (const toml::node_view objectsProperty = table[ObjectPropertyName])
 	{
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Reading objects.");
+		}
+
 		if (const toml::array* const objects = objectsProperty.as_array()) [[likely]]
 		{
 			for (const toml::node& objectProperty : *objects)
@@ -596,6 +666,11 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 						throw std::runtime_error(std::format("Object '{}' doesn't have type", *objectId));
 					}
 
+					if (Verbose) [[unlikely]]
+					{
+						std::println("Reading object '{}' of type '{}'.", *objectId, *objectType);
+					}
+
 					const auto position = objectSerializers.find(*objectType);
 					if (position == objectSerializers.cend()) [[unlikely]]
 					{
@@ -605,12 +680,18 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 					const SerializeObjectFunction serializeObject = std::get<SerializeObjectFunction>(position->second);
 					const std::size_t typeIndex = std::get<std::size_t>(position->second);
 
+					if (Verbose) [[unlikely]]
+					{
+						std::println("Serializing object '{}'.", *objectId);
+					}
+
 					const std::size_t objectSize = getObjectSize(typeIndex, object);
 					data.resize(objectSize);
 					serializeObject(typeIndex, object, data, entityIdToIndex, command.sizeTSize, command.bigEndian);
 
 					const std::uint64_t objectIndex = world.AddObject(*objectId, *objectType, data);
 					objectIdToIndex[*objectId] = objectIndex;
+					objectIdToType[*objectId] = *objectType;
 				}
 				else [[unlikely]]
 				{
@@ -629,6 +710,11 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 		std::vector<std::byte>& componentData = world.ComponentData(componentTableIndex);
 		const std::string_view componentType = *(*componentTable)[TypePropertyName].value<std::string_view>();
 
+		if (Verbose) [[unlikely]]
+		{
+			std::println("Serializing component table of type '{}'.", componentType);
+		}
+
 		const auto position = componentSerializers.find(componentType);
 		if (position == componentSerializers.cend()) [[unlikely]]
 		{
@@ -640,7 +726,7 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 
 		const std::size_t componentSize = getComponentSize(typeIndex, *componentTable, command.sizeTSize);
 		data.resize(componentSize);
-		serializeComponent(typeIndex, *componentTable, data, entityIdToIndex, objectIdToIndex, command.sizeTSize, command.bigEndian);
+		serializeComponent(typeIndex, *componentTable, data, entityIdToIndex, objectIdToIndex, objectIdToType, command.sizeTSize, command.bigEndian);
 
 		componentData.append_range(data);
 	}
