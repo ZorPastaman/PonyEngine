@@ -43,12 +43,6 @@ export namespace PonyEngine::FileSystem
 		/// @note Must have a loaded library.
 		[[nodiscard("Pure function")]]
 		void* GetAddress(const char* name) const;
-		/// @brief Gets a library address by the name.
-		/// @param name Name.
-		/// @return Library address.
-		/// @note Must have a loaded library.
-		[[nodiscard("Pure function")]]
-		void* GetAddress(std::string_view name) const;
 
 		/// @brief Checks if the dynamic library has a loaded library.
 		/// @return @a True if it has; @a false otherwise.
@@ -95,11 +89,6 @@ namespace PonyEngine::FileSystem
 	}
 
 	void* DynamicLibrary::GetAddress(const char* const name) const
-	{
-		return FileSystem::GetAddress(library, name);
-	}
-
-	void* DynamicLibrary::GetAddress(const std::string_view name) const
 	{
 		return FileSystem::GetAddress(library, name);
 	}

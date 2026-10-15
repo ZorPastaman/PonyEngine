@@ -45,19 +45,12 @@ The module requires a platform specific implementation of these functions:
 	/// @brief Frees the library.
 	/// @param library Library pointer.
 	void ReleaseLibrary(void* library);
-
 	/// @brief Gets a library address by the name.
 	/// @param library Library. Must be valid.
 	/// @param name Name.
 	/// @return Library address.
 	[[nodiscard("Pure function")]]
 	void* GetAddress(void* library, const char* name);
-	/// @brief Gets a library address by the name.
-	/// @param library Library. Must be valid.
-	/// @param name Name.
-	/// @return Library address.
-	[[nodiscard("Pure function")]]
-	void* GetAddress(void* library, std::string_view name);
 ```
 
 ### [PonyEngine.Format](Source/Format.cppm)

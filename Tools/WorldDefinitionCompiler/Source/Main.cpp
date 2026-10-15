@@ -469,7 +469,7 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 		serializerLibraries.push_back(PonyEngine::FileSystem::DynamicLibrary(serializerPath));
 		const PonyEngine::FileSystem::DynamicLibrary& library = serializerLibraries.back();
 
-		if (const auto getComponentTypes = static_cast<GetComponentTypesFunction>(library.GetAddress(GetComponentTypesFunctionName)))
+		if (const auto getComponentTypes = static_cast<GetComponentTypesFunction>(library.GetAddress(GetComponentTypesFunctionName.data())))
 		{
 			if (const std::span<const std::string_view> componentTypes = getComponentTypes(); !componentTypes.empty())
 			{
@@ -482,12 +482,12 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 					}
 				}
 
-				const auto getComponentSize = static_cast<GetComponentSizeFunction>(library.GetAddress(GetComponentSizeFunctionName));
+				const auto getComponentSize = static_cast<GetComponentSizeFunction>(library.GetAddress(GetComponentSizeFunctionName.data()));
 				if (!getComponentSize) [[unlikely]]
 				{
 					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", GetComponentSizeFunctionName, serializerPath));
 				}
-				const auto serializeComponent = static_cast<SerializeComponentFunction>(library.GetAddress(SerializeComponentFunctionName));
+				const auto serializeComponent = static_cast<SerializeComponentFunction>(library.GetAddress(SerializeComponentFunctionName.data()));
 				if (!serializeComponent) [[unlikely]]
 				{
 					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", SerializeComponentFunctionName, serializerPath));
@@ -504,7 +504,7 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 			std::println("Serializer doesn't support any component type.");
 		}
 
-		if (const auto getObjectTypes = static_cast<GetObjectTypesFunction>(library.GetAddress(GetObjectTypesFunctionName)))
+		if (const auto getObjectTypes = static_cast<GetObjectTypesFunction>(library.GetAddress(GetObjectTypesFunctionName.data())))
 		{
 			if (const std::span<const std::string_view> objectTypes = getObjectTypes(); !objectTypes.empty())
 			{
@@ -517,12 +517,12 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 					}
 				}
 
-				const auto getObjectSize = static_cast<GetObjectSizeFunction>(library.GetAddress(GetObjectSizeFunctionName));
+				const auto getObjectSize = static_cast<GetObjectSizeFunction>(library.GetAddress(GetObjectSizeFunctionName.data()));
 				if (!getObjectSize) [[unlikely]]
 				{
 					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", GetObjectSizeFunctionName, serializerPath));
 				}
-				const auto serializeObject = static_cast<SerializeObjectFunction>(library.GetAddress(SerializeObjectFunctionName));
+				const auto serializeObject = static_cast<SerializeObjectFunction>(library.GetAddress(SerializeObjectFunctionName.data()));
 				if (!serializeObject) [[unlikely]]
 				{
 					throw std::runtime_error(std::format("Failed to find '{}' function on serializer '{}'", SerializeObjectFunctionName, serializerPath));
