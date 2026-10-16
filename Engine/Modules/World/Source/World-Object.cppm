@@ -33,6 +33,16 @@ export namespace PonyEngine::World
 		/// @param data Data.
 		template<typename T> [[nodiscard("Pure constructor")]]
 		explicit Object(std::shared_ptr<T> data) noexcept;
+		/// @brief Creates an object.
+		/// @param data Data.
+		/// @param type Data type.
+		[[nodiscard("Pure constructor")]]
+		Object(std::shared_ptr<void> data, std::type_index type) noexcept;
+		/// @brief Creates an object.
+		/// @param data Data.
+		/// @param type Data type.
+		[[nodiscard("Pure constructor")]]
+		Object(std::shared_ptr<const void> data, std::type_index type) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Object(const Object& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -91,11 +101,22 @@ export namespace PonyEngine::World
 		/// @param data Data.
 		template<typename T>
 		void Reset(std::shared_ptr<T> data) noexcept;
+		/// @brief Resets the object.
+		/// @param data Data.
+		/// @param type Data type.
+		void Reset(std::shared_ptr<void> data, std::type_index type) noexcept;
+		/// @brief Resets the object.
+		/// @param data Data.
+		/// @param type Data type.
+		void Reset(std::shared_ptr<const void> data, std::type_index type) noexcept;
 
 		/// @brief Checks if the object has a data.
 		/// @return @a True if it has; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		explicit operator bool() const noexcept;
+
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const Object& other) const noexcept = default;
 
 		Object& operator =(const Object& other) noexcept = default;
 		Object& operator =(Object&& other) noexcept = default;
@@ -104,7 +125,7 @@ export namespace PonyEngine::World
 		/// @brief Validates the requested data type.
 		/// @tparam T Requested data type.
 		template<typename T>
-		void Validate();
+		void ValidateGet();
 
 		/// @brief Gets the intermediate cast type.
 		/// @tparam T Target type.
@@ -134,7 +155,21 @@ namespace PonyEngine::World
 	Object::Object(std::shared_ptr<T> data) noexcept :
 		data(std::move(data)),
 		type(typeid(T)),
-		isConst(std::is_const_v<T>)
+		isConst{std::is_const_v<T>}
+	{
+	}
+
+	Object::Object(std::shared_ptr<void> data, const std::type_index type) noexcept :
+		data(std::move(data)),
+		type(type),
+		isConst{false}
+	{
+	}
+
+	Object::Object(std::shared_ptr<const void> data, const std::type_index type) noexcept :
+		data(std::move(data)),
+		type(type),
+		isConst{true}
 	{
 	}
 
@@ -201,7 +236,7 @@ namespace PonyEngine::World
 	template<typename T>
 	T* Object::Get() const noexcept
 	{
-		Validate<T>();
+		ValidateGet<T>();
 
 		const auto ptr = const_cast<Intermediate<T>*>(data.get());
 		return static_cast<T*>(ptr);
@@ -210,7 +245,7 @@ namespace PonyEngine::World
 	template<typename T>
 	std::shared_ptr<T> Object::GetShared() const noexcept
 	{
-		Validate<T>();
+		ValidateGet<T>();
 
 		auto ptr = std::const_pointer_cast<Intermediate<T>>(data);
 		return std::static_pointer_cast<T>(std::move(ptr));
@@ -227,13 +262,23 @@ namespace PonyEngine::World
 		*this = Object(std::move(data));
 	}
 
+	void Object::Reset(std::shared_ptr<void> data, const std::type_index type) noexcept
+	{
+		*this = Object(std::move(data), type);
+	}
+
+	void Object::Reset(std::shared_ptr<const void> data, const std::type_index type) noexcept
+	{
+		*this = Object(std::move(data), type);
+	}
+
 	Object::operator bool() const noexcept
 	{
 		return static_cast<bool>(data);
 	}
 
 	template<typename T>
-	void Object::Validate()
+	void Object::ValidateGet()
 	{
 		if constexpr (!std::is_void_v<T>)
 		{

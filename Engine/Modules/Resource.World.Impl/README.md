@@ -2,6 +2,13 @@
 
 World resource module implementation.
 
+It can deserializes basic components out of the box:
+
+- `PonyEngine::World::Name`
+- `PonyEngine::World::Description`
+
+It also supports a resource object `Pony.Resource` out of the box.
+
 ## Dependencies
 
 - [PonyEngine.Application](../Application)

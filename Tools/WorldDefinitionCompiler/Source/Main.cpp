@@ -60,12 +60,12 @@ constexpr std::string_view SerializeObjectFunctionName = "SerializeObject"; ///<
 
 using GetComponentTypesFunction = std::span<const std::string_view>(*)(); ///< @p GetComponentTypes() function.
 using GetComponentSizeFunction = std::size_t(*)(std::size_t, const toml::table&, std::size_t); ///< @p GetComponentSize() function.
-using SerializeComponentFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>,
+using SerializeComponentFunction = bool(*)(std::size_t, const toml::table&, std::span<std::byte>,
 	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
 	const std::unordered_map<std::string_view, std::string_view>&, std::size_t, bool); ///< @p SerializeComponent() function.
 using GetObjectTypesFunction = std::span<const std::string_view>(*)(); ///< @p GetObjectTypes() function.
-using GetObjectSizeFunction = std::size_t(*)(std::size_t, const toml::table&); ///< @p GetObjectSize() function.
-using SerializeObjectFunction = void(*)(std::size_t, const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, std::size_t, bool); ///< @p SerializeObject() function.
+using GetObjectSizeFunction = std::size_t(*)(std::size_t, const toml::table&, std::size_t); ///< @p GetObjectSize() function.
+using SerializeObjectFunction = bool(*)(std::size_t, const toml::table&, std::span<std::byte>, std::size_t, bool); ///< @p SerializeObject() function.
 
 bool Verbose = false; ///< Verbose flag.
 
@@ -685,9 +685,16 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 						std::println("Serializing object '{}'.", *objectId);
 					}
 
-					const std::size_t objectSize = getObjectSize(typeIndex, object);
+					const std::size_t objectSize = getObjectSize(typeIndex, object, command.sizeTSize);
+					if (objectSize == std::numeric_limits<std::size_t>::max()) [[unlikely]]
+					{
+						throw std::runtime_error(std::format("Failed to get size of object of type '{}'", *objectType));
+					}
 					data.resize(objectSize);
-					serializeObject(typeIndex, object, data, entityIdToIndex, command.sizeTSize, command.bigEndian);
+					if (!serializeObject(typeIndex, object, data, command.sizeTSize, command.bigEndian))
+					{
+						throw std::runtime_error(std::format("Failed to serialize object of type '{}'", *objectType));
+					}
 
 					const std::uint64_t objectIndex = world.AddObject(*objectId, *objectType, data);
 					objectIdToIndex[*objectId] = objectIndex;
@@ -725,8 +732,15 @@ PonyTools::World::WorldDefinition ReadWorld(const Command& command)
 		const std::size_t typeIndex = std::get<std::size_t>(position->second);
 
 		const std::size_t componentSize = getComponentSize(typeIndex, *componentTable, command.sizeTSize);
+		if (componentSize == std::numeric_limits<std::size_t>::max()) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get size of component of type '{}'", componentType));
+		}
 		data.resize(componentSize);
-		serializeComponent(typeIndex, *componentTable, data, entityIdToIndex, objectIdToIndex, objectIdToType, command.sizeTSize, command.bigEndian);
+		if (!serializeComponent(typeIndex, *componentTable, data, entityIdToIndex, objectIdToIndex, objectIdToType, command.sizeTSize, command.bigEndian))
+		{
+			throw std::runtime_error(std::format("Failed to serialize component of type '{}'", componentType));
+		}
 
 		componentData.append_range(data);
 	}

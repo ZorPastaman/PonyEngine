@@ -55,8 +55,13 @@ export namespace PonyEngine::World
 		virtual void RegisterEntityReferenceMember(std::type_index componentType, std::size_t componentOffset) override;
 
 	private:
+		/// @brief Makes a world.
+		/// @return World.
 		[[nodiscard("Pure function")]]
 		std::shared_ptr<World> MakeWorld();
+		/// @brief Adds the world definition to the world.
+		/// @param world World target.
+		/// @param definition World definition.
 		void AddToWorld(World& world, const WorldDefinition& definition) const;
 
 		Application::IApplication* application; ///< Application.

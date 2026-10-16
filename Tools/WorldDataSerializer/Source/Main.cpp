@@ -14,6 +14,7 @@
 import std;
 
 import PonyEngine.Math;
+import PonyEngine.World;
 import PonyEngine.World.Hierarchy;
 
 import PonyTools.Memory;
@@ -22,15 +23,20 @@ constexpr std::string_view ParentPropertyName = "parent";
 constexpr std::string_view PositionPropertyName = "position";
 constexpr std::string_view RotationPropertyName = "rotation";
 constexpr std::string_view ScalePropertyName = "scale";
+constexpr std::string_view NamePropertyName = "name";
 
-constexpr std::array<std::string_view, 3> ComponentTypes
+using GetComponentSizeFunction = std::size_t(*)(const toml::table&, std::size_t);
+using SerializeComponentFunction = void(*)(const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, 
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::string_view>&, std::size_t, bool);
+
+struct ComponentEntry final
 {
-	"Pony.Parent",
-	"Pony.Transform2D",
-	"Pony.Transform3D"
+	std::string_view type;
+	GetComponentSizeFunction sizeFunction;
+	SerializeComponentFunction serializeFunction;
 };
 
-struct StringViewSpan final
+struct alignas(std::span<const std::string_view>) StringViewSpan final
 {
 	std::byte data[sizeof(std::span<const std::string_view>)];
 };
@@ -41,15 +47,55 @@ extern "C"
 	PONY_DLL_EXPORT_IMPL StringViewSpan GetComponentTypes() noexcept;
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT_IMPL std::size_t GetComponentSize(std::size_t typeIndex, const toml::table& componentTable, std::size_t sizeTSize) noexcept;
-	PONY_DLL_EXPORT_IMPL void SerializeComponent(std::size_t typeIndex, const toml::table& componentTable, std::span<std::byte> componentData,
+	PONY_DLL_EXPORT_IMPL bool SerializeComponent(std::size_t typeIndex, const toml::table& componentTable, std::span<std::byte> componentData,
 		const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
 		const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian) noexcept;
 }
 
-void SerializeParent(const toml::table& componentTable, std::span<std::byte> componentData, const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, 
-	bool bigEndian);
-void SerializeTransform2D(const toml::table& componentTable, std::span<std::byte> componentData, bool bigEndian);
-void SerializeTransform3D(const toml::table& componentTable, std::span<std::byte> componentData, bool bigEndian);
+[[nodiscard("Pure function")]]
+std::size_t GetNameSize(const toml::table& componentTable, std::size_t sizeTSize);
+
+[[nodiscard("Pure function")]]
+std::size_t GetParentSize(const toml::table& componentTable, std::size_t sizeTSize);
+[[nodiscard("Pure function")]]
+std::size_t GetTransform2DSize(const toml::table& componentTable, std::size_t sizeTSize);
+[[nodiscard("Pure function")]]
+std::size_t GetTransform3DSize(const toml::table& componentTable, std::size_t sizeTSize);
+
+void SerializeName(const toml::table& componentTable, std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian);
+
+void SerializeParent(const toml::table& componentTable, std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian);
+void SerializeTransform2D(const toml::table& componentTable, std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian);
+void SerializeTransform3D(const toml::table& componentTable, std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian);
+
+constexpr std::array ComponentEntries
+{
+	ComponentEntry{.type = "Pony.Name", .sizeFunction = &GetNameSize, .serializeFunction = &SerializeName},
+	ComponentEntry{.type = "Pony.Parent", .sizeFunction = &GetParentSize, .serializeFunction = &SerializeParent},
+	ComponentEntry{.type = "Pony.Transform2D", .sizeFunction = &GetTransform2DSize, .serializeFunction = &SerializeTransform2D},
+	ComponentEntry{.type = "Pony.Transform3D", .sizeFunction = &GetTransform3DSize, .serializeFunction = &SerializeTransform3D}
+};
+
+[[nodiscard("Pure function")]]
+constexpr std::array<std::string_view, ComponentEntries.size()> GetComponentEntryTypes()
+{
+	std::array<std::string_view, ComponentEntries.size()> types;
+	for (std::size_t i = 0uz; i < types.size(); ++i)
+	{
+		types[i] = ComponentEntries[i].type;
+	}
+
+	return types;
+}
+constexpr std::array<std::string_view, ComponentEntries.size()> ComponentTypes = GetComponentEntryTypes();
 
 StringViewSpan GetComponentTypes() noexcept
 {
@@ -61,54 +107,85 @@ StringViewSpan GetComponentTypes() noexcept
 
 std::size_t GetComponentSize(const std::size_t typeIndex, const toml::table& componentTable, const std::size_t sizeTSize) noexcept
 {
-	switch (typeIndex)
-	{
-	case 0:
-		return sizeof(PonyEngine::World::Hierarchy::Parent);
-	case 1:
-		return sizeof(PonyEngine::World::Hierarchy::LocalTransform2D);
-	case 2:
-		return sizeof(PonyEngine::World::Hierarchy::LocalTransform3D);
-	default: [[unlikely]]
-		std::println(std::cerr, "Type index is out of range.");
-		return 0uz;
-	}
-}
-
-void SerializeComponent(const std::size_t typeIndex, const toml::table& componentTable, const std::span<std::byte> componentData,
-	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
-	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, const std::size_t sizeTSize, const bool bigEndian) noexcept
-{
 	try
 	{
-		switch (typeIndex)
-		{
-		case 0:
-			SerializeParent(componentTable, componentData, entityIDToIndex, bigEndian);
-			break;
-		case 1:
-			SerializeTransform2D(componentTable, componentData, bigEndian);
-			break;
-		case 2:
-			SerializeTransform3D(componentTable, componentData, bigEndian);
-			break;
-		default: [[unlikely]]
-			std::println(std::cerr, "Type index is out of range.");
-			break;
-		}
+		return ComponentEntries[typeIndex].sizeFunction(componentTable, sizeTSize);
 	}
 	catch (const std::exception& e)
 	{
-		std::println(std::cerr, "Exception of type '{}' on serializing data. Message: '{}'.", typeid(e).name(), e.what());
+		std::println(std::cerr, "Exception of type '{}' on getting component size. Message: '{}'.", typeid(e).name(), e.what());
 	}
 	catch (...)
 	{
 		std::println(std::cerr, "Unknown exception on serializing data.");
 	}
+
+	return std::numeric_limits<std::size_t>::max();
 }
 
-void SerializeParent(const toml::table& componentTable, const std::span<std::byte> componentData, const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex,
-	const bool bigEndian)
+bool SerializeComponent(const std::size_t typeIndex, const toml::table& componentTable, const std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, const std::size_t sizeTSize, const bool bigEndian) noexcept
+{
+	try
+	{
+		ComponentEntries[typeIndex].serializeFunction(componentTable, componentData, entityIDToIndex, objectIDToIndex, objectIDToType, sizeTSize, bigEndian);
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		std::println(std::cerr, "Exception of type '{}' on serializing component. Message: '{}'.", typeid(e).name(), e.what());
+	}
+	catch (...)
+	{
+		std::println(std::cerr, "Unknown exception on serializing component.");
+	}
+
+	return false;
+}
+
+std::size_t GetNameSize(const toml::table&, const std::size_t)
+{
+	return sizeof(PonyEngine::World::Name);
+}
+
+std::size_t GetParentSize(const toml::table&, const std::size_t)
+{
+	return sizeof(PonyEngine::World::Hierarchy::Parent);
+}
+
+std::size_t GetTransform2DSize(const toml::table&, const std::size_t)
+{
+	return sizeof(PonyEngine::World::Hierarchy::LocalTransform2D);
+}
+
+std::size_t GetTransform3DSize(const toml::table&, const std::size_t)
+{
+	return sizeof(PonyEngine::World::Hierarchy::LocalTransform3D);
+}
+
+void SerializeName(const toml::table& componentTable, const std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
+	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool)
+{
+	if (componentData.size() != sizeof(PonyEngine::World::Name)) [[unlikely]]
+	{
+		throw std::invalid_argument("Invalid component data size");
+	}
+
+	const std::optional<std::string_view> name = componentTable[NamePropertyName].value<std::string_view>();
+	if (!name) [[unlikely]]
+	{
+		throw std::runtime_error("Invalid name component");
+	}
+
+	const auto nameComponent = PonyEngine::World::Name(*name);
+	std::memcpy(componentData.data(), &nameComponent, sizeof(PonyEngine::World::Name));
+}
+
+void SerializeParent(const toml::table& componentTable, const std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>&,
+	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool bigEndian)
 {
 	if (componentData.size() != sizeof(PonyEngine::World::Hierarchy::Parent)) [[unlikely]]
 	{
@@ -131,7 +208,9 @@ void SerializeParent(const toml::table& componentTable, const std::span<std::byt
 	writer.Write(position->second);
 }
 
-void SerializeTransform2D(const toml::table& componentTable, const std::span<std::byte> componentData, const bool bigEndian)
+void SerializeTransform2D(const toml::table& componentTable, const std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
+	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool bigEndian)
 {
 	if (componentData.size() != sizeof(PonyEngine::World::Hierarchy::LocalTransform2D)) [[unlikely]]
 	{
@@ -179,7 +258,9 @@ void SerializeTransform2D(const toml::table& componentTable, const std::span<std
 	writer.Write(transform.Scale().Y());
 }
 
-void SerializeTransform3D(const toml::table& componentTable, const std::span<std::byte> componentData, const bool bigEndian)
+void SerializeTransform3D(const toml::table& componentTable, const std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
+	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool bigEndian)
 {
 	if (componentData.size() != sizeof(PonyEngine::World::Hierarchy::LocalTransform3D)) [[unlikely]]
 	{

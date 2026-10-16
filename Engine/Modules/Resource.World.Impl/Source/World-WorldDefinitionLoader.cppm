@@ -398,6 +398,7 @@ namespace PonyEngine::Resource::World
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);
 
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		assert(!componentTypeMap.contains(typeHash) && "Component type with the same hash is already registered.");
 		assert(!componentDeserializers.contains(componentType) && "Component type is already registered.");
 
@@ -436,6 +437,7 @@ namespace PonyEngine::Resource::World
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);
 
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		assert(componentTypeMap.contains(typeHash) && "Component type with the same hash was not registered.");
 		assert(componentDeserializers.contains(componentType) && "Component type was not registered.");
 		assert(componentTypeMap.find(typeHash)->second == componentType && "Invalid type map.");
@@ -451,6 +453,7 @@ namespace PonyEngine::Resource::World
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);
 
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		assert(!objectTypeMap.contains(typeHash) && "Object type with the same hash is already registered.");
 		assert(!objectDeserializers.contains(objectType) && "Object type is already registered.");
 
@@ -480,6 +483,7 @@ namespace PonyEngine::Resource::World
 	{
 		const std::uint64_t typeHash = Hash::FNV1a64(type);
 
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		assert(objectTypeMap.contains(typeHash) && "Object type with the same hash was not registered.");
 		assert(objectDeserializers.contains(objectType) && "Object type was not registered.");
 		assert(objectTypeMap.find(typeHash)->second == objectType && "Invalid type map.");

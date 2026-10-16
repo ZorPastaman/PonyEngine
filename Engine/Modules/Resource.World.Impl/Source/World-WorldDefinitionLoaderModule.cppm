@@ -12,6 +12,7 @@ export module PonyEngine.Resource.World.Impl:WorldDefinitionLoaderModule;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.World;
 
 import :WorldDefinitionLoader;
 
@@ -35,7 +36,14 @@ export namespace PonyEngine::Resource::World
 		WorldDefinitionLoaderModule& operator =(WorldDefinitionLoaderModule&&) = delete;
 
 	private:
+		/// @brief Registers basic deserializers.
+		void RegisterDeserializers() const;
+		/// @brief Unregisters basic deserializers.
+		void UnregisterDeserializers() const;
+
 		static constexpr std::string_view WorldDefinitionResourceType = "Pony.WorldDefinition"; ///< World definition resource type.
+		static constexpr std::string_view NameType = "Pony.Name"; ///< PonyEngine::World::Name serialized type.
+		static constexpr std::string_view DescriptionType = "Pony.Description"; ///< PonyEngine::World::Description serialized type.
 
 		std::unique_ptr<WorldDefinitionLoader> worldDefinitionLoader; ///< World definition loader.
 	};
@@ -55,6 +63,15 @@ namespace PonyEngine::Resource::World
 			try
 			{
 				context.AddInterface<IWorldDefinitionLoader>(*worldDefinitionLoader);
+				try
+				{
+					RegisterDeserializers();
+				}
+				catch (...)
+				{
+					context.RemoveInterface<IWorldDefinitionLoader>(*worldDefinitionLoader);
+					throw;
+				}
 			}
 			catch (...)
 			{
@@ -72,8 +89,23 @@ namespace PonyEngine::Resource::World
 	void WorldDefinitionLoaderModule::ShutDown(Application::IModuleContext& context)
 	{
 		IResourceHub& resourceHub = context.Application().GetInterface<IResourceHub>();
+		UnregisterDeserializers();
 		context.RemoveInterface<IWorldDefinitionLoader>(*worldDefinitionLoader);
 		resourceHub.UnregisterLoader(*worldDefinitionLoader);
 		worldDefinitionLoader.reset();
+	}
+
+	void WorldDefinitionLoaderModule::RegisterDeserializers() const
+	{
+		const auto loader = static_cast<IWorldDefinitionLoader*>(worldDefinitionLoader.get());
+		loader->RegisterComponentDeserializer<PonyEngine::World::Name>(NameType);
+		loader->RegisterComponentDeserializer<PonyEngine::World::Description>(DescriptionType);
+	}
+
+	void WorldDefinitionLoaderModule::UnregisterDeserializers() const
+	{
+		const auto loader = static_cast<IWorldDefinitionLoader*>(worldDefinitionLoader.get());
+		loader->UnregisterComponentDeserializer<PonyEngine::World::Description>(DescriptionType);
+		loader->UnregisterComponentDeserializer<PonyEngine::World::Name>(NameType);
 	}
 }

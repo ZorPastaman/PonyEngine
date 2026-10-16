@@ -50,8 +50,8 @@ export namespace PonyEngine::World::Hierarchy
 
 		virtual void AddLocalTransforms2D(IWorld& world, std::span<const Entity> entities, std::span<const LocalTransform2D> transforms) const override;
 		virtual void AddLocalTransforms3D(IWorld& world, std::span<const Entity> entities, std::span<const LocalTransform3D> transforms) const override;
-		virtual void RemoveTransforms2D(IWorld& world, std::span<const Entity> entities) const override;
-		virtual void RemoveTransforms3D(IWorld& world, std::span<const Entity> entities) const override;
+		virtual void RemoveTransforms2D(IWorld& world, std::span<const Entity> entities, bool includeChildren) const override;
+		virtual void RemoveTransforms3D(IWorld& world, std::span<const Entity> entities, bool includeChildren) const override;
 
 		virtual void AddDirtyTransforms(IWorld& world, std::span<const Entity> entities) const override;
 		virtual void RemoveDirtyTransforms(IWorld& world, std::span<const Entity> entities, bool includeChildren) const override;
@@ -320,26 +320,90 @@ namespace PonyEngine::World::Hierarchy
 		world.AddComponents<LocalTransform3D>(entities, transforms);
 	}
 
-	void HierarchyService::RemoveTransforms2D(IWorld& world, const std::span<const Entity> entities) const
+	void HierarchyService::RemoveTransforms2D(IWorld& world, const std::span<const Entity> entities, const bool includeChildren) const
 	{
 		if (entities.size() == 0uz)
 		{
 			return;
 		}
 
-		world.RemoveComponents<WorldTransform2D>(entities);
-		world.RemoveComponents<LocalTransform2D>(entities);
+		if (includeChildren)
+		{
+			const std::size_t childCount = world.CountComponents<Parent>();
+			if (childCount == 0uz)
+			{
+				world.RemoveComponents<WorldTransform2D>(entities);
+				world.RemoveComponents<LocalTransform2D>(entities);
+				return;
+			}
+
+			const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(childCount) +
+				Memory::CalculateBufferSize<Parent, Entity>(childCount) +
+				Memory::CalculateBufferSize<Entity, Parent>(entities.size() + childCount);
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+
+			const std::span<Entity> childEntities = arena.AllocateArray<Entity>(childCount);
+			const std::span<Parent> parents = arena.AllocateArray<Parent>(childCount);
+			const std::span<Entity> targets = arena.AllocateArray<Entity>(entities.size() + childCount);
+
+			world.GetComponents<Parent>(childEntities, parents);
+			std::memcpy(targets.data(), entities.data(), entities.size_bytes());
+
+			const std::size_t targetCount = FindEntitiesForPropagation(targets.subspan(0uz, entities.size()), childEntities, parents,
+				targets.subspan(entities.size(), childCount));
+
+			world.RemoveComponents<WorldTransform2D>(targets.subspan(0uz, entities.size() + targetCount));
+			world.RemoveComponents<LocalTransform2D>(targets.subspan(0uz, entities.size() + targetCount));
+		}
+		else
+		{
+			world.RemoveComponents<WorldTransform2D>(entities);
+			world.RemoveComponents<LocalTransform2D>(entities);
+		}
 	}
 
-	void HierarchyService::RemoveTransforms3D(IWorld& world, const std::span<const Entity> entities) const
+	void HierarchyService::RemoveTransforms3D(IWorld& world, const std::span<const Entity> entities, const bool includeChildren) const
 	{
 		if (entities.size() == 0uz)
 		{
 			return;
 		}
 
-		world.RemoveComponents<WorldTransform3D>(entities);
-		world.RemoveComponents<LocalTransform3D>(entities);
+		if (includeChildren)
+		{
+			const std::size_t childCount = world.CountComponents<Parent>();
+			if (childCount == 0uz)
+			{
+				world.RemoveComponents<WorldTransform3D>(entities);
+				world.RemoveComponents<LocalTransform3D>(entities);
+				return;
+			}
+
+			const std::size_t bufferSize = Memory::CalculateBufferSize<Entity>(childCount) +
+				Memory::CalculateBufferSize<Parent, Entity>(childCount) +
+				Memory::CalculateBufferSize<Entity, Parent>(entities.size() + childCount);
+			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(bufferSize);
+			auto arena = Memory::Arena(buffer->Span());
+
+			const std::span<Entity> childEntities = arena.AllocateArray<Entity>(childCount);
+			const std::span<Parent> parents = arena.AllocateArray<Parent>(childCount);
+			const std::span<Entity> targets = arena.AllocateArray<Entity>(entities.size() + childCount);
+
+			world.GetComponents<Parent>(childEntities, parents);
+			std::memcpy(targets.data(), entities.data(), entities.size_bytes());
+
+			const std::size_t targetCount = FindEntitiesForPropagation(targets.subspan(0uz, entities.size()), childEntities, parents,
+				targets.subspan(entities.size(), childCount));
+
+			world.RemoveComponents<WorldTransform3D>(targets.subspan(0uz, entities.size() + targetCount));
+			world.RemoveComponents<LocalTransform3D>(targets.subspan(0uz, entities.size() + targetCount));
+		}
+		else
+		{
+			world.RemoveComponents<WorldTransform3D>(entities);
+			world.RemoveComponents<LocalTransform3D>(entities);
+		}
 	}
 
 	void HierarchyService::AddDirtyTransforms(IWorld& world, const std::span<const Entity> entities) const
