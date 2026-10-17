@@ -43,33 +43,13 @@ namespace PonyEngine::Resource::World::Hierarchy
 {
 	void HierarchyDeserializerModule::StartUp(Application::IModuleContext& context)
 	{
-		IWorldDefinitionLoader& worldDefinitionLoader = context.Application().GetInterface<IWorldDefinitionLoader>();
-		worldDefinitionLoader.RegisterComponentDeserializer<PonyEngine::World::Hierarchy::Parent>(ParentType);
-		try
-		{
-			worldDefinitionLoader.RegisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform2D>(Transform2DType);
-			try
-			{
-				worldDefinitionLoader.RegisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform3D>(Transform3DType);
-			}
-			catch (...)
-			{
-				worldDefinitionLoader.UnregisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform2D>(Transform2DType);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			worldDefinitionLoader.UnregisterComponentDeserializer<PonyEngine::World::Hierarchy::Parent>(ParentType);
-			throw;
-		}
+		ICopyComponentDeserializer& deserializer = context.Application().GetInterface<ICopyComponentDeserializer>();
+		deserializer.Associate<PonyEngine::World::Hierarchy::Parent>(ParentType);
+		deserializer.Associate<PonyEngine::World::Hierarchy::LocalTransform2D>(Transform2DType);
+		deserializer.Associate<PonyEngine::World::Hierarchy::LocalTransform3D>(Transform3DType);
 	}
 
-	void HierarchyDeserializerModule::ShutDown(Application::IModuleContext& context)
+	void HierarchyDeserializerModule::ShutDown(Application::IModuleContext&)
 	{
-		IWorldDefinitionLoader& worldDefinitionLoader = context.Application().GetInterface<IWorldDefinitionLoader>();
-		worldDefinitionLoader.UnregisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform3D>(Transform3DType);
-		worldDefinitionLoader.UnregisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform2D>(Transform2DType);
-		worldDefinitionLoader.UnregisterComponentDeserializer<PonyEngine::World::Hierarchy::Parent>(ParentType);
 	}
 }

@@ -30,7 +30,7 @@ export namespace PonyEngine::World
 
 		/// @brief Registers the component type.
 		/// @tparam T Component type.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		template<Component T>
 		void RegisterComponent();
 		/// @brief Registers the component object handle member.
@@ -38,13 +38,13 @@ export namespace PonyEngine::World
 		/// @tparam Object Object type.
 		/// @param member Member pointer. Mustn't be nullptr.
 		/// @remark It's used for correct garbage collection.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		template<Component Component, typename Object>
 		void RegisterObjectHandleMember(ObjectHandle<Object> Component::* member);
 		/// @brief Register the component entity reference member.
 		/// @tparam Component Component type.
 		/// @param member Entity reference member. Mustn't be nullptr.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		template<Component Component>
 		void RegisterEntityReferenceMember(Entity Component::* member);
 
@@ -65,19 +65,19 @@ export namespace PonyEngine::World
 		/// @param componentType Component type.
 		/// @param componentSize Component size.
 		/// @param componentAlignment Component alignment.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) = 0;
 		/// @brief Registers the component object handle member.
 		/// @param objectType Object type.
 		/// @param isConst Is an object const?
 		/// @param componentType Component type.
 		/// @param componentOffset Component offset.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		virtual void RegisterObjectHandleMember(std::type_index objectType, bool isConst, std::type_index componentType, std::size_t componentOffset) = 0;
 		/// @brief Register the component entity reference member.
 		/// @param componentType Component type.
 		/// @param componentOffset Entity reference member. Mustn't be nullptr.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		virtual void RegisterEntityReferenceMember(std::type_index componentType, std::size_t componentOffset) = 0;
 	};
 }

@@ -70,7 +70,7 @@ export namespace PonyEngine::Resource::World
 
 		/// @brief Adds the deserialization request.
 		/// @param request Deserialization request.
-		void AddDeserializationRequest(std::shared_ptr<IWorldDeserializationRequest> request);
+		void AddDeserializationRequest(std::shared_ptr<IWorldDeserializationRequest> request) noexcept;
 
 		/// @brief Checks if it has at least one exception.
 		/// @return @a True if it has; @a false otherwise.
@@ -229,7 +229,7 @@ namespace PonyEngine::Resource::World
 		return jobCount.fetch_sub(1uz, std::memory_order::relaxed) == 1uz;
 	}
 
-	void WorldDefinitionLoadRequest::AddDeserializationRequest(std::shared_ptr<IWorldDeserializationRequest> request)
+	void WorldDefinitionLoadRequest::AddDeserializationRequest(std::shared_ptr<IWorldDeserializationRequest> request) noexcept
 	{
 		deserializationRequests[nextDeserializationRequest++] = std::move(request);
 		deserializationRequestCount.fetch_add(1uz, std::memory_order::release);

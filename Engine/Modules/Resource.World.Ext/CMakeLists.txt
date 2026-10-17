@@ -5,7 +5,9 @@ add_library(PonyEngine.Resource.World.Ext STATIC)
 target_sources(PonyEngine.Resource.World.Ext PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/World.cppm"
 	"Source/World-IComponentDeserializer.cppm"
+	"Source/World-ICopyComponentDeserializer.cppm"
 	"Source/World-IObjectDeserializer.cppm"
+	"Source/World-IResourceObjectDeserializer.cppm"
 	"Source/World-IWorldDefinitionLoader.cppm"
 	"Source/World-IWorldDeserializationRequest.cppm"
 )

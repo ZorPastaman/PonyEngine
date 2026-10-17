@@ -18,9 +18,11 @@ target_sources(PonyEngine.Resource.World.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/World.cppm"
 	"Source/World-CopyComponentDeserializer.cppm"
 	"Source/World-LoadableWorldDefinitionLoadRequest.cppm"
+	"Source/World-ResourceObjectDeserializer.cppm"
 	"Source/World-WorldDefinitionLoader.cppm"
 	"Source/World-WorldDefinitionLoaderModule.cppm"
 	"Source/World-WorldDefinitionLoadRequest.cppm"
+	"Source/World-WorldDeserializationRequest.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_RESOURCE_WORLD_ORDER)

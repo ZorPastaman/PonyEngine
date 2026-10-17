@@ -108,6 +108,7 @@ namespace PonyEngine::World
 
 	void WorldService::RegisterComponent(const std::type_index componentType, const std::size_t componentSize, const std::size_t componentAlignment)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		PONY_LOG(logService, Log::LogType::Info, "Registering component type. Type name: '{}'; size: '{}'; alignment: '{}'.",
 			componentType.name(), componentSize, componentAlignment);
 		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
@@ -116,6 +117,7 @@ namespace PonyEngine::World
 
 	void WorldService::RegisterObjectHandleMember(const std::type_index objectType, const bool isConst, const std::type_index componentType, const std::size_t componentOffset)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		PONY_LOG(logService, Log::LogType::Info, "Registering component object handle member. Component type name: '{}'; Object type name: '{}'; Component offset: '{}'.",
 			componentType.name(), objectType.name(), componentOffset);
 		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
@@ -124,6 +126,7 @@ namespace PonyEngine::World
 
 	void WorldService::RegisterEntityReferenceMember(const std::type_index componentType, const std::size_t componentOffset)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		PONY_LOG(logService, Log::LogType::Info, "Registering component entity reference. Component type name: '{}'; Reference offset: '{}'.",
 			componentType.name(), componentOffset);
 		const std::unique_lock<std::shared_mutex> lock = typeRegistry.UniqueLock();
