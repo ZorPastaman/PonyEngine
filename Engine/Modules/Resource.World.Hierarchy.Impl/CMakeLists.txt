@@ -17,6 +17,8 @@ target_sources(PonyEngine.Resource.World.Hierarchy.Impl PRIVATE
 target_sources(PonyEngine.Resource.World.Hierarchy.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Hierarchy.cppm"
 	"Source/Hierarchy-HierarchyDeserializerModule.cppm"
+	"Source/Hierarchy-Transform2DDeserializer.cppm"
+	"Source/Hierarchy-Transform3DDeserializer.cppm"
 )
 
 pony_validate_module_order(PONY_ENGINE_RESOURCE_WORLD_HIERARCHY_ORDER)

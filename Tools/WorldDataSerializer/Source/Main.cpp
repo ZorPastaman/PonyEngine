@@ -247,28 +247,23 @@ std::size_t GetDescriptionSize(const toml::table&, const std::size_t)
 
 std::size_t GetParentSize(const toml::table&, const std::size_t)
 {
-	return sizeof(PonyEngine::World::Hierarchy::Parent);
+	return sizeof(std::uint64_t);
 }
 
 std::size_t GetTransform2DSize(const toml::table&, const std::size_t)
 {
-	return sizeof(PonyEngine::World::Hierarchy::LocalTransform2D);
+	return sizeof(double) * 2uz + sizeof(float) * 3uz;
 }
 
 std::size_t GetTransform3DSize(const toml::table&, const std::size_t)
 {
-	return sizeof(PonyEngine::World::Hierarchy::LocalTransform3D);
+	return sizeof(double) * 3uz + sizeof(float) * 6uz;
 }
 
 void SerializeName(const toml::table& componentTable, const std::span<std::byte> componentData,
 	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
 	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool)
 {
-	if (componentData.size() != sizeof(PonyEngine::World::Name)) [[unlikely]]
-	{
-		throw std::invalid_argument("Invalid component data size");
-	}
-
 	const std::optional<std::string_view> name = componentTable[NamePropertyName].value<std::string_view>();
 	if (!name) [[unlikely]]
 	{
@@ -283,11 +278,6 @@ void SerializeDescription(const toml::table& componentTable, const std::span<std
 	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
 	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, const std::size_t sizeTSize, const bool bigEndian)
 {
-	if (componentData.size() != sizeof(PonyEngine::World::Description)) [[unlikely]]
-	{
-		throw std::invalid_argument("Invalid component data size");
-	}
-
 	const std::optional<std::string_view> object = componentTable[ObjectPropertyName].value<std::string_view>();
 	if (!object) [[unlikely]]
 	{
@@ -307,11 +297,6 @@ void SerializeParent(const toml::table& componentTable, const std::span<std::byt
 	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>&,
 	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool bigEndian)
 {
-	if (componentData.size() != sizeof(PonyEngine::World::Hierarchy::Parent)) [[unlikely]]
-	{
-		throw std::invalid_argument("Invalid component data size");
-	}
-
 	const std::optional<std::string_view> parentId = componentTable[ParentPropertyName].value<std::string_view>();
 	if (!parentId) [[unlikely]]
 	{
@@ -332,11 +317,6 @@ void SerializeTransform2D(const toml::table& componentTable, const std::span<std
 	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
 	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool bigEndian)
 {
-	if (componentData.size() != sizeof(PonyEngine::World::Hierarchy::LocalTransform2D)) [[unlikely]]
-	{
-		throw std::invalid_argument("Invalid component data size");
-	}
-
 	const toml::table* const position = componentTable[PositionPropertyName].as_table();
 	if (!position) [[unlikely]]
 	{
@@ -367,26 +347,18 @@ void SerializeTransform2D(const toml::table& componentTable, const std::span<std
 		throw std::runtime_error("Invalid transform component");
 	}
 
-	const auto transform = PonyEngine::World::Hierarchy::LocalTransform2D(PonyEngine::Math::Vector2<double>(*positionX, *positionY),
-		*rotation, PonyEngine::Math::Vector2<float>(*scaleX, *scaleY));
-
 	auto writer = PonyTools::Memory::ByteWriter(componentData, bigEndian);
-	writer.Write(transform.Position().X());
-	writer.Write(transform.Position().Y());
-	writer.Write(transform.Rotation());
-	writer.Write(transform.Scale().X());
-	writer.Write(transform.Scale().Y());
+	writer.Write(*positionX);
+	writer.Write(*positionY);
+	writer.Write(*rotation * PonyEngine::Math::DegToRad<float>);
+	writer.Write(*scaleX);
+	writer.Write(*scaleY);
 }
 
 void SerializeTransform3D(const toml::table& componentTable, const std::span<std::byte> componentData,
 	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
 	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool bigEndian)
 {
-	if (componentData.size() != sizeof(PonyEngine::World::Hierarchy::LocalTransform3D)) [[unlikely]]
-	{
-		throw std::invalid_argument("Invalid component data size");
-	}
-
 	const toml::table* const position = componentTable[PositionPropertyName].as_table();
 	if (!position) [[unlikely]]
 	{
@@ -426,21 +398,16 @@ void SerializeTransform3D(const toml::table& componentTable, const std::span<std
 		throw std::runtime_error("Invalid transform component");
 	}
 
-	const auto transform = PonyEngine::World::Hierarchy::LocalTransform3D(PonyEngine::Math::Vector3<double>(*positionX, *positionY, *positionZ),
-		PonyEngine::Math::RotationQuaternion(PonyEngine::Math::Vector3<float>(*rotationX, *rotationY, *rotationZ) * PonyEngine::Math::DegToRad<float>),
-		PonyEngine::Math::Vector3<float>(*scaleX, *scaleY, *scaleZ));
-
 	auto writer = PonyTools::Memory::ByteWriter(componentData, bigEndian);
-	writer.Write(transform.Position().X());
-	writer.Write(transform.Position().Y());
-	writer.Write(transform.Position().Z());
-	writer.Write(transform.Rotation().X());
-	writer.Write(transform.Rotation().Y());
-	writer.Write(transform.Rotation().Z());
-	writer.Write(transform.Rotation().W());
-	writer.Write(transform.Scale().X());
-	writer.Write(transform.Scale().Y());
-	writer.Write(transform.Scale().Z());
+	writer.Write(*positionX);
+	writer.Write(*positionY);
+	writer.Write(*positionZ);
+	writer.Write(*rotationX * PonyEngine::Math::DegToRad<float>);
+	writer.Write(*rotationY * PonyEngine::Math::DegToRad<float>);
+	writer.Write(*rotationZ * PonyEngine::Math::DegToRad<float>);
+	writer.Write(*scaleX);
+	writer.Write(*scaleY);
+	writer.Write(*scaleZ);
 }
 
 std::size_t GetResourceSize(const toml::table& componentTable, const std::size_t)

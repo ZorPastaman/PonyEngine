@@ -47,7 +47,7 @@ export namespace PonyEngine::Resource::World
 		CopyComponentDeserializer& operator =(CopyComponentDeserializer&& other) noexcept = default;
 
 	private:
-		virtual void Deserialize(std::span<const std::byte> input, std::span<std::byte> output) override;
+		virtual void Deserialize(std::size_t entityCount, std::span<const std::byte> input, std::span<std::byte> output) override;
 
 		Application::IApplication* application;
 		Log::ILogService* logService;
@@ -93,9 +93,13 @@ namespace PonyEngine::Resource::World
 		PONY_LOG(logService, Log::LogType::Info, "Component type '{}' associated with serialized type '{}' as copy component.", componentType.name(), serializedType);
 	}
 
-	void CopyComponentDeserializer::Deserialize(const std::span<const std::byte> input, const std::span<std::byte> output)
+	void CopyComponentDeserializer::Deserialize(const std::size_t, const std::span<const std::byte> input, const std::span<std::byte> output)
 	{
-		assert(input.size() == output.size() && "Invalid input/output size");
+		if (input.size() != output.size()) [[unlikely]]
+		{
+			throw std::runtime_error("Invalid component table input");
+		}
+
 		std::memcpy(output.data(), input.data(), output.size());
 	}
 }

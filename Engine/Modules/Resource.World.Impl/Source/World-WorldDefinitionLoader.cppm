@@ -717,70 +717,6 @@ namespace PonyEngine::Resource::World
 					{
 						const auto lock = std::shared_lock(deserializerMutex);
 
-						for (std::size_t i = 0uz; i < componentTableCount; ++i)
-						{
-							const std::string_view type = ReadDataString(componentTypes, componentTableTypeLengths[i]);
-							const auto [componentType, componentSize] = GetComponentInfo(type);
-							if (worldDefinition.components.contains(componentType)) [[unlikely]]
-							{
-								throw std::runtime_error("Same component type found twice");
-							}
-
-							const std::size_t tableEntityCount = ReadData<std::size_t>(componentEntityCounts);
-							const std::size_t tableDataSize = componentSize * tableEntityCount;
-							PonyEngine::World::ComponentTableDefinition& tableDefinition = worldDefinition.components[componentType] = PonyEngine::World::ComponentTableDefinition
-							{
-								.entityBindings = std::vector<std::size_t>(tableEntityCount),
-								.data = std::vector<std::byte>(tableDataSize)
-							};
-							ReadData<std::size_t>(componentEntities, tableDefinition.entityBindings);
-
-							const std::size_t tableInputSize = ReadData<std::size_t>(componentDataSizes);
-							const std::span<const std::byte> tableInput = ReadDataSpan<const std::byte>(componentData, tableInputSize);
-
-							std::visit(Utility::Overload
-							{
-								[&](IInlineComponentDeserializer* const deserializer)
-								{
-									deserializer->Deserialize(tableInput, tableDefinition.data);
-								},
-								[&](IComponentDeserializer* const deserializer)
-								{
-									req->IncrementJobCount();
-									try
-									{
-										req->AddDeserializationRequest(deserializer->Deserialize(tableInput, tableDefinition.data, [this, r = req](const IWorldDeserializationRequest& dataRequest) noexcept
-										{
-											switch (dataRequest.Status())
-											{
-											case Async::RequestStatus::Success:
-												break;
-											case Async::RequestStatus::Failure:
-												r->AddExceptions(dataRequest.Exceptions());
-												break;
-											case Async::RequestStatus::Canceled:
-												r->IncrementCancelCount();
-												break;
-											default: [[unlikely]]
-												assert(false && "Unexpected status");
-												break;
-											}
-
-											if (r->DecrementJobCount())
-											{
-												FinishRequest(*r);
-											}
-										}));
-									}
-									catch (...)
-									{
-										req->DecrementJobCount();
-										throw;
-									}
-								}
-							}, GetComponentDeserializer(componentType));
-						}
-
 						for (std::size_t i = 0uz; i < objectCount; ++i)
 						{
 							const std::string_view type = ReadDataString(objectTypes, objectTypeLengths[i]);
@@ -831,6 +767,70 @@ namespace PonyEngine::Resource::World
 									}
 								}
 							}, GetObjectDeserializer(type));
+						}
+
+						for (std::size_t i = 0uz; i < componentTableCount; ++i)
+						{
+							const std::string_view type = ReadDataString(componentTypes, componentTableTypeLengths[i]);
+							const auto [componentType, componentSize] = GetComponentInfo(type);
+							if (worldDefinition.components.contains(componentType)) [[unlikely]]
+							{
+								throw std::runtime_error("Same component type found twice");
+							}
+
+							const std::size_t tableEntityCount = ReadData<std::size_t>(componentEntityCounts);
+							const std::size_t tableDataSize = componentSize * tableEntityCount;
+							PonyEngine::World::ComponentTableDefinition& tableDefinition = worldDefinition.components[componentType] = PonyEngine::World::ComponentTableDefinition
+							{
+								.entityBindings = std::vector<std::size_t>(tableEntityCount),
+								.data = std::vector<std::byte>(tableDataSize)
+							};
+							ReadData<std::size_t>(componentEntities, tableDefinition.entityBindings);
+
+							const std::size_t tableInputSize = ReadData<std::size_t>(componentDataSizes);
+							const std::span<const std::byte> tableInput = ReadDataSpan<const std::byte>(componentData, tableInputSize);
+
+							std::visit(Utility::Overload
+							{
+								[&](IInlineComponentDeserializer* const deserializer)
+								{
+									deserializer->Deserialize(tableEntityCount, tableInput, tableDefinition.data);
+								},
+								[&](IComponentDeserializer* const deserializer)
+								{
+									req->IncrementJobCount();
+									try
+									{
+										req->AddDeserializationRequest(deserializer->Deserialize(tableEntityCount, tableInput, tableDefinition.data, [this, r = req](const IWorldDeserializationRequest& dataRequest) noexcept
+										{
+											switch (dataRequest.Status())
+											{
+											case Async::RequestStatus::Success:
+												break;
+											case Async::RequestStatus::Failure:
+												r->AddExceptions(dataRequest.Exceptions());
+												break;
+											case Async::RequestStatus::Canceled:
+												r->IncrementCancelCount();
+												break;
+											default: [[unlikely]]
+												assert(false && "Unexpected status");
+												break;
+											}
+
+											if (r->DecrementJobCount())
+											{
+												FinishRequest(*r);
+											}
+										}));
+									}
+									catch (...)
+									{
+										req->DecrementJobCount();
+										throw;
+									}
+								}
+							}, GetComponentDeserializer(componentType));
 						}
 					}
 

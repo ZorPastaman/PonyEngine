@@ -25,9 +25,10 @@ export namespace PonyEngine::Resource::World
 		PONY_INTERFACE_BODY(IInlineComponentDeserializer)
 
 		/// @brief Deserializes a component.
+		/// @param entityCount Entity count in the component table.
 		/// @param input Input bytes.
 		/// @param output Output bytes.
-		virtual void Deserialize(std::span<const std::byte> input, std::span<std::byte> output) = 0;
+		virtual void Deserialize(std::size_t entityCount, std::span<const std::byte> input, std::span<std::byte> output) = 0;
 	};
 
 	/// @brief Component deserializer that executes in async manner.
@@ -36,12 +37,13 @@ export namespace PonyEngine::Resource::World
 		PONY_INTERFACE_BODY(IComponentDeserializer)
 
 		/// @brief Creates a deserialization request.
+		/// @param entityCount Entity count in the component table.
 		/// @param input Input bytes.
 		/// @param output Output bytes.
 		/// @param callback Callback.
 		/// @return Deserialization request.
 		[[nodiscard("Weird call")]]
-		virtual std::shared_ptr<IWorldDeserializationRequest> Deserialize(std::span<const std::byte> input, std::span<std::byte> output,
+		virtual std::shared_ptr<IWorldDeserializationRequest> Deserialize(std::size_t entityCount, std::span<const std::byte> input, std::span<std::byte> output,
 			std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback = nullptr) = 0;
 	};
 }
