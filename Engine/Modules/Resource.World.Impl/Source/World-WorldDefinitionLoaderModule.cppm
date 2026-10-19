@@ -48,7 +48,8 @@ export namespace PonyEngine::Resource::World
 		void DestroyResourceObjectDeserializer(Application::IModuleContext& context);
 
 		/// @brief Registers basic deserializers.
-		void RegisterDeserializers() const;
+		void RegisterComponentDeserializers() const;
+		void RegisterResourceDeserializers() const;
 
 		static constexpr std::string_view WorldDefinitionResourceType = "Pony.WorldDefinition"; ///< World definition resource type.
 		static constexpr std::string_view NameType = "Pony.Name"; ///< PonyEngine::World::Name serialized type.
@@ -75,7 +76,8 @@ namespace PonyEngine::Resource::World
 				CreateResourceObjectDeserializer(context);
 				try
 				{
-					RegisterDeserializers();
+					RegisterComponentDeserializers();
+					RegisterResourceDeserializers();
 				}
 				catch (...)
 				{
@@ -177,10 +179,16 @@ namespace PonyEngine::Resource::World
 		resourceObjectDeserializer.reset();
 	}
 
-	void WorldDefinitionLoaderModule::RegisterDeserializers() const
+	void WorldDefinitionLoaderModule::RegisterComponentDeserializers() const
 	{
 		const auto deserializer = static_cast<ICopyComponentDeserializer*>(copyComponentDeserializer.get());
 		deserializer->Associate<PonyEngine::World::Name>(NameType);
 		deserializer->Associate<PonyEngine::World::Description>(DescriptionType);
+	}
+
+	void WorldDefinitionLoaderModule::RegisterResourceDeserializers() const
+	{
+		const auto deserializer = static_cast<IResourceObjectDeserializer*>(resourceObjectDeserializer.get());
+		deserializer->Associate<std::string_view>(StringType);
 	}
 }

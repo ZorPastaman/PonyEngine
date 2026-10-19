@@ -40,12 +40,13 @@ export namespace PonyEngine::Resource::Pack
 
 		/// @brief Creates a file loadable data access request.
 		/// @param dataFile Data file.
+		/// @param fileOffset Data file offset.
 		/// @param fileSize Data file size.
 		/// @param params Load parameters.
 		/// @param callback Callback.
 		/// @return File loadable data access request.
 		[[nodiscard("Pure function")]]
-		std::shared_ptr<FileLoadableDataAccessRequest> CreateRequest(File::IFile& dataFile, std::size_t fileSize, const LoadParams& params, 
+		std::shared_ptr<FileLoadableDataAccessRequest> CreateRequest(File::IFile& dataFile, std::size_t fileOffset, std::size_t fileSize, const LoadParams& params, 
 			std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const;
 		/// @brief Creates a memory loadable data access request.
 		/// @param source Memory source.
@@ -113,8 +114,8 @@ namespace PonyEngine::Resource::Pack
 #endif
 	}
 
-	std::shared_ptr<FileLoadableDataAccessRequest> LoadableDataAccessRequestWorker::CreateRequest(File::IFile& dataFile, const std::size_t fileSize, const LoadParams& params,
-		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const
+	std::shared_ptr<FileLoadableDataAccessRequest> LoadableDataAccessRequestWorker::CreateRequest(File::IFile& dataFile, const std::size_t fileOffset, const std::size_t fileSize, 
+		const LoadParams& params, std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback) const
 	{
 		if (!params.buffer.data()) [[unlikely]]
 		{
@@ -151,7 +152,7 @@ namespace PonyEngine::Resource::Pack
 
 		try
 		{
-			const auto readParams = File::ReadParams{.buffer = params.buffer, .offset = params.offset};
+			const auto readParams = File::ReadParams{.buffer = params.buffer, .offset = fileOffset + params.offset};
 			request->FileRequest(dataFile.Read(readParams, [this, req = request.get()](const File::IReadRequest& readRequest) noexcept
 			{
 				std::shared_ptr<LoadableDataAccessRequest> finishedRequest = RemoveRequest(req);

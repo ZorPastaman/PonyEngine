@@ -103,7 +103,7 @@ namespace PonyEngine::World
 
 	bool ObjectTable::IsObjectValid(const std::type_index objectType, const bool isConst, const TypelessObjectHandle handle) const noexcept
 	{
-		if (Math::IsOdd(handle.id) && handle.id < objectsSparse.size() && handleVersions[handle.id] == handle.version && objectsSparse[handle.id] < objectsDense.size() &&
+		if (Math::IsOdd(handle.version) && handle.id < objectsSparse.size() && handleVersions[handle.id] == handle.version && objectsSparse[handle.id] < objectsDense.size() &&
 			objectsDense[objectsSparse[handle.id]] == handle.id)
 		{
 			const Object& object = objects[objectsSparse[handle.id]];

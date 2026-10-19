@@ -19,21 +19,32 @@ import PonyEngine.World.Hierarchy;
 
 import PonyTools.Memory;
 
+constexpr std::string_view NamePropertyName = "name";
+constexpr std::string_view ObjectPropertyName = "object";
 constexpr std::string_view ParentPropertyName = "parent";
 constexpr std::string_view PositionPropertyName = "position";
 constexpr std::string_view RotationPropertyName = "rotation";
 constexpr std::string_view ScalePropertyName = "scale";
-constexpr std::string_view NamePropertyName = "name";
+constexpr std::string_view InterfacePropertyName = "interface";
+constexpr std::string_view ResourcePropertyName = "resource";
 
 using GetComponentSizeFunction = std::size_t(*)(const toml::table&, std::size_t);
 using SerializeComponentFunction = void(*)(const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, 
 	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::string_view>&, std::size_t, bool);
+using GetObjectSizeFunction = std::size_t(*)(const toml::table&, std::size_t); ///< @p GetObjectSize() function.
+using SerializeObjectFunction = void(*)(const toml::table&, std::span<std::byte>, std::size_t, bool); ///< @p SerializeObject() function.
 
 struct ComponentEntry final
 {
 	std::string_view type;
 	GetComponentSizeFunction sizeFunction;
 	SerializeComponentFunction serializeFunction;
+};
+struct ObjectEntry final
+{
+	std::string_view type;
+	GetObjectSizeFunction sizeFunction;
+	SerializeObjectFunction serializeFunction;
 };
 
 struct alignas(std::span<const std::string_view>) StringViewSpan final
@@ -50,10 +61,19 @@ extern "C"
 	PONY_DLL_EXPORT_IMPL bool SerializeComponent(std::size_t typeIndex, const toml::table& componentTable, std::span<std::byte> componentData,
 		const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
 		const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian) noexcept;
+
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT_IMPL StringViewSpan GetObjectTypes() noexcept;
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT_IMPL std::size_t GetObjectSize(std::size_t typeIndex, const toml::table& objectTable, std::size_t sizeTSize) noexcept;
+	PONY_DLL_EXPORT_IMPL bool SerializeObject(std::size_t typeIndex, const toml::table& objectTable, std::span<std::byte> objectData,
+		std::size_t sizeTSize, bool bigEndian) noexcept;
 }
 
 [[nodiscard("Pure function")]]
 std::size_t GetNameSize(const toml::table& componentTable, std::size_t sizeTSize);
+[[nodiscard("Pure function")]]
+std::size_t GetDescriptionSize(const toml::table& componentTable, std::size_t sizeTSize);
 
 [[nodiscard("Pure function")]]
 std::size_t GetParentSize(const toml::table& componentTable, std::size_t sizeTSize);
@@ -63,6 +83,9 @@ std::size_t GetTransform2DSize(const toml::table& componentTable, std::size_t si
 std::size_t GetTransform3DSize(const toml::table& componentTable, std::size_t sizeTSize);
 
 void SerializeName(const toml::table& componentTable, std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian);
+void SerializeDescription(const toml::table& componentTable, std::span<std::byte> componentData,
 	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
 	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian);
 
@@ -79,11 +102,11 @@ void SerializeTransform3D(const toml::table& componentTable, std::span<std::byte
 constexpr std::array ComponentEntries
 {
 	ComponentEntry{.type = "Pony.Name", .sizeFunction = &GetNameSize, .serializeFunction = &SerializeName},
+	ComponentEntry{.type = "Pony.Description", .sizeFunction = &GetDescriptionSize, .serializeFunction = &SerializeDescription},
 	ComponentEntry{.type = "Pony.Parent", .sizeFunction = &GetParentSize, .serializeFunction = &SerializeParent},
 	ComponentEntry{.type = "Pony.Transform2D", .sizeFunction = &GetTransform2DSize, .serializeFunction = &SerializeTransform2D},
 	ComponentEntry{.type = "Pony.Transform3D", .sizeFunction = &GetTransform3DSize, .serializeFunction = &SerializeTransform3D}
 };
-
 [[nodiscard("Pure function")]]
 constexpr std::array<std::string_view, ComponentEntries.size()> GetComponentEntryTypes()
 {
@@ -96,6 +119,28 @@ constexpr std::array<std::string_view, ComponentEntries.size()> GetComponentEntr
 	return types;
 }
 constexpr std::array<std::string_view, ComponentEntries.size()> ComponentTypes = GetComponentEntryTypes();
+
+[[nodiscard("Pure function")]]
+std::size_t GetResourceSize(const toml::table& componentTable, std::size_t sizeTSize);
+
+void SerializeResource(const toml::table& componentTable, std::span<std::byte> componentData, std::size_t sizeTSize, bool bigEndian);
+
+constexpr std::array ObjectEntries
+{
+	ObjectEntry{.type = "Pony.Resource", .sizeFunction = &GetResourceSize, .serializeFunction = &SerializeResource}
+};
+[[nodiscard("Pure function")]]
+constexpr std::array<std::string_view, ObjectEntries.size()> GetObjectEntryTypes()
+{
+	std::array<std::string_view, ObjectEntries.size()> types;
+	for (std::size_t i = 0uz; i < types.size(); ++i)
+	{
+		types[i] = ObjectEntries[i].type;
+	}
+
+	return types;
+}
+constexpr std::array<std::string_view, ObjectEntries.size()> ObjectTypes = GetObjectEntryTypes();
 
 StringViewSpan GetComponentTypes() noexcept
 {
@@ -144,9 +189,60 @@ bool SerializeComponent(const std::size_t typeIndex, const toml::table& componen
 	return false;
 }
 
+StringViewSpan GetObjectTypes() noexcept
+{
+	constexpr std::span<const std::string_view> types = ObjectTypes;
+	StringViewSpan span;
+	std::memcpy(&span, &types, sizeof(StringViewSpan));
+	return span;
+}
+
+std::size_t GetObjectSize(const std::size_t typeIndex, const toml::table& objectTable, const std::size_t sizeTSize) noexcept
+{
+	try
+	{
+		return ObjectEntries[typeIndex].sizeFunction(objectTable, sizeTSize);
+	}
+	catch (const std::exception& e)
+	{
+		std::println(std::cerr, "Exception of type '{}' on getting object size. Message: '{}'.", typeid(e).name(), e.what());
+	}
+	catch (...)
+	{
+		std::println(std::cerr, "Unknown exception on serializing data.");
+	}
+
+	return std::numeric_limits<std::size_t>::max();
+}
+
+bool SerializeObject(const std::size_t typeIndex, const toml::table& objectTable, const std::span<std::byte> objectData,
+	const std::size_t sizeTSize, const bool bigEndian) noexcept
+{
+	try
+	{
+		ObjectEntries[typeIndex].serializeFunction(objectTable, objectData, sizeTSize, bigEndian);
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		std::println(std::cerr, "Exception of type '{}' on serializing object. Message: '{}'.", typeid(e).name(), e.what());
+	}
+	catch (...)
+	{
+		std::println(std::cerr, "Unknown exception on serializing object.");
+	}
+
+	return false;
+}
+
 std::size_t GetNameSize(const toml::table&, const std::size_t)
 {
 	return sizeof(PonyEngine::World::Name);
+}
+
+std::size_t GetDescriptionSize(const toml::table&, const std::size_t)
+{
+	return sizeof(PonyEngine::World::Description);
 }
 
 std::size_t GetParentSize(const toml::table&, const std::size_t)
@@ -181,6 +277,30 @@ void SerializeName(const toml::table& componentTable, const std::span<std::byte>
 
 	const auto nameComponent = PonyEngine::World::Name(*name);
 	std::memcpy(componentData.data(), &nameComponent, sizeof(PonyEngine::World::Name));
+}
+
+void SerializeDescription(const toml::table& componentTable, const std::span<std::byte> componentData,
+	const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex,
+	const std::unordered_map<std::string_view, std::string_view>& objectIDToType, const std::size_t sizeTSize, const bool bigEndian)
+{
+	if (componentData.size() != sizeof(PonyEngine::World::Description)) [[unlikely]]
+	{
+		throw std::invalid_argument("Invalid component data size");
+	}
+
+	const std::optional<std::string_view> object = componentTable[ObjectPropertyName].value<std::string_view>();
+	if (!object) [[unlikely]]
+	{
+		throw std::runtime_error("Invalid description component");
+	}
+	const auto position = objectIDToIndex.find(*object);
+	if (position == objectIDToIndex.cend()) [[unlikely]]
+	{
+		throw std::runtime_error("Object not found");
+	}
+
+	auto writer = PonyTools::Memory::ByteWriter(componentData, bigEndian);
+	writer.Write(position->second);
 }
 
 void SerializeParent(const toml::table& componentTable, const std::span<std::byte> componentData,
@@ -321,4 +441,40 @@ void SerializeTransform3D(const toml::table& componentTable, const std::span<std
 	writer.Write(transform.Scale().X());
 	writer.Write(transform.Scale().Y());
 	writer.Write(transform.Scale().Z());
+}
+
+std::size_t GetResourceSize(const toml::table& componentTable, const std::size_t)
+{
+	const std::optional<std::string_view> interface = componentTable[InterfacePropertyName].value<std::string_view>();
+	if (!interface || interface->size() > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
+	{
+		throw std::runtime_error("Invalid resource object");
+	}
+	const std::optional<std::string_view> resource = componentTable[ResourcePropertyName].value<std::string_view>();
+	if (!resource || resource->size() > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
+	{
+		throw std::runtime_error("Invalid resource object");
+	}
+
+	return sizeof(std::uint8_t) * 2uz + interface->size() + resource->size();
+}
+
+void SerializeResource(const toml::table& componentTable, const std::span<std::byte> componentData, const std::size_t sizeTSize, const bool bigEndian)
+{
+	const std::optional<std::string_view> interface = componentTable[InterfacePropertyName].value<std::string_view>();
+	if (!interface || interface->size() > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
+	{
+		throw std::runtime_error("Invalid resource object");
+	}
+	const std::optional<std::string_view> resource = componentTable[ResourcePropertyName].value<std::string_view>();
+	if (!resource || resource->size() > std::numeric_limits<std::uint8_t>::max()) [[unlikely]]
+	{
+		throw std::runtime_error("Invalid resource object");
+	}
+
+	auto writer = PonyTools::Memory::ByteWriter(componentData, bigEndian);
+	writer.Write(static_cast<std::uint8_t>(interface->size()));
+	writer.Write(static_cast<std::uint8_t>(resource->size()));
+	writer.Write(*interface);
+	writer.Write(*resource);
 }

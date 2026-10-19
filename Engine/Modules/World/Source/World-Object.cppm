@@ -125,7 +125,7 @@ export namespace PonyEngine::World
 		/// @brief Validates the requested data type.
 		/// @tparam T Requested data type.
 		template<typename T>
-		void ValidateGet();
+		void ValidateGet() const;
 
 		/// @brief Gets the intermediate cast type.
 		/// @tparam T Target type.
@@ -278,7 +278,7 @@ namespace PonyEngine::World
 	}
 
 	template<typename T>
-	void Object::ValidateGet()
+	void Object::ValidateGet() const
 	{
 		if constexpr (!std::is_void_v<T>)
 		{

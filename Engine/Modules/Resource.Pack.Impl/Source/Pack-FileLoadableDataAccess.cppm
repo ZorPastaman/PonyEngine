@@ -78,6 +78,6 @@ namespace PonyEngine::Resource::Pack
 	std::shared_ptr<ILoadableDataAccessRequest> FileLoadableDataAccess::Load(const LoadParams& params,
 		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback)
 	{
-		return worker->CreateRequest(*dataFile, size, params, std::move(callback));
+		return worker->CreateRequest(*dataFile, offset, size, params, std::move(callback));
 	}
 }

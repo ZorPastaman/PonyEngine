@@ -13,7 +13,7 @@ endmacro()
 # resource_list - path to a resource list file.
 function(pony_add_resource id data load resource_list)
 	cmake_path(ABSOLUTE_PATH data OUTPUT_VARIABLE data_abs)
-	if(${load})
+	if(load)
 		cmake_path(ABSOLUTE_PATH load OUTPUT_VARIABLE load_abs)
 		file(APPEND "${resource_list}" "\"${id}\" \"${data_abs}\" \"${load_abs}\"\n")
 	else()

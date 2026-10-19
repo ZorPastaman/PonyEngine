@@ -31,6 +31,9 @@ export namespace PonyTools::Memory
 
 		template<PonyEngine::Utility::Arithmetic T>
 		void Write(T value) noexcept;
+		template<PonyEngine::Utility::Arithmetic T>
+		void Write(std::span<const T> values) noexcept;
+		void Write(std::string_view string) noexcept;
 
 		void Skip(std::size_t count) noexcept;
 
@@ -69,6 +72,23 @@ namespace PonyTools::Memory
 			const T data = shouldSwap ? std::byteswap(value) : value;
 			std::memcpy(current, &data, sizeof(T));
 			current += sizeof(T);
+		}
+	}
+
+	template<PonyEngine::Utility::Arithmetic T>
+	void ByteWriter::Write(const std::span<const T> values) noexcept
+	{
+		for (const T value : values)
+		{
+			Write(value);
+		}
+	}
+
+	void ByteWriter::Write(const std::string_view string) noexcept
+	{
+		for (const char symbol : string)
+		{
+			Write(symbol);
 		}
 	}
 
