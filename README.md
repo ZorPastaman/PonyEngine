@@ -16,7 +16,6 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 - CMake 3.31;
 - Ninja generator;
 - C\++ 23 compiler;
-- HLSL SM 6.6 compiler;
 - Platform SDKs.
 
 ## Quick start for game developers

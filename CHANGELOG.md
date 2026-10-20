@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Resource module.
 - Resource pack module.
 - Text resource module.
-- World definition resource module.
+- World definition resource modules.
 - WinAPI input module.
 - Text compiler tool.
 - Resource packer tool.
