@@ -16,6 +16,8 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Chrono-Conversion.cppm"
 	"Source/Container.cppm"
 	"Source/Container-AlignedAllocator.cppm"
+	"Source/FileSystem.cppm"
+	"Source/FileSystem-DynamicLibrary.cppm"
 	"Source/Format.cppm"
 	"Source/Format-Optional.cppm"
 	"Source/Hash.cppm"

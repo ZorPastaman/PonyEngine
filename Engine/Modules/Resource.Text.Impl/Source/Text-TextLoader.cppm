@@ -216,11 +216,11 @@ namespace PonyEngine::Resource::Text
 				std::shared_ptr<OngoingResourceLoadRequest> loadRequest = RemoveOngoingRequest(req);
 				switch (accessRequest.Status())
 				{
-				case Async::RequestStatus::Success:
+				case Async::RequestStatus::Success: [[likely]]
 					loadRequest->SetSuccess();
 					break;
 				case Async::RequestStatus::Failure:
-					loadRequest->SetException(accessRequest.Exception());
+					loadRequest->SetFailure(accessRequest.Exception());
 					break;
 				case Async::RequestStatus::Canceled:
 					loadRequest->SetCanceled();

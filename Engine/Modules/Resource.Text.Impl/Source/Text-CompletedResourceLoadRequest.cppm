@@ -40,7 +40,7 @@ export namespace PonyEngine::Resource::Text
 		[[nodiscard("Pure function")]] 
 		virtual std::span<const void* const> ResourceInterfaces() const override;
 		[[nodiscard("Pure function")]]
-		virtual const std::exception_ptr& Exception() const override;
+		virtual std::span<const std::exception_ptr> Exceptions() const override;
 
 		virtual void Cancel() override;
 
@@ -78,7 +78,7 @@ namespace PonyEngine::Resource::Text
 		return std::span(&resourceInterface, 1uz);
 	}
 
-	const std::exception_ptr& CompletedResourceLoadRequest::Exception() const
+	std::span<const std::exception_ptr> CompletedResourceLoadRequest::Exceptions() const
 	{
 		throw std::logic_error("Invalid status");
 	}

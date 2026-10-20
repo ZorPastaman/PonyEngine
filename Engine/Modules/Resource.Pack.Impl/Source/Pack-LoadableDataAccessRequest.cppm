@@ -53,7 +53,7 @@ export namespace PonyEngine::Resource::Pack
 		void SetSuccess(std::size_t byteCount) noexcept;
 		/// @brief Sets the status to failure.
 		/// @param exception Exception that occured during the request execution.
-		void SetFailed(std::exception_ptr exception) noexcept;
+		void SetFailure(std::exception_ptr exception) noexcept;
 		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
@@ -122,10 +122,7 @@ namespace PonyEngine::Resource::Pack
 
 	void LoadableDataAccessRequest::Wait() const noexcept
 	{
-		while (status.load(std::memory_order::acquire) == Async::RequestStatus::Pending)
-		{
-			status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
-		}
+		status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 	}
 
 	void LoadableDataAccessRequest::SetSuccess(const std::size_t byteCount) noexcept
@@ -139,7 +136,7 @@ namespace PonyEngine::Resource::Pack
 		InvokeCallback();
 	}
 
-	void LoadableDataAccessRequest::SetFailed(std::exception_ptr exception) noexcept
+	void LoadableDataAccessRequest::SetFailure(std::exception_ptr exception) noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 

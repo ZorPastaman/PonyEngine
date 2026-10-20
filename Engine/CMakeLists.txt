@@ -7,6 +7,7 @@ include("CMake/Project.cmake")
 
 include("CMake/Resource.cmake")
 include("CMake/TextCompiler.cmake")
+include("CMake/WorldCompiler.cmake")
 include("CMake/ResourcePacker.cmake")
 
 set(PONY_COMPANY_NAME "PonyEngine" CACHE STRING "Company name. It's used to create project folders. So, it must be a valid directory name.")

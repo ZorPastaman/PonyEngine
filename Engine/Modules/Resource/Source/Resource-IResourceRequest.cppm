@@ -57,11 +57,11 @@ export namespace PonyEngine::Resource
 		/// @return Resource.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::shared_ptr<const T> Resource() const;
-		/// @brief Gets an exception that occured during the request execution.
-		/// @return Exception.
+		/// @brief Gets exceptions that occured during the request execution.
+		/// @return Exceptions.
 		/// @note It's valid to call it only if the request status is failure.
 		[[nodiscard("Pure function")]]
-		virtual const std::exception_ptr& Exception() const = 0;
+		virtual std::span<const std::exception_ptr> Exceptions() const = 0;
 	};
 }
 

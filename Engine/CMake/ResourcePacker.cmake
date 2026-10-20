@@ -56,6 +56,7 @@ function(pony_pack_resources data_params data_output manifest)
 	endif()
 	list(APPEND PACKER_OPTIONS -d "${PACKER_DEP_FILE_PATH}")
 
+	message(STATUS ${PACKER_OPTIONS})
 	add_custom_command(COMMAND PonyResourcePacker ${PACKER_OPTIONS}
 		DEPENDS ${PACKER_DEPENDS} ${arg_ADDITIONAL_DEPENDENCIES}
 		OUTPUT ${PACKER_OUTPUT}

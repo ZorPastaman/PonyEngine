@@ -25,6 +25,10 @@ It allows to reuse the same ID for another entity.
 
 Component concept. It requires a component to be a pod-like struct.
 
+#### [Object](Source/World-Object.cppm)
+
+`std::shared_ptr` wrapper that may be added to a world to make an object reference.
+
 #### [ObjectHandle](Source/World-ObjectHandle.cppm)
 
 Because components must be pod, you can't have object references like `std::shared_ptr` in the them.
@@ -49,6 +53,10 @@ Also, each world has its own object storage.
 #### [IWorldService](Source/World-IWorldService.cppm)
 
 World service public interface. It provides functions for component registration and world creation.
+
+#### [WorldDefinition](Source/World-WorldDefinition.cppm)
+
+World definition. It's a serialized data that may be used to create a world.
 
 ## How to manage components
 

@@ -6,6 +6,7 @@ On its initialization it registers all the hierarchy components. No need for tha
 
 ## Dependencies
 
+- [PonyEngine.Application](../Application)
 - [PonyEngine.Core](../Core)
 - [PonyEngine.World](../World)
 - [PonyEngine.World.Hierarchy](../World.Hierarchy)

@@ -315,12 +315,16 @@ namespace PonyEngine::Resource::Pack
 					break;
 				case Async::RequestStatus::Failure:
 					req->ManifestException(readRequest.Exception());
-					if (req->DecrementRequestCount()) [[likely]]
+					if (req->DecrementRequestCount())
 					{
 						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-						mountRequest->SetFailure(req->ManifestException());
+						mountRequest->SetFailure();
 						mountRequest.reset();
 						DecrementOngoingRequestCount();
+					}
+					else
+					{
+						req->Cancel();
 					}
 					break;
 				case Async::RequestStatus::Canceled:
@@ -329,7 +333,7 @@ namespace PonyEngine::Resource::Pack
 						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 						if (mountRequest->HasDataException()) [[unlikely]]
 						{
-							mountRequest->SetFailure(req->DataException());
+							mountRequest->SetFailure();
 						}
 						else [[likely]]
 						{
@@ -371,12 +375,16 @@ namespace PonyEngine::Resource::Pack
 						break;
 					case Async::RequestStatus::Failure:
 						req->DataException(readRequest.Exception());
-						if (req->DecrementRequestCount()) [[likely]]
+						if (req->DecrementRequestCount())
 						{
 							std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-							mountRequest->SetFailure(req->HasManifestException() ? req->ManifestException() : req->DataException());
+							mountRequest->SetFailure();
 							mountRequest.reset();
 							DecrementOngoingRequestCount();
+						}
+						else
+						{
+							req->Cancel();
 						}
 						break;
 					case Async::RequestStatus::Canceled:
@@ -385,7 +393,7 @@ namespace PonyEngine::Resource::Pack
 							std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
 							if (mountRequest->HasManifestException()) [[unlikely]]
 							{
-								mountRequest->SetFailure(mountRequest->ManifestException());
+								mountRequest->SetFailure();
 							}
 							else [[likely]]
 							{
@@ -407,7 +415,7 @@ namespace PonyEngine::Resource::Pack
 				if (request->DecrementRequestCount())
 				{
 					std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(request.get());
-					mountRequest->SetFailure(request->HasManifestException() ? request->ManifestException() : request->DataException());
+					mountRequest->SetFailure();
 					mountRequest.reset();
 					DecrementOngoingRequestCount();
 				}
@@ -458,7 +466,7 @@ namespace PonyEngine::Resource::Pack
 						CreatePack(*req);
 					}
 				}
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
@@ -511,7 +519,7 @@ namespace PonyEngine::Resource::Pack
 
 				const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
 				unmountRequest->SetSuccess();
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
@@ -820,7 +828,7 @@ namespace PonyEngine::Resource::Pack
 					if (req->DecrementRequestCount())
 					{
 						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-						mountRequest->SetFailure(req->ManifestException());
+						mountRequest->SetFailure();
 						mountRequest.reset();
 						DecrementOngoingRequestCount();
 					}
@@ -833,7 +841,7 @@ namespace PonyEngine::Resource::Pack
 						CreatePack(*req);
 					}
 				}
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
@@ -841,7 +849,7 @@ namespace PonyEngine::Resource::Pack
 			if (request.DecrementRequestCount())
 			{
 				std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(&request);
-				mountRequest->SetFailure(request.ManifestException());
+				mountRequest->SetFailure();
 				mountRequest.reset();
 				DecrementOngoingRequestCount();
 			}
@@ -1008,17 +1016,17 @@ namespace PonyEngine::Resource::Pack
 				{
 					req->ManifestException(std::current_exception());
 					std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-					mountRequest->SetFailure(req->ManifestException());
+					mountRequest->SetFailure();
 					mountRequest.reset();
 					DecrementOngoingRequestCount();
 				}
-			});
+			}, Job::JobParams{.priority = Job::JobPriority::Low});
 		}
 		catch (...)
 		{
 			request.ManifestException(std::current_exception());
 			std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(&request);
-			mountRequest->SetFailure(request.ManifestException());
+			mountRequest->SetFailure();
 			mountRequest.reset();
 			DecrementOngoingRequestCount();
 		}

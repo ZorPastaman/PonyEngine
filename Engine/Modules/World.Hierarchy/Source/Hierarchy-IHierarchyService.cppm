@@ -191,19 +191,23 @@ export namespace PonyEngine::World::Hierarchy
 		/// @brief Removes a local and a world transforms from the @p entity.
 		/// @param world World.
 		/// @param entity Entity. Must be valid.
-		void RemoveTransforms2D(IWorld& world, Entity entity) const;
+		/// @param includeChildren Should it remove transforms from its children as well?
+		void RemoveTransforms2D(IWorld& world, Entity entity, bool includeChildren) const;
 		/// @brief Removes local and world transforms from the @p entities.
 		/// @param world World.
 		/// @param entities Entities. Must be valid.
-		virtual void RemoveTransforms2D(IWorld& world, std::span<const Entity> entities) const = 0;
+		/// @param includeChildren Should it remove transforms from their children as well?
+		virtual void RemoveTransforms2D(IWorld& world, std::span<const Entity> entities, bool includeChildren) const = 0;
 		/// @brief Removes a local and a world transforms from the @p entity.
 		/// @param world World.
 		/// @param entity Entity. Must be valid.
-		void RemoveTransforms3D(IWorld& world, Entity entity) const;
+		/// @param includeChildren Should it remove transforms from its children as well?
+		void RemoveTransforms3D(IWorld& world, Entity entity, bool includeChildren) const;
 		/// @brief Removes local and world transforms from the @p entities.
 		/// @param world World.
 		/// @param entities Entities. Must be valid.
-		virtual void RemoveTransforms3D(IWorld& world, std::span<const Entity> entities) const = 0;
+		/// @param includeChildren Should it remove transforms from their children as well?
+		virtual void RemoveTransforms3D(IWorld& world, std::span<const Entity> entities, bool includeChildren) const = 0;
 
 		/// @brief Adds a dirty transform to the @p entity.
 		/// @param world World.
@@ -357,14 +361,14 @@ namespace PonyEngine::World::Hierarchy
 		AddLocalTransforms3D(world, entities, std::span(&transform, 1uz));
 	}
 
-	void IHierarchyService::RemoveTransforms2D(IWorld& world, const Entity entity) const
+	void IHierarchyService::RemoveTransforms2D(IWorld& world, const Entity entity, const bool includeChildren) const
 	{
-		RemoveTransforms2D(world, std::span(&entity, 1uz));
+		RemoveTransforms2D(world, std::span(&entity, 1uz), includeChildren);
 	}
 
-	void IHierarchyService::RemoveTransforms3D(IWorld& world, const Entity entity) const
+	void IHierarchyService::RemoveTransforms3D(IWorld& world, const Entity entity, const bool includeChildren) const
 	{
-		RemoveTransforms3D(world, std::span(&entity, 1uz));
+		RemoveTransforms3D(world, std::span(&entity, 1uz), includeChildren);
 	}
 
 	void IHierarchyService::AddDirtyTransform(IWorld& world, const Entity entity) const

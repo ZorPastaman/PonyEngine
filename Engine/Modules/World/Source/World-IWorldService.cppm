@@ -19,6 +19,7 @@ import std;
 
 import :Component;
 import :IWorld;
+import :WorldDefinition;
 
 export namespace PonyEngine::World
 {
@@ -29,7 +30,7 @@ export namespace PonyEngine::World
 
 		/// @brief Registers the component type.
 		/// @tparam T Component type.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		template<Component T>
 		void RegisterComponent();
 		/// @brief Registers the component object handle member.
@@ -37,29 +38,47 @@ export namespace PonyEngine::World
 		/// @tparam Object Object type.
 		/// @param member Member pointer. Mustn't be nullptr.
 		/// @remark It's used for correct garbage collection.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		template<Component Component, typename Object>
-		void RegisterComponentObjectHandleMember(ObjectHandle<Object> Component::* member);
+		void RegisterObjectHandleMember(ObjectHandle<Object> Component::* member);
+		/// @brief Register the component entity reference member.
+		/// @tparam Component Component type.
+		/// @param member Entity reference member. Mustn't be nullptr.
+		/// @note The function must be called on main thread.
+		template<Component Component>
+		void RegisterEntityReferenceMember(Entity Component::* member);
 
 		/// @brief Creates a world.
 		/// @return World.
 		/// @note The function is thread-safe.
-		[[nodiscard("Weird call")]]
+		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<IWorld> CreateWorld() = 0;
+		/// @brief Creates a world.
+		/// @param definition World definition.
+		/// @return World.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IWorld> CreateWorld(const WorldDefinition& definition) = 0;
 
 	protected:
 		/// @brief Registers the component type.
 		/// @param componentType Component type.
 		/// @param componentSize Component size.
 		/// @param componentAlignment Component alignment.
-		/// @note The function is thread-safe.
+		/// @note The function must be called on main thread.
 		virtual void RegisterComponent(std::type_index componentType, std::size_t componentSize, std::size_t componentAlignment) = 0;
 		/// @brief Registers the component object handle member.
 		/// @param objectType Object type.
+		/// @param isConst Is an object const?
 		/// @param componentType Component type.
 		/// @param componentOffset Component offset.
-		/// @note The function is thread-safe.
-		virtual void RegisterComponentObjectHandleMember(std::type_index objectType, std::type_index componentType, std::size_t componentOffset) = 0;
+		/// @note The function must be called on main thread.
+		virtual void RegisterObjectHandleMember(std::type_index objectType, bool isConst, std::type_index componentType, std::size_t componentOffset) = 0;
+		/// @brief Register the component entity reference member.
+		/// @param componentType Component type.
+		/// @param componentOffset Entity reference member. Mustn't be nullptr.
+		/// @note The function must be called on main thread.
+		virtual void RegisterEntityReferenceMember(std::type_index componentType, std::size_t componentOffset) = 0;
 	};
 }
 
@@ -72,12 +91,22 @@ namespace PonyEngine::World
 	}
 
 	template<Component Component, typename Object>
-	void IWorldService::RegisterComponentObjectHandleMember(ObjectHandle<Object> Component::* const member)
+	void IWorldService::RegisterObjectHandleMember(ObjectHandle<Object> Component::* const member)
 	{
 		assert(member && "Member is nullptr");
 
 		Component dummy{};
 		const std::size_t offset = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(&(dummy.*member).typeless) - reinterpret_cast<std::uintptr_t>(&dummy));
-		RegisterComponentObjectHandleMember(typeid(Object), typeid(Component), offset);
+		RegisterObjectHandleMember(typeid(Object), std::is_const_v<Object>, typeid(Component), offset);
+	}
+
+	template<Component Component>
+	void IWorldService::RegisterEntityReferenceMember(Entity Component::* const member)
+	{
+		assert(member && "Member is nullptr");
+
+		Component dummy{};
+		const std::size_t offset = static_cast<std::size_t>(reinterpret_cast<std::uintptr_t>(&(dummy.*member)) - reinterpret_cast<std::uintptr_t>(&dummy));
+		RegisterEntityReferenceMember(typeid(Component), offset);
 	}
 }

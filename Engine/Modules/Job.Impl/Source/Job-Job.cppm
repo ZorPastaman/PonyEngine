@@ -119,10 +119,7 @@ namespace PonyEngine::Job
 
 	void Job::Wait(const std::size_t waitedVersion) const noexcept
 	{
-		while (version.load(std::memory_order::acquire) == waitedVersion)
-		{
-			version.wait(waitedVersion, std::memory_order::acquire);
-		}
+		version.wait(waitedVersion, std::memory_order::acquire);
 	}
 
 	bool Job::HasTask() const noexcept

@@ -62,6 +62,13 @@ pony_apply_flags(PonyEngine.Resource.Pack.Impl)
 pony_add_to_module_list(PonyEngine.Resource.Pack.Impl PONY_RESOURCE_MODULES)
 pony_apply_flags(PonyEngine.Resource.Text.Impl)
 pony_add_to_module_list(PonyEngine.Resource.Text.Impl PONY_RESOURCE_MODULES)
+pony_apply_flags(PonyEngine.Resource.World.Ext)
+pony_apply_flags(PonyEngine.Resource.World.Impl)
+pony_add_to_module_list(PonyEngine.Resource.World.Impl PONY_RESOURCE_MODULES)
+pony_apply_flags(PonyEngine.Resource.World.Meta.Impl)
+pony_add_to_module_list(PonyEngine.Resource.World.Meta.Impl PONY_RESOURCE_MODULES)
+pony_apply_flags(PonyEngine.Resource.World.Hierarchy.Impl)
+pony_add_to_module_list(PonyEngine.Resource.World.Hierarchy.Impl PONY_RESOURCE_MODULES)
 
 pony_apply_flags(PonyEngine.WinInput)
 pony_apply_flags(PonyEngine.WinInput.Impl)
@@ -80,6 +87,9 @@ pony_add_to_module_list(PonyEngine.RawInput.XInput.Impl PONY_INPUT_MODULES)
 pony_apply_flags(PonyEngine.World)
 pony_apply_flags(PonyEngine.World.Impl)
 pony_add_to_module_list(PonyEngine.World.Impl PONY_LOGIC_MODULES)
+pony_apply_flags(PonyEngine.World.Meta)
+pony_apply_flags(PonyEngine.World.Meta.Impl)
+pony_add_to_module_list(PonyEngine.World.Meta.Impl PONY_LOGIC_MODULES)
 pony_apply_flags(PonyEngine.World.Hierarchy)
 pony_apply_flags(PonyEngine.World.Hierarchy.Impl)
 pony_add_to_module_list(PonyEngine.World.Hierarchy.Impl PONY_LOGIC_MODULES)
@@ -112,5 +122,5 @@ endif()
 
 install(TARGETS ${PONY_INSTALL_TARGETS}
 	RUNTIME DESTINATION .
-	LIBRARY DESTINATION
+	LIBRARY DESTINATION .
 )

@@ -10,6 +10,7 @@
 export module PonyEngine.World.Impl:WorldServiceModule;
 
 import PonyEngine.Application;
+import PonyEngine.World;
 
 import :WorldService;
 

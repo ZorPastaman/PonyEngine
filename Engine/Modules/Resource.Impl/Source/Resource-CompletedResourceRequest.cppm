@@ -47,7 +47,7 @@ export namespace PonyEngine::Resource
 		[[nodiscard("Pure function")]] 
 		virtual std::shared_ptr<const void> Resource(std::type_index type) const override;
 		[[nodiscard("Pure function")]] 
-		virtual const std::exception_ptr& Exception() const override;
+		virtual std::span<const std::exception_ptr> Exceptions() const override;
 
 		virtual void Cancel() override;
 
@@ -92,7 +92,7 @@ namespace PonyEngine::Resource
 		return MakeResource(type, resource->InterfaceTypes(), resource->ResourceInterfaces(), mainResource);
 	}
 
-	const std::exception_ptr& CompletedResourceRequest::Exception() const
+	std::span<const std::exception_ptr> CompletedResourceRequest::Exceptions() const
 	{
 		throw std::logic_error("Invalid status");
 	}

@@ -291,7 +291,7 @@ namespace PonyEngine::Resource
 						proc->SetSuccess(request.MainResource(), request.ResourceInterfaces());
 						break;
 					case Async::RequestStatus::Failure:
-						proc->SetFailure(request.Exception());
+						proc->SetFailure(request.Exceptions());
 						break;
 					case Async::RequestStatus::Canceled:
 						proc->SetCanceled();

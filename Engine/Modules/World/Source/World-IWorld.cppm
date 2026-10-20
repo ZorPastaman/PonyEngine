@@ -19,6 +19,7 @@ import std;
 
 import :Component;
 import :Entity;
+import :Object;
 import :ObjectHandle;
 import :QueryParams;
 
@@ -484,6 +485,46 @@ export namespace PonyEngine::World
 		/// @note You mustn't call any function of the world inside the @p callback.
 		virtual void Query(const QueryParams& params, const std::function<void(QueryItem&)>& callback) const = 0;
 
+		/// @brief Checks if the object handle is valid.
+		/// @tparam T Object type.
+		/// @param handle Object handle.
+		/// @return @a True if it's valid; @a false otherwise.
+		template<typename T> [[nodiscard("Pure function")]]
+		bool IsObjectValid(ObjectHandle<T> handle) const noexcept;
+		/// @brief Checks if the object handle is valid.
+		/// @param objectType Object type.
+		/// @param isConst Is the object const?
+		/// @param handle Object handle.
+		/// @return @a True if it's valid; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsObjectValid(std::type_index objectType, bool isConst, TypelessObjectHandle handle) const noexcept = 0;
+
+		/// @brief Gets an object.
+		/// @tparam T Object type.
+		/// @param handle Object handle. Must be valid.
+		/// @return Object.
+		template<typename T> [[nodiscard("Pure function")]]
+		const Object& GetObject(ObjectHandle<T> handle) const noexcept;
+		/// @brief Gets an object.
+		/// @param objectType Object type.
+		/// @param isConst Is the object const?
+		/// @param handle Object handle. Must be valid.
+		/// @return Object.
+		[[nodiscard("Pure function")]]
+		virtual const Object& GetObject(std::type_index objectType, bool isConst, TypelessObjectHandle handle) const noexcept = 0;
+		/// @brief Gets an object pointer.
+		/// @tparam T Object type.
+		/// @param handle Object handle. Must be valid.
+		/// @return Object pointer.
+		template<typename T> [[nodiscard("Pure function")]]
+		T* GetObjectPointer(ObjectHandle<T> handle) const noexcept;
+		/// @brief Gets an object shared pointer.
+		/// @tparam T Object type.
+		/// @param handle Object handle. Must be valid.
+		/// @return Object shared pointer.
+		template<typename T> [[nodiscard("Pure function")]]
+		std::shared_ptr<T> GetObjectSharedPointer(ObjectHandle<T> handle) const noexcept;
+
 		/// @brief Registers the object.
 		/// @tparam T Object type.
 		/// @param object Object.
@@ -491,120 +532,14 @@ export namespace PonyEngine::World
 		/// @remark If the object is already registered, its current handle is returned.
 		template<typename T> [[nodiscard("Weird call")]]
 		ObjectHandle<T> RegisterObject(std::shared_ptr<T> object);
-		/// @brief Unregisters an object.
-		/// @tparam T Object type.
-		/// @param handle Object handle. Must be valid.
-		template<typename T>
-		void UnregisterObject(ObjectHandle<T> handle);
-		/// @brief Replaces a registered object.
-		/// @tparam T Object type.
-		/// @param handle Object handle. Must be valid.
-		/// @param object Replacement object.
-		template<typename T>
-		void ReplaceObject(ObjectHandle<T> handle, std::shared_ptr<T> object);
-
-		/// @brief Checks if the object handle is valid.
-		/// @tparam T Object type.
-		/// @param handle Object handle.
-		/// @return @a True if it's valid; @a false otherwise.
-		template<typename T> [[nodiscard("Pure function")]]
-		bool IsObjectValid(ObjectHandle<T> handle) const noexcept;
-		/// @brief Gets an object pointer.
-		/// @tparam T Object type.
-		/// @param handle Object handle. Must be valid.
-		/// @return Object pointer.
-		template<typename T> [[nodiscard("Pure function")]]
-		T* GetObject(ObjectHandle<T> handle) const noexcept;
-		/// @brief Gets an object shared pointer.
-		/// @tparam T Object type.
-		/// @param handle Object handle. Must be valid.
-		/// @return Object shared pointer.
-		template<typename T> [[nodiscard("Pure function")]]
-		std::shared_ptr<T> GetSharedObject(ObjectHandle<T> handle) const noexcept;
-
-		/// @brief Collects garbage objects and removes them.
-		virtual void CollectGarbage() = 0;
-
-		/// @brief Checks if the world has a world data of type @p T.
-		/// @tparam T Data type.
-		/// @return @a True if it has; @a false otherwise.
-		template<typename T>
-		bool HasWorldData() const noexcept;
-		/// @brief Gets a world data of type @p T.
-		/// @tparam T Data type.
-		/// @return Data.
-		template<typename T>
-		T* GetWorldData() const;
-		/// @brief Gets a world data of type @p T.
-		/// @tparam T Data type.
-		/// @return Data.
-		template<typename T>
-		std::shared_ptr<T> GetWorldDataShared() const;
-		/// @brief Adds the @p data to the world.
-		/// @tparam T Data type.
-		/// @param data Data.
-		template<typename T>
-		void AddWorldData(std::shared_ptr<T> data);
-		/// @brief Removes a world data of type @p T.
-		/// @tparam T Data type.
-		template<typename T>
-		void RemoveWorldData();
-
-	protected:
 		/// @brief Registers the object.
-		/// @param objectType Object type.
 		/// @param object Object.
 		/// @return Object handle.
 		[[nodiscard("Weird call")]]
-		virtual TypelessObjectHandle RegisterObject(std::type_index objectType, std::shared_ptr<void> object) = 0;
-		/// @brief Unregisters an object.
-		/// @param objectType Object type.
-		/// @param handle Object handle. Must be valid.
-		virtual void UnregisterObject(std::type_index objectType, TypelessObjectHandle handle) = 0;
-		/// @brief Replaces a registered object.
-		/// @param handle Object handle. Must be valid.
-		/// @param objectType Object type.
-		/// @param object Replacement object.
-		virtual void ReplaceObject(TypelessObjectHandle handle, std::type_index objectType, std::shared_ptr<void> object) = 0;
+		virtual TypelessObjectHandle RegisterObject(Object object) = 0;
 
-		/// @brief Checks if the object handle is valid.
-		/// @param objectType Object type.
-		/// @param handle Object handle.
-		/// @return @a True if it's valid; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsObjectValid(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
-		/// @brief Gets an object.
-		/// @param objectType Object type.
-		/// @param handle Object handle. Must be valid.
-		/// @return Object.
-		[[nodiscard("Pure function")]]
-		virtual void* GetObject(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
-		/// @brief Gets an object.
-		/// @param objectType Object type.
-		/// @param handle Object handle. Must be valid.
-		/// @return Object.
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<void> GetObjectShared(std::type_index objectType, TypelessObjectHandle handle) const noexcept = 0;
-
-		/// @brief Checks if the world has a world data of the @p type.
-		/// @param type Data type.
-		/// @return @a True if it has; @a false otherwise.
-		virtual bool HasWorldData(std::type_index type) const noexcept = 0;
-		/// @brief Gets a world data of the @p type.
-		/// @param type Data type.
-		/// @return Data.
-		virtual void* GetWorldData(std::type_index type) const = 0;
-		/// @brief Gets a world data of the @p type.
-		/// @param type Data type.
-		/// @return Data.
-		virtual std::shared_ptr<void> GetWorldDataShared(std::type_index type) const = 0;
-		/// @brief Adds the @p data to the world.
-		/// @param type Data type.
-		/// @param data Data.
-		virtual void AddWorldData(std::type_index type, std::shared_ptr<void> data) = 0;
-		/// @brief Removes a world data of the @p type.
-		/// @param type Data type.
-		virtual void RemoveWorldData(std::type_index type) = 0;
+		/// @brief Collects garbage objects and removes them.
+		virtual void CollectGarbage() = 0;
 	};
 }
 
@@ -882,68 +817,32 @@ namespace PonyEngine::World
 	}
 
 	template<typename T>
-	ObjectHandle<T> IWorld::RegisterObject(std::shared_ptr<T> object)
-	{
-		return ObjectHandle<T>{.typeless = RegisterObject(typeid(T), std::move(object))};
-	}
-
-	template<typename T>
-	void IWorld::UnregisterObject(const ObjectHandle<T> handle)
-	{
-		UnregisterObject(typeid(T), handle.typeless);
-	}
-
-	template<typename T>
-	void IWorld::ReplaceObject(const ObjectHandle<T> handle, std::shared_ptr<T> object)
-	{
-		ReplaceObject(handle.typeless, typeid(T), std::move(object));
-	}
-
-	template<typename T>
 	bool IWorld::IsObjectValid(const ObjectHandle<T> handle) const noexcept
 	{
-		return IsObjectValid(typeid(T), handle.typeless);
+		return IsObjectValid(typeid(T), std::is_const_v<T>, handle.typeless);
 	}
 
 	template<typename T>
-	T* IWorld::GetObject(const ObjectHandle<T> handle) const noexcept
+	const Object& IWorld::GetObject(const ObjectHandle<T> handle) const noexcept
 	{
-		return static_cast<T*>(GetObject(typeid(T), handle.typeless));
+		return GetObject(typeid(T), std::is_const_v<T>, handle.typeless);
 	}
 
 	template<typename T>
-	std::shared_ptr<T> IWorld::GetSharedObject(const ObjectHandle<T> handle) const noexcept
+	T* IWorld::GetObjectPointer(const ObjectHandle<T> handle) const noexcept
 	{
-		return std::static_pointer_cast<T>(GetObjectShared(typeid(T), handle.typeless));
+		return GetObject(handle).template Get<T>();
 	}
 
 	template<typename T>
-	bool IWorld::HasWorldData() const noexcept
+	std::shared_ptr<T> IWorld::GetObjectSharedPointer(const ObjectHandle<T> handle) const noexcept
 	{
-		return HasWorldData(typeid(T));
+		return GetObject(handle).template GetShared<T>();
 	}
 
 	template<typename T>
-	T* IWorld::GetWorldData() const
+	ObjectHandle<T> IWorld::RegisterObject(std::shared_ptr<T> object)
 	{
-		return static_cast<T*>(GetWorldData(typeid(T)));
-	}
-
-	template<typename T>
-	std::shared_ptr<T> IWorld::GetWorldDataShared() const
-	{
-		return std::static_pointer_cast<T>(GetWorldDataShared(typeid(T)));
-	}
-
-	template<typename T>
-	void IWorld::AddWorldData(std::shared_ptr<T> data)
-	{
-		AddWorldData(typeid(T), std::move(data));
-	}
-
-	template<typename T>
-	void IWorld::RemoveWorldData()
-	{
-		RemoveWorldData(typeid(T));
+		return ObjectHandle<T>{.typeless = RegisterObject(Object(std::move(object)))};
 	}
 }

@@ -11,7 +11,7 @@ It consists of two files:
 
 Both files are binary and optimized for a host platform.
 
-One resource may have many load files but only one data file.
+One resource may have as many load files as it needs (including 0) but only one data file.
 
 ## Data
 

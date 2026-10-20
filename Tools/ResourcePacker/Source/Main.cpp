@@ -455,33 +455,40 @@ void Pack(const Command& command)
 
 		const std::pair<std::uintmax_t, std::uintmax_t> range = AddData(dataInput, dataOutput, dataRanges, resource.dataPath, outputOffset);
 
-		std::ifstream loadInput = PonyTools::FileSystem::OpenInput(resource.loadPath, std::ios::binary);
-
-		loadInput.read(loadMagicWord.data(), loadMagicWord.size());
-		if (loadInput.gcount() != loadMagicWord.size() || loadMagicWord != LoadMagicWord) [[unlikely]]
+		if (resource.loadPath.empty())
 		{
-			throw std::runtime_error(std::format("Invalid load magic word at '{}'", resource.loadPath.string()));
+			loadMetaCache.resize(0uz);
 		}
-
-		std::size_t loadMetaSize;
-		loadInput.read(reinterpret_cast<char*>(&loadMetaSize), sizeof(loadMetaSize));
-		if (loadInput.gcount() != sizeof(loadMetaSize)) [[unlikely]]
+		else
 		{
-			throw std::runtime_error(std::format("Invalid load meta size at '{}'", resource.loadPath.string()));
-		}
+			std::ifstream loadInput = PonyTools::FileSystem::OpenInput(resource.loadPath, std::ios::binary);
 
-		loadMetaCache.resize(loadMetaSize);
-		loadInput.read(reinterpret_cast<char*>(loadMetaCache.data()), loadMetaCache.size());
-		if (loadInput.gcount() != loadMetaCache.size()) [[unlikely]]
-		{
-			throw std::runtime_error(std::format("Invalid load meta at '{}'", resource.loadPath.string()));
+			loadInput.read(loadMagicWord.data(), loadMagicWord.size());
+			if (loadInput.gcount() != loadMagicWord.size() || loadMagicWord != LoadMagicWord) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Invalid load magic word at '{}'", resource.loadPath.string()));
+			}
+
+			std::size_t loadMetaSize;
+			loadInput.read(reinterpret_cast<char*>(&loadMetaSize), sizeof(loadMetaSize));
+			if (loadInput.gcount() != sizeof(loadMetaSize)) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Invalid load meta size at '{}'", resource.loadPath.string()));
+			}
+
+			loadMetaCache.resize(loadMetaSize);
+			loadInput.read(reinterpret_cast<char*>(loadMetaCache.data()), loadMetaCache.size());
+			if (loadInput.gcount() != loadMetaCache.size()) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Invalid load meta at '{}'", resource.loadPath.string()));
+			}
 		}
 
 		PonyTools::PackManifest::PackManifest& manifest = manifests[resource.manifestIndex];
 		manifest.AddResource(typeCache, dataMetaCache, loadMetaCache, range, resource.id);
 	}
 
-	std::uintmax_t sizeTMaxValue = command.sizeTSize == sizeof(std::uintmax_t)
+	const std::uintmax_t sizeTMaxValue = command.sizeTSize == sizeof(std::uintmax_t)
 		? std::numeric_limits<std::uintmax_t>::max()
 		: (std::uintmax_t{1u} << (command.sizeTSize * 8u)) - 1u;
 
@@ -611,9 +618,9 @@ std::vector<Resource> GetManifestResources(const std::span<const ManifestCommand
 		while (std::getline(input, line))
 		{
 			std::vector<std::string> parsedLine = PonyTools::Serialization::ParseLine(line);
-			if (parsedLine.size() != 3uz) [[unlikely]]
+			if (parsedLine.size() != 2uz && parsedLine.size() != 3uz) [[unlikely]]
 			{
-				throw std::runtime_error("Invalid count of arguments in line in resource list, must be 3");
+				throw std::runtime_error("Invalid count of arguments in line in resource list, must be 2 or 3");
 			}
 
 			const std::string_view id = parsedLine[0];
@@ -631,14 +638,14 @@ std::vector<Resource> GetManifestResources(const std::span<const ManifestCommand
 
 			if (Verbose) [[unlikely]]
 			{
-				std::println("Resource. ID: '{}'; Data: '{}'; Load: '{}'.", parsedLine[0], parsedLine[1], parsedLine[2]);
+				std::println("Resource. ID: '{}'; Data: '{}'; Load: '{}'.", parsedLine[0], parsedLine[1], parsedLine.size() > 2uz ? parsedLine[2] : "");
 			}
 
 			resources.push_back(Resource
 			{
 				.id = std::move(parsedLine[0]),
 				.dataPath = PonyTools::FileSystem::NormalizePath(parsedLine[1]),
-				.loadPath = PonyTools::FileSystem::NormalizePath(parsedLine[2]),
+				.loadPath = parsedLine.size() > 2uz ? PonyTools::FileSystem::NormalizePath(parsedLine[2]) : "",
 				.manifestIndex = i
 			});
 		}
@@ -704,7 +711,7 @@ void WriteDepFile(const Command& command, const std::span<const Resource> resour
 		{
 			depRule.AddDependency(resource.dataPath);
 		}
-		if (!depRule.HasDependency(resource.loadPath))
+		if (!resource.loadPath.empty() && !depRule.HasDependency(resource.loadPath))
 		{
 			depRule.AddDependency(resource.loadPath);
 		}

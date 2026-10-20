@@ -12,14 +12,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Configurable settings for Time module.
 - Job module.
 - World module.
+- World hierarchy module.
 - File module.
 - Resource module.
 - Resource pack module.
 - Text resource module.
+- World definition resource module.
+- WinAPI input module.
 - Text compiler tool.
 - Resource packer tool.
 - GUI and console modes for Windows application.
-- WinAPI input module.
 
 ### Changed
 
