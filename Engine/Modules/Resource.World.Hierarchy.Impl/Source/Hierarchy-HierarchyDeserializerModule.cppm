@@ -38,19 +38,29 @@ export namespace PonyEngine::Resource::World::Hierarchy
 		HierarchyDeserializerModule& operator =(HierarchyDeserializerModule&&) = delete;
 
 	private:
+		/// @brief Creates a transform 2D deserializer.
+		/// @param loader World definition loader.
 		void CreateTransform2DDeserializer(IWorldDefinitionLoader& loader);
+		/// @brief Destroys a transform 2D deserializer.
+		/// @param loader World definition loader.
 		void DestroyTransform2DDeserializer(IWorldDefinitionLoader& loader);
+		/// @brief Creates a transform 3D deserializer.
+		/// @param loader World definition loader.
 		void CreateTransform3DDeserializer(IWorldDefinitionLoader& loader);
+		/// @brief Destroys a transform 3D deserializer.
+		/// @param loader World definition loader.
 		void DestroyTransform3DDeserializer(IWorldDefinitionLoader& loader);
 
+		/// @brief Registers components that can be simply copied.
+		/// @param copyComponentDeserializer Copy component deserializer.
 		static void RegisterCopyComponents(ICopyComponentDeserializer& copyComponentDeserializer);
 
 		static constexpr std::string_view ParentType = "Pony.Parent"; ///< PonyEngine::World::Hierarchy::Parent serialized type.
 		static constexpr std::string_view Transform2DType = "Pony.Transform2D"; ///< PonyEngine::World::Hierarchy::Transform2D serialized type.
 		static constexpr std::string_view Transform3DType = "Pony.Transform3D"; ///< PonyEngine::World::Hierarchy::Transform3D serialized type.
 
-		std::unique_ptr<Transform2DDeserializer> transform2DDeserializer;
-		std::unique_ptr<Transform3DDeserializer> transform3DDeserializer;
+		std::unique_ptr<Transform2DDeserializer> transform2DDeserializer; ///< Transform 2D deserializer.
+		std::unique_ptr<Transform3DDeserializer> transform3DDeserializer; ///< Transform 3D deserializer.
 	};
 }
 

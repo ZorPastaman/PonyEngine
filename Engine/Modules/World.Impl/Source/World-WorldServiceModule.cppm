@@ -34,9 +34,6 @@ export namespace PonyEngine::World
 		WorldServiceModule& operator =(WorldServiceModule&&) = delete;
 
 	private:
-		/// @brief Registers basic components.
-		void RegisterComponents() const;
-
 		std::unique_ptr<WorldService> worldService; ///< World service.
 	};
 }
@@ -49,15 +46,6 @@ namespace PonyEngine::World
 		try
 		{
 			context.AddInterface<IWorldService>(*worldService);
-			try
-			{
-				RegisterComponents();
-			}
-			catch (...)
-			{
-				context.RemoveInterface<IWorldService>(*worldService);
-				throw;
-			}
 		}
 		catch (...)
 		{
@@ -70,13 +58,5 @@ namespace PonyEngine::World
 	{
 		context.RemoveInterface<IWorldService>(*worldService);
 		worldService.reset();
-	}
-
-	void WorldServiceModule::RegisterComponents() const
-	{
-		const auto service = static_cast<IWorldService*>(worldService.get());
-		service->RegisterComponent<Name>();
-		service->RegisterComponent<Description>();
-		service->RegisterObjectHandleMember(&Description::value);
 	}
 }

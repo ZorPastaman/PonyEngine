@@ -9,4 +9,6 @@
 
 export module PonyEngine.Resource.World.Hierarchy.Impl;
 
+export import PonyEngine.Resource.World.Ext;
+
 export import :HierarchyDeserializerModule;

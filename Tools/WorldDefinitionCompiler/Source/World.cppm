@@ -13,6 +13,7 @@ import std;
 
 export namespace PonyTools::World
 {
+	/// @brief World definition.
 	class WorldDefinition final
 	{
 	public:
@@ -25,58 +26,105 @@ export namespace PonyTools::World
 
 		~WorldDefinition() noexcept = default;
 
+		/// @brief Gets the entity count.
+		/// @return Entity count.
 		[[nodiscard("Pure function")]]
 		std::size_t EntityCount() const noexcept;
+		/// @brief Gets an entity ID.
+		/// @param index Entity index.
+		/// @return Entity ID.
 		[[nodiscard("Pure function")]]
 		std::string_view EntityID(std::size_t index) const noexcept;
 
+		/// @brief Gets the component table count.
+		/// @return Component table count.
 		[[nodiscard("Pure function")]]
 		std::size_t ComponentTableCount() const noexcept;
+		/// @brief Gets a component table type.
+		/// @param tableIndex Table index.
+		/// @return Component table type.
 		[[nodiscard("Pure function")]]
 		std::string_view ComponentType(std::size_t tableIndex) const noexcept;
+		/// @brief Gets component table entity indices.
+		/// @param tableIndex Table index.
+		/// @return Component table entity indices.
 		[[nodiscard("Pure function")]]
 		std::span<const std::uint64_t> ComponentEntities(std::size_t tableIndex) const noexcept;
+		/// @brief Gets a component table data.
+		/// @param tableIndex Table index.
+		/// @return Component table data.
 		[[nodiscard("Pure function")]]
 		std::vector<std::byte>& ComponentData(std::size_t tableIndex) noexcept;
+		/// @brief Gets a component table data.
+		/// @param tableIndex Table index.
+		/// @return Component table data.
 		[[nodiscard("Pure function")]]
 		std::span<const std::byte> ComponentData(std::size_t tableIndex) const noexcept;
 
+		/// @brief Gets the object count.
+		/// @return Object count.
 		[[nodiscard("Pure function")]]
 		std::size_t ObjectCount() const noexcept;
+		/// @brief Gets an object ID.
+		/// @param objectIndex Object index.
+		/// @return Object ID.
 		[[nodiscard("Pure function")]]
 		std::string_view ObjectID(std::size_t objectIndex) const noexcept;
+		/// @brief Gets an object type.
+		/// @param objectIndex Object index.
+		/// @return Object type.
 		[[nodiscard("Pure function")]]
 		std::string_view ObjectType(std::size_t objectIndex) const noexcept;
+		/// @brief Gets an object type.
+		/// @param objectIndex Object index.
+		/// @return Object type.
 		[[nodiscard("Pure function")]]
 		std::span<const std::byte> ObjectData(std::size_t objectIndex) const noexcept;
 
+		/// @brief Adds the entity.
+		/// @param entityId Entity ID.
+		/// @return Entity index.
 		std::uint64_t AddEntity(std::string_view entityId);
+		/// @brief Adds a component.
+		/// @param entityIndex Entity index.
+		/// @param componentType Component type.
+		/// @return Component table index.
 		std::size_t AddComponent(std::uint64_t entityIndex, std::string_view componentType);
+		/// @brief Adds the object.
+		/// @param objectId Object ID.
+		/// @param objectType Object type.
+		/// @param objectData Object data.
+		/// @return Object index.
 		std::uint64_t AddObject(std::string_view objectId, std::string_view objectType, std::span<const std::byte> objectData);
 
 		WorldDefinition& operator =(const WorldDefinition& other);
 		WorldDefinition& operator =(WorldDefinition&& other) noexcept = default;
 
 	private:
+		/// @brief Component table.
 		struct ComponentTable final
 		{
-			std::string type;
-			std::vector<std::uint64_t> entities;
-			std::vector<std::byte> data;
+			std::string type; ///< Component type.
+			std::vector<std::uint64_t> entities; ///< Indices of entities that have a component of this table.
+			std::vector<std::byte> data; ///< Component data.
 		};
+		/// @brief Object.
 		struct Object final
 		{
-			std::string id;
-			std::string type;
-			std::vector<std::byte> data;
+			std::string id; ///< Object ID.
+			std::string type; ///< Object type.
+			std::vector<std::byte> data; ///< Object data.
 		};
 
+		/// @brief Gets or creates a component table.
+		/// @param componentType Component type.
+		/// @return Component table index.
 		[[nodiscard("Weird call")]]
 		std::size_t GetOrCreateTable(std::string_view componentType);
 
-		std::vector<std::string> entityIds;
-		std::vector<ComponentTable> componentTables;
-		std::vector<Object> objects;
+		std::vector<std::string> entityIds; ///< Entity IDs.
+		std::vector<ComponentTable> componentTables; ///< Component table.
+		std::vector<Object> objects; ///< Objects.
 	};
 }
 

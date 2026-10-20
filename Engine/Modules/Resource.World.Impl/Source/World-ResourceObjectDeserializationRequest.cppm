@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Resource.World.Impl:WorldDeserializationRequest;
+export module PonyEngine.Resource.World.Impl:ResourceObjectDeserializationRequest;
 
 import std;
 
@@ -21,15 +21,19 @@ import PonyEngine.World;
 
 export namespace PonyEngine::Resource::World
 {
-	class WorldDeserializationRequest final : public IWorldDeserializationRequest
+	/// @brief Resource object deserialization request.
+	class ResourceObjectDeserializationRequest final : public IWorldDeserializationRequest
 	{
 	public:
+		/// @brief Creates a resource object deserialization request.
+		/// @param output Object output.
+		/// @param callback Callback.
 		[[nodiscard("Pure constructor")]]
-		WorldDeserializationRequest(PonyEngine::World::Object& output, std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback);
-		WorldDeserializationRequest(const WorldDeserializationRequest&) = delete;
-		WorldDeserializationRequest(WorldDeserializationRequest&&) = delete;
+		ResourceObjectDeserializationRequest(PonyEngine::World::Object& output, std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback);
+		ResourceObjectDeserializationRequest(const ResourceObjectDeserializationRequest&) = delete;
+		ResourceObjectDeserializationRequest(ResourceObjectDeserializationRequest&&) = delete;
 
-		~WorldDeserializationRequest() noexcept = default;
+		~ResourceObjectDeserializationRequest() noexcept = default;
 
 		[[nodiscard("Pure function")]] 
 		virtual Async::RequestStatus Status() const noexcept override;
@@ -40,28 +44,38 @@ export namespace PonyEngine::Resource::World
 
 		virtual void Wait() const noexcept override;
 
+		/// @brief Gets the load request.
+		/// @return Load request.
 		[[nodiscard("Pure function")]]
 		const std::shared_ptr<IResourceRequest>& LoadRequest() const noexcept;
+		/// @brief Sets the load request.
+		/// @param request Load request.
 		void LoadRequest(std::shared_ptr<IResourceRequest> request) noexcept;
 
+		/// @brief Sets the status to success.
+		/// @param object World object.
 		void SetSuccess(PonyEngine::World::Object object) noexcept;
+		/// @brief Sets the status to failure.
+		/// @param exceptions Exceptions.
 		void SetFailure(std::span<const std::exception_ptr> exceptions) noexcept;
+		/// @brief Sets the status to canceled.
 		void SetCanceled() noexcept;
 
-		WorldDeserializationRequest& operator =(const WorldDeserializationRequest&) = delete;
-		WorldDeserializationRequest& operator =(WorldDeserializationRequest&&) = delete;
+		ResourceObjectDeserializationRequest& operator =(const ResourceObjectDeserializationRequest&) = delete;
+		ResourceObjectDeserializationRequest& operator =(ResourceObjectDeserializationRequest&&) = delete;
 
 	private:
+		/// @brief Invokes the callback.
 		void InvokeCallback() noexcept;
 
-		PonyEngine::World::Object* output;
+		PonyEngine::World::Object* output; ///< World object slot.
 
-		std::vector<std::exception_ptr> exceptions;
-		std::atomic<Async::RequestStatus> status;
+		std::vector<std::exception_ptr> exceptions; ///< Exceptions.
+		std::atomic<Async::RequestStatus> status; ///< Status.
 
-		std::shared_ptr<IResourceRequest> loadRequest;
+		std::shared_ptr<IResourceRequest> loadRequest; ///< Load request.
 
-		std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback;
+		std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback; ///< Callback.
 
 		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "std::atomic<Async::RequestStatus> isn't lock-free");
 	};
@@ -69,7 +83,7 @@ export namespace PonyEngine::Resource::World
 
 namespace PonyEngine::Resource::World
 {
-	WorldDeserializationRequest::WorldDeserializationRequest(PonyEngine::World::Object& output, 
+	ResourceObjectDeserializationRequest::ResourceObjectDeserializationRequest(PonyEngine::World::Object& output, 
 		std::move_only_function<void(const IWorldDeserializationRequest&) noexcept> callback) :
 		output{&output},
 		status(Async::RequestStatus::Pending),
@@ -78,12 +92,12 @@ namespace PonyEngine::Resource::World
 		exceptions.reserve(4uz);
 	}
 
-	Async::RequestStatus WorldDeserializationRequest::Status() const noexcept
+	Async::RequestStatus ResourceObjectDeserializationRequest::Status() const noexcept
 	{
 		return status.load(std::memory_order::acquire);
 	}
 
-	std::span<const std::exception_ptr> WorldDeserializationRequest::Exceptions() const
+	std::span<const std::exception_ptr> ResourceObjectDeserializationRequest::Exceptions() const
 	{
 		if (status.load(std::memory_order::acquire) != Async::RequestStatus::Failure) [[unlikely]]
 		{
@@ -93,27 +107,27 @@ namespace PonyEngine::Resource::World
 		return exceptions;
 	}
 
-	void WorldDeserializationRequest::Cancel()
+	void ResourceObjectDeserializationRequest::Cancel()
 	{
 		loadRequest->Cancel();
 	}
 
-	void WorldDeserializationRequest::Wait() const noexcept
+	void ResourceObjectDeserializationRequest::Wait() const noexcept
 	{
 		status.wait(Async::RequestStatus::Pending, std::memory_order::acquire);
 	}
 
-	const std::shared_ptr<IResourceRequest>& WorldDeserializationRequest::LoadRequest() const noexcept
+	const std::shared_ptr<IResourceRequest>& ResourceObjectDeserializationRequest::LoadRequest() const noexcept
 	{
 		return loadRequest;
 	}
 
-	void WorldDeserializationRequest::LoadRequest(std::shared_ptr<IResourceRequest> request) noexcept
+	void ResourceObjectDeserializationRequest::LoadRequest(std::shared_ptr<IResourceRequest> request) noexcept
 	{
 		loadRequest = std::move(request);
 	}
 
-	void WorldDeserializationRequest::SetSuccess(PonyEngine::World::Object object) noexcept
+	void ResourceObjectDeserializationRequest::SetSuccess(PonyEngine::World::Object object) noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
@@ -125,7 +139,7 @@ namespace PonyEngine::Resource::World
 		InvokeCallback();
 	}
 
-	void WorldDeserializationRequest::SetFailure(const std::span<const std::exception_ptr> exceptions) noexcept
+	void ResourceObjectDeserializationRequest::SetFailure(const std::span<const std::exception_ptr> exceptions) noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
@@ -155,7 +169,7 @@ namespace PonyEngine::Resource::World
 		InvokeCallback();
 	}
 
-	void WorldDeserializationRequest::SetCanceled() noexcept
+	void ResourceObjectDeserializationRequest::SetCanceled() noexcept
 	{
 		assert(status.load(std::memory_order::relaxed) == Async::RequestStatus::Pending && "Invalid status.");
 
@@ -165,7 +179,7 @@ namespace PonyEngine::Resource::World
 		InvokeCallback();
 	}
 
-	void WorldDeserializationRequest::InvokeCallback() noexcept
+	void ResourceObjectDeserializationRequest::InvokeCallback() noexcept
 	{
 		if (callback)
 		{

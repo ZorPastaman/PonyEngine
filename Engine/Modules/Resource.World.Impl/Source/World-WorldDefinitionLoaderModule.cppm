@@ -38,28 +38,37 @@ export namespace PonyEngine::Resource::World
 		WorldDefinitionLoaderModule& operator =(WorldDefinitionLoaderModule&&) = delete;
 
 	private:
+		/// @brief Creates a world definition loader.
+		/// @param context Module context.
 		void CreateWorldDefinitionLoader(Application::IModuleContext& context);
+		/// @brief Destroys a world definition loader.
+		/// @param context Module context.
 		void DestroyWorldDefinitionLoader(Application::IModuleContext& context);
 
+		/// @brief Creates a copy component deserializer.
+		/// @param context Module context.
 		void CreateCopyComponentDeserializer(Application::IModuleContext& context);
+		/// @brief Destroys a copy component deserializer.
+		/// @param context Module context.
 		void DestroyCopyComponentDeserializer(Application::IModuleContext& context);
 
+		/// @brief Creates a resource object deserializer.
+		/// @param context Module context.
 		void CreateResourceObjectDeserializer(Application::IModuleContext& context);
+		/// @brief Destroys a resource object deserializer.
+		/// @param context Module context.
 		void DestroyResourceObjectDeserializer(Application::IModuleContext& context);
 
-		/// @brief Registers basic deserializers.
-		void RegisterComponentDeserializers() const;
+		/// @brief Registers resource object deserializers.
 		void RegisterResourceDeserializers() const;
 
 		static constexpr std::string_view WorldDefinitionResourceType = "Pony.WorldDefinition"; ///< World definition resource type.
-		static constexpr std::string_view NameType = "Pony.Name"; ///< PonyEngine::World::Name serialized type.
-		static constexpr std::string_view DescriptionType = "Pony.Description"; ///< PonyEngine::World::Description serialized type.
-		static constexpr std::string_view ResourceType = "Pony.Resource";
-		static constexpr std::string_view StringType = "Pony.String";
+		static constexpr std::string_view ResourceType = "Pony.Resource"; ///< Resource object type.
+		static constexpr std::string_view StringType = "Pony.String"; ///< std::string_view type.
 
 		std::unique_ptr<WorldDefinitionLoader> worldDefinitionLoader; ///< World definition loader.
 		std::unique_ptr<CopyComponentDeserializer> copyComponentDeserializer; ///< Copy component deserializer.
-		std::unique_ptr<ResourceObjectDeserializer> resourceObjectDeserializer;
+		std::unique_ptr<ResourceObjectDeserializer> resourceObjectDeserializer; ///< Resource object deserializer.
 	};
 }
 
@@ -76,7 +85,6 @@ namespace PonyEngine::Resource::World
 				CreateResourceObjectDeserializer(context);
 				try
 				{
-					RegisterComponentDeserializers();
 					RegisterResourceDeserializers();
 				}
 				catch (...)
@@ -177,13 +185,6 @@ namespace PonyEngine::Resource::World
 	{
 		worldDefinitionLoader->UnregisterObjectDeserializer(ResourceType, *resourceObjectDeserializer);
 		resourceObjectDeserializer.reset();
-	}
-
-	void WorldDefinitionLoaderModule::RegisterComponentDeserializers() const
-	{
-		const auto deserializer = static_cast<ICopyComponentDeserializer*>(copyComponentDeserializer.get());
-		deserializer->Associate<PonyEngine::World::Name>(NameType);
-		deserializer->Associate<PonyEngine::World::Description>(DescriptionType);
 	}
 
 	void WorldDefinitionLoaderModule::RegisterResourceDeserializers() const

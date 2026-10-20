@@ -2,18 +2,6 @@
 
 Adds hierarchy component deserializers to the world definition loader.
 
-It deserializes Parent and LocalTransform2D(3D) components only. All other hierarchy components are runtime only.
-The deserialized components are pure data and their serialized versions are simply copied to a world definition.
-The Parent component should have an index reference to its parent.
-
-Component types:
-
-| Type                                             | Serialized type    |
-|:-------------------------------------------------|:-------------------|
-| `PonyEngine::World::Hierarchy::Parent`           | `Pony.Parent`      |
-| `PonyEngine::World::Hierarchy::LocalTransform2D` | `Pony.Transform2D` |
-| `PonyEngine::World::Hierarchy::LocalTransform3D` | `Pony.Transform3D` |
-
 ## Dependencies
 
 - [PonyEngine.Core](../Core)
@@ -32,4 +20,6 @@ These variables are used to configure the build of the module:
 
 Main sub-modules:
 
+- [Transform2DDeserializer](Source/Hierarchy-Transform2DDeserializer.cppm) - transform 2D deserializer.
+- [Transform3DDeserializer](Source/Hierarchy-Transform2DDeserializer.cppm) - transform 3D deserializer.
 - [HierarchyDesrializerModule](Source/Hierarchy-HierarchyDeserializerModule.cppm) - hierarchy deserializer module.

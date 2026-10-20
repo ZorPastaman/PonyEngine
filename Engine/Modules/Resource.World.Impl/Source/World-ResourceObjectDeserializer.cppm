@@ -22,14 +22,18 @@ import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.Resource.World.Ext;
 
+import :ResourceObjectDeserializationRequest;
 import :WorldDefinitionLoader;
-import :WorldDeserializationRequest;
 
 export namespace PonyEngine::Resource::World
 {
+	/// @brief Resource object deserializer.
+	/// @details It deserializes 'Pony.Resource' world objects.
 	class ResourceObjectDeserializer final : public IResourceObjectDeserializer, public IObjectDeserializer
 	{
 	public:
+		/// @brief Creates a resource object deserializer.
+		/// @param application 
 		[[nodiscard("Pure constructor")]]
 		explicit ResourceObjectDeserializer(Application::IApplication& application);
 		ResourceObjectDeserializer(const ResourceObjectDeserializer&) = delete;
@@ -46,21 +50,36 @@ export namespace PonyEngine::Resource::World
 		ResourceObjectDeserializer& operator =(ResourceObjectDeserializer&&) = delete;
 
 	private:
+		/// @brief Gets a resource interface type by its serialized version.
+		/// @param type Serialized type.
+		/// @return Resource interface type.
 		[[nodiscard("Pure function")]]
 		std::type_index GetType(std::string_view type) const;
 
+		/// @brief Validates if the buffer has enough data.
+		/// @param current Current buffer pointer.
+		/// @param end End buffer pointer.
+		/// @param requiredSize Required size.
 		static void ValidateSize(const std::byte* current, const std::byte* end, std::size_t requiredSize);
+		/// @brief Reads the input as a data of type @p T and moves the pointer.
+		/// @tparam T Data type.
+		/// @param current Input.
+		/// @return Read data.
 		template<typename T>
-		T Read(const std::byte*& current) noexcept;
+		static T Read(const std::byte*& current) noexcept;
+		/// @brief Reads the input as a string and moves the pointer.
+		/// @param current Input.
+		/// @param length String length.
+		/// @return Read string.
 		static std::string_view ReadString(const std::byte*& current, std::size_t length) noexcept;
 
-		Application::IApplication* application;
-		Log::ILogService* logService;
+		Application::IApplication* application; ///< Application.
+		Log::ILogService* logService; ///< Log service.
 
-		IResourceService* resourceService;
+		IResourceService* resourceService; ///< Resource service.
 
-		std::unordered_map<std::uint64_t, std::type_index> types;
-		mutable std::shared_mutex typeMutex;
+		std::unordered_map<std::uint64_t, std::type_index> types; ///< Type map.
+		mutable std::shared_mutex typeMutex; ///< Type mutex.
 	};
 }
 
@@ -104,7 +123,7 @@ namespace PonyEngine::Resource::World
 		const std::type_index resourceInterface = GetType(interface);
 		const ResourceID resourceId = resourceService->MakeResourceID(id);
 
-		auto request = std::make_shared<WorldDeserializationRequest>(output, std::move(callback));
+		auto request = std::make_shared<ResourceObjectDeserializationRequest>(output, std::move(callback));
 		request->LoadRequest(resourceService->LoadResource(resourceId, resourceInterface, 
 		[req = request.get(), resInterface = resourceInterface](const IResourceRequest& resourceRequest) noexcept
 		{

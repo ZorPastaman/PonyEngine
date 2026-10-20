@@ -45,14 +45,6 @@ The main ones are `PonyEngine::World::QueryParams` and `PonyEngine::World::Query
 But they are too abstract and may be hard to use in a game code. That's why the API provides useful template helpers like
 `PonyEngine::World::Query` and `PonyEngine::World::MakeQuery()`.
 
-#### [Name](Source/World-Name.cppm)
-
-Name component. Holds inline string.
-
-#### [Description](Source/World-Description.cppm)
-
-Description component. Holds a string object.
-
 #### [IWorld](Source/World-IWorld.cppm)
 
 World interface. Each world is a totally separate from other worlds. It has its own entities and components.

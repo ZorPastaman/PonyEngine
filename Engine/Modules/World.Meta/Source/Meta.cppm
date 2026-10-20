@@ -7,17 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.World:Description;
+export module PonyEngine.World.Meta;
 
-import std;
+export import PonyEngine.World;
 
-import :ObjectHandle;
-
-export namespace PonyEngine::World
-{
-	/// @brief Description. Holds data to any @p std::string_view object.
-	struct Description final
-	{
-		ObjectHandle<const std::string_view> value; ///< Description object handle.
-	};
-}
+export import :Description;
+export import :Name;

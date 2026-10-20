@@ -17,6 +17,7 @@ import PonyEngine.World.Hierarchy;
 
 export namespace PonyEngine::Resource::World::Hierarchy
 {
+	/// @brief Transform 2D deserializer.
 	class Transform2DDeserializer final : public IInlineComponentDeserializer
 	{
 	public:
@@ -33,10 +34,14 @@ export namespace PonyEngine::Resource::World::Hierarchy
 		Transform2DDeserializer& operator =(Transform2DDeserializer&&) = delete;
 
 	private:
-		static constexpr std::size_t InputComponentSize = sizeof(double) * 2uz + sizeof(float) * 3uz;
+		static constexpr std::size_t InputComponentSize = sizeof(double) * 2uz + sizeof(float) * 3uz; ///< Transform 2D input data size.
 
+		/// @brief Reads the buffer as a data of the specified type and moves the input pointer.
+		/// @tparam T Data type.
+		/// @param input Input pointer.
+		/// @return Read data.
 		template<typename T>
-		T Read(const std::byte*& input) noexcept;
+		static T Read(const std::byte*& input) noexcept;
 	};
 }
 

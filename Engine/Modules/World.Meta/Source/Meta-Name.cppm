@@ -7,15 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
-export module PonyEngine.World:Name;
+export module PonyEngine.World.Meta:Name;
 
 import std;
 
-export namespace PonyEngine::World
+export namespace PonyEngine::World::Meta
 {
 	/// @brief Entity name.
 	class Name final
@@ -72,7 +68,7 @@ export namespace PonyEngine::World
 	};
 }
 
-namespace PonyEngine::World
+namespace PonyEngine::World::Meta
 {
 	Name::Name() noexcept :
 		size{0u}

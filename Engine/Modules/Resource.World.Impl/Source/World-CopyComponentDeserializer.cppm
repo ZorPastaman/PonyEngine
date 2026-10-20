@@ -49,8 +49,8 @@ export namespace PonyEngine::Resource::World
 	private:
 		virtual void Deserialize(std::size_t entityCount, std::span<const std::byte> input, std::span<std::byte> output) override;
 
-		Application::IApplication* application;
-		Log::ILogService* logService;
+		Application::IApplication* application; ///< Application.
+		Log::ILogService* logService; ///< Log service.
 
 		WorldDefinitionLoader* worldDefinitionLoader; ///< World definition loader.
 

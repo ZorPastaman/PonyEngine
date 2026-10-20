@@ -13,7 +13,7 @@ FetchContent_MakeAvailable(tomlplusplus)
 
 set(PONY_ENGINE_CORE ON)
 set(PONY_ENGINE_WORLD ON)
-set(PONY_ENGINE_WORLD_HIERARCHY ON)
+set(PONY_ENGINE_WORLD_META ON)
 add_subdirectory("../Engine/Modules" "${CMAKE_CURRENT_BINARY_DIR}/Engine/Modules")
 
 add_subdirectory("Utility")

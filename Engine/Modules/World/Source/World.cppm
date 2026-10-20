@@ -10,11 +10,9 @@
 export module PonyEngine.World;
 
 export import :Component;
-export import :Description;
 export import :Entity;
 export import :IWorld;
 export import :IWorldService;
-export import :Name;
 export import :Object;
 export import :ObjectHandle;
 export import :QueryParams;

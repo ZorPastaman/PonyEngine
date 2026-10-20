@@ -15,16 +15,22 @@ export module PonyEngine.Resource.World.Ext:IResourceObjectDeserializer;
 
 import std;
 
-import PonyEngine.World;
-
 export namespace PonyEngine::Resource::World
 {
+	/// @brief Resource object deserializer.
+	/// @details It deserializes 'Pony.Resource' world objects.
 	class IResourceObjectDeserializer
 	{
 		PONY_INTERFACE_BODY(IResourceObjectDeserializer)
 
+		/// @brief Associates the resource interface type with its serialized type.
+		/// @tparam T Resource interface type.
+		/// @param serializedType Serialized type.
 		template<typename T>
 		void Associate(std::string_view serializedType);
+		/// @brief Associates the resource interface type with its serialized type.
+		/// @param interfaceType Resource interface type.
+		/// @param serializedType Serialized type.
 		virtual void Associate(std::type_index interfaceType, std::string_view serializedType) = 0;
 	};
 }

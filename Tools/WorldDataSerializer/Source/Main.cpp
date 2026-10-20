@@ -14,58 +14,91 @@
 import std;
 
 import PonyEngine.Math;
-import PonyEngine.World;
-import PonyEngine.World.Hierarchy;
+import PonyEngine.World.Meta;
 
 import PonyTools.Memory;
 
-constexpr std::string_view NamePropertyName = "name";
-constexpr std::string_view ObjectPropertyName = "object";
-constexpr std::string_view ParentPropertyName = "parent";
-constexpr std::string_view PositionPropertyName = "position";
-constexpr std::string_view RotationPropertyName = "rotation";
-constexpr std::string_view ScalePropertyName = "scale";
-constexpr std::string_view InterfacePropertyName = "interface";
-constexpr std::string_view ResourcePropertyName = "resource";
+constexpr std::string_view NamePropertyName = "name"; ///< Name property name.
+constexpr std::string_view ObjectPropertyName = "object"; ///< Object property name.
+constexpr std::string_view ParentPropertyName = "parent"; ///< Parent property name.
+constexpr std::string_view PositionPropertyName = "position"; ///< Position property name.
+constexpr std::string_view RotationPropertyName = "rotation"; ///< Rotation property name.
+constexpr std::string_view ScalePropertyName = "scale"; ///< Scale property name.
+constexpr std::string_view InterfacePropertyName = "interface"; ///< Resource interface property name.
+constexpr std::string_view ResourcePropertyName = "resource"; ///< Resource ID property name.
 
-using GetComponentSizeFunction = std::size_t(*)(const toml::table&, std::size_t);
+using GetComponentSizeFunction = std::size_t(*)(const toml::table&, std::size_t); ///< Get component size function.
 using SerializeComponentFunction = void(*)(const toml::table&, std::span<std::byte>, const std::unordered_map<std::string_view, std::uint64_t>&, 
-	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::string_view>&, std::size_t, bool);
+	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::string_view>&, std::size_t, bool); ///< Serialize component function.
 using GetObjectSizeFunction = std::size_t(*)(const toml::table&, std::size_t); ///< @p GetObjectSize() function.
 using SerializeObjectFunction = void(*)(const toml::table&, std::span<std::byte>, std::size_t, bool); ///< @p SerializeObject() function.
 
+/// @brief Component entry.
 struct ComponentEntry final
 {
-	std::string_view type;
-	GetComponentSizeFunction sizeFunction;
-	SerializeComponentFunction serializeFunction;
+	std::string_view type; ///< Component type.
+	GetComponentSizeFunction sizeFunction; ///< Get component size function.
+	SerializeComponentFunction serializeFunction; ///< Serialize component function.
 };
+/// @brief Object entry.
 struct ObjectEntry final
 {
-	std::string_view type;
-	GetObjectSizeFunction sizeFunction;
-	SerializeObjectFunction serializeFunction;
+	std::string_view type; ///< Object type.
+	GetObjectSizeFunction sizeFunction; ///< Get object size function.
+	SerializeObjectFunction serializeFunction; ///< Serialize object function.
 };
 
+/// @brief std::string_view C wrapper.
 struct alignas(std::span<const std::string_view>) StringViewSpan final
 {
-	std::byte data[sizeof(std::span<const std::string_view>)];
+	[[maybe_unused]] std::byte data[sizeof(std::span<const std::string_view>)];
 };
 
 extern "C"
 {
+	/// @brief Gets component types.
+	/// @return Component types.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT_IMPL StringViewSpan GetComponentTypes() noexcept;
+	/// @brief Gets a component size.
+	/// @param typeIndex Component type index.
+	/// @param componentTable Component table.
+	/// @param sizeTSize Target platform std::size_t size.
+	/// @return Component size.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT_IMPL std::size_t GetComponentSize(std::size_t typeIndex, const toml::table& componentTable, std::size_t sizeTSize) noexcept;
+	/// @brief Serializes a component.
+	/// @param typeIndex Component type index.
+	/// @param componentTable Component table.
+	/// @param componentData Component output data.
+	/// @param entityIDToIndex Entity ID to index map.
+	/// @param objectIDToIndex Object ID to index map.
+	/// @param objectIDToType Object ID to type map.
+	/// @param sizeTSize Target platform std::size_t size.
+	/// @param bigEndian Is the target platform big endian?
+	/// @return @a True if it serialized successfully; @a false otherwise.
 	PONY_DLL_EXPORT_IMPL bool SerializeComponent(std::size_t typeIndex, const toml::table& componentTable, std::span<std::byte> componentData,
 		const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
 		const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian) noexcept;
 
+	/// @brief Gets object types.
+	/// @return Object types.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT_IMPL StringViewSpan GetObjectTypes() noexcept;
+	/// @brief Gets an object size.
+	/// @param typeIndex Object type index.
+	/// @param objectTable Object table.
+	/// @param sizeTSize Target platform std::size_t size.
+	/// @return Object size.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT_IMPL std::size_t GetObjectSize(std::size_t typeIndex, const toml::table& objectTable, std::size_t sizeTSize) noexcept;
+	/// @brief Serializes a object.
+	/// @param typeIndex Object type index.
+	/// @param objectTable Object table.
+	/// @param objectData Object output data.
+	/// @param sizeTSize Target platform std::size_t size.
+	/// @param bigEndian Is the target platform big endian?
+	/// @return @a True if it serialized successfully; @a false otherwise.
 	PONY_DLL_EXPORT_IMPL bool SerializeObject(std::size_t typeIndex, const toml::table& objectTable, std::span<std::byte> objectData,
 		std::size_t sizeTSize, bool bigEndian) noexcept;
 }
@@ -235,14 +268,20 @@ bool SerializeObject(const std::size_t typeIndex, const toml::table& objectTable
 	return false;
 }
 
-std::size_t GetNameSize(const toml::table&, const std::size_t)
+std::size_t GetNameSize(const toml::table& componentTable, const std::size_t)
 {
-	return sizeof(PonyEngine::World::Name);
+	const std::optional<std::string_view> name = componentTable[NamePropertyName].value<std::string_view>();
+	if (!name || name->size() > PonyEngine::World::Meta::Name::MaxLength) [[unlikely]]
+	{
+		throw std::runtime_error("Invalid name component");
+	}
+
+	return sizeof(std::uint8_t) + name->size();
 }
 
 std::size_t GetDescriptionSize(const toml::table&, const std::size_t)
 {
-	return sizeof(PonyEngine::World::Description);
+	return sizeof(std::uint64_t);
 }
 
 std::size_t GetParentSize(const toml::table&, const std::size_t)
@@ -262,16 +301,17 @@ std::size_t GetTransform3DSize(const toml::table&, const std::size_t)
 
 void SerializeName(const toml::table& componentTable, const std::span<std::byte> componentData,
 	const std::unordered_map<std::string_view, std::uint64_t>&, const std::unordered_map<std::string_view, std::uint64_t>&,
-	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool)
+	const std::unordered_map<std::string_view, std::string_view>&, const std::size_t, const bool bigEndian)
 {
 	const std::optional<std::string_view> name = componentTable[NamePropertyName].value<std::string_view>();
-	if (!name) [[unlikely]]
+	if (!name || name->size() > PonyEngine::World::Meta::Name::MaxLength) [[unlikely]]
 	{
 		throw std::runtime_error("Invalid name component");
 	}
 
-	const auto nameComponent = PonyEngine::World::Name(*name);
-	std::memcpy(componentData.data(), &nameComponent, sizeof(PonyEngine::World::Name));
+	auto writer = PonyTools::Memory::ByteWriter(componentData, bigEndian);
+	writer.Write(static_cast<std::uint8_t>(name->size()));
+	writer.Write(*name);
 }
 
 void SerializeDescription(const toml::table& componentTable, const std::span<std::byte> componentData,

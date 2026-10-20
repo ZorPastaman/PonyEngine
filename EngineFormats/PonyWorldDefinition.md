@@ -39,14 +39,62 @@ The index must be `std::uint64_t`. Max value means no reference.
 
 ## Component data layout
 
-### `PonyEngine::World::Hierarchy::Parent`
+### `Pony.Name` - `PonyEngine::World::Meta::Name`
 
-Raw component data.
+| Size               | Description  |
+|:------------------:|:-------------|
+| 1                  | Name length. |
+| [0, MaxNameLength] | Name.        |
 
-### `PonyEngine::World::Hierarchy::LocalTransform2D`
+### `Pony.Description` - `PonyEngine::World::Meta::Description`
 
-Raw component data.
+| Size | Description          |
+|:----:|:---------------------|
+| 8    | String object index. |
 
-### `PonyEngine::World::Hierarchy::LocalTransform3D`
+### `Pony.Parent` - `PonyEngine::World::Hierarchy::Parent`
 
-Raw component data.
+| Size | Description          |
+|:----:|:---------------------|
+| 8    | Parent entity index. |
+
+### `Pony.Transform2D` - `PonyEngine::World::Hierarchy::LocalTransform2D`
+
+| Size | Description          |
+|:----:|:---------------------|
+| 8    | Position X.          |
+| 8    | Position Y.          |
+| 4    | Rotation in radians. |
+| 4    | Scale X.             |
+| 4    | Scale Y.             |
+
+### `Pony.Transform3D` - `PonyEngine::World::Hierarchy::LocalTransform3D`
+
+| Size | Description            |
+|:----:|:-----------------------|
+| 8    | Position X.            |
+| 8    | Position Y.            |
+| 8    | Position Z.            |
+| 4    | Rotation X in radians. |
+| 4    | Rotation Y in radians. |
+| 4    | Rotation Z in radians. |
+| 4    | Scale X.               |
+| 4    | Scale Y.               |
+| 4    | Scale Z.               |
+
+## Object data layout
+
+### `Pony.Resource`
+
+| Size     | Description         |
+|:--------:|:--------------------|
+| 1        | Interface length.   |
+| 1        | Resource ID length. |
+| [0, 255] | Interface.          |
+| [0, 255] | Resource ID.        |
+
+Standard interface to type mapping:
+
+| Interface     | Type               |
+|:--------------|:-------------------|
+| `Pony.String` | `std::string_view` |

@@ -23,7 +23,6 @@ set_target_properties(PonyTools.WorldDataSerializer PROPERTIES
 target_link_libraries(PonyTools.WorldDataSerializer PRIVATE
 	PonyTools.Utility
 	PonyEngine.Core
-	PonyEngine.World
-	PonyEngine.World.Hierarchy
+	PonyEngine.World.Meta
 	tomlplusplus::tomlplusplus
 )

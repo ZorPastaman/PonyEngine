@@ -17,6 +17,7 @@ import PonyEngine.World.Hierarchy;
 
 export namespace PonyEngine::Resource::World::Hierarchy
 {
+	/// @brief Transform 3D deserializer.
 	class Transform3DDeserializer final : public IInlineComponentDeserializer
 	{
 	public:
@@ -33,14 +34,15 @@ export namespace PonyEngine::Resource::World::Hierarchy
 		Transform3DDeserializer& operator =(Transform3DDeserializer&&) = delete;
 
 	private:
+		/// @brief Input transform.
 		struct InputTransform final
 		{
-			Math::Vector3<double> position;
-			Math::Vector3<float> rotation;
-			Math::Vector3<float> scale;
+			Math::Vector3<double> position; ///< Position.
+			Math::Vector3<float> rotation; ///< Rotation in radians in Euler angles.
+			Math::Vector3<float> scale; ///< Scale.
 		};
 
-		static constexpr std::size_t InputComponentSize = sizeof(double) * 3uz + sizeof(float) * 6uz;
+		static constexpr std::size_t InputComponentSize = sizeof(double) * 3uz + sizeof(float) * 6uz; ///< Transform 3D input data size.
 		static_assert(sizeof(InputTransform) == InputComponentSize, "Invalid input transform");
 	};
 }
