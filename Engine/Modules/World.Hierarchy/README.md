@@ -11,6 +11,8 @@ Mark entities that need to be updated with it and call a special function in the
 
 The module provides 2D and 3D transforms. They work independently. But usually you don't want to mix them on one entity.
 
+Adds `PonyEngine.World.Hierarchy` target.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)

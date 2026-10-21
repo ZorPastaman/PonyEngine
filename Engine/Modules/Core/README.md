@@ -4,8 +4,6 @@ Core utilities module.
 
 Adds `PonyEngine.Core` target as a static library.
 
-The module requires a compiler specific implementation. See [Custom compiler](#custom-compiler) for details.
-
 ## C\++ modules
 
 ### [PonyEngine.Async](Source/Async.cppm)
@@ -127,15 +125,11 @@ Utilities:
 
 ### [PonyEngine/Macro/Compiler.h](Include/Public/PonyEngine/Macro/Compiler.h)
 
-Compiler utilities.
+Compiler utilities. They must be implemented by a modification module that adds a compiler support.
 
-| Define                   | Description                                                        |
-|:-------------------------|:-------------------------------------------------------------------|
-| `PONY_DLL_EXPORT`        | Sets `dllexport` attribute if `PONY_DLL` is defined.               |
-| `PONY_PRESERVE(symbol)`  | Prevents a compiler from removing the symbol.                      |
-| `PONY_SECTION_DELIMITER` | Section delimiter that is set between a section name and an order. |
-| `PONY_SECTION(name)`     | Declares a section with the name.                                  |
-| `PONY_ALLOCATE(segment)` | Allocates the segment.                                             |
+| Define                   | Description                 |
+|:-------------------------|:----------------------------|
+| `PONY_DLL_EXPORT`        | Sets `dllexport` attribute. |
 
 ### [PonyEngine/Macro/Text.h](Include/Public/PonyEngine/Macro/Text.h)
 
@@ -171,24 +165,3 @@ Enum utilities.
 | `PONY_ENUM_MASK_FEATURES(Mask)`                               | Shortcut for `PONY_ENUM_MASK_OPERATORS(Mask) PONY_ENUM_MASK_CHECKS(Mask)`.                                                        |
 | `PONY_ENUM_VALUE_MASK_FEATURES(Value, Mask)`                  | Shortcut for `PONY_ENUM_MASK_FEATURES(Mask) PONY_ENUM_VALUE_MASK(Value, Mask)`.                                                   |
 | `PONY_ENUM_VALUE_MASK_FORMATTER(Value, Mask, ValueMaskNames)` | Shortcut for `PONY_ENUM_VALUE_FORMATTER(Value, ValueMaskNames) PONY_ENUM_MASK_FORMATTER(Mask, ValueMaskNames)`.                   |
-
-## CMake functions
-
-| Function name                    | Script file                 | Description                                     |
-|:---------------------------------|:----------------------------|:------------------------------------------------|
-| `pony_make_module_group modules` | [File](CMake/Target.cmake)  | Makes a shared library out of static libraries. |
-
-## Custom compiler
-
-The module requires a compiler specific implementation. For that, some defines must be implemented by a compiler module that modifies `PonyEngine.Core`.
-
-1. The define `PONY_COMPILER_INCLUDE` must be set and contain a valid path a compiler implementation header file.
-2. The header file must contain and implement these defines:
-
-| Define                        | Description                                                        |
-|:------------------------------|:-------------------------------------------------------------------|
-| `PONY_DLL_EXPORT_IMPL`        | Sets `dllexport` attribute.                                        |
-| `PONY_PRESERVE_IMPL(symbol)`  | Prevents a compiler from removing the symbol.                      |
-| `PONY_SECTION_DELIMITER_IMPL` | Section delimiter that is set between a section name and an order. |
-| `PONY_SECTION_IMPL(name)`     | Declares a section with the name.                                  |
-| `PONY_ALLOCATE_IMPL(segment)` | Allocates the segment.                                             |

@@ -20,5 +20,5 @@ namespace PonyEngine::RawInput::Mouse
 	/// @brief Creates the mouse provider module.
 	/// @return Mouse provider module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateMouseProviderModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateMouseProviderModule();
 }

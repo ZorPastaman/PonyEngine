@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::Resource::Pack
 	/// @brief Creates the pack service module.
 	/// @return Pack service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreatePackServiceModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreatePackServiceModule();
 }

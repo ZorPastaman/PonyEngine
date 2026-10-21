@@ -2,6 +2,8 @@
 
 Provides meta components for worlds.
 
+Adds `PonyEngine.World.Meta` target.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)

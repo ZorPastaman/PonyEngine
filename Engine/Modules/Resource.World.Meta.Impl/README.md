@@ -2,6 +2,8 @@
 
 Adds meta component deserializers to the world definition loader.
 
+Adds `PonyEngine.Resource.World.Meta.Impl` target.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)

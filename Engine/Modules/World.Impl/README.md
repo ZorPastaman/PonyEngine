@@ -2,6 +2,8 @@
 
 World service implementation module.
 
+Adds `PonyEngine.World.Impl` target.
+
 ## Dependencies
 
 - [PonyEngine.Application](../Application)

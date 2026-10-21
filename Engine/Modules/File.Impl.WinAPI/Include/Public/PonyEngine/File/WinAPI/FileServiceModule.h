@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::File
 	/// @brief Creates the file service module.
 	/// @return File service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateFileServiceModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateFileServiceModule();
 }

@@ -20,5 +20,5 @@ namespace PonyEngine::RawInput::XInput
 	/// @brief Creates the XInput provider module.
 	/// @return XInput provider module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateXInputProviderModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateXInputProviderModule();
 }

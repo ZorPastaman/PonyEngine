@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::Log::Console
 	/// @brief Creates a console logger module.
 	/// @return Console logger module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateConsoleLoggerModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateConsoleLoggerModule();
 }

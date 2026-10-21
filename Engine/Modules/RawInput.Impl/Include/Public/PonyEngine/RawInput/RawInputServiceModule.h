@@ -20,5 +20,5 @@ namespace PonyEngine::RawInput
 	/// @brief Creates the raw input service module.
 	/// @return Raw input service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateRawInputServiceModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateRawInputServiceModule();
 }

@@ -30,25 +30,6 @@ import :IdentityUtility;
 import :IProcess;
 import :PathUtility;
 
-/// @brief Begins an early section declaration.
-/// @note For internal use only.
-PONY_SECTION(PONY_EARLY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
-/// @brief Ends an early section declaration.
-/// @note For internal use only.
-PONY_SECTION(PONY_EARLY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
-/// @brief Begins a normal section declaration.
-/// @note For internal use only.
-PONY_SECTION(PONY_NORMAL_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
-/// @brief Ends a normal section declaration.
-/// @note For internal use only.
-PONY_SECTION(PONY_NORMAL_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
-/// @brief Begins a late section declaration.
-/// @note For internal use only.
-PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
-/// @brief Ends a late section declaration.
-/// @note For internal use only.
-PONY_SECTION(PONY_LATE_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
-
 export namespace PonyEngine::Application
 {
 	/// @brief Application.
@@ -223,13 +204,12 @@ export namespace PonyEngine::Application
 
 	private:
 		using ModuleGetter = std::shared_ptr<IModule>(*)(); ///< Module getter function.
-
-		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) inline static ModuleGetter firstEarlyModule = nullptr; ///< Early module begin pointer.
-		PONY_EARLY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) inline static ModuleGetter lastEarlyModule = nullptr; ///< Early module end pointer.
-		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) inline static ModuleGetter firstNormalModule = nullptr; ///< Normal module begin pointer.
-		PONY_NORMAL_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) inline static ModuleGetter lastNormalModule = nullptr; ///< Normal module end pointer.
-		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) inline static ModuleGetter firstLateModule = nullptr; ///< Late module begin pointer.
-		PONY_LATE_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) inline static ModuleGetter lastLateModule = nullptr; ///< Late module end pointer.
+		PONY_MODULE_BEGIN(PONY_MODULE_EARLY_SECTION, firstEarlyModule)
+		PONY_MODULE_END(PONY_MODULE_EARLY_SECTION, lastEarlyModule)
+		PONY_MODULE_BEGIN(PONY_MODULE_NORMAL_SECTION, firstNormalModule)
+		PONY_MODULE_END(PONY_MODULE_NORMAL_SECTION, lastNormalModule)
+		PONY_MODULE_BEGIN(PONY_MODULE_LATE_SECTION, firstLateModule)
+		PONY_MODULE_END(PONY_MODULE_LATE_SECTION, lastLateModule)
 
 		/// @brief Temp buffer cache.
 		struct TempBufferCache final

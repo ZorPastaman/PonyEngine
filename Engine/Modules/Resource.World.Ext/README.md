@@ -2,6 +2,8 @@
 
 Resource module extension that adds support of world resources.
 
+Adds `PonyEngine.Resource.World.Ext` target.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)

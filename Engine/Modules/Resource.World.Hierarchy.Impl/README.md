@@ -2,6 +2,8 @@
 
 Adds hierarchy component deserializers to the world definition loader.
 
+Adds `PonyEngine.Resource.World.Hierarchy.Impl` target.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::Resource
 	/// @brief Creates the resource service module.
 	/// @return Resource service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateResourceServiceModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateResourceServiceModule();
 }

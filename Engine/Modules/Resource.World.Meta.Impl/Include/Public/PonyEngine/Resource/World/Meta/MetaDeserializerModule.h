@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::Resource::World::Meta
 	/// @brief Creates the meta deserializer module.
 	/// @return Meta deserializer module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateMetaDeserializerModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateMetaDeserializerModule();
 }

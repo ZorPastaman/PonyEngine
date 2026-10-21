@@ -20,5 +20,5 @@ namespace PonyEngine::RawInput::Keyboard
 	/// @brief Creates the keyboard provider module.
 	/// @return Keyboard provider module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateKeyboardProviderModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateKeyboardProviderModule();
 }

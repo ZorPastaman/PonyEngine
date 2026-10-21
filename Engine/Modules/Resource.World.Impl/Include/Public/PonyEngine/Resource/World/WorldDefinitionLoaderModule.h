@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::Resource::World
 	/// @brief Creates the world definition loader module.
 	/// @return World definition loader module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateWorldDefinitionLoaderModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateWorldDefinitionLoaderModule();
 }

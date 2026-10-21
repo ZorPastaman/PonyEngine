@@ -59,14 +59,14 @@ extern "C"
 	/// @brief Gets component types.
 	/// @return Component types.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT_IMPL StringViewSpan GetComponentTypes() noexcept;
+	PONY_DLL_EXPORT StringViewSpan GetComponentTypes() noexcept;
 	/// @brief Gets a component size.
 	/// @param typeIndex Component type index.
 	/// @param componentTable Component table.
 	/// @param sizeTSize Target platform std::size_t size.
 	/// @return Component size.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT_IMPL std::size_t GetComponentSize(std::size_t typeIndex, const toml::table& componentTable, std::size_t sizeTSize) noexcept;
+	PONY_DLL_EXPORT std::size_t GetComponentSize(std::size_t typeIndex, const toml::table& componentTable, std::size_t sizeTSize) noexcept;
 	/// @brief Serializes a component.
 	/// @param typeIndex Component type index.
 	/// @param componentTable Component table.
@@ -77,21 +77,21 @@ extern "C"
 	/// @param sizeTSize Target platform std::size_t size.
 	/// @param bigEndian Is the target platform big endian?
 	/// @return @a True if it serialized successfully; @a false otherwise.
-	PONY_DLL_EXPORT_IMPL bool SerializeComponent(std::size_t typeIndex, const toml::table& componentTable, std::span<std::byte> componentData,
+	PONY_DLL_EXPORT bool SerializeComponent(std::size_t typeIndex, const toml::table& componentTable, std::span<std::byte> componentData,
 		const std::unordered_map<std::string_view, std::uint64_t>& entityIDToIndex, const std::unordered_map<std::string_view, std::uint64_t>& objectIDToIndex, 
 		const std::unordered_map<std::string_view, std::string_view>& objectIDToType, std::size_t sizeTSize, bool bigEndian) noexcept;
 
 	/// @brief Gets object types.
 	/// @return Object types.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT_IMPL StringViewSpan GetObjectTypes() noexcept;
+	PONY_DLL_EXPORT StringViewSpan GetObjectTypes() noexcept;
 	/// @brief Gets an object size.
 	/// @param typeIndex Object type index.
 	/// @param objectTable Object table.
 	/// @param sizeTSize Target platform std::size_t size.
 	/// @return Object size.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT_IMPL std::size_t GetObjectSize(std::size_t typeIndex, const toml::table& objectTable, std::size_t sizeTSize) noexcept;
+	PONY_DLL_EXPORT std::size_t GetObjectSize(std::size_t typeIndex, const toml::table& objectTable, std::size_t sizeTSize) noexcept;
 	/// @brief Serializes a object.
 	/// @param typeIndex Object type index.
 	/// @param objectTable Object table.
@@ -99,7 +99,7 @@ extern "C"
 	/// @param sizeTSize Target platform std::size_t size.
 	/// @param bigEndian Is the target platform big endian?
 	/// @return @a True if it serialized successfully; @a false otherwise.
-	PONY_DLL_EXPORT_IMPL bool SerializeObject(std::size_t typeIndex, const toml::table& objectTable, std::span<std::byte> objectData,
+	PONY_DLL_EXPORT bool SerializeObject(std::size_t typeIndex, const toml::table& objectTable, std::span<std::byte> objectData,
 		std::size_t sizeTSize, bool bigEndian) noexcept;
 }
 
