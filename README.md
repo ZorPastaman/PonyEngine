@@ -8,7 +8,7 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 - Modular architecture;
 - Replaceable engine modules;
 - Easily extensible;
-- Mesh shader–based render;
+- Mesh shader based render;
 - ECS.
 
 ## Prerequisites
@@ -22,7 +22,7 @@ Pony Engine is a modular game engine with a minimal core. Users can easily add t
 
 ### Simple way
 
-TODO: reference samples
+See sample projects at https://github.com/ZorPastaman/PonyEngineSamples
 
 ### Advanced way
 
