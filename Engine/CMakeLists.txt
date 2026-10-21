@@ -25,7 +25,4 @@ pony_validate_version(PONY_PROJECT_VERSION)
 pony_validate_title(PONY_COMPANY_TITLE)
 pony_validate_title(PONY_PROJECT_TITLE)
 
-option(PONY_ENGINE_CUSTOM_PLATFORM "If OFF, the engine automatically detects and configures supported platforms. If ON, the engine skips platform detection and a custom platform configuration must be provided." OFF)
-option(PONY_ENGINE_CUSTOM_COMPILER "If OFF, the engine automatically detects and configures supported compilers. If ON, the engine skips compiler detection and a custom compiler configuration must be provided." OFF)
-
 add_subdirectory("Modules")

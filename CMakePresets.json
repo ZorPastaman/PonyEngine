@@ -144,6 +144,20 @@
 			}
 		},
 		{
+			"name": "Runtime-Windows-Console",
+			"inherits": [ "Runtime-Console", "Runtime-Windows" ],
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_ENGINE_APPLICATION_MODE": "Console"
+			}
+		},
+		{
+			"name": "Runtime-Windows-MSVC",
+			"inherits": "Runtime-Windows",
+			"hidden": true,
+			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
+		},
+		{
 			"name": "Runtime-Windows-GUI",
 			"inherits": [ "Runtime-Desktop", "Runtime-Windows" ],
 			"hidden": true,
@@ -157,24 +171,34 @@
 			}
 		},
 		{
-			"name": "Runtime-Windows-GUI-MSVC",
-			"inherits": "Runtime-Windows-GUI",
-			"hidden": true,
-			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
-		},
-		{
-			"name": "Runtime-Windows-Console",
-			"inherits": [ "Runtime-Console", "Runtime-Windows" ],
-			"hidden": true,
-			"cacheVariables": {
-				"PONY_ENGINE_APPLICATION_MODE": "Console"
-			}
-		},
-		{
 			"name": "Runtime-Windows-Console-MSVC",
-			"inherits": "Runtime-Windows-Console",
-			"hidden": true,
-			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
+			"inherits": [ "Runtime-Windows-Console", "Runtime-Windows-MSVC" ],
+			"hidden": true
+		},
+		{
+			"name": "Runtime-Windows-GUI-MSVC",
+			"inherits": [ "Runtime-Windows-GUI", "Runtime-Windows-MSVC" ],
+			"hidden": true
+		},
+		{
+			"name": "R-Win-Con-MSVC-Deb",
+			"displayName": "Runtime: Windows Console MSVC - Debug",
+			"inherits": [ "Runtime-Debug", "Runtime-Windows-Console-MSVC" ]
+		},
+		{
+			"name": "R-Win-Con-MSVC-Opt",
+			"displayName": "Runtime: Windows Console MSVC - Optimized",
+			"inherits": [ "Runtime-Optimized", "Runtime-Windows-Console-MSVC" ]
+		},
+		{
+			"name": "R-Win-Con-MSVC-Rel",
+			"displayName": "Runtime: Windows Console MSVC - Release",
+			"inherits": [ "Runtime-Release", "Runtime-Windows-Console-MSVC" ]
+		},
+		{
+			"name": "R-Win-Con-MSVC-Shi",
+			"displayName": "Runtime: Windows Console MSVC - Shipping",
+			"inherits": [ "Runtime-Shipping", "Runtime-Windows-Console-MSVC" ]
 		},
 		{
 			"name": "R-Win-GUI-MSVC-Deb",
@@ -209,26 +233,6 @@
 			}
 		},
 		{
-			"name": "R-Win-Con-MSVC-Deb",
-			"displayName": "Runtime: Windows Console MSVC - Debug",
-			"inherits": [ "Runtime-Debug", "Runtime-Windows-Console-MSVC" ]
-		},
-		{
-			"name": "R-Win-Con-MSVC-Opt",
-			"displayName": "Runtime: Windows Console MSVC - Optimized",
-			"inherits": [ "Runtime-Optimized", "Runtime-Windows-Console-MSVC" ]
-		},
-		{
-			"name": "R-Win-Con-MSVC-Rel",
-			"displayName": "Runtime: Windows Console MSVC - Release",
-			"inherits": [ "Runtime-Release", "Runtime-Windows-Console-MSVC" ]
-		},
-		{
-			"name": "R-Win-Con-MSVC-Shi",
-			"displayName": "Runtime: Windows Console MSVC - Shipping",
-			"inherits": [ "Runtime-Shipping", "Runtime-Windows-Console-MSVC" ]
-		},
-		{
 			"name": "Tools",
 			"inherits": "Base",
 			"hidden": true,
@@ -260,26 +264,6 @@
 	],
 	"buildPresets": [
 		{
-			"name": "R-Win-GUI-MSVC-Deb",
-			"displayName": "Runtime: Windows GUI MSVC - Debug",
-			"configurePreset": "R-Win-GUI-MSVC-Deb"
-		},
-		{
-			"name": "R-Win-GUI-MSVC-Opt",
-			"displayName": "Runtime: Windows GUI MSVC - Optimized",
-			"configurePreset": "R-Win-GUI-MSVC-Opt"
-		},
-		{
-			"name": "R-Win-GUI-MSVC-Rel",
-			"displayName": "Runtime: Windows GUI MSVC - Release",
-			"configurePreset": "R-Win-GUI-MSVC-Rel"
-		},
-		{
-			"name": "R-Win-GUI-MSVC-Shi",
-			"displayName": "Runtime: Windows GUI MSVC - Shipping",
-			"configurePreset": "R-Win-GUI-MSVC-Shi"
-		},
-		{
 			"name": "R-Win-Con-MSVC-Deb",
 			"displayName": "Runtime: Windows Console MSVC - Debug",
 			"configurePreset": "R-Win-Con-MSVC-Deb"
@@ -298,6 +282,26 @@
 			"name": "R-Win-Con-MSVC-Shi",
 			"displayName": "Runtime: Windows Console MSVC - Shipping",
 			"configurePreset": "R-Win-Con-MSVC-Shi"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Deb",
+			"displayName": "Runtime: Windows GUI MSVC - Debug",
+			"configurePreset": "R-Win-GUI-MSVC-Deb"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Opt",
+			"displayName": "Runtime: Windows GUI MSVC - Optimized",
+			"configurePreset": "R-Win-GUI-MSVC-Opt"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Rel",
+			"displayName": "Runtime: Windows GUI MSVC - Release",
+			"configurePreset": "R-Win-GUI-MSVC-Rel"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Shi",
+			"displayName": "Runtime: Windows GUI MSVC - Shipping",
+			"configurePreset": "R-Win-GUI-MSVC-Shi"
 		},
 		{
 			"name": "Tools-Debug",
@@ -317,26 +321,6 @@
 	],
 	"testPresets": [
 		{
-			"name": "R-Win-GUI-MSVC-Deb",
-			"displayName": "Runtime: Windows GUI MSVC - Debug",
-			"configurePreset": "R-Win-GUI-MSVC-Deb"
-		},
-		{
-			"name": "R-Win-GUI-MSVC-Opt",
-			"displayName": "Runtime: Windows GUI MSVC - Optimized",
-			"configurePreset": "R-Win-GUI-MSVC-Opt"
-		},
-		{
-			"name": "R-Win-GUI-MSVC-Rel",
-			"displayName": "Runtime: Windows GUI MSVC - Release",
-			"configurePreset": "R-Win-GUI-MSVC-Rel"
-		},
-		{
-			"name": "R-Win-GUI-MSVC-Shi",
-			"displayName": "Runtime: Windows GUI MSVC - Shipping",
-			"configurePreset": "R-Win-GUI-MSVC-Shi"
-		},
-		{
 			"name": "R-Win-Con-MSVC-Deb",
 			"displayName": "Runtime: Windows Console MSVC - Debug",
 			"configurePreset": "R-Win-Con-MSVC-Deb"
@@ -355,6 +339,26 @@
 			"name": "R-Win-Con-MSVC-Shi",
 			"displayName": "Runtime: Windows Console MSVC - Shipping",
 			"configurePreset": "R-Win-Con-MSVC-Shi"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Deb",
+			"displayName": "Runtime: Windows GUI MSVC - Debug",
+			"configurePreset": "R-Win-GUI-MSVC-Deb"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Opt",
+			"displayName": "Runtime: Windows GUI MSVC - Optimized",
+			"configurePreset": "R-Win-GUI-MSVC-Opt"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Rel",
+			"displayName": "Runtime: Windows GUI MSVC - Release",
+			"configurePreset": "R-Win-GUI-MSVC-Rel"
+		},
+		{
+			"name": "R-Win-GUI-MSVC-Shi",
+			"displayName": "Runtime: Windows GUI MSVC - Shipping",
+			"configurePreset": "R-Win-GUI-MSVC-Shi"
 		}
 	]
 }
