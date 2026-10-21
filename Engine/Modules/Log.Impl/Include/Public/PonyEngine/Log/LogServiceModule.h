@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::Log
 	/// @brief Creates a log service module.
 	/// @return Log service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateLogServiceModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateLogServiceModule();
 }

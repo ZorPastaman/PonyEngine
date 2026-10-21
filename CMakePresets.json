@@ -84,7 +84,7 @@
 				"PONY_ENGINE_OPTIMIZED_DEBUG": true,
 				"PONY_ENGINE_LOG_LEVEL": "Info",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Fatal",
-				"PONY_MAKE_GROUPS": false
+				"PONY_MAKE_GROUPS": true
 			}
 		},
 		{
@@ -244,14 +244,6 @@
 			}
 		},
 		{
-			"name": "Tools-Optimized",
-			"inherits": "Tools",
-			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Debug",
-				"PONY_ENGINE_OPTIMIZED_DEBUG": true
-			}
-		},
-		{
 			"name": "Tools-Release",
 			"inherits": "Tools",
 			"cacheVariables": {
@@ -311,11 +303,6 @@
 			"name": "Tools-Debug",
 			"displayName": "Tools - Debug",
 			"configurePreset": "Tools-Debug"
-		},
-		{
-			"name": "Tools-Optimized",
-			"displayName": "Tools - Optimized",
-			"configurePreset": "Tools-Optimized"
 		},
 		{
 			"name": "Tools-Release",

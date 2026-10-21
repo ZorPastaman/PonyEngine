@@ -4,6 +4,8 @@ World resource module implementation.
 
 It supports a resource object `Pony.Resource` out of the box.
 
+Adds `PonyEngine.Resource.World.Impl` target.
+
 ## Dependencies
 
 - [PonyEngine.Application](../Application)

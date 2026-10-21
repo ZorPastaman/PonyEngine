@@ -6,6 +6,8 @@ The service provides world objects that allow to manage game data in ECS style.
 It's pure data management (entities and components). The service doesn't provide anything for systems -
 they can be implemented as needed for a game project.
 
+Adds `PonyEngine.World` target.
+
 ## Dependencies
 
 - [PonyEngine.Core](../Core)

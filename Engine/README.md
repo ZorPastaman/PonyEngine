@@ -65,6 +65,7 @@ Some modules may require modifications to work because they need implementation 
 
 | Module name                                                                       | Build flag                                   |
 |:----------------------------------------------------------------------------------|:---------------------------------------------|
+| [PonyEngine.Application.MSVC](Modules/Application.MSVC)                           | `PONY_ENGINE_APPLICATION_MSVC`               |
 | [PonyEngine.Application.WinAPI](Modules/Application.WinAPI)                       | `PONY_ENGINE_APPLICATION_WINAPI`             |
 | [PonyEngine.Application.Impl.WinAPI](Modules/Application.Impl.WinAPI)             | `PONY_ENGINE_APPLICATION_IMPL_WINAPI`        |
 | [PonyEngine.Core.MSVC](Modules/Core.MSVC)                                         | `PONY_ENGINE_CORE_MSVC`                      |

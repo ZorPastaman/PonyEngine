@@ -4,6 +4,8 @@ World meta implementation module.
 
 On its initialization it registers all the meta components. No need for that from a project code.
 
+Adds `PonyEngine.World.Meta.Impl` target.
+
 ## Dependencies
 
 - [PonyEngine.Application](../Application)

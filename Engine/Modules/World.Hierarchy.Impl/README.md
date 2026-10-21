@@ -4,6 +4,8 @@ World hierarchy implementation module.
 
 On its initialization it registers all the hierarchy components. No need for that from a project code.
 
+Adds `PonyEngine.World.Hierarchy.Impl` target.
+
 ## Dependencies
 
 - [PonyEngine.Application](../Application)

@@ -20,5 +20,5 @@ namespace PonyEngine::WinInput
 	/// @brief Creates a WinInput module.
 	/// @return WinInput module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateWinInputModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateWinInputModule();
 }

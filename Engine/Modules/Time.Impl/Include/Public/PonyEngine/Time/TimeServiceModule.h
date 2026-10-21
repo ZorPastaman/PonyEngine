@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,5 +20,5 @@ namespace PonyEngine::Time
 	/// @brief Creates the time service module.
 	/// @return Time service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateTimeServiceModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateTimeServiceModule();
 }

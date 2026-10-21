@@ -43,21 +43,30 @@ Tickable interface. A tickable is an object that reacts to the application main 
 
 Application module utilities.
 
-| Define                                                         | Description                                                                                                                                         |
-|:---------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `PONY_EARLY_MODULE(function, moduleName, order)`               | Makes an application module with an early registration. It's a group for log modules. The application tries to find a log service after this group. |
-| `PONY_NORMAL_MODULE(function, moduleName, order)`              | Makes an application module with a normal registration. It's a group for engine modules.                                                            |
-| `PONY_LATE_MODULE(function, moduleName, order)`                | Makes an application module with a late registration. It's a group for game modules.                                                                |
-| `PONY_LOG_MODULE(function, moduleName, order)`                 | Synonym to `PONY_EARLY_MODULE(function, moduleName, order)`.                                                                                        |
-| `PONY_ENGINE_MODULE(function, moduleName, order)`              | Synonym to `PONY_NORMAL_MODULE(function, moduleName, order)`.                                                                                       |
-| `PONY_PROJECT_MODULE(function, moduleName, order)`             | Synonym to `PONY_LATE_MODULE(function, moduleName, order)`.                                                                                         |
+| Define                                             | Description                                                                                                                                         |
+|:---------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `PONY_EARLY_MODULE(function, moduleName, order)`   | Makes an application module with an early registration. It's a group for log modules. The application tries to find a log service after this group. |
+| `PONY_NORMAL_MODULE(function, moduleName, order)`  | Makes an application module with a normal registration. It's a group for engine modules.                                                            |
+| `PONY_LATE_MODULE(function, moduleName, order)`    | Makes an application module with a late registration. It's a group for game modules.                                                                |
+| `PONY_LOG_MODULE(function, moduleName, order)`     | Synonym to `PONY_EARLY_MODULE(function, moduleName, order)`.                                                                                        |
+| `PONY_ENGINE_MODULE(function, moduleName, order)`  | Synonym to `PONY_NORMAL_MODULE(function, moduleName, order)`.                                                                                       |
+| `PONY_PROJECT_MODULE(function, moduleName, order)` | Synonym to `PONY_LATE_MODULE(function, moduleName, order)`.                                                                                         |
+
+These macros must be implemented by a modification module that adds a compiler support.
+
+| Define                                                  | Description                                      |
+|:--------------------------------------------------------|:-------------------------------------------------|
+| `PONY_MODULE(function, moduleName, order, sectionName)` | Adds the module.                                 |
+| `PONY_MODULE_BEGIN(sectionName, variableName)`          | Makes a variable that points to a section begin. |
+| `PONY_MODULE_END(sectionName, variableName)`            | Makes a variable that points to a section end.   |
 
 ## CMake functions
 
-| Function name                | Script file                | Description                              |
-|:-----------------------------|:---------------------------|:-----------------------------------------|
-| `pony_validate_module_order` | [File](CMake/Module.cmake) | Validates a module order variable.       |
-| `pony_validate_tick_order`   | [File](CMake/Module.cmake) | Validates a service tick order variable. |
+| Function name                    | Script file                | Description                                     |
+|:---------------------------------|:---------------------------|:------------------------------------------------|
+| `pony_validate_module_order`     | [File](CMake/Module.cmake) | Validates a module order variable.              |
+| `pony_validate_tick_order`       | [File](CMake/Module.cmake) | Validates a service tick order variable.        |
+| `pony_make_module_group modules` | [File](CMake/Module.cmake) | Makes a shared library out of static libraries. |
 
 ## Custom application module
 

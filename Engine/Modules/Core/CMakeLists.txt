@@ -1,7 +1,5 @@
 message(STATUS "Configuring PonyEngine.Core feature module")
 
-include("CMake/Target.cmake")
-
 add_library(PonyEngine.Core STATIC)
 
 target_include_directories(PonyEngine.Core PUBLIC 

@@ -5,5 +5,5 @@ target_include_directories(PonyEngine.Core PUBLIC
 )
 
 target_compile_definitions(PonyEngine.Core PUBLIC
-	PONY_COMPILER_INCLUDE="PonyEngine/Macro/MSVC/Compiler.h"
+	PONY_ENGINE_CORE_COMPILER_INCLUDE="PonyEngine/Core/MSVC/Compiler.h"
 )

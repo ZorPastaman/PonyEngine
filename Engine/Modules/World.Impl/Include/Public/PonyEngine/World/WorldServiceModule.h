@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "PonyEngine/Macro/Compiler.h"
+#include "PonyEngine/Application/Module.h"
 
 import std;
 
@@ -20,6 +20,6 @@ namespace PonyEngine::World
 	/// @brief Creates the world service module.
 	/// @return World service module.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<Application::IModule> CreateWorldServiceModule();
+	PONY_MODULE_FUNC std::shared_ptr<Application::IModule> CreateWorldServiceModule();
 }
 
