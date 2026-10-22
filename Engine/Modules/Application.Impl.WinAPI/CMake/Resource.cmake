@@ -11,7 +11,6 @@ target_sources(PonyEngine.Application.Impl PRIVATE "${PONY_RESOURCE_FILE_PATH}")
 # type - resource type. Must be one of the supported rc types.
 function(pony_add_winapi_resource id path type)
 	get_target_property(resource_file_path PonyEngine.Application.Impl PONY_RESOURCE_FILE_PATH)
-	cmake_path(CONVERT "${path}" TO_NATIVE_PATH_LIST path)
 	file(APPEND "${resource_file_path}" "\"${id}\" ${type} \"${path}\"\n")
 endfunction()
 
