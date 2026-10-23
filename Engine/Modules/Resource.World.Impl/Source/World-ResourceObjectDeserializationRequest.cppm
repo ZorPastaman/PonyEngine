@@ -149,13 +149,10 @@ namespace PonyEngine::Resource::World
 		}
 		catch (...)
 		{
-			const std::size_t count = std::min(this->exceptions.size(), exceptions.size());
 			try
 			{
-				for (std::size_t i = 0uz; i < count; ++i)
-				{
-					this->exceptions.push_back(exceptions[i]);
-				}
+				const std::size_t count = std::min(this->exceptions.size(), exceptions.size());
+				this->exceptions.append_range(exceptions.subspan(0uz, count));
 			}
 			catch (...)
 			{

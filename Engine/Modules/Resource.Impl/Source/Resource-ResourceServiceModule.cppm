@@ -12,6 +12,7 @@ export module PonyEngine.Resource.Impl:ResourceServiceModule;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Utility;
 
 import :ResourceService;
 
@@ -43,25 +44,15 @@ namespace PonyEngine::Resource
 {
 	void ResourceServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		resourceService = std::make_unique<ResourceService>(context.Application());
-		try
-		{
-			context.AddInterface<IResourceService>(*resourceService);
-			try
-			{
-				context.AddInterface<IResourceHub>(*resourceService);
-			}
-			catch (...)
-			{
-				context.RemoveInterface<IResourceService>(*resourceService);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			resourceService.reset();
-			throw;
-		}
+		const auto resourceServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { resourceService.reset(); }, scopeGuardFlag);
+		context.AddInterface<IResourceService>(*resourceService);
+		const auto resourceServiceInterfaceScopeGuard = Utility::ScopeGuard([&]() noexcept { context.RemoveInterface<IResourceService>(*resourceService); }, scopeGuardFlag);
+		context.AddInterface<IResourceHub>(*resourceService);
+
+		scopeGuardFlag.Release();
 	}
 
 	void ResourceServiceModule::ShutDown(Application::IModuleContext& context)

@@ -11,6 +11,7 @@ export module PonyEngine.Time.Impl:TimeServiceModule;
 
 import PonyEngine.Application;
 import PonyEngine.Time;
+import PonyEngine.Utility;
 
 import :TimeService;
 
@@ -42,26 +43,15 @@ namespace PonyEngine::Time
 {
 	void TimeServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		timeService = std::make_unique<TimeService>(context.Application());
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
-		try
-		{
-			context.AddInterface<ITimeService>(*timeService);
-			try
-			{
-				context.AddTickable(timeService->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_TIME_TICK_ORDER});
-			}
-			catch (...)
-			{
-				context.RemoveInterface<ITimeService>(*timeService);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			timeService.reset();
-			throw;
-		}
+		timeService = std::make_unique<TimeService>(context.Application());
+		const auto timeScopeGuard = Utility::ScopeGuard([&]() noexcept { timeService.reset(); }, scopeGuardFlag);
+		context.AddInterface<ITimeService>(*timeService);
+		const auto timeServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { context.RemoveInterface<ITimeService>(*timeService); }, scopeGuardFlag);
+		context.AddTickable(timeService->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_TIME_TICK_ORDER});
+
+		scopeGuardFlag.Release();
 	}
 
 	void TimeServiceModule::ShutDown(Application::IModuleContext& context)

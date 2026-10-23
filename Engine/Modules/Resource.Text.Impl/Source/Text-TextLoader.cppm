@@ -16,6 +16,7 @@ export module PonyEngine.Resource.Text.Impl:TextLoader;
 import std;
 
 import PonyEngine.Resource.Ext;
+import PonyEngine.Utility;
 
 import :CompletedResourceLoadRequest;
 import :OngoingResourceLoadRequest;
@@ -195,42 +196,41 @@ namespace PonyEngine::Resource::Text
 		const auto buffer = std::span(reinterpret_cast<std::byte*>(data.get()), size);
 		const auto text = std::string_view(data.get(), size);
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		auto resource = CreateTextResource(std::move(data), text);
 		auto request = std::make_shared<OngoingResourceLoadRequest>(std::move(resource), std::move(callback));
 		AddOngoingRequest(request);
 		IncrementOngoingRequestCount();
-
-		try
-		{
-			request->Request(dataAccess->Load(LoadParams{.buffer = buffer}, [this, req = request.get()](const ILoadableDataAccessRequest& accessRequest) noexcept
-			{
-				std::shared_ptr<OngoingResourceLoadRequest> loadRequest = RemoveOngoingRequest(req);
-				switch (accessRequest.Status())
-				{
-				case Async::RequestStatus::Success: [[likely]]
-					loadRequest->SetSuccess();
-					break;
-				case Async::RequestStatus::Failure:
-					loadRequest->SetFailure(accessRequest.Exception());
-					break;
-				case Async::RequestStatus::Canceled:
-					loadRequest->SetCanceled();
-					break;
-				default: [[unlikely]]
-					assert(false && "Unexpected status");
-					break;
-				}
-
-				loadRequest.reset();
-				DecrementOngoingRequestCount();
-			}));
-		}
-		catch (...)
+		const auto requestKeeperScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveOngoingRequest(request.get());
 			DecrementOngoingRequestCount();
-			throw;
-		}
+		}, scopeGuardFlag);
+		request->Request(dataAccess->Load(LoadParams{ .buffer = buffer }, [this, req = request.get()](const ILoadableDataAccessRequest& accessRequest) noexcept
+		{
+			std::shared_ptr<OngoingResourceLoadRequest> loadRequest = RemoveOngoingRequest(req);
+			switch (accessRequest.Status())
+			{
+			case Async::RequestStatus::Success: [[likely]]
+				loadRequest->SetSuccess();
+				break;
+			case Async::RequestStatus::Failure:
+				loadRequest->SetFailure(accessRequest.Exception());
+				break;
+			case Async::RequestStatus::Canceled:
+				loadRequest->SetCanceled();
+				break;
+			default: [[unlikely]]
+				assert(false && "Unexpected status");
+				break;
+			}
+
+			loadRequest.reset();
+			DecrementOngoingRequestCount();
+		}));
+
+		scopeGuardFlag.Release();
 
 		return request;
 	}

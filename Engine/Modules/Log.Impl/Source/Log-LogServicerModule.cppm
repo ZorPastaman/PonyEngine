@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log.Ext;
+import PonyEngine.Utility;
 
 import :LogService;
 
@@ -44,26 +45,15 @@ namespace PonyEngine::Log
 {
 	void LogServiceModule::StartUp(Application::IModuleContext& context)
 	{
-		logService = std::make_unique<LogService>(context.Application());
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
-		try
-		{
-			context.AddInterface<ILogService>(*logService);
-			try
-			{
-				context.AddInterface<ILogHub>(*logService);
-			}
-			catch (...)
-			{
-				context.RemoveInterface<ILogService>(*logService);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			logService.reset();
-			throw;
-		}
+		logService = std::make_unique<LogService>(context.Application());
+		const auto logServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { logService.reset(); }, scopeGuardFlag);
+		context.AddInterface<ILogService>(*logService);
+		const auto logServiceInterfaceScopeGuard = Utility::ScopeGuard([&]() noexcept { context.RemoveInterface<ILogService>(*logService); }, scopeGuardFlag);
+		context.AddInterface<ILogHub>(*logService);
+
+		scopeGuardFlag.Release();
 	}
 
 	void LogServiceModule::ShutDown(Application::IModuleContext& context)

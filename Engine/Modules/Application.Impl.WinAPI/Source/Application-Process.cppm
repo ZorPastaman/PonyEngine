@@ -28,6 +28,7 @@ import PonyEngine.Application.Impl;
 import PonyEngine.Chrono;
 import PonyEngine.FileSystem.WinAPI;
 import PonyEngine.Log;
+import PonyEngine.Utility;
 
 import :ThreadRole;
 
@@ -173,23 +174,9 @@ namespace PonyEngine::Application
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Wrong thread.");
 
-		int exitCode;
-
 		Initialize();
-
-		try
-		{
-			exitCode = RunMainLoop();
-		}
-		catch (...)
-		{
-			Finalize();
-			throw;
-		}
-
-		Finalize();
-
-		return exitCode;
+		const auto finalizeGuard = Utility::ScopeGuard([&]() noexcept { Finalize(); });
+		return RunMainLoop();
 	}
 
 	App& Process::Application() const noexcept
@@ -350,49 +337,25 @@ namespace PonyEngine::Application
 
 	void Process::Initialize()
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		application->InitializeEarly();
+		const auto initializeEarlyScopeGuard = Utility::ScopeGuard([&]() noexcept { application->FinalizeEarly(); }, scopeGuardFlag);
 		CreateConsole();
+		const auto consoleScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyConsole(); }, scopeGuardFlag);
 		LogProcessBasicInfo();
 		SetProcessPriority();
-		try
-		{
-			SetMainThreadRole();
-			CreateMainLoopTimer();
-			try
-			{
-				AddProcessInterfaces();
-				try
-				{
-					application->InitializeNormal();
-					try
-					{
-						application->InitializeLate();
-					}
-					catch (...)
-					{
-						application->FinalizeNormal();
-						throw;
-					}
-				}
-				catch (...)
-				{
-					RemoveProcessInterfaces();
-					throw;
-				}
-			}
-			catch (...)
-			{
-				DestroyMainLoopTimer();
-				RevertMainThreadMmcss();
-				throw;
-			}
-		}
-		catch (...)
-		{
-			DestroyConsole();
-			application->FinalizeEarly();
-			throw;
-		}
+		SetMainThreadRole();
+		const auto mainThreadRoleScopeGuard = Utility::ScopeGuard([&]() noexcept { RevertMainThreadMmcss(); }, scopeGuardFlag);
+		CreateMainLoopTimer();
+		const auto mainLoopTimeScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyMainLoopTimer(); }, scopeGuardFlag);
+		AddProcessInterfaces();
+		const auto processInterfacesScopeGuard = Utility::ScopeGuard([&]() noexcept { RemoveProcessInterfaces(); }, scopeGuardFlag);
+		application->InitializeNormal();
+		const auto initializeNormalScopeGuard = Utility::ScopeGuard([&]() noexcept { application->FinalizeNormal(); }, scopeGuardFlag);
+		application->InitializeLate();
+
+		scopeGuardFlag.Release();
 	}
 
 	void Process::Finalize()
@@ -408,29 +371,19 @@ namespace PonyEngine::Application
 
 	int Process::RunMainLoop()
 	{
-		std::optional<int> exitCode;
-
 		application->Begin();
+		const auto endScopeGuard = Utility::ScopeGuard([&]() noexcept { application->End(); });
 
-		try
+		std::optional<int> exitCode;
+		do
 		{
-			do
-			{
-				WaitForNextFrame();
-				application->BeginFrame();
-				TickPlatform();
-				application->Tick();
-				application->EndFrame();
-				exitCode = application->ExitCode();
-			} while (!exitCode);
-		}
-		catch (...)
-		{
-			application->End();
-			throw;
-		}
-
-		application->End();
+			WaitForNextFrame();
+			application->BeginFrame();
+			TickPlatform();
+			application->Tick();
+			application->EndFrame();
+			exitCode = application->ExitCode();
+		} while (!exitCode);
 
 		return *exitCode;
 	}
@@ -475,7 +428,7 @@ namespace PonyEngine::Application
 		}
 		catch (...)
 		{
-			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On setting main thread role.");
+			PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On finding main thread role.");
 			throw;
 		}
 	}

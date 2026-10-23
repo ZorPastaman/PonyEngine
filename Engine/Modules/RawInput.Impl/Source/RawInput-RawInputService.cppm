@@ -450,21 +450,15 @@ namespace PonyEngine::RawInput
 			}
 		}
 
-		const DeviceHandle currentHandle = deadDeviceHandleIds.empty()
-			? MakeDeviceHandle()
-			: ResurrectDeviceHandle();
-		try
-		{
-			devices.Add(currentHandle.id, deviceController, isConnected, params);
-		}
-		catch (...)
-		{
-			KillDeviceHandle(currentHandle);
-			throw;
-		}
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
+		const DeviceHandle currentHandle = deadDeviceHandleIds.empty() ? MakeDeviceHandle() : ResurrectDeviceHandle();
+		const auto deviceHandleScopeGuard = Utility::ScopeGuard([&]() noexcept { KillDeviceHandle(currentHandle); }, scopeGuardFlag);
+		devices.Add(currentHandle.id, deviceController, isConnected, params);
 		PONY_LOG(logService, Log::LogType::Info, "Device registered. HandleID: '0x{:X}'; Controller: '{}'; Name: '{}'.", 
 			currentHandle.id, typeid(deviceController).name(), params.name);
+
+		scopeGuardFlag.Release();
 
 		ObserveDeviceAdded(currentHandle);
 

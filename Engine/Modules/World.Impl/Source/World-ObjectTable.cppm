@@ -18,6 +18,7 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Math;
 import PonyEngine.Memory;
+import PonyEngine.Utility;
 import PonyEngine.World;
 
 import :ComponentTable;
@@ -190,37 +191,19 @@ namespace PonyEngine::World
 			throw std::logic_error("Object list is full");
 		}
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const ObjectHandleID handleId = static_cast<ObjectHandleID>(objectsSparse.size());
 		constexpr ObjectHandleVersion handleVersion = 1u;
-
 		objectsSparse.push_back(static_cast<ObjectHandleID>(objectsDense.size()));
-		try
-		{
-			handleVersions.push_back(handleVersion);
-			try
-			{
-				objectsDense.push_back(handleId);
-				try
-				{
-					objects.push_back(std::move(object));
-				}
-				catch (...)
-				{
-					objectsDense.pop_back();
-					throw;
-				}
-			}
-			catch (...)
-			{
-				handleVersions.pop_back();
-				throw;
-			}
-		}
-		catch (...)
-		{
-			objectsSparse.pop_back();
-			throw;
-		}
+		const auto objectsSparseScopeGuard = Utility::ScopeGuard([&]() noexcept { objectsSparse.pop_back(); }, scopeGuardFlag);
+		handleVersions.push_back(handleVersion);
+		const auto handleVersionsScopeGuard = Utility::ScopeGuard([&]() noexcept { handleVersions.pop_back(); }, scopeGuardFlag);
+		objectsDense.push_back(handleId);
+		const auto objectsDenseScopeGuard = Utility::ScopeGuard([&]() noexcept { objectsDense.pop_back(); }, scopeGuardFlag);
+		objects.push_back(std::move(object));
+
+		scopeGuardFlag.Release();
 
 		return TypelessObjectHandle{.id = handleId, .version = handleVersion};
 	}

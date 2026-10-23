@@ -376,34 +376,19 @@ namespace PonyEngine::Resource::World
 		assert(!componentTypeMap.contains(typeHash) && "Component type with the same hash is already registered.");
 		assert(!componentDeserializers.contains(componentType) && "Component type is already registered.");
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		componentTypeMap.emplace(typeHash, componentType);
-		try
-		{
-			componentTypeNameMap[typeHash] = type;
-			try
-			{
-				componentSizeMap[componentType] = componentSize;
-				try
-				{
-					return componentDeserializers[componentType] = std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>();
-				}
-				catch (...)
-				{
-					componentSizeMap.erase(componentType);
-					throw;
-				}
-			}
-			catch (...)
-			{
-				componentTypeNameMap.erase(typeHash);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			componentTypeMap.erase(typeHash);
-			throw;
-		}
+		const auto typeMapScopeGuard = Utility::ScopeGuard([&]() noexcept { componentTypeMap.erase(typeHash); }, scopeGuardFlag);
+		componentTypeNameMap[typeHash] = type;
+		const auto typeNameMapScopeGuard = Utility::ScopeGuard([&]() noexcept { componentTypeNameMap.erase(typeHash); }, scopeGuardFlag);
+		componentSizeMap[componentType] = componentSize;
+		const auto sizeMapScopeGuard = Utility::ScopeGuard([&]() noexcept { componentSizeMap.erase(componentType); }, scopeGuardFlag);
+		auto& deserializer = componentDeserializers[componentType] = std::variant<IInlineComponentDeserializer*, IComponentDeserializer*>();
+
+		scopeGuardFlag.Release();
+
+		return deserializer;
 	}
 
 	void WorldDefinitionLoader::RemoveComponentDeserializer(const std::type_index componentType, const std::string_view type,
@@ -430,16 +415,15 @@ namespace PonyEngine::Resource::World
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
 		assert(!objectDeserializers.contains(typeHash) && "Object type is already registered.");
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		objectTypeNameMap[typeHash] = type;
-		try
-		{
-			return objectDeserializers[typeHash] = std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>();
-		}
-		catch (...)
-		{
-			objectTypeNameMap.erase(typeHash);
-			throw;
-		}
+		const auto typeNameMapScopeGuard = Utility::ScopeGuard([&]() noexcept { objectTypeNameMap.erase(typeHash); }, scopeGuardFlag);
+		auto& deserializer = objectDeserializers[typeHash] = std::variant<IInlineObjectDeserializer*, IObjectDeserializer*>();
+
+		scopeGuardFlag.Release();
+
+		return deserializer;
 	}
 
 	void WorldDefinitionLoader::RemoveObjectDeserializer(const std::string_view type,
@@ -467,54 +451,53 @@ namespace PonyEngine::Resource::World
 		std::shared_ptr<PonyEngine::World::WorldDefinition> worldDefinition = CreateWorldDefinitionResource();
 		auto request = std::make_shared<LoadableWorldDefinitionLoadRequest>(std::move(data), size, std::move(worldDefinition), std::move(callback));
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		AddRequest(request);
 		IncrementRequestCount();
-
-		try
-		{
-			request->Request(dataAccess->Load(LoadParams{.buffer = buffer}, [this, req = request.get()](const ILoadableDataAccessRequest& accessRequest) noexcept
-			{
-				switch (accessRequest.Status())
-				{
-				case Async::RequestStatus::Success: [[likely]]
-					if (req->IsCancelRequested()) [[unlikely]]
-					{
-						CancelRequest(*req);
-					}
-					else [[likely]]
-					{
-						Parse(*req);
-					}
-					break;
-				case Async::RequestStatus::Failure:
-					{
-						std::shared_ptr<WorldDefinitionLoadRequest> loadRequest = RemoveRequest(req);
-						loadRequest->AddException(accessRequest.Exception());
-						loadRequest->SetFailure();
-						loadRequest.reset();
-						DecrementRequestCount();
-					}
-					break;
-				case Async::RequestStatus::Canceled:
-					{
-						std::shared_ptr<WorldDefinitionLoadRequest> loadRequest = RemoveRequest(req);
-						loadRequest->SetCanceled();
-						loadRequest.reset();
-						DecrementRequestCount();
-					}
-					break;
-				default: [[unlikely]]
-					assert(false && "Unexpected status");
-					break;
-				}
-			}));
-		}
-		catch (...)
+		const auto requestKeeperScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveRequest(request.get());
 			DecrementRequestCount();
-			throw;
-		}
+		}, scopeGuardFlag);
+		request->Request(dataAccess->Load(LoadParams{ .buffer = buffer }, [this, req = request.get()](const ILoadableDataAccessRequest& accessRequest) noexcept
+		{
+			switch (accessRequest.Status())
+			{
+			case Async::RequestStatus::Success: [[likely]]
+				if (req->IsCancelRequested()) [[unlikely]]
+				{
+					CancelRequest(*req);
+				}
+				else [[likely]]
+				{
+					Parse(*req);
+				}
+				break;
+			case Async::RequestStatus::Failure:
+				{
+					std::shared_ptr<WorldDefinitionLoadRequest> loadRequest = RemoveRequest(req);
+					loadRequest->AddException(accessRequest.Exception());
+					loadRequest->SetFailure();
+					loadRequest.reset();
+					DecrementRequestCount();
+				}
+				break;
+			case Async::RequestStatus::Canceled:
+				{
+					std::shared_ptr<WorldDefinitionLoadRequest> loadRequest = RemoveRequest(req);
+					loadRequest->SetCanceled();
+					loadRequest.reset();
+					DecrementRequestCount();
+				}
+				break;
+			default: [[unlikely]]
+				assert(false && "Unexpected status");
+				break;
+			}
+		}));
+
+		scopeGuardFlag.Release();
 
 		return request;
 	}
@@ -726,36 +709,30 @@ namespace PonyEngine::Resource::World
 								[&](IObjectDeserializer* deserializer)
 								{
 									req->IncrementJobCount();
-									try
+									auto requestScopeGuard = Utility::ScopeGuard([&]() noexcept { req->DecrementJobCount(); });
+									req->AddDeserializationRequest(deserializer->Deserialize(objectInput, target, [this, r = req](const IWorldDeserializationRequest& dataRequest) noexcept
 									{
-										req->AddDeserializationRequest(deserializer->Deserialize(objectInput, target, [this, r = req](const IWorldDeserializationRequest& dataRequest) noexcept
+										switch (dataRequest.Status())
 										{
-											switch (dataRequest.Status())
-											{
-											case Async::RequestStatus::Success:
-												break;
-											case Async::RequestStatus::Failure:
-												r->AddExceptions(dataRequest.Exceptions());
-												break;
-											case Async::RequestStatus::Canceled:
-												r->IncrementCancelCount();
-												break;
-											default: [[unlikely]]
-												assert(false && "Unexpected status");
-												break;
-											}
+										case Async::RequestStatus::Success:
+											break;
+										case Async::RequestStatus::Failure:
+											r->AddExceptions(dataRequest.Exceptions());
+											break;
+										case Async::RequestStatus::Canceled:
+											r->IncrementCancelCount();
+											break;
+										default: [[unlikely]]
+											assert(false && "Unexpected status");
+											break;
+										}
 
-											if (r->DecrementJobCount())
-											{
-												FinishRequest(*r);
-											}
-										}));
-									}
-									catch (...)
-									{
-										req->DecrementJobCount();
-										throw;
-									}
+										if (r->DecrementJobCount())
+										{
+											FinishRequest(*r);
+										}
+									}));
+									requestScopeGuard.Release();
 								}
 							}, GetObjectDeserializer(type));
 						}
@@ -790,36 +767,30 @@ namespace PonyEngine::Resource::World
 								[&](IComponentDeserializer* const deserializer)
 								{
 									req->IncrementJobCount();
-									try
+									auto requestScopeGuard = Utility::ScopeGuard([&]() noexcept { req->DecrementJobCount(); });
+									req->AddDeserializationRequest(deserializer->Deserialize(tableEntityCount, tableInput, tableDefinition.data, [this, r = req](const IWorldDeserializationRequest& dataRequest) noexcept
 									{
-										req->AddDeserializationRequest(deserializer->Deserialize(tableEntityCount, tableInput, tableDefinition.data, [this, r = req](const IWorldDeserializationRequest& dataRequest) noexcept
+										switch (dataRequest.Status())
 										{
-											switch (dataRequest.Status())
-											{
-											case Async::RequestStatus::Success:
-												break;
-											case Async::RequestStatus::Failure:
-												r->AddExceptions(dataRequest.Exceptions());
-												break;
-											case Async::RequestStatus::Canceled:
-												r->IncrementCancelCount();
-												break;
-											default: [[unlikely]]
-												assert(false && "Unexpected status");
-												break;
-											}
+										case Async::RequestStatus::Success:
+											break;
+										case Async::RequestStatus::Failure:
+											r->AddExceptions(dataRequest.Exceptions());
+											break;
+										case Async::RequestStatus::Canceled:
+											r->IncrementCancelCount();
+											break;
+										default: [[unlikely]]
+											assert(false && "Unexpected status");
+											break;
+										}
 
-											if (r->DecrementJobCount())
-											{
-												FinishRequest(*r);
-											}
-										}));
-									}
-									catch (...)
-									{
-										req->DecrementJobCount();
-										throw;
-									}
+										if (r->DecrementJobCount())
+										{
+											FinishRequest(*r);
+										}
+									}));
+									requestScopeGuard.Release();
 								}
 							}, GetComponentDeserializer(componentType));
 						}

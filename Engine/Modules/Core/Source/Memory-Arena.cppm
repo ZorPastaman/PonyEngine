@@ -117,13 +117,6 @@ export namespace PonyEngine::Memory
 		/// @return Object place.
 		template<typename T>
 		T* AllocateObject();
-		/// @brief Allocates a memory for an object and creates it there.
-		/// @tparam T Object type.
-		/// @tparam Args Object constructor argument types.
-		/// @param args Object constructor arguments.
-		/// @return Object.
-		template<typename T, typename... Args> requires std::constructible_from<T, Args...>
-		T* CreateObject(Args&&... args);
 
 		/// @brief Allocates a memory for an array.
 		/// @param objectAlignment Array element alignment.
@@ -137,14 +130,6 @@ export namespace PonyEngine::Memory
 		/// @return Array place.
 		template<typename T>
 		std::span<T> AllocateArray(std::size_t count);
-		/// @brief Allocates a memory for an array and creates its elements there.
-		/// @tparam T Array element type.
-		/// @tparam Args Array element constructor argument types.
-		/// @param count Array element count.
-		/// @param args Array element constructor arguments.
-		/// @return Array.
-		template<typename T, typename... Args> requires std::constructible_from<T, Args...>
-		std::span<T> CreateArray(std::size_t count, Args&&... args);
 
 		Arena& operator =(const Arena&) = delete;
 		Arena& operator =(Arena&&) = delete;
@@ -274,23 +259,6 @@ namespace PonyEngine::Memory
 		return static_cast<T*>(AllocateObject(alignof(T), sizeof(T)));
 	}
 
-	template<typename T, typename... Args> requires std::constructible_from<T, Args...>
-	T* Arena::CreateObject(Args&&... args)
-	{
-		const std::size_t prevSize = size;
-		T* const object = AllocateObject<T>();
-
-		try
-		{
-			return std::construct_at(object, std::forward<Args>(args)...);
-		}
-		catch (...)
-		{
-			size = prevSize;
-			throw;
-		}
-	}
-
 	void* Arena::AllocateArray(const std::size_t objectAlignment, const std::size_t objectSize, const std::size_t count)
 	{
 		return AllocateObject(objectAlignment, objectSize * count);
@@ -300,33 +268,5 @@ namespace PonyEngine::Memory
 	std::span<T> Arena::AllocateArray(const std::size_t count)
 	{
 		return std::span<T>(static_cast<T*>(AllocateArray(alignof(T), sizeof(T), count)), count);
-	}
-
-	template<typename T, typename... Args> requires std::constructible_from<T, Args...>
-	std::span<T> Arena::CreateArray(const std::size_t count, Args&&... args)
-	{
-		const std::size_t prevSize = size;
-		const std::span<T> array = AllocateArray<T>(count);
-
-		std::size_t constructed = 0uz;
-		try
-		{
-			for (; constructed < count; ++constructed)
-			{
-				std::construct_at(&array[constructed], std::forward<Args>(args)...);
-			}
-		}
-		catch (...)
-		{
-			while (constructed-- > 0uz)
-			{
-				std::destroy_at(&array[constructed]);
-			}
-
-			size = prevSize;
-			throw;
-		}
-
-		return array;
 	}
 }

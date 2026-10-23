@@ -12,6 +12,7 @@ export module PonyEngine.World.Hierarchy.Impl:HierarchyServiceModule;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Utility;
 
 import :HierarchyService;
 
@@ -47,19 +48,15 @@ namespace PonyEngine::World::Hierarchy
 {
 	void HierarchyServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		Application::IApplication& application = context.Application();
 		RegisterComponents(application.GetInterface<IWorldService>());
-
 		hierarchyService = std::make_unique<HierarchyService>(application);
-		try
-		{
-			context.AddInterface<IHierarchyService>(*hierarchyService);
-		}
-		catch (...)
-		{
-			hierarchyService.reset();
-			throw;
-		}
+		const auto hierarchyServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { hierarchyService.reset(); }, scopeGuardFlag);
+		context.AddInterface<IHierarchyService>(*hierarchyService);
+
+		scopeGuardFlag.Release();
 	}
 
 	void HierarchyServiceModule::ShutDown(Application::IModuleContext& context)

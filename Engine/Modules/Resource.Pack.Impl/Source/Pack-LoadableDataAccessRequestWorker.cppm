@@ -19,6 +19,7 @@ import PonyEngine.Async;
 import PonyEngine.File;
 import PonyEngine.Job;
 import PonyEngine.Math;
+import PonyEngine.Utility;
 
 import :FileLoadableDataAccessRequest;
 import :LoadableDataAccessRequest;
@@ -135,43 +136,44 @@ namespace PonyEngine::Resource::Pack
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
 		}, requestAllocator);
 #else
-		auto request = std::allocate_shared<FileLoadableDataAccessRequest>(requestAllocator, params, std::move(callback));
+		std::shared_ptr<FileLoadableDataAccessRequest> request = std::allocate_shared<FileLoadableDataAccessRequest>(requestAllocator, params, std::move(callback));
 #endif
+
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		IncrementOngoingRequestCount();
 		AddRequest(request);
-
-		try
-		{
-			const auto readParams = File::ReadParams{.buffer = params.buffer, .offset = fileOffset + params.offset};
-			request->FileRequest(dataFile.Read(readParams, [this, req = request.get()](const File::IReadRequest& readRequest) noexcept
-			{
-				std::shared_ptr<LoadableDataAccessRequest> finishedRequest = RemoveRequest(req);
-				switch (readRequest.Status())
-				{
-				case Async::RequestStatus::Success: [[likely]]
-					finishedRequest->SetSuccess(readRequest.ByteCount());
-					break;
-				case Async::RequestStatus::Failure:
-					finishedRequest->SetFailure(readRequest.Exception());
-					break;
-				case Async::RequestStatus::Canceled:
-					finishedRequest->SetCanceled();
-					break;
-				default: [[unlikely]]
-					assert(false && "Unexpected file request status.");
-					break;
-				}
-
-				finishedRequest.reset();
-				DecrementOngoingRequestCount();
-			}));
-		}
-		catch (...)
+		const auto requestKeeperScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveRequest(request.get());
 			DecrementOngoingRequestCount();
-			throw;
-		}
+		}, scopeGuardFlag);
+
+		const auto readParams = File::ReadParams{.buffer = params.buffer, .offset = fileOffset + params.offset};
+		request->FileRequest(dataFile.Read(readParams, [this, req = request.get()](const File::IReadRequest& readRequest) noexcept
+		{
+			std::shared_ptr<LoadableDataAccessRequest> finishedRequest = RemoveRequest(req);
+			switch (readRequest.Status())
+			{
+			case Async::RequestStatus::Success: [[likely]]
+				finishedRequest->SetSuccess(readRequest.ByteCount());
+				break;
+			case Async::RequestStatus::Failure:
+				finishedRequest->SetFailure(readRequest.Exception());
+				break;
+			case Async::RequestStatus::Canceled:
+				finishedRequest->SetCanceled();
+				break;
+			default: [[unlikely]]
+				assert(false && "Unexpected file request status.");
+				break;
+			}
+
+			finishedRequest.reset();
+			DecrementOngoingRequestCount();
+		}));
+
+		scopeGuardFlag.Release();
 
 		return request;
 	}
@@ -197,30 +199,31 @@ namespace PonyEngine::Resource::Pack
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
 		}, requestAllocator);
 #else
-		auto request = std::allocate_shared<LoadableDataAccessRequest>(requestAllocator, params, std::move(callback));
+		std::shared_ptr<LoadableDataAccessRequest> request = std::allocate_shared<LoadableDataAccessRequest>(requestAllocator, params, std::move(callback));
 #endif
+
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		IncrementOngoingRequestCount();
 		AddRequest(request);
-
-		try
-		{
-			jobService->Schedule([this, req = request.get(), src = source.data() + params.offset, dst = params.buffer.data(), count = params.buffer.size()]() noexcept
-			{
-				std::memcpy(dst, src, count);
-				
-				std::shared_ptr<LoadableDataAccessRequest> finishedRequest = RemoveRequest(req);
-				finishedRequest->SetSuccess(count);
-
-				finishedRequest.reset();
-				DecrementOngoingRequestCount();
-			}, Job::JobParams{.priority = Job::JobPriority::Low});
-		}
-		catch (...)
+		const auto requestKeeperScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveRequest(request.get());
 			DecrementOngoingRequestCount();
-			throw;
-		}
+		}, scopeGuardFlag);
+
+		jobService->Schedule([this, req = request.get(), src = source.data() + params.offset, dst = params.buffer.data(), count = params.buffer.size()]() noexcept
+		{
+			std::memcpy(dst, src, count);
+
+			std::shared_ptr<LoadableDataAccessRequest> finishedRequest = RemoveRequest(req);
+			finishedRequest->SetSuccess(count);
+
+			finishedRequest.reset();
+			DecrementOngoingRequestCount();
+		}, Job::JobParams{.priority = Job::JobPriority::Low});
+
+		scopeGuardFlag.Release();
 
 		return request;
 	}

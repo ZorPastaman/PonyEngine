@@ -11,3 +11,4 @@ export module PonyEngine.Utility;
 
 export import :Concepts;
 export import :Overload;
+export import :ScopeGuard;

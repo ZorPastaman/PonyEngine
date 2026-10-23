@@ -21,6 +21,7 @@ import std;
 
 import PonyEngine.File.Impl;
 import PonyEngine.Log;
+import PonyEngine.Utility;
 
 import :FileUtility;
 import :Worker;
@@ -94,15 +95,9 @@ namespace PonyEngine::File
 		fileInfo(std::move(path), params.access, params.flags),
 		fileHandle(OpenFile(fileInfo.Path(), params))
 	{
-		try
-		{
-			this->worker->AssociateFile(fileHandle);
-		}
-		catch (...)
-		{
-			CloseFile();
-			throw;
-		}
+		auto fileScopeGuard = Utility::ScopeGuard([&]() noexcept { CloseFile(); });
+		this->worker->AssociateFile(fileHandle);
+		fileScopeGuard.Release();
 	}
 
 	File::~File() noexcept

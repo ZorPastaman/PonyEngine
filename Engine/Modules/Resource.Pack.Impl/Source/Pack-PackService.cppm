@@ -25,6 +25,7 @@ import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.Resource.Pack;
+import PonyEngine.Utility;
 
 import :DataAccessFactory;
 import :FilePackMountRequest;
@@ -298,63 +299,64 @@ namespace PonyEngine::Resource::Pack
 		std::shared_ptr<std::byte[]> dataBuffer = loadedData ? std::make_shared<std::byte[]>(dataSize) : nullptr;
 		auto request = CreateFilePackMountRequest(std::move(manifest), std::move(data), accessType,
 			std::move(manifestBuffer), manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
+
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		AddMountRequest(request);
 		IncrementOngoingRequestCount();
-
-		try
-		{
-			request->ManifestReadRequest(request->ManifestFile()->Read(File::ReadParams{.buffer = request->ManifestTarget()}, [this, req = request.get()](const File::IReadRequest& readRequest) noexcept
-			{
-				switch (readRequest.Status())
-				{
-				case Async::RequestStatus::Success: [[likely]]
-					if (CheckCancel(req)) [[likely]]
-					{
-						ParseManifest(*req);
-					}
-					break;
-				case Async::RequestStatus::Failure:
-					req->ManifestException(readRequest.Exception());
-					if (req->DecrementRequestCount())
-					{
-						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-						mountRequest->SetFailure();
-						mountRequest.reset();
-						DecrementOngoingRequestCount();
-					}
-					else
-					{
-						req->Cancel();
-					}
-					break;
-				case Async::RequestStatus::Canceled:
-					if (req->DecrementRequestCount()) [[likely]]
-					{
-						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-						if (mountRequest->HasDataException()) [[unlikely]]
-						{
-							mountRequest->SetFailure();
-						}
-						else [[likely]]
-						{
-							mountRequest->SetCanceled();
-						}
-						mountRequest.reset();
-						DecrementOngoingRequestCount();
-					}
-					break;
-				default: [[unlikely]]
-					assert(false && "Unexpected read request status.");
-					break;
-				}
-			}));
-		}
-		catch (...)
+		const auto requestKeeperScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveMountRequest(request.get());
 			DecrementOngoingRequestCount();
-			throw;
-		}
+		}, scopeGuardFlag);
+
+		request->ManifestReadRequest(request->ManifestFile()->Read(File::ReadParams{ .buffer = request->ManifestTarget() }, [this, req = request.get()](const File::IReadRequest& readRequest) noexcept
+		{
+			switch (readRequest.Status())
+			{
+			case Async::RequestStatus::Success: [[likely]]
+				if (CheckCancel(req)) [[likely]]
+				{
+					ParseManifest(*req);
+				}
+				break;
+			case Async::RequestStatus::Failure:
+				req->ManifestException(readRequest.Exception());
+				if (req->DecrementRequestCount())
+				{
+					std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+					mountRequest->SetFailure();
+					mountRequest.reset();
+					DecrementOngoingRequestCount();
+				}
+				else
+				{
+					req->Cancel();
+				}
+				break;
+			case Async::RequestStatus::Canceled:
+				if (req->DecrementRequestCount()) [[likely]]
+				{
+					std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+					if (mountRequest->HasDataException()) [[unlikely]]
+					{
+						mountRequest->SetFailure();
+					}
+					else [[likely]]
+					{
+						mountRequest->SetCanceled();
+					}
+					mountRequest.reset();
+					DecrementOngoingRequestCount();
+				}
+				break;
+			default: [[unlikely]]
+				assert(false && "Unexpected read request status.");
+				break;
+			}
+		}));
+
+		scopeGuardFlag.Release();
 
 		if (loadedData)
 		{
@@ -443,37 +445,36 @@ namespace PonyEngine::Resource::Pack
 
 		auto dataBuffer = std::make_shared<std::byte[]>(packData.size());
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		auto request = CreatePackMountRequest(accessType, packManifest.data(), packManifest.size(), std::move(dataBuffer), packData.size(), std::move(callback));
 		AddMountRequest(request);
 		IncrementOngoingRequestCount();
-
-		try
-		{
-			jobService->Schedule([this, req = request.get(), src = packData.data()]() noexcept
-			{
-				if (!CheckCancel(req)) [[unlikely]]
-				{
-					return;
-				}
-
-				const std::span<std::byte> data = req->Data();
-				std::memcpy(data.data(), src, data.size());
-
-				if (CheckCancel(req)) [[likely]]
-				{
-					if (req->DecrementRequestCount()) [[likely]]
-					{
-						CreatePack(*req);
-					}
-				}
-			}, Job::JobParams{.priority = Job::JobPriority::Low});
-		}
-		catch (...)
+		const auto requestKeeperScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveMountRequest(request.get());
 			DecrementOngoingRequestCount();
-			throw;
-		}
+		}, scopeGuardFlag);
+		jobService->Schedule([this, req = request.get(), src = packData.data()]() noexcept
+		{
+			if (!CheckCancel(req)) [[unlikely]]
+			{
+				return;
+			}
+
+			const std::span<std::byte> data = req->Data();
+			std::memcpy(data.data(), src, data.size());
+
+			if (CheckCancel(req)) [[likely]]
+			{
+				if (req->DecrementRequestCount()) [[likely]]
+				{
+					CreatePack(*req);
+				}
+			}
+		}, Job::JobParams{.priority = Job::JobPriority::Low});
+
+		scopeGuardFlag.Release();
 
 		ParseManifest(*request);
 
@@ -482,50 +483,46 @@ namespace PonyEngine::Resource::Pack
 
 	std::shared_ptr<IPackUnmountRequest> PackService::UnmountPack(const PackHandle packHandle, std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		auto request = CreatePackUnmountRequest(packHandle, std::move(callback));
 		AddUnmountRequest(request);
-
-		try
+		const auto requestKeeperScopeGuard = Utility::ScopeGuard([&]() noexcept { RemoveUnmountRequest(request.get()); }, scopeGuardFlag);
+		jobService->Schedule([this, req = request.get()]() noexcept
 		{
-			jobService->Schedule([this, req = request.get()]() noexcept
+			if (req->IsCancelRequested()) [[unlikely]]
 			{
-				if (req->IsCancelRequested()) [[unlikely]]
-				{
-					const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
-					unmountRequest->SetCanceled();
-					return;
-				}
-
-				try
-				{
-					const auto lock = std::unique_lock(stateMutex);
-					if (!IsValid(req->Pack())) [[unlikely]]
-					{
-						throw std::invalid_argument("Pack handle is invalid");
-					}
-
-					const PackHandle packHandle = req->Pack();
-					const std::size_t index = packContainer.IndexOf(packHandle.id);
-					assert(index < packContainer.Size() && "Invalid pack handle.");
-					resourceHub->UnregisterCollection(packContainer.Pack(index), packContainer.Collection(index));
-					packContainer.Remove(index);
-					KillPackHandle(packHandle);
-				}
-				catch (...)
-				{
-					const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
-					unmountRequest->SetFailure(std::current_exception());
-				}
-
 				const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
-				unmountRequest->SetSuccess();
-			}, Job::JobParams{.priority = Job::JobPriority::Low});
-		}
-		catch (...)
-		{
-			RemoveUnmountRequest(request.get());
-			throw;
-		}
+				unmountRequest->SetCanceled();
+				return;
+			}
+
+			try
+			{
+				const auto lock = std::unique_lock(stateMutex);
+				if (!IsValid(req->Pack())) [[unlikely]]
+				{
+					throw std::invalid_argument("Pack handle is invalid");
+				}
+
+				const PackHandle packHandle = req->Pack();
+				const std::size_t index = packContainer.IndexOf(packHandle.id);
+				assert(index < packContainer.Size() && "Invalid pack handle.");
+				resourceHub->UnregisterCollection(packContainer.Pack(index), packContainer.Collection(index));
+				packContainer.Remove(index);
+				KillPackHandle(packHandle);
+			}
+			catch (...)
+			{
+				const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
+				unmountRequest->SetFailure(std::current_exception());
+			}
+
+			const std::shared_ptr<PackUnmountRequest> unmountRequest = RemoveUnmountRequest(req);
+			unmountRequest->SetSuccess();
+		}, Job::JobParams{.priority = Job::JobPriority::Low});
+
+		scopeGuardFlag.Release();
 
 		return request;
 	}
@@ -957,33 +954,21 @@ namespace PonyEngine::Resource::Pack
 						accessTypes.push_back(typeid(IMemoryDataAccess));
 					}
 
+					auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 					const ResourceCollection collection = resourceHub->RegisterCollection(*pack, req->CollectionResources(), accessTypes);
+					const auto collectionScopeGuard = Utility::ScopeGuard([&]() noexcept { resourceHub->UnregisterCollection(*pack, collection); }, scopeGuardFlag);
+					const auto lock = std::unique_lock(stateMutex);
+					const PackHandle packHandle = CreatePackHandle();
+					const auto packHandleScopeGuard = Utility::ScopeGuard([&]() noexcept { KillPackHandle(packHandle); }, scopeGuardFlag);
+					packContainer.Add(packHandle.id, collection, std::move(pack));
 
-					try
-					{
-						const auto lock = std::unique_lock(stateMutex);
-						const PackHandle packHandle = CreatePackHandle();
-						
-						try
-						{
-							packContainer.Add(packHandle.id, collection, std::move(pack));
-						}
-						catch (...)
-						{
-							KillPackHandle(packHandle);
-							throw;
-						}
+					scopeGuardFlag.Release();
 
-						std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
-						mountRequest->SetSuccess(packHandle);
-						mountRequest.reset();
-						DecrementOngoingRequestCount();
-					}
-					catch (...)
-					{
-						resourceHub->UnregisterCollection(*pack, collection);
-						throw;
-					}
+					std::shared_ptr<PackMountRequest> mountRequest = RemoveMountRequest(req);
+					mountRequest->SetSuccess(packHandle);
+					mountRequest.reset();
+					DecrementOngoingRequestCount();
 				}
 				catch (...)
 				{

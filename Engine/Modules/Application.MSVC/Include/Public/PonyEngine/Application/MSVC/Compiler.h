@@ -43,7 +43,7 @@
 #define PONY_MODULE_BEGIN(sectionName, variableName) \
 	__pragma(section(PONY_MSVC_MODULE_SECTION_NAME(sectionName, PONY_MSVC_SECTION_BEGIN_ORDER), read)) \
 	__declspec(allocate(PONY_MSVC_MODULE_SECTION_NAME(sectionName, PONY_MSVC_SECTION_BEGIN_ORDER))) \
-	inline static const std::shared_ptr<PonyEngine::Application::IModule>(*variableName)() = nullptr; \
+	inline static std::shared_ptr<PonyEngine::Application::IModule>(* const variableName)() = nullptr; \
 
 /// @brief Makes a variable that points to a section end.
 /// @param sectionName Section name.
@@ -51,4 +51,4 @@
 #define PONY_MODULE_END(sectionName, variableName) \
 	__pragma(section(PONY_MSVC_MODULE_SECTION_NAME(sectionName, PONY_MSVC_SECTION_END_ORDER), read)) \
 	__declspec(allocate(PONY_MSVC_MODULE_SECTION_NAME(sectionName, PONY_MSVC_SECTION_END_ORDER))) \
-	inline static const std::shared_ptr<PonyEngine::Application::IModule>(*variableName)() = nullptr; \
+	inline static std::shared_ptr<PonyEngine::Application::IModule>(* const variableName)() = nullptr; \

@@ -12,6 +12,7 @@ export module PonyEngine.Resource.Impl:CollectionContainer;
 import std;
 
 import PonyEngine.Resource.Ext;
+import PonyEngine.Utility;
 
 export namespace PonyEngine::Resource
 {
@@ -109,32 +110,16 @@ namespace PonyEngine::Resource
 
 	void CollectionContainer::Add(const ResourceCollectionID collection, IResourceProvider& provider, std::vector<ResourceID>&& resources)
 	{
-		const std::size_t initialSize = Size();
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const std::size_t index = std::ranges::lower_bound(collections, collection) - collections.cbegin();
+		collections.insert(collections.cbegin() + index, collection);
+		const auto collectionsScopeGuard = Utility::ScopeGuard([&]() noexcept { collections.erase(collections.cbegin() + index); }, scopeGuardFlag);
+		providers.insert(providers.cbegin() + index, &provider);
+		const auto providersScopeGuard = Utility::ScopeGuard([&]() noexcept { providers.erase(providers.cbegin() + index); }, scopeGuardFlag);
+		this->resources.insert(this->resources.cbegin() + index, std::move(resources));
 
-		try
-		{
-			collections.insert(collections.cbegin() + index, collection);
-			providers.insert(providers.cbegin() + index, &provider);
-			this->resources.insert(this->resources.cbegin() + index, std::move(resources));
-		}
-		catch (...)
-		{
-			if (this->resources.size() != initialSize)
-			{
-				this->resources.erase(this->resources.cbegin() + index);
-			}
-			if (providers.size() != initialSize)
-			{
-				providers.erase(providers.cbegin() + index);
-			}
-			if (collections.size() != initialSize)
-			{
-				collections.erase(collections.cbegin() + index);
-			}
-
-			throw;
-		}
+		scopeGuardFlag.Release();
 	}
 
 	void CollectionContainer::Remove(const std::size_t index) noexcept

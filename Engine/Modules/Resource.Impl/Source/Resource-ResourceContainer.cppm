@@ -16,6 +16,7 @@ export module PonyEngine.Resource.Impl:ResourceContainer;
 import std;
 
 import PonyEngine.Resource.Ext;
+import PonyEngine.Utility;
 
 import :Resource;
 
@@ -92,6 +93,8 @@ namespace PonyEngine::Resource
 
 	void ResourceContainer::Add(std::shared_ptr<Resource> resource)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const ResourceID id = resource->ID();
 		const ResourceType type = resource->Type();
 
@@ -100,17 +103,11 @@ namespace PonyEngine::Resource
 			typeCounts[type] = 0uz;
 		}
 		++typeCounts[type];
+		const auto typeCountsScopeGuard = Utility::ScopeGuard([&]() noexcept { --typeCounts[type]; }, scopeGuardFlag);
+		const auto [_, added] = resources.try_emplace(id, std::move(resource));
+		assert(added && "The resource not added.");
 
-		try
-		{
-			const auto [_, added] = resources.try_emplace(id, std::move(resource));
-			assert(added && "The resource not added.");
-		}
-		catch (...)
-		{
-			--typeCounts[type];
-			throw;
-		}
+		scopeGuardFlag.Release();
 	}
 
 	void ResourceContainer::Remove(const ResourceID id) noexcept

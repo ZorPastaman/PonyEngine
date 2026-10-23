@@ -12,6 +12,7 @@ export module PonyEngine.Resource.Pack.Impl:PackContainer;
 import std;
 
 import PonyEngine.Resource.Pack;
+import PonyEngine.Utility;
 
 import :Pack;
 
@@ -70,9 +71,9 @@ export namespace PonyEngine::Resource::Pack
 		PackContainer& operator =(PackContainer&&) = delete;
 
 	private:
-		std::vector<PackID> handles;
-		std::vector<ResourceCollection> collections;
-		std::vector<std::shared_ptr<class Pack>> packs;
+		std::vector<PackID> handles; ///< Pack IDs.
+		std::vector<ResourceCollection> collections; ///< Resource collections. Synced with the packs by index.
+		std::vector<std::shared_ptr<class Pack>> packs; ///< Packs. Synced with IDs by index.
 	};
 }
 
@@ -111,32 +112,16 @@ namespace PonyEngine::Resource::Pack
 
 	void PackContainer::Add(const PackID handle, const ResourceCollection collection, std::shared_ptr<class Pack> pack)
 	{
-		const std::size_t initialSize = Size();
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const std::size_t index = std::ranges::lower_bound(handles, handle) - handles.cbegin();
+		handles.insert(handles.cbegin() + index, handle);
+		const auto handlesScopeGuard = Utility::ScopeGuard([&]() noexcept { handles.erase(handles.cbegin() + index); }, scopeGuardFlag);
+		collections.insert(collections.cbegin() + index, collection);
+		const auto collectionsScopeGuard = Utility::ScopeGuard([&]() noexcept { collections.erase(collections.cbegin() + index); }, scopeGuardFlag);
+		packs.insert(packs.cbegin() + index, std::move(pack));
 
-		try
-		{
-			handles.insert(handles.cbegin() + index, handle);
-			collections.insert(collections.cbegin() + index, collection);
-			packs.insert(packs.cbegin() + index, std::move(pack));
-		}
-		catch (...)
-		{
-			if (packs.size() != initialSize)
-			{
-				packs.erase(packs.cbegin() + index);
-			}
-			if (collections.size() != initialSize)
-			{
-				collections.erase(collections.cbegin() + index);
-			}
-			if (handles.size() != initialSize)
-			{
-				handles.erase(handles.cbegin() + index);
-			}
-
-			throw;
-		}
+		scopeGuardFlag.Release();
 	}
 
 	void PackContainer::Remove(const std::size_t index) noexcept

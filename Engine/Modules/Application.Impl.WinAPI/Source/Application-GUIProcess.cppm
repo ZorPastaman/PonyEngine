@@ -25,6 +25,7 @@ import std;
 
 import PonyEngine.Application.WinAPI;
 import PonyEngine.Log;
+import PonyEngine.Utility;
 
 import :Process;
 
@@ -191,16 +192,13 @@ namespace PonyEngine::Application
 	{
 		try
 		{
+			auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 			Application().AddInterface<IMainData>(*this);
-			try
-			{
-				Application().AddInterface<IMessagePump>(*this);
-			}
-			catch (...)
-			{
-				Application().RemoveInterface<IMainData>(*this);
-				throw;
-			}
+			const auto mainDataScopeGuard = Utility::ScopeGuard([&]() noexcept { Application().RemoveInterface<IMainData>(*this); }, scopeGuardFlag);
+			Application().AddInterface<IMessagePump>(*this);
+
+			scopeGuardFlag.Release();
 		}
 		catch (...)
 		{

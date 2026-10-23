@@ -181,67 +181,39 @@ namespace PonyEngine::RawInput
 	{
 		assert(event.axes.size() == event.values.size() && "Incorrect event axes/values.");
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const std::size_t axisIndex = axes.size();
-
 		axes.append_range(event.axes);
-		try
-		{
-			values.append_range(event.values);
-		}
-		catch (...)
-		{
-			axes.erase(axes.cbegin() + axisIndex, axes.cend());
-			throw;
-		}
-
+		const auto axesScopeGuard = Utility::ScopeGuard([&]() noexcept { axes.erase(axes.cbegin() + axisIndex, axes.cend()); }, scopeGuardFlag);
+		values.append_range(event.values);
+		const auto valuesScopeGuard = Utility::ScopeGuard([&]() noexcept { values.erase(values.cbegin() + axisIndex, values.cend()); }, scopeGuardFlag);
 		devices.push_back(device);
-		try
+		const auto devicesScopeGuard = Utility::ScopeGuard([&]() noexcept { devices.pop_back(); }, scopeGuardFlag);
+		events.push_back(InputData
 		{
-			events.push_back(InputData
-			{
-				.valueIndex = axisIndex,
-				.valueCount = event.axes.size(),
-				.eventType = event.eventType,
-				.cursorPosition = event.cursorPosition
-			});
-			try
-			{
-				eventTimes.push_back(event.timePoint);
-			}
-			catch (...)
-			{
-				events.pop_back();
-				throw;
-			}
-		}
-		catch (...)
-		{
-			devices.pop_back();
-			throw;
-		}
+			.valueIndex = axisIndex,
+			.valueCount = event.axes.size(),
+			.eventType = event.eventType,
+			.cursorPosition = event.cursorPosition
+		});
+		const auto eventsScopeGuard = Utility::ScopeGuard([&]() noexcept { events.pop_back(); }, scopeGuardFlag);
+		eventTimes.push_back(event.timePoint);
+
+		scopeGuardFlag.Release();
 	}
 
 	void RawInputQueue::AddConnection(const DeviceHandleID device, const ConnectionEvent& event)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		devices.push_back(device);
-		try
-		{
-			events.push_back(ConnectionData{.isConnected = event.isConnected});
-			try
-			{
-				eventTimes.push_back(event.timePoint);
-			}
-			catch (...)
-			{
-				events.pop_back();
-				throw;
-			}
-		}
-		catch (...)
-		{
-			devices.pop_back();
-			throw;
-		}
+		const auto devicesScopeGuard = Utility::ScopeGuard([&]() noexcept { devices.pop_back(); }, scopeGuardFlag);
+		events.push_back(ConnectionData{.isConnected = event.isConnected});
+		const auto eventsScopeGuard = Utility::ScopeGuard([&]() noexcept { events.pop_back(); }, scopeGuardFlag);
+		eventTimes.push_back(event.timePoint);
+
+		scopeGuardFlag.Release();
 	}
 
 	void RawInputQueue::Remove(const DeviceHandleID device) noexcept

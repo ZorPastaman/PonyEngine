@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Resource.World.Ext;
+import PonyEngine.Utility;
 import PonyEngine.World.Hierarchy;
 
 import :Transform2DDeserializer;
@@ -68,29 +69,18 @@ namespace PonyEngine::Resource::World::Hierarchy
 {
 	void HierarchyDeserializerModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const Application::IApplication& application = context.Application();
 		IWorldDefinitionLoader& loader = application.GetInterface<IWorldDefinitionLoader>();
 		ICopyComponentDeserializer& copyComponentDeserializer = context.Application().GetInterface<ICopyComponentDeserializer>();
-
 		CreateTransform2DDeserializer(loader);
-		try
-		{
-			CreateTransform3DDeserializer(loader);
-			try
-			{
-				RegisterCopyComponents(copyComponentDeserializer);
-			}
-			catch (...)
-			{
-				DestroyTransform3DDeserializer(loader);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			DestroyTransform2DDeserializer(loader);
-			throw;
-		}
+		const auto transform2DScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyTransform2DDeserializer(loader); }, scopeGuardFlag);
+		CreateTransform3DDeserializer(loader);
+		const auto transform3DScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyTransform3DDeserializer(loader); }, scopeGuardFlag);
+		RegisterCopyComponents(copyComponentDeserializer);
+
+		scopeGuardFlag.Release();
 	}
 
 	void HierarchyDeserializerModule::ShutDown(Application::IModuleContext& context)
@@ -103,16 +93,13 @@ namespace PonyEngine::Resource::World::Hierarchy
 
 	void HierarchyDeserializerModule::CreateTransform2DDeserializer(IWorldDefinitionLoader& loader)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		transform2DDeserializer = std::make_unique<Transform2DDeserializer>();
-		try
-		{
-			loader.RegisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform2D>(Transform2DType, *transform2DDeserializer);
-		}
-		catch (...)
-		{
-			transform2DDeserializer.reset();
-			throw;
-		}
+		const auto deserializerScopeGuard = Utility::ScopeGuard([&]() noexcept { transform2DDeserializer.reset(); }, scopeGuardFlag);
+		loader.RegisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform2D>(Transform2DType, *transform2DDeserializer);
+
+		scopeGuardFlag.Release();
 	}
 
 	void HierarchyDeserializerModule::DestroyTransform2DDeserializer(IWorldDefinitionLoader& loader)
@@ -123,16 +110,13 @@ namespace PonyEngine::Resource::World::Hierarchy
 
 	void HierarchyDeserializerModule::CreateTransform3DDeserializer(IWorldDefinitionLoader& loader)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		transform3DDeserializer = std::make_unique<Transform3DDeserializer>();
-		try
-		{
-			loader.RegisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform3D>(Transform3DType, *transform3DDeserializer);
-		}
-		catch (...)
-		{
-			transform3DDeserializer.reset();
-			throw;
-		}
+		const auto deserializerScopeGuard = Utility::ScopeGuard([&]() noexcept { transform3DDeserializer.reset(); }, scopeGuardFlag);
+		loader.RegisterComponentDeserializer<PonyEngine::World::Hierarchy::LocalTransform3D>(Transform3DType, *transform3DDeserializer);
+
+		scopeGuardFlag.Release();
 	}
 
 	void HierarchyDeserializerModule::DestroyTransform3DDeserializer(IWorldDefinitionLoader& loader)

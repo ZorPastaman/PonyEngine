@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Resource.World.Ext;
+import PonyEngine.Utility;
 import PonyEngine.World.Meta;
 
 import :NameDeserializer;
@@ -59,20 +60,16 @@ namespace PonyEngine::Resource::World::Meta
 {
 	void MetaDeserializerModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const Application::IApplication& application = context.Application();
 		IWorldDefinitionLoader& loader = application.GetInterface<IWorldDefinitionLoader>();
 		ICopyComponentDeserializer& copyComponentDeserializer = context.Application().GetInterface<ICopyComponentDeserializer>();
-
 		CreateNameDeserializer(loader);
-		try
-		{
-			RegisterCopyComponents(copyComponentDeserializer);
-		}
-		catch (...)
-		{
-			DestroyNameDeserializer(loader);
-			throw;
-		}
+		const auto deserializerScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyNameDeserializer(loader); }, scopeGuardFlag);
+		RegisterCopyComponents(copyComponentDeserializer);
+
+		scopeGuardFlag.Release();
 	}
 
 	void MetaDeserializerModule::ShutDown(Application::IModuleContext& context)
@@ -84,16 +81,13 @@ namespace PonyEngine::Resource::World::Meta
 
 	void MetaDeserializerModule::CreateNameDeserializer(IWorldDefinitionLoader& loader)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		nameDeserializer = std::make_unique<NameDeserializer>();
-		try
-		{
-			loader.RegisterComponentDeserializer<PonyEngine::World::Meta::Name>(NameType, *nameDeserializer);
-		}
-		catch (...)
-		{
-			nameDeserializer.reset();
-			throw;
-		}
+		const auto deserializerScopeGuard = Utility::ScopeGuard([&]() noexcept { nameDeserializer.reset(); }, scopeGuardFlag);
+		loader.RegisterComponentDeserializer<PonyEngine::World::Meta::Name>(NameType, *nameDeserializer);
+
+		scopeGuardFlag.Release();
 	}
 
 	void MetaDeserializerModule::DestroyNameDeserializer(IWorldDefinitionLoader& loader)

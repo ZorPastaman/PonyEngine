@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log.Ext;
+import PonyEngine.Utility;
 
 import :FileLogger;
 
@@ -61,16 +62,13 @@ namespace PonyEngine::Log::File
 			std::filesystem::create_directories(logPath.parent_path());
 		}
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		logger = std::make_unique<FileLogger>(logPath);
-		try
-		{
-			logHub.AddLogger(*logger);
-		}
-		catch (...)
-		{
-			logger.reset();
-			throw;
-		}
+		const auto loggerScopeGuard = Utility::ScopeGuard([&]() noexcept { logger.reset(); }, scopeGuardFlag);
+		logHub.AddLogger(*logger);
+
+		scopeGuardFlag.Release();
 	}
 
 	void FileLoggerModule::ShutDown(Application::IModuleContext& context)

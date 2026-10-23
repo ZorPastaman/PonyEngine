@@ -12,6 +12,7 @@ export module PonyEngine.WinInput.Impl:InputDispatcherModule;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Utility;
 
 import :InputDispatcher;
 
@@ -43,16 +44,13 @@ namespace PonyEngine::WinInput
 {
 	void InputDispatcherModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		inputDispatcher = std::make_unique<InputDispatcher>(context.Application());
-		try
-		{
-			context.AddInterface<IInputDispatcher>(*inputDispatcher);
-		}
-		catch (...)
-		{
-			inputDispatcher.reset();
-			throw;
-		}
+		const auto dispatcherScopeGuard = Utility::ScopeGuard([&]() noexcept { inputDispatcher.reset(); }, scopeGuardFlag);
+		context.AddInterface<IInputDispatcher>(*inputDispatcher);
+
+		scopeGuardFlag.Release();
 	}
 
 	void InputDispatcherModule::ShutDown(Application::IModuleContext& context)

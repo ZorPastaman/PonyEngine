@@ -45,6 +45,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Utility.cppm"
 	"Source/Utility-Concepts.cppm"
 	"Source/Utility-Overload.cppm"
+	"Source/Utility-ScopeGuard.cppm"
 )
 
 set_target_properties(PonyEngine.Core PROPERTIES

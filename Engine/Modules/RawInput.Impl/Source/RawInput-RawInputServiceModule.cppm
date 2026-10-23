@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.RawInput.Ext;
+import PonyEngine.Utility;
 
 import :RawInputService;
 
@@ -44,34 +45,17 @@ namespace PonyEngine::RawInput
 {
 	void RawInputServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		rawInput = std::make_unique<RawInputService>(context.Application());
-		try
-		{
-			context.AddInterface<IRawInputService>(*rawInput);
-			try
-			{
-				context.AddInterface<IDeviceHub>(*rawInput);
-				try
-				{
-					context.AddTickable(rawInput->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_RAW_INPUT_TICK_ORDER});
-				}
-				catch (...)
-				{
-					context.RemoveInterface<IDeviceHub>(*rawInput);
-					throw;
-				}
-			}
-			catch (...)
-			{
-				context.RemoveInterface<IRawInputService>(*rawInput);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			rawInput.reset();
-			throw;
-		}
+		const auto rawInputScopeGuard = Utility::ScopeGuard([&]() noexcept { rawInput.reset(); }, scopeGuardFlag);
+		context.AddInterface<IRawInputService>(*rawInput);
+		const auto rawInputServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { context.RemoveInterface<IRawInputService>(*rawInput); }, scopeGuardFlag);
+		context.AddInterface<IDeviceHub>(*rawInput);
+		const auto deviceHubScopeGuard = Utility::ScopeGuard([&]() noexcept { context.RemoveInterface<IDeviceHub>(*rawInput); }, scopeGuardFlag);
+		context.AddTickable(rawInput->Tickable(), Application::TickableOrder{.tickOrder = PONY_ENGINE_RAW_INPUT_TICK_ORDER});
+
+		scopeGuardFlag.Release();
 	}
 
 	void RawInputServiceModule::ShutDown(Application::IModuleContext& context)

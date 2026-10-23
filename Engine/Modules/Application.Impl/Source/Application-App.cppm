@@ -24,6 +24,7 @@ import PonyEngine.Chrono;
 import PonyEngine.Container;
 import PonyEngine.Format;
 import PonyEngine.Log;
+import PonyEngine.Utility;
 
 import :Buffer;
 import :IdentityUtility;
@@ -161,7 +162,7 @@ export namespace PonyEngine::Application
 		/// @return Interface or nullptr if not found.
 		/// @note Must be called on a main thread.
 		template<typename T>
-		T* FindInterface() const;
+		T* FindInterface() const noexcept;
 		/// @brief Adds the interface.
 		/// @param type Interface type.
 		/// @param interface Interface. Mustn't be nullptr.
@@ -299,7 +300,7 @@ export namespace PonyEngine::Application
 		/// @param firstModule First module getter.
 		/// @param lastModule Last module getter.
 		/// @param modules Module list to add to.
-		void CreateModules(std::uintptr_t firstModule, std::uintptr_t lastModule, std::vector<std::shared_ptr<IModule>>& modules) const;
+		void CreateModules(const ModuleGetter* firstModule, const ModuleGetter* lastModule, std::vector<std::shared_ptr<IModule>>& modules) const;
 		/// @brief Destroys the modules.
 		/// @param modules Modules to destroy.
 		void DestroyModules(std::vector<std::shared_ptr<IModule>>& modules) const noexcept;
@@ -658,26 +659,21 @@ namespace PonyEngine::Application
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		PONY_LOG(logService, Log::LogType::Info, "Initializing early modules...");
-
+		PONY_LOG(logService, Log::LogType::Info, "Creating early modules...");
+		const auto createModulesScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyModules(earlyModules); }, scopeGuardFlag);
+		CreateModules(&firstEarlyModule, &lastEarlyModule, earlyModules);
+		PONY_LOG(logService, Log::LogType::Info, "Creating early modules done.");
+		PONY_LOG(logService, Log::LogType::Info, "Starting up early modules...");
 		std::size_t count = 0uz;
-		try
-		{
-			PONY_LOG(logService, Log::LogType::Info, "Creating early modules...");
-			CreateModules(reinterpret_cast<std::uintptr_t>(&firstEarlyModule), reinterpret_cast<std::uintptr_t>(&lastEarlyModule), earlyModules);
-			PONY_LOG(logService, Log::LogType::Info, "Creating early modules done.");
-			PONY_LOG(logService, Log::LogType::Info, "Starting up early modules...");
-			StartUpModules(earlyModules, count);
-			PONY_LOG(logService, Log::LogType::Info, "Starting up early modules done.");
-		}
-		catch (...)
-		{
-			ShutDownModules(earlyModules, count);
-			DestroyModules(earlyModules);
-			throw;
-		}
-
+		const auto startUpModulesScopeGuard = Utility::ScopeGuard([&]() noexcept { ShutDownModules(earlyModules, count); }, scopeGuardFlag);
+		StartUpModules(earlyModules, count);
+		PONY_LOG(logService, Log::LogType::Info, "Starting up early modules done.");
 		PONY_LOG(logService, Log::LogType::Info, "Initializing early modules done.");
+
+		scopeGuardFlag.Release();
 
 		logService = FindInterface<Log::ILogService>();
 	}
@@ -700,26 +696,21 @@ namespace PonyEngine::Application
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		PONY_LOG(logService, Log::LogType::Info, "Initializing normal modules...");
-
+		PONY_LOG(logService, Log::LogType::Info, "Creating normal modules...");
+		const auto createModulesScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyModules(normalModules); }, scopeGuardFlag);
+		CreateModules(&firstNormalModule, &lastNormalModule, normalModules);
+		PONY_LOG(logService, Log::LogType::Info, "Creating normal modules done.");
+		PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules...");
 		std::size_t count = 0uz;
-		try
-		{
-			PONY_LOG(logService, Log::LogType::Info, "Creating normal modules...");
-			CreateModules(reinterpret_cast<std::uintptr_t>(&firstNormalModule), reinterpret_cast<std::uintptr_t>(&lastNormalModule), normalModules);
-			PONY_LOG(logService, Log::LogType::Info, "Creating normal modules done.");
-			PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules...");
-			StartUpModules(normalModules, count);
-			PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules done.");
-		}
-		catch (...)
-		{
-			ShutDownModules(normalModules, count);
-			DestroyModules(normalModules);
-			throw;
-		}
-
+		const auto startUpModulesScopeGuard = Utility::ScopeGuard([&]() noexcept { ShutDownModules(normalModules, count); }, scopeGuardFlag);
+		StartUpModules(normalModules, count);
+		PONY_LOG(logService, Log::LogType::Info, "Starting up normal modules done.");
 		PONY_LOG(logService, Log::LogType::Info, "Initializing normal modules done.");
+
+		scopeGuardFlag.Release();
 	}
 
 	void App::FinalizeNormal() noexcept
@@ -738,26 +729,21 @@ namespace PonyEngine::Application
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		PONY_LOG(logService, Log::LogType::Info, "Initializing late modules...");
-
+		PONY_LOG(logService, Log::LogType::Info, "Creating late modules...");
+		const auto createModulesScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyModules(lateModules); }, scopeGuardFlag);
+		CreateModules(&firstLateModule, &lastLateModule, lateModules);
+		PONY_LOG(logService, Log::LogType::Info, "Creating late modules done.");
+		PONY_LOG(logService, Log::LogType::Info, "Starting up late modules...");
 		std::size_t count = 0uz;
-		try
-		{
-			PONY_LOG(logService, Log::LogType::Info, "Creating late modules...");
-			CreateModules(reinterpret_cast<std::uintptr_t>(&firstLateModule), reinterpret_cast<std::uintptr_t>(&lastLateModule), lateModules);
-			PONY_LOG(logService, Log::LogType::Info, "Creating late modules done.");
-			PONY_LOG(logService, Log::LogType::Info, "Starting up late modules...");
-			StartUpModules(lateModules, count);
-			PONY_LOG(logService, Log::LogType::Info, "Starting up late modules done.");
-		}
-		catch (...)
-		{
-			ShutDownModules(lateModules, count);
-			DestroyModules(lateModules);
-			throw;
-		}
-
+		const auto startUpModulesScopeGuard = Utility::ScopeGuard([&]() noexcept { ShutDownModules(lateModules, count); }, scopeGuardFlag);
+		StartUpModules(lateModules, count);
+		PONY_LOG(logService, Log::LogType::Info, "Starting up late modules done.");
 		PONY_LOG(logService, Log::LogType::Info, "Initializing late modules done.");
+
+		scopeGuardFlag.Release();
 	}
 
 	void App::FinalizeLate() noexcept
@@ -804,15 +790,9 @@ namespace PonyEngine::Application
 		}
 
 		std::size_t count = 0uz;
-		try
-		{
-			Begin(count);
-		}
-		catch (...)
-		{
-			End(count);
-			throw;
-		}
+		auto beginScopeGuard = Utility::ScopeGuard([&]() noexcept { End(count); });
+		Begin(count);
+		beginScopeGuard.Release();
 	}
 
 	void App::End() noexcept
@@ -869,7 +849,7 @@ namespace PonyEngine::Application
 	}
 
 	template<typename T>
-	T* App::FindInterface() const
+	T* App::FindInterface() const noexcept
 	{
 		return static_cast<T*>(FindInterface(typeid(T)));
 	}
@@ -1051,16 +1031,16 @@ namespace PonyEngine::Application
 		return commandLineString;
 	}
 
-	void App::CreateModules(const std::uintptr_t firstModule, const std::uintptr_t lastModule, std::vector<std::shared_ptr<IModule>>& modules) const
+	void App::CreateModules(const ModuleGetter* const firstModule, const ModuleGetter* const lastModule, std::vector<std::shared_ptr<IModule>>& modules) const
 	{
-		for (std::uintptr_t current = firstModule + sizeof(ModuleGetter); current < lastModule; current += sizeof(ModuleGetter))
+		for (const ModuleGetter* current = firstModule + 1; current < lastModule; ++current)
 		{
-			if (const auto moduleGetter = *reinterpret_cast<ModuleGetter*>(current))
+			if (const ModuleGetter getter = *current)
 			{
 				std::shared_ptr<IModule> appModule;
 				try
 				{
-					appModule = moduleGetter();
+					appModule = (*getter)();
 				}
 				catch (...)
 				{

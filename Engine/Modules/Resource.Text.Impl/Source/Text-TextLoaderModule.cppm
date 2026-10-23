@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Resource.Ext;
+import PonyEngine.Utility;
 
 import :TextLoader;
 
@@ -46,19 +47,16 @@ namespace PonyEngine::Resource::Text
 {
 	void TextLoaderModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		IResourceHub& resourceHub = context.Application().GetInterface<IResourceHub>();
 		const ResourceType textResourceType = resourceHub.MakeResourceType(TextResourceType);
 
 		textLoader = std::make_unique<TextLoader>();
-		try
-		{
-			resourceHub.RegisterLoader(*textLoader, std::span(&textResourceType, 1uz));
-		}
-		catch (...)
-		{
-			textLoader.reset();
-			throw;
-		}
+		const auto textLoaderScopeGuard = Utility::ScopeGuard([&]() noexcept { textLoader.reset(); }, scopeGuardFlag);
+		resourceHub.RegisterLoader(*textLoader, std::span(&textResourceType, 1uz));
+
+		scopeGuardFlag.Release();
 	}
 
 	void TextLoaderModule::ShutDown(Application::IModuleContext& context)

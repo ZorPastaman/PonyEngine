@@ -10,6 +10,7 @@
 export module PonyEngine.World.Impl:WorldServiceModule;
 
 import PonyEngine.Application;
+import PonyEngine.Utility;
 import PonyEngine.World;
 
 import :WorldService;
@@ -42,16 +43,13 @@ namespace PonyEngine::World
 {
 	void WorldServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		worldService = std::make_unique<WorldService>(context.Application());
-		try
-		{
-			context.AddInterface<IWorldService>(*worldService);
-		}
-		catch (...)
-		{
-			worldService.reset();
-			throw;
-		}
+		const auto worldServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { worldService.reset(); }, scopeGuardFlag);
+		context.AddInterface<IWorldService>(*worldService);
+
+		scopeGuardFlag.Release();
 	}
 
 	void WorldServiceModule::ShutDown(Application::IModuleContext& context)

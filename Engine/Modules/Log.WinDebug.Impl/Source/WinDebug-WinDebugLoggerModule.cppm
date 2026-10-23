@@ -13,6 +13,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Log.Ext;
+import PonyEngine.Utility;
 
 import :WinDebugLogger;
 
@@ -44,18 +45,14 @@ namespace PonyEngine::Log::WinDebug
 {
 	void WinDebugLoggerModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		ILogHub& logHub = context.Application().GetInterface<ILogHub>();
 		logger = std::make_unique<WinDebugLogger>();
+		const auto loggerScopeGuard = Utility::ScopeGuard([&]() noexcept { logger.reset(); }, scopeGuardFlag);
+		logHub.AddLogger(*logger);
 
-		try
-		{
-			logHub.AddLogger(*logger);
-		}
-		catch (...)
-		{
-			logger.reset();
-			throw;
-		}
+		scopeGuardFlag.Release();
 	}
 
 	void WinDebugLoggerModule::ShutDown(Application::IModuleContext& context)

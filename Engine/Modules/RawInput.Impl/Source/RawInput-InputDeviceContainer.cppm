@@ -16,6 +16,7 @@ export module PonyEngine.RawInput.Impl:InputDeviceContainer;
 import std;
 
 import PonyEngine.RawInput.Ext;
+import PonyEngine.Utility;
 
 export namespace PonyEngine::RawInput
 {
@@ -273,57 +274,26 @@ namespace PonyEngine::RawInput
 
 	void InputDeviceContainer::Add(const DeviceHandleID handle, IDeviceController& controller, const bool isConnected, const DeviceParams& params)
 	{
-		const std::size_t initialSize = Size();
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const std::size_t index = std::ranges::lower_bound(handles, handle) - handles.cbegin();
+		handles.insert(handles.cbegin() + index, handle);
+		const auto handlesScopeGuard = Utility::ScopeGuard([&]() noexcept { handles.erase(handles.cbegin() + index); }, scopeGuardFlag);
+		controllers.insert(controllers.cbegin() + index, &controller);
+		const auto controllersScopeGuard = Utility::ScopeGuard([&]() noexcept { controllers.erase(controllers.cbegin() + index); }, scopeGuardFlag);
+		deviceNames.insert(deviceNames.cbegin() + index, std::string(params.name));
+		const auto deviceNamesScopeGuard = Utility::ScopeGuard([&]() noexcept { deviceNames.erase(deviceNames.cbegin() + index); }, scopeGuardFlag);
+		deviceTypes.insert(deviceTypes.cbegin() + index, params.type);
+		const auto deviceTypesScopeGuard = Utility::ScopeGuard([&]() noexcept { deviceTypes.erase(deviceTypes.cbegin() + index); }, scopeGuardFlag);
+		deviceStyles.insert(deviceStyles.cbegin() + index, params.style);
+		const auto deviceStylesScopeGuard = Utility::ScopeGuard([&]() noexcept { deviceStyles.erase(deviceStyles.cbegin() + index); }, scopeGuardFlag);
+		features.insert(features.cbegin() + index, std::vector(params.features.cbegin(), params.features.cend()));
+		const auto featuresScopeGuard = Utility::ScopeGuard([&]() noexcept { features.erase(features.cbegin() + index); }, scopeGuardFlag);
+		connections.insert(connections.cbegin() + index, isConnected);
+		const auto connectionsScopeGuard = Utility::ScopeGuard([&]() noexcept { connections.erase(connections.cbegin() + index); }, scopeGuardFlag);
+		axisIndices.insert(axisIndices.cbegin() + index, std::vector<std::size_t>());
 
-		try
-		{
-			handles.insert(handles.cbegin() + index, handle);
-			controllers.insert(controllers.cbegin() + index, &controller);
-			deviceNames.insert(deviceNames.cbegin() + index, std::string(params.name));
-			deviceTypes.insert(deviceTypes.cbegin() + index, params.type);
-			deviceStyles.insert(deviceStyles.cbegin() + index, params.style);
-			features.insert(features.cbegin() + index, std::vector(params.features.cbegin(), params.features.cend()));
-			connections.insert(connections.cbegin() + index, isConnected);
-			axisIndices.insert(axisIndices.cbegin() + index, std::vector<std::size_t>());
-		}
-		catch (...)
-		{
-			if (axisIndices.size() != initialSize)
-			{
-				axisIndices.erase(axisIndices.cbegin() + index);
-			}
-			if (connections.size() != initialSize)
-			{
-				connections.erase(connections.cbegin() + index);
-			}
-			if (features.size() != initialSize)
-			{
-				features.erase(features.cbegin() + index);
-			}
-			if (deviceStyles.size() != initialSize)
-			{
-				deviceStyles.erase(deviceStyles.cbegin() + index);
-			}
-			if (deviceTypes.size() != initialSize)
-			{
-				deviceTypes.erase(deviceTypes.cbegin() + index);
-			}
-			if (deviceNames.size() != initialSize)
-			{
-				deviceNames.erase(deviceNames.cbegin() + index);
-			}
-			if (controllers.size() != initialSize)
-			{
-				controllers.erase(controllers.cbegin() + index);
-			}
-			if (handles.size() != initialSize)
-			{
-				handles.erase(handles.cbegin() + index);
-			}
-
-			throw;
-		}
+		scopeGuardFlag.Release();
 	}
 
 	void InputDeviceContainer::Remove(const std::size_t index) noexcept
@@ -394,25 +364,19 @@ namespace PonyEngine::RawInput
 
 	std::size_t InputDeviceContainer::AddAxis(const std::size_t deviceIndex, const Axis axis)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const std::size_t axisIndex = axes.size();
 		std::vector<std::size_t>& deviceAxes = axisIndices[deviceIndex];
+		deviceAxes.push_back(axisIndex);
+		const auto deviceAxesScopeGuard = Utility::ScopeGuard([&]() noexcept { deviceAxes.pop_back(); }, scopeGuardFlag);
+		axes.push_back(axis);
+		const auto axesScopeGuard = Utility::ScopeGuard([&]() noexcept { axes.pop_back(); }, scopeGuardFlag);
+		states.push_back(0.f);
+		const auto statesScopeGuard = Utility::ScopeGuard([&]() noexcept { states.pop_back(); }, scopeGuardFlag);
+		deltas.push_back(0.f);
 
-		const std::size_t initialAxisCount = deviceAxes.size();
-		try
-		{
-			deviceAxes.push_back(axisIndex);
-			axes.push_back(axis);
-			states.push_back(0.f);
-			deltas.push_back(0.f);
-		}
-		catch (...)
-		{
-			deltas.resize(initialAxisCount);
-			states.resize(initialAxisCount);
-			axes.resize(initialAxisCount);
-			deviceAxes.resize(initialAxisCount);
-			throw;
-		}
+		scopeGuardFlag.Release();
 
 		return axisIndex;
 	}

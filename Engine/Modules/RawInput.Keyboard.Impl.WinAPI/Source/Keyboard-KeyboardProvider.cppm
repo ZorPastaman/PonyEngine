@@ -26,6 +26,7 @@ import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Keyboard.Impl;
+import PonyEngine.Utility;
 import PonyEngine.WinInput;
 
 import :KeyboardAxisMap;
@@ -135,34 +136,23 @@ namespace PonyEngine::RawInput::Keyboard
 			const std::span<char> name = arena.AllocateArray<char>(nameLength);
 			const std::size_t nameSize = WinInput::GetDeviceName(device, name);
 
-			const std::size_t initialSize = nativeHandles.size();
-			try
+			auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
+			nativeHandles.push_back(device);
+			const auto nativeHandlesScopeGuard = Utility::ScopeGuard([&]() noexcept { nativeHandles.pop_back(); }, scopeGuardFlag);
+			keyboardControllers.push_back(std::make_unique<KeyboardController>(true));
+			const auto keyboardControllersScopeGuard = Utility::ScopeGuard([&]() noexcept { keyboardControllers.pop_back(); }, scopeGuardFlag);
+			IDeviceController& controller = keyboardControllers.back()->Controller();
+			const DeviceHandle deviceHandle = hub->RegisterDevice(controller, true, DeviceParams
 			{
-				nativeHandles.push_back(device);
-				keyboardControllers.push_back(std::make_unique<KeyboardController>(true));
-				IDeviceController& controller = keyboardControllers.back()->Controller();
-				const DeviceHandle deviceHandle = hub->RegisterDevice(controller, true, DeviceParams
-				{
-					.name = std::string_view(name.data(), nameSize),
-					.type = deviceType,
-					.style = deviceStyle
-				});
-				try
-				{
-					deviceHandles.push_back(deviceHandle);
-				}
-				catch (...)
-				{
-					hub->UnregisterDevice(deviceHandle, controller);
-					throw;
-				}
-			}
-			catch (...)
-			{
-				keyboardControllers.resize(initialSize);
-				nativeHandles.resize(initialSize);
-				throw;
-			}
+				.name = std::string_view(name.data(), nameSize),
+				.type = deviceType,
+				.style = deviceStyle
+			});
+			const auto deviceHandleScopeGuard = Utility::ScopeGuard([&]() noexcept { hub->UnregisterDevice(deviceHandle, controller); }, scopeGuardFlag);
+			deviceHandles.push_back(deviceHandle);
+
+			scopeGuardFlag.Release();
 		}
 		else
 		{

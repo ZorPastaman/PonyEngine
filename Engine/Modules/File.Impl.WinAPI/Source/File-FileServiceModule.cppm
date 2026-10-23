@@ -11,6 +11,8 @@ export module PonyEngine.File.Impl.WinAPI:FileServiceModule;
 
 import std;
 
+import PonyEngine.Utility;
+
 import :FileService;
 
 export namespace PonyEngine::File
@@ -41,16 +43,13 @@ namespace PonyEngine::File
 {
 	void FileServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		fileService = std::make_unique<FileService>(context.Application());
-		try
-		{
-			context.AddInterface<IFileService>(*fileService);
-		}
-		catch (...)
-		{
-			fileService.reset();
-			throw;
-		}
+		const auto fileServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { fileService.reset(); }, scopeGuardFlag);
+		context.AddInterface<IFileService>(*fileService);
+
+		scopeGuardFlag.Release();
 	}
 
 	void FileServiceModule::ShutDown(Application::IModuleContext& context)

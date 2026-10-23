@@ -23,6 +23,7 @@ import PonyEngine.Hash;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Resource.Ext;
+import PonyEngine.Utility;
 
 import :CollectionContainer;
 import :CompletedResourceRequest;
@@ -273,49 +274,49 @@ namespace PonyEngine::Resource
 		IResourceLoader* const loader = FindLoader(resource->Type());
 		assert(loader && "Loader not found.");
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		auto loadProcess = std::make_shared<ResourceLoadProcess>(resource, std::move(dataAccess));
 		AddLoadProcess(loadProcess);
 		IncrementLoadProcessCount();
-
-		try
-		{
-			loadProcess->SetLoadRequest(loader->Load(*loadProcess, [this, process = loadProcess.get()](const IResourceLoadRequest& request) noexcept
-			{
-				std::shared_ptr<ResourceLoadProcess> proc = RemoveLoadProcess(process);
-
-				if (proc->IncrementCancelCount()) [[likely]]
-				{
-					switch (request.Status())
-					{
-					case Async::RequestStatus::Success: [[likely]]
-						proc->SetSuccess(request.MainResource(), request.ResourceInterfaces());
-						break;
-					case Async::RequestStatus::Failure:
-						proc->SetFailure(request.Exceptions());
-						break;
-					case Async::RequestStatus::Canceled:
-						proc->SetCanceled();
-						break;
-					default: [[unlikely]]
-						assert(false && "Unexpected status.");
-						break;
-					}
-				}
-				else [[unlikely]]
-				{
-					proc->SetCanceled();
-				}
-
-				proc.reset();
-				DecrementLoadProcessCount();
-			}));
-		}
-		catch (...)
+		const auto processScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveLoadProcess(loadProcess.get());
 			DecrementLoadProcessCount();
-			throw;
-		}
+		}, scopeGuardFlag);
+
+		loadProcess->SetLoadRequest(loader->Load(*loadProcess, [this, process = loadProcess.get()](const IResourceLoadRequest& request) noexcept
+		{
+			std::shared_ptr<ResourceLoadProcess> proc = RemoveLoadProcess(process);
+
+			if (proc->IncrementCancelCount()) [[likely]]
+			{
+				switch (request.Status())
+				{
+				case Async::RequestStatus::Success: [[likely]]
+					proc->SetSuccess(request.MainResource(), request.ResourceInterfaces());
+					break;
+				case Async::RequestStatus::Failure:
+					proc->SetFailure(request.Exceptions());
+					break;
+				case Async::RequestStatus::Canceled:
+					proc->SetCanceled();
+					break;
+				default: [[unlikely]]
+					assert(false && "Unexpected status.");
+					break;
+				}
+			}
+			else [[unlikely]]
+			{
+				proc->SetCanceled();
+			}
+
+			proc.reset();
+			DecrementLoadProcessCount();
+		}));
+
+		scopeGuardFlag.Release();
 
 		return CreateResourceRequest(std::move(loadProcess), std::move(callback));
 	}
@@ -333,69 +334,59 @@ namespace PonyEngine::Resource
 		}
 
 		const auto lock = std::unique_lock(stateMutex);
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
 		const ResourceCollection collection = CreateCollection();
-		try
+		const auto collectionScopeGuard = Utility::ScopeGuard([&]() noexcept { KillCollection(collection); }, scopeGuardFlag);
+		collectionContainer.Add(collection.id, provider, std::move(resourceIds));
+		const auto collectionContainerScopeGuard = Utility::ScopeGuard([&]() noexcept { collectionContainer.Remove(collectionContainer.IndexOf(collection.id)); }, scopeGuardFlag);
+
+		std::size_t addedResourceCount = 0uz;
+		const auto addedResourceScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
-			collectionContainer.Add(collection.id, provider, std::move(resourceIds));
-
-			std::size_t addedResourceCount = 0uz;
-			try
+			for (std::size_t i = addedResourceCount; i-- > 0uz; )
 			{
-				for (const CollectionResource& resource : resources)
-				{
-					if (resourceContainer.Contains(resource.id)) [[unlikely]]
-					{
-						throw std::invalid_argument(std::format("Resource with the same ID '0x{:X}' is already added", resource.id.value));
-					}
-					if (!IsResourceIDValid(resource.id)) [[unlikely]]
-					{
-						throw std::invalid_argument(std::format("Resource ID is invalid: ID = '0x{:X}'", resource.id.value));
-					}
-					if (!IsResourceTypeValid(resource.type)) [[unlikely]]
-					{
-						throw std::invalid_argument(std::format("Resource type is invalid: Type = '0x{:X}'", resource.type.value));
-					}
-
-					IResourceLoader* const loader = FindLoader(resource.type);
-					if (!loader) [[unlikely]]
-					{
-						throw std::logic_error(std::format("No resource loader found for type '0x{:X}'", resource.type.value));
-					}
-
-					auto loadableResource = LoadableResource(resource.type, resource.dataMeta, resource.loadMeta, dataAccessTypes);
-					loader->PrepareResource(loadableResource);
-					if (!loadableResource.DataAccessType()) [[unlikely]]
-					{
-						throw std::logic_error("Loader didn't set data access type");
-					}
-					if (loadableResource.InterfaceTypes().empty()) [[unlikely]]
-					{
-						throw std::logic_error("Loader didn't set output types");
-					}
-
-					resourceContainer.Add(std::make_shared<Resource>(resource.id, resource.type, collection.id, resource.dataIndex,
-						*loadableResource.DataAccessType(), std::move(loadableResource.LoadData()), std::move(loadableResource.InterfaceTypes())));
-
-					++addedResourceCount;
-				}
+				resourceContainer.Remove(resources[i].id);
 			}
-			catch (...)
-			{
-				for (std::size_t i = addedResourceCount; i-- > 0uz; )
-				{
-					resourceContainer.Remove(resources[i].id);
-				}
-				collectionContainer.Remove(collectionContainer.IndexOf(collection.id));
-
-				throw;
-			}
-		}
-		catch (...)
+		}, scopeGuardFlag);
+		for (const CollectionResource& resource : resources)
 		{
-			KillCollection(collection);
-			throw;
+			if (resourceContainer.Contains(resource.id)) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Resource with the same ID '0x{:X}' is already added", resource.id.value));
+			}
+			if (!IsResourceIDValid(resource.id)) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Resource ID is invalid: ID = '0x{:X}'", resource.id.value));
+			}
+			if (!IsResourceTypeValid(resource.type)) [[unlikely]]
+			{
+				throw std::invalid_argument(std::format("Resource type is invalid: Type = '0x{:X}'", resource.type.value));
+			}
+
+			IResourceLoader* const loader = FindLoader(resource.type);
+			if (!loader) [[unlikely]]
+			{
+				throw std::logic_error(std::format("No resource loader found for type '0x{:X}'", resource.type.value));
+			}
+
+			auto loadableResource = LoadableResource(resource.type, resource.dataMeta, resource.loadMeta, dataAccessTypes);
+			loader->PrepareResource(loadableResource);
+			if (!loadableResource.DataAccessType()) [[unlikely]]
+			{
+				throw std::logic_error("Loader didn't set data access type");
+			}
+			if (loadableResource.InterfaceTypes().empty()) [[unlikely]]
+			{
+				throw std::logic_error("Loader didn't set output types");
+			}
+
+			resourceContainer.Add(std::make_shared<Resource>(resource.id, resource.type, collection.id, resource.dataIndex,
+				*loadableResource.DataAccessType(), std::move(loadableResource.LoadData()), std::move(loadableResource.InterfaceTypes())));
+			++addedResourceCount;
 		}
+
+		scopeGuardFlag.Release();
 
 		PONY_LOG(logService, Log::LogType::Info, "Resource collection registered. CollectionID: '0x{:X}'; Provider: '{}'.", collection.id, typeid(provider).name());
 		PONY_LOG(logService, Log::LogType::Debug, "Resource IDs:");

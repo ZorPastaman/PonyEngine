@@ -20,9 +20,9 @@ export namespace PonyEngine::Job
 	/// @brief Job priority.
 	enum class JobPriority : std::uint8_t
 	{
-		Low,
-		Normal,
-		High
+		Low, ///< Low priority is recommended to use if it's ok if the job takes several frames to finish.
+		Normal, ///< Normal priority is recommended to use when you're going to wait for the job to finish within a frame.
+		High ///< High priority is recommended to use when you're going to wait for the job to finish within some narrow scope.
 	};
 }
 

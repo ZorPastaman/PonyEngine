@@ -17,6 +17,7 @@ import std;
 
 import PonyEngine.Async;
 import PonyEngine.Resource.World.Ext;
+import PonyEngine.Utility;
 import PonyEngine.World;
 
 export namespace PonyEngine::Resource::World
@@ -264,10 +265,10 @@ namespace PonyEngine::Resource::World
 		}
 		catch (...)
 		{
-			const std::size_t preallocatedCount = this->exceptions.capacity() - this->exceptions.size();
 			try
 			{
-				this->exceptions.append_range(exceptions.subspan(0uz, preallocatedCount));
+				const std::size_t preallocatedCount = this->exceptions.capacity() - this->exceptions.size();
+				this->exceptions.append_range(exceptions.subspan(0uz, std::min(preallocatedCount, exceptions.size())));
 			}
 			catch (...)
 			{

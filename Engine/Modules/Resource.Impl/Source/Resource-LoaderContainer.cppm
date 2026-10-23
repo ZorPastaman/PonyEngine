@@ -12,6 +12,7 @@ export module PonyEngine.Resource.Impl:LoaderContainer;
 import std;
 
 import PonyEngine.Resource.Ext;
+import PonyEngine.Utility;
 
 export namespace PonyEngine::Resource
 {
@@ -112,16 +113,13 @@ namespace PonyEngine::Resource
 
 	void LoaderContainer::Add(IResourceLoader& loader, const std::span<const ResourceType> types)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		loaders.push_back(&loader);
-		try
-		{
-			this->types.push_back(std::vector<ResourceType>(types.cbegin(), types.cend()));
-		}
-		catch (...)
-		{
-			loaders.pop_back();
-			throw;
-		}
+		const auto loadersScopeGuard = Utility::ScopeGuard([&]() noexcept { loaders.pop_back(); }, scopeGuardFlag);
+		this->types.push_back(std::vector<ResourceType>(types.cbegin(), types.cend()));
+
+		scopeGuardFlag.Release();
 	}
 
 	void LoaderContainer::Remove(const std::size_t index) noexcept

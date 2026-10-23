@@ -20,6 +20,7 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.Resource.World.Ext;
+import PonyEngine.Utility;
 
 import :WorldDefinitionLoader;
 
@@ -79,18 +80,15 @@ namespace PonyEngine::Resource::World
 	void CopyComponentDeserializer::Associate(const std::type_index componentType, const std::size_t componentSize, const std::string_view serializedType)
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread");
-		worldDefinitionLoader->RegisterComponentDeserializer(componentType, componentSize, serializedType, *this);
-		try
-		{
-			registrations.emplace_back(componentType, serializedType);
-		}
-		catch (...)
-		{
-			worldDefinitionLoader->UnregisterComponentDeserializer(componentType, serializedType, *this);
-			throw;
-		}
 
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
+		worldDefinitionLoader->RegisterComponentDeserializer(componentType, componentSize, serializedType, *this);
+		const auto loaderScopeGuard = Utility::ScopeGuard([&]() noexcept { worldDefinitionLoader->UnregisterComponentDeserializer(componentType, serializedType, *this); }, scopeGuardFlag);
+		registrations.emplace_back(componentType, serializedType);
 		PONY_LOG(logService, Log::LogType::Info, "Component type '{}' associated with serialized type '{}' as copy component.", componentType.name(), serializedType);
+
+		scopeGuardFlag.Release();
 	}
 
 	void CopyComponentDeserializer::Deserialize(const std::size_t, const std::span<const std::byte> input, const std::span<std::byte> output)

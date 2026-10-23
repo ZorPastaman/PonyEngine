@@ -12,6 +12,7 @@ export module PonyEngine.Resource.World.Impl:WorldDefinitionLoaderModule;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Utility;
 import PonyEngine.World;
 
 import :CopyComponentDeserializer;
@@ -76,34 +77,17 @@ namespace PonyEngine::Resource::World
 {
 	void WorldDefinitionLoaderModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		CreateWorldDefinitionLoader(context);
-		try
-		{
-			CreateCopyComponentDeserializer(context);
-			try
-			{
-				CreateResourceObjectDeserializer(context);
-				try
-				{
-					RegisterResourceDeserializers();
-				}
-				catch (...)
-				{
-					DestroyResourceObjectDeserializer(context);
-					throw;
-				}
-			}
-			catch (...)
-			{
-				DestroyCopyComponentDeserializer(context);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			DestroyWorldDefinitionLoader(context);
-			throw;
-		}
+		const auto loaderScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyWorldDefinitionLoader(context); }, scopeGuardFlag);
+		CreateCopyComponentDeserializer(context);
+		const auto copyComponentScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyCopyComponentDeserializer(context); }, scopeGuardFlag);
+		CreateResourceObjectDeserializer(context);
+		const auto resourceObjectScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyResourceObjectDeserializer(context); }, scopeGuardFlag);
+		RegisterResourceDeserializers();
+
+		scopeGuardFlag.Release();
 	}
 
 	void WorldDefinitionLoaderModule::ShutDown(Application::IModuleContext& context)
@@ -115,28 +99,17 @@ namespace PonyEngine::Resource::World
 
 	void WorldDefinitionLoaderModule::CreateWorldDefinitionLoader(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		IResourceHub& resourceHub = context.Application().GetInterface<IResourceHub>();
 		const Resource::ResourceType worldDefinitionResourceType = resourceHub.MakeResourceType(WorldDefinitionResourceType);
-
 		worldDefinitionLoader = std::make_unique<WorldDefinitionLoader>(context.Application());
-		try
-		{
-			resourceHub.RegisterLoader(*worldDefinitionLoader, std::span(&worldDefinitionResourceType, 1uz));
-			try
-			{
-				context.AddInterface<IWorldDefinitionLoader>(*worldDefinitionLoader);
-			}
-			catch (...)
-			{
-				resourceHub.UnregisterLoader(*worldDefinitionLoader);
-				throw;
-			}
-		}
-		catch (...)
-		{
-			worldDefinitionLoader.reset();
-			throw;
-		}
+		const auto loaderScopeGuard = Utility::ScopeGuard([&]() noexcept { worldDefinitionLoader.reset(); }, scopeGuardFlag);
+		resourceHub.RegisterLoader(*worldDefinitionLoader, std::span(&worldDefinitionResourceType, 1uz));
+		const auto registerScopeGuard = Utility::ScopeGuard([&]() noexcept { resourceHub.UnregisterLoader(*worldDefinitionLoader); }, scopeGuardFlag);
+		context.AddInterface<IWorldDefinitionLoader>(*worldDefinitionLoader);
+
+		scopeGuardFlag.Release();
 	}
 
 	void WorldDefinitionLoaderModule::DestroyWorldDefinitionLoader(Application::IModuleContext& context)
@@ -149,16 +122,13 @@ namespace PonyEngine::Resource::World
 
 	void WorldDefinitionLoaderModule::CreateCopyComponentDeserializer(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		copyComponentDeserializer = std::make_unique<CopyComponentDeserializer>(context.Application(), *worldDefinitionLoader);
-		try
-		{
-			context.AddInterface<ICopyComponentDeserializer>(*copyComponentDeserializer);
-		}
-		catch (...)
-		{
-			copyComponentDeserializer.reset();
-			throw;
-		}
+		const auto deserializerScopeGuard = Utility::ScopeGuard([&]() noexcept { copyComponentDeserializer.reset(); }, scopeGuardFlag);
+		context.AddInterface<ICopyComponentDeserializer>(*copyComponentDeserializer);
+
+		scopeGuardFlag.Release();
 	}
 
 	void WorldDefinitionLoaderModule::DestroyCopyComponentDeserializer(Application::IModuleContext& context)
@@ -169,16 +139,13 @@ namespace PonyEngine::Resource::World
 
 	void WorldDefinitionLoaderModule::CreateResourceObjectDeserializer(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		resourceObjectDeserializer = std::make_unique<ResourceObjectDeserializer>(context.Application());
-		try
-		{
-			worldDefinitionLoader->RegisterObjectDeserializer(ResourceType, *resourceObjectDeserializer);
-		}
-		catch (...)
-		{
-			resourceObjectDeserializer.reset();
-			throw;
-		}
+		const auto deserializerScopeGuard = Utility::ScopeGuard([&]() noexcept { resourceObjectDeserializer.reset(); }, scopeGuardFlag);
+		worldDefinitionLoader->RegisterObjectDeserializer(ResourceType, *resourceObjectDeserializer);
+
+		scopeGuardFlag.Release();
 	}
 
 	void WorldDefinitionLoaderModule::DestroyResourceObjectDeserializer(Application::IModuleContext& context)

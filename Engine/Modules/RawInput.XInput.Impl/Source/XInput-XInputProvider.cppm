@@ -23,6 +23,7 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Log;
 import PonyEngine.RawInput.Ext;
+import PonyEngine.Utility;
 
 import :GamepadAxisMap;
 import :GamepadController;
@@ -62,6 +63,8 @@ namespace PonyEngine::RawInput::XInput
 		logService{application.FindInterface<Log::ILogService>()},
 		gamepadAxisMap(*deviceHub)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		for (DWORD i = 0uz; i < XUSER_MAX_COUNT; ++i)
 		{
 			gamepadControllers[i] = GamepadController(gamepadAxisMap, logService, i);
@@ -69,31 +72,30 @@ namespace PonyEngine::RawInput::XInput
 
 		const DeviceType type = deviceHub->MakeDeviceType(GamepadDevice::GenericType);
 		const DeviceStyle style = deviceHub->MakeDeviceStyle(Style::Xbox);
+		DWORD registeredDeviceCount = 0u;
+		const auto registeredDeviceScopeGuard = Utility::ScopeGuard([&]() noexcept
+		{
+			for (DWORD i = registeredDeviceCount; i-- > 0uz; )
+			{
+				deviceHub->UnregisterDevice(deviceHandles[i], gamepadControllers[i].Controller());
+			}
+		}, scopeGuardFlag);
 		for (DWORD i = 0u; i < XUSER_MAX_COUNT; ++i)
 		{
-			try
+			GamepadController& controller = gamepadControllers[i];
+			const std::string name = std::format("XInput_{}", i);
+			const auto vibratingFeature = FeatureEntry::Make<IVibrating>(controller);
+			deviceHandles[i] = deviceHub->RegisterDevice(controller.Controller(), controller.IsConnected(), DeviceParams
 			{
-				GamepadController& controller = gamepadControllers[i];
-				const std::string name = std::format("XInput_{}", i);
-				const auto vibratingFeature = FeatureEntry::Make<IVibrating>(controller);
-				deviceHandles[i] = deviceHub->RegisterDevice(controller.Controller(), controller.IsConnected(), DeviceParams
-				{
-					.name = name,
-					.type = type,
-					.style = style,
-					.features = std::span(&vibratingFeature, 1uz)
-				});
-			}
-			catch (...)
-			{
-				while (i-- > 0u)
-				{
-					deviceHub->UnregisterDevice(deviceHandles[i], gamepadControllers[i].Controller());
-				}
-
-				throw;
-			}
+				.name = name,
+				.type = type,
+				.style = style,
+				.features = std::span(&vibratingFeature, 1uz)
+			});
+			++registeredDeviceCount;
 		}
+
+		scopeGuardFlag.Release();
 	}
 
 	XInputProvider::~XInputProvider() noexcept

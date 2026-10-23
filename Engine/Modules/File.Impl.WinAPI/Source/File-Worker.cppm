@@ -25,6 +25,7 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.File.Impl;
 import PonyEngine.Log;
+import PonyEngine.Utility;
 
 import :OverlappedRequest;
 
@@ -118,41 +119,41 @@ namespace PonyEngine::File
 		ongoingRequestCount(0uz),
 		running(true)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		PONY_LOG(logService, Log::LogType::Info, "Creating IOCP...");
 		iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
 		if (!iocp) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create iocp: Error code = '0x{:X}'", GetLastError()));
 		}
-		PONY_LOG(logService, Log::LogType::Info, "Creating IOCP done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(iocp));
-
-		constexpr std::string_view role = PONY_STRINGIFY_VALUE(PONY_ENGINE_FILE_THREAD_ROLE);
-		PONY_LOG(logService, Log::LogType::Info, "Creating io work thread... Role: '{}'.", role);
-		try
-		{
-			thread = application.CreateThread([this] { Work(); }, Application::ThreadParams
-			{
-				.role = role,
-				.onBeginException = [ls = logService](const std::exception_ptr& exception) noexcept
-				{
-					PONY_LOG(ls, Log::LogType::Error, exception, "On beginning IO thread. ID: '{}'.", std::this_thread::get_id());
-					return true;
-				},
-				.onEndException = [ls = logService](const std::exception_ptr& exception) noexcept
-				{
-					PONY_LOG(ls, Log::LogType::Error, exception, "On ending IO thread. ID: '{}'.", std::this_thread::get_id());
-				}
-			});
-		}
-		catch (...)
+		const auto iocpScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			if (!CloseHandle(iocp)) [[unlikely]]
 			{
 				PONY_LOG(logService, Log::LogType::Error, "Failed to close iocp. Error code: '0x{:X}'.", GetLastError());
 			}
-			throw;
-		}
+		}, scopeGuardFlag);
+		PONY_LOG(logService, Log::LogType::Info, "Creating IOCP done. Handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(iocp));
+
+		constexpr std::string_view role = PONY_STRINGIFY_VALUE(PONY_ENGINE_FILE_THREAD_ROLE);
+		PONY_LOG(logService, Log::LogType::Info, "Creating io work thread... Role: '{}'.", role);
+		thread = application.CreateThread([this] { Work(); }, Application::ThreadParams
+		{
+			.role = role,
+			.onBeginException = [ls = logService](const std::exception_ptr& exception) noexcept
+			{
+				PONY_LOG(ls, Log::LogType::Error, exception, "On beginning IO thread. ID: '{}'.", std::this_thread::get_id());
+				return true;
+			},
+			.onEndException = [ls = logService](const std::exception_ptr& exception) noexcept
+			{
+				PONY_LOG(ls, Log::LogType::Error, exception, "On ending IO thread. ID: '{}'.", std::this_thread::get_id());
+			}
+		});
 		PONY_LOG(logService, Log::LogType::Info, "Creating io work thread done.");
+
+		scopeGuardFlag.Release();
 	}
 
 	Worker::~Worker() noexcept
@@ -216,39 +217,40 @@ namespace PonyEngine::File
 #else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
 #endif
+		
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		IncrementOngoingRequestCount();
 		AddOngoingRequest(request);
-
-		try
-		{
-			if (ReadFile(file, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
-			{
-				DWORD bytesTransferred = 0;
-				if (GetOverlappedResult(file, &request->Overlapped(), &bytesTransferred, FALSE)) [[likely]]
-				{
-					RemoveOngoingRequest(&request->Overlapped());
-					request->SetSuccess(static_cast<std::size_t>(bytesTransferred));
-					DecrementOngoingRequestCount();
-				}
-				else [[unlikely]]
-				{
-					throw std::runtime_error(std::format("Failed to create file read request: Error code = '0x{:X}'", GetLastError()));
-				}
-			}
-			else [[likely]]
-			{
-				if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
-				{
-					throw std::runtime_error(std::format("Failed to create file read request: Error code = '0x{:X}'", error));
-				}
-			}
-		}
-		catch (...)
+		const auto requestKeepingScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveOngoingRequest(&request->Overlapped());
 			DecrementOngoingRequestCount();
-			throw;
+		}, scopeGuardFlag);
+
+		if (ReadFile(file, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
+		{
+			DWORD bytesTransferred = 0;
+			if (GetOverlappedResult(file, &request->Overlapped(), &bytesTransferred, FALSE)) [[likely]]
+			{
+				RemoveOngoingRequest(&request->Overlapped());
+				request->SetSuccess(static_cast<std::size_t>(bytesTransferred));
+				DecrementOngoingRequestCount();
+			}
+			else [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to create file read request: Error code = '0x{:X}'", GetLastError()));
+			}
 		}
+		else [[likely]]
+		{
+			if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to create file read request: Error code = '0x{:X}'", error));
+			}
+		}
+
+		scopeGuardFlag.Release();
 
 		return std::shared_ptr<IReadRequest>(std::move(request), &request->Read());
 	}
@@ -275,39 +277,40 @@ namespace PonyEngine::File
 #else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
 #endif
+
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		IncrementOngoingRequestCount();
 		AddOngoingRequest(request);
-
-		try
-		{
-			if (WriteFile(file, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
-			{
-				DWORD bytesTransferred = 0;
-				if (GetOverlappedResult(file, &request->Overlapped(), &bytesTransferred, FALSE)) [[likely]]
-				{
-					RemoveOngoingRequest(&request->Overlapped());
-					request->SetSuccess(static_cast<std::size_t>(bytesTransferred));
-					DecrementOngoingRequestCount();
-				}
-				else [[unlikely]]
-				{
-					throw std::runtime_error(std::format("Failed to create file write request: Error code = '0x{:X}'", GetLastError()));
-				}
-			}
-			else [[likely]]
-			{
-				if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
-				{
-					throw std::runtime_error(std::format("Failed to create file write request: Error code = '0x{:X}'", error));
-				}
-			}
-		}
-		catch (...)
+		const auto requestKeepingScopeGuard = Utility::ScopeGuard([&]() noexcept
 		{
 			RemoveOngoingRequest(&request->Overlapped());
 			DecrementOngoingRequestCount();
-			throw;
+		}, scopeGuardFlag);
+
+		if (WriteFile(file, params.buffer.data(), static_cast<DWORD>(params.buffer.size()), nullptr, &request->Overlapped())) [[unlikely]]
+		{
+			DWORD bytesTransferred = 0;
+			if (GetOverlappedResult(file, &request->Overlapped(), &bytesTransferred, FALSE)) [[likely]]
+			{
+				RemoveOngoingRequest(&request->Overlapped());
+				request->SetSuccess(static_cast<std::size_t>(bytesTransferred));
+				DecrementOngoingRequestCount();
+			}
+			else [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to create file write request: Error code = '0x{:X}'", GetLastError()));
+			}
 		}
+		else [[likely]]
+		{
+			if (const DWORD error = GetLastError(); error != ERROR_IO_PENDING) [[unlikely]]
+			{
+				throw std::runtime_error(std::format("Failed to create file write request: Error code = '0x{:X}'", error));
+			}
+		}
+
+		scopeGuardFlag.Release();
 
 		return std::shared_ptr<IWriteRequest>(std::move(request), &request->Write());
 	}

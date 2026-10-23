@@ -18,6 +18,7 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.Math;
 import PonyEngine.Memory;
+import PonyEngine.Utility;
 import PonyEngine.World;
 
 import :ComponentTable;
@@ -952,17 +953,14 @@ namespace PonyEngine::World
 			return componentTables[position->second];
 		}
 		
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		ComponentTable table = CreateComponentTable(componentType);
 		componentTables.push_back(std::move(table));
-		try
-		{
-			componentTablesIndices[componentType] = componentTables.size() - 1uz;
-		}
-		catch (...)
-		{
-			componentTables.pop_back();
-			throw;
-		}
+		const auto tablesScopeGuard = Utility::ScopeGuard([&]() noexcept { componentTables.pop_back(); }, scopeGuardFlag);
+		componentTablesIndices[componentType] = componentTables.size() - 1uz;
+
+		scopeGuardFlag.Release();
 
 		return componentTables.back();
 	}

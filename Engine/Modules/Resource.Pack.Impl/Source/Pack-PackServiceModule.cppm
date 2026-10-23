@@ -12,6 +12,7 @@ export module PonyEngine.Resource.Pack.Impl:PackServiceModule;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Utility;
 
 import :PackService;
 
@@ -43,16 +44,13 @@ namespace PonyEngine::Resource::Pack
 {
 	void PackServiceModule::StartUp(Application::IModuleContext& context)
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		packService = std::make_unique<PackService>(context.Application());
-		try
-		{
-			context.AddInterface<IPackService>(*packService);
-		}
-		catch (...)
-		{
-			packService.reset();
-			throw;
-		}
+		const auto packServiceScopeGuard = Utility::ScopeGuard([&]() noexcept { packService.reset(); }, scopeGuardFlag);
+		context.AddInterface<IPackService>(*packService);
+
+		scopeGuardFlag.Release();
 	}
 
 	void PackServiceModule::ShutDown(Application::IModuleContext& context)
