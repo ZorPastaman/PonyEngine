@@ -586,20 +586,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto request = new PackMountRequest(accessType, manifest, manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<PackMountRequest>(request, [this](const PackMountRequest* const req) noexcept
 		{
-			return std::shared_ptr<PackMountRequest>(request, [this](const PackMountRequest* const req) noexcept
-			{
-				delete req;
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete request;
+			delete req;
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<PackMountRequest>(accessType, manifest, manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
 #endif
@@ -613,20 +604,11 @@ namespace PonyEngine::Resource::Pack
 		const auto request = new FilePackMountRequest(std::move(manifestFile), std::move(dataFile), accessType,
 			std::move(manifestBuffer), manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<FilePackMountRequest>(request, [this](const FilePackMountRequest* const req) noexcept
 		{
-			return std::shared_ptr<FilePackMountRequest>(request, [this](const FilePackMountRequest* const req) noexcept
-			{
-				delete req;
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete request;
+			delete req;
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<FilePackMountRequest>(std::move(manifestFile), std::move(dataFile), accessType,
 			std::move(manifestBuffer), manifestSize, std::move(dataBuffer), dataSize, std::move(callback));
@@ -639,20 +621,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto request = new PackUnmountRequest(packHandle, std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<PackUnmountRequest>(request, [this](const PackUnmountRequest* const req) noexcept
 		{
-			return std::shared_ptr<PackUnmountRequest>(request, [this](const PackUnmountRequest* const req) noexcept
-			{
-				delete req;
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete request;
+			delete req;
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<PackUnmountRequest>(packHandle, std::move(callback));
 #endif

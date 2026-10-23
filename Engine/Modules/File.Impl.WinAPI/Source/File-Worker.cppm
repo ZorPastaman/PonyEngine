@@ -208,21 +208,11 @@ namespace PonyEngine::File
 #ifndef NDEBUG
 		const auto overlappedRequest = requestAllocator.new_object<OverlappedRequest>(params, std::move(callback), file);
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		std::shared_ptr<OverlappedRequest> request;
-		try
+		std::shared_ptr<OverlappedRequest> request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](OverlappedRequest* const req) noexcept
 		{
-			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](OverlappedRequest* const req)
-			{
-				requestAllocator.delete_object(req);
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			}, requestAllocator);
-		}
-		catch (...)
-		{
-			requestAllocator.delete_object(overlappedRequest);
+			requestAllocator.delete_object(req);
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		}, requestAllocator);
 #else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
 #endif
@@ -277,21 +267,11 @@ namespace PonyEngine::File
 #ifndef NDEBUG
 		const auto overlappedRequest = requestAllocator.new_object<OverlappedRequest>(params, std::move(callback), file);
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		std::shared_ptr<OverlappedRequest> request;
-		try
+		std::shared_ptr<OverlappedRequest> request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](OverlappedRequest* const req) noexcept
 		{
-			request = std::shared_ptr<OverlappedRequest>(overlappedRequest, [this](OverlappedRequest* const req)
-			{
-				requestAllocator.delete_object(req);
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			}, requestAllocator);
-		}
-		catch (...)
-		{
-			requestAllocator.delete_object(overlappedRequest);
+			requestAllocator.delete_object(req);
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		}, requestAllocator);
 #else
 		std::shared_ptr<OverlappedRequest> request = std::allocate_shared<OverlappedRequest>(requestAllocator, params, std::move(callback), file);
 #endif

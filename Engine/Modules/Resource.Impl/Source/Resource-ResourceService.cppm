@@ -659,20 +659,11 @@ namespace PonyEngine::Resource
 #ifndef NDEBUG
 		const auto request = new CompletedResourceRequest(std::move(resource), std::move(mainResource));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<CompletedResourceRequest>(request, [this](const CompletedResourceRequest* const req) noexcept
 		{
-			return std::shared_ptr<CompletedResourceRequest>(request, [this](const CompletedResourceRequest* const req) noexcept
-			{
-				delete req;
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete request;
+			delete req;
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<CompletedResourceRequest>(std::move(resource), std::move(mainResource));
 #endif
@@ -684,20 +675,11 @@ namespace PonyEngine::Resource
 #ifndef NDEBUG
 		const auto request = new OngoingResourceRequest(std::move(loadProcess), std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<OngoingResourceRequest>(request, [this](const OngoingResourceRequest* const req) noexcept
 		{
-			return std::shared_ptr<OngoingResourceRequest>(request, [this](const OngoingResourceRequest* const req) noexcept
-			{
-				delete req;
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete request;
+			delete req;
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<OngoingResourceRequest>(std::move(loadProcess), std::move(callback));
 #endif

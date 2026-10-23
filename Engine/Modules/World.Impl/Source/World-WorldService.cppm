@@ -138,20 +138,11 @@ namespace PonyEngine::World
 #ifndef NDEBUG
 		const auto world = new World(*application, typeRegistry);
 		worldCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<World>(world, [this](const World* const worldToDestroy) noexcept
 		{
-			return std::shared_ptr<World>(world, [this](const World* const worldToDestroy) noexcept
-				{
-					delete worldToDestroy;
-					worldCount.fetch_sub(1uz, std::memory_order::relaxed);
-				});
-		}
-		catch (...)
-		{
-			delete world;
+			delete worldToDestroy;
 			worldCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<World>(*application, typeRegistry);
 #endif

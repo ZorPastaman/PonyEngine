@@ -539,20 +539,11 @@ namespace PonyEngine::Resource::World
 #ifndef NDEBUG
 		const auto resource = new PonyEngine::World::WorldDefinition();
 		worldDefinitionResourceCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<PonyEngine::World::WorldDefinition>(resource, [this](const PonyEngine::World::WorldDefinition* const worldDefinition) noexcept
 		{
-			return std::shared_ptr<PonyEngine::World::WorldDefinition>(resource, [this](const PonyEngine::World::WorldDefinition* const worldDefinition) noexcept
-			{
-				delete worldDefinition;
-				worldDefinitionResourceCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete resource;
+			delete worldDefinition;
 			worldDefinitionResourceCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<PonyEngine::World::WorldDefinition>();
 #endif

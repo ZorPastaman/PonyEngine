@@ -129,21 +129,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto rawRequest = requestAllocator.new_object<FileLoadableDataAccessRequest>(params, std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		std::shared_ptr<FileLoadableDataAccessRequest> request;
-		try
+		std::shared_ptr<FileLoadableDataAccessRequest> request = std::shared_ptr<FileLoadableDataAccessRequest>(rawRequest, [this](FileLoadableDataAccessRequest* const req) noexcept
 		{
-			request = std::shared_ptr<FileLoadableDataAccessRequest>(rawRequest, [this](FileLoadableDataAccessRequest* const req)
-			{
-				requestAllocator.delete_object(req);
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			}, requestAllocator);
-		}
-		catch (...)
-		{
-			requestAllocator.delete_object(rawRequest);
+			requestAllocator.delete_object(req);
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		}, requestAllocator);
 #else
 		auto request = std::allocate_shared<FileLoadableDataAccessRequest>(requestAllocator, params, std::move(callback));
 #endif
@@ -201,21 +191,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto memoryRequest = requestAllocator.new_object<LoadableDataAccessRequest>(params, std::move(callback));
 		requestCount.fetch_add(1uz, std::memory_order::relaxed);
-		std::shared_ptr<LoadableDataAccessRequest> request;
-		try
+		std::shared_ptr<LoadableDataAccessRequest> request = std::shared_ptr<LoadableDataAccessRequest>(memoryRequest, [this](LoadableDataAccessRequest* const req) noexcept
 		{
-			request = std::shared_ptr<LoadableDataAccessRequest>(memoryRequest, [this](LoadableDataAccessRequest* const req)
-			{
-				requestAllocator.delete_object(req);
-				requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			}, requestAllocator);
-		}
-		catch (...)
-		{
-			requestAllocator.delete_object(memoryRequest);
+			requestAllocator.delete_object(req);
 			requestCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		}, requestAllocator);
 #else
 		auto request = std::allocate_shared<LoadableDataAccessRequest>(requestAllocator, params, std::move(callback));
 #endif

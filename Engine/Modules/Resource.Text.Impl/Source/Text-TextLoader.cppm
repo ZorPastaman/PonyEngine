@@ -177,20 +177,11 @@ namespace PonyEngine::Resource::Text
 #ifndef NDEBUG
 		const auto resource = new TextResource(std::move(textData), textView);
 		textResourceCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<TextResource>(resource, [this](const TextResource* const text) noexcept
 		{
-			return std::shared_ptr<TextResource>(resource, [this](const TextResource* const text) noexcept
-			{
-				delete text;
-				textResourceCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete resource;
+			delete text;
 			textResourceCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<TextResource>(std::move(textData), textView);
 #endif

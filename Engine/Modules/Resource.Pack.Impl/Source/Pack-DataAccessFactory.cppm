@@ -100,20 +100,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto access = new FileLoadableDataAccess(*requestWorker, std::move(dataFile), offset, size);
 		accessCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<FileLoadableDataAccess>(access, [this](const FileLoadableDataAccess* const dataAccess) noexcept
 		{
-			return std::shared_ptr<FileLoadableDataAccess>(access, [this](const FileLoadableDataAccess* const dataAccess) noexcept
-			{
-				delete dataAccess;
-				accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete access;
+			delete dataAccess;
 			accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<FileLoadableDataAccess>(*requestWorker, std::move(dataFile), offset, size);
 #endif
@@ -125,20 +116,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto access = new MemoryLoadableDataAccess(*requestWorker, std::move(loadedData), offset, size);
 		accessCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<MemoryLoadableDataAccess>(access, [this](const MemoryLoadableDataAccess* const dataAccess) noexcept
 		{
-			return std::shared_ptr<MemoryLoadableDataAccess>(access, [this](const MemoryLoadableDataAccess* const dataAccess) noexcept
-			{
-				delete dataAccess;
-				accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete access;
+			delete dataAccess;
 			accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<MemoryLoadableDataAccess>(*requestWorker, std::move(loadedData), offset, size);
 #endif
@@ -149,20 +131,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto access = new FileDataAccess(std::move(path), offset, size);
 		accessCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<FileDataAccess>(access, [this](const FileDataAccess* const dataAccess) noexcept
 		{
-			return std::shared_ptr<FileDataAccess>(access, [this](const FileDataAccess* const dataAccess) noexcept
-			{
-				delete dataAccess;
-				accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete access;
+			delete dataAccess;
 			accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<FileDataAccess>(std::move(path), offset, size);
 #endif
@@ -174,20 +147,11 @@ namespace PonyEngine::Resource::Pack
 #ifndef NDEBUG
 		const auto access = new MemoryDataAccess(std::move(loadedData), offset, size);
 		accessCount.fetch_add(1uz, std::memory_order::relaxed);
-		try
+		return std::shared_ptr<MemoryDataAccess>(access, [this](const MemoryDataAccess* const dataAccess) noexcept
 		{
-			return std::shared_ptr<MemoryDataAccess>(access, [this](const MemoryDataAccess* const dataAccess) noexcept
-			{
-				delete dataAccess;
-				accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			});
-		}
-		catch (...)
-		{
-			delete access;
+			delete dataAccess;
 			accessCount.fetch_sub(1uz, std::memory_order::relaxed);
-			throw;
-		}
+		});
 #else
 		return std::make_shared<MemoryDataAccess>(std::move(loadedData), offset, size);
 #endif

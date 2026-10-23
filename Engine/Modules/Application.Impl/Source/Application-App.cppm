@@ -632,23 +632,11 @@ namespace PonyEngine::Application
 		}
 
 		Buffer* const buffer = bufferAllocator.new_object<Buffer>(std::move(bufferData));
-
-		std::shared_ptr<IBuffer> answer;
-		try
-		{
-			answer = std::shared_ptr<Buffer>(buffer, BufferDeleter{.application = this}, bufferControlAllocator);
-		}
-		catch (...)
-		{
-			bufferAllocator.delete_object(buffer);
-			throw;
-		}
-
 #ifndef NDEBUG
 		bufferCount.fetch_add(1uz, std::memory_order::relaxed);
 #endif
 
-		return answer;
+		return std::shared_ptr<Buffer>(buffer, BufferDeleter{.application = this}, bufferControlAllocator);
 	}
 
 	std::span<const std::string_view> App::ThreadRoles() const noexcept
@@ -1296,7 +1284,6 @@ namespace PonyEngine::Application
 		}
 
 		bufferAllocator.delete_object(&buffer);
-
 #ifndef NDEBUG
 		bufferCount.fetch_sub(1uz, std::memory_order::relaxed);
 #endif
