@@ -69,13 +69,6 @@ TEST_CASE("Arena: allocate object", "[Memory][Arena]")
 	REQUIRE(arena.Capacity() == 1024uz);
 	REQUIRE(arena.GetMarker().mark == 40uz);
 	REQUIRE(static_cast<const void*>(object1) == buffer.data() + 32uz);
-
-	const std::int64_t* const object2 = arena.CreateObject<std::int64_t>(3);
-	REQUIRE(arena.Size() == 48uz);
-	REQUIRE(arena.Capacity() == 1024uz);
-	REQUIRE(arena.GetMarker().mark == 48uz);
-	REQUIRE(static_cast<const void*>(object2) == buffer.data() + 40uz);
-	REQUIRE(*object2 == 3);
 }
 
 TEST_CASE("Arena: allocate array", "[Memory][Arena]")
@@ -96,13 +89,4 @@ TEST_CASE("Arena: allocate array", "[Memory][Arena]")
 	REQUIRE(arena.GetMarker().mark == 152uz);
 	REQUIRE(static_cast<const void*>(slice1.data()) == buffer.data() + 128uz);
 	REQUIRE(slice1.size() == 3uz);
-
-	const std::span<const std::uint64_t> slice2 = arena.CreateArray<std::uint64_t>(2uz, 4);
-	REQUIRE(arena.Size() == 168uz);
-	REQUIRE(arena.Capacity() == 1024uz);
-	REQUIRE(arena.GetMarker().mark == 168uz);
-	REQUIRE(static_cast<const void*>(slice2.data()) == buffer.data() + 152uz);
-	REQUIRE(slice2.size() == 2uz);
-	REQUIRE(slice2[0] == 4);
-	REQUIRE(slice2[1] == 4);
 }

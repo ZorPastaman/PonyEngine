@@ -119,7 +119,8 @@ Basic utilities.
 
 Utilities:
 - [Concepts](Source/Utility-Concepts.cppm) - basic concepts;
-- [Overload](Source/Utility-Overload.cppm) - overload pattern implementation.
+- [Overload](Source/Utility-Overload.cppm) - overload pattern implementation;
+- [ScopeGuard](Source/Utility-ScopeGuard.cppm) - scope guard implementation.
 
 ## C\++ headers
 

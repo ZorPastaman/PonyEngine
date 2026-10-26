@@ -29,7 +29,7 @@ namespace PonyEngine::Memory
 	template<typename T, typename Prev>
 	constexpr std::size_t CalculateBufferSize(const std::size_t count) noexcept
 	{
-		const std::size_t alignmentShift = Math::DifferenceClamp(alignof(T), alignof(Prev)) & (static_cast<std::size_t>(count == 0uz) - 1uz);
+		const std::size_t alignmentShift = count != 0uz ? Math::DifferenceClamp(alignof(T), alignof(Prev)) : 0uz;
 		return count * sizeof(T) + alignmentShift;
 	}
 }

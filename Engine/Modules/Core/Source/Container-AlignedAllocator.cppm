@@ -97,7 +97,7 @@ namespace PonyEngine::Container
 			throw std::bad_array_new_length();
 		}
 
-		return static_cast<T*>(operator new[](n * sizeof(T), std::align_val_t{ alignment }));
+		return static_cast<T*>(operator new[](n * sizeof(T), std::align_val_t{alignment}));
 	}
 
 	template<typename T>
