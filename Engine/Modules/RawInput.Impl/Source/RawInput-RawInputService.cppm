@@ -48,9 +48,6 @@ export namespace PonyEngine::RawInput
 		virtual float Value(Axis axis, DeviceHandle deviceHandle) const noexcept override;
 
 		[[nodiscard("Pure function")]] 
-		virtual DeviceHandle LastInputDevice() const noexcept override;
-
-		[[nodiscard("Pure function")]] 
 		virtual std::size_t DeviceCount() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual DeviceHandle Device(std::size_t index) const noexcept override;
@@ -187,7 +184,6 @@ export namespace PonyEngine::RawInput
 
 		std::vector<DeviceHandleVersion> deviceHandleVersions; ///< Device handle versions.
 		std::vector<DeviceHandleID> deadDeviceHandleIds; ///< Device handle IDs.
-		DeviceHandle lastInputDevice; ///< Last device that sent input.
 
 		std::unordered_map<std::uint64_t, std::vector<std::string>> axisHashMap; ///< Input axis hash map. It has a hash and a vector that is synced by index.
 		std::unordered_map<struct DeviceType, std::string> deviceTypeHashMap; ///< Device type hash map.
@@ -222,12 +218,6 @@ namespace PonyEngine::RawInput
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
 		return devices.Value(axis, devices.IndexOf(deviceHandle.id));
-	}
-
-	DeviceHandle RawInputService::LastInputDevice() const noexcept
-	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
-		return lastInputDevice;
 	}
 
 	std::size_t RawInputService::DeviceCount() const noexcept
@@ -474,11 +464,6 @@ namespace PonyEngine::RawInput
 
 		ObserveDeviceRemoved(deviceHandle);
 
-		if (lastInputDevice == deviceHandle)
-		{
-			lastInputDevice = DeviceHandle{};
-		}
-
 		inputQueue.Remove(deviceHandle.id);
 		devices.Remove(deviceIndex);
 		KillDeviceHandle(deviceHandle);
@@ -548,7 +533,6 @@ namespace PonyEngine::RawInput
 					{
 						devices.Value(deviceIndex, inputEvent.axes[axisIndex], inputEvent.values[axisIndex], inputEvent.eventType);
 					}
-					lastInputDevice = deviceHandle;
 
 					ObserveInput(deviceHandle, inputEvent);
 				},

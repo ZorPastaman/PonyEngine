@@ -42,14 +42,6 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]]
 		virtual float Value(Axis axis, DeviceHandle deviceHandle) const noexcept = 0;
 
-		/// @brief Gets a last device reported its input.
-		/// @return Last input device.
-		/// @remark The value is updated each frame. If no device reported an input this frame, the return value is invalid.
-		/// @remark If the last input device was unregistered, the return value is invalid.
-		/// @note The function must be called on a main thread.
-		[[nodiscard("Pure function")]]
-		virtual DeviceHandle LastInputDevice() const noexcept = 0;
-
 		/// @brief Gets the device count.
 		/// @return Device count.
 		/// @note The function must be called on a main thread.
