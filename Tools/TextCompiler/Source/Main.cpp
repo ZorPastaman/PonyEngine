@@ -371,7 +371,7 @@ void CompileData(const std::string_view inputPath, const std::string_view output
 
 	output.write(DataMagicWord.data(), DataMagicWord.size());
 
-	constexpr std::uint8_t typeSize = TextResourceType.size();
+	constexpr std::uint8_t typeSize = static_cast<std::uint8_t>(TextResourceType.size());
 	output.write(reinterpret_cast<const char*>(&typeSize), sizeof(typeSize));
 	output.write(TextResourceType.data(), typeSize);
 

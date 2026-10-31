@@ -339,7 +339,7 @@ void Compile(const Command& command)
 
 	output.write(DataMagicWord.data(), DataMagicWord.size());
 
-	constexpr std::uint8_t typeSize = WorldDefinitionResourceType.size();
+	constexpr std::uint8_t typeSize = static_cast<std::uint8_t>(WorldDefinitionResourceType.size());
 	output.write(reinterpret_cast<const char*>(&typeSize), sizeof(typeSize));
 	output.write(WorldDefinitionResourceType.data(), typeSize);
 
@@ -378,7 +378,7 @@ void Compile(const Command& command)
 			throw std::runtime_error(std::format("Component type '{}' is too long", type));
 		}
 
-		const std::uint8_t length = type.size();
+		const std::uint8_t length = static_cast<std::uint8_t>(type.size());
 		output.write(reinterpret_cast<const char*>(&length), sizeof(length));
 	}
 
@@ -396,7 +396,7 @@ void Compile(const Command& command)
 			throw std::runtime_error(std::format("Object type '{}' is too long", type));
 		}
 
-		const std::uint8_t length = type.size();
+		const std::uint8_t length = static_cast<std::uint8_t>(type.size());
 		output.write(reinterpret_cast<const char*>(&length), sizeof(length));
 	}
 

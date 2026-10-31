@@ -243,13 +243,24 @@
 		{
 			"name": "Tools-Debug",
 			"inherits": "Tools",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug"
 			}
 		},
 		{
+			"name": "Tools-Optimized",
+			"inherits": "Tools",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"PONY_ENGINE_OPTIMIZED_DEBUG": true
+			}
+		},
+		{
 			"name": "Tools-Release",
 			"inherits": "Tools",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
 			}
@@ -257,9 +268,39 @@
 		{
 			"name": "Tools-Shipping",
 			"inherits": "Tools",
+			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release"
 			}
+		},
+		{
+			"name": "Tools-Windows",
+			"hidden": true
+		},
+		{
+			"name": "Tools-Windows-MSVC",
+			"hidden": true,
+			"toolchainFile": "CMake/Toolchains/Windows-MSVC.cmake"
+		},
+		{
+			"name": "T-Win-MSVC-Deb",
+			"displayName": "Tools: Windows MSVC - Debug",
+			"inherits": [ "Tools-Debug", "Tools-Windows-MSVC" ]
+		},
+		{
+			"name": "T-Win-MSVC-Opt",
+			"displayName": "Tools: Windows MSVC - Optimized",
+			"inherits": [ "Tools-Optimized", "Tools-Windows-MSVC" ]
+		},
+		{
+			"name": "T-Win-MSVC-Rel",
+			"displayName": "Tools: Windows MSVC - Release",
+			"inherits": [ "Tools-Release", "Tools-Windows-MSVC" ]
+		},
+		{
+			"name": "T-Win-MSVC-Shi",
+			"displayName": "Tools: Windows MSVC - Shipping",
+			"inherits": [ "Tools-Shipping", "Tools-Windows-MSVC" ]
 		}
 	],
 	"buildPresets": [
@@ -304,19 +345,24 @@
 			"configurePreset": "R-Win-GUI-MSVC-Shi"
 		},
 		{
-			"name": "Tools-Debug",
-			"displayName": "Tools - Debug",
-			"configurePreset": "Tools-Debug"
+			"name": "T-Win-MSVC-Deb",
+			"displayName": "Tools: Windows MSVC - Debug",
+			"configurePreset": "T-Win-MSVC-Deb"
 		},
 		{
-			"name": "Tools-Release",
-			"displayName": "Tools - Release",
-			"configurePreset": "Tools-Release"
+			"name": "T-Win-MSVC-Opt",
+			"displayName": "Tools: Windows MSVC - Optimized",
+			"configurePreset": "T-Win-MSVC-Opt"
 		},
 		{
-			"name": "Tools-Shipping",
-			"displayName": "Tools - Shipping",
-			"configurePreset": "Tools-Shipping"
+			"name": "T-Win-MSVC-Rel",
+			"displayName": "Tools: Windows MSVC - Release",
+			"configurePreset": "T-Win-MSVC-Rel"
+		},
+		{
+			"name": "T-Win-MSVC-Shi",
+			"displayName": "Tools: Windows MSVC - Shipping",
+			"configurePreset": "T-Win-MSVC-Shi"
 		}
 	],
 	"testPresets": [
