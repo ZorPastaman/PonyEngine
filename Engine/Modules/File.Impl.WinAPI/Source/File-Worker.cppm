@@ -100,7 +100,7 @@ export namespace PonyEngine::File
 		std::atomic_bool running; ///< Should the worker run?
 
 #ifndef NDEBUG
-		mutable std::atomic_size_t requestCount;
+		mutable std::atomic_size_t requestCount; ///< File request count.
 #endif
 
 		static_assert(std::atomic_bool::is_always_lock_free, "bool is not lock-free.");
@@ -183,16 +183,12 @@ namespace PonyEngine::File
 
 	void Worker::AssociateFile(const HANDLE file) const
 	{
-		PONY_LOG(logService, Log::LogType::Debug, "Associating file with iocp... File handle: '0x{:X}'; IOCP: '0x{:X}'.",
+		PONY_LOG(logService, Log::LogType::Debug, "Associating file with iocp. File handle: '0x{:X}'; IOCP: '0x{:X}'.",
 			reinterpret_cast<std::uintptr_t>(file), reinterpret_cast<std::uintptr_t>(iocp));
-
 		if (!CreateIoCompletionPort(file, iocp, 0, 0)) [[unlikely]]
 		{
 			throw std::runtime_error(std::format("Failed to create file iocp association: Error code = '0x{:X}'", GetLastError()));
 		}
-
-		PONY_LOG(logService, Log::LogType::Debug, "Associating file with iocp done. File handle: '0x{:X}'; IOCP: '0x{:X}'.",
-			reinterpret_cast<std::uintptr_t>(file), reinterpret_cast<std::uintptr_t>(iocp));
 	}
 
 	std::shared_ptr<IReadRequest> Worker::MakeRequest(const ReadParams& params, std::move_only_function<void(const IReadRequest&) noexcept> callback, const HANDLE file) const
