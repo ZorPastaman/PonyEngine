@@ -215,15 +215,18 @@ namespace PonyEngine::World
 		{
 			assert(Contains(entity) && "The entity wasn't added.");
 
-			if (const EntityID denseIndexToRemove = sparse[entity]; denseIndexToRemove != --denseSize) [[likely]]
+			const EntityID lastDenseIndex = denseSize - 1u;
+
+			if (const EntityID denseIndexToRemove = sparse[entity]; denseIndexToRemove != lastDenseIndex) [[likely]]
 			{
-				const EntityID lastEntity = entities[denseSize];
+				const EntityID lastEntity = entities[lastDenseIndex];
 				entities[denseIndexToRemove] = lastEntity;
-				std::memcpy(Component(denseIndexToRemove), Component(denseSize), componentSize);
+				std::memcpy(Component(denseIndexToRemove), Component(lastDenseIndex), componentSize);
 				sparse[lastEntity] = denseIndexToRemove;
 			}
 
 			sparse[entity] = std::numeric_limits<EntityID>::max();
+			denseSize = lastDenseIndex;
 		}
 	}
 
