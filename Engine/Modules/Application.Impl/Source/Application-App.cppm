@@ -24,6 +24,7 @@ import PonyEngine.Chrono;
 import PonyEngine.Container;
 import PonyEngine.Format;
 import PonyEngine.Log;
+import PonyEngine.Thread;
 import PonyEngine.Utility;
 
 import :Buffer;
@@ -808,12 +809,7 @@ namespace PonyEngine::Application
 		assert(!exitCode && "The exit code is set.");
 
 		const std::chrono::time_point<std::chrono::steady_clock> target = NextFrameTimePoint();
-		std::chrono::time_point<std::chrono::steady_clock> now;
-		do
-		{
-			now = NowTimePoint();
-		} while (now < target);
-
+		const std::chrono::time_point<std::chrono::steady_clock> now = Thread::SpinUntil(target);
 		++frameCount;
 		prevFrameTimePoint = thisFrameTimePoint;
 		thisFrameTimePoint = now;

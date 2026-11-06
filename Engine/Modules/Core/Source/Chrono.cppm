@@ -9,4 +9,5 @@
 
 export module PonyEngine.Chrono;
 
+export import :Concepts;
 export import :Conversion;
