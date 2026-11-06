@@ -13,7 +13,7 @@ import std;
 
 /// @brief Formatter of std::optional.
 /// @tparam T Underlying type.
-export template<typename T>
+template<typename T>
 struct std::formatter<std::optional<T>, char>
 {
 private:

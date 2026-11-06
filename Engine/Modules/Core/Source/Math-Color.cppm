@@ -694,7 +694,7 @@ export namespace PonyEngine::Math
 /// @tparam SecondChannel Second channel.
 /// @tparam ThirdChannel Third channel.
 /// @tparam FourthChannel Fourth channel.
-export template<PonyEngine::Math::ColorChannelType T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>
+template<PonyEngine::Math::ColorChannelType T, PonyEngine::Math::ColorChannel FirstChannel, PonyEngine::Math::ColorChannel SecondChannel, PonyEngine::Math::ColorChannel ThirdChannel, PonyEngine::Math::ColorChannel FourthChannel>
 struct std::formatter<PonyEngine::Math::Color<T, FirstChannel, SecondChannel, ThirdChannel, FourthChannel>, char>
 {
 private:

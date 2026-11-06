@@ -635,7 +635,7 @@ export namespace PonyEngine::Math
 /// @details The format is ":<range_args>:<component_args>". The default brackets are (). The default separator is ", ".
 /// @tparam T Component type.
 /// @tparam Size Component count.
-export template<PonyEngine::Utility::Arithmetic T, std::size_t Size>
+template<PonyEngine::Utility::Arithmetic T, std::size_t Size>
 struct std::formatter<PonyEngine::Math::Vector<T, Size>, char>
 {
 private:

@@ -18,7 +18,7 @@ import std;
 /// @brief COM GUID formatter.
 /// @details The format is ":<guid_args>". The default brackets are {}.
 ///          Guid args: n - no brackets.
-export template<>
+template<>
 struct std::formatter<GUID, char>
 {
 private:

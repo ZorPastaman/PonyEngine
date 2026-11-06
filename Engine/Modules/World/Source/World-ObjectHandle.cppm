@@ -179,7 +179,7 @@ namespace PonyEngine::World
 	}
 }
 
-export template<>
+template<>
 struct std::hash<PonyEngine::World::TypelessObjectHandle> final
 {
 	[[nodiscard("Pure function")]]
@@ -189,7 +189,7 @@ struct std::hash<PonyEngine::World::TypelessObjectHandle> final
 	}
 };
 
-export template<typename T>
+template<typename T>
 struct std::hash<PonyEngine::World::ObjectHandle<T>> final
 {
 	[[nodiscard("Pure function")]]

@@ -89,7 +89,7 @@ namespace PonyEngine::RawInput
 	}
 }
 
-export template<>
+template<>
 struct std::hash<PonyEngine::RawInput::DeviceType> final
 {
 	[[nodiscard("Pure operator")]]

@@ -572,7 +572,7 @@ export namespace PonyEngine::Math
 /// @tparam T Component type.
 /// @tparam RowSize Row count.
 /// @tparam ColumnSize Column count.
-export template<PonyEngine::Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
+template<PonyEngine::Utility::Arithmetic T, std::size_t RowSize, std::size_t ColumnSize>
 struct std::formatter<PonyEngine::Math::Matrix<T, RowSize, ColumnSize>, char>
 {
 private:

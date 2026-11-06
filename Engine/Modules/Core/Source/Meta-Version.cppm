@@ -117,7 +117,7 @@ export namespace PonyEngine::Meta
 /// @brief Version formatter.
 /// @details The format is ":<version_args>".
 ///          Version args: n[1:4] - version number count.
-export template<>
+template<>
 struct std::formatter<PonyEngine::Meta::Version, char>
 {
 private:

@@ -358,7 +358,7 @@ export namespace PonyEngine::Math
 /// @brief Quaternion formatter.
 /// @details It's just a wrapper over the vector formatter.
 /// @tparam T Component type.
-export template<std::floating_point T>
+template<std::floating_point T>
 struct std::formatter<PonyEngine::Math::Quaternion<T>, char>
 {
 private:

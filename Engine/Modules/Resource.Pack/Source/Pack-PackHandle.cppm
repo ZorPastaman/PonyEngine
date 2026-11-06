@@ -93,7 +93,7 @@ namespace PonyEngine::Resource::Pack
 	}
 }
 
-export template<>
+template<>
 struct std::hash<PonyEngine::Resource::Pack::PackHandle> final
 {
 	[[nodiscard("Pure function")]]

@@ -93,7 +93,7 @@ namespace PonyEngine::RawInput
 	}
 }
 
-export template<>
+template<>
 struct std::hash<PonyEngine::RawInput::DeviceHandle> final
 {
 	[[nodiscard("Pure function")]]

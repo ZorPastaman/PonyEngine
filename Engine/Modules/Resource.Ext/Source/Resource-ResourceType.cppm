@@ -89,7 +89,7 @@ namespace PonyEngine::Resource
 	}
 }
 
-export template<>
+template<>
 struct std::hash<PonyEngine::Resource::ResourceType> final
 {
 	[[nodiscard("Pure function")]]

@@ -93,7 +93,7 @@ namespace PonyEngine::World
 	}
 }
 
-export template<>
+template<>
 struct std::hash<PonyEngine::World::Entity> final
 {
 	[[nodiscard("Pure function")]]
