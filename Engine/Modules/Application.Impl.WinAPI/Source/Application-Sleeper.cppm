@@ -77,7 +77,7 @@ namespace PonyEngine::Application
 		const auto waitTime = LARGE_INTEGER{.QuadPart = -intervals};
 		if (!SetWaitableTimer(timer, &waitTime, 0, nullptr, nullptr, false)) [[unlikely]]
 		{
-			throw std::runtime_error(std::format("Failed to set timer. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to set timer: Error code = '0x{:X}'", GetLastError()));
 		}
 
 		switch (const DWORD result = WaitForSingleObject(timer, INFINITE))
@@ -85,9 +85,9 @@ namespace PonyEngine::Application
 		case WAIT_OBJECT_0: [[likely]]
 			return;
 		case WAIT_FAILED: [[unlikely]]
-			throw std::runtime_error(std::format("Failed to wait for timer. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(std::format("Failed to wait for timer: Error code = '0x{:X}'", GetLastError()));
 		default: [[unlikely]]
-			throw std::runtime_error(std::format("Failed to wait for timer. Result: '0x{:X}'.", result));
+			throw std::runtime_error(std::format("Failed to wait for timer: Result = '0x{:X}'", result));
 		}
 	}
 }

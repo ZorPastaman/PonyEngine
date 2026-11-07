@@ -78,6 +78,9 @@ export namespace PonyEngine::Application
 		App& Application() const noexcept;
 
 	private:
+		[[nodiscard("Pure function")]]
+		virtual MemoryStatus GetMemoryStatus() const override;
+
 		[[nodiscard("Pure function")]] 
 		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params) override final;
 
@@ -189,6 +192,22 @@ namespace PonyEngine::Application
 	App& Process::Application() const noexcept
 	{
 		return *application;
+	}
+
+	MemoryStatus Process::GetMemoryStatus() const
+	{
+		auto memoryStatus = MEMORYSTATUSEX{.dwLength = sizeof(MEMORYSTATUSEX)};
+		if (!GlobalMemoryStatusEx(&memoryStatus)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get memory status: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		return MemoryStatus
+		{
+			.physicalMemory = MemoryInfo{.total = memoryStatus.ullTotalPhys, .available = memoryStatus.ullAvailPhys},
+			.commitMemory = MemoryInfo{.total = memoryStatus.ullTotalPageFile, .available = memoryStatus.ullAvailPageFile},
+			.virtualMemory = MemoryInfo{.total = memoryStatus.ullTotalVirtual, .available = memoryStatus.ullAvailVirtual}
+		};
 	}
 
 	std::thread Process::CreateThread(std::move_only_function<void()> func, ThreadParams params)
