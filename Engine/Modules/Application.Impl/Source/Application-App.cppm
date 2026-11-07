@@ -814,7 +814,7 @@ namespace PonyEngine::Application
 		thisFrameTimePoint = now;
 
 		PONY_LOG(logService, Log::LogType::Verbose, "New frame began. Frame: '{}'; Time point: '{}'; Target time point: '{}'; Diff: '{}'.", 
-			frameCount, thisFrameTimePoint.time_since_epoch(), target.time_since_epoch(), thisFrameTimePoint - target);
+			frameCount, thisFrameTimePoint - startTimePoint, target - startTimePoint, thisFrameTimePoint - target);
 	}
 
 	void App::EndFrame()
