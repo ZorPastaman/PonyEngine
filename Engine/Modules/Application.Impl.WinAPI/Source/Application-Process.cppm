@@ -25,11 +25,11 @@ export module PonyEngine.Application.Impl.WinAPI:Process;
 import std;
 
 import PonyEngine.Application.Impl;
-import PonyEngine.Chrono;
 import PonyEngine.FileSystem.WinAPI;
 import PonyEngine.Log;
 import PonyEngine.Utility;
 
+import :Sleeper;
 import :ThreadRole;
 
 export namespace PonyEngine::Application
@@ -41,7 +41,7 @@ export namespace PonyEngine::Application
 		Process(const Process&) = delete;
 		Process(Process&&) = delete;
 
-		virtual ~Process() noexcept = default;
+		virtual ~Process() noexcept;
 
 		/// @brief Runs the process.
 		/// @return Exit code.
@@ -80,6 +80,9 @@ export namespace PonyEngine::Application
 	private:
 		[[nodiscard("Pure function")]] 
 		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params) override final;
+
+		[[nodiscard("Pure function")]] 
+		virtual std::shared_ptr<ISleeper> CreateSleeper() override;
 
 		/// @brief Gets a list of thread roles.
 		/// @return Thread roles.
@@ -146,28 +149,32 @@ export namespace PonyEngine::Application
 		/// @brief Reverts the main thread mmcss if it's set.
 		void RevertMainThreadMmcss() noexcept;
 
-		/// @brief Creates a main loop timer.
-		void CreateMainLoopTimer() noexcept;
-		/// @brief Destroys a main loop timer.
-		void DestroyMainLoopTimer() noexcept;
-		/// @brief Waits for the next frame to start.
-		void WaitForNextFrame() const noexcept;
-
 		HANDLE mainThreadMmcss; ///< Main thread mmcss.
-		HANDLE mainThreadTimer; ///< Main loop timer handle.
-
 		std::unique_ptr<App> application; ///< Application.
+
+#ifndef NDEBUG
+		std::atomic_size_t sleeperCount; ///< Sleeper count.
+#endif
 	};
 }
 
 namespace PonyEngine::Application
 {
 	Process::Process(const std::span<const std::string_view> commandLine) :
+#ifndef NDEBUG
+		sleeperCount(0uz),
+#endif
 		mainThreadMmcss{nullptr},
-		mainThreadTimer{nullptr},
 		application(std::make_unique<App>(commandLine, GetThreadRoles(), GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), GetTempDataDirectory(), 
 			static_cast<IProcess&>(*this)))
 	{
+	}
+
+	Process::~Process() noexcept
+	{
+#ifndef NDEBUG
+		assert(sleeperCount.load(std::memory_order::relaxed) == 0uz && "Some sleepers weren't destroyed.");
+#endif
 	}
 
 	int Process::Run()
@@ -235,6 +242,21 @@ namespace PonyEngine::Application
 				}
 			}
 		});
+	}
+
+	std::shared_ptr<ISleeper> Process::CreateSleeper()
+	{
+#ifndef NDEBUG
+		const auto sleeper = new Sleeper();
+		sleeperCount.fetch_add(1uz, std::memory_order::relaxed);
+		return std::shared_ptr<Sleeper>(sleeper, [this](const Sleeper* const sleeperToDestroy) noexcept
+		{
+			delete sleeperToDestroy;
+			sleeperCount.fetch_sub(1uz, std::memory_order::relaxed);
+		});
+#else
+		return std::make_shared<Sleeper>();
+#endif
 	}
 
 	std::vector<std::string_view> Process::GetThreadRoles()
@@ -347,8 +369,6 @@ namespace PonyEngine::Application
 		SetProcessPriority();
 		SetMainThreadRole();
 		const auto mainThreadRoleScopeGuard = Utility::ScopeGuard([&]() noexcept { RevertMainThreadMmcss(); }, scopeGuardFlag);
-		CreateMainLoopTimer();
-		const auto mainLoopTimeScopeGuard = Utility::ScopeGuard([&]() noexcept { DestroyMainLoopTimer(); }, scopeGuardFlag);
 		AddProcessInterfaces();
 		const auto processInterfacesScopeGuard = Utility::ScopeGuard([&]() noexcept { RemoveProcessInterfaces(); }, scopeGuardFlag);
 		application->InitializeNormal();
@@ -363,7 +383,6 @@ namespace PonyEngine::Application
 		application->FinalizeLate();
 		application->FinalizeNormal();
 		RemoveProcessInterfaces();
-		DestroyMainLoopTimer();
 		RevertMainThreadMmcss();
 		DestroyConsole();
 		application->FinalizeEarly();
@@ -377,7 +396,6 @@ namespace PonyEngine::Application
 		std::optional<int> exitCode;
 		do
 		{
-			WaitForNextFrame();
 			application->BeginFrame();
 			TickPlatform();
 			application->Tick();
@@ -447,66 +465,6 @@ namespace PonyEngine::Application
 				PONY_LOG(application->LogService(), Log::LogType::Error, std::current_exception(), "On reverting main thread MMCSS.");
 			}
 			mainThreadMmcss = nullptr;
-		}
-	}
-
-	void Process::CreateMainLoopTimer() noexcept
-	{
-		PONY_LOG(application->LogService(), Log::LogType::Info, "Creating main loop timer.");
-
-		mainThreadTimer = CreateWaitableTimerExA(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_MODIFY_STATE | SYNCHRONIZE);
-		if (!mainThreadTimer) [[unlikely]]
-		{
-			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to create main loop timer. Error code: '0x{:X}'.", GetLastError());
-		}
-	}
-
-	void Process::DestroyMainLoopTimer() noexcept
-	{
-		if (mainThreadTimer) [[likely]]
-		{
-			PONY_LOG(application->LogService(), Log::LogType::Info, "Destroying main loop timer.");
-
-			if (!CloseHandle(mainThreadTimer)) [[unlikely]]
-			{
-				PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to destroy main loop timer. Error code: '0x{:X}'.", GetLastError());
-			}
-
-			mainThreadTimer = nullptr;
-		}
-	}
-
-	void Process::WaitForNextFrame() const noexcept
-	{
-		if (!mainThreadTimer) [[unlikely]]
-		{
-			return;
-		}
-
-		constexpr std::chrono::nanoseconds busySpinLength = Chrono::ToDuration<std::chrono::nanoseconds>(double{PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH});
-		const std::chrono::time_point<std::chrono::steady_clock> nextFrameTimePoint = application->NextFrameTimePoint();
-		const std::chrono::time_point<std::chrono::steady_clock> waitTill = nextFrameTimePoint - busySpinLength;
-		const std::chrono::nanoseconds waitLength = std::chrono::duration_cast<std::chrono::nanoseconds>(waitTill - std::chrono::steady_clock::now());
-		const auto waitTime = LARGE_INTEGER{.QuadPart = -waitLength.count() / 100ll};
-		if (waitTime.QuadPart >= 0ll)
-		{
-			return;
-		}
-
-		if (!SetWaitableTimer(mainThreadTimer, &waitTime, 0, nullptr, nullptr, FALSE)) [[unlikely]]
-		{
-			PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to set a high resolution waitable timer. Error code: '0x{:X}'.", GetLastError());
-		}
-		if (const DWORD result = WaitForSingleObject(mainThreadTimer, INFINITE); result != WAIT_OBJECT_0) [[unlikely]]
-		{
-			if (result == WAIT_FAILED)
-			{
-				PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to wait for a high resolution waitable timer. Error code: '0x{:X}'.", GetLastError());
-			}
-			else
-			{
-				PONY_LOG(application->LogService(), Log::LogType::Error, "Failed to wait for a high resolution waitable timer. Result: '0x{:X}'.", result);
-			}
 		}
 	}
 }

@@ -13,6 +13,7 @@ export import :IApplication;
 export import :IBuffer;
 export import :IModule;
 export import :IModuleContext;
+export import :ISleeper;
 export import :ITickable;
 export import :ThreadParams;
 export import :TickOrder;

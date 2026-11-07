@@ -19,6 +19,7 @@ import PonyEngine.Chrono;
 import PonyEngine.Meta;
 
 import :IBuffer;
+import :ISleeper;
 import :ThreadParams;
 
 export namespace PonyEngine::Application
@@ -246,6 +247,27 @@ export namespace PonyEngine::Application
 		/// @note The function must be called on a main thread.
 		template<std::floating_point T> [[nodiscard("Pure function")]]
 		void TargetFrameTimeSeconds(T frameTime) noexcept;
+		/// @brief Gets a time that the main thread spins before it's started. The other portion of time it sleeps.
+		/// @return Spin length.
+		/// @note The function must be called on a main thread.
+		[[nodiscard("Pure function")]]
+		virtual std::chrono::nanoseconds NextFrameBusySpinLength() const noexcept = 0;
+		/// @brief Gets a time that the main thread spins before it's started. The other portion of time it sleeps.
+		/// @tparam T Second type.
+		/// @return Spin length in seconds.
+		/// @note The function must be called on a main thread.
+		template<std::floating_point T = double> [[nodiscard("Pure function")]]
+		T NextFrameBusySpinLengthSeconds() const noexcept;
+		/// @brief Sets a time that the main thread spins before it's started. The other portion of time it sleeps.
+		/// @param spinLength Spin length.
+		/// @note The function must be called on a main thread.
+		virtual void NextFrameBusySpinLength(std::chrono::nanoseconds spinLength) noexcept = 0;
+		/// @brief Sets a time that the main thread spins before it's started. The other portion of time it sleeps.
+		/// @tparam T Second type.
+		/// @param spinLength Spin length.
+		/// @note The function must be called on a main thread.
+		template<std::floating_point T>
+		void NextFrameBusySpinLength(T spinLength) noexcept;
 
 		/// @brief Tries to find an interface by its type.
 		/// @param type Interface type.
@@ -285,8 +307,15 @@ export namespace PonyEngine::Application
 		/// @param func Thread function.
 		/// @param params Thread parameters.
 		/// @return Thread.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params = ThreadParams{}) = 0;
+
+		/// @brief Creates a sleeper.
+		/// @return Sleeper.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<ISleeper> CreateSleeper() = 0;
 	};
 }
 
@@ -332,6 +361,18 @@ namespace PonyEngine::Application
 	void IApplication::TargetFrameTimeSeconds(const T frameTime) noexcept
 	{
 		TargetFrameTime(Chrono::ToDuration<std::chrono::nanoseconds>(frameTime));
+	}
+
+	template<std::floating_point T>
+	T IApplication::NextFrameBusySpinLengthSeconds() const noexcept
+	{
+		return Chrono::ToSeconds<T>(NextFrameBusySpinLength());
+	}
+
+	template<std::floating_point T>
+	void IApplication::NextFrameBusySpinLength(const T spinLength) noexcept
+	{
+		NextFrameBusySpinLength(Chrono::ToDuration<std::chrono::nanoseconds>(spinLength));
 	}
 
 	template<typename T>
