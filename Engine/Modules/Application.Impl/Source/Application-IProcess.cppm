@@ -28,7 +28,14 @@ export namespace PonyEngine::Application
 		/// @param func Thread function.
 		/// @param params Thread parameters.
 		/// @return Thread.
+		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::thread CreateThread(std::move_only_function<void()> func, ThreadParams params) = 0;
+
+		/// @brief Creates a sleeper.
+		/// @return Sleeper.
+		/// @note The function is thread-safe.
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<ISleeper> CreateSleeper() = 0;
 	};
 }

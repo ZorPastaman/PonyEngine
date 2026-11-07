@@ -3,7 +3,6 @@ message(STATUS "Configuring PonyEngine.Application.Impl.WinAPI modification modu
 set(PONY_ENGINE_APPLICATION_MODE "GUI" CACHE STRING "Application mode. Must be Console or GUI.")
 option(PONY_ENGINE_APPLICATION_CREATE_CONSOLE "Enable console. Can be used only in GUI builds." OFF)
 set(PONY_ENGINE_APPLICATION_PROCESS_PRIORITY "ABOVE_NORMAL_PRIORITY_CLASS" CACHE STRING "Application process priority. Must be DWORD or predefined priority class.")
-set(PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH "0.001" CACHE STRING "Amount of time in seconds that is waited on busy spin. All other time before it is waited on thread sleep. Must be double.")
 option(PONY_ENGINE_APPLICATION_ADD_DEFAULT_MANIFEST "Add default manifest." ON)
 set(PONY_ENGINE_APPLICATION_SUPPORTED_OS "8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a" CACHE STRING "Supported OS GUID. By default, it corresponds to Windows 10/11.")
 
@@ -21,6 +20,7 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 	"Source/Application.cppm"
 	"Source/Application-CommandLine.cppm"
 	"Source/Application-Process.cppm"
+	"Source/Application-Sleeper.cppm"
 )
 
 if(PONY_ENGINE_APPLICATION_ADD_DEFAULT_MANIFEST)
@@ -34,7 +34,6 @@ target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	$<$<STREQUAL:${PONY_ENGINE_APPLICATION_MODE},Console>:PONY_ENGINE_APPLICATION_MODE_CONSOLE>
 	$<$<STREQUAL:${PONY_ENGINE_APPLICATION_MODE},GUI>:PONY_ENGINE_APPLICATION_MODE_GUI>
 	PONY_ENGINE_APPLICATION_PROCESS_PRIORITY=${PONY_ENGINE_APPLICATION_PROCESS_PRIORITY}
-	PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH=${PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH}
 )
 
 if(PONY_ENGINE_APPLICATION_MODE STREQUAL "Console")

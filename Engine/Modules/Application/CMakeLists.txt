@@ -14,6 +14,7 @@ target_sources(PonyEngine.Application PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Application-IBuffer.cppm"
 	"Source/Application-IModule.cppm"
 	"Source/Application-IModuleContext.cppm"
+	"Source/Application-ISleeper.cppm"
 	"Source/Application-ITickable.cppm"
 	"Source/Application-ThreadParams.cppm"
 	"Source/Application-TickOrder.cppm"

@@ -4,6 +4,7 @@ include("CMake/Module.cmake")
 
 set(PONY_ENGINE_APPLICATION_ROOT_PATH "" CACHE STRING "Root path. It must be relative to an executable directory, and the folder must exist at runtime. Empty path is valid.")
 set(PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD "0.002" CACHE STRING "Application target frame period in seconds. Must be double.")
+set(PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH "0.001" CACHE STRING "Amount of time in seconds that is waited on busy spin. All other time before it is waited on thread sleep. Must be double.")
 
 add_executable(PonyEngine.Application.Impl)
 
@@ -34,6 +35,7 @@ target_compile_definitions(PonyEngine.Application.Impl PRIVATE
 	PONY_PROJECT_TITLE=${PONY_PROJECT_TITLE}
 	PONY_ENGINE_APPLICATION_ROOT_PATH=${PONY_ENGINE_APPLICATION_ROOT_PATH}
 	PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD=${PONY_ENGINE_APPLICATION_TARGET_FRAME_PERIOD}
+	PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH=${PONY_ENGINE_APPLICATION_NEXT_FRAME_BUSY_SPIN_LENGTH}
 )
 
 set_target_properties(PonyEngine.Application.Impl PROPERTIES
