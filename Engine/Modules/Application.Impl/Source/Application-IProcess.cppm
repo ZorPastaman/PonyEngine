@@ -24,6 +24,11 @@ export namespace PonyEngine::Application
 	{
 		PONY_INTERFACE_BODY(IProcess)
 
+		/// @brief Gets a current memory status.
+		/// @return Memory status.
+		[[nodiscard("Pure function")]]
+		virtual MemoryStatus GetMemoryStatus() const = 0;
+
 		/// @brief Creates a thread.
 		/// @param func Thread function.
 		/// @param params Thread parameters.

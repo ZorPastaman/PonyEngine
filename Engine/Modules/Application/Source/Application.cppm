@@ -15,5 +15,7 @@ export import :IModule;
 export import :IModuleContext;
 export import :ISleeper;
 export import :ITickable;
+export import :MemoryInfo;
+export import :MemoryStatus;
 export import :ThreadParams;
 export import :TickOrder;

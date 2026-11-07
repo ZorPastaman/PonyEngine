@@ -95,6 +95,9 @@ export namespace PonyEngine::Application
 		virtual std::span<const std::string_view> CommandLine() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual MemoryStatus GetMemoryStatus() const override;
+
+		[[nodiscard("Pure function")]]
 		virtual std::optional<int> ExitCode() const noexcept override;
 		virtual void Stop(int exitCode = 0) noexcept override;
 		[[nodiscard("Pure function")]]
@@ -524,6 +527,11 @@ namespace PonyEngine::Application
 	std::span<const std::string_view> App::CommandLine() const noexcept
 	{
 		return commandLine;
+	}
+
+	MemoryStatus App::GetMemoryStatus() const
+	{
+		return process->GetMemoryStatus();
 	}
 
 	std::optional<int> App::ExitCode() const noexcept

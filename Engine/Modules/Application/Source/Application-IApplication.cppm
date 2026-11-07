@@ -20,6 +20,7 @@ import PonyEngine.Meta;
 
 import :IBuffer;
 import :ISleeper;
+import :MemoryStatus;
 import :ThreadParams;
 
 export namespace PonyEngine::Application
@@ -127,6 +128,11 @@ export namespace PonyEngine::Application
 		/// @note The function is thread-safe.
 		[[nodiscard("Pure function")]]
 		virtual std::span<const std::string_view> CommandLine() const noexcept = 0;
+
+		/// @brief Gets a current memory status.
+		/// @return Memory status.
+		[[nodiscard("Pure function")]]
+		virtual MemoryStatus GetMemoryStatus() const = 0;
 
 		/// @brief Gets the exit code.
 		/// @return Exit code; @a std::nullopt if the application isn't stopped.
