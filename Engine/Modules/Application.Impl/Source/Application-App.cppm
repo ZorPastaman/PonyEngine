@@ -814,8 +814,6 @@ namespace PonyEngine::Application
 
 		const std::chrono::time_point<std::chrono::steady_clock> target = NextFrameTimePoint();
 		frameSleeper->SleepUntil(target - nextFrameBusySpinLength);
-		const std::chrono::time_point<std::chrono::steady_clock> timeAfterSleep = NowTimePoint();
-		PONY_LOG_IF(timeAfterSleep > target, logService, Log::LogType::Warning, "Main loop overslept. Diff: '{}'. Consider increasing next frame busy spin length.", timeAfterSleep - target);
 		const std::chrono::time_point<std::chrono::steady_clock> now = Thread::SpinUntil(target);
 		++frameCount;
 		prevFrameTimePoint = thisFrameTimePoint;
@@ -920,6 +918,11 @@ namespace PonyEngine::Application
 		{
 			PONY_LOG(logService, Log::LogType::Info, "{} v{}", EngineTitle(), EngineVersion());
 			PONY_LOG(logService, Log::LogType::Info, "{} v{}", ProjectTitle(), ProjectVersion());
+
+			const MemoryStatus memoryStatus = GetMemoryStatus();
+			PONY_LOG(logService, Log::LogType::Info, "Physical memory: '{}' ('{}' GB); Commit memory: '{}' ('{}' GB).", 
+				memoryStatus.physicalMemory.total, memoryStatus.physicalMemory.total / 1073741824ull, memoryStatus.commitMemory.total, memoryStatus.commitMemory.total / 1073741824ull);
+
 			PONY_LOG(logService, Log::LogType::Info, "Main thread ID: '{}'.", mainThreadId);
 			PONY_LOG(logService, Log::LogType::Info, "Command line:{}", MakeCommandLineString());
 
