@@ -78,6 +78,9 @@ export namespace PonyEngine::Application
 		App& Application() const noexcept;
 
 	private:
+		[[nodiscard("Pure function")]] 
+		virtual Application::ProcessID ProcessID() const noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual MemoryStatus GetMemoryStatus() const override;
 
@@ -192,6 +195,11 @@ namespace PonyEngine::Application
 	App& Process::Application() const noexcept
 	{
 		return *application;
+	}
+
+	Application::ProcessID Process::ProcessID() const noexcept
+	{
+		return GetCurrentProcessId();
 	}
 
 	MemoryStatus Process::GetMemoryStatus() const
@@ -428,7 +436,6 @@ namespace PonyEngine::Application
 	void Process::LogProcessBasicInfo() const noexcept
 	{
 		application->LogBasicInfo();
-		PONY_LOG(application->LogService(), Log::LogType::Info, "PID: '{}'.", GetCurrentProcessId());
 
 		PONY_LOG(application->LogService(), Log::LogType::Info, "Thread roles:");
 		for (const auto& [role, threadRole] : ThreadRoles)

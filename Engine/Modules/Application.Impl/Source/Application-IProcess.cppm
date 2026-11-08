@@ -24,6 +24,11 @@ export namespace PonyEngine::Application
 	{
 		PONY_INTERFACE_BODY(IProcess)
 
+		/// @brief Gets the process ID.
+		/// @return Process ID.
+		[[nodiscard("Pure function")]]
+		virtual ProcessID ProcessID() const noexcept = 0;
+
 		/// @brief Gets a current memory status.
 		/// @return Memory status.
 		[[nodiscard("Pure function")]]

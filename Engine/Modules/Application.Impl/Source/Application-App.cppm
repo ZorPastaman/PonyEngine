@@ -89,6 +89,8 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]] 
 		virtual std::filesystem::path AddPathTail(std::filesystem::path path) const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual Application::ProcessID ProcessID() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::thread::id MainThreadID() const noexcept override;
 		[[nodiscard("Pure function")]] 
@@ -519,6 +521,11 @@ namespace PonyEngine::Application
 		return AddTail(path);
 	}
 
+	Application::ProcessID App::ProcessID() const noexcept
+	{
+		return process->ProcessID();
+	}
+
 	std::thread::id App::MainThreadID() const noexcept
 	{
 		return mainThreadId;
@@ -920,9 +927,10 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Info, "{} v{}", ProjectTitle(), ProjectVersion());
 
 			const MemoryStatus memoryStatus = GetMemoryStatus();
-			PONY_LOG(logService, Log::LogType::Info, "Physical memory: '{}' ('{}' GB); Commit memory: '{}' ('{}' GB).", 
-				memoryStatus.physicalMemory.total, memoryStatus.physicalMemory.total / 1073741824ull, memoryStatus.commitMemory.total, memoryStatus.commitMemory.total / 1073741824ull);
+			PONY_LOG(logService, Log::LogType::Info, "Physical memory: '{}' ('{}' GB).",
+				memoryStatus.physicalMemory.total, memoryStatus.physicalMemory.total / 1073741824ull);
 
+			PONY_LOG(logService, Log::LogType::Info, "Process ID: '{}'.", ProcessID());
 			PONY_LOG(logService, Log::LogType::Info, "Main thread ID: '{}'.", mainThreadId);
 			PONY_LOG(logService, Log::LogType::Info, "Command line:{}", MakeCommandLineString());
 
