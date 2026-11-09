@@ -142,8 +142,8 @@ export namespace PonyEngine::Resource
 		bool finished; ///< Were the @p requests called?
 		std::mutex requestMutex; ///< Request callback mutex.
 
-		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
-		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
+		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free");
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free");
 	};
 
 	/// @brief Resource request that is used when a resource isn't alive.
@@ -188,7 +188,7 @@ export namespace PonyEngine::Resource
 
 		std::move_only_function<void(const IResourceRequest&) noexcept> callback; ///< Callback.
 
-		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free.");
+		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free");
 	};
 }
 

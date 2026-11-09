@@ -72,7 +72,7 @@ export namespace PonyEngine::Resource::Pack
 
 		std::move_only_function<void(const ILoadableDataAccessRequest&) noexcept> callback; ///< Callback.
 
-		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
+		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free");
 	};
 }
 

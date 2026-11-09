@@ -22,8 +22,8 @@ int APIENTRY WinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, c
 	try
 	{
 		const std::vector<std::string> commandLine = PonyEngine::Application::MakeCommandLine();
-		return std::make_unique<PonyEngine::Application::GUIProcess>(hInstance, hPrevInstance, lpCmdLine, nShowCmd, 
-			PonyEngine::Application::MakeCommandLineView(commandLine))->Run();
+		auto process = PonyEngine::Application::GUIProcess(hInstance, hPrevInstance, lpCmdLine, nShowCmd, PonyEngine::Application::MakeCommandLineView(commandLine));
+		return process.Run();
 	}
 	catch (const std::exception& e)
 	{

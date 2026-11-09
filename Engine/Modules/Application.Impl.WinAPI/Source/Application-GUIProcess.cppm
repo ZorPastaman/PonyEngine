@@ -118,7 +118,7 @@ namespace PonyEngine::Application
 	void GUIProcess::CreateConsole() noexcept
 	{
 #ifdef PONY_ENGINE_APPLICATION_CREATE_CONSOLE
-		PONY_LOG(Application().LogService(), Log::LogType::Info, "Creating console...");
+		PONY_LOG(Application().LogService(), Log::LogType::Info, "Creating console.");
 
 		if (!AllocConsole()) [[unlikely]]
 		{
@@ -149,8 +149,6 @@ namespace PonyEngine::Application
 		{
 			PONY_LOG(Application().LogService(), Log::LogType::Error, "Failed to reassign stdin to console. ErrorCode = '0x{:X}'.", error);
 		}
-
-		PONY_LOG(Application().LogService(), Log::LogType::Info, "Creating console done.");
 #endif
 	}
 
@@ -162,7 +160,7 @@ namespace PonyEngine::Application
 			return;
 		}
 
-		PONY_LOG(Application().LogService(), Log::LogType::Info, "Destroying console...");
+		PONY_LOG(Application().LogService(), Log::LogType::Info, "Destroying console.");
 
 		FILE* fp;
 		if (const errno_t error = freopen_s(&fp, "NUL", "w", stdout)) [[unlikely]]
@@ -183,8 +181,6 @@ namespace PonyEngine::Application
 			PONY_LOG(Application().LogService(), Log::LogType::Error, "Failed to free console. ErrorCode = '0x{:X}'.", GetLastError());
 		}
 		hasConsole = false;
-
-		PONY_LOG(Application().LogService(), Log::LogType::Info, "Destroying console done.");
 #endif
 	}
 

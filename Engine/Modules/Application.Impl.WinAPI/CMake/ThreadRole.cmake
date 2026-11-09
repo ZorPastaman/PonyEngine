@@ -1,9 +1,9 @@
-set(PONY_THREAD_ROLE_SOURCE_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Source/Application-ThreadRole.cppm.in")
-set_target_properties(PonyEngine.Application.Impl PROPERTIES PONY_THREAD_ROLE_SOURCE_FILE_PATH "${PONY_THREAD_ROLE_SOURCE_FILE_PATH}")
-set(PONY_THREAD_ROLE_TARGET_FILE_PATH "${CMAKE_CURRENT_BINARY_DIR}/Generated/Source/Application-ThreadRole.cppm")
-set_target_properties(PonyEngine.Application.Impl PROPERTIES PONY_THREAD_ROLE_TARGET_FILE_PATH "${PONY_THREAD_ROLE_TARGET_FILE_PATH}")
-configure_file("${PONY_THREAD_ROLE_SOURCE_FILE_PATH}" "${PONY_THREAD_ROLE_TARGET_FILE_PATH}")
-target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}" FILES "${PONY_THREAD_ROLE_TARGET_FILE_PATH}")
+set(PONY_THREAD_ROLE_LIST_SOURCE_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Source/Application-ThreadRoleList.cppm.in")
+set_target_properties(PonyEngine.Application.Impl PROPERTIES PONY_THREAD_ROLE_LIST_SOURCE_FILE_PATH "${PONY_THREAD_ROLE_LIST_SOURCE_FILE_PATH}")
+set(PONY_THREAD_ROLE_LIST_TARGET_FILE_PATH "${CMAKE_CURRENT_BINARY_DIR}/Generated/Source/Application-ThreadRoleList.cppm")
+set_target_properties(PonyEngine.Application.Impl PROPERTIES PONY_THREAD_ROLE_LIST_TARGET_FILE_PATH "${PONY_THREAD_ROLE_LIST_TARGET_FILE_PATH}")
+configure_file("${PONY_THREAD_ROLE_LIST_SOURCE_FILE_PATH}" "${PONY_THREAD_ROLE_LIST_TARGET_FILE_PATH}")
+target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_BINARY_DIR}" FILES "${PONY_THREAD_ROLE_LIST_TARGET_FILE_PATH}")
 set_target_properties(PonyEngine.Application.Impl PROPERTIES PONY_THREAD_ROLES "")
 
 # Adds a thread role.
@@ -22,14 +22,14 @@ function(pony_add_thread_role id thread_priority)
 
 	get_target_property(thread_roles PonyEngine.Application.Impl PONY_THREAD_ROLES)
 	string(APPEND thread_roles
-		"		{ \"${id}\", ThreadRole {.threadPriority = ${thread_priority}, .mmcssPriority = ${role_arg_MMCSS_PRIORITY}, .mmcssTask = \"${role_arg_MMCSS_TASK}\" } },\n"
+		"std::pair(std::string_view(\"${id}\"), ThreadRole{.threadPriority = ${thread_priority}, .mmcssPriority = ${role_arg_MMCSS_PRIORITY}, .mmcssTask = \"${role_arg_MMCSS_TASK}\"}),\n"
 	)
 	set_target_properties(PonyEngine.Application.Impl PROPERTIES PONY_THREAD_ROLES "${thread_roles}")
 
-	get_target_property(thread_role_source_file_path PonyEngine.Application.Impl PONY_THREAD_ROLE_SOURCE_FILE_PATH)
-	get_target_property(thread_role_target_file_path PonyEngine.Application.Impl PONY_THREAD_ROLE_TARGET_FILE_PATH)
+	get_target_property(thread_role_list_source_file_path PonyEngine.Application.Impl PONY_THREAD_ROLE_LIST_SOURCE_FILE_PATH)
+	get_target_property(thread_role_list_target_file_path PonyEngine.Application.Impl PONY_THREAD_ROLE_LIST_TARGET_FILE_PATH)
 	set(PONY_APPLICATION_THREAD_ROLES "${thread_roles}")
-	configure_file("${thread_role_source_file_path}" "${thread_role_target_file_path}")
+	configure_file("${thread_role_list_source_file_path}" "${thread_role_list_target_file_path}")
 endfunction()
 
 option(PONY_ENGINE_APPLICATION_SET_DEFAULT_THREAD_ROLES "If true, the default thread roles are added automatically." ON)
