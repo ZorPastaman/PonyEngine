@@ -21,6 +21,7 @@ import PonyEngine.Meta;
 import :IBuffer;
 import :ISleeper;
 import :MemoryStatus;
+import :ProcessID;
 import :ThreadParams;
 
 export namespace PonyEngine::Application
@@ -118,6 +119,10 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		virtual std::filesystem::path AddPathTail(std::filesystem::path path) const noexcept = 0;
 
+		/// @brief Gets the process ID.
+		/// @return Process ID.
+		[[nodiscard("Pure function")]]
+		virtual ProcessID ProcessID() const noexcept = 0;
 		/// @brief Gets the main thread ID.
 		/// @return Main thread ID.
 		/// @note The function is thread-safe.

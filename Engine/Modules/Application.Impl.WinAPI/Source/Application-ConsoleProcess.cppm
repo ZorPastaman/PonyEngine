@@ -55,7 +55,7 @@ namespace PonyEngine::Application
 	std::atomic_bool CtrlExit = false; ///< Is CTRL+C received?
 	BOOL WINAPI CtrlHandler(DWORD ctrlType);
 
-	static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free.");
+	static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free");
 
 	ConsoleProcess::ConsoleProcess(const std::span<const std::string_view> commandLine) :
 		Process(commandLine)

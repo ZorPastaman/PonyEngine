@@ -230,7 +230,7 @@ export namespace PonyEngine::Resource::Pack
 		std::atomic_size_t requestCount; ///< Request count.
 #endif
 
-		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free");
 	};
 }
 

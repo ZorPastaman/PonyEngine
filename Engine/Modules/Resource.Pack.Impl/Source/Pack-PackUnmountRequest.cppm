@@ -75,8 +75,8 @@ export namespace PonyEngine::Resource::Pack
 
 		std::move_only_function<void(const IPackUnmountRequest&) noexcept> callback; ///< Callback.
 
-		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free.");
-		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free.");
+		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus isn't lock-free");
+		static_assert(std::atomic_bool::is_always_lock_free, "bool isn't lock-free");
 	};
 }
 

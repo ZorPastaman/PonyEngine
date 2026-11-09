@@ -89,6 +89,8 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]] 
 		virtual std::filesystem::path AddPathTail(std::filesystem::path path) const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual Application::ProcessID ProcessID() const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual std::thread::id MainThreadID() const noexcept override;
 		[[nodiscard("Pure function")]] 
@@ -291,16 +293,6 @@ export namespace PonyEngine::Application
 			App* application; ///< Application.
 		};
 
-		/// @brief Buffer deleter.
-		struct BufferDeleter final
-		{
-			App* application = nullptr; ///< Application.
-
-			/// @brief Deletes the buffer.
-			/// @param buffer Buffer to delete.
-			void operator ()(Buffer* buffer) const noexcept;
-		};
-
 		/// @brief Make a single string out of the command line arguments.
 		/// @return Command line string. It starts with a space.
 		[[nodiscard("Pure function")]]
@@ -349,6 +341,12 @@ export namespace PonyEngine::Application
 		/// @brief Ends the tickables.
 		/// @param count How many tickables to end.
 		void End(std::size_t count) noexcept;
+
+		/// @brief Syncs the begin frame time.
+		/// @param target Begin frame target time point.
+		/// @return Next frame start time.
+		[[nodiscard("Must be used")]]
+		std::chrono::time_point<std::chrono::steady_clock> SyncBeginFrameTime(std::chrono::time_point<std::chrono::steady_clock> target) const noexcept;
 
 		/// @brief Gets a buffer data.
 		/// @return Buffer data.
@@ -401,7 +399,7 @@ export namespace PonyEngine::Application
 		std::atomic_size_t bufferCount; ///< Count of buffers in use.
 #endif
 
-		static_assert(std::atomic_size_t::is_always_lock_free, "std::atomic_size_t is not lock free.");
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::atomic_size_t is not lock free");
 	};
 }
 
@@ -517,6 +515,11 @@ namespace PonyEngine::Application
 	std::filesystem::path App::AddPathTail(const std::filesystem::path path) const noexcept
 	{
 		return AddTail(path);
+	}
+
+	Application::ProcessID App::ProcessID() const noexcept
+	{
+		return process->ProcessID();
 	}
 
 	std::thread::id App::MainThreadID() const noexcept
@@ -676,7 +679,14 @@ namespace PonyEngine::Application
 		bufferCount.fetch_add(1uz, std::memory_order::relaxed);
 #endif
 
-		return std::shared_ptr<Buffer>(buffer, BufferDeleter{.application = this}, bufferControlAllocator);
+		return std::shared_ptr<Buffer>(buffer, [this](Buffer* const bufferToDelete) noexcept
+		{
+			ReturnBuffer(*bufferToDelete);
+			bufferAllocator.delete_object(bufferToDelete);
+#ifndef NDEBUG
+			bufferCount.fetch_sub(1uz, std::memory_order::relaxed);
+#endif
+		}, bufferControlAllocator);
 	}
 
 	std::span<const std::string_view> App::ThreadRoles() const noexcept
@@ -813,19 +823,22 @@ namespace PonyEngine::Application
 		assert(!exitCode && "The exit code is set.");
 
 		const std::chrono::time_point<std::chrono::steady_clock> target = NextFrameTimePoint();
-		frameSleeper->SleepUntil(target - nextFrameBusySpinLength);
-		const std::chrono::time_point<std::chrono::steady_clock> now = Thread::SpinUntil(target);
+		const std::chrono::time_point<std::chrono::steady_clock> now = SyncBeginFrameTime(target);
 		++frameCount;
 		prevFrameTimePoint = thisFrameTimePoint;
 		thisFrameTimePoint = now;
 
-		PONY_LOG(logService, Log::LogType::Verbose, "New frame began. Frame: '{}'; Time point: '{}'; Target time point: '{}'; Diff: '{}'.", 
+		PONY_LOG(logService, Log::LogType::Verbose, "Frame began. Frame: '{}'; Time point: '{}'; Target time point: '{}'; Diff: '{}'.", 
 			frameCount, thisFrameTimePoint - startTimePoint, target - startTimePoint, thisFrameTimePoint - target);
 	}
 
 	void App::EndFrame()
 	{
 		assert(std::this_thread::get_id() == mainThreadId && "Wrong thread.");
+
+		const std::chrono::time_point<std::chrono::steady_clock> now = NowTimePoint();
+		PONY_LOG(logService, Log::LogType::Verbose, "Frame ended. Frame: '{}'; Time point: '{}'; Frame duration: '{}'.",
+			frameCount, now - startTimePoint, now - thisFrameTimePoint);
 	}
 
 	void App::Tick()
@@ -920,9 +933,10 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Info, "{} v{}", ProjectTitle(), ProjectVersion());
 
 			const MemoryStatus memoryStatus = GetMemoryStatus();
-			PONY_LOG(logService, Log::LogType::Info, "Physical memory: '{}' ('{}' GB); Commit memory: '{}' ('{}' GB).", 
-				memoryStatus.physicalMemory.total, memoryStatus.physicalMemory.total / 1073741824ull, memoryStatus.commitMemory.total, memoryStatus.commitMemory.total / 1073741824ull);
+			PONY_LOG(logService, Log::LogType::Info, "Physical memory: '{}' B ('{}' GiB).",
+				memoryStatus.physicalMemory.total, memoryStatus.physicalMemory.total / 1073741824ull);
 
+			PONY_LOG(logService, Log::LogType::Info, "Process ID: '{}'.", ProcessID());
 			PONY_LOG(logService, Log::LogType::Info, "Main thread ID: '{}'.", mainThreadId);
 			PONY_LOG(logService, Log::LogType::Info, "Command line:{}", MakeCommandLineString());
 
@@ -931,6 +945,12 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Info, "Local data directory: '{}'; User data directory: '{}'; Temp data directory: '{}'.",
 				localDataDirectory.string(), userDataDirectory.string(), tempDataDirectory.string());
 			PONY_LOG(logService, Log::LogType::Info, "Working directory: '{}'.", std::filesystem::current_path().string());
+
+			PONY_LOG(logService, Log::LogType::Info, "Thread roles:");
+			for (const std::string_view threadRole : threadRoles)
+			{
+				PONY_LOG(logService, Log::LogType::Info, "Role: '{}'; {}.", threadRole, process->GetThreadRoleLog(threadRole));
+			}
 
 			PONY_LOG(logService, Log::LogType::Info, "Engine start time point: '{}'.", startTimePoint.time_since_epoch());
 		}
@@ -1009,11 +1029,6 @@ namespace PonyEngine::Application
 	void App::ShutDownModuleContext::RemoveTickable(ITickable& tickable, const TickableOrder& tickOrder)
 	{
 		application->RemoveTickable(tickable, tickOrder);
-	}
-
-	void App::BufferDeleter::operator ()(Buffer* const buffer) const noexcept
-	{
-		application->ReturnBuffer(*buffer);
 	}
 
 	std::string App::MakeCommandLineString() const
@@ -1269,6 +1284,19 @@ namespace PonyEngine::Application
 		tickTickables.clear();
 	}
 
+	std::chrono::time_point<std::chrono::steady_clock> App::SyncBeginFrameTime(const std::chrono::time_point<std::chrono::steady_clock> target) const noexcept
+	{
+		const std::chrono::time_point<std::chrono::steady_clock> now = NowTimePoint();
+		
+		if (now >= target)
+		{
+			return now;
+		}
+
+		frameSleeper->SleepFor(target - now - nextFrameBusySpinLength);
+		return Thread::SpinUntil(target);
+	}
+
 	std::vector<std::byte, Container::AlignedAllocator<std::byte>> App::GetBufferData() noexcept
 	{
 		const auto lock = std::lock_guard(bufferDataMutex);
@@ -1296,10 +1324,5 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "Failed to return buffer data to buffer data pool.");
 			// It's ok to lose the buffer data.
 		}
-
-		bufferAllocator.delete_object(&buffer);
-#ifndef NDEBUG
-		bufferCount.fetch_sub(1uz, std::memory_order::relaxed);
-#endif
 	}
 }

@@ -11,8 +11,6 @@ Adds `PonyEngine.Application` target as a static library.
 
 ## C\++ modules
 
-### [PonyEngine.Application](Source/Application.cppm)
-
 #### [IApplication](Source/Application-IApplication.cppm)
 
 Interface representing the engine application. Provides access to application metadata, environment information, and the current application state.
@@ -36,6 +34,12 @@ Exposes functions to register interfaces and tickables.
 #### [ITickable](Source/Application-ITickable.cppm)
 
 Tickable interface. A tickable is an object that reacts to the application main loop: `Begin()`, `End()` and `Tick()` functions.
+
+#### ProcessID
+
+Process ID.
+
+Requires a platform specific implementation.
 
 ## C\++ headers
 

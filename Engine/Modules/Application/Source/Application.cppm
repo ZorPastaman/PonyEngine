@@ -17,5 +17,6 @@ export import :ISleeper;
 export import :ITickable;
 export import :MemoryInfo;
 export import :MemoryStatus;
+export import :ProcessID;
 export import :ThreadParams;
 export import :TickOrder;

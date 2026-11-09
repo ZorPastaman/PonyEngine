@@ -24,11 +24,21 @@ export namespace PonyEngine::Application
 	{
 		PONY_INTERFACE_BODY(IProcess)
 
+		/// @brief Gets the process ID.
+		/// @return Process ID.
+		[[nodiscard("Pure function")]]
+		virtual ProcessID ProcessID() const noexcept = 0;
+
 		/// @brief Gets a current memory status.
 		/// @return Memory status.
 		[[nodiscard("Pure function")]]
 		virtual MemoryStatus GetMemoryStatus() const = 0;
 
+		/// @brief Gets a thread role log.
+		/// @param role Thread role.
+		/// @return Thread role log.
+		[[nodiscard("Pure function")]]
+		virtual std::string GetThreadRoleLog(std::string_view role) const = 0;
 		/// @brief Creates a thread.
 		/// @param func Thread function.
 		/// @param params Thread parameters.

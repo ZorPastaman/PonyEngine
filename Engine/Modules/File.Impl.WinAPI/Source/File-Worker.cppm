@@ -103,8 +103,8 @@ export namespace PonyEngine::File
 		mutable std::atomic_size_t requestCount; ///< File request count.
 #endif
 
-		static_assert(std::atomic_bool::is_always_lock_free, "bool is not lock-free.");
-		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
+		static_assert(std::atomic_bool::is_always_lock_free, "bool is not lock-free");
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free");
 	};
 }
 

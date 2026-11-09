@@ -17,7 +17,8 @@ int main(const int argc, const char* const argv[])
 {
 	try
 	{
-		return std::make_unique<PonyEngine::Application::ConsoleProcess>(PonyEngine::Application::MakeCommandLineView(argc, argv))->Run();
+		auto process = PonyEngine::Application::ConsoleProcess(PonyEngine::Application::MakeCommandLineView(argc, argv));
+		return process.Run();
 	}
 	catch (const std::exception& e)
 	{

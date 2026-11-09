@@ -66,7 +66,7 @@ export namespace PonyEngine::File
 		std::exception_ptr exception; ///< Exception that occured during the request execution.
 		std::atomic<Async::RequestStatus> status; ///< Request status.
 
-		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus is not lock-free.");
+		static_assert(std::atomic<Async::RequestStatus>::is_always_lock_free, "RequestStatus is not lock-free");
 	};
 }
 

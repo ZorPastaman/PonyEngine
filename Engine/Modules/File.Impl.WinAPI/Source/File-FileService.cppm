@@ -51,7 +51,7 @@ export namespace PonyEngine::File
 		std::atomic_size_t fileCount; ///< File count.
 #endif
 
-		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free.");
+		static_assert(std::atomic_size_t::is_always_lock_free, "std::size_t isn't lock-free");
 	};
 }
 

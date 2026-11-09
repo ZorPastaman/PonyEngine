@@ -21,6 +21,8 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 	"Source/Application-CommandLine.cppm"
 	"Source/Application-Process.cppm"
 	"Source/Application-Sleeper.cppm"
+	"Source/Application-ThreadHelper.cppm"
+	"Source/Application-ThreadRole.cppm"
 )
 
 if(PONY_ENGINE_APPLICATION_ADD_DEFAULT_MANIFEST)

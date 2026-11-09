@@ -27,10 +27,4 @@ export namespace PonyEngine::Application
 		AVRT_PRIORITY mmcssPriority = AVRT_PRIORITY_NORMAL; ///< MMCSS priority. It's used only if the @p mmcssTask isn't empty.
 		std::string_view mmcssTask = ""; ///< MMCSS task. If empty, no MMCSS task is applied.
 	};
-
-	/// @brief Thread roles.
-	const std::unordered_map<std::string_view, ThreadRole> ThreadRoles
-	{
-${PONY_APPLICATION_THREAD_ROLES}
-	};
 }

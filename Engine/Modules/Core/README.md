@@ -32,9 +32,9 @@ Utilities for file system.
 Utilities:
 - [DynamicLibrary](Source/FileSystem-DynamicLibrary.cppm) - Dynamic library raii wrapper.
 
-The module requires a platform specific implementation of these functions:
+The module requires a platform specific implementation of these modules:
 
-- Library.cppm
+- Library
 ```
 	/// @brief Loads a library by the path.
 	/// @param path Library path.
