@@ -932,6 +932,7 @@ namespace PonyEngine::Application
 			PONY_LOG(logService, Log::LogType::Info, "{} v{}", EngineTitle(), EngineVersion());
 			PONY_LOG(logService, Log::LogType::Info, "{} v{}", ProjectTitle(), ProjectVersion());
 
+			PONY_LOG(logService, Log::LogType::Info, "Hardware concurrency: '{}'.", std::thread::hardware_concurrency());
 			const MemoryStatus memoryStatus = GetMemoryStatus();
 			PONY_LOG(logService, Log::LogType::Info, "Physical memory: '{}' B ('{}' GiB).",
 				memoryStatus.physicalMemory.total, memoryStatus.physicalMemory.total / 1073741824ull);
