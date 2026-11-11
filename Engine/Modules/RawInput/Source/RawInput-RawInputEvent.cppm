@@ -14,20 +14,16 @@ import std;
 import PonyEngine.Math;
 
 import :Axis;
-import :InputEventType;
+import :InputType;
 
 export namespace PonyEngine::RawInput
 {
 	/// @brief Raw input event.
 	struct RawInputEvent final
 	{
-		std::span<const Axis> axes; ///< Axes. It's synced by index with the @p values.
+		std::span<const Axis> axes; ///< Axes.
 		std::span<const float> values; ///< Values. It's synced by index with the @p axes.
-		InputEventType eventType = InputEventType::State; ///< Event type.
-
-		/// @brief Time point when the event was created.
-		/// @remark Different devices use different clocks. So, it can be used only to approximately compare what input was earlier or something like that.
-		std::chrono::time_point<std::chrono::steady_clock> timePoint;
-		std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position in screen coordinates; std::nullopt if not applicable.
+		std::span<const InputType> inputTypes; ///< Input types. It's synced by index with the @p axes.
+		std::chrono::time_point<std::chrono::steady_clock> timePoint; ///< Time point when the event was created.
 	};
 }

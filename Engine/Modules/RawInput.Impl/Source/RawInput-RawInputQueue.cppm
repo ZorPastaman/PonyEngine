@@ -77,10 +77,8 @@ export namespace PonyEngine::RawInput
 		/// @brief Input data.
 		struct InputData final
 		{
-			std::size_t valueIndex = 0uz; ///< Index in the axes and values.
-			std::size_t valueCount = 0uz; ///< Value count.
-			InputEventType eventType = InputEventType::State; ///< Event type.
-			std::optional<Math::Vector2<std::int32_t>> cursorPosition; ///< Cursor position in screen coordinates; std::nullopt if not applicable.
+			std::size_t valueOffset = 0uz; ///< Input value offset.
+			std::size_t valueCount = 0uz; ///< Input value count.
 		};
 		/// @brief Connection data.
 		struct ConnectionData final
@@ -92,8 +90,9 @@ export namespace PonyEngine::RawInput
 		std::vector<std::variant<InputData, ConnectionData>> events; ///< Input events.
 		std::vector<std::chrono::time_point<std::chrono::steady_clock>> eventTimes; ///< Input event times.
 
-		std::vector<Axis> axes; ///< Input axes.
-		std::vector<float> values; ///< Input values.
+		std::vector<Axis> inputAxes; ///< Input axes.
+		std::vector<float> inputValues; ///< Input values.
+		std::vector<InputType> inputTypes; ///< Input types.
 
 		std::vector<std::size_t> eventIndices; ///< Sorted event indices.
 	};
@@ -123,11 +122,10 @@ namespace PonyEngine::RawInput
 			{
 				return RawInputEvent
 				{
-					.axes = std::span<const Axis>(&axes[inputData.valueIndex], inputData.valueCount),
-					.values = std::span<const float>(&values[inputData.valueIndex], inputData.valueCount),
-					.eventType = inputData.eventType,
-					.timePoint = time,
-					.cursorPosition = inputData.cursorPosition
+					.axes = std::span<const Axis>(&inputAxes[inputData.valueOffset], inputData.valueCount),
+					.values = std::span<const float>(&inputValues[inputData.valueOffset], inputData.valueCount),
+					.inputTypes = std::span<const InputType>(&inputTypes[inputData.valueOffset], inputData.valueCount),
+					.timePoint = time
 				};
 			},
 			[&](const ConnectionData& connectionData) noexcept
@@ -179,23 +177,30 @@ namespace PonyEngine::RawInput
 
 	void RawInputQueue::AddInput(const DeviceHandleID device, const RawInputEvent& event)
 	{
-		assert(event.axes.size() == event.values.size() && "Incorrect event axes/values.");
+		assert(event.axes.size() == event.values.size() && event.axes.size() == event.inputTypes.size() && "Input event axes, values and event types sizes are mismatched.");
+		for (std::size_t i = 1uz; i < event.axes.size(); ++i)
+		{
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				assert(event.axes[i] != event.axes[j] && "Axis duplicate in one event found.");
+			}
+		}
 
 		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
-		const std::size_t axisIndex = axes.size();
-		axes.append_range(event.axes);
-		const auto axesScopeGuard = Utility::ScopeGuard([&]() noexcept { axes.erase(axes.cbegin() + axisIndex, axes.cend()); }, scopeGuardFlag);
-		values.append_range(event.values);
-		const auto valuesScopeGuard = Utility::ScopeGuard([&]() noexcept { values.erase(values.cbegin() + axisIndex, values.cend()); }, scopeGuardFlag);
+		const std::size_t axisIndex = inputAxes.size();
+		inputAxes.append_range(event.axes);
+		const auto axesScopeGuard = Utility::ScopeGuard([&]() noexcept { inputAxes.erase(inputAxes.cbegin() + axisIndex, inputAxes.cend()); }, scopeGuardFlag);
+		inputValues.append_range(event.values);
+		const auto valuesScopeGuard = Utility::ScopeGuard([&]() noexcept { inputValues.erase(inputValues.cbegin() + axisIndex, inputValues.cend()); }, scopeGuardFlag);
+		inputTypes.append_range(event.inputTypes);
+		const auto eventTypesScopeGuard = Utility::ScopeGuard([&]() noexcept { inputTypes.erase(inputTypes.cbegin() + axisIndex, inputTypes.cend()); }, scopeGuardFlag);
 		devices.push_back(device);
 		const auto devicesScopeGuard = Utility::ScopeGuard([&]() noexcept { devices.pop_back(); }, scopeGuardFlag);
 		events.push_back(InputData
 		{
-			.valueIndex = axisIndex,
-			.valueCount = event.axes.size(),
-			.eventType = event.eventType,
-			.cursorPosition = event.cursorPosition
+			.valueOffset = axisIndex,
+			.valueCount = event.axes.size()
 		});
 		const auto eventsScopeGuard = Utility::ScopeGuard([&]() noexcept { events.pop_back(); }, scopeGuardFlag);
 		eventTimes.push_back(event.timePoint);
@@ -234,8 +239,8 @@ namespace PonyEngine::RawInput
 		devices.clear();
 		events.clear();
 		eventTimes.clear();
-		axes.clear();
-		values.clear();
+		inputAxes.clear();
+		inputValues.clear();
 		eventIndices.clear();
 	}
 }

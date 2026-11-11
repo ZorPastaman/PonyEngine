@@ -7,14 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.RawInput:InputEventType;
+export module PonyEngine.RawInput:InputType;
 
 import std;
 
 export namespace PonyEngine::RawInput
 {
 	/// @brief Input event type.
-	enum class InputEventType : std::uint8_t
+	enum class InputType : std::uint8_t
 	{
 		State, ///< A value is kept till set to another value.
 		Delta ///< A value is zeroed each tick.

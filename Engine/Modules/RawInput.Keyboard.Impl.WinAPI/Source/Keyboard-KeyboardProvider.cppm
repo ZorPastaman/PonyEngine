@@ -121,9 +121,7 @@ namespace PonyEngine::RawInput::Keyboard
 		const Axis axis = axisMap.EngineAxis(*hub, rawInput.data.keyboard);
 		const bool pressed = !(rawInput.data.keyboard.Flags & RI_KEY_BREAK);
 		const std::chrono::time_point<std::chrono::steady_clock> time = messagePump->LastMessageTimePoint();
-		const POINT nativeCursor = messagePump->LastMessageCursorPoint();
-		const auto cursor = Math::Vector2<std::int32_t>(static_cast<std::int32_t>(nativeCursor.x), static_cast<std::int32_t>(nativeCursor.y));
-		keyboardControllers[keyboardIndex]->SetInput(axis, pressed, time, cursor);
+		keyboardControllers[keyboardIndex]->SetInput(axis, pressed, time);
 	}
 
 	void KeyboardProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)

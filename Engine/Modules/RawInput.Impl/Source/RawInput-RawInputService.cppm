@@ -531,7 +531,7 @@ namespace PonyEngine::RawInput
 				{
 					for (std::size_t axisIndex = 0uz; axisIndex < inputEvent.axes.size(); ++axisIndex)
 					{
-						devices.Value(deviceIndex, inputEvent.axes[axisIndex], inputEvent.values[axisIndex], inputEvent.eventType);
+						devices.Value(deviceIndex, inputEvent.axes[axisIndex], inputEvent.values[axisIndex], inputEvent.inputTypes[axisIndex]);
 					}
 
 					ObserveInput(deviceHandle, inputEvent);

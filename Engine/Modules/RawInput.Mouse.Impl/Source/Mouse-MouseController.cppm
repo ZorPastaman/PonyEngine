@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.RawInput.Mouse.Impl:MouseController;
 
 import std;
@@ -35,26 +39,13 @@ export namespace PonyEngine::RawInput::Mouse
 
 		~MouseController() noexcept = default;
 
-		/// @brief Sets the button input if it's different from the current state.
-		/// @param button Button.
-		/// @param pressed Is it pressed?
+		/// @brief Sets the input.
+		/// @param pointers Pointer input.
+		/// @param wheels Wheel input.
+		/// @param buttons Button input.
 		/// @param time Event time.
-		/// @param cursor Event cursor position.
-		void SetButton(MouseButton button, bool pressed, 
-			std::chrono::time_point<std::chrono::steady_clock> time, const std::optional<Math::Vector2<std::int32_t>>& cursor);
-		/// @brief Adds the wheel input.
-		/// @param wheel Wheel.
-		/// @param delta Wheel delta.
-		/// @param time Event time.
-		/// @param cursor Event cursor position.
-		void AddWheel(MouseWheel wheel, float delta, 
-			std::chrono::time_point<std::chrono::steady_clock> time, const std::optional<Math::Vector2<std::int32_t>>& cursor);
-		/// @brief Adds the pointer input.
-		/// @param delta Pointer delta.
-		/// @param time Event time.
-		/// @param cursor Event cursor position.
-		void AddPointer(const Math::Vector2<float>& delta, 
-			std::chrono::time_point<std::chrono::steady_clock> time, const std::optional<Math::Vector2<std::int32_t>>& cursor);
+		void SetInput(std::span<const std::pair<MousePointer, float>> pointers, std::span<const std::pair<MouseWheel, float>> wheels,
+			std::span<const std::pair<MouseButton, bool>> buttons, std::chrono::time_point<std::chrono::steady_clock> time);
 		/// @brief Sets the connection if it's different from the current state.
 		/// @param isConnected Is it connected?
 		/// @param time Event time.
@@ -76,34 +67,40 @@ export namespace PonyEngine::RawInput::Mouse
 		{
 			std::chrono::time_point<std::chrono::steady_clock> time; ///< Event time.
 		};
-		/// @brief Mouse event with cursor position.
-		struct CursorEvent : Event
-		{
-			std::optional<Math::Vector2<std::int32_t>> cursor; ///< Cursor position on the event.
-		};
 		/// @brief Mouse button event.
-		struct ButtonEvent final : CursorEvent
+		struct ButtonEvent final
 		{
-			bool pressed; ///< Is the button pressed?
 			MouseButton button; ///< Button axis.
+			bool pressed; ///< Is the button pressed?
 		};
 		/// @brief Mouse wheel event.
-		struct WheelEvent final : CursorEvent
+		struct WheelEvent final
 		{
-			float delta; ///< Wheel delta.
 			MouseWheel wheel; ///< Wheel axis.
+			float delta; ///< Wheel delta.
 		};
 		/// @brief Mouse pointer event.
-		struct PointerEvent final : CursorEvent
+		struct PointerEvent final
 		{
-			Math::Vector2<float> delta; ///< Pointer delta.
+			MousePointer pointer; ///< Pointer axis.
+			float delta; ///< Pointer delta.
+		};
+		/// @brief Mouse input event.
+		struct InputEvent final : Event
+		{
+			std::array<PointerEvent, MousePointerCount> pointers;
+			std::array<WheelEvent, MouseWheelCount> wheels;
+			std::array<ButtonEvent, MouseButtonCount> buttons;
+			std::uint8_t pointerCount = 0u;
+			std::uint8_t wheelCount = 0u;
+			std::uint8_t buttonCount = 0u;
 		};
 		/// @brief Mouse connection event.
 		struct ConnectEvent final : Event
 		{
 			bool isConnected; ///< Is a device connected?
 		};
-		using MouseEvent = std::variant<ButtonEvent, WheelEvent, PointerEvent, ConnectEvent>; ///< Mouse event.
+		using MouseEvent = std::variant<InputEvent, ConnectEvent>; ///< Mouse event.
 
 		const MouseAxisMap* axisMap; ///< Axis map.
 
@@ -111,6 +108,10 @@ export namespace PonyEngine::RawInput::Mouse
 		bool isConnected; ///< Is the mouse connected?
 
 		std::queue<MouseEvent> events; ///< Event queue.
+
+		static_assert(MousePointerCount <= std::numeric_limits<std::uint8_t>::max(), "Mouse pointer count is too great");
+		static_assert(MouseWheelCount <= std::numeric_limits<std::uint8_t>::max(), "Mouse wheel count is too great");
+		static_assert(MouseButtonCount <= std::numeric_limits<std::uint8_t>::max(), "Mouse button count is too great");
 	};
 }
 
@@ -123,38 +124,61 @@ namespace PonyEngine::RawInput::Mouse
 		std::ranges::fill(buttonState, false);
 	}
 
-	void MouseController::SetButton(const MouseButton button, const bool pressed,
-		const std::chrono::time_point<std::chrono::steady_clock> time, const std::optional<Math::Vector2<std::int32_t>>& cursor)
+	void MouseController::SetInput(const std::span<const std::pair<MousePointer, float>> pointers, const std::span<const std::pair<MouseWheel, float>> wheels, 
+		const std::span<const std::pair<MouseButton, bool>> buttons, const std::chrono::time_point<std::chrono::steady_clock> time)
 	{
-		if (buttonState[static_cast<std::size_t>(button)] == pressed)
+		assert(pointers.size() <= MousePointerCount && "Invalid pointer spans.");
+		assert(wheels.size() <= MouseWheelCount && "Invalid wheel spans.");
+		assert(buttons.size() <= MouseButtonCount && "Invalid button spans.");
+		for (std::size_t i = 1uz; i < pointers.size(); ++i)
 		{
-			return;
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				assert(pointers[i] != pointers[j] && "Pointer duplicate found.");
+			}
+		}
+		for (std::size_t i = 1uz; i < wheels.size(); ++i)
+		{
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				assert(wheels[i] != wheels[j] && "Wheel duplicate found.");
+			}
+		}
+		for (std::size_t i = 1uz; i < buttons.size(); ++i)
+		{
+			for (std::size_t j = 0uz; j < i; ++j)
+			{
+				assert(buttons[i] != buttons[j] && "Button duplicate found.");
+			}
 		}
 
-		events.push(ButtonEvent
+		auto event = InputEvent{ Event{ time } };
+		for (const auto [type, delta] : pointers)
 		{
-			CursorEvent{ Event{ time }, cursor }, pressed, button
-		});
-
-		buttonState[static_cast<std::size_t>(button)] = pressed;
-	}
-
-	void MouseController::AddWheel(const MouseWheel wheel, const float delta,
-		const std::chrono::time_point<std::chrono::steady_clock> time, const std::optional<Math::Vector2<std::int32_t>>& cursor)
-	{
-		events.push(WheelEvent
+			event.pointers[event.pointerCount] = PointerEvent{.pointer = type, .delta = delta};
+			event.pointerCount += static_cast<bool>(delta);
+		}
+		for (const auto [type, delta] : wheels)
 		{
-			CursorEvent { Event { time }, cursor }, delta, wheel
-		});
-	}
-
-	void MouseController::AddPointer(const Math::Vector2<float>& delta,
-		const std::chrono::time_point<std::chrono::steady_clock> time, const std::optional<Math::Vector2<std::int32_t>>& cursor)
-	{
-		events.push(PointerEvent
+			event.wheels[event.wheelCount] = WheelEvent{.wheel = type, .delta = delta};
+			event.wheelCount += static_cast<bool>(delta);
+		}
+		for (const auto [type, pressed] : buttons)
 		{
-			CursorEvent { Event { time }, cursor }, delta
-		});
+			event.buttons[event.buttonCount] = ButtonEvent{.button = type, .pressed = pressed};
+			event.buttonCount += buttonState[static_cast<std::size_t>(type)] != pressed;
+		}
+
+		if (event.pointerCount > 0u || event.wheelCount > 0u || event.buttonCount > 0u)
+		{
+			events.push(event);
+		}
+
+		for (std::uint8_t i = 0uz; i < event.buttonCount; ++i)
+		{
+			const ButtonEvent buttonEvent = event.buttons[i];
+			buttonState[static_cast<std::size_t>(buttonEvent.button)] = buttonEvent.pressed;
+		}
 	}
 
 	void MouseController::SetConnection(const bool isConnected, const std::chrono::time_point<std::chrono::steady_clock> time)
@@ -183,40 +207,42 @@ namespace PonyEngine::RawInput::Mouse
 		{
 			std::visit(Utility::Overload
 			{
-				[&](const ButtonEvent& button)
+				[&](const InputEvent& input)
 				{
-					const Axis axis = axisMap->Axis(button.button);
-					const float value = button.pressed;
+					static constexpr std::size_t AxisCount = MousePointerCount + MouseWheelCount + MouseButtonCount;
+					std::array<Axis, AxisCount> axes;
+					std::array<float, AxisCount> values;
+					std::array<InputType, AxisCount> types;
+					std::size_t axisCount = 0uz;
+
+					for (std::uint8_t i = 0u; i < input.pointerCount; ++i, ++axisCount)
+					{
+						const PointerEvent event = input.pointers[i];
+						axes[axisCount] = axisMap->Axis(event.pointer);
+						values[axisCount] = event.delta;
+						types[axisCount] = InputType::Delta;
+					}
+					for (std::uint8_t i = 0u; i < input.wheelCount; ++i, ++axisCount)
+					{
+						const WheelEvent event = input.wheels[i];
+						axes[axisCount] = axisMap->Axis(event.wheel);
+						values[axisCount] = event.delta;
+						types[axisCount] = InputType::Delta;
+					}
+					for (std::uint8_t i = 0u; i < input.buttonCount; ++i, ++axisCount)
+					{
+						const ButtonEvent event = input.buttons[i];
+						axes[axisCount] = axisMap->Axis(event.button);
+						values[axisCount] = event.pressed;
+						types[axisCount] = InputType::State;
+					}
+
 					inputRegistry.AddInput(RawInputEvent
 					{
-						.axes = std::span(&axis, 1uz),
-						.values = std::span(&value, 1uz),
-						.eventType = InputEventType::State,
-						.timePoint = button.time,
-						.cursorPosition = button.cursor
-					});
-				},
-				[&](const WheelEvent& wheel)
-				{
-					const Axis axis = axisMap->Axis(wheel.wheel);
-					inputRegistry.AddInput(RawInputEvent
-					{
-						.axes = std::span(&axis, 1uz),
-						.values = std::span(&wheel.delta, 1uz),
-						.eventType = InputEventType::Delta,
-						.timePoint = wheel.time,
-						.cursorPosition = wheel.cursor
-					});
-				},
-				[&](const PointerEvent& pointer)
-				{
-					inputRegistry.AddInput(RawInputEvent
-					{
-						.axes = axisMap->Pointers(),
-						.values = pointer.delta.Span(),
-						.eventType = InputEventType::Delta,
-						.timePoint = pointer.time,
-						.cursorPosition = pointer.cursor
+						.axes = std::span<const Axis>(axes.data(), axisCount),
+						.values = std::span<const float>(values.data(), axisCount),
+						.inputTypes = std::span<const InputType>(types.data(), axisCount),
+						.timePoint = input.time
 					});
 				},
 				[&](const ConnectEvent& connect)

@@ -22,7 +22,6 @@ import std;
 
 import PonyEngine.Application.WinAPI;
 import PonyEngine.Log;
-import PonyEngine.Math;
 import PonyEngine.Memory;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.RawInput.Mouse.Impl;
@@ -51,27 +50,24 @@ export namespace PonyEngine::RawInput::Mouse
 		virtual void OnInput(const RAWINPUT& rawInput) override;
 		virtual void OnDeviceConnectionChanged(HANDLE device, bool isConnected) override;
 
-		/// @brief Updates button states.
+		/// @brief Gets button input.
 		/// @param source Input source.
-		/// @param controller Mouse controller.
-		/// @param time Input time.
-		/// @param cursor Input cursor position.
-		static void UpdateButtons(const RAWMOUSE& source, MouseController& controller,
-			std::chrono::time_point<std::chrono::steady_clock> time, const Math::Vector2<std::int32_t>& cursor);
-		/// @brief Updates wheel states.
+		/// @param buttons Buttons.
+		/// @return Button event count.
+		[[nodiscard("Must be used")]]
+		static std::size_t GetButtons(const RAWMOUSE& source, std::span<std::pair<MouseButton, bool>, MouseButtonCount> buttons) noexcept;
+		/// @brief Gets wheel input.
 		/// @param source Input source.
-		/// @param controller Mouse controller.
-		/// @param time Input time.
-		/// @param cursor Input cursor position.
-		static void UpdateWheels(const RAWMOUSE& source, MouseController& controller,
-			std::chrono::time_point<std::chrono::steady_clock> time, const Math::Vector2<std::int32_t>& cursor);
-		/// @brief Updates pointer states.
+		/// @param wheels Wheels.
+		/// @return Wheel event count.
+		[[nodiscard("Must be used")]]
+		static std::size_t GetWheels(const RAWMOUSE& source, std::span<std::pair<MouseWheel, float>, MouseWheelCount> wheels) noexcept;
+		/// @brief Gets pointer input.
 		/// @param source Input source.
-		/// @param controller Mouse controller.
-		/// @param time Input time.
-		/// @param cursor Input cursor position.
-		static void UpdatePointer(const RAWMOUSE& source, MouseController& controller,
-			std::chrono::time_point<std::chrono::steady_clock> time, const Math::Vector2<std::int32_t>& cursor);
+		/// @param pointers Pointers.
+		/// @return Pointer event count.
+		[[nodiscard("Must be used")]]
+		static std::size_t GetPointers(const RAWMOUSE& source, std::span<std::pair<MousePointer, float>, MousePointerCount> pointers) noexcept;
 
 		[[nodiscard("Pure function")]]
 		static float ToWheelInputValue(USHORT value) noexcept;
@@ -143,12 +139,22 @@ namespace PonyEngine::RawInput::Mouse
 
 		const RAWMOUSE& input = rawInput.data.mouse;
 		MouseController& controller = *mouseControllers[mouseIndex];
+
+		std::array<std::pair<MousePointer, float>, MousePointerCount> pointers;
+		const std::size_t pointerCount = GetPointers(input, pointers);
+
+		std::array<std::pair<MouseWheel, float>, MouseWheelCount> wheels;
+		const std::size_t wheelCount = GetWheels(input, wheels);
+
+		std::array<std::pair<MouseButton, bool>, MouseButtonCount> buttons;
+		const std::size_t buttonCount = GetButtons(input, buttons);
+
 		const std::chrono::time_point<std::chrono::steady_clock> time = messagePump->LastMessageTimePoint();
-		const POINT point = messagePump->LastMessageCursorPoint();
-		const auto cursor = Math::Vector2<std::int32_t>(static_cast<std::int32_t>(point.x), static_cast<std::int32_t>(point.y));
-		UpdatePointer(input, controller, time, cursor);
-		UpdateWheels(input, controller, time, cursor);
-		UpdateButtons(input, controller, time, cursor);
+		
+		controller.SetInput(std::span<const std::pair<MousePointer, float>>(pointers.data(), pointerCount),
+			std::span<const std::pair<MouseWheel, float>>(wheels.data(), wheelCount),
+			std::span<const std::pair<MouseButton, bool>>(buttons.data(), buttonCount),
+			time);
 	}
 
 	void MouseProvider::OnDeviceConnectionChanged(const HANDLE device, const bool isConnected)
@@ -195,8 +201,7 @@ namespace PonyEngine::RawInput::Mouse
 		}
 	}
 
-	void MouseProvider::UpdateButtons(const RAWMOUSE& source, MouseController& controller,
-		const std::chrono::time_point<std::chrono::steady_clock> time, const Math::Vector2<std::int32_t>& cursor)
+	std::size_t MouseProvider::GetButtons(const RAWMOUSE& source, const std::span<std::pair<MouseButton, bool>, MouseButtonCount> buttons) noexcept
 	{
 		struct ButtonFlagMap final
 		{
@@ -204,8 +209,7 @@ namespace PonyEngine::RawInput::Mouse
 			USHORT upFlag;
 			MouseButton button;
 		};
-
-		constexpr auto buttonMap = std::array<ButtonFlagMap, 5>
+		constexpr auto buttonMap = std::array<ButtonFlagMap, MouseButtonCount>
 		{
 			ButtonFlagMap{.downFlag = RI_MOUSE_LEFT_BUTTON_DOWN, .upFlag = RI_MOUSE_LEFT_BUTTON_UP, .button = MouseButton::Left},
 			ButtonFlagMap{.downFlag = RI_MOUSE_RIGHT_BUTTON_DOWN, .upFlag = RI_MOUSE_RIGHT_BUTTON_UP, .button = MouseButton::Right},
@@ -214,46 +218,48 @@ namespace PonyEngine::RawInput::Mouse
 			ButtonFlagMap{.downFlag = RI_MOUSE_BUTTON_5_DOWN, .upFlag = RI_MOUSE_BUTTON_5_UP, .button = MouseButton::X2}
 		};
 
-		for (const ButtonFlagMap& mapping : buttonMap)
+		std::size_t count = 0uz;
+		for (const ButtonFlagMap map : buttonMap)
 		{
-			if (source.usButtonFlags & mapping.downFlag)
-			{
-				controller.SetButton(mapping.button, true, time, cursor);
-			}
-			if (source.usButtonFlags & mapping.upFlag)
-			{
-				controller.SetButton(mapping.button, false, time, cursor);
-			}
+			const bool isPressed = source.usButtonFlags & map.downFlag;
+			const bool isUnpressed = source.usButtonFlags & map.upFlag;
+			buttons[count] = std::pair(map.button, isPressed && !isUnpressed);
+			count += isPressed || isUnpressed;
 		}
+
+		return count;
 	}
 
-	void MouseProvider::UpdateWheels(const RAWMOUSE& source, MouseController& controller,
-		const std::chrono::time_point<std::chrono::steady_clock> time, const Math::Vector2<std::int32_t>& cursor)
+	std::size_t MouseProvider::GetWheels(const RAWMOUSE& source, const std::span<std::pair<MouseWheel, float>, MouseWheelCount> wheels) noexcept
 	{
-		if (source.usButtonFlags & RI_MOUSE_WHEEL)
+		constexpr auto wheelMap = std::array<std::pair<USHORT, MouseWheel>, MouseWheelCount>
 		{
-			controller.AddWheel(MouseWheel::Vertical, ToWheelInputValue(source.usButtonData), time, cursor);
-		}
-		if (source.usButtonFlags & RI_MOUSE_HWHEEL)
+			std::pair(RI_MOUSE_WHEEL, MouseWheel::Vertical),
+			std::pair(RI_MOUSE_HWHEEL, MouseWheel::Horizontal)
+		};
+
+		const float input = ToWheelInputValue(source.usButtonData);
+		std::size_t count = 0uz;
+		for (const auto [nativeWheel, wheel] : wheelMap)
 		{
-			controller.AddWheel(MouseWheel::Horizontal, ToWheelInputValue(source.usButtonData), time, cursor);
+			wheels[count] = std::pair(wheel, input);
+			count += static_cast<bool>(source.usButtonFlags & nativeWheel);
 		}
+
+		return count;
 	}
 
-	void MouseProvider::UpdatePointer(const RAWMOUSE& source, MouseController& controller,
-		const std::chrono::time_point<std::chrono::steady_clock> time, const Math::Vector2<std::int32_t>& cursor)
+	std::size_t MouseProvider::GetPointers(const RAWMOUSE& source, const std::span<std::pair<MousePointer, float>, MousePointerCount> pointers) noexcept
 	{
 		if (source.usFlags != MOUSE_MOVE_RELATIVE) [[unlikely]]
 		{
-			return;
-		}
-		if (!source.lLastX && !source.lLastY)
-		{
-			return;
+			return 0uz;
 		}
 
-		const auto delta = Math::Vector2<float>(static_cast<float>(source.lLastX), static_cast<float>(source.lLastY));
-		controller.AddPointer(delta, time, cursor);
+		pointers[0] = std::pair(MousePointer::X, static_cast<float>(source.lLastX));
+		pointers[1] = std::pair(MousePointer::Y, static_cast<float>(source.lLastY));
+
+		return 2uz;
 	}
 
 	float MouseProvider::ToWheelInputValue(const USHORT value) noexcept

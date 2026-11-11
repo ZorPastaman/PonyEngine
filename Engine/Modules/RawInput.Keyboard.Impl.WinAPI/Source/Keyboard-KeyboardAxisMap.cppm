@@ -200,12 +200,10 @@ namespace PonyEngine::RawInput::Keyboard
 		const USHORT extension = flags & RI_KEY_E0 ? 0xE0 : flags & RI_KEY_E1 ? 0xE1 : 0x00;
 		const WORD scanCode =  MAKEWORD(base, extension);
 
-		if (const auto position = axisMap.find(scanCode); position != axisMap.cend()) [[likely]]
-		{
-			return position->second;
-		}
-
-		return Bind(scanCode, std::format("{}/scanCode/0x{:04X}", KeyboardLayout::Layout, scanCode), hub);
+		const auto position = axisMap.find(scanCode);
+		return position != axisMap.cend()
+			? position->second
+			: Bind(scanCode, std::format("{}/scanCode/0x{:04X}", KeyboardLayout::Layout, scanCode), hub);
 	}
 
 	Axis KeyboardAxisMap::Bind(const WORD scanCode, const std::string_view axisPath, IDeviceHub& hub)

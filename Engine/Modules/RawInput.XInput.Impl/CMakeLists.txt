@@ -16,6 +16,7 @@ target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE
 )
 target_sources(PonyEngine.RawInput.XInput.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/XInput.cppm"
+	"Source/XInput-GamepadAxis.cppm"
 	"Source/XInput-GamepadAxisMap.cppm"
 	"Source/XInput-GamepadController.cppm"
 	"Source/XInput-XInputProvider.cppm"

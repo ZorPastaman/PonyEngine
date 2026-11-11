@@ -177,6 +177,15 @@ export namespace PonyEngine::Math
 		/// @return A vector with magnitude in [0, 1] encoding the normalized magnitude.
 		[[nodiscard("Pure function")]]
 		Vector Normalized(T minMagnitude, T maxMagnitude) const noexcept requires (std::is_floating_point_v<T>);
+		/// @brief Returns a vector whose direction matches this vector, 
+		///        and whose magnitude represents the normalized magnitude of this vector
+		///        relative to the range [minMagnitude, maxMagnitude].
+		/// @param minMagnitude Lower bound for magnitude normalization. Must be non-negative.
+		/// @param maxMagnitude Upper bound for magnitude normalization. Must be non-negative.
+		/// @param fallback Fallback vector. This vector is set if the magnitude of the vector is 0.
+		/// @return A vector with magnitude in [0, 1] encoding the normalized magnitude.
+		[[nodiscard("Pure function")]]
+		Vector Normalized(T minMagnitude, T maxMagnitude, const Vector& fallback) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Gets a minimum among the components.
 		/// @return Minimum component.
@@ -899,15 +908,15 @@ namespace PonyEngine::Math
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
 	Vector<T, Size> Vector<T, Size>::Normalized(const T minMagnitude, const T maxMagnitude) const noexcept requires (std::is_floating_point_v<T>)
 	{
-		const T magnitudeSqr = MagnitudeSquared();
-		if (AreAlmostEqual(magnitudeSqr, T{0})) [[unlikely]]
-		{
-			return Zero();
-		}
-
-		const T magnitude = std::sqrt(magnitudeSqr);
+		const T magnitude = Magnitude();
 		const T normalizedMagnitude = (magnitude - minMagnitude) / (maxMagnitude - minMagnitude);
 		return std::clamp(normalizedMagnitude, 0.f, 1.f) / magnitude * *this;
+	}
+
+	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)
+	Vector<T, Size> Vector<T, Size>::Normalized(const T minMagnitude, const T maxMagnitude, const Vector& fallback) const noexcept requires (std::is_floating_point_v<T>)
+	{
+		return IsAlmostZero() ? fallback : Normalized(minMagnitude, maxMagnitude);
 	}
 
 	template<Utility::Arithmetic T, std::size_t Size> requires (Size >= 1uz)

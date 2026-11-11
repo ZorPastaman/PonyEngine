@@ -17,8 +17,6 @@ export namespace PonyEngine::RawInput
 	struct ConnectionEvent final
 	{
 		bool isConnected = false; ///< Is connected?
-		/// @brief Time point when the event was created.
-		/// @remark Different devices use different clocks. So, it can be used only to approximately compare what input was earlier or something like that.
-		std::chrono::time_point<std::chrono::steady_clock> timePoint;
+		std::chrono::time_point<std::chrono::steady_clock> timePoint; ///< Time point when the event was created.
 	};
 }
