@@ -24,6 +24,7 @@ import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
 
+import :GamepadAxis;
 import :GamepadAxisMap;
 
 export namespace PonyEngine::RawInput::XInput
@@ -78,36 +79,37 @@ export namespace PonyEngine::RawInput::XInput
 		void UpdateInput(const XINPUT_STATE& currentState, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry);
 		/// @brief Updates a button input.
 		/// @param currentState Current gamepad state.
-		/// @param now Event time.
-		/// @param inputRegistry Input registry.
-		void UpdateButtonInput(const XINPUT_GAMEPAD& currentState, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry) const;
+		/// @param axes Axes.
+		/// @param values Values
+		/// @return Input axis count.
+		[[nodiscard("Must be used")]]
+		std::size_t GetButtonInput(const XINPUT_GAMEPAD& currentState, std::span<Axis, ButtonCount> axes, std::span<float, ButtonCount> values) const;
 		/// @brief Updates a trigger input.
 		/// @param currentState Current gamepad state.
-		/// @param now Event time.
-		/// @param inputRegistry Input registry.
-		void UpdateTriggerInput(const XINPUT_GAMEPAD& currentState, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry) const;
-		/// @brief Updates a trigger input.
-		/// @param trigger Trigger axis.
-		/// @param previousState Previous state.
-		/// @param currentState Current state.
-		/// @param now Event time.
-		/// @param inputRegistry Input registry.
-		void UpdateTriggerInput(GamepadAxisMap::TriggerAxis trigger, BYTE previousState, BYTE currentState, 
-			std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry) const;
-		/// @brief Updates a stick input.
+		/// @param axes Axes.
+		/// @param values Values
+		/// @return Input axis count.
+		[[nodiscard("Must be used")]]
+		std::size_t GetTriggerInput(const XINPUT_GAMEPAD& currentState, std::span<Axis, TriggerAxisCount> axes, std::span<float, TriggerAxisCount> values) const;
+		/// @brief Get stick input.
 		/// @param currentState Current gamepad state.
-		/// @param now Event time.
-		/// @param inputRegistry Input registry.
-		void UpdateStickInput(const XINPUT_GAMEPAD& currentState, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry) const;
-		/// @brief Updates a stick input.
+		/// @param axes Axes.
+		/// @param values Values
+		/// @return Input axis count.
+		[[nodiscard("Must be used")]]
+		std::size_t GetStickInput(const XINPUT_GAMEPAD& currentState, 
+			std::span<Axis, StickPlacementCount * StickDirectionCount> axes, std::span<float, StickPlacementCount * StickDirectionCount> values) const noexcept;
+		/// @brief Gets stick input.
 		/// @param placement Stick placement.
 		/// @param previousState Previous state.
 		/// @param currentState Current state.
 		/// @param threshold Dead zone threshold.
-		/// @param now Event time.
-		/// @param inputRegistry Input registry.
-		void UpdateStickInput(GamepadAxisMap::StickPlacement placement, const Math::Vector2<SHORT>& previousState, const Math::Vector2<SHORT>& currentState,
-			SHORT threshold, std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry) const;
+		/// @param axes Axes.
+		/// @param values Values
+		/// @return Input axis count.
+		[[nodiscard("Must be used")]]
+		std::size_t GetStickInput(StickPlacement placement, const Math::Vector2<SHORT>& previousState, const Math::Vector2<SHORT>& currentState, SHORT threshold,
+			std::span<Axis, StickDirectionCount> axes, std::span<float, StickDirectionCount> values) const noexcept;
 
 		const GamepadAxisMap* axisMap; ///< Axis map.
 		const Log::ILogService* logService; ///< Log service.
@@ -188,112 +190,131 @@ namespace PonyEngine::RawInput::XInput
 			return;
 		}
 
-		UpdateStickInput(currentState.Gamepad, now, inputRegistry);
-		UpdateTriggerInput(currentState.Gamepad, now, inputRegistry);
-		UpdateButtonInput(currentState.Gamepad, now, inputRegistry);
-		state = currentState;
-	}
-
-	void GamepadController::UpdateButtonInput(const XINPUT_GAMEPAD& currentState, const std::chrono::time_point<std::chrono::steady_clock> now, 
-		IInputRegistry& inputRegistry) const
-	{
-		constexpr std::array<WORD, 14> buttons =
+		static constexpr std::size_t AxisCount = ButtonCount + TriggerAxisCount + StickPlacementCount * StickDirectionCount;
+		std::array<Axis, AxisCount> axes;
+		std::array<float, AxisCount> values;
+		static constexpr std::array<InputType, AxisCount> Types = []() noexcept
 		{
-			XINPUT_GAMEPAD_DPAD_UP,
-			XINPUT_GAMEPAD_DPAD_DOWN,
-			XINPUT_GAMEPAD_DPAD_LEFT,
-			XINPUT_GAMEPAD_DPAD_RIGHT,
-			XINPUT_GAMEPAD_START,
-			XINPUT_GAMEPAD_BACK,
-			XINPUT_GAMEPAD_LEFT_THUMB,
-			XINPUT_GAMEPAD_RIGHT_THUMB,
-			XINPUT_GAMEPAD_LEFT_SHOULDER,
-			XINPUT_GAMEPAD_RIGHT_SHOULDER,
-			XINPUT_GAMEPAD_A,
-			XINPUT_GAMEPAD_B,
-			XINPUT_GAMEPAD_X,
-			XINPUT_GAMEPAD_Y
-		};
+			std::array<InputType, AxisCount> array;
+			std::ranges::fill(array, InputType::State);
+			return array;
+		}();
+		std::size_t count = 0uz;
 
-		for (std::size_t i = 0uz; i < buttons.size(); ++i)
+		count += GetStickInput(currentState.Gamepad, std::span<Axis, StickPlacementCount * StickDirectionCount>(&axes[count], StickPlacementCount * StickDirectionCount),
+			std::span<float, StickPlacementCount * StickDirectionCount>(&values[count], StickPlacementCount * StickDirectionCount));
+		count += GetTriggerInput(currentState.Gamepad, std::span<Axis, TriggerAxisCount>(&axes[count], TriggerAxisCount), 
+			std::span<float, TriggerAxisCount>(&values[count], TriggerAxisCount));
+		count += GetButtonInput(currentState.Gamepad, std::span<Axis, ButtonCount>(&axes[count], ButtonCount),
+			std::span<float, ButtonCount>(&values[count], ButtonCount));
+
+		if (count > 0uz)
 		{
-			const WORD button = buttons[i];
-			const WORD prev = state.Gamepad.wButtons & button;
-			const WORD current = currentState.wButtons & button;
-			if (prev == current)
-			{
-				continue;
-			}
-
-			const bool pressed = current;
-			const float value = pressed;
-			const Axis axis = axisMap->Button(button);
 			inputRegistry.AddInput(RawInputEvent
 			{
-				.axes = std::span<const Axis>(&axis, 1uz),
-				.values = std::span<const float>(&value, 1uz),
-				.eventType = InputEventType::State,
+				.axes = std::span<const Axis>(axes.data(), count),
+				.values = std::span<const float>(values.data(), count),
+				.inputTypes = std::span<const InputType>(Types.data(), count),
 				.timePoint = now
 			});
 		}
+
+		state = currentState;
 	}
 
-	void GamepadController::UpdateTriggerInput(const XINPUT_GAMEPAD& currentState, const std::chrono::time_point<std::chrono::steady_clock> now, 
-		IInputRegistry& inputRegistry) const
+	std::size_t GamepadController::GetButtonInput(const XINPUT_GAMEPAD& currentState, const std::span<Axis, ButtonCount> axes, const std::span<float, ButtonCount> values) const
 	{
-		UpdateTriggerInput(GamepadAxisMap::TriggerAxis::Left, state.Gamepad.bLeftTrigger, currentState.bLeftTrigger, now, inputRegistry);
-		UpdateTriggerInput(GamepadAxisMap::TriggerAxis::Right, state.Gamepad.bRightTrigger, currentState.bRightTrigger, now, inputRegistry);
-	}
-
-	void GamepadController::UpdateTriggerInput(const GamepadAxisMap::TriggerAxis trigger, const BYTE previousState, const BYTE currentState, 
-		const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry) const
-	{
-		if (previousState == currentState || (previousState <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD && currentState <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD))
+		static constexpr std::array<std::pair<WORD, Button>, ButtonCount> ButtonMap
 		{
-			return;
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_DPAD_UP, Button::DpadUp),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_DPAD_DOWN, Button::DpadDown),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_DPAD_LEFT, Button::DpadLeft),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_DPAD_RIGHT, Button::DpadRight),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_START, Button::Start),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_BACK, Button::Back),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_LEFT_THUMB, Button::LeftThumb),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_RIGHT_THUMB, Button::RightThumb),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_LEFT_SHOULDER, Button::LeftShoulder),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_RIGHT_SHOULDER, Button::RightShoulder),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_A, Button::A),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_B, Button::B),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_X, Button::X),
+			std::pair<WORD, Button>(XINPUT_GAMEPAD_Y, Button::Y)
+		};
+
+		std::size_t count = 0uz;
+		for (const auto [nativeButton, button] : ButtonMap)
+		{
+			const bool prevPressed = state.Gamepad.wButtons & nativeButton;
+			const bool currentPressed = currentState.wButtons & nativeButton;
+			axes[count] = axisMap->Button(button);
+			values[count] = currentPressed;
+			count += currentPressed != prevPressed;
 		}
 
-		const float value = Math::UnormToNormalized<float>(currentState, Math::Range<BYTE>{.min = XINPUT_GAMEPAD_TRIGGER_THRESHOLD});
-		const Axis axis = axisMap->Trigger(trigger);
-		inputRegistry.AddInput(RawInputEvent
-		{
-			.axes = std::span<const Axis>(&axis, 1uz),
-			.values = std::span<const float>(&value, 1uz),
-			.eventType = InputEventType::State,
-			.timePoint = now
-		});
+		return count;
 	}
 
-	void GamepadController::UpdateStickInput(const XINPUT_GAMEPAD& currentState, const std::chrono::time_point<std::chrono::steady_clock> now, 
-		IInputRegistry& inputRegistry) const
+	std::size_t GamepadController::GetTriggerInput(const XINPUT_GAMEPAD& currentState, 
+		const std::span<Axis, TriggerAxisCount> axes, const std::span<float, TriggerAxisCount> values) const
 	{
-		UpdateStickInput(GamepadAxisMap::StickPlacement::Left, Math::Vector2<SHORT>(state.Gamepad.sThumbLX, state.Gamepad.sThumbLY), 
-			Math::Vector2<SHORT>(currentState.sThumbLX, currentState.sThumbLY), XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, now, inputRegistry);
-		UpdateStickInput(GamepadAxisMap::StickPlacement::Right, Math::Vector2<SHORT>(state.Gamepad.sThumbRX, state.Gamepad.sThumbRY), 
-			Math::Vector2<SHORT>(currentState.sThumbRX, currentState.sThumbRY), XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, now, inputRegistry);
+		const auto prevTriggers = Math::Vector2<BYTE>(state.Gamepad.bLeftTrigger, state.Gamepad.bRightTrigger);
+		const auto currentTriggers = Math::Vector2<BYTE>(currentState.bLeftTrigger, currentState.bRightTrigger);
+
+		std::size_t count = 0uz;
+		for (std::size_t i = 0uz; i < TriggerAxisCount; ++i)
+		{
+			const float prev = Math::UnormToNormalized<float>(prevTriggers[i], Math::Range<BYTE>{.min = XINPUT_GAMEPAD_TRIGGER_THRESHOLD});
+			const float current = Math::UnormToNormalized<float>(currentTriggers[i], Math::Range<BYTE>{.min = XINPUT_GAMEPAD_TRIGGER_THRESHOLD});
+			axes[count] = axisMap->Trigger(static_cast<TriggerAxis>(i));
+			values[count] = current;
+			count += current != prev;
+		}
+
+		return count;
 	}
 
-	void GamepadController::UpdateStickInput(const GamepadAxisMap::StickPlacement placement, const Math::Vector2<SHORT>& previousState, const Math::Vector2<SHORT>& currentState,
-		const SHORT threshold, const std::chrono::time_point<std::chrono::steady_clock> now, IInputRegistry& inputRegistry) const
+	std::size_t GamepadController::GetStickInput(const XINPUT_GAMEPAD& currentState, 
+		const std::span<Axis, StickPlacementCount * StickDirectionCount> axes, const std::span<float, StickPlacementCount * StickDirectionCount> values) const noexcept
 	{
-		if (previousState == currentState)
+		static constexpr auto Thresholds = std::array<SHORT, StickPlacementCount> { XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE };
+		const auto prevSticks = std::array<Math::Vector2<SHORT>, StickPlacementCount>
 		{
-			return;
+			Math::Vector2<SHORT>(state.Gamepad.sThumbLX, state.Gamepad.sThumbLY),
+			Math::Vector2<SHORT>(state.Gamepad.sThumbRX, state.Gamepad.sThumbRY)
+		};
+		const auto currentSticks = std::array<Math::Vector2<SHORT>, StickPlacementCount>
+		{
+			Math::Vector2<SHORT>(currentState.sThumbLX, currentState.sThumbLY),
+			Math::Vector2<SHORT>(currentState.sThumbRX, currentState.sThumbRY)
+		};
+
+		std::size_t count = 0uz;
+		for (std::size_t i = 0uz; i < StickPlacementCount; ++i)
+		{
+			count += GetStickInput(static_cast<StickPlacement>(i), prevSticks[i], currentSticks[i], Thresholds[i],
+				std::span<Axis, StickDirectionCount>(&axes[count], StickDirectionCount), std::span<float, StickDirectionCount>(&values[count], StickDirectionCount));
 		}
 
-		const auto prevNormalized = static_cast<Math::Vector2<float>>(previousState).Normalized(threshold, std::numeric_limits<SHORT>::max());
-		const auto currentNormalized = static_cast<Math::Vector2<float>>(currentState).Normalized(threshold, std::numeric_limits<SHORT>::max());
-		if (prevNormalized == currentNormalized)
+		return count;
+	}
+
+	std::size_t GamepadController::GetStickInput(const StickPlacement placement, const Math::Vector2<SHORT>& previousState, const Math::Vector2<SHORT>& currentState, 
+		const SHORT threshold, const std::span<Axis, StickDirectionCount> axes, const std::span<float, StickDirectionCount> values) const noexcept
+	{
+		const auto prevNormalized = static_cast<Math::Vector2<float>>(previousState).Normalized(threshold, std::numeric_limits<SHORT>::max(), Math::Vector2<float>::Zero());
+		const auto currentNormalized = static_cast<Math::Vector2<float>>(currentState).Normalized(threshold, std::numeric_limits<SHORT>::max(), Math::Vector2<float>::Zero());
+		
+		std::size_t count = 0uz;
+		for (std::size_t i = 0uz; i < StickDirectionCount; ++i)
 		{
-			return;
+			const float prev = prevNormalized[i];
+			const float current = currentNormalized[i];
+			axes[count] = axisMap->Stick(placement, static_cast<StickDirection>(i));
+			values[count] = current;
+			count += current != prev;
 		}
 
-		inputRegistry.AddInput(RawInputEvent
-		{
-			.axes = axisMap->Stick(placement),
-			.values = currentNormalized.Span(),
-			.eventType = InputEventType::State,
-			.timePoint = now
-		});
+		return count;
 	}
 }

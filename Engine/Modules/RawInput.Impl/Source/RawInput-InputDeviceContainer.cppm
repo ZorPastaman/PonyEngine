@@ -101,7 +101,7 @@ export namespace PonyEngine::RawInput
 		/// @param axis Axis.
 		/// @param value Axis value.
 		/// @param type Event type.
-		void Value(std::size_t deviceIndex, Axis axis, float value, InputEventType type);
+		void Value(std::size_t deviceIndex, Axis axis, float value, InputType type);
 
 		/// @brief Clears deltas.
 		void ClearDeltas() noexcept;
@@ -243,7 +243,7 @@ namespace PonyEngine::RawInput
 		return axisIndex < axes.size() ? Value(axisIndex) : 0.f;
 	}
 
-	void InputDeviceContainer::Value(const std::size_t deviceIndex, const Axis axis, const float value, const InputEventType type)
+	void InputDeviceContainer::Value(const std::size_t deviceIndex, const Axis axis, const float value, const InputType type)
 	{
 		assert(deviceIndex < Size() && "Incorrect device.");
 
@@ -255,10 +255,10 @@ namespace PonyEngine::RawInput
 
 		switch (type)
 		{
-		case InputEventType::State:
+		case InputType::State:
 			states[axisIndex] = value;
 			break;
-		case InputEventType::Delta:
+		case InputType::Delta:
 			deltas[axisIndex] += value;
 			break;
 		default: [[unlikely]]

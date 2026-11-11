@@ -35,9 +35,8 @@ export namespace PonyEngine::RawInput::Keyboard
 		/// @param axis Input axis.
 		/// @param pressed Is the key pressed?
 		/// @param time Event time.
-		/// @param cursor Cursor point on event creation.
 		/// @remark The function does nothing if the event doesn't change the current state.
-		void SetInput(Axis axis, bool pressed, std::chrono::time_point<std::chrono::steady_clock> time, const std::optional<Math::Vector2<std::int32_t>>& cursor);
+		void SetInput(Axis axis, bool pressed, std::chrono::time_point<std::chrono::steady_clock> time);
 		/// @brief Sets the connection status.
 		/// @param isConnected Is the keyboard connected?
 		/// @param time Event time.
@@ -63,7 +62,6 @@ export namespace PonyEngine::RawInput::Keyboard
 		/// @brief Input event.
 		struct InputEvent final : Event
 		{
-			std::optional<Math::Vector2<std::int32_t>> cursor; ///< Cursor position on the event.
 			Axis axis; ///< Axis.
 			bool pressed; ///< Is the key pressed?
 		};
@@ -88,8 +86,7 @@ namespace PonyEngine::RawInput::Keyboard
 	{
 	}
 
-	void KeyboardController::SetInput(const Axis axis, const bool pressed, const std::chrono::time_point<std::chrono::steady_clock> time, 
-		const std::optional<Math::Vector2<std::int32_t>>& cursor)
+	void KeyboardController::SetInput(const Axis axis, const bool pressed, const std::chrono::time_point<std::chrono::steady_clock> time)
 	{
 		const auto pressedKeyPosition = std::ranges::find(pressedKeys, axis);
 		if ((pressed && pressedKeyPosition != pressedKeys.cend()) || (!pressed && pressedKeyPosition == pressedKeys.cend()))
@@ -97,17 +94,24 @@ namespace PonyEngine::RawInput::Keyboard
 			return;
 		}
 
-		events.push(InputEvent
-		{
-			Event{ time }, cursor, axis, pressed
-		});
+		const auto event = InputEvent{ Event{ time }, axis, pressed};
 
 		if (pressed)
 		{
 			pressedKeys.push_back(axis);
+			try
+			{
+				events.push(event);
+			}
+			catch (...)
+			{
+				pressedKeys.pop_back();
+				throw;
+			}
 		}
 		else
 		{
+			events.push(event);
 			pressedKeys.erase(pressedKeyPosition);
 		}
 	}
@@ -140,14 +144,14 @@ namespace PonyEngine::RawInput::Keyboard
 			{
 				[&](const InputEvent& input)
 				{
+					constexpr auto type = InputType::State;
 					const float value = input.pressed;
 					inputRegistry.AddInput(RawInputEvent
 					{
 						.axes = std::span(&input.axis, 1uz),
 						.values = std::span(&value, 1uz),
-						.eventType = InputEventType::State,
-						.timePoint = input.time,
-						.cursorPosition = input.cursor
+						.inputTypes = std::span(&type, 1uz),
+						.timePoint = input.time
 					});
 				},
 				[&](const ConnectEvent& connect)
