@@ -124,6 +124,8 @@
 			"name": "Runtime-GUI",
 			"hidden": true,
 			"cacheVariables": {
+				"PONY_ENGINE_DISPLAY": true,
+				"PONY_ENGINE_DISPLAY_IMPL": true,
 				"PONY_ENGINE_RAW_INPUT": true,
 				"PONY_ENGINE_RAW_INPUT_EXT": true,
 				"PONY_ENGINE_RAW_INPUT_IMPL": true,

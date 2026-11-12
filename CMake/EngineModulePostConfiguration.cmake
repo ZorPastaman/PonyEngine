@@ -70,6 +70,10 @@ pony_add_to_module_list(PonyEngine.Resource.World.Meta.Impl PONY_RESOURCE_MODULE
 pony_apply_flags(PonyEngine.Resource.World.Hierarchy.Impl)
 pony_add_to_module_list(PonyEngine.Resource.World.Hierarchy.Impl PONY_RESOURCE_MODULES)
 
+pony_apply_flags(PonyEngine.Display)
+pony_apply_flags(PonyEngine.Display.Impl)
+pony_add_to_module_list(PonyEngine.Display.Impl PONY_RENDER_MODULES)
+
 pony_apply_flags(PonyEngine.WinInput)
 pony_apply_flags(PonyEngine.WinInput.Impl)
 pony_add_to_module_list(PonyEngine.WinInput.Impl PONY_INPUT_MODULES)

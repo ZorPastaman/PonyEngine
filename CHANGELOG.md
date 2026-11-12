@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - IRawInputContext doesn't have functions for registering/unregistering devices and adding input any more. Now IInputProvider gets special interfaces for that in its Begin(), End() and Tick().
 - All modules are optional now.
 - Application architecture was simplified. Now it doesn't have services but have tickables and interfaces.
+- Surface module was renamed as Display module and fully rewritten.
 
 ### Removed
 

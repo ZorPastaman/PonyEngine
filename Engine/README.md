@@ -23,6 +23,8 @@ To configure a module, a specific CMake flag must be `true`.
 | [PonyEngine.Application](Modules/Application)                                     | `PONY_ENGINE_APPLICATION`                   |
 | [PonyEngine.Application.Impl](Modules/Application.Impl)                           | `PONY_ENGINE_APPLICATION_IMPL`              |
 | [PonyEngine.Core](Modules/Core)                                                   | `PONY_ENGINE_CORE`                          |
+| [PonyEngine.Display](Modules/Display)                                             | `PONY_ENGINE_DISPLAY`                       |
+| [PonyEngine.Display.Impl](Modules/Display.Impl)                                   | `PONY_ENGINE_DISPLAY_IMPL`                  |
 | [PonyEngine.File](Modules/File)                                                   | `PONY_ENGINE_FILE`                          |
 | [PonyEngine.File.Impl](Modules/File.Impl)                                         | `PONY_ENGINE_FILE_IMPL`                     |
 | [PonyEngine.Job](Modules/Job)                                                     | `PONY_ENGINE_JOB`                           |
@@ -70,6 +72,8 @@ Some modules may require modifications to work because they need implementation 
 | [PonyEngine.Application.Impl.WinAPI](Modules/Application.Impl.WinAPI)             | `PONY_ENGINE_APPLICATION_IMPL_WINAPI`        |
 | [PonyEngine.Core.MSVC](Modules/Core.MSVC)                                         | `PONY_ENGINE_CORE_MSVC`                      |
 | [PonyEngine.Core.WinAPI](Modules/Core.WinAPI)                                     | `PONY_ENGINE_CORE_WINAPI`                    |
+| [PonyEngine.Display.WinAPI](Modules/Display.WinAPI)                               | `PONY_ENGINE_DISPLAY_WINAPI`                 |
+| [PonyEngine.Display.Impl.WinAPI](Modules/Display.Impl.WinAPI)                     | `PONY_ENGINE_DISPLAY_IMPL_WINAPI`            |
 | [PonyEngine.File.Impl.WinAPI](Modules/File.Impl.WinAPI)                           | `PONY_ENGINE_FILE_IMPL_WINAPI`               |
 | [PonyEngine.RawInput.Keyboard.Impl.WinAPI](Modules/RawInput.Keyboard.Impl.WinAPI) | `PONY_ENGINE_RAW_INPUT_KEYBOARD_IMPL_WINAPI` |
 | [PonyEngine.RawInput.Mouse.Impl.WinAPI](Modules/RawInput.Mouse.Impl.WinAPI)       | `PONY_ENGINE_RAW_INPUT_MOUSE_IMPL_WINAPI`    |
