@@ -11,27 +11,29 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.RawInput.Impl:InputDeviceContainer;
+export module PonyEngine.RawInput.Impl:DeviceContainer;
 
 import std;
 
 import PonyEngine.RawInput.Ext;
 import PonyEngine.Utility;
 
+import :DeviceProperties;
+
 export namespace PonyEngine::RawInput
 {
-	/// @brief Input device container.
-	class InputDeviceContainer final
+	/// @brief Device container.
+	class DeviceContainer final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		InputDeviceContainer() noexcept = default;
+		DeviceContainer() noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		InputDeviceContainer(const InputDeviceContainer& other) = default;
+		DeviceContainer(const DeviceContainer& other) = default;
 		[[nodiscard("Pure constructor")]]
-		InputDeviceContainer(InputDeviceContainer&& other) noexcept = default;
+		DeviceContainer(DeviceContainer&& other) noexcept = default;
 
-		~InputDeviceContainer() noexcept = default;
+		~DeviceContainer() noexcept = default;
 
 		/// @brief Gets the size.
 		/// @return Size.
@@ -54,27 +56,11 @@ export namespace PonyEngine::RawInput
 		/// @return Device controller.
 		[[nodiscard("Pure function")]]
 		IDeviceController& Controller(std::size_t index) const noexcept;
-		/// @brief Gets a device name.
+		/// @brief Gets device properties.
 		/// @param index Device index.
-		/// @return Device name.
+		/// @return Device properties.
 		[[nodiscard("Pure function")]]
-		std::string_view DeviceName(std::size_t index) const noexcept;
-		/// @brief Gets a device type.
-		/// @param index Device index.
-		/// @return Device type.
-		[[nodiscard("Pure function")]]
-		struct DeviceType DeviceType(std::size_t index) const noexcept;
-		/// @brief Gets a device style.
-		/// @param index Device index.
-		/// @return Device style.
-		[[nodiscard("Pure function")]]
-		struct DeviceStyle DeviceStyle(std::size_t index) const noexcept;
-		/// @brief Tries to find a feature.
-		/// @param index Device index.
-		/// @param type Feature type.
-		/// @return Feature or nullptr if not found.
-		[[nodiscard("Pure function")]]
-		void* FindFeature(std::size_t index, std::type_index type) const noexcept;
+		const DeviceProperties& Properties(std::size_t index) const noexcept;
 		/// @brief Check if a device at the @p index is connected.
 		/// @param index Device index.
 		/// @return @a True if it's connected; @a false otherwise.
@@ -118,8 +104,8 @@ export namespace PonyEngine::RawInput
 		/// @brief Clears all the data.
 		void Clear() noexcept;
 
-		InputDeviceContainer& operator =(const InputDeviceContainer& other) = delete;
-		InputDeviceContainer& operator =(InputDeviceContainer&& other) noexcept = default;
+		DeviceContainer& operator =(const DeviceContainer& other) = delete;
+		DeviceContainer& operator =(DeviceContainer&& other) noexcept = default;
 
 	private:
 		/// @brief Finds an index of the axis among the axis indices.
@@ -143,10 +129,7 @@ export namespace PonyEngine::RawInput
 
 		std::vector<DeviceHandleID> handles; ///< Device handles.
 		std::vector<IDeviceController*> controllers; ///< Device controller.
-		std::vector<std::string> deviceNames; ///< Device names.
-		std::vector<struct DeviceType> deviceTypes; ///< Device types.
-		std::vector<struct DeviceStyle> deviceStyles; ///< Device styles.
-		std::vector<std::vector<FeatureEntry>> features; ///< Device features.
+		std::vector<DeviceProperties> properties; ///< Device properties.
 		std::vector<bool> connections; ///< Device connection statuses
 		std::vector<std::vector<std::size_t>> axisIndices; ///< Device axes indices. These indices point to the @p axes, @p states and @p deltas.
 
@@ -159,12 +142,12 @@ export namespace PonyEngine::RawInput
 
 namespace PonyEngine::RawInput
 {
-	std::size_t InputDeviceContainer::Size() const noexcept
+	std::size_t DeviceContainer::Size() const noexcept
 	{
 		return handles.size();
 	}
 
-	std::size_t InputDeviceContainer::IndexOf(const DeviceHandleID handle) const noexcept
+	std::size_t DeviceContainer::IndexOf(const DeviceHandleID handle) const noexcept
 	{
 		auto position = std::ranges::lower_bound(handles, handle);
 		if (position != handles.cend() && *position != handle)
@@ -175,55 +158,34 @@ namespace PonyEngine::RawInput
 		return position - handles.cbegin();
 	}
 
-	IDeviceController& InputDeviceContainer::Controller(const std::size_t index) const noexcept
-	{
-		return *controllers[index];
-	}
-
-	DeviceHandleID InputDeviceContainer::Handle(const std::size_t index) const noexcept
+	DeviceHandleID DeviceContainer::Handle(const std::size_t index) const noexcept
 	{
 		return handles[index];
 	}
 
-	std::string_view InputDeviceContainer::DeviceName(const std::size_t index) const noexcept
+	IDeviceController& DeviceContainer::Controller(const std::size_t index) const noexcept
 	{
-		return deviceNames[index];
+		return *controllers[index];
 	}
 
-	struct DeviceType InputDeviceContainer::DeviceType(const std::size_t index) const noexcept
+	const DeviceProperties& DeviceContainer::Properties(const std::size_t index) const noexcept
 	{
-		return deviceTypes[index];
+		return properties[index];
 	}
 
-	struct DeviceStyle InputDeviceContainer::DeviceStyle(const std::size_t index) const noexcept
-	{
-		return deviceStyles[index];
-	}
-
-	void* InputDeviceContainer::FindFeature(const std::size_t index, const std::type_index type) const noexcept
-	{
-		const std::span<const FeatureEntry> featureEntries = features[index];
-		if (const auto position = std::ranges::find(featureEntries, type, &FeatureEntry::featureType); position != featureEntries.cend())
-		{
-			return position->feature;
-		}
-
-		return nullptr;
-	}
-
-	bool InputDeviceContainer::IsConnected(const std::size_t index) const noexcept
+	bool DeviceContainer::IsConnected(const std::size_t index) const noexcept
 	{
 		return connections[index];
 	}
 
-	void InputDeviceContainer::IsConnected(const std::size_t index, const bool value) noexcept
+	void DeviceContainer::IsConnected(const std::size_t index, const bool value) noexcept
 	{
 		assert(index < connections.size() && "The device index is incorrect.");
 
 		connections[index] = value;
 	}
 
-	float InputDeviceContainer::Value(const Axis axis) const noexcept
+	float DeviceContainer::Value(const Axis axis) const noexcept
 	{
 		float value = 0.f;
 		for (std::size_t i = 0uz; i < axes.size(); ++i)
@@ -237,13 +199,13 @@ namespace PonyEngine::RawInput
 		return value;
 	}
 
-	float InputDeviceContainer::Value(const Axis axis, const std::size_t deviceIndex) const noexcept
+	float DeviceContainer::Value(const Axis axis, const std::size_t deviceIndex) const noexcept
 	{
 		const std::size_t axisIndex = IndexOf(axisIndices[deviceIndex], axis);
 		return axisIndex < axes.size() ? Value(axisIndex) : 0.f;
 	}
 
-	void InputDeviceContainer::Value(const std::size_t deviceIndex, const Axis axis, const float value, const InputType type)
+	void DeviceContainer::Value(const std::size_t deviceIndex, const Axis axis, const float value, const InputType type)
 	{
 		assert(deviceIndex < Size() && "Incorrect device.");
 
@@ -267,12 +229,12 @@ namespace PonyEngine::RawInput
 		}
 	}
 
-	void InputDeviceContainer::ClearDeltas() noexcept
+	void DeviceContainer::ClearDeltas() noexcept
 	{
 		std::ranges::fill(deltas, 0.f);
 	}
 
-	void InputDeviceContainer::Add(const DeviceHandleID handle, IDeviceController& controller, const bool isConnected, const DeviceParams& params)
+	void DeviceContainer::Add(const DeviceHandleID handle, IDeviceController& controller, const bool isConnected, const DeviceParams& params)
 	{
 		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
@@ -281,14 +243,14 @@ namespace PonyEngine::RawInput
 		const auto handlesScopeGuard = Utility::ScopeGuard([&]() noexcept { handles.erase(handles.cbegin() + index); }, scopeGuardFlag);
 		controllers.insert(controllers.cbegin() + index, &controller);
 		const auto controllersScopeGuard = Utility::ScopeGuard([&]() noexcept { controllers.erase(controllers.cbegin() + index); }, scopeGuardFlag);
-		deviceNames.insert(deviceNames.cbegin() + index, std::string(params.name));
-		const auto deviceNamesScopeGuard = Utility::ScopeGuard([&]() noexcept { deviceNames.erase(deviceNames.cbegin() + index); }, scopeGuardFlag);
-		deviceTypes.insert(deviceTypes.cbegin() + index, params.type);
-		const auto deviceTypesScopeGuard = Utility::ScopeGuard([&]() noexcept { deviceTypes.erase(deviceTypes.cbegin() + index); }, scopeGuardFlag);
-		deviceStyles.insert(deviceStyles.cbegin() + index, params.style);
-		const auto deviceStylesScopeGuard = Utility::ScopeGuard([&]() noexcept { deviceStyles.erase(deviceStyles.cbegin() + index); }, scopeGuardFlag);
-		features.insert(features.cbegin() + index, std::vector(params.features.cbegin(), params.features.cend()));
-		const auto featuresScopeGuard = Utility::ScopeGuard([&]() noexcept { features.erase(features.cbegin() + index); }, scopeGuardFlag);
+		properties.insert(properties.cbegin() + index, DeviceProperties
+		{
+			.name = std::string(params.name),
+			.type = params.type,
+			.style = params.style,
+			.features = std::vector(params.features.cbegin(), params.features.cend())
+		});
+		const auto propertiesScopeGuard = Utility::ScopeGuard([&]() noexcept { properties.erase(properties.cbegin() + index); }, scopeGuardFlag);
 		connections.insert(connections.cbegin() + index, isConnected);
 		const auto connectionsScopeGuard = Utility::ScopeGuard([&]() noexcept { connections.erase(connections.cbegin() + index); }, scopeGuardFlag);
 		axisIndices.insert(axisIndices.cbegin() + index, std::vector<std::size_t>());
@@ -296,7 +258,7 @@ namespace PonyEngine::RawInput
 		scopeGuardFlag.Release();
 	}
 
-	void InputDeviceContainer::Remove(const std::size_t index) noexcept
+	void DeviceContainer::Remove(const std::size_t index) noexcept
 	{
 		for (std::size_t i = 0uz; i < axisIndices.size(); ++i)
 		{
@@ -327,22 +289,16 @@ namespace PonyEngine::RawInput
 
 		axisIndices.erase(axisIndices.cbegin() + index);
 		connections.erase(connections.cbegin() + index);
-		features.erase(features.cbegin() + index);
-		deviceStyles.erase(deviceStyles.cbegin() + index);
-		deviceTypes.erase(deviceTypes.cbegin() + index);
-		deviceNames.erase(deviceNames.cbegin() + index);
+		properties.erase(properties.cbegin() + index);
 		controllers.erase(controllers.cbegin() + index);
 		handles.erase(handles.cbegin() + index);
 	}
 
-	void InputDeviceContainer::Clear() noexcept
+	void DeviceContainer::Clear() noexcept
 	{
 		handles.clear();
 		controllers.clear();
-		deviceNames.clear();
-		deviceTypes.clear();
-		deviceStyles.clear();
-		features.clear();
+		properties.clear();
 		connections.clear();
 		axisIndices.clear();
 
@@ -351,18 +307,18 @@ namespace PonyEngine::RawInput
 		deltas.clear();
 	}
 
-	std::size_t InputDeviceContainer::IndexOf(const std::span<const std::size_t> axisIndices, const Axis axis) const noexcept
+	std::size_t DeviceContainer::IndexOf(const std::span<const std::size_t> axisIndices, const Axis axis) const noexcept
 	{
 		const std::size_t axisIndex = std::ranges::find_if(axisIndices, [&](const std::size_t index) { return axes[index] == axis; }) - axisIndices.cbegin();
 		return axisIndex < axisIndices.size() ? axisIndices[axisIndex] : axes.size();
 	}
 
-	float InputDeviceContainer::Value(const std::size_t axisIndex) const noexcept
+	float DeviceContainer::Value(const std::size_t axisIndex) const noexcept
 	{
 		return states[axisIndex] + deltas[axisIndex];
 	}
 
-	std::size_t InputDeviceContainer::AddAxis(const std::size_t deviceIndex, const Axis axis)
+	std::size_t DeviceContainer::AddAxis(const std::size_t deviceIndex, const Axis axis)
 	{
 		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 

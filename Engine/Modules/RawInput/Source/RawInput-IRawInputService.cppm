@@ -17,6 +17,7 @@ import std;
 
 import :Axis;
 import :DeviceHandle;
+import :DeviceInfo;
 import :DeviceStyle;
 import :DeviceType;
 import :IRawInputObserver;
@@ -65,24 +66,11 @@ export namespace PonyEngine::RawInput
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
 		virtual bool IsConnected(DeviceHandle deviceHandle) const noexcept = 0;
-		/// @brief Gets a device name.
+		/// @brief Gets a device info.
 		/// @param deviceHandle Device handle. Must be valid.
-		/// @return Device name.
-		/// @note The function must be called on a main thread.
+		/// @return Device info.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view DeviceName(DeviceHandle deviceHandle) const noexcept = 0;
-		/// @brief Gets a device type.
-		/// @param deviceHandle Device handle. Must be valid.
-		/// @return Device type.
-		/// @note The function must be called on a main thread.
-		[[nodiscard("Pure function")]]
-		virtual DeviceType DeviceType(DeviceHandle deviceHandle) const noexcept = 0;
-		/// @brief Gets a device style.
-		/// @param deviceHandle Device handle. Must be valid.
-		/// @return Device style.
-		/// @note The function must be called on a main thread.
-		[[nodiscard("Pure function")]]
-		virtual DeviceStyle DeviceStyle(DeviceHandle deviceHandle) const noexcept = 0;
+		virtual DeviceInfo DeviceInfo(DeviceHandle deviceHandle) const noexcept = 0;
 		/// @brief Tries to find a device feature.
 		/// @param deviceHandle Device handle. Must be valid.
 		/// @param type Feature type.

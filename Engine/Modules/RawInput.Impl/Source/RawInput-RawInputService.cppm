@@ -24,7 +24,8 @@ import PonyEngine.Math;
 import PonyEngine.RawInput.Ext;
 import PonyEngine.Utility;
 
-import :InputDeviceContainer;
+import :DeviceContainer;
+import :DeviceProperties;
 import :RawInputQueue;
 
 export namespace PonyEngine::RawInput
@@ -56,11 +57,7 @@ export namespace PonyEngine::RawInput
 		[[nodiscard("Pure function")]] 
 		virtual bool IsConnected(DeviceHandle deviceHandle) const noexcept override;
 		[[nodiscard("Pure function")]] 
-		virtual std::string_view DeviceName(DeviceHandle deviceHandle) const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual struct DeviceType DeviceType(DeviceHandle deviceHandle) const noexcept override;
-		[[nodiscard("Pure function")]] 
-		virtual struct DeviceStyle DeviceStyle(DeviceHandle deviceHandle) const noexcept override;
+		virtual struct DeviceInfo DeviceInfo(DeviceHandle deviceHandle) const noexcept override;
 		[[nodiscard("Pure function")]] 
 		virtual void* FindFeature(DeviceHandle deviceHandle, std::type_index type) const noexcept override;
 
@@ -179,7 +176,7 @@ export namespace PonyEngine::RawInput
 		const Application::IApplication* application; ///< Application.
 		const Log::ILogService* logService; ///< Log service.
 
-		InputDeviceContainer devices; ///< Input devices.
+		DeviceContainer devices; ///< Input devices.
 		RawInputQueue inputQueue; ///< Input queue.
 
 		std::vector<DeviceHandleVersion> deviceHandleVersions; ///< Device handle versions.
@@ -246,32 +243,33 @@ namespace PonyEngine::RawInput
 		return devices.IsConnected(devices.IndexOf(deviceHandle.id));
 	}
 
-	std::string_view RawInputService::DeviceName(const DeviceHandle deviceHandle) const noexcept
+	struct DeviceInfo RawInputService::DeviceInfo(const DeviceHandle deviceHandle) const noexcept
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
-		return devices.DeviceName(devices.IndexOf(deviceHandle.id));
-	}
 
-	struct DeviceType RawInputService::DeviceType(const DeviceHandle deviceHandle) const noexcept
-	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
-		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
-		return devices.DeviceType(devices.IndexOf(deviceHandle.id));
-	}
-
-	struct DeviceStyle RawInputService::DeviceStyle(const DeviceHandle deviceHandle) const noexcept
-	{
-		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
-		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
-		return devices.DeviceStyle(devices.IndexOf(deviceHandle.id));
+		const DeviceProperties& properties = devices.Properties(devices.IndexOf(deviceHandle.id));
+		return RawInput::DeviceInfo
+		{
+			.name = properties.name,
+			.type = properties.type,
+			.style = properties.style
+		};
 	}
 
 	void* RawInputService::FindFeature(const DeviceHandle deviceHandle, const std::type_index type) const noexcept
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
 		assert(!IsInvalid(deviceHandle) && "Invalid device handle.");
-		return devices.FindFeature(devices.IndexOf(deviceHandle.id), type);
+
+		const DeviceProperties& properties = devices.Properties(devices.IndexOf(deviceHandle.id));
+		const std::span<const FeatureEntry> featureEntries = properties.features;
+		if (const auto position = std::ranges::find(featureEntries, type, &FeatureEntry::featureType); position != featureEntries.cend())
+		{
+			return position->feature;
+		}
+
+		return nullptr;
 	}
 
 	Axis RawInputService::MakeAxis(const std::string_view axis)
