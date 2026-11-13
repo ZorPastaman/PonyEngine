@@ -224,9 +224,6 @@ export namespace PonyEngine::Resource::World
 namespace PonyEngine::Resource::World
 {
 	WorldDefinitionLoader::WorldDefinitionLoader(Application::IApplication& application) :
-#ifndef NDEBUG
-		worldDefinitionResourceCount(0uz),
-#endif
 		application{&application},
 		jobService{&this->application->GetInterface<Job::IJobService>()},
 		logService{this->application->FindInterface<Log::ILogService>()}

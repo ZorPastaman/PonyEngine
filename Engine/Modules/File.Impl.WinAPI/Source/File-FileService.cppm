@@ -58,9 +58,6 @@ export namespace PonyEngine::File
 namespace PonyEngine::File
 {
 	FileService::FileService(Application::IApplication& application) :
-#ifndef NDEBUG
-		fileCount(0uz),
-#endif
 		logService{application.FindInterface<Log::ILogService>()},
 		worker(application)
 	{

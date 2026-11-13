@@ -80,9 +80,6 @@ export namespace PonyEngine::Resource::Pack
 namespace PonyEngine::Resource::Pack
 {
 	DataAccessFactory::DataAccessFactory(LoadableDataAccessRequestWorker& requestWorker) noexcept :
-#ifndef NDEBUG
-		accessCount(0uz),
-#endif
 		requestWorker{&requestWorker}
 	{
 	}

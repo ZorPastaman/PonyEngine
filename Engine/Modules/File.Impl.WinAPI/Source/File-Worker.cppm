@@ -111,9 +111,6 @@ export namespace PonyEngine::File
 namespace PonyEngine::File
 {
 	Worker::Worker(Application::IApplication& application) :
-#ifndef NDEBUG
-		requestCount(0uz),
-#endif
 		logService{application.FindInterface<Log::ILogService>()},
 		requestAllocator(&requestPool),
 		ongoingRequestCount(0uz),

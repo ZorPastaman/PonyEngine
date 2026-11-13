@@ -97,9 +97,6 @@ export namespace PonyEngine::Resource::Pack
 namespace PonyEngine::Resource::Pack
 {
 	LoadableDataAccessRequestWorker::LoadableDataAccessRequestWorker(Job::IJobService& jobService) :
-#ifndef NDEBUG
-		requestCount(0uz),
-#endif
 		jobService{&jobService},
 		requestAllocator(&requestResource),
 		ongoingRequestCount(0uz)

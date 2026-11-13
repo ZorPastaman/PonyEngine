@@ -407,9 +407,6 @@ namespace PonyEngine::Application
 {
 	App::App(const std::span<const std::string_view> commandLine, const std::span<const std::string_view> threadRoles, std::filesystem::path executableFile,
 		std::filesystem::path localDataDirectory, std::filesystem::path userDataDirectory, std::filesystem::path tempDataDirectory, IProcess& process) :
-#ifndef NDEBUG
-		bufferCount(0uz),
-#endif
 		mainThreadId(std::this_thread::get_id()),
 		commandLine(commandLine.cbegin(), commandLine.cend()),
 		threadRoles(threadRoles.cbegin(), threadRoles.cend()),

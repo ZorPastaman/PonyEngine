@@ -78,9 +78,6 @@ export namespace PonyEngine::World
 namespace PonyEngine::World
 {
 	WorldService::WorldService(Application::IApplication& application) noexcept :
-#ifndef NDEBUG
-		worldCount(0uz),
-#endif
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()}
 	{

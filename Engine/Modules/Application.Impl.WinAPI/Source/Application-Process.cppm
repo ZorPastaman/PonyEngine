@@ -138,9 +138,6 @@ export namespace PonyEngine::Application
 namespace PonyEngine::Application
 {
 	Process::Process(const std::span<const std::string_view> commandLine) :
-#ifndef NDEBUG
-		sleeperCount(0uz),
-#endif
 		mainThreadMmcss{nullptr},
 		application(std::make_unique<App>(commandLine, GetThreadRoles(), GetExecutablePath(), GetLocalDataDirectory(), GetUserDataDirectory(), GetTempDataDirectory(), 
 			static_cast<IProcess&>(*this)))

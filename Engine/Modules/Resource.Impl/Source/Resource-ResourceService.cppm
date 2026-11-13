@@ -176,9 +176,6 @@ export namespace PonyEngine::Resource
 namespace PonyEngine::Resource
 {
 	ResourceService::ResourceService(Application::IApplication& application) noexcept :
-#ifndef NDEBUG
-		requestCount(0uz),
-#endif
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
 		loadProcessCount(0uz)

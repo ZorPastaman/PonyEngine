@@ -237,9 +237,6 @@ export namespace PonyEngine::Resource::Pack
 namespace PonyEngine::Resource::Pack
 {
 	PackService::PackService(Application::IApplication& application) :
-#ifndef NDEBUG
-		requestCount(0uz),
-#endif
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
 		resourceHub{&this->application->GetInterface<IResourceHub>()},

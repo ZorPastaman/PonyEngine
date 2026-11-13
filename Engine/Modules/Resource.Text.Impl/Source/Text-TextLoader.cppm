@@ -105,9 +105,6 @@ export namespace PonyEngine::Resource::Text
 namespace PonyEngine::Resource::Text
 {
 	TextLoader::TextLoader() :
-#ifndef NDEBUG
-		textResourceCount(0uz),
-#endif
 		ongoingRequestCount(0uz)
 	{
 	}
