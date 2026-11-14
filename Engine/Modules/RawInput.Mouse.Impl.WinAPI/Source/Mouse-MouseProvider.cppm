@@ -69,8 +69,18 @@ export namespace PonyEngine::RawInput::Mouse
 		[[nodiscard("Must be used")]]
 		static std::size_t GetPointers(const RAWMOUSE& source, std::span<std::pair<MousePointer, float>, MousePointerCount> pointers) noexcept;
 
+		/// @brief Transform the raw wheel value to an engine axis value.
+		/// @param value Wheel value.
+		/// @return Axis value.
 		[[nodiscard("Pure function")]]
 		static float ToWheelInputValue(USHORT value) noexcept;
+
+		/// @brief Connects the mouse device.
+		/// @param device Device handle.
+		void ConnectDevice(HANDLE device);
+		/// @brief Disconnects the mouse device.
+		/// @param device Device handle.
+		void DisconnectDevice(HANDLE device);
 
 		Application::IApplication* application; ///< Application.
 		IDeviceHub* hub; ///< Device hub.
@@ -83,6 +93,7 @@ export namespace PonyEngine::RawInput::Mouse
 		MouseAxisMap axisMap; ///< Axis map.
 
 		std::vector<HANDLE> nativeHandles; ///< Native handles.
+		std::vector<std::string> mouseNames; ///< Mouse names.
 		std::vector<std::unique_ptr<MouseController>> mouseControllers; ///< Mouse controller.
 		std::vector<DeviceHandle> deviceHandles; ///< Device handles.
 	};
@@ -161,43 +172,11 @@ namespace PonyEngine::RawInput::Mouse
 	{
 		if (isConnected)
 		{
-			const std::size_t nameLength = WinInput::GetDeviceNameSize(device);
-			const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(nameLength);
-			auto arena = Memory::Arena(buffer->Span());
-			const std::span<char> name = arena.AllocateArray<char>(nameLength);
-			const std::size_t nameSize = WinInput::GetDeviceName(device, name);
-
-			auto scopeGuardFlag = Utility::ScopeGuardFlag();
-
-			nativeHandles.push_back(device);
-			const auto nativeHandlesScopeGuard = Utility::ScopeGuard([&]() noexcept { nativeHandles.pop_back(); }, scopeGuardFlag);
-			mouseControllers.push_back(std::make_unique<MouseController>(axisMap, true));
-			const auto mouseControllersScopeGuard = Utility::ScopeGuard([&]() noexcept { mouseControllers.pop_back(); }, scopeGuardFlag);
-			IDeviceController& controller = mouseControllers.back()->Controller();
-			const DeviceHandle deviceHandle = hub->RegisterDevice(controller, true, DeviceParams
-			{
-				.name = std::string_view(name.data(), nameSize),
-				.type = deviceType,
-				.style = deviceStyle
-			});
-			const auto deviceHandleScopeGuard = Utility::ScopeGuard([&]() noexcept { hub->UnregisterDevice(deviceHandle, controller); }, scopeGuardFlag);
-			deviceHandles.push_back(deviceHandle);
-
-			scopeGuardFlag.Release();
+			ConnectDevice(device);
 		}
 		else
 		{
-			const std::size_t mouseIndex = std::ranges::find(nativeHandles, device) - nativeHandles.cbegin();
-			if (mouseIndex >= nativeHandles.size())
-			{
-				return;
-			}
-
-			hub->UnregisterDevice(deviceHandles[mouseIndex], mouseControllers[mouseIndex]->Controller());
-
-			deviceHandles.erase(deviceHandles.cbegin() + mouseIndex);
-			mouseControllers.erase(mouseControllers.cbegin() + mouseIndex);
-			nativeHandles.erase(nativeHandles.cbegin() + mouseIndex);
+			DisconnectDevice(device);
 		}
 	}
 
@@ -265,5 +244,50 @@ namespace PonyEngine::RawInput::Mouse
 	float MouseProvider::ToWheelInputValue(const USHORT value) noexcept
 	{
 		return static_cast<float>(std::bit_cast<SHORT>(value)) / WHEEL_DELTA;
+	}
+
+	void MouseProvider::ConnectDevice(const HANDLE device)
+	{
+		const std::size_t nameLength = WinInput::GetDeviceNameSize(device);
+		const std::shared_ptr<Application::IBuffer> buffer = application->CreateBuffer(nameLength);
+		auto arena = Memory::Arena(buffer->Span());
+		const std::span<char> rawName = arena.AllocateArray<char>(nameLength);
+		const std::size_t nameSize = WinInput::GetDeviceName(device, rawName);
+		const auto name = std::string_view(rawName.data(), nameSize);
+
+		if (const std::size_t mouseIndex = std::ranges::find(mouseNames, name) - mouseNames.cbegin(); mouseIndex < nativeHandles.size())
+		{
+			mouseControllers[mouseIndex]->SetConnection(true, messagePump->LastMessageTimePoint());
+		}
+		else
+		{
+			auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
+			nativeHandles.push_back(device);
+			const auto nativeHandlesScopeGuard = Utility::ScopeGuard([&]() noexcept { nativeHandles.pop_back(); }, scopeGuardFlag);
+			mouseNames.push_back(std::string(name));
+			const auto mouseNamesScopeGuard = Utility::ScopeGuard([&]() noexcept { mouseNames.pop_back(); }, scopeGuardFlag);
+			mouseControllers.push_back(std::make_unique<MouseController>(axisMap, true));
+			const auto mouseControllersScopeGuard = Utility::ScopeGuard([&]() noexcept { mouseControllers.pop_back(); }, scopeGuardFlag);
+			IDeviceController& controller = mouseControllers.back()->Controller();
+			const DeviceHandle deviceHandle = hub->RegisterDevice(controller, true, DeviceParams
+			{
+				.name = mouseNames.back(),
+				.type = deviceType,
+				.style = deviceStyle
+			});
+			const auto deviceHandleScopeGuard = Utility::ScopeGuard([&]() noexcept { hub->UnregisterDevice(deviceHandle, controller); }, scopeGuardFlag);
+			deviceHandles.push_back(deviceHandle);
+
+			scopeGuardFlag.Release();
+		}
+	}
+
+	void MouseProvider::DisconnectDevice(const HANDLE device)
+	{
+		if (const std::size_t mouseIndex = std::ranges::find(nativeHandles, device) - nativeHandles.cbegin(); mouseIndex < nativeHandles.size())
+		{
+			mouseControllers[mouseIndex]->SetConnection(false, messagePump->LastMessageTimePoint());
+		}
 	}
 }

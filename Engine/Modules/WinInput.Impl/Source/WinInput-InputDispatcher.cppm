@@ -65,12 +65,23 @@ export namespace PonyEngine::WinInput
 		/// @param wParam wParam.
 		/// @param lParam lParam.
 		[[nodiscard("Must be returned to system")]]
-		void ObserveRawInput(WPARAM wParam, LPARAM lParam) noexcept;
+		LRESULT ObserveRawInput(WPARAM wParam, LPARAM lParam) noexcept;
 		/// @brief Observes WM_INPUT_DEVICE_CHANGE.
 		/// @param wParam wParam.
 		/// @param lParam lParam.
 		[[nodiscard("Must be returned to system")]]
-		void ObserveRawInputDeviceChange(WPARAM wParam, LPARAM lParam) noexcept;
+		LRESULT ObserveRawInputDeviceChange(WPARAM wParam, LPARAM lParam) noexcept;
+
+		/// @brief Adds the device.
+		/// @param deviceHandle Device handle.
+		/// @return Usage key.
+		[[nodiscard("Must be used")]]
+		UINT AddDevice(HANDLE deviceHandle);
+		/// @brief Removes a device.
+		/// deviceHandle Device handle.
+		/// @return Usage key.
+		[[nodiscard("Must be used")]]
+		UINT RemoveDevice(HANDLE deviceHandle) noexcept;
 
 		/// @brief Gets a usage key (usage page | usage).
 		/// @param header Raw input header.
@@ -82,6 +93,11 @@ export namespace PonyEngine::WinInput
 		/// @return Usage key.
 		[[nodiscard("Pure function")]]
 		UINT GetUsageKey(HANDLE deviceHandle) const noexcept;
+		/// @brief Finds a usage key among previously connected devices.
+		/// @param deviceHandle Device handle.
+		/// @return Usage key and handle index.
+		[[nodiscard("Pure function")]]
+		std::pair<UINT, std::size_t> FindUsageKey(HANDLE deviceHandle) const noexcept;
 
 		/// @brief Calculates a total count of raw input observers.
 		/// @return Raw input observer count.
@@ -117,6 +133,7 @@ namespace PonyEngine::WinInput
 		{
 			const auto dispatcher = static_cast<InputDispatcher*>(reinterpret_cast<CREATESTRUCTA*>(lParam)->lpCreateParams);
 			SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(dispatcher));
+			return 0;
 		}
 
 		if (const auto dispatcher = reinterpret_cast<InputDispatcher*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA))) [[likely]]
@@ -124,11 +141,9 @@ namespace PonyEngine::WinInput
 			switch (msg)
 			{
 			case WM_INPUT:
-				dispatcher->ObserveRawInput(wParam, lParam);
-				break;
+				return dispatcher->ObserveRawInput(wParam, lParam);
 			case WM_INPUT_DEVICE_CHANGE:
-				dispatcher->ObserveRawInputDeviceChange(wParam, lParam);
-				break;
+				return dispatcher->ObserveRawInputDeviceChange(wParam, lParam);
 			default:
 				break;
 			}
@@ -238,18 +253,18 @@ namespace PonyEngine::WinInput
 		assert(false && "Observer wasn't added");
 	}
 
-	void InputDispatcher::ObserveRawInput(const WPARAM wParam, const LPARAM lParam) noexcept
+	LRESULT InputDispatcher::ObserveRawInput(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		const auto rawInputInfo = reinterpret_cast<HRAWINPUT>(lParam);
 		UINT size = 0u;
 		if (GetRawInputData(rawInputInfo, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER))) [[unlikely]]
 		{
 			PONY_LOG(logService, Log::LogType::Error, "Failed to get raw input size. Error code: '0x{:X}'.", GetLastError());
-			return;
+			return 0;
 		}
 		if (size < 1u) [[unlikely]]
 		{
-			return;
+			return 0;
 		}
 
 		std::shared_ptr<Application::IBuffer> buffer;
@@ -260,21 +275,21 @@ namespace PonyEngine::WinInput
 		catch (...)
 		{
 			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On allocating raw input buffer.");
-			return;
+			return 0;
 		}
 
 		const std::span<std::byte> bufferData = buffer->Span();
 		if (GetRawInputData(rawInputInfo, RID_INPUT, bufferData.data(), &size, sizeof(RAWINPUTHEADER)) != size) [[unlikely]]
 		{
 			PONY_LOG(logService, Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
-			return;
+			return 0;
 		}
 
 		const RAWINPUT* const input = reinterpret_cast<RAWINPUT*>(bufferData.data());
 		const UINT usageKey = GetUsageKey(input->header);
 		if (usageKey == 0u) [[unlikely]]
 		{
-			return;
+			return 0;
 		}
 
 		if (const auto position = rawInputObservers.find(usageKey); position != rawInputObservers.cend()) [[likely]]
@@ -291,66 +306,85 @@ namespace PonyEngine::WinInput
 				}
 			}
 		}
+
+		return 0;
 	}
 
-	void InputDispatcher::ObserveRawInputDeviceChange(const WPARAM wParam, const LPARAM lParam) noexcept
+	LRESULT InputDispatcher::ObserveRawInputDeviceChange(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		bool isConnected;
-		switch (wParam)
-		{
-		case GIDC_ARRIVAL:
-			isConnected = true;
-			break;
-		case GIDC_REMOVAL:
-			isConnected = false;
-			break;
-		default: [[unlikely]]
-			return;
-		}
-
 		const auto deviceHandle = reinterpret_cast<HANDLE>(lParam);
 		if (!deviceHandle) [[unlikely]]
 		{
-			return;
-		}
-		const UINT usageKey = GetUsageKey(deviceHandle);
-		if (usageKey == 0u) [[unlikely]]
-		{
-			return;
+			return 0;
 		}
 
+		UINT usageKey;
+		bool isConnected;
 		try
 		{
-			if (isConnected)
+			switch (wParam)
 			{
-				connectedDevices[usageKey].push_back(deviceHandle);
-			}
-			else
-			{
-				std::vector<HANDLE>& devices = connectedDevices[usageKey];
-				devices.erase(std::ranges::find(devices, deviceHandle));
+			case GIDC_ARRIVAL:
+				usageKey = AddDevice(deviceHandle);
+				isConnected = true;
+				break;
+			case GIDC_REMOVAL:
+				usageKey = RemoveDevice(deviceHandle);
+				isConnected = false;
+				break;
+			default: [[unlikely]]
+				return 0;
 			}
 		}
 		catch (...)
 		{
 			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On updating WinAPI connected device list.");
-			return;
+			return 0;
 		}
 
-		if (const auto position = rawInputObservers.find(usageKey); position != rawInputObservers.cend()) [[likely]]
+		if (usageKey != 0u)
 		{
-			for (IRawInputObserver* const observer : position->second)
+			if (const auto position = rawInputObservers.find(usageKey); position != rawInputObservers.cend()) [[likely]]
 			{
-				try
+				for (IRawInputObserver* const observer : position->second)
 				{
-					observer->OnDeviceConnectionChanged(deviceHandle, isConnected);
-				}
-				catch (...)
-				{
-					PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On calling '{}' raw input observer on device connection changed.", typeid(*observer).name());
+					try
+					{
+						observer->OnDeviceConnectionChanged(deviceHandle, isConnected);
+					}
+					catch (...)
+					{
+						PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On calling '{}' raw input observer on device connection changed.", 
+							typeid(*observer).name());
+					}
 				}
 			}
 		}
+
+		return 0;
+	}
+
+	UINT InputDispatcher::AddDevice(const HANDLE deviceHandle)
+	{
+		const UINT usageKey = GetUsageKey(deviceHandle);
+		if (usageKey != 0u)
+		{
+			connectedDevices[usageKey].push_back(deviceHandle);
+		}
+
+		return usageKey;
+	}
+
+	UINT InputDispatcher::RemoveDevice(const HANDLE deviceHandle) noexcept
+	{
+		const auto [usageKey, deviceIndex] = FindUsageKey(deviceHandle);
+		if (usageKey != 0u)
+		{
+			std::vector<HANDLE>& devices = connectedDevices[usageKey];
+			devices.erase(devices.cbegin() + deviceIndex);
+		}
+
+		return usageKey;
 	}
 
 	UINT InputDispatcher::GetUsageKey(const RAWINPUTHEADER& header) const noexcept
@@ -390,6 +424,20 @@ namespace PonyEngine::WinInput
 		PONY_LOG(logService, Log::LogType::Error, "Failed to get hid device usage. Handle: '0x{:X}'; Error code: '0x{:X}'.", 
 			reinterpret_cast<std::uintptr_t>(deviceHandle), GetLastError());
 		return 0u;
+	}
+
+	std::pair<UINT, std::size_t> InputDispatcher::FindUsageKey(const HANDLE deviceHandle) const noexcept
+	{
+		for (const auto& [usageKey, handles] : connectedDevices)
+		{
+			const std::size_t index = std::ranges::find(handles, deviceHandle) - handles.cbegin();
+			if (index < handles.size())
+			{
+				return std::pair(usageKey, index);
+			}
+		}
+
+		return std::pair(0u, std::numeric_limits<std::size_t>::max());
 	}
 
 	std::size_t InputDispatcher::RawInputObserverCount() const noexcept
