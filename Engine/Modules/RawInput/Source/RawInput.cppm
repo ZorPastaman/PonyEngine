@@ -17,6 +17,7 @@ export import :DeviceStyle;
 export import :DeviceType;
 export import :Gamepad;
 export import :InputType;
+export import :Interface;
 export import :IRawInputObserver;
 export import :IRawInputService;
 export import :IVibrating;

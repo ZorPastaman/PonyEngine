@@ -84,10 +84,13 @@ namespace PonyEngine::RawInput::XInput
 		{
 			GamepadController& controller = gamepadControllers[i];
 			const std::string name = std::format("XInput_{}", i);
+			const std::string friendlyName = std::format("XInput {}", i);
 			const auto vibratingFeature = FeatureEntry::Make<IVibrating>(controller);
 			deviceHandles[i] = deviceHub->RegisterDevice(controller.Controller(), controller.IsConnected(), DeviceParams
 			{
 				.name = name,
+				.friendlyName = friendlyName,
+				.interfaceName = Interface::XInput,
 				.type = type,
 				.style = style,
 				.features = std::span(&vibratingFeature, 1uz)

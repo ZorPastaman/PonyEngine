@@ -21,8 +21,12 @@ export namespace PonyEngine::RawInput
 	struct DeviceParams final
 	{
 		std::string_view name; ///< Device name.
+		std::string_view friendlyName; ///< Device friendly name.
+		std::string_view interfaceName; ///< Device interface name.
+
 		DeviceType type; ///< Device type.
 		DeviceStyle style; ///< Device style.
+
 		std::span<const FeatureEntry> features; ///< Device features.
 	};
 }

@@ -270,9 +270,12 @@ namespace PonyEngine::RawInput::Mouse
 			mouseControllers.push_back(std::make_unique<MouseController>(axisMap, true));
 			const auto mouseControllersScopeGuard = Utility::ScopeGuard([&]() noexcept { mouseControllers.pop_back(); }, scopeGuardFlag);
 			IDeviceController& controller = mouseControllers.back()->Controller();
+			const std::string friendlyName = std::format("Mouse {}", mouseIndex);
 			const DeviceHandle deviceHandle = hub->RegisterDevice(controller, true, DeviceParams
 			{
 				.name = mouseNames.back(),
+				.friendlyName = friendlyName,
+				.interfaceName = Interface::RawInput,
 				.type = deviceType,
 				.style = deviceStyle
 			});

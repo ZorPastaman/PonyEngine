@@ -168,9 +168,12 @@ namespace PonyEngine::RawInput::Keyboard
 			keyboardControllers.push_back(std::make_unique<KeyboardController>(true));
 			const auto keyboardControllersScopeGuard = Utility::ScopeGuard([&]() noexcept { keyboardControllers.pop_back(); }, scopeGuardFlag);
 			IDeviceController& controller = keyboardControllers.back()->Controller();
+			const std::string friendlyName = std::format("Keyboard {}", keyboardIndex);
 			const DeviceHandle deviceHandle = hub->RegisterDevice(controller, true, DeviceParams
 			{
 				.name = keyboardNames.back(),
+				.friendlyName = friendlyName,
+				.interfaceName = Interface::RawInput,
 				.type = deviceType,
 				.style = deviceStyle
 			});

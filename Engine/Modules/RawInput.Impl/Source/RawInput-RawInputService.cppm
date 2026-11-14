@@ -252,6 +252,8 @@ namespace PonyEngine::RawInput
 		return RawInput::DeviceInfo
 		{
 			.name = properties.name,
+			.friendlyName = properties.friendlyName,
+			.interfaceName = properties.interfaceName,
 			.type = properties.type,
 			.style = properties.style
 		};

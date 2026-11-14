@@ -20,6 +20,9 @@ export namespace PonyEngine::RawInput
 	struct DeviceInfo final
 	{
 		std::string_view name; ///< Device name.
+		std::string_view friendlyName; ///< Device friendly name.
+		std::string_view interfaceName; ///< Device interface name. It's a source API name.
+
 		DeviceType type; ///< Device type.
 		DeviceStyle style; ///< Device style.
 	};

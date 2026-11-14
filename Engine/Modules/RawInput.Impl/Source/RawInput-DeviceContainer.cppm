@@ -246,6 +246,8 @@ namespace PonyEngine::RawInput
 		properties.insert(properties.cbegin() + index, DeviceProperties
 		{
 			.name = std::string(params.name),
+			.friendlyName = std::string(params.friendlyName),
+			.interfaceName = std::string(params.interfaceName),
 			.type = params.type,
 			.style = params.style,
 			.features = std::vector(params.features.cbegin(), params.features.cend())
