@@ -13,6 +13,7 @@ if(PONY_ENGINE_APPLICATION_MODE STREQUAL "Console" AND PONY_ENGINE_APPLICATION_C
 	message(FATAL_ERROR "PONY_ENGINE_APPLICATION_CREATE_CONSOLE can't be TRUE if PONY_ENGINE_APPLICATION_MODE = Console")
 endif()
 
+include("CMake/Manifest.cmake")
 include("CMake/Resource.cmake")
 include("CMake/ThreadRole.cmake")
 
@@ -26,8 +27,9 @@ target_sources(PonyEngine.Application.Impl PRIVATE FILE_SET CXX_MODULES BASE_DIR
 )
 
 if(PONY_ENGINE_APPLICATION_ADD_DEFAULT_MANIFEST)
-	set(MANIFEST_PATH "${CMAKE_CURRENT_BINARY_DIR}/Generated/Data/Application.manifest")
-	configure_file("Data/Application.manifest.in" "${MANIFEST_PATH}")
+	string(REGEX REPLACE "\\\\$" "" PONY_WINDOWS_SDK_VERSION "$ENV{WindowsSDKVersion}")
+	set(MANIFEST_PATH "${CMAKE_CURRENT_BINARY_DIR}/Generated/Manifests/Application.manifest")
+	configure_file("Manifests/Application.manifest.in" "${MANIFEST_PATH}")
 	target_sources(PonyEngine.Application.Impl PRIVATE "${MANIFEST_PATH}")
 endif()
 

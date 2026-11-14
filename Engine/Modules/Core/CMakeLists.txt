@@ -35,6 +35,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Math-Matrix.cppm"
 	"Source/Math-OrientedBox.cppm"
 	"Source/Math-Quaternion.cppm"
+	"Source/Math-Rational.cppm"
 	"Source/Math-Ray.cppm"
 	"Source/Math-Transformations.cppm"
 	"Source/Math-Vector.cppm"

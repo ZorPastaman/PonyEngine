@@ -21,6 +21,7 @@ export import :Intersections;
 export import :Matrix;
 export import :OrientedBox;
 export import :Quaternion;
+export import :Rational;
 export import :Ray;
 export import :Transformations;
 export import :Vector;

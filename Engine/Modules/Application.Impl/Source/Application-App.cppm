@@ -1146,6 +1146,7 @@ namespace PonyEngine::Application
 			try
 			{
 				appModule->StartUp(context);
+				++count;
 			}
 			catch (...)
 			{
@@ -1159,7 +1160,7 @@ namespace PonyEngine::Application
 	void App::ShutDownModules(const std::span<const std::shared_ptr<IModule>> modules, const std::size_t count) noexcept
 	{
 		auto context = ShutDownModuleContext(*this);
-		for (std::size_t i = modules.size(); i-- > 0uz; )
+		for (std::size_t i = count; i-- > 0uz; )
 		{
 			const std::shared_ptr<IModule>& appModule = modules[i];
 			PONY_LOG(logService, Log::LogType::Info, "Shutting down '{}' module...", typeid(*appModule).name());

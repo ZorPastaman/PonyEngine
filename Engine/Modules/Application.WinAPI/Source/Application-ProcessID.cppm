@@ -17,5 +17,5 @@ export module PonyEngine.Application:ProcessID;
 
 export namespace PonyEngine::Application
 {
-	using ProcessID = DWORD; ///< WinAPI process ID.
+	using ProcessID = DWORD; ///< Native process ID.
 }
