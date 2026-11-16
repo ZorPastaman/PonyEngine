@@ -66,14 +66,17 @@ export namespace PonyEngine::Memory
 			struct Marker marker; ///< Marker.
 		};
 
+		/// @brief Creates an invalid arena.
+		[[nodiscard("Pure constructor")]]
+		Arena() noexcept;
 		/// @brief Creates an arena.
 		/// @param buffer Buffer.
 		[[nodiscard("Pure constructor")]]
 		explicit Arena(std::span<std::byte> buffer) noexcept;
 		[[nodiscard("Pure constructor")]]
-		Arena(const Arena&) = delete;
+		Arena(const Arena& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		Arena(Arena&&) = delete;
+		Arena(Arena&& other) noexcept = default;
 
 		~Arena() noexcept = default;
 
@@ -107,6 +110,11 @@ export namespace PonyEngine::Memory
 		/// @param marker Marker to rewind to.
 		void Rewind(Marker marker = Marker{}) noexcept;
 
+		/// @brief Checks if the arena is valid.
+		/// @return @a True if it's valid; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsValid() const noexcept;
+
 		/// @brief Allocates a memory for an object.
 		/// @param objectAlignment Object alignment.
 		/// @param objectSize Object size.
@@ -131,8 +139,8 @@ export namespace PonyEngine::Memory
 		template<typename T>
 		std::span<T> AllocateArray(std::size_t count);
 
-		Arena& operator =(const Arena&) = delete;
-		Arena& operator =(Arena&&) = delete;
+		Arena& operator =(const Arena& other) noexcept = default;
+		Arena& operator =(Arena&& other) noexcept = default;
 
 	private:
 		std::span<std::byte> buffer; ///< Memory buffer.
@@ -197,6 +205,11 @@ namespace PonyEngine::Memory
 		return *this;
 	}
 
+	Arena::Arena() noexcept :
+		size{0uz}
+	{
+	}
+
 	Arena::Arena(const std::span<std::byte> buffer) noexcept :
 		buffer(buffer),
 		size{0uz}
@@ -237,6 +250,11 @@ namespace PonyEngine::Memory
 	{
 		assert(marker.mark <= size && "Invalid rewind call.");
 		size = marker.mark;
+	}
+
+	bool Arena::IsValid() const noexcept
+	{
+		return buffer.data();
 	}
 
 	void* Arena::AllocateObject(const std::size_t objectAlignment, const std::size_t objectSize)

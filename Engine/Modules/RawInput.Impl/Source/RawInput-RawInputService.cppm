@@ -145,6 +145,10 @@ export namespace PonyEngine::RawInput
 		/// @return @a True if it's invalid; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsInvalid(DeviceHandle handle) const noexcept;
+		/// @brief Create a new device handle.
+		/// @return Device handle.
+		[[nodiscard("Weird call")]]
+		DeviceHandle CreateDeviceHandle();
 		/// @brief Makes a new device handle.
 		/// @return Device handle.
 		[[nodiscard("Weird call")]]
@@ -442,7 +446,7 @@ namespace PonyEngine::RawInput
 
 		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
-		const DeviceHandle currentHandle = deadDeviceHandleIds.empty() ? MakeDeviceHandle() : ResurrectDeviceHandle();
+		const DeviceHandle currentHandle = CreateDeviceHandle();
 		const auto deviceHandleScopeGuard = Utility::ScopeGuard([&]() noexcept { KillDeviceHandle(currentHandle); }, scopeGuardFlag);
 		devices.Add(currentHandle.id, deviceController, isConnected, params);
 		PONY_LOG(logService, Log::LogType::Info, "Device registered. HandleID: '0x{:X}'; Controller: '{}'; Name: '{}'.", 
@@ -559,6 +563,11 @@ namespace PonyEngine::RawInput
 	bool RawInputService::IsInvalid(const DeviceHandle handle) const noexcept
 	{
 		return Math::IsEven(handle.version) || handle.id >= deviceHandleVersions.size() || deviceHandleVersions[handle.id] != handle.version;
+	}
+
+	DeviceHandle RawInputService::CreateDeviceHandle()
+	{
+		return deadDeviceHandleIds.empty() ? MakeDeviceHandle() : ResurrectDeviceHandle();
 	}
 
 	DeviceHandle RawInputService::MakeDeviceHandle()

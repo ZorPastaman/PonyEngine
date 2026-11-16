@@ -9,4 +9,6 @@
 
 export module PonyEngine.Display.Impl.WinAPI;
 
+export import PonyEngine.Display.Impl;
+
 export import :DisplayServiceModule;

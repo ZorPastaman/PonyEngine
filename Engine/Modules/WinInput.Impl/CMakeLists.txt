@@ -14,7 +14,7 @@ target_sources(PonyEngine.WinInput.Impl PUBLIC
 target_sources(PonyEngine.WinInput.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
-target_sources(PonyEngine.WinInput.Impl PUBLIC FILE_SET CXX_MODULES FILES
+target_sources(PonyEngine.WinInput.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/WinInput.cppm"
 	"Source/WinInput-InputDispatcher.cppm"
 	"Source/WinInput-InputDispatcherModule.cppm"

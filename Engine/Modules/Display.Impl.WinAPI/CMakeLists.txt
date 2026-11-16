@@ -12,10 +12,14 @@ target_sources(PonyEngine.Display.Impl PUBLIC
 target_sources(PonyEngine.Display.Impl PRIVATE
 	"Source/Launch.Impl.cpp"
 )
-target_sources(PonyEngine.Display.Impl PUBLIC FILE_SET CXX_MODULES FILES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
+target_sources(PonyEngine.Display.Impl PRIVATE FILE_SET CXX_MODULES FILES BASE_DIRS "${CMAKE_CURRENT_LIST_DIR}" FILES
 	"Source/Display.cppm"
+	"Source/Display-DisplayContainer.cppm"
+	"Source/Display-DisplayID.cppm"
+	"Source/Display-DisplayProperties.cppm"
 	"Source/Display-DisplayService.cppm"
 	"Source/Display-DisplayServiceModule.cppm"
+	"Source/Display-DisplayState.cppm"
 )
 
 pony_add_winapi_manifest("Manifests/DPIAwareness.manifest")

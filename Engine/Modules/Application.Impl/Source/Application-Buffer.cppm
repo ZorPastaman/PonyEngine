@@ -40,6 +40,8 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]] 
 		virtual std::size_t Alignment() const noexcept override;
 
+		virtual bool EnsureSize(std::size_t size) override;
+
 		/// @brief Gets the buffer data.
 		/// @return Buffer data.
 		[[nodiscard("Pure function")]]
@@ -78,6 +80,17 @@ namespace PonyEngine::Application
 	std::size_t Buffer::Alignment() const noexcept
 	{
 		return buffer.get_allocator().Alignment();
+	}
+
+	bool Buffer::EnsureSize(const std::size_t size)
+	{
+		if (buffer.size() < size)
+		{
+			buffer.resize(size);
+			return true;
+		}
+
+		return false;
 	}
 
 	std::vector<std::byte, Container::AlignedAllocator<std::byte>>& Buffer::Data() noexcept

@@ -18,8 +18,9 @@ export namespace PonyEngine::Display
 	/// @brief Display info.
 	struct DisplayInfo final
 	{
-		std::string_view name; ///< Display name.
-		std::string_view friendlyName; ///< Display friendly name.
+		std::string_view sourceName; ///< Display source name.
+		std::string_view targetName; ///< Display target name.
+		std::string_view friendlyTargetName; ///< Display friendly target name.
 
 		Math::Vector2<std::uint32_t> resolution; ///< Display resolution in pixels.
 		Math::Rational<std::uint32_t> refreshRate; ///< Display refresh rate.

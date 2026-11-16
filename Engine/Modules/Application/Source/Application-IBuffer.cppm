@@ -39,5 +39,11 @@ export namespace PonyEngine::Application
 		/// @return Alignment.
 		[[nodiscard("Pure function")]]
 		virtual std::size_t Alignment() const noexcept = 0;
+
+		/// @brief Ensures the buffer size.
+		/// @param size Required size.
+		/// @return @a True if the buffer was changed; @a false otherwise.
+		/// @note The previously returned span may become invalid.
+		virtual bool EnsureSize(std::size_t size) = 0;
 	};
 }

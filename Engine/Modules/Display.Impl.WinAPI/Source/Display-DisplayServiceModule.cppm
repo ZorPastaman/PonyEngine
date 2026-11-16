@@ -36,7 +36,7 @@ export namespace PonyEngine::Display
 		DisplayServiceModule& operator =(DisplayServiceModule&&) = delete;
 
 	private:
-		std::unique_ptr<DisplayService> displayService;
+		std::unique_ptr<DisplayService> displayService; ///< Display service.
 	};
 }
 
