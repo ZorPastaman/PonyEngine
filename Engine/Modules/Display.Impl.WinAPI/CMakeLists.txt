@@ -16,7 +16,6 @@ target_sources(PonyEngine.Display.Impl PRIVATE FILE_SET CXX_MODULES FILES BASE_D
 	"Source/Display.cppm"
 	"Source/Display-DisplayContainer.cppm"
 	"Source/Display-DisplayID.cppm"
-	"Source/Display-DisplayProperties.cppm"
 	"Source/Display-DisplayService.cppm"
 	"Source/Display-DisplayServiceModule.cppm"
 	"Source/Display-DisplayState.cppm"

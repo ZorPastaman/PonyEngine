@@ -7,17 +7,37 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Display.Impl.WinAPI:DisplayProperties;
+module;
+
+#include "PonyEngine/Utility/Enum.h"
+
+export module PonyEngine.Display:ColorMode;
 
 import std;
 
 export namespace PonyEngine::Display
 {
-	/// @brief Display properties.
-	struct DisplayProperties final
+	/// @brief Color modes.
+	enum class ColorMode : std::uint8_t
 	{
-		std::string sourceName; ///< Display source name.
-		std::string targetName; ///< Display target name.
-		std::string friendlyTargetName; ///< Display friendly target name.
+		SDR,
+		WCG,
+		HDR
 	};
+}
+
+namespace PonyEngine::Display
+{
+	/// @brief Color mode names.
+	constexpr std::array<std::string_view, 3> ColorModeNames
+	{
+		"SDR",
+		"WCG",
+		"HDR"
+	};
+}
+
+export
+{
+	PONY_ENUM_VALUE_FORMATTER(PonyEngine::Display::ColorMode, PonyEngine::Display::ColorModeNames)
 }

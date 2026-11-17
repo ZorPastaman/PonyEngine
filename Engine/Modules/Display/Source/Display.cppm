@@ -9,6 +9,7 @@
 
 export module PonyEngine.Display;
 
+export import :ColorMode;
 export import :DisplayHandle;
 export import :DisplayInfo;
 export import :IDisplayService;
