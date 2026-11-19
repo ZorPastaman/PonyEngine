@@ -15,6 +15,9 @@ export module PonyEngine.Display:IDisplayService;
 
 import :DisplayHandle;
 import :DisplayInfo;
+import :IWindow;
+import :WindowParams;
+import :WindowSupport;
 
 export namespace PonyEngine::Display
 {
@@ -52,5 +55,10 @@ export namespace PonyEngine::Display
 		/// @note The function must be called on a main thread.
 		[[nodiscard("Pure function")]]
 		virtual DisplayInfo DisplayInfo(DisplayHandle displayHandle) const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual struct WindowSupport WindowSupport() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IWindow> CreateWindow(const WindowParams& params) = 0;
 	};
 }

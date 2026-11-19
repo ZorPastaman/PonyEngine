@@ -19,6 +19,7 @@ target_sources(PonyEngine.Display.Impl PRIVATE FILE_SET CXX_MODULES FILES BASE_D
 	"Source/Display-DisplayService.cppm"
 	"Source/Display-DisplayServiceModule.cppm"
 	"Source/Display-DisplayState.cppm"
+	"Source/Display-Window.cppm"
 )
 
 pony_add_winapi_manifest("Manifests/DPIAwareness.manifest")

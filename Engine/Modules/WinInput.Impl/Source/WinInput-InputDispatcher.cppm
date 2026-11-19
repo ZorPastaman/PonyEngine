@@ -25,19 +25,8 @@ import std;
 import PonyEngine.Application;
 import PonyEngine.FileSystem.WinAPI;
 import PonyEngine.Log;
+import PonyEngine.Utility;
 import PonyEngine.WinInput;
-
-namespace PonyEngine::WinInput
-{
-	/// @brief Window proc for the @p InputDispatcher.
-	/// @param hwnd Window handle.
-	/// @param msg Message.
-	/// @param wParam wParam.
-	/// @param lParam lParam.
-	/// @return Result.
-	[[nodiscard("Must be returned to system")]]
-	LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
-}
 
 export namespace PonyEngine::WinInput
 {
@@ -61,6 +50,14 @@ export namespace PonyEngine::WinInput
 		InputDispatcher& operator =(InputDispatcher&&) = delete;
 
 	private:
+		/// @brief Window proc for the @p InputDispatcher.
+		/// @param hwnd Window handle.
+		/// @param msg Message.
+		/// @param wParam wParam.
+		/// @param lParam lParam.
+		/// @return Result.
+		[[nodiscard("Must be returned to system")]]
+		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		/// @brief Observes WM_INPUT.
 		/// @param wParam wParam.
 		/// @param lParam lParam.
@@ -120,43 +117,18 @@ export namespace PonyEngine::WinInput
 
 		std::unordered_map<UINT, std::vector<IRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 		std::unordered_map<UINT, std::vector<HANDLE>> connectedDevices; ///< Connected devices.
-
-		friend LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	};
 }
 
 namespace PonyEngine::WinInput
 {
-	LRESULT WindowProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) noexcept
-	{
-		if (msg == WM_CREATE) [[unlikely]]
-		{
-			const auto dispatcher = static_cast<InputDispatcher*>(reinterpret_cast<CREATESTRUCTA*>(lParam)->lpCreateParams);
-			SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(dispatcher));
-			return 0;
-		}
-
-		if (const auto dispatcher = reinterpret_cast<InputDispatcher*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA))) [[likely]]
-		{
-			switch (msg)
-			{
-			case WM_INPUT:
-				return dispatcher->ObserveRawInput(wParam, lParam);
-			case WM_INPUT_DEVICE_CHANGE:
-				return dispatcher->ObserveRawInputDeviceChange(wParam, lParam);
-			default:
-				break;
-			}
-		}
-
-		return DefWindowProcA(hwnd, msg, wParam, lParam);
-	}
-
 	InputDispatcher::InputDispatcher(Application::IApplication& application) :
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
 		moduleHandle{FileSystem::GetModule()}
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
 		const auto wc = WNDCLASSEXA
 		{
 			.cbSize = sizeof(WNDCLASSEXA),
@@ -177,19 +149,21 @@ namespace PonyEngine::WinInput
 		{
 			throw std::runtime_error(std::format("Failed to register class: ErrorCode = '0x{:X}'", GetLastError()));
 		}
+		const auto classScopeGuard = Utility::ScopeGuard([&]() noexcept
+		{
+			if (!UnregisterClassA(reinterpret_cast<LPCSTR>(classHandle), moduleHandle)) [[unlikely]]
+			{
+				PONY_LOG(logService, Log::LogType::Error, "Failed to unregister class on message window creation failure. Error code: '0x{:X}'.", GetLastError());
+			}
+		}, scopeGuardFlag);
 
 		hwnd = CreateWindowExA(0, reinterpret_cast<LPCSTR>(classHandle), "PonyEngineRawInput", 0, 0, 0, 0, 0, HWND_MESSAGE, nullptr, moduleHandle, this);
 		if (!hwnd) [[unlikely]]
 		{
-			const DWORD windowError = GetLastError();
-
-			if (!UnregisterClassA(reinterpret_cast<LPCSTR>(classHandle), moduleHandle)) [[unlikely]]
-			{
-				PONY_LOG(logService, Log::LogType::Error, "Failed to window unregister class on message window creation failure. Error code: '0x{:X}'.", GetLastError());
-			}
-
-			throw std::runtime_error(std::format("Failed to create message window: Error code = '0x{:X}'", windowError));
+			throw std::runtime_error(std::format("Failed to create message window: Error code = '0x{:X}'", GetLastError()));
 		}
+
+		scopeGuardFlag.Release();
 	}
 
 	InputDispatcher::~InputDispatcher() noexcept
@@ -251,6 +225,31 @@ namespace PonyEngine::WinInput
 		}
 
 		assert(false && "Observer wasn't added");
+	}
+
+	LRESULT InputDispatcher::WindowProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		if (msg == WM_CREATE) [[unlikely]]
+		{
+			const auto dispatcher = static_cast<InputDispatcher*>(reinterpret_cast<CREATESTRUCTA*>(lParam)->lpCreateParams);
+			SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(dispatcher));
+			return 0;
+		}
+
+		if (const auto dispatcher = reinterpret_cast<InputDispatcher*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA))) [[likely]]
+		{
+			switch (msg)
+			{
+			case WM_INPUT:
+				return dispatcher->ObserveRawInput(wParam, lParam);
+			case WM_INPUT_DEVICE_CHANGE:
+				return dispatcher->ObserveRawInputDeviceChange(wParam, lParam);
+			default:
+				break;
+			}
+		}
+
+		return DefWindowProcA(hwnd, msg, wParam, lParam);
 	}
 
 	LRESULT InputDispatcher::ObserveRawInput(const WPARAM wParam, const LPARAM lParam) noexcept

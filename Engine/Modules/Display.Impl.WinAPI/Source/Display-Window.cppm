@@ -1,0 +1,426 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include <cassert>
+
+#include "PonyEngine/Log/Log.h"
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+
+export module PonyEngine.Display.Impl.WinAPI:Window;
+
+import std;
+
+import PonyEngine.Application;
+import PonyEngine.Display;
+import PonyEngine.Log;
+import PonyEngine.Math;
+import PonyEngine.Utility;
+
+import :DisplayContainer;
+import :DisplayState;
+
+export namespace PonyEngine::Display
+{
+	class Window final : public IWindow
+	{
+	public:
+		static constexpr auto MaxWindowSize = Math::Vector2<std::uint32_t>(std::numeric_limits<int>::max());
+
+		[[nodiscard("Pure constructor")]]
+		Window(Application::IApplication& application, const DisplayContainer& displayContainer, ATOM windowClass, HMODULE moduleHandle, const WindowParams& params);
+		Window(const Window&) = delete;
+		Window(Window&&) = delete;
+
+		~Window() noexcept;
+
+		[[nodiscard("Pure function")]]
+		static WNDCLASSEXA MakeWindowClassDesc(HMODULE moduleHandle) noexcept;
+
+		Window& operator =(const Window&) = delete;
+		Window& operator =(Window&&) = delete;
+
+	private:
+		struct SizeLimits final
+		{
+			Math::Vector2<int> min;
+			Math::Vector2<int> max;
+		};
+		struct FullscreenPositionSizeMode final
+		{
+		};
+		struct WindowedPositionSizeMode final
+		{
+			std::optional<SizeLimits> sizeLimits;
+		};
+		using PositionSizeMode = std::variant<FullscreenPositionSizeMode, WindowedPositionSizeMode>;
+
+		[[nodiscard("Pure function")]]
+		static PositionSizeMode CalculatePositionSizeMode(const WindowMode& mode);
+
+		[[nodiscard("Pure function")]]
+		Math::CornerRect<int> CalculateClientRect(const WindowMode& mode) const;
+		[[nodiscard("Pure function")]]
+		Math::CornerRect<int> CalculateClientRect(const FullscreenWindowMode& mode) const;
+		[[nodiscard("Pure function")]]
+		static Math::CornerRect<int> CalculateClientRect(const WindowedWindowMode& mode);
+		[[nodiscard("Pure function")]]
+		static Math::Vector2<int> CalculateClientSize(const WindowedWindowMode& mode);
+
+		[[nodiscard("Pure function")]]
+		static Math::CornerRect<int> CalculateWindowRect(const Math::CornerRect<int>& clientRect, DWORD style, DWORD styleEx, UINT dpi);
+
+		[[nodiscard("Pure function")]]
+		static Math::CornerRect<int> ToCornerRect(const RECT& rect) noexcept;
+		[[nodiscard("Pure function")]]
+		static RECT ToRect(const Math::CornerRect<int>& rect) noexcept;
+
+		[[nodiscard("Pure function")]]
+		static std::pair<DWORD, DWORD> CalculateStyle(const WindowMode& mode) noexcept;
+		[[nodiscard("Pure function")]]
+		static std::pair<DWORD, DWORD> CalculateStyle(const FullscreenWindowMode& mode) noexcept;
+		[[nodiscard("Pure function")]]
+		static std::pair<DWORD, DWORD> CalculateStyle(const WindowedWindowMode& mode) noexcept;
+
+		[[nodiscard("Pure function")]]
+		Math::CornerRect<int> GetWindowRect() const;
+		void SetWindowRect(const Math::CornerRect<int>& rect);
+
+		[[nodiscard("Must be returned to system")]]
+		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard("Must be used")]]
+		LRESULT ObserveCreate(WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard("Must be used")]]
+		LRESULT ObserveDestroy(WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard("Must be used")]]
+		LRESULT ObserveEraseBackground(WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard("Must be used")]]
+		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
+
+		static constexpr DWORD ResizableByUserStyle = WS_THICKFRAME & WS_MAXIMIZEBOX;
+		static constexpr DWORD FullscreenStyle = WS_POPUP;
+		static constexpr DWORD FullscreenStyleEx = WS_EX_APPWINDOW;
+		static constexpr DWORD WindowedStyle = WS_OVERLAPPEDWINDOW & ~ResizableByUserStyle;
+		static constexpr DWORD WindowedStyleEx = WS_EX_APPWINDOW;
+
+		Application::IApplication* application;
+		const Log::ILogService* logService;
+
+		const DisplayContainer* displayContainer;
+
+		HWND windowHandle;
+
+		PositionSizeMode positionSizeMode;
+		bool quitOnDestroy;
+	};
+}
+
+namespace PonyEngine::Display
+{
+	Window::Window(Application::IApplication& application, const DisplayContainer& displayContainer, const ATOM windowClass, const HMODULE moduleHandle,
+		const WindowParams& params) :
+		application{&application},
+		logService{this->application->FindInterface<Log::ILogService>()},
+		displayContainer{&displayContainer},
+		positionSizeMode(CalculatePositionSizeMode(params.mode)),
+		quitOnDestroy{params.quitOnDestroy}
+	{
+		const Math::CornerRect<int> clientRect = CalculateClientRect(params.mode);
+		const auto [style, styleEx] = CalculateStyle(params.mode);
+		const std::string_view title = params.title ? *params.title : this->application->ProjectTitle();
+
+		windowHandle = CreateWindowExA(styleEx, reinterpret_cast<LPCSTR>(windowClass), title.data(), style,
+			clientRect.Position().X(), clientRect.Position().Y(), clientRect.Size().X(), clientRect.Size().Y(), nullptr, nullptr, moduleHandle, this);
+		if (!windowHandle) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create window: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		if (const UINT dpi = GetDpiForWindow(windowHandle)) [[likely]]
+		{
+			try
+			{
+				const Math::CornerRect<int> currentWindowRect = GetWindowRect();
+				const Math::CornerRect<int> windowRect = CalculateWindowRect(currentWindowRect, style, styleEx, dpi);
+				SetWindowRect(windowRect);
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On adjusting window rect");
+			}
+		}
+		else [[unlikely]]
+		{
+			PONY_LOG(logService, Log::LogType::Error, "Failed to get window dpi.");
+		}
+
+		if (!params.hidden)
+		{
+			ShowWindow(windowHandle, SW_NORMAL);
+		}
+	}
+
+	Window::~Window() noexcept
+	{
+		if (IsWindow(windowHandle))
+		{
+			if (!DestroyWindow(windowHandle)) [[unlikely]]
+			{
+				PONY_LOG(logService, Log::LogType::Error, "Failed to destroy window. Error code: '0x{:X}'.", GetLastError());
+			}
+		}
+	}
+
+	WNDCLASSEXA Window::MakeWindowClassDesc(const HMODULE moduleHandle) noexcept
+	{
+		return WNDCLASSEXA
+		{
+			.cbSize = sizeof(WNDCLASSEXA),
+			.style = 0u,
+			.lpfnWndProc = &WindowProc,
+			.cbClsExtra = 0,
+			.cbWndExtra = 0,
+			.hInstance = moduleHandle,
+			.hIcon = nullptr,
+			.hCursor = nullptr,
+			.hbrBackground = nullptr,
+			.lpszMenuName = nullptr,
+			.lpszClassName = "PonyEngineWindow",
+			.hIconSm = nullptr
+		};
+	}
+
+	Window::PositionSizeMode Window::CalculatePositionSizeMode(const WindowMode& mode)
+	{
+		return std::visit<PositionSizeMode>(Utility::Overload
+		{
+			[](const FullscreenWindowMode& mode) noexcept
+			{
+				return FullscreenPositionSizeMode{};
+			},
+			[](const WindowedWindowMode& mode)
+			{
+				if (mode.sizeLimits)
+				{
+					if (mode.sizeLimits->min.X() > MaxWindowSize.X() || mode.sizeLimits->min.Y() > MaxWindowSize.Y() ||
+						mode.sizeLimits->max.X() > MaxWindowSize.X() || mode.sizeLimits->max.Y() > MaxWindowSize.Y() ||
+						mode.sizeLimits->min.X() > mode.sizeLimits->max.X() || mode.sizeLimits->min.Y() > mode.sizeLimits->max.Y()) [[unlikely]]
+					{
+						throw std::invalid_argument("Invalid size limits");
+					}
+
+					return WindowedPositionSizeMode
+					{
+						.sizeLimits = SizeLimits{.min = static_cast<Math::Vector2<int>>(mode.sizeLimits->min), .max = static_cast<Math::Vector2<int>>(mode.sizeLimits->max)}
+					};
+				}
+
+				return WindowedPositionSizeMode{};
+			}
+		}, mode);
+	}
+
+	Math::CornerRect<int> Window::CalculateClientRect(const WindowMode& mode) const
+	{
+		return std::visit(Utility::Overload
+		{
+			[this](const FullscreenWindowMode& mode) noexcept
+			{
+				return CalculateClientRect(mode);
+			},
+			[this](const WindowedWindowMode& mode) noexcept
+			{
+				return CalculateClientRect(mode);
+			}
+		}, mode);
+	}
+
+	Math::CornerRect<int> Window::CalculateClientRect(const FullscreenWindowMode& mode) const
+	{
+		if (mode.displays.empty()) [[unlikely]]
+		{
+			throw std::invalid_argument("No display set");
+		}
+
+		for (const DisplayHandle displayHandle : mode.displays)
+		{
+			assert(displayHandle.id < displayContainer->Size() && displayHandle.version == 1u && "Invalid display handle.");
+		}
+
+		auto minCorner = Math::Vector2<int>(std::numeric_limits<int>::max());
+		auto maxCorner = Math::Vector2<int>(std::numeric_limits<int>::min());
+		for (const DisplayHandle displayHandle : mode.displays)
+		{
+			const DisplayState& state = displayContainer->State(displayHandle.id);
+			const auto displayMinCorner = static_cast<Math::Vector2<int>>(state.position);
+			const auto displayMaxCorner = displayMinCorner + static_cast<Math::Vector2<int>>(state.resolution);
+			minCorner = Math::Min(minCorner, displayMinCorner);
+			maxCorner = Math::Max(maxCorner, displayMaxCorner);
+		}
+
+		return Math::CornerRect<int>(minCorner, maxCorner - minCorner);
+	}
+
+	Math::CornerRect<int> Window::CalculateClientRect(const WindowedWindowMode& mode)
+	{
+		constexpr auto position = Math::Vector2<int>(CW_USEDEFAULT, CW_USEDEFAULT);
+		return Math::CornerRect<int>(position, CalculateClientSize(mode));
+	}
+
+	Math::Vector2<int> Window::CalculateClientSize(const WindowedWindowMode& mode)
+	{
+		if (!mode.size)
+		{
+			return Math::Vector2<int>(CW_USEDEFAULT, CW_USEDEFAULT);
+		}
+
+		if (mode.size->X() > MaxWindowSize.X() || mode.size->Y() > MaxWindowSize.Y()) [[unlikely]]
+		{
+			throw std::invalid_argument("Invalid window size");
+		}
+
+		return static_cast<Math::Vector2<int>>(*mode.size);
+	}
+
+	Math::CornerRect<int> Window::CalculateWindowRect(const Math::CornerRect<int>& clientRect, const DWORD style, const DWORD styleEx, const UINT dpi)
+	{
+		auto rect = ToRect(clientRect);
+		if (!AdjustWindowRectExForDpi(&rect, style, FALSE, styleEx, dpi)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to adjust window rect: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		return ToCornerRect(rect);
+	}
+
+	Math::CornerRect<int> Window::ToCornerRect(const RECT& rect) noexcept
+	{
+		return Math::CornerRect<int>(Math::Vector2<int>(static_cast<int>(rect.left), static_cast<int>(rect.top)),
+			Math::Vector2<int>(static_cast<int>(rect.right - rect.left), static_cast<int>(rect.bottom - rect.top)));
+	}
+
+	RECT Window::ToRect(const Math::CornerRect<int>& rect) noexcept
+	{
+		return RECT
+		{
+			.left = rect.Position().X(),
+			.top = rect.Position().Y(),
+			.right = rect.Position().X() + rect.Size().X(),
+			.bottom = rect.Position().Y() + rect.Size().Y()
+		};
+	}
+
+	std::pair<DWORD, DWORD> Window::CalculateStyle(const WindowMode& mode) noexcept
+	{
+		return std::visit(Utility::Overload
+		{
+			[](const FullscreenWindowMode& mode) noexcept
+			{
+				return CalculateStyle(mode);
+			},
+			[](const WindowedWindowMode& mode) noexcept
+			{
+				return CalculateStyle(mode);
+			}
+		}, mode);
+	}
+
+	std::pair<DWORD, DWORD> Window::CalculateStyle(const FullscreenWindowMode& mode) noexcept
+	{
+		return std::pair(FullscreenStyle, FullscreenStyleEx);
+	}
+
+	std::pair<DWORD, DWORD> Window::CalculateStyle(const WindowedWindowMode& mode) noexcept
+	{
+		DWORD style = WindowedStyle;
+		style |= mode.resizableByUser ? ResizableByUserStyle : 0;
+		return std::pair(style, WindowedStyleEx);
+	}
+
+	Math::CornerRect<int> Window::GetWindowRect() const
+	{
+		RECT rect;
+		if (!::GetWindowRect(windowHandle, &rect)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to get window rect: Error code = '0x{:X}'", GetLastError()));
+		}
+
+		return ToCornerRect(rect);
+	}
+
+	void Window::SetWindowRect(const Math::CornerRect<int>& rect)
+	{
+		if (!SetWindowPos(windowHandle, HWND_TOP, rect.Position().X(), rect.Position().Y(), rect.Size().X(), rect.Size().Y(), SWP_NOZORDER | SWP_NOSENDCHANGING)) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to set window rect: Error code = '0x{:X}'", GetLastError()));
+		}
+	}
+
+	LRESULT Window::WindowProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		if (msg == WM_CREATE) [[unlikely]]
+		{
+			const auto window = static_cast<Window*>(reinterpret_cast<CREATESTRUCTA*>(lParam)->lpCreateParams);
+			SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
+		}
+
+		if (const auto window = reinterpret_cast<Window*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA))) [[likely]]
+		{
+			switch (msg)
+			{
+			case WM_CREATE:
+				return window->ObserveCreate(wParam, lParam);
+			case WM_DESTROY:
+				return window->ObserveDestroy(wParam, lParam);
+			case WM_ERASEBKGND:
+				return window->ObserveEraseBackground(wParam, lParam);
+			case WM_PAINT:
+				return window->ObservePaint(wParam, lParam);
+			default:
+				break;
+			}
+		}
+
+		return DefWindowProcA(hwnd, msg, wParam, lParam);
+	}
+
+	LRESULT Window::ObserveCreate(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		return 0;
+	}
+
+	LRESULT Window::ObserveDestroy(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		if (quitOnDestroy)
+		{
+			application->Stop();
+		}
+
+		return 0;
+	}
+
+	LRESULT Window::ObserveEraseBackground(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		return 1;
+	}
+
+	LRESULT Window::ObservePaint(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		if (!ValidateRect(windowHandle, nullptr)) [[unlikely]]
+		{
+			PONY_LOG(logService, Log::LogType::Error, "Failed to validate rect. Error code: '0x{:X}'.", GetLastError());
+		}
+
+		return 0;
+	}
+}

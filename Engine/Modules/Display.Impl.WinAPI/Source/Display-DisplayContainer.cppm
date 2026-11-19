@@ -35,12 +35,8 @@ export namespace PonyEngine::Display
 		std::size_t Size() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::size_t IndexOf(DisplayHandleID handle) const noexcept;
-		[[nodiscard("Pure function")]]
 		std::size_t IndexOf(const DisplayID& id) const noexcept;
 
-		[[nodiscard("Pure function")]]
-		DisplayHandleID Handle(std::size_t index) const noexcept;
 		[[nodiscard("Pure function")]]
 		const struct DisplayID& DisplayID(std::size_t index) const noexcept;
 		[[nodiscard("Pure function")]]
@@ -48,7 +44,7 @@ export namespace PonyEngine::Display
 		[[nodiscard("Pure function")]]
 		const DisplayState& State(std::size_t index) const noexcept;
 
-		std::size_t Add(DisplayHandleID handle, const struct DisplayID& id, DisplayState displayState);
+		void Add(const struct DisplayID& id, DisplayState displayState);
 		void Remove(std::size_t index) noexcept;
 		void Clear() noexcept;
 
@@ -56,7 +52,6 @@ export namespace PonyEngine::Display
 		DisplayContainer& operator =(DisplayContainer&& other) noexcept = default;
 
 	private:
-		std::vector<DisplayHandleID> handles;
 		std::vector<struct DisplayID> ids;
 		std::vector<DisplayState> states;
 	};
@@ -66,18 +61,7 @@ namespace PonyEngine::Display
 {
 	std::size_t DisplayContainer::Size() const noexcept
 	{
-		return handles.size();
-	}
-
-	std::size_t DisplayContainer::IndexOf(const DisplayHandleID handle) const noexcept
-	{
-		auto position = std::ranges::lower_bound(handles, handle);
-		if (position != handles.cend() && *position != handle)
-		{
-			position = handles.cend();
-		}
-
-		return position - handles.cbegin();
+		return ids.size();
 	}
 
 	std::size_t DisplayContainer::IndexOf(const struct DisplayID& id) const noexcept
@@ -85,11 +69,6 @@ namespace PonyEngine::Display
 		std::size_t i = 0uz;
 		for (; i < ids.size() && ids[i] != id; ++i) {}
 		return i;
-	}
-
-	DisplayHandleID DisplayContainer::Handle(const std::size_t index) const noexcept
-	{
-		return handles[index];
 	}
 
 	const struct DisplayID& DisplayContainer::DisplayID(const std::size_t index) const noexcept
@@ -107,33 +86,25 @@ namespace PonyEngine::Display
 		return states[index];
 	}
 
-	std::size_t DisplayContainer::Add(const DisplayHandleID handle, const struct DisplayID& id, DisplayState displayState)
+	void DisplayContainer::Add(const struct DisplayID& id, DisplayState displayState)
 	{
 		auto scopeGuardFlag = Utility::ScopeGuardFlag();
 
-		const std::size_t index = std::ranges::lower_bound(handles, handle) - handles.cbegin();
-		handles.insert(handles.cbegin() + index, handle);
-		const auto handlesScopeGuard = Utility::ScopeGuard([&]() noexcept { handles.erase(handles.cbegin() + index); }, scopeGuardFlag);
-		ids.insert(ids.cbegin() + index, id);
-		const auto idsScopeGuard = Utility::ScopeGuard([&]() noexcept { ids.erase(ids.cbegin() + index); }, scopeGuardFlag);
-		states.insert(states.cbegin() + index, std::move(displayState));
-		const auto statesScopeGuard = Utility::ScopeGuard([&]() noexcept { states.erase(states.cbegin() + index); }, scopeGuardFlag);
+		ids.push_back(id);
+		const auto idsScopeGuard = Utility::ScopeGuard([&]() noexcept { ids.pop_back(); }, scopeGuardFlag);
+		states.push_back(std::move(displayState));
 
 		scopeGuardFlag.Release();
-
-		return index;
 	}
 
 	void DisplayContainer::Remove(const std::size_t index) noexcept
 	{
-		handles.erase(handles.cbegin() + index);
 		ids.erase(ids.cbegin() + index);
 		states.erase(states.cbegin() + index);
 	}
 
 	void DisplayContainer::Clear() noexcept
 	{
-		handles.clear();
 		ids.clear();
 		states.clear();
 	}

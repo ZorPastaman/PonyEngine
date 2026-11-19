@@ -16,6 +16,7 @@ module;
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#undef CreateWindow
 
 export module PonyEngine.Display.Impl.WinAPI:DisplayService;
 
@@ -23,6 +24,7 @@ import std;
 
 import PonyEngine.Application;
 import PonyEngine.Display;
+import PonyEngine.FileSystem.WinAPI;
 import PonyEngine.Log;
 import PonyEngine.Math;
 import PonyEngine.Memory;
@@ -31,6 +33,7 @@ import PonyEngine.Utility;
 
 import :DisplayContainer;
 import :DisplayState;
+import :Window;
 
 export namespace PonyEngine::Display
 {
@@ -55,6 +58,11 @@ export namespace PonyEngine::Display
 		[[nodiscard("Pure function")]]
 		virtual struct DisplayInfo DisplayInfo(DisplayHandle displayHandle) const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual struct WindowSupport WindowSupport() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<IWindow> CreateWindow(const WindowParams& params) override;
+
 		DisplayService& operator =(const DisplayService&) = delete;
 		DisplayService& operator =(DisplayService&&) = delete;
 
@@ -77,34 +85,24 @@ export namespace PonyEngine::Display
 		[[nodiscard("Pure function")]]
 		static void GetDisplayName(std::wstring_view sourceName, std::string& name);
 
-		/// @brief Checks if the display handle is invalid.
-		/// @param handle Handle to check.
-		/// @return @a True if it's invalid; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		bool IsInvalid(DisplayHandle handle) const noexcept;
-		/// @brief Create a new display handle.
-		/// @return Display handle.
-		[[nodiscard("Weird call")]]
-		DisplayHandle CreateDisplayHandle();
-		/// @brief Makes a new display handle.
-		/// @return Display handle.
-		[[nodiscard("Weird call")]]
-		DisplayHandle MakeDisplayHandle();
-		/// @brief Resurrects a display handle.
-		/// @return Display handle.
-		[[nodiscard("Weird call")]]
-		DisplayHandle ResurrectDisplayHandle() noexcept;
-		/// @brief Kills the display handle.
-		/// @param handle Display handle to kill.
-		void KillDisplayHandle(DisplayHandle handle) noexcept;
+		[[nodiscard("Must be returned to system")]]
+		static LRESULT CALLBACK MessageProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard("Must be used")]]
+		LRESULT ObserveDisplayChange(WPARAM wParam, LPARAM lParam) noexcept;
 
 		Application::IApplication* application;
 		Log::ILogService* logService;
 
 		DisplayContainer displayContainer;
 
-		std::vector<DisplayHandleVersion> displayHandleVersions; ///< Display handle versions.
-		std::vector<DisplayHandleID> deadDisplayHandleIds; ///< Display handle IDs.
+		HMODULE moduleHandle; ///< Module instance handle.
+		ATOM messageClass; /// Message class handle.
+		ATOM windowClass; ///< Window class handle.
+		HWND messageWindow; ///< Message window.
+
+#ifndef NDEBUG
+		std::atomic_size_t windowCount;
+#endif
 	};
 }
 
@@ -112,13 +110,82 @@ namespace PonyEngine::Display
 {
 	DisplayService::DisplayService(Application::IApplication& application) :
 		application{&application},
-		logService{this->application->FindInterface<Log::ILogService>()}
+		logService{this->application->FindInterface<Log::ILogService>()},
+		moduleHandle{FileSystem::GetModule()}
 	{
+		auto scopeGuardFlag = Utility::ScopeGuardFlag();
+
+		const auto messageClassDesc = WNDCLASSEXA
+		{
+			.cbSize = sizeof(WNDCLASSEXA),
+			.style = 0u,
+			.lpfnWndProc = &MessageProc,
+			.cbClsExtra = 0,
+			.cbWndExtra = 0,
+			.hInstance = moduleHandle,
+			.hIcon = nullptr,
+			.hCursor = nullptr,
+			.hbrBackground = nullptr,
+			.lpszMenuName = nullptr,
+			.lpszClassName = "PonyEngineDisplayMessage",
+			.hIconSm = nullptr
+		};
+		messageClass = RegisterClassExA(&messageClassDesc);
+		if (!messageClass) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to register message class: ErrorCode = '0x{:X}'", GetLastError()));
+		}
+		const auto messageClassScopeGuard = Utility::ScopeGuard([&]() noexcept
+		{
+			if (!UnregisterClassA(reinterpret_cast<LPCSTR>(messageClass), moduleHandle)) [[unlikely]]
+			{
+				PONY_LOG(logService, Log::LogType::Error, "Failed to unregister message class on constructor failure. Error code: '0x{:X}'.", GetLastError());
+			}
+		}, scopeGuardFlag);
+		messageWindow = CreateWindowExA(0, reinterpret_cast<LPCSTR>(messageClass), "PonyEngineDisplayMessage", 0, 0, 0, 0, 0, nullptr, nullptr, moduleHandle, this);
+		if (!messageWindow) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to create message window: Error code = '0x{:X}'", GetLastError()));
+		}
+		const auto messageWindowScopeGuard = Utility::ScopeGuard([&]() noexcept
+		{
+			if (!DestroyWindow(messageWindow)) [[unlikely]]
+			{
+				PONY_LOG(logService, Log::LogType::Error, "Failed to destroy message window on constructor failure. Error code: '0x{:X}'.", GetLastError());
+			}
+		}, scopeGuardFlag);
+
+		const auto windowClassDesc = Window::MakeWindowClassDesc(moduleHandle);
+		windowClass = RegisterClassExA(&windowClassDesc);
+		if (!windowClass) [[unlikely]]
+		{
+			throw std::runtime_error(std::format("Failed to register window class: ErrorCode = '0x{:X}'", GetLastError()));
+		}
+
 		UpdateDisplays();
+
+		scopeGuardFlag.Release();
 	}
 
 	DisplayService::~DisplayService() noexcept
 	{
+#ifndef NDEBUG
+		assert(windowCount.load(std::memory_order::relaxed) == 0uz && "Some windows weren't destroyed.");
+#endif
+
+		if (!UnregisterClassA(reinterpret_cast<LPCSTR>(windowClass), moduleHandle)) [[unlikely]]
+		{
+			PONY_LOG(logService, Log::LogType::Error, "Failed to unregister window class. Error code: '0x{:X}'.", GetLastError());
+		}
+
+		if (!DestroyWindow(messageWindow)) [[unlikely]]
+		{
+			PONY_LOG(logService, Log::LogType::Error, "Failed to destroy message window. Error code: '0x{:X}'.", GetLastError());
+		}
+		if (!UnregisterClassA(reinterpret_cast<LPCSTR>(messageClass), moduleHandle)) [[unlikely]]
+		{
+			PONY_LOG(logService, Log::LogType::Error, "Failed to unregister message class. Error code: '0x{:X}'.", GetLastError());
+		}
 	}
 
 	std::size_t DisplayService::DisplayCount() const noexcept
@@ -130,31 +197,29 @@ namespace PonyEngine::Display
 	DisplayHandle DisplayService::Display(const std::size_t index) const noexcept
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
-		const DisplayHandleID id = displayContainer.Handle(index);
-		return DisplayHandle{.id = id, .version = displayHandleVersions[id]};
+		assert(index < displayContainer.Size() && "Out of range.");
+		return DisplayHandle{.id = static_cast<DisplayHandleID>(index), .version = 1u};
 	}
 
 	bool DisplayService::IsValid(const DisplayHandle displayHandle) const noexcept
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
-		return !IsInvalid(displayHandle);
+		return displayHandle.id < displayContainer.Size() && displayHandle.version == 1u;
 	}
 
 	bool DisplayService::IsConnected(const DisplayHandle displayHandle) const noexcept
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
-		assert(!IsInvalid(displayHandle) && "Invalid display handle.");
-		return displayContainer.State(displayContainer.IndexOf(displayHandle.id)).isConnected;
+		assert(displayHandle.id < displayContainer.Size() && displayHandle.version == 1u && "Invalid display handle.");
+		return displayContainer.State(displayHandle.id).isConnected;
 	}
 
 	struct DisplayInfo DisplayService::DisplayInfo(const DisplayHandle displayHandle) const noexcept
 	{
 		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
-		assert(!IsInvalid(displayHandle) && "Invalid display handle.");
+		assert(displayHandle.id < displayContainer.Size() && displayHandle.version == 1u && "Invalid display handle.");
 
-		const std::size_t index = displayContainer.IndexOf(displayHandle.id);
-		const DisplayState& state = displayContainer.State(index);
-
+		const DisplayState& state = displayContainer.State(displayHandle.id);
 		return Display::DisplayInfo
 		{
 			.sourceName = state.sourceName,
@@ -166,6 +231,43 @@ namespace PonyEngine::Display
 			.colorMode = state.colorMode,
 			.bitsPerColorChannel = state.bitsPerColorChannel,
 		};
+	}
+
+	struct WindowSupport DisplayService::WindowSupport() const noexcept
+	{
+		constexpr auto commonFeatures = CommonWindowFeature::Title | CommonWindowFeature::Icon | CommonWindowFeature::Hidable;
+		constexpr auto fullscreenFeatures = FullscreenWindowFeature::MultiWindowPerDisplay | FullscreenWindowFeature::MultiDisplayWindow | FullscreenWindowFeature::Changeable;
+		constexpr auto windowedFeatures = WindowedWindowFeature::ResizableFromCode | WindowedWindowFeature::ResizeLimits;
+
+		return Display::WindowSupport
+		{
+			.commonFeatures = commonFeatures,
+			.fullscreen = FullscreenWindowSupport
+			{
+				.features = fullscreenFeatures
+			},
+			.windowed = WindowedWindowSupport
+			{
+				.maxSize = Window::MaxWindowSize,
+				.features = windowedFeatures
+			},
+			.modeSwitchable = true
+		};
+	}
+
+	std::shared_ptr<IWindow> DisplayService::CreateWindow(const WindowParams& params)
+	{
+#ifndef NDEBUG
+		const auto window = new Window(*application, displayContainer, windowClass, moduleHandle, params);
+		windowCount.fetch_add(1uz, std::memory_order::relaxed);
+		return std::shared_ptr<Window>(window, [this](const Window* const windowToDelete) noexcept
+		{
+			delete windowToDelete;
+			windowCount.fetch_sub(1uz, std::memory_order::relaxed);
+		});
+#else
+		return std::make_shared<Window>(*application, displayContainer, windowClass, moduleHandle, params);
+#endif
 	}
 
 	void DisplayService::UpdateDisplays() noexcept
@@ -246,11 +348,15 @@ namespace PonyEngine::Display
 
 			try
 			{
-				std::size_t index = displayContainer.IndexOf(displayId);
+				const std::size_t index = displayContainer.IndexOf(displayId);
 				if (index >= displayContainer.Size())
 				{
-					const DisplayHandle handle = CreateDisplayHandle();
-					index = displayContainer.Add(handle.id, displayId, DisplayState{.isConnected = true});
+					if (index >= std::numeric_limits<DisplayHandleID>::max()) [[unlikely]]
+					{
+						throw std::overflow_error("No more display handles available");
+					}
+
+					displayContainer.Add(displayId, DisplayState{.isConnected = true});
 				}
 
 				FillDisplayState(displayPath, displayModes, displayContainer.State(index));
@@ -407,52 +513,32 @@ namespace PonyEngine::Display
 		name.resize(nameSize);
 	}
 
-	bool DisplayService::IsInvalid(const DisplayHandle handle) const noexcept
+	LRESULT DisplayService::MessageProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		return Math::IsEven(handle.version) || handle.id >= displayHandleVersions.size() || displayHandleVersions[handle.id] != handle.version;
-	}
-
-	DisplayHandle DisplayService::CreateDisplayHandle()
-	{
-		return deadDisplayHandleIds.empty() ? MakeDisplayHandle() : ResurrectDisplayHandle();
-	}
-
-	DisplayHandle DisplayService::MakeDisplayHandle()
-	{
-		if (displayHandleVersions.size() >= std::numeric_limits<DisplayHandleID>::max()) [[unlikely]]
+		if (msg == WM_CREATE) [[unlikely]]
 		{
-			throw std::overflow_error("No more display handles available");
+			const auto displayService = static_cast<DisplayService*>(reinterpret_cast<CREATESTRUCTA*>(lParam)->lpCreateParams);
+			SetWindowLongPtrA(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(displayService));
+			return 0;
 		}
 
-		const DisplayHandleID handleId = static_cast<DisplayHandleID>(displayHandleVersions.size());
+		if (const auto displayService = reinterpret_cast<DisplayService*>(GetWindowLongPtrA(hwnd, GWLP_USERDATA))) [[likely]]
+		{
+			switch (msg)
+			{
+			case WM_DISPLAYCHANGE:
+				return displayService->ObserveDisplayChange(wParam, lParam);
+			default:
+				break;
+			}
+		}
 
-		constexpr DisplayHandleVersion handleVersion = 1u;
-		displayHandleVersions.push_back(handleVersion);
-
-		return DisplayHandle{.id = handleId, .version = handleVersion};
+		return DefWindowProcA(hwnd, msg, wParam, lParam);
 	}
 
-	DisplayHandle DisplayService::ResurrectDisplayHandle() noexcept
+	LRESULT DisplayService::ObserveDisplayChange(const WPARAM wParam, const LPARAM lParam) noexcept
 	{
-		const DisplayHandleID handleId = deadDisplayHandleIds.back();
-		deadDisplayHandleIds.pop_back();
-
-		const DisplayHandleVersion handleVersion = ++displayHandleVersions[handleId];
-
-		return DisplayHandle{.id = handleId, .version = handleVersion};
-	}
-
-	void DisplayService::KillDisplayHandle(const DisplayHandle handle) noexcept
-	{
-		try
-		{
-			++displayHandleVersions[handle.id];
-			deadDisplayHandleIds.push_back(handle.id);
-		}
-		catch (...)
-		{
-			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On killing display handle. HandleID: '0x{:X}'.", handle.id);
-			// Just forget about this handle.
-		}
+		UpdateDisplays();
+		return 0;
 	}
 }
