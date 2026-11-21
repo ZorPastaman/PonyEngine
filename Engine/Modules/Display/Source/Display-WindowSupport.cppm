@@ -22,10 +22,11 @@ export namespace PonyEngine::Display
 	enum class CommonWindowFeature : std::uint8_t
 	{
 		None = 0,
-		Title = 1 << 0,
-		Icon = 1 << 1,
-		Hidable = 1 << 2,
-		All = (1 << 3) - 1
+		SwitchableMode = 1 << 0,
+		Title = 1 << 1,
+		Icon = 1 << 2,
+		Hidable = 1 << 3,
+		All = (1 << 4) - 1
 	};
 
 	enum class FullscreenWindowFeature : std::uint8_t
@@ -57,7 +58,8 @@ export namespace PonyEngine::Display
 
 	struct WindowedWindowSupport final
 	{
-		Math::Vector2<std::uint32_t> maxSize;
+		std::optional<Math::Vector2<std::uint32_t>> minSize;
+		std::optional<Math::Vector2<std::uint32_t>> maxSize;
 		WindowedWindowFeature features = WindowedWindowFeature::None;
 	};
 
@@ -66,14 +68,14 @@ export namespace PonyEngine::Display
 		CommonWindowFeature commonFeatures = CommonWindowFeature::None;
 		std::optional<FullscreenWindowSupport> fullscreen;
 		std::optional<WindowedWindowSupport> windowed;
-		bool modeSwitchable = false;
 	};
 }
 
 namespace PonyEngine::Display
 {
-	constexpr std::array<std::string_view, 3> CommonWindowFeatureNames
+	constexpr std::array<std::string_view, 4> CommonWindowFeatureNames
 	{
+		"SwitchableMode",
 		"Title",
 		"Icon",
 		"Hidable"
@@ -90,7 +92,7 @@ namespace PonyEngine::Display
 	{
 		"ResizableFromCode",
 		"ResizableByUser",
-		"ResizeLimits",
+		"ResizeLimits"
 	};
 }
 

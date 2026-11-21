@@ -17,5 +17,4 @@ export import :IWindow;
 export import :WindowHandle;
 export import :WindowMode;
 export import :WindowParams;
-export import :WindowSizeLimits;
 export import :WindowSupport;

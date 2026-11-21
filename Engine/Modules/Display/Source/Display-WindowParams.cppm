@@ -12,7 +12,6 @@ export module PonyEngine.Display:WindowParams;
 import std;
 
 import :WindowMode;
-import :WindowSizeLimits;
 
 export namespace PonyEngine::Display
 {

@@ -35,10 +35,11 @@ export namespace PonyEngine::Display
 	class Window final : public IWindow
 	{
 	public:
+		static constexpr auto MinWindowSize = Math::Vector2<std::uint32_t>::Zero();
 		static constexpr auto MaxWindowSize = Math::Vector2<std::uint32_t>(std::numeric_limits<int>::max());
 
 		[[nodiscard("Pure constructor")]]
-		Window(Application::IApplication& application, const DisplayContainer& displayContainer, ATOM windowClass, HMODULE moduleHandle, const WindowParams& params);
+		Window(const Application::IApplication& application, const DisplayContainer& displayContainer, ATOM windowClass, HMODULE moduleHandle, const WindowParams& params);
 		Window(const Window&) = delete;
 		Window(Window&&) = delete;
 
@@ -51,17 +52,14 @@ export namespace PonyEngine::Display
 		Window& operator =(Window&&) = delete;
 
 	private:
-		struct SizeLimits final
-		{
-			Math::Vector2<int> min;
-			Math::Vector2<int> max;
-		};
 		struct FullscreenPositionSizeMode final
 		{
 		};
 		struct WindowedPositionSizeMode final
 		{
-			std::optional<SizeLimits> sizeLimits;
+			std::optional<Math::Vector2<int>> minSize;
+			std::optional<Math::Vector2<int>> maxSize;
+			std::optional<float> aspect;
 		};
 		using PositionSizeMode = std::variant<FullscreenPositionSizeMode, WindowedPositionSizeMode>;
 
@@ -96,12 +94,17 @@ export namespace PonyEngine::Display
 		Math::CornerRect<int> GetWindowRect() const;
 		void SetWindowRect(const Math::CornerRect<int>& rect);
 
+		[[nodiscard("Pure function")]]
+		std::pair<DWORD, DWORD> GetWindowStyle() const;
+
 		[[nodiscard("Must be returned to system")]]
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("Must be used")]]
 		LRESULT ObserveCreate(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("Must be used")]]
 		LRESULT ObserveDestroy(WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard("Must be used")]]
+		LRESULT ObserveGetMinMaxInfo(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("Must be used")]]
 		LRESULT ObserveEraseBackground(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("Must be used")]]
@@ -113,7 +116,7 @@ export namespace PonyEngine::Display
 		static constexpr DWORD WindowedStyle = WS_OVERLAPPEDWINDOW & ~ResizableByUserStyle;
 		static constexpr DWORD WindowedStyleEx = WS_EX_APPWINDOW;
 
-		Application::IApplication* application;
+		const Application::IApplication* application;
 		const Log::ILogService* logService;
 
 		const DisplayContainer* displayContainer;
@@ -127,7 +130,7 @@ export namespace PonyEngine::Display
 
 namespace PonyEngine::Display
 {
-	Window::Window(Application::IApplication& application, const DisplayContainer& displayContainer, const ATOM windowClass, const HMODULE moduleHandle,
+	Window::Window(const Application::IApplication& application, const DisplayContainer& displayContainer, const ATOM windowClass, const HMODULE moduleHandle,
 		const WindowParams& params) :
 		application{&application},
 		logService{this->application->FindInterface<Log::ILogService>()},
@@ -210,22 +213,33 @@ namespace PonyEngine::Display
 			},
 			[](const WindowedWindowMode& mode)
 			{
-				if (mode.sizeLimits)
+				if (mode.minSize)
 				{
-					if (mode.sizeLimits->min.X() > MaxWindowSize.X() || mode.sizeLimits->min.Y() > MaxWindowSize.Y() ||
-						mode.sizeLimits->max.X() > MaxWindowSize.X() || mode.sizeLimits->max.Y() > MaxWindowSize.Y() ||
-						mode.sizeLimits->min.X() > mode.sizeLimits->max.X() || mode.sizeLimits->min.Y() > mode.sizeLimits->max.Y()) [[unlikely]]
+					if (mode.minSize->X() > MaxWindowSize.X() || mode.minSize->Y() > MaxWindowSize.Y()) [[unlikely]]
 					{
-						throw std::invalid_argument("Invalid size limits");
+						throw std::invalid_argument("Invalid min size");
 					}
-
-					return WindowedPositionSizeMode
+				}
+				if (mode.maxSize)
+				{
+					if (mode.maxSize->X() > MaxWindowSize.X() || mode.maxSize->Y() > MaxWindowSize.Y()) [[unlikely]]
 					{
-						.sizeLimits = SizeLimits{.min = static_cast<Math::Vector2<int>>(mode.sizeLimits->min), .max = static_cast<Math::Vector2<int>>(mode.sizeLimits->max)}
-					};
+						throw std::invalid_argument("Invalid max size");
+					}
+				}
+				if (mode.minSize && mode.maxSize)
+				{
+					if (mode.minSize->X() > mode.maxSize->X() || mode.minSize->Y() > mode.maxSize->Y()) [[unlikely]]
+					{
+						throw std::invalid_argument("Invalid min/max size");
+					}
 				}
 
-				return WindowedPositionSizeMode{};
+				return WindowedPositionSizeMode
+				{
+					.minSize = mode.minSize ? static_cast<Math::Vector2<int>>(*mode.minSize) : std::optional<Math::Vector2<int>>(),
+					.maxSize = mode.maxSize ? static_cast<Math::Vector2<int>>(*mode.maxSize) : std::optional<Math::Vector2<int>>(),
+				};
 			}
 		}, mode);
 	}
@@ -366,6 +380,31 @@ namespace PonyEngine::Display
 		}
 	}
 
+	std::pair<DWORD, DWORD> Window::GetWindowStyle() const
+	{
+		SetLastError(ERROR_SUCCESS);
+
+		const LONG_PTR style = GetWindowLongPtrW(windowHandle, GWL_STYLE);
+		if (!style) [[unlikely]]
+		{
+			if (const DWORD error = GetLastError(); error != ERROR_SUCCESS) [[likely]]
+			{
+				throw std::runtime_error(std::format("Failed to get style: Error code = '0x{:X}'", error));
+			}
+		}
+
+		const LONG_PTR styleEx = GetWindowLongPtrW(windowHandle, GWL_EXSTYLE);
+		if (!styleEx) [[unlikely]]
+		{
+			if (const DWORD error = GetLastError(); error != ERROR_SUCCESS) [[likely]]
+			{
+				throw std::runtime_error(std::format("Failed to get style ex: Error code = '0x{:X}'", error));
+			}
+		}
+
+		return std::pair(static_cast<DWORD>(style), static_cast<DWORD>(styleEx));
+	}
+
 	LRESULT Window::WindowProc(const HWND hwnd, const UINT msg, const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		if (msg == WM_CREATE) [[unlikely]]
@@ -382,6 +421,8 @@ namespace PonyEngine::Display
 				return window->ObserveCreate(wParam, lParam);
 			case WM_DESTROY:
 				return window->ObserveDestroy(wParam, lParam);
+			case WM_GETMINMAXINFO:
+				return window->ObserveGetMinMaxInfo(wParam, lParam);
 			case WM_ERASEBKGND:
 				return window->ObserveEraseBackground(wParam, lParam);
 			case WM_PAINT:
@@ -403,7 +444,55 @@ namespace PonyEngine::Display
 	{
 		if (quitOnDestroy)
 		{
-			application->Stop();
+			PostQuitMessage(0);
+		}
+
+		return 0;
+	}
+
+	LRESULT Window::ObserveGetMinMaxInfo(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		const auto minMaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
+		try
+		{
+			std::visit(Utility::Overload
+			{
+				[&](const FullscreenPositionSizeMode& mode)
+				{
+					const Math::CornerRect<int> windowRect = GetWindowRect();
+					minMaxInfo->ptMaxSize = POINT{.x = windowRect.Size().X(), .y = windowRect.Size().Y()};
+					minMaxInfo->ptMaxPosition = POINT{.x = windowRect.Position().X(), .y = windowRect.Position().Y()};
+					minMaxInfo->ptMinTrackSize = POINT{.x = windowRect.Size().X(), .y = windowRect.Size().Y()};
+					minMaxInfo->ptMaxTrackSize = POINT{.x = windowRect.Size().X(), .y = windowRect.Size().Y()};
+				},
+				[&](const WindowedPositionSizeMode& mode)
+				{
+					const auto [style, styleEx] = GetWindowStyle();
+					const UINT dpi = GetDpiForWindow(windowHandle);
+
+					if (mode.minSize)
+					{
+						const auto clientRect = Math::CornerRect<int>(Math::Vector2<int>(mode.minSize->X(), mode.minSize->Y()));
+						const auto windowRect = CalculateWindowRect(clientRect, style, styleEx, dpi);
+						minMaxInfo->ptMinTrackSize = POINT{.x = windowRect.Size().X(), .y = windowRect.Size().Y()};
+					}
+
+					if (mode.maxSize)
+					{
+						const auto clientRect = Math::CornerRect<int>(Math::Vector2<int>(mode.maxSize->X(), mode.maxSize->Y()));
+						const auto windowRect = CalculateWindowRect(clientRect, style, styleEx, dpi);
+						const LONG maxWidth = std::min(minMaxInfo->ptMaxSize.x, static_cast<LONG>(windowRect.Size().X()));
+						const LONG maxHeight = std::min(minMaxInfo->ptMaxSize.y, static_cast<LONG>(windowRect.Size().Y()));
+						minMaxInfo->ptMaxPosition.x += (minMaxInfo->ptMaxSize.x - maxWidth) / 2;
+						minMaxInfo->ptMaxPosition.y += (minMaxInfo->ptMaxSize.y - maxHeight) / 2;
+						minMaxInfo->ptMaxTrackSize = POINT{.x = windowRect.Size().X(), .y = windowRect.Size().Y()};
+					}
+				}
+			}, positionSizeMode);
+		}
+		catch (...)
+		{
+			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On getting min max info.")
 		}
 
 		return 0;

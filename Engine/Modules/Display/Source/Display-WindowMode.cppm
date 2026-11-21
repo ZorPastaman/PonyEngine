@@ -14,7 +14,6 @@ import std;
 import PonyEngine.Math;
 
 import :DisplayHandle;
-import :WindowSizeLimits;
 
 export namespace PonyEngine::Display
 {
@@ -26,7 +25,8 @@ export namespace PonyEngine::Display
 	struct WindowedWindowMode final
 	{
 		std::optional<Math::Vector2<std::uint32_t>> size;
-		std::optional<WindowSizeLimits> sizeLimits;
+		std::optional<Math::Vector2<std::uint32_t>> minSize;
+		std::optional<Math::Vector2<std::uint32_t>> maxSize;
 		bool resizableByUser = true;
 	};
 

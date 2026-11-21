@@ -11,7 +11,6 @@ target_sources(PonyEngine.Display PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Display-IWindow.cppm"
 	"Source/Display-WindowMode.cppm"
 	"Source/Display-WindowParams.cppm"
-	"Source/Display-WindowSizeLimits.cppm"
 	"Source/Display-WindowSupport.cppm"
 )
 

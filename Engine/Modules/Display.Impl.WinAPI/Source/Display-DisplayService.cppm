@@ -235,7 +235,7 @@ namespace PonyEngine::Display
 
 	struct WindowSupport DisplayService::WindowSupport() const noexcept
 	{
-		constexpr auto commonFeatures = CommonWindowFeature::Title | CommonWindowFeature::Icon | CommonWindowFeature::Hidable;
+		constexpr auto commonFeatures = CommonWindowFeature::SwitchableMode | CommonWindowFeature::Title | CommonWindowFeature::Icon | CommonWindowFeature::Hidable;
 		constexpr auto fullscreenFeatures = FullscreenWindowFeature::MultiWindowPerDisplay | FullscreenWindowFeature::MultiDisplayWindow | FullscreenWindowFeature::Changeable;
 		constexpr auto windowedFeatures = WindowedWindowFeature::ResizableFromCode | WindowedWindowFeature::ResizeLimits;
 
@@ -248,10 +248,10 @@ namespace PonyEngine::Display
 			},
 			.windowed = WindowedWindowSupport
 			{
+				.minSize = Window::MinWindowSize,
 				.maxSize = Window::MaxWindowSize,
 				.features = windowedFeatures
-			},
-			.modeSwitchable = true
+			}
 		};
 	}
 
