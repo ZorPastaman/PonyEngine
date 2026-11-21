@@ -15,6 +15,7 @@ export module PonyEngine.Display:IDisplayService;
 
 import :DisplayHandle;
 import :DisplayInfo;
+import :IDisplayObserver;
 import :IWindow;
 import :WindowParams;
 import :WindowSupport;
@@ -60,5 +61,8 @@ export namespace PonyEngine::Display
 		virtual struct WindowSupport WindowSupport() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<IWindow> CreateWindow(const WindowParams& params) = 0;
+
+		virtual void AddObserver(IDisplayObserver& observer) = 0;
+		virtual void RemoveObserver(IDisplayObserver& observer) = 0;
 	};
 }

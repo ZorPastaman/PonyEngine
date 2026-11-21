@@ -22,7 +22,7 @@ export namespace PonyEngine::Display
 	enum class CommonWindowFeature : std::uint8_t
 	{
 		None = 0,
-		SwitchableMode = 1 << 0,
+		ModeSwitchable = 1 << 0,
 		Title = 1 << 1,
 		Icon = 1 << 2,
 		Hidable = 1 << 3,
@@ -41,8 +41,8 @@ export namespace PonyEngine::Display
 	enum class WindowedWindowFeature : std::uint8_t
 	{
 		None = 0,
-		ResizableFromCode = 1 << 0,
-		ResizableByUser = 1 << 1,
+		Resizable = 1 << 0,
+		ResizeForbiddable = 1 << 1,
 		ResizeLimits = 1 << 2,
 		All = (1 << 3) - 1
 	};
@@ -75,7 +75,7 @@ namespace PonyEngine::Display
 {
 	constexpr std::array<std::string_view, 4> CommonWindowFeatureNames
 	{
-		"SwitchableMode",
+		"ModeSwitchable",
 		"Title",
 		"Icon",
 		"Hidable"
@@ -90,8 +90,8 @@ namespace PonyEngine::Display
 
 	constexpr std::array<std::string_view, 3> WindowedWindowFeatureNames
 	{
-		"ResizableFromCode",
-		"ResizableByUser",
+		"Resizable",
+		"ResizeForbiddable",
 		"ResizeLimits"
 	};
 }

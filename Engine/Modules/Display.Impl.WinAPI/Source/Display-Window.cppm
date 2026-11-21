@@ -48,6 +48,9 @@ export namespace PonyEngine::Display
 		[[nodiscard("Pure function")]]
 		static WNDCLASSEXA MakeWindowClassDesc(HMODULE moduleHandle) noexcept;
 
+		virtual void AddObserver(IWindowObserver& observer) override;
+		virtual void RemoveObserver(IWindowObserver& observer) override;
+
 		Window& operator =(const Window&) = delete;
 		Window& operator =(Window&&) = delete;
 
@@ -106,6 +109,8 @@ export namespace PonyEngine::Display
 		[[nodiscard("Must be used")]]
 		LRESULT ObserveGetMinMaxInfo(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("Must be used")]]
+		LRESULT ObserveSize(WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard("Must be used")]]
 		LRESULT ObserveEraseBackground(WPARAM wParam, LPARAM lParam) noexcept;
 		[[nodiscard("Must be used")]]
 		LRESULT ObservePaint(WPARAM wParam, LPARAM lParam) noexcept;
@@ -125,6 +130,8 @@ export namespace PonyEngine::Display
 
 		PositionSizeMode positionSizeMode;
 		bool quitOnDestroy;
+
+		std::vector<IWindowObserver*> observers;
 	};
 }
 
@@ -175,6 +182,8 @@ namespace PonyEngine::Display
 
 	Window::~Window() noexcept
 	{
+		assert(observers.empty() && "Some window observers weren't removed.");
+
 		if (IsWindow(windowHandle))
 		{
 			if (!DestroyWindow(windowHandle)) [[unlikely]]
@@ -201,6 +210,20 @@ namespace PonyEngine::Display
 			.lpszClassName = "PonyEngineWindow",
 			.hIconSm = nullptr
 		};
+	}
+
+	void Window::AddObserver(IWindowObserver& observer)
+	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		observers.push_back(&observer);
+	}
+
+	void Window::RemoveObserver(IWindowObserver& observer)
+	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		const auto position = std::ranges::find(observers, &observer);
+		assert(position != observers.cend() && "Window observer not found.");
+		observers.erase(position);
 	}
 
 	Window::PositionSizeMode Window::CalculatePositionSizeMode(const WindowMode& mode)
@@ -423,6 +446,8 @@ namespace PonyEngine::Display
 				return window->ObserveDestroy(wParam, lParam);
 			case WM_GETMINMAXINFO:
 				return window->ObserveGetMinMaxInfo(wParam, lParam);
+			case WM_SIZE:
+				return window->ObserveSize(wParam, lParam);
 			case WM_ERASEBKGND:
 				return window->ObserveEraseBackground(wParam, lParam);
 			case WM_PAINT:
@@ -445,6 +470,18 @@ namespace PonyEngine::Display
 		if (quitOnDestroy)
 		{
 			PostQuitMessage(0);
+		}
+
+		for (IWindowObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnDestroyed(*this);
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On calling '{}' on window destruction.", typeid(*observer).name());
+			}
 		}
 
 		return 0;
@@ -493,6 +530,28 @@ namespace PonyEngine::Display
 		catch (...)
 		{
 			PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On getting min max info.")
+		}
+
+		return 0;
+	}
+
+	LRESULT Window::ObserveSize(const WPARAM wParam, const LPARAM lParam) noexcept
+	{
+		const bool minimized = wParam == SIZE_MINIMIZED;
+		const WORD width = LOWORD(lParam);
+		const WORD height = HIWORD(lParam);
+		const auto size = Math::Vector2<std::uint32_t>(width, height);
+
+		for (IWindowObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnSizeChanged(*this, size, minimized);
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On calling '{}' on sizing.", typeid(*observer).name());
+			}
 		}
 
 		return 0;

@@ -63,6 +63,9 @@ export namespace PonyEngine::Display
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<IWindow> CreateWindow(const WindowParams& params) override;
 
+		virtual void AddObserver(IDisplayObserver& observer) override;
+		virtual void RemoveObserver(IDisplayObserver& observer) override;
+
 		DisplayService& operator =(const DisplayService&) = delete;
 		DisplayService& operator =(DisplayService&&) = delete;
 
@@ -79,6 +82,7 @@ export namespace PonyEngine::Display
 		void FillDisplayStateWithTargetName(const DISPLAYCONFIG_PATH_INFO& displayPath, DisplayState& displayState) const noexcept;
 		void FillDisplayStateWithColorInfo(const DISPLAYCONFIG_PATH_INFO& displayPath, DisplayState& displayState) const noexcept;
 		void FillDisplayStateWithSDRWhiteLevel(const DISPLAYCONFIG_PATH_INFO& displayPath, DisplayState& displayState) const noexcept;
+		void ObserveDisplays() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		static std::size_t IndexOfSource(std::span<const DISPLAYCONFIG_PATH_INFO> paths, const DisplayID& displayID) noexcept;
@@ -99,6 +103,8 @@ export namespace PonyEngine::Display
 		ATOM messageClass; /// Message class handle.
 		ATOM windowClass; ///< Window class handle.
 		HWND messageWindow; ///< Message window.
+
+		std::vector<IDisplayObserver*> observers;
 
 #ifndef NDEBUG
 		std::atomic_size_t windowCount;
@@ -172,6 +178,7 @@ namespace PonyEngine::Display
 #ifndef NDEBUG
 		assert(windowCount.load(std::memory_order::relaxed) == 0uz && "Some windows weren't destroyed.");
 #endif
+		assert(observers.empty() && "Some display observers weren't removed.");
 
 		if (!UnregisterClassA(reinterpret_cast<LPCSTR>(windowClass), moduleHandle)) [[unlikely]]
 		{
@@ -235,9 +242,9 @@ namespace PonyEngine::Display
 
 	struct WindowSupport DisplayService::WindowSupport() const noexcept
 	{
-		constexpr auto commonFeatures = CommonWindowFeature::SwitchableMode | CommonWindowFeature::Title | CommonWindowFeature::Icon | CommonWindowFeature::Hidable;
+		constexpr auto commonFeatures = CommonWindowFeature::ModeSwitchable | CommonWindowFeature::Title | CommonWindowFeature::Icon | CommonWindowFeature::Hidable;
 		constexpr auto fullscreenFeatures = FullscreenWindowFeature::MultiWindowPerDisplay | FullscreenWindowFeature::MultiDisplayWindow | FullscreenWindowFeature::Changeable;
-		constexpr auto windowedFeatures = WindowedWindowFeature::ResizableFromCode | WindowedWindowFeature::ResizeLimits;
+		constexpr auto windowedFeatures = WindowedWindowFeature::Resizable | WindowedWindowFeature::ResizeLimits;
 
 		return Display::WindowSupport
 		{
@@ -257,6 +264,8 @@ namespace PonyEngine::Display
 
 	std::shared_ptr<IWindow> DisplayService::CreateWindow(const WindowParams& params)
 	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+
 #ifndef NDEBUG
 		const auto window = new Window(*application, displayContainer, windowClass, moduleHandle, params);
 		windowCount.fetch_add(1uz, std::memory_order::relaxed);
@@ -270,6 +279,20 @@ namespace PonyEngine::Display
 #endif
 	}
 
+	void DisplayService::AddObserver(IDisplayObserver& observer)
+	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		observers.push_back(&observer);
+	}
+
+	void DisplayService::RemoveObserver(IDisplayObserver& observer)
+	{
+		assert(std::this_thread::get_id() == application->MainThreadID() && "Must be called on main thread.");
+		const auto position = std::ranges::find(observers, &observer);
+		assert(position != observers.cend() && "Observer not found.");
+		observers.erase(position);
+	}
+
 	void DisplayService::UpdateDisplays() noexcept
 	{
 		try
@@ -278,6 +301,7 @@ namespace PonyEngine::Display
 			const auto [displayPaths, displayModes] = GetDisplayPaths(*buffer);
 			UpdateDisplayConnections(displayPaths);
 			UpdateDisplayInfos(displayPaths, displayModes);
+			ObserveDisplays();
 		}
 		catch (...)
 		{
@@ -489,6 +513,21 @@ namespace PonyEngine::Display
 		}
 
 		displayState.sdrWhiteLevel = static_cast<float>(whiteInfo.SDRWhiteLevel) / 1000.f * 80.f;
+	}
+
+	void DisplayService::ObserveDisplays() const noexcept
+	{
+		for (IDisplayObserver* const observer : observers)
+		{
+			try
+			{
+				observer->OnDisplayChanged();
+			}
+			catch (...)
+			{
+				PONY_LOG(logService, Log::LogType::Error, std::current_exception(), "On calling '{}' on display change.", typeid(*observer).name());
+			}
+		}
 	}
 
 	std::size_t DisplayService::IndexOfSource(const std::span<const DISPLAYCONFIG_PATH_INFO> paths, const DisplayID& displayID) noexcept

@@ -7,6 +7,7 @@ target_sources(PonyEngine.Display PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Display-ColorMode.cppm"
 	"Source/Display-DisplayHandle.cppm"
 	"Source/Display-DisplayInfo.cppm"
+	"Source/Display-IDisplayObserver.cppm"
 	"Source/Display-IDisplayService.cppm"
 	"Source/Display-IWindow.cppm"
 	"Source/Display-WindowMode.cppm"
